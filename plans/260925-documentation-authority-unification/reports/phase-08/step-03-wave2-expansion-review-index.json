@@ -1,0 +1,1011 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "selectedFiles": 36,
+  "selectedEdges": 252,
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave2-x-p01.md",
+      "files": [
+        {
+          "file": "docs/explanation/skill-prose-cleanup-design.md",
+          "set": "batch-036",
+          "strata": [
+            "Part-A-outcome-change"
+          ],
+          "edges": 8,
+          "recordSha256": "efe7f6a2b13ddd187cd20afe93e6b479a4837ebccfdc9db7675c2d76e14b7c47",
+          "sourceDigest": "dab6d6d6ce981510a7a006b163931436c14bf86fa91af81b493d484f38f9b07a",
+          "diffSha256": "6e167956d51a596511b793370cc069917f4a2c52d2323df4bba749cab028d18a",
+          "recordBytes": 22384,
+          "sourceBytes": 5502,
+          "contextPlusRecordBytes": 27886
+        },
+        {
+          "file": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 3,
+          "recordSha256": "163b0a703cf97494ef86743bf9ed9f41fcd99343a7fd2a3719f3d3e84b6a91d7",
+          "sourceDigest": "cd5a163ad56d54b8dbeb6adef4c66a46a3a117d94030ecd22059cfa76faacef5",
+          "diffSha256": "cf8dfbd8437522e4855a3f065b2acb079bd156690683da54c44738fca96f72fb",
+          "recordBytes": 14004,
+          "sourceBytes": 6341,
+          "contextPlusRecordBytes": 20345
+        },
+        {
+          "file": "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 1,
+          "recordSha256": "27e5341402b694db875eb3a63755887fa37fe24fd7f16381b396187993dfefd9",
+          "sourceDigest": "ba5dcc4675151a8d0b7aaf6cba7616fe91b5248a24c0e84c7f0d99a89eee090e",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1786,
+          "sourceBytes": 4071,
+          "contextPlusRecordBytes": 5857
+        },
+        {
+          "file": "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 5,
+          "recordSha256": "293958847ac477ce969e30264180db88d0b7d6788115b6d33299d712040b0661",
+          "sourceDigest": "460e526a3d5602d2a541b836a770a0a9609134cd5c1325c422f5d640ca05461b",
+          "diffSha256": "5b4f61fd45535321555f3c9ca5fbbd20370c16126520e177e3e976f2c047334a",
+          "recordBytes": 20042,
+          "sourceBytes": 3654,
+          "contextPlusRecordBytes": 23696
+        },
+        {
+          "file": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 1,
+          "recordSha256": "b4211f947375eeaa0c154060c51fda2ff44c5adc07262bde04de575cc285438a",
+          "sourceDigest": "e3a689245637d27598a70e5d8c16e9b52da82bc20de08553f9a84d714b541944",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1820,
+          "sourceBytes": 3326,
+          "contextPlusRecordBytes": 5146
+        },
+        {
+          "file": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 6,
+          "recordSha256": "104a11c7e1da50985389ed409e2f6fea67cbd333109a9ddfb92fc18ff41121b1",
+          "sourceDigest": "ab941bc9e9b8b531ebb4a7691b35a40d0a10d1a78f891b1c2f625cbbb9f3ed20",
+          "diffSha256": "4ded224bb940e1dc37cdbdcba7bc6d98d59896c459d82a245680df224ec8e5bf",
+          "recordBytes": 39340,
+          "sourceBytes": 7895,
+          "contextPlusRecordBytes": 47235
+        }
+      ],
+      "fileCount": 6,
+      "edges": 24,
+      "sourcePlusRecordBytes": 130165,
+      "readingPages": [
+        {
+          "file": "docs/explanation/skill-prose-cleanup-design.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 8
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 5
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave2-x-p02.md",
+      "files": [
+        {
+          "file": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 3,
+          "recordSha256": "6cb9f4544a06d6f89a9d0774963553204f3465baa493953daf0916e49ea603c4",
+          "sourceDigest": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3618,
+          "sourceBytes": 9211,
+          "contextPlusRecordBytes": 12829
+        },
+        {
+          "file": "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 2,
+          "recordSha256": "e3076ea52193a722fe0a9af39b55ae35923579deb36e5e046ac34434afd5f026",
+          "sourceDigest": "4f1b08ebaa9230ac933d8fabfedf4621eb7d1259a9f8aa9d1a0716dc4f294ce9",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2660,
+          "sourceBytes": 5393,
+          "contextPlusRecordBytes": 8053
+        },
+        {
+          "file": "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 2,
+          "recordSha256": "4577e17fa1527fc0ecaf66cda53adf582677f1f1906488b6db4407525bfa7f2d",
+          "sourceDigest": "642ca7d4d67b99d1fa678f59b050f8b9cbb73f2a04431e1f58d3639da0311515",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2551,
+          "sourceBytes": 6262,
+          "contextPlusRecordBytes": 8813
+        },
+        {
+          "file": "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 3,
+          "recordSha256": "478ccf696369388f70376779d0c0754dd7105991924f7b0d0f71aeea04915776",
+          "sourceDigest": "b78e93f829bb71e075dcb12302b4740e7ee6fc545c30d1213d3ef21cfc6b910c",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3465,
+          "sourceBytes": 4854,
+          "contextPlusRecordBytes": 8319
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 1,
+          "recordSha256": "27265d67cc4be2abab2971b4bf88250c5acd41e93efb4ad9c3c95fbe4301229a",
+          "sourceDigest": "d5e03cd0c0a9920b4d25234bee2b96c595fa0dde872ef09613dae15e9416e24d",
+          "diffSha256": "2e3df9d92c8fda06bbed2fc8790db0373faff240aa0c385d47bfaf1f9a83d008",
+          "recordBytes": 12274,
+          "sourceBytes": 4062,
+          "contextPlusRecordBytes": 16336
+        },
+        {
+          "file": "docs/knowledge/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 0,
+          "recordSha256": "81cd9bb87a1fca8a223de2e737fc38540081ca0466abbcbb78f8e96322876614",
+          "sourceDigest": "44bb30bf4001f3b2c29cefef297608514ed1cf5308abba8d9c75645674e8df16",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1033,
+          "sourceBytes": 4279,
+          "contextPlusRecordBytes": 5312
+        }
+      ],
+      "fileCount": 6,
+      "edges": 11,
+      "sourcePlusRecordBytes": 59662,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md",
+          "edgeRanges": [],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 3,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave2-x-p03.md",
+      "files": [
+        {
+          "file": "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 3,
+          "recordSha256": "26dc6c243d74de897f316d6d17a8fd4d72593cb0fe13e3c92a0fcfc0866197df",
+          "sourceDigest": "c16bf530bba9255808133858f022e2e08b45c024a0590251967613af70627277",
+          "diffSha256": "6abda6321a9e22e8b9d9babbbd63d27bd4847cd155e3102206621c166c0baa4d",
+          "recordBytes": 21930,
+          "sourceBytes": 9021,
+          "contextPlusRecordBytes": 30951
+        },
+        {
+          "file": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 1,
+          "recordSha256": "ea01bd3ab423766211c28d56601fd7e050c5c3857f5d42f1b8f22478810710d2",
+          "sourceDigest": "ed4e14f7288f623c2580b62fd0956658bc8a37b57f33c03dfe2a05f49ae2fc7b",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 6753,
+          "sourceBytes": 1960,
+          "contextPlusRecordBytes": 8713
+        },
+        {
+          "file": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 7,
+          "recordSha256": "7af67d08554f8f70a4b712eaf3d4261de519469d0c062b3130ed4260be053906",
+          "sourceDigest": "8c1dd8db19f4bbe54ba90ab9ec4f16e69906b43c9894be87d5b35ec0babb1a84",
+          "diffSha256": "d6c9aecf799864f8c8911113ca05e5b199257bd08a071f1c404b9f23cc478ea1",
+          "recordBytes": 14559,
+          "sourceBytes": 6139,
+          "contextPlusRecordBytes": 20698
+        },
+        {
+          "file": "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 2,
+          "recordSha256": "4e3bacd91d6369024d783b8f3ba604ec89db75d8e5d98eecdcfe30615a9f7283",
+          "sourceDigest": "671088c4185eb341a48b219b6f06563cebe79be71a9876dcbd7ba98c80995087",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 4084,
+          "sourceBytes": 3385,
+          "contextPlusRecordBytes": 7469
+        },
+        {
+          "file": "docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 1,
+          "recordSha256": "80de6f2f47455c9d38a1317cffbbe94b60afc7c629c5e631856637e51e881f64",
+          "sourceDigest": "2e12aa1132327294aa2b7b064afa8c4693923fe8ebd435f713e0bc83b0945735",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 5295,
+          "sourceBytes": 5089,
+          "contextPlusRecordBytes": 10384
+        },
+        {
+          "file": "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md",
+          "set": "batch-037",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 0,
+          "recordSha256": "746aba9b8f7a1767d33946031b1ffa2e30ad7778c1a4eb152c86a8e2c03ca7e1",
+          "sourceDigest": "76244abf2826654ecef1b623ef12b7f730d84fc0a618d43ce7e667b031af657f",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1054,
+          "sourceBytes": 3343,
+          "contextPlusRecordBytes": 4397
+        }
+      ],
+      "fileCount": 6,
+      "edges": 14,
+      "sourcePlusRecordBytes": 82612,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 7
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md",
+          "edgeRanges": [],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 4,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave2-x-p04.md",
+      "files": [
+        {
+          "file": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 21,
+          "recordSha256": "1c459e995466ae6de6e55e362d3f64f3d9a1dd9414a224e6fcb6a8a12bb6e98c",
+          "sourceDigest": "90f07b2fe30267ed4b0d86dfa7d1d38e69b62dcfe81195f05dcf4e1c17e66279",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 23970,
+          "sourceBytes": 8893,
+          "contextPlusRecordBytes": 32863
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 9,
+          "recordSha256": "925749c5150a0ceb5ef06cc91766a010d817fa8bcb621bc63ee3179a32937f4a",
+          "sourceDigest": "5a4f9f9209d843b392693f6613243d8172cef807a8c86b719a8dbf9e4eaa4075",
+          "diffSha256": "3ac3f1833c4fec281b664acd666da214dc63d344aa07a14d248f2eb7e65d7065",
+          "recordBytes": 15348,
+          "sourceBytes": 6536,
+          "contextPlusRecordBytes": 21884
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 9,
+          "recordSha256": "e0d203c1b773d5b0e7b017b1a32a38a0920f98796d983d9617b719d9de12fb6d",
+          "sourceDigest": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b",
+          "diffSha256": "bd5a183ececd9dc3205a768297fbfd0dfd23a4d63f976fdbd8d4e7c5f76c27fe",
+          "recordBytes": 31112,
+          "sourceBytes": 41907,
+          "contextPlusRecordBytes": 73019
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 5,
+          "recordSha256": "69b7c6733b26f9ac766a6054d0237de943d61008a616aa994c4fb55c4972cb18",
+          "sourceDigest": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+          "diffSha256": "38537f3eae16f21a6792dcd0d6cfdbfa386df36c882922c7d0a3cab6073819b7",
+          "recordBytes": 19440,
+          "sourceBytes": 22380,
+          "contextPlusRecordBytes": 41820
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 10,
+          "recordSha256": "3f32d2d9c88a64a3b3747e3529ec95296825f1e59eadc3232f5eac104740ff3e",
+          "sourceDigest": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+          "diffSha256": "a0828fd95b9a3ecd4fb8e595081be2bde34e4ceb679734fee25a911ec7a78d37",
+          "recordBytes": 24599,
+          "sourceBytes": 87296,
+          "contextPlusRecordBytes": 111895
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 11,
+          "recordSha256": "f0c8d4582138078fb802ebbec33ffeecf5a75a1a367b8525b217371c7e162388",
+          "sourceDigest": "7d08a6824a122fe1eb19ae97f7e4d37395f900c4ac380bf42340e6952c1fb387",
+          "diffSha256": "84a69c84888f0272724f5ee39c10ca03f2a61f513629e7878cc0e65d48a2bb6f",
+          "recordBytes": 22248,
+          "sourceBytes": 17757,
+          "contextPlusRecordBytes": 40005
+        }
+      ],
+      "fileCount": 6,
+      "edges": 65,
+      "sourcePlusRecordBytes": 321486,
+      "readingPages": [
+        {
+          "file": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 21
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 9
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 9
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 5
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 10
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 11
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 5,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave2-x-p05.md",
+      "files": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 25,
+          "recordSha256": "f7af5cc39614019df5578095cd38f9b7beda19b6740d18ba5e7cb7eb59a178ba",
+          "sourceDigest": "4bcc7cbff043ba85e5b41f4e14f9954966c861a0f8f39259fb0050f4431cbc5d",
+          "diffSha256": "fc731992e3e2f095c074272ba9f96b31f062f0555e762323a056595ea9aca6b5",
+          "recordBytes": 39380,
+          "sourceBytes": 22346,
+          "contextPlusRecordBytes": 61726
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 19,
+          "recordSha256": "3078e2e841d84b25eb884a584a96a664503eac2d38b1a27b4c471fdf3111b0fc",
+          "sourceDigest": "8d1e5a682927463a5ef6fac777040a08d2389b78c697985327a0c8f7bbc30cd6",
+          "diffSha256": "d11cb66dcbfd740b977a939555262f5b67b3ebd7737d72b8e0bcf50607e7e9ec",
+          "recordBytes": 75100,
+          "sourceBytes": 127583,
+          "contextPlusRecordBytes": 202683
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 12,
+          "recordSha256": "281d7a655e8a428c6ec7ed2a1760c9a489be6686f3c40b9c25961437df7a3815",
+          "sourceDigest": "b6e18afd8dcc39f52877ea77a836cc45a5f5f7ccce937dc5c8863a913ab0f5bd",
+          "diffSha256": "b7cbc7e8d1829a565223b352adea5374ed7cace4c2912b31f860a693050501ae",
+          "recordBytes": 19985,
+          "sourceBytes": 29605,
+          "contextPlusRecordBytes": 49590
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 23,
+          "recordSha256": "33be267bddef0b6ad53e8ff9aa8a298642b0076fcd89d07dd4457adea6ffc698",
+          "sourceDigest": "de04beab895a45657097eae7dd8d2bcc8dd8ad888f5f661a44cf63a56ba97446",
+          "diffSha256": "c38d17a7370804474f3a251405210600041d1f9085af4e9a922a6feef4c0f986",
+          "recordBytes": 20293,
+          "sourceBytes": 24207,
+          "contextPlusRecordBytes": 44500
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/README.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 2,
+          "recordSha256": "4b6351086d7c72f27d2bbddebddadca9d6f55e42d3e7374be5e1b3ca2dadd0a5",
+          "sourceDigest": "bb30bd431390f4791b4f722434adecccb85b302f964f7b3c0e54fc8feb9cd953",
+          "diffSha256": "82f0e765cc5ab5776832a32bb28463813349e5aef14c1db9331514538a29575f",
+          "recordBytes": 11388,
+          "sourceBytes": 5563,
+          "contextPlusRecordBytes": 16951
+        }
+      ],
+      "fileCount": 5,
+      "edges": 81,
+      "sourcePlusRecordBytes": 375450,
+      "readingPages": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 25
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 19
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 12
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 23
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/README.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 6,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave2-x-p06.md",
+      "files": [
+        {
+          "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 2,
+          "recordSha256": "7d611b9cb192911c360a573c74fa8ab19023fb6dfec969f3a0d5df7851e25a30",
+          "sourceDigest": "f5dd4ea468dbf1cfcee48ecc0aa9de20fa3925a8b134ec1d2a37f1a50d819827",
+          "diffSha256": "435a1ecd34e7bc43b139e39282c22091b2e6ad040aa50e361f5223e9e90e4638",
+          "recordBytes": 19382,
+          "sourceBytes": 45289,
+          "contextPlusRecordBytes": 64671
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 2,
+          "recordSha256": "d5ed7631478fda30a9322333c48d85d7052154e56375dd905ef6301176659cc4",
+          "sourceDigest": "f2586e6b0be3aaa0b2c6530bb4961a8d4b80d33e55b40b02acb34e65eb5d7a27",
+          "diffSha256": "6c3a2c080e17fa4993238c9ec69bb3dcee42c96b58fdfd3e3bd9ff675b1eaa00",
+          "recordBytes": 9566,
+          "sourceBytes": 21840,
+          "contextPlusRecordBytes": 31406
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 2,
+          "recordSha256": "b7c16e56c0476c2062833a88bd789d08fcc1d6160b9f36b2b52d475cc581d07f",
+          "sourceDigest": "aeb5be5b11a8b6144756c1578d122095e599b7781f46f89889bdcc1a7d52ab45",
+          "diffSha256": "f490684095f91a0563612242920407fd4bae102636a71cc89acc90c68edacf21",
+          "recordBytes": 13258,
+          "sourceBytes": 82161,
+          "contextPlusRecordBytes": 95419
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 6,
+          "recordSha256": "5f82a9d99e2d0b02c2e77a5362c9638410c60fb261657d7b6c210e06c1b3216d",
+          "sourceDigest": "e8f78ba9a72e660df02eaf498231ecedd51826ada7a9b8f02b5ea234ceb2da66",
+          "diffSha256": "91c6fe1f5655a10ce0f39f1fe10c0781f3c4185c41044a96ffc9d8c7c29dca02",
+          "recordBytes": 17639,
+          "sourceBytes": 16287,
+          "contextPlusRecordBytes": 33926
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 3,
+          "recordSha256": "304784e2ba4e89d14a6b4af5884d25b73837ae827f644f468ef687b79d6a7bca",
+          "sourceDigest": "87d1eb6b945b6344aa6841484bf3c3b58c69f74e3566f1e5184ce9b0e70a8be6",
+          "diffSha256": "2b9066ce521efcf1d7ef8bc4e08a33ea5d8c1d14d6307576ad00aefcab4f24e8",
+          "recordBytes": 26447,
+          "sourceBytes": 3669,
+          "contextPlusRecordBytes": 30116
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+          "set": "batch-038",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 3,
+          "recordSha256": "7e810977cd53e15182a563d89173d0906927addac8cf112fffbcea9370530017",
+          "sourceDigest": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6",
+          "diffSha256": "17f1cc1937c0b225eb09b19ae8530557ff2e4c0dd8afd761b63f5a845ec58506",
+          "recordBytes": 13397,
+          "sourceBytes": 27675,
+          "contextPlusRecordBytes": 41072
+        }
+      ],
+      "fileCount": 6,
+      "edges": 18,
+      "sourcePlusRecordBytes": 296610,
+      "readingPages": [
+        {
+          "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 7,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave2-x-p07.md",
+      "files": [
+        {
+          "file": "docs/specs/work-state.md",
+          "set": "batch-041",
+          "strata": [
+            "Part-A-outcome-change"
+          ],
+          "edges": 39,
+          "recordSha256": "de29f1ecf91338c4d6f335ae66477feaee6b136973b3a21fc2086d179f29d894",
+          "sourceDigest": "499ec68376dd202ea6c55b1c7db136cc1523605dc7c83bb9d964dded970eb3a8",
+          "diffSha256": "83a172d2ee5d5fdc62f8b8465a9fb0d0d06917ce6e5a9212fbc36f9a1ec3fde0",
+          "recordBytes": 67958,
+          "sourceBytes": 327843,
+          "contextPlusRecordBytes": 395801
+        }
+      ],
+      "fileCount": 1,
+      "edges": 39,
+      "sourcePlusRecordBytes": 395801,
+      "readingPages": [
+        {
+          "file": "docs/specs/work-state.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 39
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "coverageBySet": [
+    {
+      "set": "batch-036",
+      "files": 1,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending"
+    },
+    {
+      "set": "batch-037",
+      "files": 17,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending"
+    },
+    {
+      "set": "batch-038",
+      "files": 17,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending"
+    },
+    {
+      "set": "batch-041",
+      "files": 1,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending"
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0,
+  "binding": "step-03-wave2-r2-binding-manifest.json",
+  "historicalSample": "step-03-wave2-manifest.json"
+}

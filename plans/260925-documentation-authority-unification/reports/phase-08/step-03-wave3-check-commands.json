@@ -1,0 +1,97 @@
+[
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check.py"
+    ],
+    "output": "step-03-wave3-check-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 120.722
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py"
+    ],
+    "output": "step-03-wave3-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 9.085
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "--author-commit",
+      "ae141550c2e022310de7a0efea757580c0b2479f"
+    ],
+    "output": "step-03-wave3-inherited-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 57.227
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-probes.py"
+    ],
+    "output": "step-03-wave3-wave1-r2-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 1.922
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-probes.py"
+    ],
+    "output": "step-03-wave3-wave1-r3-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 16.302
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes.py"
+    ],
+    "output": "step-03-wave3-wave2-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 5.503
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "--test",
+      "test/scripts/doc-link-pass.test.mjs",
+      "test/scripts/check-doc-candidate-status.test.mjs",
+      "test/scripts/check-doc-constitution.test.mjs"
+    ],
+    "output": "step-03-wave3-light-tests.log",
+    "exitCode": 0,
+    "elapsedSeconds": 0.94
+  }
+]

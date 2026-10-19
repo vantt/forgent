@@ -1,0 +1,51 @@
+{
+  "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 156,
+  "edges": 1769,
+  "failureCount": 0,
+  "failures": [],
+  "verifiedAsSubsetOf": "step-03-wave3-check-result.json",
+  "renamedAliasPreserveHitsAfterFix": [],
+  "ruleHitsBeforeFix": [
+    {
+      "file": "docs/explanation/skill-prose-cleanup-design.md",
+      "edgeId": "maps-j-03951",
+      "legacy": "docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+      "liveAliasHolders": [
+        "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md"
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "edgeId": "maps-j-04520",
+      "legacy": "docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+      "liveAliasHolders": [
+        "docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md"
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+      "edgeId": "maps-j-04835",
+      "legacy": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+      "liveAliasHolders": [
+        "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md"
+      ]
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08367",
+      "legacy": "docs/reference/triage-table-columns.md:18",
+      "liveAliasHolders": [
+        "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md"
+      ]
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08368",
+      "legacy": "docs/reference/triage-table-columns.md",
+      "liveAliasHolders": [
+        "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md"
+      ]
+    }
+  ]
+}

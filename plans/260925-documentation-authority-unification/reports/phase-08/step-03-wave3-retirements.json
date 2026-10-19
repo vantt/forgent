@@ -1,0 +1,584 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/evidence-and-results.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/protocol-model.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/run-handle.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/runtime-model.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/system-context.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/visibility-and-herdr.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/work-integration.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/contracts/assignment-run-runresult.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/contracts/coordination-session.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/contracts/flow-definition.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/contracts/workflow-stage-operation.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/ADR-004-reserve-job.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/documentation-governance.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/intent-preservation-ledger.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/proposals/dag-request-scheduler.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/vision.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/architecture-intent.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/component-boundary/repo-layout-vision.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/dispatch-control-plane-redesign.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/documentation-system-design.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/documentation-system-discussion.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/doing-coordination-redesign.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/knowledge-registry-redesign.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/packaging-distribution/future-constraints.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/proposals/architecture-advisory-panel.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/proposals/coordination-capability-envelope.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/proposals/coordination-dispatch-contract.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/proposals/coordination-envelope-probe-contract.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/proposals/coordination-envelope-progress.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/proposals/coordination-worker-provider-boundary.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/proposals/group-thinking-plan-loop.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/proposals/step-09-group-thinking-substrate.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/workspace-topology-audit.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    },
+    {
+      "file": "docs/architect/workspace-topology.md",
+      "eligible": true,
+      "evidencePayload": false,
+      "carryException": false,
+      "reason": "Maintained architecture/design/contract/proposal doc, not a relocated verification payload."
+    }
+  ],
+  "relocatedEvidenceWaived": 0,
+  "retirementExceptionsFound": [],
+  "briefCount": 83,
+  "authoringRequestCount": 82,
+  "countReconciliation": "Batches 042–057 list 82 distinct consumers (25+13+11+1+2+1+1+1+1+6+1+5+11+1+1+1), not the parenthetical 83 in the brief/L12-37. Every listed path is authored; no 83rd path is invented and no listed file omitted."
+}

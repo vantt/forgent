@@ -1,0 +1,1090 @@
+{
+  "status": "AUTHOR complete; independent review pending",
+  "verifiedAt": "2026-10-19T21:46:37.477136+00:00",
+  "inputHEAD": "49e57d50340c51fa0bbd3794b585f547c03f3c3b",
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "partA": {
+    "scannedRecords": 156,
+    "scannedCoverageEdges": 1769,
+    "outcomeChanges": 7,
+    "recordTextChanges": 29,
+    "outcomeChangedFiles": [
+      "docs/explanation/skill-prose-cleanup-design.md",
+      "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+      "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "docs/specs/work-state.md"
+    ]
+  },
+  "partARuleHits": 5,
+  "partB": {
+    "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "files": 271,
+    "inventoryEdges": 1769,
+    "retiringFiles": 82,
+    "retiringEdges": 884,
+    "activeFiles": 189,
+    "activeEdges": 887,
+    "addedEdges": 2,
+    "patchedFiles": 25,
+    "dispositions": {
+      "preserve": 741,
+      "parked": 106,
+      "patch": 40
+    },
+    "parks": {
+      "step5-parity": 95,
+      "description-rewrite": 5,
+      "phase9-carry": 6
+    },
+    "leadRulingGaps": [],
+    "acceptance": "AUTHOR only, independent per-set/per-stratum review pending."
+  },
+  "checker": {
+    "files": 427,
+    "edges": 3540,
+    "failureCount": 0,
+    "retiredFiles": 125,
+    "retiredEdges": 1487,
+    "activeFiles": 302,
+    "activeEdges": 2053,
+    "renamedAliasPreserveHits": []
+  },
+  "locatorReviewFlags": {
+    "total": 5,
+    "newWave3": [
+      {
+        "file": "docs/how-to/configure-and-operate-agent-confinement.md",
+        "edgeId": "maps-j-03990",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "§9.2."
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "Complete source claim is bound to the pinned target passage; the repository anchor API supplies the closest enclosing heading.",
+        "correspondence": null
+      }
+    ],
+    "interpretation": "Four inherited advisories plus one sentence-final punctuation advisory: §9.2. corresponds exactly to the source-bound 9.2 hostRead: blind target heading at line 454. No target/anchor mismatch or new ruling gap; independent semantic review remains A51-scoped."
+  },
+  "probes": {
+    "total": 162,
+    "perSuite": [
+      {
+        "path": "step-03-wave3-probes-result.json",
+        "negativeProbes": 11,
+        "allRejected": true
+      },
+      {
+        "path": "step-03-wave3-inherited-probes-result.json",
+        "negativeProbes": 87,
+        "allRejected": true
+      },
+      {
+        "path": "step-03-wave3-wave1-r2-probes-result.json",
+        "negativeProbes": 23,
+        "allRejected": true
+      },
+      {
+        "path": "step-03-wave3-wave1-r3-probes-result.json",
+        "negativeProbes": 25,
+        "allRejected": true
+      },
+      {
+        "path": "step-03-wave3-wave2-probes-result.json",
+        "negativeProbes": 16,
+        "allRejected": true
+      }
+    ],
+    "inherited87NamesAndExpectedChecksUnchanged": true,
+    "historicalFixtureMigrations": [
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08275",
+        "target": "docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
+        "rule": "L12-37; real in-memory alias patch, not a check waiver"
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08299",
+        "target": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+        "rule": "L12-37; real in-memory alias patch, not a check waiver"
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08300",
+        "target": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+        "rule": "L12-37; real in-memory alias patch, not a check waiver"
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08308",
+        "target": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+        "rule": "L12-37; real in-memory alias patch, not a check waiver"
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08309",
+        "target": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+        "rule": "L12-37; real in-memory alias patch, not a check waiver"
+      }
+    ]
+  },
+  "lightTests": {
+    "tests": 95,
+    "pass": 95,
+    "fail": 0,
+    "skipped": 0
+  },
+  "expansion": {
+    "files": 36,
+    "edges": 252,
+    "parts": 7
+  },
+  "wave3Review": {
+    "files": 38,
+    "edges": 597,
+    "parts": 11,
+    "patchedSeeded": 7,
+    "mandatory": 9,
+    "patchedMandatoryDistinct": 16,
+    "unpatchedSelected": 22,
+    "perSet": [
+      {
+        "set": "batch-042",
+        "allFiles": 25,
+        "retiringFiles": 25,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-043",
+        "allFiles": 13,
+        "retiringFiles": 13,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-044",
+        "allFiles": 11,
+        "retiringFiles": 11,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-045",
+        "allFiles": 1,
+        "retiringFiles": 1,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-046",
+        "allFiles": 2,
+        "retiringFiles": 2,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-047",
+        "allFiles": 1,
+        "retiringFiles": 1,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-048",
+        "allFiles": 1,
+        "retiringFiles": 1,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-049",
+        "allFiles": 1,
+        "retiringFiles": 1,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-050",
+        "allFiles": 1,
+        "retiringFiles": 1,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-051",
+        "allFiles": 6,
+        "retiringFiles": 6,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-052",
+        "allFiles": 1,
+        "retiringFiles": 1,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-053",
+        "allFiles": 5,
+        "retiringFiles": 5,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-054",
+        "allFiles": 11,
+        "retiringFiles": 11,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-055",
+        "allFiles": 1,
+        "retiringFiles": 1,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-056",
+        "allFiles": 1,
+        "retiringFiles": 1,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-057",
+        "allFiles": 1,
+        "retiringFiles": 1,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-058",
+        "allFiles": 1,
+        "retiringFiles": 0,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 1,
+        "unpatchedSample": 1,
+        "distinctSelected": 1,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-059",
+        "allFiles": 1,
+        "retiringFiles": 0,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 1,
+        "patchedAndMandatoryDistinct": 1,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 1,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-060",
+        "allFiles": 10,
+        "retiringFiles": 0,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 1,
+        "patchedAndMandatoryDistinct": 1,
+        "unpatchedEligiblePopulation": 5,
+        "unpatchedSample": 1,
+        "distinctSelected": 2,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-061",
+        "allFiles": 25,
+        "retiringFiles": 0,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 6,
+        "patchedAndMandatoryDistinct": 6,
+        "unpatchedEligiblePopulation": 9,
+        "unpatchedSample": 2,
+        "distinctSelected": 8,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 6,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 2,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-062",
+        "allFiles": 2,
+        "retiringFiles": 0,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 1,
+        "patchedAndMandatoryDistinct": 1,
+        "unpatchedEligiblePopulation": 1,
+        "unpatchedSample": 1,
+        "distinctSelected": 2,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-063",
+        "allFiles": 25,
+        "retiringFiles": 0,
+        "patchedPopulation": 2,
+        "patchedSeedSample": 1,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 1,
+        "unpatchedEligiblePopulation": 17,
+        "unpatchedSample": 3,
+        "distinctSelected": 4,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 3,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-064",
+        "allFiles": 25,
+        "retiringFiles": 0,
+        "patchedPopulation": 3,
+        "patchedSeedSample": 1,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 1,
+        "unpatchedEligiblePopulation": 15,
+        "unpatchedSample": 3,
+        "distinctSelected": 4,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 3,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-065",
+        "allFiles": 25,
+        "retiringFiles": 0,
+        "patchedPopulation": 3,
+        "patchedSeedSample": 1,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 1,
+        "unpatchedEligiblePopulation": 15,
+        "unpatchedSample": 3,
+        "distinctSelected": 4,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 3,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-066",
+        "allFiles": 25,
+        "retiringFiles": 0,
+        "patchedPopulation": 4,
+        "patchedSeedSample": 1,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 1,
+        "unpatchedEligiblePopulation": 14,
+        "unpatchedSample": 3,
+        "distinctSelected": 4,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 3,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-067",
+        "allFiles": 22,
+        "retiringFiles": 0,
+        "patchedPopulation": 1,
+        "patchedSeedSample": 1,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 1,
+        "unpatchedEligiblePopulation": 13,
+        "unpatchedSample": 2,
+        "distinctSelected": 3,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 2,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-068",
+        "allFiles": 23,
+        "retiringFiles": 0,
+        "patchedPopulation": 12,
+        "patchedSeedSample": 2,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 2,
+        "unpatchedEligiblePopulation": 9,
+        "unpatchedSample": 2,
+        "distinctSelected": 4,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 2,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 2,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-069",
+        "allFiles": 5,
+        "retiringFiles": 0,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 2,
+        "unpatchedSample": 1,
+        "distinctSelected": 1,
+        "reviewedFileDenominator": 0,
+        "reworkNumerator": "pending",
+        "patchedStratum": {
+          "selectedDenominator": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      }
+    ],
+    "indivisibleStreamingExceptions": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p02.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p03.md"
+    ]
+  },
+  "protectedManifests": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "00f31980aea696d5ae8572db0381cfaca2b8d9029b66b92f148a72dba6504fef",
+      "byteIdenticalToInputHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "afd59dccebeeecf384d0e14b6fe53db36dc8bd78269ab852be2059dd3ba0ad3d",
+      "byteIdenticalToInputHEAD": true
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check.py"
+      ],
+      "output": "step-03-wave3-check-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 120.722
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py"
+      ],
+      "output": "step-03-wave3-probes-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 9.085
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+        "--author-commit",
+        "ae141550c2e022310de7a0efea757580c0b2479f"
+      ],
+      "output": "step-03-wave3-inherited-probes-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 57.227
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-probes.py"
+      ],
+      "output": "step-03-wave3-wave1-r2-probes-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 1.922
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-probes.py"
+      ],
+      "output": "step-03-wave3-wave1-r3-probes-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 16.302
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes.py"
+      ],
+      "output": "step-03-wave3-wave2-probes-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 5.503
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "test/scripts/doc-link-pass.test.mjs",
+        "test/scripts/check-doc-candidate-status.test.mjs",
+        "test/scripts/check-doc-constitution.test.mjs"
+      ],
+      "output": "step-03-wave3-light-tests.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.94
+    }
+  ],
+  "scope": {
+    "changedPaths": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-036.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-037.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-038.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-042.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-043.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-044.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-045.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-046.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-047.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-048.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-049.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-050.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-051.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-052.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-053.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-054.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-055.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-056.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-057.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-059.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-060.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-061.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-062.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-063.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-064.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-065.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-066.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-067.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-069.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-expansion-review-index.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-expansion-review-request.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-r2-author.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-r2-binding-manifest.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-r2-changes.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-r2-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-author.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check-attempts.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check-commands.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-inherited-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-initial-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-light-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-manifest.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-packet.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-population.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-retirements.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-review-index.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-review-request.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-second-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-target-parity.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-verification.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-verify.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-wave1-r2-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-wave1-r3-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-wave2-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-whole-file-reads.json"
+    ],
+    "outsidePlan": [],
+    "consumerEdits": 0,
+    "gitWrites": 0,
+    "fgosCLICalls": 0,
+    "scratch": "/tmp/fgos-work/",
+    "serialHeavyJobs": true
+  },
+  "leadRulingGaps": [],
+  "needsWrites": [],
+  "limits": [
+    "Independent semantic review and committed-byte acceptance pending Lead.",
+    "No full runtime/reproduction suite; runner commits and Lead updates protected manifests.",
+    "82 listed retirement files reconciled against brief parenthetical 83; no missing listed file.",
+    "Preview remains Lead-owned under no-service/no-state write boundary."
+  ],
+  "artifactSha256": {
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md": "fd72ffcd3f44cbe88ce678a73f21f789438f8f56001346cde323a7c36a02d426",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py": "6a149b8aae2e027d1912043642e746bf0bd71122527224a1c380516e2a40a11f",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py": "ccf4c08707b1c8a0f86e2a99dfadbf95b092327267b351267d77af395aa83e08",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-036.jsonl": "51dd40a4d6da029888e35d3b01133bdc9185835399fa0e1e29b187f0dfc09c1a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-037.jsonl": "528911254f3b00542cf504e8b7d1d8f0a53b6c67fe0265b286d6f095aa783a53",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-038.jsonl": "dd2bc321e23d065f805a3ddd498abd473e3a512414454c2feddb2b1c02ca6739",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl": "0dd4538660dea72474cab8f7e7598aa03b85ead3586a1fafe84b185ab4e77da2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-042.jsonl": "287d6cf3632a95ab416e2ebad3a3295bbc4d0dda34e472bafa66ea99d0cf10f4",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-043.jsonl": "91b9faa7c292f9cdd276e0346e9fc9a230f445e5d688797f810a7bf47c1914fd",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-044.jsonl": "caeb971925934f2f21a684d0a69ab264ad15793074f12b753666916a29061b29",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-045.jsonl": "079c1065a0fbc9396b9b071cb761e8048990ed874e8b6ef3e5b53d0e22be0472",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-046.jsonl": "911011cbf1c7ccbe53884ce1cffd615639127a1b86a1b94e5f638a5da16fc9b7",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-047.jsonl": "c52249a7a30805b93fe3800337d2b1a36cf7907b79fa51e566bb9d47eb2bb4f3",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-048.jsonl": "f24093b482346b77a7c17842824f8b0c55f39bf15d7d99fd6dcc43dc420fb1d5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-049.jsonl": "4ecaeda857f444c5bcdac7f109482f76ee9d0fd03a4b1e0ac6e29df586ed77da",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-050.jsonl": "02ff5b99b51d2225631801903716bb0d2791bef7b22b5982ea01689a27f9ae5b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-051.jsonl": "8e97a1d396eabb24a023f1b03292fb78a51ef7d767c1df5f47563905e8156f83",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-052.jsonl": "90df44d30f8699bf0d24a9051ad8e8dffdd0cc5b01f57bb2ace5c8c5e6e435b0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-053.jsonl": "097915ff94a5c6d7af9fa67b8e1da31c5e4d5ca22902cc368aed7060ca32c6bb",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-054.jsonl": "16e4cbbb7724df633058e2779af01c7e0a1d67fd9880b42e52a183e7475ea924",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-055.jsonl": "ad84aa24fefb096eb1ec24090c5ad7c0e4aa5e23bf941cbeb772c10a103d11bf",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-056.jsonl": "58138975dde677714ab67f46270594b5d78d3f2aefcc7e137b4726babcdbf78e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-057.jsonl": "5de2308b31bdf028b7843a47a52727573d5f1dc6706385b6b31e96214836b980",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-059.jsonl": "47f737c6edf8e00c1b451a231e9b69be56d7be9af493bb89d5e81d3cc98825e3",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-060.jsonl": "481f40b7602dafdf993603b94cd154e54eb3e799aa060a782426c3f10d60d3f0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-061.jsonl": "a5a7083b6f8de51cf0ee70aa03e5777bc4d4145f527c546241e8384786ca44b1",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-062.jsonl": "6207eb02d9eb42d1f04170b994faa006afabc9355c6f7c7cc53132869bfbb312",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-063.jsonl": "8959d2a78e2ee647ffb577bc73d7f3362f92ac4ce5107b717ac6bcf5d8ad0424",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-064.jsonl": "8805eb8be79f391113c3fbe70bbdd5c429d761a5f779aa56f0c7113fadc6a9a2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-065.jsonl": "fbc4c3a168e48fa74eeb109e85c13fa2e4ddb0ee0a72594db22320a2ec2b1a5f",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-066.jsonl": "08c5dd649f5d4f2ff4b50ae772a3d04a1f6bef5556d7f47b0ade4782ae02f5a3",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-067.jsonl": "a8d293acf1a460d207db17a255e3405fce20253da64515864723ec0c004b3ead",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl": "21085224f3c993a2c03f2fa82855bb9e454411b75ae965c08bcfb56e04e4b4fc",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-069.jsonl": "89201e6e652a7660baa2083d3ddd5401d05458bad4658f3b1b19a5ad9d4d7489",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-expansion-review-index.json": "f5500c609cd80a69f7288c0c4e7e1bf33d4e0365bbb74c8a68d7643fbff9e279",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-expansion-review-request.md": "6bfab868f71ded1b7f2455a36919b6e18de5733201b01c13a1de48bf57226fd7",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-r2-author.py": "aeafdd3cfb9267b3c26cee17d84766a2d54ffd96043c560b5a7577deccae079e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-r2-binding-manifest.json": "247c64bd412598b4c185a10318669db3c87f55591e7591aabc7afc4b14d651ae",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-r2-changes.json": "9cdafe11eac3978e912137dd33f1d1643277b526d30f82b4a93b33ef5ca3dfbb",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-r2-check-result.json": "86160bbf944f24f94d0baf6ecc9f28b08d675fb4ca04f594d71d49fe220cea61",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-author.py": "b9f924eb092a65c26440a232739011072a20cd0b29d3889c90541aa4fde45251",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check-attempts.json": "24185dee5dc3eed40303a12e5db7c65b2ec4c227fd872984446b93e17fcfe12f",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check-commands.json": "9fa7cf43e822a64cc6554e39cfdd044ba378684bf5e22dededd9e1a6763222c2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check-result.json": "b54fe5286733e1de8f835c9ed92f610d0875850b8b6e9b2933e4b94905beb68e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check.py": "9d1290a986d837f0f70f2381968d33a58bef24b194feeb19f5fa99b7993b86c8",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-inherited-probes-result.json": "fe5f18f7a550aca6a2eb5ff0f2dff6413041f17ba8b1a588475870dfc1cb1688",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-initial-check-result.json": "b3eab6cac80d63794c6e481ac9b06814421b62c66461b58aa1062da306708571",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-light-tests.log": "ba151c79da35d436c1d79f2a1006cf375955b674546a4b6cf6f07de30d6e5a96",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-manifest.json": "b748840f71659e1c14861410d72be91b12612493ad987c7260ef70d0ec0d1694",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-packet.py": "d059e14d9ef6c87a4fc376475f2fef32aabcdda56ebbb1f477ba977a1dd0d281",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-population.json": "bf194a8bad856b008b0d846bfa0a11ddb72e5de598213fcf61c5551fe0b90581",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes-result.json": "4bb7b5c9a7b1492bbb502866b914ec96eccc4b0dcb865f3e7383ba8ea8e1ff58",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py": "23445f4e54292d9fccd1c8d0a6525a891b187444935102da5097b9a6ce01c564",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-retirements.json": "05d7d98b70790735005051a206d26c8c21a53bea1a42afb6a424b97ff0a83459",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-review-index.json": "a9eb28c62f626c71b1b9d949089a1f38497e37fd3f965f26c77a9503ea4a1481",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-review-request.md": "64bf6bf400c78b7b64824a25854385042ebd0a7c6d6c67521359521c3dad6e42",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-second-check-result.json": "d3e213727c0fc1cbbd40c1343f23fbd09acdfaba9771c6b24533b66c7ad2647d",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-target-parity.json": "c20a9d38da282bc64183ba98c51d791b5be10e61131cf8e7ba149f8da3918683",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-verify.py": "47f50aee5cb89be3f81e833a9a4b5f099393ec355dc559cfbb5e77be2a23625d",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-wave1-r2-probes-result.json": "dca387da6d19c6d5fd5e98850107e4e2259dbbb4fd11537797a17450f3cd5d19",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-wave1-r3-probes-result.json": "acea9071b3c749f9aab5a00ea7be59c211176725acec07150181523c0e7dfb25",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-wave2-probes-result.json": "59674ea194a044793e64d21a24e548f1dcde968707b86c76c3fc9b4cdec53b36",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-whole-file-reads.json": "551c3390f8de7af28802c815d8e64f32a0be3f8417c77b5aabf1d04e682acc6e"
+  }
+}

@@ -1,0 +1,1770 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "manifest": "step-03-wave3-manifest.json",
+  "selectedFiles": 38,
+  "selectedEdges": 597,
+  "perSet": [
+    {
+      "set": "batch-042",
+      "allFiles": 25,
+      "retiringFiles": 25,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-043",
+      "allFiles": 13,
+      "retiringFiles": 13,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-044",
+      "allFiles": 11,
+      "retiringFiles": 11,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-045",
+      "allFiles": 1,
+      "retiringFiles": 1,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-046",
+      "allFiles": 2,
+      "retiringFiles": 2,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-047",
+      "allFiles": 1,
+      "retiringFiles": 1,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-048",
+      "allFiles": 1,
+      "retiringFiles": 1,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-049",
+      "allFiles": 1,
+      "retiringFiles": 1,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-050",
+      "allFiles": 1,
+      "retiringFiles": 1,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-051",
+      "allFiles": 6,
+      "retiringFiles": 6,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-052",
+      "allFiles": 1,
+      "retiringFiles": 1,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-053",
+      "allFiles": 5,
+      "retiringFiles": 5,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-054",
+      "allFiles": 11,
+      "retiringFiles": 11,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-055",
+      "allFiles": 1,
+      "retiringFiles": 1,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-056",
+      "allFiles": 1,
+      "retiringFiles": 1,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-057",
+      "allFiles": 1,
+      "retiringFiles": 1,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-058",
+      "allFiles": 1,
+      "retiringFiles": 0,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 1,
+      "unpatchedSample": 1,
+      "distinctSelected": 1,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-059",
+      "allFiles": 1,
+      "retiringFiles": 0,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 1,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 1,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-060",
+      "allFiles": 10,
+      "retiringFiles": 0,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 1,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 5,
+      "unpatchedSample": 1,
+      "distinctSelected": 2,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-061",
+      "allFiles": 25,
+      "retiringFiles": 0,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 6,
+      "patchedAndMandatoryDistinct": 6,
+      "unpatchedEligiblePopulation": 9,
+      "unpatchedSample": 2,
+      "distinctSelected": 8,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 6,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-062",
+      "allFiles": 2,
+      "retiringFiles": 0,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 1,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 1,
+      "unpatchedSample": 1,
+      "distinctSelected": 2,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-063",
+      "allFiles": 25,
+      "retiringFiles": 0,
+      "patchedPopulation": 2,
+      "patchedSeedSample": 1,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 17,
+      "unpatchedSample": 3,
+      "distinctSelected": 4,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 3,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-064",
+      "allFiles": 25,
+      "retiringFiles": 0,
+      "patchedPopulation": 3,
+      "patchedSeedSample": 1,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 15,
+      "unpatchedSample": 3,
+      "distinctSelected": 4,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 3,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-065",
+      "allFiles": 25,
+      "retiringFiles": 0,
+      "patchedPopulation": 3,
+      "patchedSeedSample": 1,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 15,
+      "unpatchedSample": 3,
+      "distinctSelected": 4,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 3,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-066",
+      "allFiles": 25,
+      "retiringFiles": 0,
+      "patchedPopulation": 4,
+      "patchedSeedSample": 1,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 14,
+      "unpatchedSample": 3,
+      "distinctSelected": 4,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 3,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-067",
+      "allFiles": 22,
+      "retiringFiles": 0,
+      "patchedPopulation": 1,
+      "patchedSeedSample": 1,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 13,
+      "unpatchedSample": 2,
+      "distinctSelected": 3,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-068",
+      "allFiles": 23,
+      "retiringFiles": 0,
+      "patchedPopulation": 12,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 9,
+      "unpatchedSample": 2,
+      "distinctSelected": 4,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-069",
+      "allFiles": 5,
+      "retiringFiles": 0,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 2,
+      "unpatchedSample": 1,
+      "distinctSelected": 1,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "patchedStratum": {
+        "selectedDenominator": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p01.md",
+      "files": [
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "set": "batch-058",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 17,
+          "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+          "sourceDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 34882,
+          "sourceBytes": 34956,
+          "contextPlusRecordBytes": 69838
+        }
+      ],
+      "fileCount": 1,
+      "edges": 17,
+      "sourcePlusRecordBytes": 69838,
+      "readingPages": [
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 17
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p02.md",
+      "files": [
+        {
+          "file": "docs/decisions/index.md",
+          "set": "batch-059",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 77,
+          "recordSha256": "47f737c6edf8e00c1b451a231e9b69be56d7be9af493bb89d5e81d3cc98825e3",
+          "sourceDigest": "a0c9f0239f56019041a4a8e01327aee43740ea0e3643c0b291a706fd4b1a4b66",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 387622,
+          "sourceBytes": 33997,
+          "contextPlusRecordBytes": 421619
+        }
+      ],
+      "fileCount": 1,
+      "edges": 77,
+      "sourcePlusRecordBytes": 421619,
+      "readingPages": [
+        {
+          "file": "docs/decisions/index.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 77
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": true
+    },
+    {
+      "part": 3,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p03.md",
+      "files": [
+        {
+          "file": "docs/distillery/comparison-matrix.md",
+          "set": "batch-060",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 207,
+          "recordSha256": "8f601024ae19f1025da9c23374bec47a88ca63d1499715c016231675e7808f27",
+          "sourceDigest": "65a00a1f6665a05b0e7a464bc45722f5505b88f289f706930216e1cb99c19238",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 221773,
+          "sourceBytes": 55038,
+          "contextPlusRecordBytes": 276811
+        }
+      ],
+      "fileCount": 1,
+      "edges": 207,
+      "sourcePlusRecordBytes": 276811,
+      "readingPages": [
+        {
+          "file": "docs/distillery/comparison-matrix.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 100
+            },
+            {
+              "first": 101,
+              "last": 200
+            },
+            {
+              "first": 201,
+              "last": 207
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": true
+    },
+    {
+      "part": 4,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p04.md",
+      "files": [
+        {
+          "file": "docs/distillery/deep-dives/how-to-use-herdr.md",
+          "set": "batch-060",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "d7588a74cff69587c22bdd4c42f9e1d502fa8ed77263deafe88f0c6f26e65fa9",
+          "sourceDigest": "95d1591943f5448d7338f60bfe7c8433466bbe5b97490629a762f79be0978715",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3397,
+          "sourceBytes": 51768,
+          "contextPlusRecordBytes": 55165
+        },
+        {
+          "file": "docs/distillery/deep-dives/work-item-management.md",
+          "set": "batch-061",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 46,
+          "recordSha256": "83d88d0622e47ae29bfeb51d90f2118fb67739933a70006dfe61c4951b8a2edb",
+          "sourceDigest": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 53651,
+          "sourceBytes": 72025,
+          "contextPlusRecordBytes": 125676
+        },
+        {
+          "file": "docs/distillery/porting-log.md",
+          "set": "batch-061",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 11,
+          "recordSha256": "168bd863b97441869b12190f22c1368843c0a4d6452b18adfdd01d199c0d8c5d",
+          "sourceDigest": "8da134d2d32563db0a20532ce282b3bb35707699be07ad2b5c980b6269150b2d",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 16962,
+          "sourceBytes": 99149,
+          "contextPlusRecordBytes": 116111
+        }
+      ],
+      "fileCount": 3,
+      "edges": 59,
+      "sourcePlusRecordBytes": 296952,
+      "readingPages": [
+        {
+          "file": "docs/distillery/deep-dives/how-to-use-herdr.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/distillery/deep-dives/work-item-management.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 46
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/distillery/porting-log.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 11
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 5,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p05.md",
+      "files": [
+        {
+          "file": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "set": "batch-061",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 31,
+          "recordSha256": "1b80c2a6b4199c4722f7daa62c4882a7dc51f193be3ec47842d16974ca618b5e",
+          "sourceDigest": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 23032,
+          "sourceBytes": 82163,
+          "contextPlusRecordBytes": 105195
+        },
+        {
+          "file": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-b.md",
+          "set": "batch-061",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 44,
+          "recordSha256": "97023a821fec7d14a31f566e3acd76310a0965852d66b63f427e25ce5f527024",
+          "sourceDigest": "98b8c6afb863bf9aadb01995135f49261447f6f3d60ac574b27e49b53ebf07ff",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 30807,
+          "sourceBytes": 117745,
+          "contextPlusRecordBytes": 148552
+        },
+        {
+          "file": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md",
+          "set": "batch-061",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 9,
+          "recordSha256": "d9d5d0eb8ba7398e9c483ecd781dac09a7a7266d944b41724e306d93a3f8c7a1",
+          "sourceDigest": "b70260067ae69bbdfd6d364090cd084951b33b05c31884c29929671e48cd11e0",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 7603,
+          "sourceBytes": 69968,
+          "contextPlusRecordBytes": 77571
+        }
+      ],
+      "fileCount": 3,
+      "edges": 84,
+      "sourcePlusRecordBytes": 331318,
+      "readingPages": [
+        {
+          "file": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 31
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-b.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 44
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 9
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 6,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p06.md",
+      "files": [
+        {
+          "file": "docs/distillery/sources/beehive.md",
+          "set": "batch-061",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 68,
+          "recordSha256": "2fec955d852d22454f0468a79f10c990b0a6a865904afb20012fbdae82cdf010",
+          "sourceDigest": "544a84bf984a49d7986fcfa01bb4bf7c7a4ac97cc8a056d34b2fa03db915b274",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 45716,
+          "sourceBytes": 188784,
+          "contextPlusRecordBytes": 234500
+        },
+        {
+          "file": "docs/distillery/sources/compound-engineering-plugin.md",
+          "set": "batch-061",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 6,
+          "recordSha256": "b1016dcc84a75c2d35bd42df1aa10dca8d80f5262dd9b2fc0f2db98161569bfa",
+          "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 5041,
+          "sourceBytes": 38809,
+          "contextPlusRecordBytes": 43850
+        },
+        {
+          "file": "docs/distillery/sources/repository-harness.md",
+          "set": "batch-061",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 8,
+          "recordSha256": "085784a6aa1c113d43653e1cafc9ffcb36f14940113ce12a2c8bd43c99df24a6",
+          "sourceDigest": "66de008f2a3f01731312a944e9decff2a64d84d6487f1e1883a81cf3deadf87f",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 7483,
+          "sourceBytes": 45085,
+          "contextPlusRecordBytes": 52568
+        }
+      ],
+      "fileCount": 3,
+      "edges": 82,
+      "sourcePlusRecordBytes": 330918,
+      "readingPages": [
+        {
+          "file": "docs/distillery/sources/beehive.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 68
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/distillery/sources/compound-engineering-plugin.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/distillery/sources/repository-harness.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 8
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 7,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p07.md",
+      "files": [
+        {
+          "file": "docs/distillery/sources/superpowers.md",
+          "set": "batch-062",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 0,
+          "recordSha256": "1c48e36432ffcab236413790e907ae189b1c7f07eb9cba83282cf6b0a2df2e15",
+          "sourceDigest": "4a1c70d9c7975b83fe12d62fbf323557abef773e4b1197d603a4c37a7b1d744b",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 916,
+          "sourceBytes": 75131,
+          "contextPlusRecordBytes": 76047
+        },
+        {
+          "file": "docs/distillery/sources/symphony.md",
+          "set": "batch-062",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 6,
+          "recordSha256": "0fb629d3df0e914779e84b7c3780a5b86248058d06e69f7f987233f6811b30e3",
+          "sourceDigest": "ec16bffdb69d6056b30eff80b0dcab2469e4c1a5625d11c973e1bfae097c2f34",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 6226,
+          "sourceBytes": 17911,
+          "contextPlusRecordBytes": 24137
+        },
+        {
+          "file": "docs/explanation/branch-content-mismatch-fgos-exclusion.md",
+          "set": "batch-063",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "37b19a24d8124e71357052614c7ced5cdc948a2aaacd0195a83f1d68cb53dd2d",
+          "sourceDigest": "4b60c91ab0897fb3f262c9563e9b387bda35fc4b7e6e288c55d7deaaff58ac35",
+          "diffSha256": "0abfec298200efafa74b9f837a9c879a5dc80540c5c3345d054de0331d8bb800",
+          "recordBytes": 11529,
+          "sourceBytes": 3728,
+          "contextPlusRecordBytes": 15257
+        },
+        {
+          "file": "docs/explanation/capabilities-prefer-symmetry-removed.md",
+          "set": "batch-063",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "e3b3f727d0edee3d8baed249f12541be39d27f4199195ac65a705a58d2caddab",
+          "sourceDigest": "4c22f36c63cb8e97f1af8208a7a8e726ec763b54439f282b155cd028b168bfe3",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1757,
+          "sourceBytes": 3146,
+          "contextPlusRecordBytes": 4903
+        },
+        {
+          "file": "docs/explanation/citation-baseline-cleanup-calibration-slice.md",
+          "set": "batch-063",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "7634dc8a05d1d1cc5b5ebfa2ba56985d9a44edb0553b26ebc116c072b808e140",
+          "sourceDigest": "412f376096ecf490e19dc8eef685e18181a4aa35162e0095030bd159e769a94b",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 4359,
+          "sourceBytes": 3828,
+          "contextPlusRecordBytes": 8187
+        },
+        {
+          "file": "docs/explanation/codex-bypass-executor.md",
+          "set": "batch-063",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "10e2f63d1db0a4354d8cc0b34a013e95ecab0cb0841c69cb72f9225be4c166c6",
+          "sourceDigest": "30002dafe887df1443c292c0cac3ebbdc3f26dfe413f6cd74b60165dd72d1b3b",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2590,
+          "sourceBytes": 3665,
+          "contextPlusRecordBytes": 6255
+        }
+      ],
+      "fileCount": 6,
+      "edges": 12,
+      "sourcePlusRecordBytes": 134786,
+      "readingPages": [
+        {
+          "file": "docs/distillery/sources/superpowers.md",
+          "edgeRanges": [],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/distillery/sources/symphony.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/branch-content-mismatch-fgos-exclusion.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/capabilities-prefer-symmetry-removed.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/citation-baseline-cleanup-calibration-slice.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/codex-bypass-executor.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 8,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p08.md",
+      "files": [
+        {
+          "file": "docs/explanation/dispatch-config-cache-scope-narrowed.md",
+          "set": "batch-064",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "12a9a7fb8c51c35ff4bcb79fa6b2627536839d8c7dfb2faa8ec484f8eb858e41",
+          "sourceDigest": "29c6f79df795d445d9265e97fcbbb420d9fc984d52ce9fe66863bad2ccd4cc77",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2735,
+          "sourceBytes": 4960,
+          "contextPlusRecordBytes": 7695
+        },
+        {
+          "file": "docs/explanation/eventlog-guard-fail-closed-event-count-checkpoint.md",
+          "set": "batch-064",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "c74fa72268946af0485db9ba25e5ba311f87f0e239c319606a2f990134bc8cae",
+          "sourceDigest": "2e7b4962a85d092042bbd4d0675696905c5d747dabca5d28b53c3239887250c6",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2830,
+          "sourceBytes": 4790,
+          "contextPlusRecordBytes": 7620
+        },
+        {
+          "file": "docs/explanation/eventlog-sweep-checkpoint-redesign.md",
+          "set": "batch-064",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 6,
+          "recordSha256": "10dc2341f83491771af520242aef1553b044020e9ac60b797a041552c1d89bc3",
+          "sourceDigest": "0b2458b2d9fcd8e3f1ffe4dd55dcabec781a776dc677ffccbe42af61fc1fbe7d",
+          "diffSha256": "81282d008cc477dcb6ab0f932b943f1eabd976887abceda70db37ca35718ee67",
+          "recordBytes": 22938,
+          "sourceBytes": 7829,
+          "contextPlusRecordBytes": 30767
+        },
+        {
+          "file": "docs/explanation/eventlog-tier-a-multifile-content-hash-redesign.md",
+          "set": "batch-064",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 6,
+          "recordSha256": "216775bc55e89872693b50faa231d627a9b41fa14c4e3c882667cf2043b07ed6",
+          "sourceDigest": "39b7e53d19f48957ad557150df4db9d9d64c67ced9ffbfb7675bc8b1f5ba5511",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 5996,
+          "sourceBytes": 8854,
+          "contextPlusRecordBytes": 14850
+        },
+        {
+          "file": "docs/explanation/executor-dispatch-manual-log-gap-and-step-b5-fix.md",
+          "set": "batch-065",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "2d2e7c63694cff456c7e205b23f62a4ff6833f97e9af7e44f2dc8a5a6452030f",
+          "sourceDigest": "2c4ebb5523f4a2d61d9c0400e708deec7198a422ce7eb6b5df6cd6ba212edf8d",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2126,
+          "sourceBytes": 4221,
+          "contextPlusRecordBytes": 6347
+        },
+        {
+          "file": "docs/explanation/fanout-batch-per-child-sync-spawn-and-listwork.md",
+          "set": "batch-065",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "3779dd2727b494f5065b25172b937b842d3a29d5c3e5b5cc5e625724e2737593",
+          "sourceDigest": "7f6483f9b2e3d5813096882bc0c4ef7a4a573c31821434736e9ce97ed91f508d",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1787,
+          "sourceBytes": 3828,
+          "contextPlusRecordBytes": 5615
+        }
+      ],
+      "fileCount": 6,
+      "edges": 18,
+      "sourcePlusRecordBytes": 72894,
+      "readingPages": [
+        {
+          "file": "docs/explanation/dispatch-config-cache-scope-narrowed.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/eventlog-guard-fail-closed-event-count-checkpoint.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/eventlog-sweep-checkpoint-redesign.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/eventlog-tier-a-multifile-content-hash-redesign.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/executor-dispatch-manual-log-gap-and-step-b5-fix.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/fanout-batch-per-child-sync-spawn-and-listwork.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 9,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p09.md",
+      "files": [
+        {
+          "file": "docs/explanation/footprint-diff-research-md-noise.md",
+          "set": "batch-065",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 7,
+          "recordSha256": "7c7636287f1fc10c2975e5eb4ca932ee9b6808a477db1d1ba72c2950cb6d955d",
+          "sourceDigest": "82f3b8cd10c1a1486ffc4246a73cc6eec640fd8d2ed79e7ac51255cdf070e5f2",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 6383,
+          "sourceBytes": 4066,
+          "contextPlusRecordBytes": 10449
+        },
+        {
+          "file": "docs/explanation/herdr-orchestrator-terminology-boundary.md",
+          "set": "batch-065",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 5,
+          "recordSha256": "4dbdd2cfcf370fda0ab3f0e36ea9a01a677d6bebcc2e0733472f3ebdfe796271",
+          "sourceDigest": "d7cdf87db715d14b410a48210814c1471c9f8c7f3d289899018b93805abd5dbb",
+          "diffSha256": "626a6a512300b5750232d1d4fc261ce3d6444d842d5678ce2436361345c77cac",
+          "recordBytes": 17601,
+          "sourceBytes": 3437,
+          "contextPlusRecordBytes": 21038
+        },
+        {
+          "file": "docs/explanation/mode-gate-tiny-small-skip-load.md",
+          "set": "batch-066",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "73ea911397e28f9fa0e2dafb24b2754b7b9acd54a741759249a8c029b90f97a8",
+          "sourceDigest": "68ad9607716c5e30ee3265dbb4ab3b964bc36136370b4dc9c99125ca09b76052",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2670,
+          "sourceBytes": 3923,
+          "contextPlusRecordBytes": 6593
+        },
+        {
+          "file": "docs/explanation/partial-claim-event-loss-covered-by-tsk-1vc.md",
+          "set": "batch-066",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "e3ec9415df92eea4bbb2ab736be284f99a7935a4aab66142ef7dcb0edda008d8",
+          "sourceDigest": "1ac5d528589928989006fe5cd5a656890c2f5829e0c23c3640c3da56dfbece1c",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1873,
+          "sourceBytes": 2900,
+          "contextPlusRecordBytes": 4773
+        },
+        {
+          "file": "docs/explanation/retro-next-shared-driving.md",
+          "set": "batch-066",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "d49e9aa144d48982fcb1384c8aa77c5da2fcd7d48a0e1393c97fed714ffcb0c8",
+          "sourceDigest": "e99b21f972b13bb978c5570f6d6b16133d3dd07b1384425023335f02f6065ce2",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1608,
+          "sourceBytes": 5112,
+          "contextPlusRecordBytes": 6720
+        },
+        {
+          "file": "docs/explanation/return-approve-background-execution-guidance.md",
+          "set": "batch-066",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "825976a5094575913dfafed320437290e9d761e1860b07abc1f894d87be57187",
+          "sourceDigest": "97d4c97c2fe6cc8cd8cd1a0f1447372549f9a9fd18c1db6b3696c0294f2e27b8",
+          "diffSha256": "3deb082bfc59766fff1a88cb633bc480fe941101803cdffb1d5a0623de571c03",
+          "recordBytes": 11461,
+          "sourceBytes": 1976,
+          "contextPlusRecordBytes": 13437
+        }
+      ],
+      "fileCount": 6,
+      "edges": 18,
+      "sourcePlusRecordBytes": 63010,
+      "readingPages": [
+        {
+          "file": "docs/explanation/footprint-diff-research-md-noise.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 7
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/herdr-orchestrator-terminology-boundary.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 5
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/mode-gate-tiny-small-skip-load.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/partial-claim-event-loss-covered-by-tsk-1vc.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/retro-next-shared-driving.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/return-approve-background-execution-guidance.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 10,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p10.md",
+      "files": [
+        {
+          "file": "docs/explanation/root-resolution-two-call-split-propagation.md",
+          "set": "batch-067",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "49e48a94a020712eaedfef900824d52115542574ace676e0c38fb07756a5f057",
+          "sourceDigest": "ad12f866fc4aaad74f830f32a995b81e1b95b0a139729aa7e65bf35e85155142",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3129,
+          "sourceBytes": 3180,
+          "contextPlusRecordBytes": 6309
+        },
+        {
+          "file": "docs/explanation/tsk-397-post-merge-review-remediation.md",
+          "set": "batch-067",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "6b4cdd0595b02555dcb0e1ba273fe1489cd4fdf91edcaab81ababa0a186e87b6",
+          "sourceDigest": "f4fb30a2f39fffffc0a79e11b64d6fd36e764a595f0e960cf524cd7206212a04",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2848,
+          "sourceBytes": 6298,
+          "contextPlusRecordBytes": 9146
+        },
+        {
+          "file": "docs/explanation/worktree-manual-merge-fgos-blob-safety-net.md",
+          "set": "batch-067",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "3919677b92dc56aeca3de6291641783eab9a443ccf7c68a8a0237a412e649f98",
+          "sourceDigest": "97a644fa5a29da7929e98c485e2e445a03a0073ec38b54ce14b340237d14a858",
+          "diffSha256": "cb29ec03a89a9c104615a8ff790bbe3c39c2651132fb40c80524ef5463f13cda",
+          "recordBytes": 16903,
+          "sourceBytes": 4612,
+          "contextPlusRecordBytes": 21515
+        },
+        {
+          "file": "docs/how-to/author-a-plan-loop-track.md",
+          "set": "batch-068",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "bc34c5cd8149de19c031a27d8a3e3f6e83a6cc4f05d9b936ed97182b5b523391",
+          "sourceDigest": "b6caccddc2ed6c84e5af1b8d61a752cc90e7815731b5184a1f537976f8242f74",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 11391,
+          "sourceBytes": 14361,
+          "contextPlusRecordBytes": 25752
+        },
+        {
+          "file": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-alternative-and-composite-reopen.md",
+          "set": "batch-068",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "0db5ed215a990053ce253b3bec2705e552d24932a5830b5c6cf1a1b16a6c5654",
+          "sourceDigest": "71a122831e2a1c2e3c716fac30e6ac708b98c5151998abb5b9926a27bbfbbdd5",
+          "diffSha256": "614f904986e10d9ba42aab37a964ceea0e61c7fb097bf0a4708ed2a597a68269",
+          "recordBytes": 11560,
+          "sourceBytes": 7496,
+          "contextPlusRecordBytes": 19056
+        },
+        {
+          "file": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md",
+          "set": "batch-068",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "44d97d3e7ace0e8b05b02bf4ea449f0d5c44a18222fa09fdd59399dbe7b0b591",
+          "sourceDigest": "3a24d99141ef2e073181a87943c118f2df843f3a2bb227ac86536f5cf8fa08eb",
+          "diffSha256": "05f5cbdb38139e7a3a2e86d59fd746984392803f6dbfac50dc3d374944f82f3e",
+          "recordBytes": 17879,
+          "sourceBytes": 10039,
+          "contextPlusRecordBytes": 27918
+        }
+      ],
+      "fileCount": 6,
+      "edges": 12,
+      "sourcePlusRecordBytes": 109696,
+      "readingPages": [
+        {
+          "file": "docs/explanation/root-resolution-two-call-split-propagation.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/tsk-397-post-merge-review-remediation.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/explanation/worktree-manual-merge-fgos-blob-safety-net.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/how-to/author-a-plan-loop-track.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-alternative-and-composite-reopen.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 11,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave3-p11.md",
+      "files": [
+        {
+          "file": "docs/how-to/run-a-coordination-session.md",
+          "set": "batch-068",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 10,
+          "recordSha256": "b10f1292f742e69521f1c751c6603abba8ef0f8d923cd98019da1ae8619a883a",
+          "sourceDigest": "af2dcfe5c5bc2b3386caf1fd2a6c93e255969c97653a28d447255ed1375bf04d",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 18732,
+          "sourceBytes": 13470,
+          "contextPlusRecordBytes": 32202
+        },
+        {
+          "file": "docs/journals/260728-2038-claim-port-str46-parallel-merge.md",
+          "set": "batch-069",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "6503aeaa8ce4a5b3c06f31765adb2ee87775aa2da152f564515ee173056a5964",
+          "sourceDigest": "7508fdea83ec973896ae33e141ec0c0b29c075fe8b07e197328f04f802ab314a",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1877,
+          "sourceBytes": 5409,
+          "contextPlusRecordBytes": 7286
+        }
+      ],
+      "fileCount": 2,
+      "edges": 11,
+      "sourcePlusRecordBytes": 39488,
+      "readingPages": [
+        {
+          "file": "docs/how-to/run-a-coordination-session.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 10
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/journals/260728-2038-claim-port-str46-parallel-merge.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0,
+  "semanticAcceptance": "Pending independent Lead acceptance; author freezes bindings only."
+}

@@ -1,0 +1,2562 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "rule": "L12-37",
+  "scannedRecords": 156,
+  "scannedCoverageEdges": 1769,
+  "renamedAliasPreserveHits": [
+    {
+      "file": "docs/explanation/skill-prose-cleanup-design.md",
+      "edgeId": "maps-j-03951",
+      "legacy": "docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+      "liveAliasHolders": [
+        "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md"
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "edgeId": "maps-j-04520",
+      "legacy": "docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+      "liveAliasHolders": [
+        "docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md"
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+      "edgeId": "maps-j-04835",
+      "legacy": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+      "liveAliasHolders": [
+        "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md"
+      ]
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08367",
+      "legacy": "docs/reference/triage-table-columns.md:18",
+      "liveAliasHolders": [
+        "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md"
+      ]
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08368",
+      "legacy": "docs/reference/triage-table-columns.md",
+      "liveAliasHolders": [
+        "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md"
+      ]
+    }
+  ],
+  "outcomeChanges": 7,
+  "recordTextChanges": 29,
+  "outcomeChangedFiles": [
+    "docs/explanation/skill-prose-cleanup-design.md",
+    "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+    "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+    "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+    "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+    "docs/specs/work-state.md"
+  ],
+  "changes": [
+    {
+      "file": "docs/explanation/skill-prose-cleanup-design.md",
+      "set": "batch-036",
+      "edgeId": "maps-j-03951",
+      "kind": "outcome",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 71,
+            "columnStart": 28,
+            "line": 77,
+            "text": "docs/how-to/smoke-test-fgos-code-implement-"
+          },
+          {
+            "columnEndExclusive": 26,
+            "columnStart": 1,
+            "line": 78,
+            "text": "   with-a-trivial-item.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/how-to/smoke-test-fgos-code-implement-\n   with-a-trivial-item.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path renamed at 9ee11df05000d1c9d573ed864229bea8d79293d8 to docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md; original source spelling conserved. Preserve historical QA/implementation evidence: the design explicitly labels this “Safety and QA process (D2/D5)” and describes the tests used by each tsk-56w child, rather than newly prescribing a migrated document layout. Non-executable successor note: docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-03951",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L77",
+        "targetFacts": [
+          {
+            "path": "docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+            "state": "renamed",
+            "commit": "9ee11df05000d1c9d573ed864229bea8d79293d8",
+            "successor": "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 71,
+            "columnStart": 28,
+            "line": 77,
+            "text": "docs/how-to/smoke-test-fgos-code-implement-"
+          },
+          {
+            "columnEndExclusive": 26,
+            "columnStart": 1,
+            "line": 78,
+            "text": "   with-a-trivial-item.md"
+          }
+        ],
+        "target": "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+        "matchedExpression": "docs/how-to/smoke-test-fgos-code-implement-\n   with-a-trivial-item.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-30, L12-32: committed doc-registry alias identifies the exact renamed live document; retarget this operative citation in its original path/label form to docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md; specific evidence is enclosed by the actual extractor heading. Phase 9 specification only.",
+        "diffHunk": "@@ -74,8 +74,8 @@",
+        "edgeId": "maps-j-03951",
+        "dependencyCategory": null,
+        "anchor": "steps",
+        "unitId": "item-L77"
+      },
+      "diffChanged": true
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "set": "batch-037",
+      "edgeId": "maps-j-04520",
+      "kind": "outcome",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 77,
+            "columnStart": 4,
+            "line": 159,
+            "text": "docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path renamed at 1338628f72e9aafd1b8d637ea5960a0e8c8b8c3b to docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md; original source spelling conserved. Preserve historical QA/implementation evidence: the Related entry explicitly identifies “real gaps hit while returning the sibling items” that built the mechanism; this is evidence lineage for the completed wiring. Non-executable successor note: docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-04520",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L159",
+        "targetFacts": [
+          {
+            "path": "docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+            "state": "renamed",
+            "commit": "1338628f72e9aafd1b8d637ea5960a0e8c8b8c3b",
+            "successor": "docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 77,
+            "columnStart": 4,
+            "line": 159,
+            "text": "docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md"
+          }
+        ],
+        "target": "docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+        "matchedExpression": "docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-30, L12-32: committed doc-registry alias identifies the exact renamed live document; retarget this operative citation in its original path/label form to docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md; specific evidence is enclosed by the actual extractor heading. Phase 9 specification only.",
+        "diffHunk": "@@ -156,6 +156,6 @@",
+        "edgeId": "maps-j-04520",
+        "dependencyCategory": null,
+        "anchor": "real-example-two-genuine-gaps-in-returns-own-branch-source-verify-path-not-stale-tests",
+        "unitId": "item-L159"
+      },
+      "diffChanged": true
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+      "set": "batch-037",
+      "edgeId": "maps-j-04835",
+      "kind": "outcome",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 55,
+            "columnStart": 3,
+            "line": 71,
+            "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path renamed at 0c32f343352c304edceaf40af1d91327feeb4386 to docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md; original source spelling conserved. Preserve historical QA/implementation evidence: the path is inside the verbatim historical “D5: Quy trình đảm bảo chất lượng” quotation; keep the quoted decision text unchanged. Non-executable successor note: docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-04835",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L71",
+        "targetFacts": [
+          {
+            "path": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "state": "renamed",
+            "commit": "0c32f343352c304edceaf40af1d91327feeb4386",
+            "successor": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 55,
+            "columnStart": 3,
+            "line": 71,
+            "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+          }
+        ],
+        "target": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+        "matchedExpression": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-30, L12-32: committed doc-registry alias identifies the exact renamed live document; retarget this operative citation in its original path/label form to docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md; specific evidence is enclosed by the actual extractor heading. Phase 9 specification only.",
+        "diffHunk": "@@ -68,7 +68,7 @@",
+        "edgeId": "maps-j-04835",
+        "dependencyCategory": null,
+        "anchor": "verify-trông-thế-nào",
+        "unitId": "line-L71"
+      },
+      "diffChanged": true
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05978",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-05978",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-05978 docs/specs/runner.md Distinct claim: This independently names docs/platform/runner/spec.md as the live operative citation, with evidence in descriptionTruth; unrelated source-history citations keep their own spelling."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-05978",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-05978 docs/specs/runner.md Distinct claim: L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05979",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05979",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-05979 docs/specs/runner.md Distinct claim: This retained history/decision/backlog or how-to citation or explicitly quoted historical source has its own provenance; it is independent of the sibling operative reference or retiring-tree category."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05979",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-05979 docs/specs/runner.md Distinct claim: L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05980",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05980",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-31, L12-35(3), L12-37(5): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the explicitly dated retirement framing 'The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.'. Non-executable successor note: docs/platform/runner/decisions/h-aabefc85f0c9.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05980",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05983",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-05983",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-05983 docs/specs/runner.md Distinct claim: This independently names docs/platform/runner/spec.md as the live operative citation, with evidence in descriptionTruth; unrelated source-history citations keep their own spelling."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-05983",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-05983 docs/specs/runner.md Distinct claim: L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05984",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05984",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-05984 docs/specs/runner.md Distinct claim: This retained history/decision/backlog or how-to citation or explicitly quoted historical source has its own provenance; it is independent of the sibling operative reference or retiring-tree category."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05984",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-05984 docs/specs/runner.md Distinct claim: L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05985",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05985",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-31, L12-35(3), L12-37(5): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the explicitly dated retirement framing 'The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.'. Non-executable successor note: docs/platform/runner/decisions/h-aabefc85f0c9.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05985",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05988",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-05988",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-05988 docs/specs/runner.md Distinct claim: This independently names docs/platform/runner/spec.md as the live operative citation, with evidence in descriptionTruth; unrelated source-history citations keep their own spelling."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-05988",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-05988 docs/specs/runner.md Distinct claim: L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05989",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05989",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-05989 docs/specs/runner.md Distinct claim: This retained history/decision/backlog or how-to citation or explicitly quoted historical source has its own provenance; it is independent of the sibling operative reference or retiring-tree category."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05989",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-05989 docs/specs/runner.md Distinct claim: L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05990",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05990",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-31, L12-35(3), L12-37(5): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the explicitly dated retirement framing 'The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.'. Non-executable successor note: docs/platform/runner/decisions/h-aabefc85f0c9.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05990",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05992",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-05992",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-05992 docs/specs/runner.md Distinct claim: This independently names docs/platform/runner/spec.md as the live operative citation, with evidence in descriptionTruth; unrelated source-history citations keep their own spelling."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-05992",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-05992 docs/specs/runner.md Distinct claim: L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05993",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05993",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-05993 docs/specs/runner.md Distinct claim: This retained history/decision/backlog or how-to citation or explicitly quoted historical source has its own provenance; it is independent of the sibling operative reference or retiring-tree category."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05993",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-05993 docs/specs/runner.md Distinct claim: L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05994",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05994",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-31, L12-35(3), L12-37(5): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the explicitly dated retirement framing 'The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.'. Non-executable successor note: docs/platform/runner/decisions/h-aabefc85f0c9.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05994",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05996",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-05996",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-05996 docs/specs/runner.md Distinct claim: This independently names docs/platform/runner/spec.md as the live operative citation, with evidence in descriptionTruth; unrelated source-history citations keep their own spelling."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-05996",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-05996 docs/specs/runner.md Distinct claim: L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05997",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05997",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-05997 docs/specs/runner.md Distinct claim: This retained history/decision/backlog or how-to citation or explicitly quoted historical source has its own provenance; it is independent of the sibling operative reference or retiring-tree category."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05997",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-05997 docs/specs/runner.md Distinct claim: L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-05998",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05998",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-31, L12-35(3), L12-37(5): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the explicitly dated retirement framing 'The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.'. Non-executable successor note: docs/platform/runner/decisions/h-aabefc85f0c9.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-05998",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06005",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-06005",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-06005 docs/specs/runner.md Distinct claim: This independently names docs/platform/runner/spec.md as the live operative citation, with evidence in descriptionTruth; unrelated source-history citations keep their own spelling."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-06005",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-06005 docs/specs/runner.md Distinct claim: L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06006",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06006",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-06006 docs/specs/runner.md Distinct claim: This retained history/decision/backlog or how-to citation or explicitly quoted historical source has its own provenance; it is independent of the sibling operative reference or retiring-tree category."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06006",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-06006 docs/specs/runner.md Distinct claim: L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06007",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06007",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-31, L12-35(3), L12-37(5): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the explicitly dated retirement framing 'The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.'. Non-executable successor note: docs/platform/runner/decisions/h-aabefc85f0c9.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06007",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06023",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-06023",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-06023 docs/specs/runner.md Distinct claim: This independently names docs/platform/runner/spec.md as the live operative citation, with evidence in descriptionTruth; unrelated source-history citations keep their own spelling."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-06023",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-06023 docs/specs/runner.md Distinct claim: L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06024",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06024",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-06024 docs/specs/runner.md Distinct claim: This retained history/decision/backlog or how-to citation or explicitly quoted historical source has its own provenance; it is independent of the sibling operative reference or retiring-tree category."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06024",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-06024 docs/specs/runner.md Distinct claim: L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06025",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06025",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 109,
+            "columnStart": 89,
+            "line": 23,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-31, L12-35(3), L12-37(5): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the explicitly dated retirement framing 'The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.'. Non-executable successor note: docs/platform/runner/decisions/h-aabefc85f0c9.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06025",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L23",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06033",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-06033",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-06033 docs/specs/runner.md Distinct claim: This independently names docs/platform/runner/spec.md as the live operative citation, with evidence in descriptionTruth; unrelated source-history citations keep their own spelling."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-06033",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-06033 docs/specs/runner.md Distinct claim: L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06034",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06034",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-06034 docs/specs/runner.md Distinct claim: This retained history/decision/backlog or how-to citation or explicitly quoted historical source has its own provenance; it is independent of the sibling operative reference or retiring-tree category."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06034",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-06034 docs/specs/runner.md Distinct claim: L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06045",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-06045",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-06045 docs/specs/runner.md Distinct claim: This independently names docs/platform/runner/spec.md as the live operative citation, with evidence in descriptionTruth; unrelated source-history citations keep their own spelling."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 23,
+            "columnStart": 3,
+            "line": 17,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only.",
+        "diffHunk": "@@ -14,7 +14,7 @@",
+        "edgeId": "maps-j-06045",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "unitDispositionReason": "maps-j-06045 docs/specs/runner.md Distinct claim: L12-34(4): wrapper Related navigation to the exact live whole-file area spec docs/platform/runner/spec.md; no subject/section locator is asserted by this list entry. Phase 9 patch specification only."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06046",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06046",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-06046 docs/specs/runner.md Distinct claim: This retained history/decision/backlog or how-to citation or explicitly quoted historical source has its own provenance; it is independent of the sibling operative reference or retiring-tree category."
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 67,
+            "columnStart": 47,
+            "line": 19,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06046",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "item-L17",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ],
+        "unitDispositionReason": "maps-j-06046 docs/specs/runner.md Distinct claim: L12-35(3), L12-37(6): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the history wrapper’s separate “Superseded by: Current execution ownership” line. Non-executable successor note: docs/platform/runner/spec.md."
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06496",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 310,
+            "columnStart": 290,
+            "line": 48,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06496",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L48",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 310,
+            "columnStart": 290,
+            "line": 48,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-31, L12-35(3), L12-37(5): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the explicitly dated retirement framing 'The complete classified input, including the historical operational sections, is [preserved verbatim](../history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md#literal-snapshot). The former engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md`’s historical CoordinationSession section.'. Non-executable successor note: docs/platform/runner/decisions/h-aabefc85f0c9.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06496",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L48",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06498",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 309,
+            "columnStart": 289,
+            "line": 29,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06498",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L29",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 309,
+            "columnStart": 289,
+            "line": 29,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-31, L12-35(3), L12-37(5): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the explicitly dated retirement framing 'The complete classified input, including the historical operational sections, is [preserved verbatim](../history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot). The former engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md`’s historical CoordinationSession section.'. Non-executable successor note: docs/platform/runner/decisions/h-aabefc85f0c9.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06498",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L29",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06500",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 305,
+            "columnStart": 285,
+            "line": 29,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06500",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L29",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 305,
+            "columnStart": 285,
+            "line": 29,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-31, L12-35(3), L12-37(5): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the explicitly dated retirement framing 'The complete classified input, including the historical operational sections, is [preserved verbatim](../history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot). The former engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md`’s historical CoordinationSession section.'. Non-executable successor note: docs/platform/runner/decisions/h-aabefc85f0c9.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06500",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L29",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06502",
+      "kind": "outcome",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 63,
+            "columnStart": 48,
+            "line": 33,
+            "text": "docs/architect/"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/architect/",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/architect; tree retires at Phase 9. Preserve the explicitly historical “frozen docs/architect/ tree” contrast; the operative write destination is already the current platform verification owner. No stale writer root is retargeted.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06502",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L33",
+        "targetFacts": [
+          {
+            "path": "docs/architect",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 63,
+            "columnStart": 48,
+            "line": 33,
+            "text": "docs/architect/"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/architect/",
+        "disposition": "parked",
+        "dependency": "Description needs rewrite: the live sentence contrasts the current verification writer with the frozen docs/architect/ tree, which disappears at Phase 9. Restate the complete object/contrast while keeping the already-current verification writer literal.",
+        "blockedReason": "Description needs rewrite: the live sentence contrasts the current verification writer with the frozen docs/architect/ tree, which disappears at Phase 9. Restate the complete object/contrast while keeping the already-current verification writer literal.",
+        "timing": "none",
+        "blockedCategory": "description-rewrite",
+        "reason": "L12-30, L12-32, L12-34: Description needs rewrite: the live sentence contrasts the current verification writer with the frozen docs/architect/ tree, which disappears at Phase 9. Restate the complete object/contrast while keeping the already-current verification writer literal.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06502",
+        "dependencyCategory": "description-rewrite",
+        "anchor": null,
+        "unitId": "line-L33",
+        "targetFacts": [
+          {
+            "path": "docs/architect",
+            "state": "exists"
+          }
+        ],
+        "searchWitness": {
+          "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+          "roots": [
+            "docs/platform",
+            "docs/knowledge",
+            "docs/reference",
+            "docs/tutorials"
+          ],
+          "legacyPath": "docs/architect/",
+          "passage": "`verification/<track>/` owner, not the frozen `docs/architect/` tree. The",
+          "aliasLookups": [
+            {
+              "source": "plans/260925-documentation-authority-unification/alias-table.json",
+              "matches": []
+            },
+            {
+              "source": "docs/doc-registry.json",
+              "matches": []
+            }
+          ],
+          "queries": [
+            {
+              "query": "docs/architect/",
+              "hitCount": 1542,
+              "liveHitCount": 805,
+              "hitsSha256": "d348ecc3f854ebb9699a6fbc1a31a924f17d423b02144c9c97af7d84c0c9576d"
+            }
+          ],
+          "assessment": "Description needs rewrite: the live sentence contrasts the current verification writer with the frozen docs/architect/ tree, which disappears at Phase 9. Restate the complete object/contrast while keeping the already-current verification writer literal.",
+          "hitGroups": [
+            {
+              "query": "docs/architect/",
+              "carriageCount": 737,
+              "liveCount": 805,
+              "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+              "liveAssessment": "Description needs rewrite: the live sentence contrasts the current verification writer with the frozen docs/architect/ tree, which disappears at Phase 9. Restate the complete object/contrast while keeping the already-current verification writer literal.",
+              "category": "citation-only",
+              "note": "Description needs rewrite: the live sentence contrasts the current verification writer with the frozen docs/architect/ tree, which disappears at Phase 9. Restate the complete object/contrast while keeping the already-current verification writer literal."
+            }
+          ]
+        }
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06508",
+      "kind": "record-text",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 385,
+            "columnStart": 365,
+            "line": 35,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06508",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L35",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 385,
+            "columnStart": 365,
+            "line": 35,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-31, L12-35(3), L12-37(5): Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. Preserve the explicitly dated retirement framing 'The complete prior manual prompt, input examples, roster and retirement proposal are [preserved verbatim](../../history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md#literal-snapshot). They are dated history, not current APIs or safety proof. The former coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; `docs/specs/runner.md` records that retirement in its historical CoordinationSession section.'. Non-executable successor note: docs/platform/runner/decisions/h-aabefc85f0c9.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06508",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L35",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "diffChanged": true
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "set": "batch-038",
+      "edgeId": "maps-j-06509",
+      "kind": "outcome",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 22,
+            "columnStart": 2,
+            "line": 40,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": null,
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "preserve",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "none",
+        "blockedCategory": null,
+        "reason": "L12-26, L12-31, L12-35: Source path exists at author pin: docs/specs/runner.md; tree retires at Phase 9. L12-35(3): preserve dated retirement/removed-door framing (“coordination engine was retired” or “removed ... decision 0062”), not a current read instruction. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md.",
+        "diffHunk": null,
+        "edgeId": "maps-j-06509",
+        "dependencyCategory": null,
+        "anchor": null,
+        "unitId": "line-L40",
+        "targetFacts": [
+          {
+            "path": "docs/specs/runner.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 22,
+            "columnStart": 2,
+            "line": 40,
+            "text": "docs/specs/runner.md"
+          }
+        ],
+        "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "matchedExpression": "docs/specs/runner.md",
+        "disposition": "patch",
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "blockedCategory": null,
+        "reason": "L12-37(3): undated live decision 0062 navigation; exact door-removal decision holder, Phase 9 patch specification.",
+        "diffHunk": "@@ -37,7 +37,7 @@",
+        "edgeId": "maps-j-06509",
+        "dependencyCategory": null,
+        "anchor": "0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability",
+        "unitId": "line-L40"
+      },
+      "diffChanged": true
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "set": "batch-041",
+      "edgeId": "maps-j-08367",
+      "kind": "outcome",
+      "before": {
+        "edgeId": "maps-j-08367",
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 45,
+            "columnStart": 4,
+            "line": 2069,
+            "text": "docs/reference/triage-table-columns.md:18"
+          }
+        ],
+        "matchedExpression": "docs/reference/triage-table-columns.md:18",
+        "disposition": "preserve",
+        "diffHunk": null,
+        "reason": "L12-26(3,5,8), L12-30(5): historical decision/provenance; target renamed at 126a8ae518a3390b40179d050b2452e23143ebb7 to docs/knowledge/fgos-triage-table-columns/triage-table-columns.md; registry successor docs/knowledge/fgos-triage-table-columns/triage-table-columns.md; source spelling retained as provenance: docs/reference/triage-table-columns.md; preserve exact source spelling. Non-executable successor note: docs/knowledge/fgos-triage-table-columns/triage-table-columns.md. Non-executable successor: docs/knowledge/fgos-triage-table-columns/triage-table-columns.md (move 126a8ae51); decision-provenance spelling retained. Source: docs/specs/work-state.md:2069. L12-31(5) region quote: “Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.”",
+        "target": null,
+        "anchor": null,
+        "timing": "none",
+        "blockedReason": null,
+        "dependency": null,
+        "blockedCategory": null,
+        "dependencyCategory": null,
+        "targetFacts": [
+          {
+            "state": "renamed",
+            "path": "docs/reference/triage-table-columns.md",
+            "commit": "126a8ae518a3390b40179d050b2452e23143ebb7",
+            "successor": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md"
+          }
+        ],
+        "unitId": "row-L2069"
+      },
+      "after": {
+        "edgeId": "maps-j-08367",
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 45,
+            "columnStart": 4,
+            "line": 2069,
+            "text": "docs/reference/triage-table-columns.md:18"
+          }
+        ],
+        "matchedExpression": "docs/reference/triage-table-columns.md:18",
+        "disposition": "parked",
+        "diffHunk": null,
+        "reason": "L12-30, L12-32, L12-34: Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+        "target": null,
+        "anchor": null,
+        "timing": "none",
+        "blockedReason": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+        "dependency": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+        "blockedCategory": "description-rewrite",
+        "dependencyCategory": "description-rewrite",
+        "targetFacts": [
+          {
+            "state": "renamed",
+            "path": "docs/reference/triage-table-columns.md",
+            "commit": "126a8ae518a3390b40179d050b2452e23143ebb7",
+            "successor": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md"
+          }
+        ],
+        "unitId": "row-L2069",
+        "searchWitness": {
+          "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+          "roots": [
+            "docs/platform",
+            "docs/knowledge",
+            "docs/reference",
+            "docs/tutorials"
+          ],
+          "legacyPath": "docs/reference/triage-table-columns.md:18",
+          "passage": "| `docs/reference/triage-table-columns.md:18` | Bảng cột hiển thị CLI liệt kê CHỈ 7 status cũ (`todo`/`doing`/`blocked`/`awaiting-human`/`awaiting-approval`/`done`), \"rendered as-is\" — literal, đã lệch 10 status thật hôm nay (thiếu `delivered`/`retrospective`/`cleanup`/`wontfix`) | **Gap có thật, ĐỘC LẬP với quyết định category** (DISCUSSION.md §3 #6) — cần sửa dù thiết kế category chốt kiểu gì; hiển thị \"as-is\" hôm nay đã ngầm giả định 1 domain, sẽ hiện sai khi domain khác dùng nhãn khác cho cùng category |",
+          "aliasLookups": [
+            {
+              "source": "plans/260925-documentation-authority-unification/alias-table.json",
+              "matches": []
+            },
+            {
+              "source": "docs/doc-registry.json",
+              "matches": []
+            }
+          ],
+          "queries": [
+            {
+              "query": "as-is",
+              "hitCount": 108,
+              "liveHitCount": 104,
+              "hitsSha256": "3cbfdad49242ae52e56f990045b536a58c371b68d333b44258774a33dd27b969"
+            },
+            {
+              "query": "docs/reference/triage-table-columns.md:18",
+              "hitCount": 1,
+              "liveHitCount": 1,
+              "hitsSha256": "6eca63502f6fc25f71e28ccf9ad6fe9f0954486ea844e3a80da3a7ee43d904d9"
+            },
+            {
+              "query": "rendered as-is",
+              "hitCount": 2,
+              "liveHitCount": 2,
+              "hitsSha256": "79aef9f25498ab31a830323e665dbb325eb1a8d1c86b0d7272d79a3fe803c4b5"
+            },
+            {
+              "query": "§3 #6",
+              "hitCount": 1,
+              "liveHitCount": 1,
+              "hitsSha256": "6eca63502f6fc25f71e28ccf9ad6fe9f0954486ea844e3a80da3a7ee43d904d9"
+            }
+          ],
+          "assessment": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+          "hitGroups": [
+            {
+              "query": "as-is",
+              "carriageCount": 4,
+              "liveCount": 104,
+              "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+              "liveAssessment": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+              "category": "citation-only",
+              "note": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation."
+            },
+            {
+              "query": "docs/reference/triage-table-columns.md:18",
+              "carriageCount": 0,
+              "liveCount": 1,
+              "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+              "liveAssessment": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+              "category": "citation-only",
+              "note": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation."
+            },
+            {
+              "query": "rendered as-is",
+              "carriageCount": 0,
+              "liveCount": 2,
+              "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+              "liveAssessment": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+              "category": "citation-only",
+              "note": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation."
+            },
+            {
+              "query": "§3 #6",
+              "carriageCount": 0,
+              "liveCount": 1,
+              "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+              "liveAssessment": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+              "category": "citation-only",
+              "note": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation."
+            }
+          ]
+        }
+      },
+      "diffChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "set": "batch-041",
+      "edgeId": "maps-j-08368",
+      "kind": "outcome",
+      "before": {
+        "edgeId": "maps-j-08368",
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 42,
+            "columnStart": 4,
+            "line": 2107,
+            "text": "docs/reference/triage-table-columns.md"
+          }
+        ],
+        "matchedExpression": "docs/reference/triage-table-columns.md",
+        "disposition": "preserve",
+        "diffHunk": null,
+        "reason": "L12-26(3,5,8), L12-30(5): historical decision/provenance; target renamed at 126a8ae518a3390b40179d050b2452e23143ebb7 to docs/knowledge/fgos-triage-table-columns/triage-table-columns.md; registry successor docs/knowledge/fgos-triage-table-columns/triage-table-columns.md; source spelling retained as provenance: docs/reference/triage-table-columns.md; preserve exact source spelling. Non-executable successor note: docs/knowledge/fgos-triage-table-columns/triage-table-columns.md. Non-executable successor: docs/knowledge/fgos-triage-table-columns/triage-table-columns.md (move 126a8ae51); decision-provenance spelling retained. Source: docs/specs/work-state.md:2107. L12-31(5) region quote: “Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.”",
+        "target": null,
+        "anchor": null,
+        "timing": "none",
+        "blockedReason": null,
+        "dependency": null,
+        "blockedCategory": null,
+        "dependencyCategory": null,
+        "targetFacts": [
+          {
+            "state": "renamed",
+            "path": "docs/reference/triage-table-columns.md",
+            "commit": "126a8ae518a3390b40179d050b2452e23143ebb7",
+            "successor": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md"
+          }
+        ],
+        "unitId": "item-L2107"
+      },
+      "after": {
+        "edgeId": "maps-j-08368",
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 42,
+            "columnStart": 4,
+            "line": 2107,
+            "text": "docs/reference/triage-table-columns.md"
+          }
+        ],
+        "matchedExpression": "docs/reference/triage-table-columns.md",
+        "disposition": "parked",
+        "diffHunk": null,
+        "reason": "L12-30, L12-32, L12-34: Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+        "target": null,
+        "anchor": null,
+        "timing": "none",
+        "blockedReason": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+        "dependency": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+        "blockedCategory": "description-rewrite",
+        "dependencyCategory": "description-rewrite",
+        "targetFacts": [
+          {
+            "state": "renamed",
+            "path": "docs/reference/triage-table-columns.md",
+            "commit": "126a8ae518a3390b40179d050b2452e23143ebb7",
+            "successor": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md"
+          }
+        ],
+        "unitId": "item-L2107",
+        "searchWitness": {
+          "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+          "roots": [
+            "docs/platform",
+            "docs/knowledge",
+            "docs/reference",
+            "docs/tutorials"
+          ],
+          "legacyPath": "docs/reference/triage-table-columns.md",
+          "passage": "- `docs/reference/triage-table-columns.md` lệch code (7 vs 10 status thật) là",
+          "aliasLookups": [
+            {
+              "source": "plans/260925-documentation-authority-unification/alias-table.json",
+              "matches": []
+            },
+            {
+              "source": "docs/doc-registry.json",
+              "matches": [
+                {
+                  "docId": "fgos-triage-table-columns:triage-table-columns",
+                  "topicId": "fgos-triage-table-columns",
+                  "role": "triage-table-columns",
+                  "framework": "diataxis",
+                  "mode": "reference",
+                  "docLifecycle": "provisional",
+                  "currentPath": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+                  "aliases": [
+                    "docs/reference/triage-table-columns.md"
+                  ],
+                  "sourceCaptureIds": [
+                    "docs/reference/triage-table-columns.md"
+                  ],
+                  "createdAt": "2026-08-26T00:19:29.487Z",
+                  "updatedAt": "2026-08-27T08:27:29.795Z"
+                }
+              ]
+            }
+          ],
+          "queries": [
+            {
+              "query": "docs/reference/triage-table-columns.md",
+              "hitCount": 3,
+              "liveHitCount": 3,
+              "hitsSha256": "e6c21846e569bb03bdeddab41fd7f45ca1e44f3980b269accdbabc06358690d4"
+            }
+          ],
+          "assessment": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+          "hitGroups": [
+            {
+              "query": "docs/reference/triage-table-columns.md",
+              "carriageCount": 0,
+              "liveCount": 3,
+              "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+              "liveAssessment": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation.",
+              "category": "citation-only",
+              "note": "Description needs rewrite: the paragraph claims the triage document has seven statuses versus ten in code, but its committed renamed holder already lists ten statuses in the status table and enumeration. Reconcile the stale seven-versus-ten claim before changing the citation."
+            }
+          ]
+        }
+      },
+      "diffChanged": false
+    }
+  ],
+  "checkerChanges": [
+    "body Related lists count as navigation",
+    "renamed-alias preserve outside carriage/history fails",
+    "wrapped reference destinations distribute across all pinned spans; no token dropped",
+    "normalize repo/ and path:line before alias lookup",
+    "citation-specific evidence anchors use repository GitHub slugs for Markdown and extractor anchors for plain references",
+    "wrapped units require unique, non-overlapping consecutive physical spans and preserve continuation indentation/comment prefixes"
+  ],
+  "consumerEdits": 0,
+  "historicalFixtureOnly": {
+    "file": "step-03-probes.py",
+    "migrations": [
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08275",
+        "target": "docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
+        "rule": "L12-37; real in-memory alias patch, not a check waiver"
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08299",
+        "target": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+        "rule": "L12-37; real in-memory alias patch, not a check waiver"
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08300",
+        "target": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+        "rule": "L12-37; real in-memory alias patch, not a check waiver"
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08308",
+        "target": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+        "rule": "L12-37; real in-memory alias patch, not a check waiver"
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08309",
+        "target": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+        "rule": "L12-37; real in-memory alias patch, not a check waiver"
+      }
+    ],
+    "actualConsumerRecordChanged": false,
+    "reason": "Archived full-runner fixture predates L12-37; runner actually retires. In-memory fixture uses real aliases/targets/diffs to remain valid under current checks, with all 87 old mutations unchanged and no rule waived."
+  }
+}

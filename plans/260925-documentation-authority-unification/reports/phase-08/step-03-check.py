@@ -66,6 +66,23 @@ def bounds(text,spans):
     for l in ls: offsets.append(offsets[-1]+len(l))
     return [(offsets[s['line']-1]+s['columnStart']-1,offsets[s['line']-1]+s['columnEndExclusive']-1) for s in spans]
 
+def replacement_changes(text,spans,replacement):
+    """Replace one logical reference across its bound physical spans.
+
+    Keep line breaks and indentation outside spans; distribute the destination
+    at path separators without dropping any character of the logical token.
+    """
+    positions=bounds(text,spans);parts=[];tail=replacement
+    for span in spans[:-1]:
+        limit=min(len(span['text']),len(tail)-1)
+        cuts=[i+1 for i,ch in enumerate(tail[:limit]) if ch in '/-']
+        cut=cuts[-1] if cuts else limit
+        assert cut>0
+        parts.append(tail[:cut]);tail=tail[cut:]
+    parts.append(tail)
+    return [(a,b,(re.match(r'^[ \t]*(?:(?:>[ \t]*)+|//[ \t]*)?',span['text'])[0] if i else '')+part)
+            for i,((a,b),span,part) in enumerate(zip(positions,spans,parts))]
+
 def normalize(file,destination):
     p=destination.split('#',1)[0]
     if p.startswith('repo/'): p=p[5:]
@@ -133,6 +150,9 @@ def related_header(text, line):
     # A wrapper header ends at a blank line, code fence, or heading. A Related
     # block inside Literal Snapshot is source bytes, not wrapper navigation.
     lines=text.splitlines()
+    if not carriage_declaration(text,line):
+        headers=[(i,l) for i,l in enumerate(lines[:line],1) if re.match(r'^#{1,6} ',l)]
+        if headers and re.match(r'^#{1,6} Related\s*$',headers[-1][1],re.I):return True
     if not re.match(r'^\s*(?:[-*] |Related:)',lines[line-1]):return False
     fences=[i for i,l in enumerate(lines,1) if l.startswith('```')]
     if len(fences)>=2 and fences[0]<15 and line>fences[1]:return False
@@ -448,7 +468,8 @@ def evidence_anchor(commit,e,proof):
     sections=heading_sections(commit,e['target'])
     holders=[h for h in sections if all(h['startLine']<=n<=h['sectionEndLine'] for n in lines)]
     holder=max(holders,key=lambda h:(h['level'],h['startLine']))
-    assert e['anchor']==holder['anchor'],'anchor differs from nearest extractor heading'
+    expected=holder['githubSlug'] if e['matchedExpression'].startswith(('[','![')) else holder['anchor']
+    assert e['anchor']==expected,'anchor differs from nearest heading in citation-specific form'
     text=blob(commit,e['target']).decode().splitlines()
     assert proof['targetLineText']==[text[n-1] for n in lines], 'line evidence differs from pinned target'
 
@@ -460,6 +481,23 @@ class Checker:
         self.tree=set(git('ls-tree','-r','--name-only',commit).decode().splitlines())
         self.dirs={str(pathlib.PurePosixPath(p).parent) for p in self.tree}
         self.dirs.update('/'.join(p.split('/')[:i]) for p in self.tree for i in range(1,len(p.split('/'))))
+    def renamed_alias_holders(self,r,e):
+        """L12-37(2): missing preserved navigation with a committed live alias."""
+        f=r['file'];body=blob(self.commit,f).decode()
+        if e['disposition']!='preserve' or carriage_declaration(body,e['sourceSpans'][0]['line']):return []
+        if '/history/' in f or f.startswith('docs/journals/') or re.search(r'^Document type:\s*History|Superseded / implementation history only',body[:7000],re.M|re.I):return []
+        inv=self.entries.get(e['edgeId']) or e.get('authorAddedEdge',{})
+        path=re.sub(r':\d+(?:[-–]\d+)?$','',path_identity(inv['normalizedReference'].removeprefix('repo/')))
+        if path in self.tree|self.dirs:return []
+        holders=set()
+        for a in resolver.aliases(self.commit,path):
+            row=a['entry']
+            for key in ('currentPath','targetPath','toPath','targetOwner'):
+                holder=row.get(key)
+                if isinstance(holder,str):
+                    holder=holder.split('#')[0]
+                    if holder in self.tree and not resolver.carriage(blob(self.commit,holder).decode(),1,holder):holders.add(holder)
+        return sorted(holders)
     def check_record(self,r,apply=True):
         if r.get('retiresWithTree'):return retirement_failures(r,self)
         failures=[]
@@ -560,6 +598,7 @@ class Checker:
                      'normalizedReference':e['authorAddedEdge']['normalizedReference'],'locatorTokens':[]}
             if not inv: continue
             check('related-retiring-preserve',lambda e=e,inv=inv:not (e['disposition']=='preserve' and inv['normalizedReference'].startswith(RETIRING_ROOTS) and related_header(before,e['sourceSpans'][0]['line'])))
+            check('renamed-alias-preserve',lambda e=e:not self.renamed_alias_holders(r,e))
             check('source-span',lambda e=e:spans_text(before,e['sourceSpans'])==e['matchedExpression'])
             def carriage_facts(e=e):
                 declaration=carriage_declaration(before,e['sourceSpans'][0]['line'])
@@ -695,8 +734,8 @@ class Checker:
                 assert e['target'] not in rest
             check('related-duplicate',related)
             bs=bounds(before,e['sourceSpans'])
-            check('complete-unit',lambda bs=bs:len(bs)==1)
-            if len(bs)==1:changes.append((bs[0][0],bs[0][1],replacement))
+            check('complete-unit',lambda bs=bs:bool(bs) and len(bs)==len(e['sourceSpans']) and len(set(bs))==len(bs) and all(a<b for a,b in bs) and all(e['sourceSpans'][i]['line']+1==e['sourceSpans'][i+1]['line'] and bs[i][1]<=bs[i+1][0] for i in range(len(bs)-1)))
+            changes.extend(replacement_changes(before,e['sourceSpans'],replacement))
         check('orphan-hunk',lambda:used_hunks=={x.splitlines()[0] for x in hunks(r['diff'])})
         unique=sorted(set(changes));after=before
         check('overlap',lambda:all(unique[i][1]<=unique[i+1][0] for i in range(len(unique)-1)))

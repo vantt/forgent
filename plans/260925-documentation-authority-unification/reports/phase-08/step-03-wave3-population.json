@@ -1,0 +1,23 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 271,
+  "inventoryEdges": 1769,
+  "retiringFiles": 82,
+  "retiringEdges": 884,
+  "activeFiles": 189,
+  "activeEdges": 887,
+  "addedEdges": 2,
+  "patchedFiles": 25,
+  "dispositions": {
+    "preserve": 741,
+    "parked": 106,
+    "patch": 40
+  },
+  "parks": {
+    "step5-parity": 95,
+    "description-rewrite": 5,
+    "phase9-carry": 6
+  },
+  "leadRulingGaps": [],
+  "acceptance": "AUTHOR only, independent per-set/per-stratum review pending."
+}
