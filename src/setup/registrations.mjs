@@ -1482,7 +1482,7 @@ registerCheck({
 
 registerCheck({
   id: 'model-policy-pools',
-  description: 'every pool a runner.modelPolicies cell names (model@pool) is declared in runner.llmAccounts; warns otherwise',
+  description: 'every pool a runner.modelPolicies cell names (model@pool) is declared in runner.llmAccounts, since a pool with no account is skipped by the walk; warns otherwise',
   check: (cwd) => checkModelPolicyPools(cwd),
 });
 
@@ -1494,7 +1494,7 @@ registerCheck({
 
 registerCheck({
   id: 'llm-accounts-vs-legacy',
-  description: 'when runner.llmAccounts is declared, it carries the same accounts and login directories as runner.providers, which the lease still reads; warns otherwise',
+  description: 'when runner.llmAccounts is declared, it carries the same accounts and login directories as runner.providers, which the lease still reads for a pool llmAccounts does not declare; warns otherwise',
   check: (cwd) => checkLlmAccountsVsLegacy(cwd),
 });
 

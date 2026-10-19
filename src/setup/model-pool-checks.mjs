@@ -83,7 +83,7 @@ export function checkModelPolicyPools(cwd) {
   if (missing.length > 0) {
     return {
       passed: true,
-      message: `warning: tier cells name pools runner.llmAccounts does not declare: ${missing.map((e) => `${e.cell}@${e.pool}`).join(', ')}; these entries cannot run until the pool has accounts`,
+      message: `warning: tier cells name pools runner.llmAccounts does not declare: ${missing.map((e) => `${e.cell}@${e.pool}`).join(', ')}; the walk skips these entries until the pool has an enabled account holding a login store for the CLI of the invocation (fgos dispatch explain shows each)`,
     };
   }
   return { passed: true, message: `${explicit.length} tier cell entries name a pool declared in runner.llmAccounts` };
@@ -106,7 +106,10 @@ export function checkLlmAccountsShape(cwd) {
   return { passed: true, message: `runner.llmAccounts declares ${count} accounts in ${Object.keys(pools).length} pools` };
 }
 
-/** While the lease reads runner.providers, an account declared on one side only is a surprise later. */
+/**
+ * The lease reads a pool from runner.llmAccounts when it declares it and from runner.providers
+ * otherwise (the transition read), so an account declared on one side only is a surprise later.
+ */
 export function checkLlmAccountsVsLegacy(cwd) {
   const { runnerConfig, skip } = loadOrExplain(cwd);
   if (skip) return skip;
@@ -116,7 +119,7 @@ export function checkLlmAccountsVsLegacy(cwd) {
   if (onlyLegacy.length > 0) parts.push(`only in runner.providers: ${onlyLegacy.map((a) => `${a.pool}/${a.account}`).join(', ')}`);
   if (onlyNew.length > 0) parts.push(`only in runner.llmAccounts: ${onlyNew.map((a) => `${a.pool}/${a.account}`).join(', ')}`);
   if (storeMismatch.length > 0) parts.push(`different login directories: ${storeMismatch.map((a) => `${a.pool}/${a.account}`).join(', ')}`);
-  if (parts.length > 0) return { passed: true, message: `warning: the lease still reads runner.providers; ${parts.join('; ')}` };
+  if (parts.length > 0) return { passed: true, message: `warning: the lease reads runner.llmAccounts for a pool it declares and runner.providers for the rest; ${parts.join('; ')}` };
   return { passed: true, message: 'runner.llmAccounts matches runner.providers' };
 }
 
