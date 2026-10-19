@@ -1,0 +1,1319 @@
+{
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "assemblyCopies": [
+    {
+      "path": ".agents/skills/_shared/capability-catalog.md",
+      "sourcePath": "core/skills/_shared/capability-catalog.md",
+      "fileDigest": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "sourceDigest": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/_shared/capability-matching.md",
+      "sourcePath": "core/skills/_shared/capability-matching.md",
+      "fileDigest": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
+      "sourceDigest": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/_shared/catchup-self-recovery.md",
+      "sourcePath": "core/skills/_shared/catchup-self-recovery.md",
+      "fileDigest": "922265f0c21121259b026a428710d40dac0150dbcefe0ad958dd91fc8ed78ce1",
+      "sourceDigest": "84afa75b23b685d1357210eb31f0b257fbbe959fc519598e9992e1fcf3e091a8",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/_shared/citation-format.md",
+      "sourcePath": "core/skills/_shared/citation-format.md",
+      "fileDigest": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+      "sourceDigest": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/_shared/coding-cell-policy.md",
+      "sourcePath": "domains/coding/skills/_shared/coding-cell-policy.md",
+      "fileDigest": "0c5bc230f8d9ee3c75b55c582300bb96cf102d87b8114dcb56bba67bd31a59d0",
+      "sourceDigest": "5860d544eaeb4d9a5f83a61204a6fea8122a9bd3976a5e4e396e11b21e13fbb1",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/_shared/coding-worker-contract.md",
+      "sourcePath": "core/skills/_shared/coding-worker-contract.md",
+      "fileDigest": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "sourceDigest": "e76250e9dc79a8c161f6e7e4c22e85069461e4c4b29d919b10bbff6059185185",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/_shared/coordination-driver.md",
+      "sourcePath": "core/skills/_shared/coordination-driver.md",
+      "fileDigest": "8ed96f146f16d68186ab8504df95accd715781f1c8dc74f7056b610baa4fd3cc",
+      "sourceDigest": "7cdefc3fa3ab4d8a12d4b8d1856843bdb59031b88b29d67ccbd02ad0d0f14bc4",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/_shared/decision-question.md",
+      "sourcePath": "core/skills/_shared/decision-question.md",
+      "fileDigest": "59e905ab0e06d35299aed5420de2edafbe83bfb1030bc200dad423db38950393",
+      "sourceDigest": "b53bfbc91ef5fbe5833c2dec5c7181df1d1b5d276248d795722095d2f1d2c8b7",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+      "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+      "sourceDigest": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/_shared/fgos-cli-fallback.md",
+      "sourcePath": "core/skills/_shared/fgos-cli-fallback.md",
+      "fileDigest": "de0c928316be7ec03cee52d43974e249bbaae9fe3d90ac3fa2c175705eefc587",
+      "sourceDigest": "923bc223a8cd0b81bc2cd5785083e9650f304f87b40f595645f227a383797dd5",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/_shared/planning-capability-awareness.md",
+      "sourcePath": "core/skills/_shared/planning-capability-awareness.md",
+      "fileDigest": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "sourceDigest": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/_shared/private-cell-worktree.md",
+      "sourcePath": "core/skills/_shared/private-cell-worktree.md",
+      "fileDigest": "6e238b11d9bb8d5eb0b52c78d4374c68a3d315ae8f977376d8e8a8cef7e09fc9",
+      "sourceDigest": "1464561d491b83d7f752cf1e2a73e44aac5d6f47ffab6928d696ff3812699b37",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/distill/CREATION-LOG.md",
+      "sourcePath": "core/skills/distill/CREATION-LOG.md",
+      "fileDigest": "60afdb5c524fa528f6771c9d9a7d4e3ef2bdb1364ff6abf1bdd3210fb5c9d9d9",
+      "sourceDigest": "15a662efd1f47e8ba07be655d4f3397e45901f9666676584c264c43511943486",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/distill/SKILL.md",
+      "sourcePath": "core/skills/distill/SKILL.md",
+      "fileDigest": "76dc97fe8f8c7eabdb0ac44425b3fca2a39474f03e2d35b39512a399b7e3e1b4",
+      "sourceDigest": "4b45bcab0699be58354933be096ebd4943a8ca7b26f81e91f40d356a01643ca7",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/distill/references/consult-protocol.md",
+      "sourcePath": "core/skills/distill/references/consult-protocol.md",
+      "fileDigest": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503",
+      "sourceDigest": "f435be045fea0a10a367d0dac428a512444694041877cff9a57991dada0a73e4",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/distill/references/deep-dive-protocol.md",
+      "sourcePath": "core/skills/distill/references/deep-dive-protocol.md",
+      "fileDigest": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
+      "sourceDigest": "dc6c43de2ffdb23e581b19f2d46a72affbc2279d92f7ccb971fd567c5e7d9961",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/distill/references/extract-rules.md",
+      "sourcePath": "core/skills/distill/references/extract-rules.md",
+      "fileDigest": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8",
+      "sourceDigest": "bd27a5dde54a78556fb4e7603dd7930217d2e6972b049bc99ea8e33402d316de",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-advise/SKILL.md",
+      "sourcePath": "core/skills/fgos-advise/SKILL.md",
+      "fileDigest": "37b42d396cc54d8d57f66188aa95738e45ca3bee30aa2c159e77d6baaf6fe4e4",
+      "sourceDigest": "fc3dcbf9953bcc16ca71d77a8d09ed4a34c32b1eebc07a5c7448832eccaad88d",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-advise/references/request-kinds-and-routes.md",
+      "sourcePath": "core/skills/fgos-advise/references/request-kinds-and-routes.md",
+      "fileDigest": "b6a5fe324e636686e11c6b9e618bd9594e4972d4016bb7b8669aa532d7dbbd4f",
+      "sourceDigest": "dacf826724674d3dc92a6638c0e806be4a613792d889b7b42c41632711fdc1d9",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-architecture-panel/SKILL.md",
+      "sourcePath": "core/skills/fgos-architecture-panel/SKILL.md",
+      "fileDigest": "0e73e2b90921338641519e55d65edfa3869b1e66acd09420e614fd3cf7f24dfd",
+      "sourceDigest": "b82218093ebe293c00c47d59a7dea6802da7bf5d9bd27a18fe7038a24da42a47",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-clarifying/SKILL.md",
+      "sourcePath": "core/skills/fgos-clarifying/SKILL.md",
+      "fileDigest": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+      "sourceDigest": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-discovering/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "fileDigest": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
+      "sourceDigest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-driving/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-driving/SKILL.md",
+      "fileDigest": "07066c5f3789392655f000f60883a8d8d432a0a9f39f1ca8f5971f3c5befa0ba",
+      "sourceDigest": "e241360f3670b6c54d8c730ff6028f4455174c6019b426338e93312cae2d71bd",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-driving/references/caller-contract.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-driving/references/caller-contract.md",
+      "fileDigest": "dcf13fe93461eedc708bc65b496eee323c7fca421b597f296f5d4dbeb28eca6c",
+      "sourceDigest": "e24b2edec6a8c260be7be810537e324c9dcf2a8be322f42531644a719c7cc418",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-driving/references/loop-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md",
+      "fileDigest": "c8afa92336735847e4f2486c272098898ec6017efa0a6588c274004588b307e1",
+      "sourceDigest": "fa1d4c0f277f05e5213486db2709fda6caec91f6c4ff0e0c67028cee21275713",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-driving/references/reclaim-and-role-graph.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-driving/references/reclaim-and-role-graph.md",
+      "fileDigest": "a61b76a44bfc046808e494629a298e34535861e2af676b0c370ba030855b645c",
+      "sourceDigest": "47e1ad800ea1f15ed59e81ef3f12149015a218fe496c2909331fa25064e7dc16",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+      "fileDigest": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "sourceDigest": "9427b9e7d3bfe654519419ec2ec8632b66b69bca11218c2279238cc4f3289d3f",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "fileDigest": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "sourceDigest": "b0bc2aeacea29dbe5f4ea8d46a684ca9f907453f8813f02accf226f1549463bc",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "fileDigest": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "sourceDigest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/references/re-entry-from-planning.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/re-entry-from-planning.md",
+      "fileDigest": "53bdbc198a36a11d4c4b8b29dea4a15254602c80c278651b6c7f865edcee6ed4",
+      "sourceDigest": "bf05e294c104a9c413c6bdb41c3ce0443dcf90d3bf180239dc0a187e8bd58d8c",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "fileDigest": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
+      "sourceDigest": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+      "fileDigest": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "sourceDigest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+      "fileDigest": "8b595ac32f219313bdc7e824803fdb2be32692dea986326f376dc20acd4966f2",
+      "sourceDigest": "1be49dfb43f958ffd5d54aa73ba8a4e29f4591332f3f46316970f1dcab34ad37",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/references/return-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/return-mechanics.md",
+      "fileDigest": "ba349aaaa33f3ddc317ed468f6abde8acd41df307e58b30ff75d83fef04cdfb2",
+      "sourceDigest": "ef6e11b880c3b1e55f42d0963f17b9127e530aaad576ff034a0afe98cdc09067",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "fileDigest": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+      "sourceDigest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "fileDigest": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "sourceDigest": "ea2d3891915949c1e9764240b81af748393713f00685ac173eb5c64ed1df9043",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "fileDigest": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "sourceDigest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "fileDigest": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "sourceDigest": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+      "fileDigest": "8b264db72fb94bd59c8bd3e5b1ebb939f3a7b0776645bcda7fa54b5577004f9b",
+      "sourceDigest": "f6d79063ae11e9e48db33b5876ea414292f9023c1da4b2adc70478e4785ce576",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "fileDigest": "49fed6b7fb21fab69354cb383c8857926d3636c53f08e8c040e4763f1a50aa70",
+      "sourceDigest": "4eca5e5f5db1c61d2582cced415a1b283d3663274760fea6e76e9ffb3ad3b3e7",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+      "fileDigest": "d15bbb0c0b52d6bca57ede0d785dce5a4682db90912a499f9ee164b457e25c77",
+      "sourceDigest": "5d48fdf43978474a8339f75bf2b1bc9e215e02545a2cbda4019845d6feb42297",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "fileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "sourceDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "fileDigest": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3",
+      "sourceDigest": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+      "fileDigest": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "sourceDigest": "fa831842240da6d8b77ad4193a09c1ccf8ea7972608ec31fc3966c2511b06d0c",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "fileDigest": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "sourceDigest": "7e448dffd744f14eec929b42849e7c6567743a257ee3950e7f559ba2c78a3183",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "fileDigest": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "sourceDigest": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md",
+      "fileDigest": "1b0496bcdc6e22ab650325b363dae7eb225b7b61cd154d0b1b7489f449622b30",
+      "sourceDigest": "186f7bb8f6fce1dc830dd9037f672dc41a06dff4806232a294e43d3c7bba4a55",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-fanout/SKILL.md",
+      "sourcePath": "core/skills/fgos-fanout/SKILL.md",
+      "fileDigest": "2d3c472e1bdf901d31ee54dff6e444f737650f73175cbd597732d2f4742ebb79",
+      "sourceDigest": "03dc71d49ddb0ecc44d05f3ef8377d2473531e5dc94684802623851a3197624a",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+      "sourcePath": "core/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+      "fileDigest": "a0fe69420b35473170e16047369fb3ce6d9dff9c33de08d9b84e00ef46a6f885",
+      "sourceDigest": "6aaaa2f8c3704b7c36dbcbf9f9603880c3704cf2b878ace806607c4202f19925",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-group-thinking/SKILL.md",
+      "sourcePath": "core/skills/fgos-group-thinking/SKILL.md",
+      "fileDigest": "3992738511dbd7eb4c512a9b6da86aa59539064390c08474bb1ccf6913919146",
+      "sourceDigest": "17fc268485be03314fc525ffa8110c9e863372921ea424a28f2123179b4caa7e",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-indexing/SKILL.md",
+      "sourcePath": "core/skills/fgos-indexing/SKILL.md",
+      "fileDigest": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+      "sourceDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-lock-fence/SKILL.md",
+      "sourcePath": "core/skills/fgos-lock-fence/SKILL.md",
+      "fileDigest": "3b9608f2fe74dd8dd31e63d1de65451023bacaa8f32eaf992da01d632455ab49",
+      "sourceDigest": "582332cc26e747b37b1529a3f8bd548888a3daf21b975cdd5617de2f5bef4a14",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-researching/SKILL.md",
+      "sourcePath": "core/skills/fgos-researching/SKILL.md",
+      "fileDigest": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
+      "sourceDigest": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-routing/SKILL.md",
+      "sourcePath": "core/skills/fgos-routing/SKILL.md",
+      "fileDigest": "8a215975394d282772c768e69a0767aabbf1a2ca30e0fe7959252f7fcdba3a8e",
+      "sourceDigest": "b1e259da39eee39c9b213f3ae156ec1680ffd816ff40a8a51e78379ccb3b05ce",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".agents/skills/fgos-run/SKILL.md",
+      "sourcePath": "core/skills/fgos-run/SKILL.md",
+      "fileDigest": "825f130e0a838dc788b7d67cc3c8cdd8877667c524d744f6acda2a76928d286a",
+      "sourceDigest": "8fd267a429aa393cbc936e7d583e2dc432962a0dcda8da849bbd0dc9dbf4c82d",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/distill/CREATION-LOG.md",
+      "sourcePath": "core/skills/distill/CREATION-LOG.md",
+      "fileDigest": "60afdb5c524fa528f6771c9d9a7d4e3ef2bdb1364ff6abf1bdd3210fb5c9d9d9",
+      "sourceDigest": "15a662efd1f47e8ba07be655d4f3397e45901f9666676584c264c43511943486",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/distill/references/consult-protocol.md",
+      "sourcePath": "core/skills/distill/references/consult-protocol.md",
+      "fileDigest": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503",
+      "sourceDigest": "f435be045fea0a10a367d0dac428a512444694041877cff9a57991dada0a73e4",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/distill/references/deep-dive-protocol.md",
+      "sourcePath": "core/skills/distill/references/deep-dive-protocol.md",
+      "fileDigest": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
+      "sourceDigest": "dc6c43de2ffdb23e581b19f2d46a72affbc2279d92f7ccb971fd567c5e7d9961",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/distill/references/extract-rules.md",
+      "sourcePath": "core/skills/distill/references/extract-rules.md",
+      "fileDigest": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8",
+      "sourceDigest": "bd27a5dde54a78556fb4e7603dd7930217d2e6972b049bc99ea8e33402d316de",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-advise/references/request-kinds-and-routes.md",
+      "sourcePath": "core/skills/fgos-advise/references/request-kinds-and-routes.md",
+      "fileDigest": "b6a5fe324e636686e11c6b9e618bd9594e4972d4016bb7b8669aa532d7dbbd4f",
+      "sourceDigest": "dacf826724674d3dc92a6638c0e806be4a613792d889b7b42c41632711fdc1d9",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-driving/references/caller-contract.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-driving/references/caller-contract.md",
+      "fileDigest": "dcf13fe93461eedc708bc65b496eee323c7fca421b597f296f5d4dbeb28eca6c",
+      "sourceDigest": "e24b2edec6a8c260be7be810537e324c9dcf2a8be322f42531644a719c7cc418",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-driving/references/loop-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md",
+      "fileDigest": "c8afa92336735847e4f2486c272098898ec6017efa0a6588c274004588b307e1",
+      "sourceDigest": "fa1d4c0f277f05e5213486db2709fda6caec91f6c4ff0e0c67028cee21275713",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-driving/references/reclaim-and-role-graph.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-driving/references/reclaim-and-role-graph.md",
+      "fileDigest": "a61b76a44bfc046808e494629a298e34535861e2af676b0c370ba030855b645c",
+      "sourceDigest": "47e1ad800ea1f15ed59e81ef3f12149015a218fe496c2909331fa25064e7dc16",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "fileDigest": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "sourceDigest": "b0bc2aeacea29dbe5f4ea8d46a684ca9f907453f8813f02accf226f1549463bc",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "fileDigest": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "sourceDigest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-exploring/references/re-entry-from-planning.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/re-entry-from-planning.md",
+      "fileDigest": "53bdbc198a36a11d4c4b8b29dea4a15254602c80c278651b6c7f865edcee6ed4",
+      "sourceDigest": "bf05e294c104a9c413c6bdb41c3ce0443dcf90d3bf180239dc0a187e8bd58d8c",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "fileDigest": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
+      "sourceDigest": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+      "fileDigest": "8b595ac32f219313bdc7e824803fdb2be32692dea986326f376dc20acd4966f2",
+      "sourceDigest": "1be49dfb43f958ffd5d54aa73ba8a4e29f4591332f3f46316970f1dcab34ad37",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-implement/references/return-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/return-mechanics.md",
+      "fileDigest": "ba349aaaa33f3ddc317ed468f6abde8acd41df307e58b30ff75d83fef04cdfb2",
+      "sourceDigest": "ef6e11b880c3b1e55f42d0963f17b9127e530aaad576ff034a0afe98cdc09067",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "fileDigest": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+      "sourceDigest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "fileDigest": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "sourceDigest": "ea2d3891915949c1e9764240b81af748393713f00685ac173eb5c64ed1df9043",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-planning/references/approach-and-shape.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+      "fileDigest": "8b264db72fb94bd59c8bd3e5b1ebb939f3a7b0776645bcda7fa54b5577004f9b",
+      "sourceDigest": "f6d79063ae11e9e48db33b5876ea414292f9023c1da4b2adc70478e4785ce576",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "fileDigest": "49fed6b7fb21fab69354cb383c8857926d3636c53f08e8c040e4763f1a50aa70",
+      "sourceDigest": "4eca5e5f5db1c61d2582cced415a1b283d3663274760fea6e76e9ffb3ad3b3e7",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-planning/references/split-and-child-specs.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+      "fileDigest": "d15bbb0c0b52d6bca57ede0d785dce5a4682db90912a499f9ee164b457e25c77",
+      "sourceDigest": "5d48fdf43978474a8339f75bf2b1bc9e215e02545a2cbda4019845d6feb42297",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "fileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "sourceDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "fileDigest": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "sourceDigest": "7e448dffd744f14eec929b42849e7c6567743a257ee3950e7f559ba2c78a3183",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "fileDigest": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "sourceDigest": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md",
+      "fileDigest": "1b0496bcdc6e22ab650325b363dae7eb225b7b61cd154d0b1b7489f449622b30",
+      "sourceDigest": "186f7bb8f6fce1dc830dd9037f672dc41a06dff4806232a294e43d3c7bba4a55",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": ".claude/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+      "sourcePath": "core/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+      "fileDigest": "a0fe69420b35473170e16047369fb3ce6d9dff9c33de08d9b84e00ef46a6f885",
+      "sourceDigest": "6aaaa2f8c3704b7c36dbcbf9f9603880c3704cf2b878ace806607c4202f19925",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/capability-catalog.md",
+      "sourcePath": "core/skills/_shared/capability-catalog.md",
+      "fileDigest": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "sourceDigest": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/capability-matching.md",
+      "sourcePath": "core/skills/_shared/capability-matching.md",
+      "fileDigest": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
+      "sourceDigest": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/catchup-self-recovery.md",
+      "sourcePath": "core/skills/_shared/catchup-self-recovery.md",
+      "fileDigest": "922265f0c21121259b026a428710d40dac0150dbcefe0ad958dd91fc8ed78ce1",
+      "sourceDigest": "84afa75b23b685d1357210eb31f0b257fbbe959fc519598e9992e1fcf3e091a8",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/citation-format.md",
+      "sourcePath": "core/skills/_shared/citation-format.md",
+      "fileDigest": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+      "sourceDigest": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/coding-cell-policy.md",
+      "sourcePath": "domains/coding/skills/_shared/coding-cell-policy.md",
+      "fileDigest": "0c5bc230f8d9ee3c75b55c582300bb96cf102d87b8114dcb56bba67bd31a59d0",
+      "sourceDigest": "5860d544eaeb4d9a5f83a61204a6fea8122a9bd3976a5e4e396e11b21e13fbb1",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/coding-worker-contract.md",
+      "sourcePath": "core/skills/_shared/coding-worker-contract.md",
+      "fileDigest": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "sourceDigest": "e76250e9dc79a8c161f6e7e4c22e85069461e4c4b29d919b10bbff6059185185",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/coordination-driver.md",
+      "sourcePath": "core/skills/_shared/coordination-driver.md",
+      "fileDigest": "8ed96f146f16d68186ab8504df95accd715781f1c8dc74f7056b610baa4fd3cc",
+      "sourceDigest": "7cdefc3fa3ab4d8a12d4b8d1856843bdb59031b88b29d67ccbd02ad0d0f14bc4",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/decision-question.md",
+      "sourcePath": "core/skills/_shared/decision-question.md",
+      "fileDigest": "59e905ab0e06d35299aed5420de2edafbe83bfb1030bc200dad423db38950393",
+      "sourceDigest": "b53bfbc91ef5fbe5833c2dec5c7181df1d1b5d276248d795722095d2f1d2c8b7",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+      "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+      "sourceDigest": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/fgos-cli-fallback.md",
+      "sourcePath": "core/skills/_shared/fgos-cli-fallback.md",
+      "fileDigest": "de0c928316be7ec03cee52d43974e249bbaae9fe3d90ac3fa2c175705eefc587",
+      "sourceDigest": "923bc223a8cd0b81bc2cd5785083e9650f304f87b40f595645f227a383797dd5",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+      "sourcePath": "core/skills/_shared/planning-capability-awareness.md",
+      "fileDigest": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "sourceDigest": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/private-cell-worktree.md",
+      "sourcePath": "core/skills/_shared/private-cell-worktree.md",
+      "fileDigest": "6e238b11d9bb8d5eb0b52c78d4374c68a3d315ae8f977376d8e8a8cef7e09fc9",
+      "sourceDigest": "1464561d491b83d7f752cf1e2a73e44aac5d6f47ffab6928d696ff3812699b37",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-advise/SKILL.md",
+      "sourcePath": "core/skills/fgos-advise/SKILL.md",
+      "fileDigest": "37b42d396cc54d8d57f66188aa95738e45ca3bee30aa2c159e77d6baaf6fe4e4",
+      "sourceDigest": "fc3dcbf9953bcc16ca71d77a8d09ed4a34c32b1eebc07a5c7448832eccaad88d",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-advise/references/request-kinds-and-routes.md",
+      "sourcePath": "core/skills/fgos-advise/references/request-kinds-and-routes.md",
+      "fileDigest": "b6a5fe324e636686e11c6b9e618bd9594e4972d4016bb7b8669aa532d7dbbd4f",
+      "sourceDigest": "dacf826724674d3dc92a6638c0e806be4a613792d889b7b42c41632711fdc1d9",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md",
+      "sourcePath": "core/skills/fgos-architecture-panel/SKILL.md",
+      "fileDigest": "0e73e2b90921338641519e55d65edfa3869b1e66acd09420e614fd3cf7f24dfd",
+      "sourceDigest": "b82218093ebe293c00c47d59a7dea6802da7bf5d9bd27a18fe7038a24da42a47",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+      "sourcePath": "core/skills/fgos-clarifying/SKILL.md",
+      "fileDigest": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+      "sourceDigest": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "fileDigest": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
+      "sourceDigest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-driving/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-driving/SKILL.md",
+      "fileDigest": "07066c5f3789392655f000f60883a8d8d432a0a9f39f1ca8f5971f3c5befa0ba",
+      "sourceDigest": "e241360f3670b6c54d8c730ff6028f4455174c6019b426338e93312cae2d71bd",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-driving/references/caller-contract.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-driving/references/caller-contract.md",
+      "fileDigest": "dcf13fe93461eedc708bc65b496eee323c7fca421b597f296f5d4dbeb28eca6c",
+      "sourceDigest": "e24b2edec6a8c260be7be810537e324c9dcf2a8be322f42531644a719c7cc418",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-driving/references/loop-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md",
+      "fileDigest": "c8afa92336735847e4f2486c272098898ec6017efa0a6588c274004588b307e1",
+      "sourceDigest": "fa1d4c0f277f05e5213486db2709fda6caec91f6c4ff0e0c67028cee21275713",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-driving/references/reclaim-and-role-graph.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-driving/references/reclaim-and-role-graph.md",
+      "fileDigest": "a61b76a44bfc046808e494629a298e34535861e2af676b0c370ba030855b645c",
+      "sourceDigest": "47e1ad800ea1f15ed59e81ef3f12149015a218fe496c2909331fa25064e7dc16",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+      "fileDigest": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "sourceDigest": "9427b9e7d3bfe654519419ec2ec8632b66b69bca11218c2279238cc4f3289d3f",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "fileDigest": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "sourceDigest": "b0bc2aeacea29dbe5f4ea8d46a684ca9f907453f8813f02accf226f1549463bc",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "fileDigest": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "sourceDigest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/references/re-entry-from-planning.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/re-entry-from-planning.md",
+      "fileDigest": "53bdbc198a36a11d4c4b8b29dea4a15254602c80c278651b6c7f865edcee6ed4",
+      "sourceDigest": "bf05e294c104a9c413c6bdb41c3ce0443dcf90d3bf180239dc0a187e8bd58d8c",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "fileDigest": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
+      "sourceDigest": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+      "fileDigest": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "sourceDigest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+      "fileDigest": "8b595ac32f219313bdc7e824803fdb2be32692dea986326f376dc20acd4966f2",
+      "sourceDigest": "1be49dfb43f958ffd5d54aa73ba8a4e29f4591332f3f46316970f1dcab34ad37",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-implement/references/return-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/return-mechanics.md",
+      "fileDigest": "ba349aaaa33f3ddc317ed468f6abde8acd41df307e58b30ff75d83fef04cdfb2",
+      "sourceDigest": "ef6e11b880c3b1e55f42d0963f17b9127e530aaad576ff034a0afe98cdc09067",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "fileDigest": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+      "sourceDigest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "fileDigest": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "sourceDigest": "ea2d3891915949c1e9764240b81af748393713f00685ac173eb5c64ed1df9043",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "fileDigest": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "sourceDigest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "fileDigest": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "sourceDigest": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+      "fileDigest": "8b264db72fb94bd59c8bd3e5b1ebb939f3a7b0776645bcda7fa54b5577004f9b",
+      "sourceDigest": "f6d79063ae11e9e48db33b5876ea414292f9023c1da4b2adc70478e4785ce576",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "fileDigest": "49fed6b7fb21fab69354cb383c8857926d3636c53f08e8c040e4763f1a50aa70",
+      "sourceDigest": "4eca5e5f5db1c61d2582cced415a1b283d3663274760fea6e76e9ffb3ad3b3e7",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+      "fileDigest": "d15bbb0c0b52d6bca57ede0d785dce5a4682db90912a499f9ee164b457e25c77",
+      "sourceDigest": "5d48fdf43978474a8339f75bf2b1bc9e215e02545a2cbda4019845d6feb42297",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "fileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "sourceDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "fileDigest": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3",
+      "sourceDigest": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+      "fileDigest": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "sourceDigest": "fa831842240da6d8b77ad4193a09c1ccf8ea7972608ec31fc3966c2511b06d0c",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "fileDigest": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "sourceDigest": "7e448dffd744f14eec929b42849e7c6567743a257ee3950e7f559ba2c78a3183",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "fileDigest": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "sourceDigest": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md",
+      "fileDigest": "1b0496bcdc6e22ab650325b363dae7eb225b7b61cd154d0b1b7489f449622b30",
+      "sourceDigest": "186f7bb8f6fce1dc830dd9037f672dc41a06dff4806232a294e43d3c7bba4a55",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-fanout/SKILL.md",
+      "sourcePath": "core/skills/fgos-fanout/SKILL.md",
+      "fileDigest": "2d3c472e1bdf901d31ee54dff6e444f737650f73175cbd597732d2f4742ebb79",
+      "sourceDigest": "03dc71d49ddb0ecc44d05f3ef8377d2473531e5dc94684802623851a3197624a",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+      "sourcePath": "core/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+      "fileDigest": "a0fe69420b35473170e16047369fb3ce6d9dff9c33de08d9b84e00ef46a6f885",
+      "sourceDigest": "6aaaa2f8c3704b7c36dbcbf9f9603880c3704cf2b878ace806607c4202f19925",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-group-thinking/SKILL.md",
+      "sourcePath": "core/skills/fgos-group-thinking/SKILL.md",
+      "fileDigest": "3992738511dbd7eb4c512a9b6da86aa59539064390c08474bb1ccf6913919146",
+      "sourceDigest": "17fc268485be03314fc525ffa8110c9e863372921ea424a28f2123179b4caa7e",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+      "sourcePath": "core/skills/fgos-indexing/SKILL.md",
+      "fileDigest": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+      "sourceDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-lock-fence/SKILL.md",
+      "sourcePath": "core/skills/fgos-lock-fence/SKILL.md",
+      "fileDigest": "3b9608f2fe74dd8dd31e63d1de65451023bacaa8f32eaf992da01d632455ab49",
+      "sourceDigest": "582332cc26e747b37b1529a3f8bd548888a3daf21b975cdd5617de2f5bef4a14",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-researching/SKILL.md",
+      "sourcePath": "core/skills/fgos-researching/SKILL.md",
+      "fileDigest": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
+      "sourceDigest": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-routing/SKILL.md",
+      "sourcePath": "core/skills/fgos-routing/SKILL.md",
+      "fileDigest": "8a215975394d282772c768e69a0767aabbf1a2ca30e0fe7959252f7fcdba3a8e",
+      "sourceDigest": "b1e259da39eee39c9b213f3ae156ec1680ffd816ff40a8a51e78379ccb3b05ce",
+      "equalAfterRemovingGeneratedHeader": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-run/SKILL.md",
+      "sourcePath": "core/skills/fgos-run/SKILL.md",
+      "fileDigest": "825f130e0a838dc788b7d67cc3c8cdd8877667c524d744f6acda2a76928d286a",
+      "sourceDigest": "8fd267a429aa393cbc936e7d583e2dc432962a0dcda8da849bbd0dc9dbf4c82d",
+      "equalAfterRemovingGeneratedHeader": true
+    }
+  ],
+  "byteIdenticalCopies": [
+    {
+      "path": ".agents/skills/distill/scripts/distill.mjs",
+      "sourcePath": "core/skills/distill/scripts/distill.mjs",
+      "equal": true
+    },
+    {
+      "path": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "sourcePath": "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/distill/scripts/distill.mjs",
+      "sourcePath": "core/skills/distill/scripts/distill.mjs",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "sourcePath": "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "equal": true
+    }
+  ],
+  "managedInstructionSpans": [
+    {
+      "edgeId": "instructions-025",
+      "canonicalEdgeIds": [
+        "instructions-039",
+        "instructions-050"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-026",
+      "canonicalEdgeIds": [
+        "instructions-040"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-027",
+      "canonicalEdgeIds": [
+        "instructions-041"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-028",
+      "canonicalEdgeIds": [
+        "instructions-042"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-029",
+      "canonicalEdgeIds": [
+        "instructions-043"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-030",
+      "canonicalEdgeIds": [
+        "instructions-044"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-031",
+      "canonicalEdgeIds": [
+        "instructions-045"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-032",
+      "canonicalEdgeIds": [
+        "instructions-046"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-033",
+      "canonicalEdgeIds": [
+        "instructions-047"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-034",
+      "canonicalEdgeIds": [
+        "instructions-048"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-035",
+      "canonicalEdgeIds": [
+        "instructions-049"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-036",
+      "canonicalEdgeIds": [
+        "instructions-039",
+        "instructions-050"
+      ],
+      "sourcePath": "core/instructions/platform-laws.md"
+    },
+    {
+      "edgeId": "instructions-037",
+      "canonicalEdgeIds": [
+        "instructions-038"
+      ],
+      "sourcePath": "core/instructions/design-principles.md"
+    }
+  ],
+  "anchors": [
+    {
+      "edgeId": "instructions-026",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l1-hai-vật-lý-của-tri-thức-log-vs-state",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-027",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l2-kiến-trúc-memory-hai-tầng",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-028",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l3-luật-store-truth-ở-jsonl-db-là-view",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-029",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l4-routing-model-theo-audience-của-từng-interface",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-030",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l5-definition-of-done-sáu-câu-hỏi",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-031",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l6-maturity-ladder-f0f5",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-032",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l7-durability-ladder",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-033",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l8-doctrine-placement-rule-always-loaded-layer",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-034",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l9-thang-hoàn-tất-của-một-việc-run-merge-durable",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-035",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-040",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l1-hai-vật-lý-của-tri-thức-log-vs-state",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-041",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l2-kiến-trúc-memory-hai-tầng",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-042",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l3-luật-store-truth-ở-jsonl-db-là-view",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-043",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l4-routing-model-theo-audience-của-từng-interface",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-044",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l5-definition-of-done-sáu-câu-hỏi",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-045",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l6-maturity-ladder-f0f5",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-046",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l7-durability-ladder",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-047",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l8-doctrine-placement-rule-always-loaded-layer",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-048",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l9-thang-hoàn-tất-của-một-việc-run-merge-durable",
+      "exists": true
+    },
+    {
+      "edgeId": "instructions-049",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa",
+      "exists": true
+    },
+    {
+      "edgeId": "skills-015",
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "anchor": "unheaded-block-6",
+      "exists": true
+    },
+    {
+      "edgeId": "skills-016",
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "anchor": "unheaded-block-6",
+      "exists": true
+    },
+    {
+      "edgeId": "skills-045",
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "anchor": "unheaded-block-6",
+      "exists": true
+    },
+    {
+      "edgeId": "skills-084",
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "anchor": "unheaded-block-6",
+      "exists": true
+    },
+    {
+      "edgeId": "skills-087",
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "anchor": "unheaded-block-6",
+      "exists": true
+    },
+    {
+      "edgeId": "skills-090",
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "anchor": "unheaded-block-6",
+      "exists": true
+    },
+    {
+      "edgeId": "skills-148",
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "anchor": "unheaded-block-6",
+      "exists": true
+    },
+    {
+      "edgeId": "skills-149",
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "anchor": "unheaded-block-6",
+      "exists": true
+    },
+    {
+      "edgeId": "skills-178",
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "anchor": "unheaded-block-6",
+      "exists": true
+    }
+  ],
+  "wrappers": [
+    {
+      "path": ".claude/skills/distill/SKILL.md",
+      "assembled": ".agents/skills/distill/SKILL.md",
+      "relative": "../../../.agents/skills/distill/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-advise/SKILL.md",
+      "assembled": ".agents/skills/fgos-advise/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-advise/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-architecture-panel/SKILL.md",
+      "assembled": ".agents/skills/fgos-architecture-panel/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-architecture-panel/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-clarifying/SKILL.md",
+      "assembled": ".agents/skills/fgos-clarifying/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-clarifying/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-discovering/SKILL.md",
+      "assembled": ".agents/skills/fgos-coding-discovering/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-coding-discovering/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-driving/SKILL.md",
+      "assembled": ".agents/skills/fgos-coding-driving/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-coding-driving/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-exploring/SKILL.md",
+      "assembled": ".agents/skills/fgos-coding-exploring/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-coding-exploring/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-implement/SKILL.md",
+      "assembled": ".agents/skills/fgos-coding-implement/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-coding-implement/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-knowledge/SKILL.md",
+      "assembled": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-coding-knowledge/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-planning/SKILL.md",
+      "assembled": ".agents/skills/fgos-coding-planning/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-coding-planning/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-shaping/SKILL.md",
+      "assembled": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-coding-shaping/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-validating/SKILL.md",
+      "assembled": ".agents/skills/fgos-coding-validating/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-coding-validating/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-fanout/SKILL.md",
+      "assembled": ".agents/skills/fgos-fanout/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-fanout/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-group-thinking/SKILL.md",
+      "assembled": ".agents/skills/fgos-group-thinking/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-group-thinking/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-indexing/SKILL.md",
+      "assembled": ".agents/skills/fgos-indexing/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-indexing/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-lock-fence/SKILL.md",
+      "assembled": ".agents/skills/fgos-lock-fence/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-lock-fence/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-researching/SKILL.md",
+      "assembled": ".agents/skills/fgos-researching/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-researching/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-routing/SKILL.md",
+      "assembled": ".agents/skills/fgos-routing/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-routing/SKILL.md",
+      "equal": true
+    },
+    {
+      "path": ".claude/skills/fgos-run/SKILL.md",
+      "assembled": ".agents/skills/fgos-run/SKILL.md",
+      "relative": "../../../.agents/skills/fgos-run/SKILL.md",
+      "equal": true
+    }
+  ],
+  "method": "Unchanged anchor API and pure generateWrapperContent; no discover/materialize function invoked; no state accessed or render generated on disk",
+  "limits": "Pure/static checks only; no materialization/build/doctor/discovery against state. Semantic source/render acceptance remains independent."
+}

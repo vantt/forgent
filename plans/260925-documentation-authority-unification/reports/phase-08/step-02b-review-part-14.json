@@ -1,0 +1,3222 @@
+{
+  "requestIdentity": "step-02b-census-0689b862e",
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "part": 14,
+  "entries": [
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_4ff17805d1f3cd2dea78c88a",
+          "line": 11,
+          "targetPath": "docs/backlog.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/backlog.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 11,
+            "text": "- docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)"
+          },
+          {
+            "line": 59,
+            "text": "   `docs/backlog.md`; a new product area gets a spec before it gets code."
+          }
+        ],
+        "censusEdges": [
+          "instructions-004",
+          "instructions-015"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_8274eee42ccfe21d69651fb1",
+          "line": 58,
+          "targetPath": "docs/backlog.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/backlog.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 11,
+            "text": "- docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)"
+          },
+          {
+            "line": 59,
+            "text": "   `docs/backlog.md`; a new product area gets a spec before it gets code."
+          }
+        ],
+        "censusEdges": [
+          "instructions-004",
+          "instructions-015"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_c11e7620506f661ef82bdf73",
+          "line": 13,
+          "targetPath": "docs/decisions/index.md",
+          "path": "AGENTS.md",
+          "kind": "dynamic",
+          "resolvedTarget": "docs/decisions/index.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 14,
+            "text": "- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own \"Lịch sử quyết định\" sections (tsk-1lv-4)"
+          }
+        ],
+        "censusEdges": [
+          "instructions-005",
+          "instructions-006"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_fdd946e9a3d4cebc45b05202",
+          "line": 26,
+          "targetPath": "docs/decisions/index.md",
+          "path": "AGENTS.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/decisions/*.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 14,
+            "text": "- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own \"Lịch sử quyết định\" sections (tsk-1lv-4)"
+          }
+        ],
+        "censusEdges": [
+          "instructions-006"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_275eaf85b4c1b6bd7a962f1a",
+          "line": 34,
+          "targetPath": "docs/decisions/index.md",
+          "path": "AGENTS.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/decisions/*.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 14,
+            "text": "- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own \"Lịch sử quyết định\" sections (tsk-1lv-4)"
+          }
+        ],
+        "censusEdges": [
+          "instructions-006"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_dcb67cbe73c0cd3b2ade518d",
+          "line": 361,
+          "targetPath": "docs/decisions/index.md",
+          "path": "src/setup/instruction-registry.mjs",
+          "kind": "dynamic",
+          "resolvedTarget": "docs/decisions/index.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 361,
+            "text": "        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,"
+          }
+        ],
+        "censusEdges": [
+          "instructions-053"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_2d99653b3596925031f6b610",
+          "line": 99,
+          "targetPath": "docs/decisions/index.md",
+          "path": "src/setup/instruction-registry.mjs",
+          "kind": "dynamic",
+          "resolvedTarget": "docs/decisions/index.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 361,
+            "text": "        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,"
+          }
+        ],
+        "censusEdges": [
+          "instructions-053",
+          "instructions-058"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_1b257fb56eeaaf5b1b090df9",
+          "line": 115,
+          "targetPath": "docs/distribution-vision.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distribution-vision.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 116,
+            "text": "`docs/distribution-vision.md` sets the direction for this repo's own"
+          },
+          {
+            "line": 128,
+            "text": "  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`"
+          }
+        ],
+        "censusEdges": [
+          "instructions-019",
+          "instructions-020"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_e755db38c6434d286ac78dbd",
+          "line": 127,
+          "targetPath": "docs/distribution-vision.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distribution-vision.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 116,
+            "text": "`docs/distribution-vision.md` sets the direction for this repo's own"
+          },
+          {
+            "line": 128,
+            "text": "  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`"
+          }
+        ],
+        "censusEdges": [
+          "instructions-019",
+          "instructions-020"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_81b5f58263d99d5773e1e230",
+          "line": null,
+          "targetPath": "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md",
+          "path": "domains/coding/AGENTS.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-056"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_02bf1954749ae14707373ee1",
+          "line": 135,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_af4d0ed675c3024427b76fd6",
+          "line": 324,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_f090b608babee9f2d67c9b70",
+          "line": 326,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_fd61cb34bb7159fdb98f4508",
+          "line": 327,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_1aeb981b77dee201a12e6e0d",
+          "line": 328,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_61ad2904c885dc0d5dc240fe",
+          "line": 329,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_09b8676fe111ce8b49e9545c",
+          "line": 330,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_d1f2e72602fb6a5a1841ab0a",
+          "line": 331,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_ca241e392cee08761cd32a65",
+          "line": 332,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_8919970665e215bea03d519e",
+          "line": 333,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_a6ff56b2d155997a8ae6c859",
+          "line": 335,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_a066d83c5a2e71507fc064d4",
+          "line": 62,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_860cf8ae2b3c8fb12b294f43",
+          "line": 8,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 8,
+            "text": "- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)"
+          },
+          {
+            "line": 63,
+            "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+          },
+          {
+            "line": 136,
+            "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+          },
+          {
+            "line": 339,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 341,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 342,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 343,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 344,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 345,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 346,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 347,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 348,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 349,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 350,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 352,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-001",
+          "instructions-017",
+          "instructions-022",
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_0ef23adde741cc0a48554127",
+          "line": null,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "core/instructions/platform-laws.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 15,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 17,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 18,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 19,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 20,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 21,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 22,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 23,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 24,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 25,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 26,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 28,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_c16c92e7fbf725cf9fb5ccc0",
+          "line": 15,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "core/instructions/platform-laws.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 15,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 17,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 18,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 19,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 20,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 21,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 22,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 23,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 24,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 25,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 26,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 28,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_fa14a04ea4cec8f9ee4148b8",
+          "line": 17,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "core/instructions/platform-laws.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 15,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 17,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 18,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 19,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 20,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 21,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 22,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 23,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 24,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 25,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 26,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 28,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_8826d7e9546c79759b921194",
+          "line": 18,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "core/instructions/platform-laws.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 15,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 17,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 18,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 19,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 20,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 21,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 22,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 23,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 24,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 25,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 26,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 28,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_5cff76203cab6421d533e6b7",
+          "line": 19,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "core/instructions/platform-laws.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 15,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 17,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 18,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 19,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 20,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 21,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 22,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 23,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 24,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 25,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 26,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 28,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_d36d6744d49ac2a504fd54a4",
+          "line": 20,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "core/instructions/platform-laws.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 15,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 17,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 18,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 19,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 20,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 21,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 22,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 23,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 24,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 25,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 26,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 28,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_2e4682d3bef9683f2a2ca020",
+          "line": 21,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "core/instructions/platform-laws.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 15,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 17,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 18,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 19,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 20,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 21,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 22,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 23,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 24,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 25,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 26,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 28,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_11ac1309e16756ea891ab079",
+          "line": 22,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "core/instructions/platform-laws.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 15,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 17,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 18,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 19,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 20,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 21,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 22,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 23,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 24,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 25,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 26,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 28,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_7febaf53c7c361e2c01723ae",
+          "line": 23,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "core/instructions/platform-laws.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 15,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 17,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 18,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 19,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 20,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 21,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 22,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 23,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 24,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 25,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 26,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 28,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_e8bf60f686da6689e25a89a1",
+          "line": 24,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "core/instructions/platform-laws.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 15,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 17,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 18,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 19,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 20,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 21,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 22,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 23,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 24,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 25,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 26,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 28,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_5c6284383ce39d3e8c80faa6",
+          "line": 26,
+          "targetPath": "docs/platform-foundations.md",
+          "path": "core/instructions/platform-laws.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 15,
+            "text": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+          },
+          {
+            "line": 17,
+            "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+          },
+          {
+            "line": 18,
+            "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+          },
+          {
+            "line": 19,
+            "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+          },
+          {
+            "line": 20,
+            "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+          },
+          {
+            "line": 21,
+            "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+          },
+          {
+            "line": 22,
+            "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+          },
+          {
+            "line": 23,
+            "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+          },
+          {
+            "line": 24,
+            "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+          },
+          {
+            "line": 25,
+            "text": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+          },
+          {
+            "line": 26,
+            "text": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+          },
+          {
+            "line": 28,
+            "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+          }
+        ],
+        "censusEdges": [
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_292c2f6a8da1d5f4b78e6373",
+          "line": 2,
+          "targetPath": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+          "path": "src/setup/instruction-composition.mjs",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 2,
+            "text": "// (docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md,"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_b01dfa7cfc41ef0c1ab6e7ff",
+          "line": 2,
+          "targetPath": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+          "path": "src/setup/instruction-registry.mjs",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 2,
+            "text": "// (docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md)."
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_1e3b26cc07e5e7d62966fc98",
+          "line": 93,
+          "targetPath": "docs/platform/session-identity/spec.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/session-identity/spec.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 94,
+            "text": "(`docs/platform/session-identity/spec.md`), so these channels write only"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_7ff9cd733145be18e9d46d25",
+          "line": 12,
+          "targetPath": "docs/routing-handoff-contract.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/routing-handoff-contract.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 13,
+            "text": "- docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary"
+          },
+          {
+            "line": 60,
+            "text": "3. **What contract does it touch?** `docs/routing-handoff-contract.md` for"
+          }
+        ],
+        "censusEdges": [
+          "instructions-005",
+          "instructions-016"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_3ae9962d73a1e02316bb7b24",
+          "line": 59,
+          "targetPath": "docs/routing-handoff-contract.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/routing-handoff-contract.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 13,
+            "text": "- docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary"
+          },
+          {
+            "line": 60,
+            "text": "3. **What contract does it touch?** `docs/routing-handoff-contract.md` for"
+          }
+        ],
+        "censusEdges": [
+          "instructions-005",
+          "instructions-015",
+          "instructions-016"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_1ccec13e3f17e0362967dc93",
+          "line": 127,
+          "targetPath": "docs/specs/distribution.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/distribution.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 128,
+            "text": "  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`"
+          }
+        ],
+        "censusEdges": [
+          "instructions-021"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_d4529ba64b50348e29c9ecba",
+          "line": 138,
+          "targetPath": "docs/specs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 29,
+            "text": "## Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)"
+          },
+          {
+            "line": 35,
+            "text": "fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi \"sửa fgOS\" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/specs/platform-foundations.md's \"Lịch sử quyết định\" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+          },
+          {
+            "line": 139,
+            "text": "## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)"
+          },
+          {
+            "line": 151,
+            "text": "## RUL104 — tốt hơn, không to hơn (D-ADR0062, supersedes D-ADR0061, docs/specs/platform-foundations.md)"
+          }
+        ],
+        "censusEdges": [
+          "instructions-010",
+          "instructions-011",
+          "instructions-023",
+          "instructions-024"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_6cfa6d710bade63f576a06ea",
+          "line": 28,
+          "targetPath": "docs/specs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 29,
+            "text": "## Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)"
+          },
+          {
+            "line": 35,
+            "text": "fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi \"sửa fgOS\" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/specs/platform-foundations.md's \"Lịch sử quyết định\" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+          },
+          {
+            "line": 139,
+            "text": "## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)"
+          },
+          {
+            "line": 151,
+            "text": "## RUL104 — tốt hơn, không to hơn (D-ADR0062, supersedes D-ADR0061, docs/specs/platform-foundations.md)"
+          }
+        ],
+        "censusEdges": [
+          "instructions-010",
+          "instructions-011",
+          "instructions-023",
+          "instructions-024"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_f80abda8fcab479fd46f7974",
+          "line": 34,
+          "targetPath": "docs/specs/platform-foundations.md",
+          "path": "AGENTS.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/platform-foundations.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 29,
+            "text": "## Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)"
+          },
+          {
+            "line": 35,
+            "text": "fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi \"sửa fgOS\" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/specs/platform-foundations.md's \"Lịch sử quyết định\" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+          },
+          {
+            "line": 139,
+            "text": "## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)"
+          },
+          {
+            "line": 151,
+            "text": "## RUL104 — tốt hơn, không to hơn (D-ADR0062, supersedes D-ADR0061, docs/specs/platform-foundations.md)"
+          }
+        ],
+        "censusEdges": [
+          "instructions-010",
+          "instructions-011",
+          "instructions-023",
+          "instructions-024"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_8ba6780a939a3ea4a1c7d4fc",
+          "line": 10,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/reading-map.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 10,
+            "text": "- docs/specs/reading-map.md — where every doc and source path in this repo lives"
+          },
+          {
+            "line": 40,
+            "text": "Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever"
+          },
+          {
+            "line": 57,
+            "text": "1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec."
+          }
+        ],
+        "censusEdges": [
+          "instructions-003",
+          "instructions-012",
+          "instructions-014"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_728baa88b8f6691e07a8746d",
+          "line": 39,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/reading-map.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 10,
+            "text": "- docs/specs/reading-map.md — where every doc and source path in this repo lives"
+          },
+          {
+            "line": 40,
+            "text": "Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever"
+          },
+          {
+            "line": 57,
+            "text": "1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec."
+          }
+        ],
+        "censusEdges": [
+          "instructions-003",
+          "instructions-012",
+          "instructions-014"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_25eeb532b9e62403825b30fe",
+          "line": 56,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/reading-map.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 10,
+            "text": "- docs/specs/reading-map.md — where every doc and source path in this repo lives"
+          },
+          {
+            "line": 40,
+            "text": "Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever"
+          },
+          {
+            "line": 57,
+            "text": "1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec."
+          }
+        ],
+        "censusEdges": [
+          "instructions-003",
+          "instructions-012",
+          "instructions-014"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_6c5c80ccac996c903db85504",
+          "line": 16,
+          "targetPath": "docs/specs/runner.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 17,
+            "text": "## Product priority order (D-ADR0030, docs/specs/runner.md)"
+          },
+          {
+            "line": 27,
+            "text": "Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+          }
+        ],
+        "censusEdges": [
+          "instructions-008",
+          "instructions-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_4c896a1f1d0aa93b439a8412",
+          "line": 26,
+          "targetPath": "docs/specs/runner.md",
+          "path": "AGENTS.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 17,
+            "text": "## Product priority order (D-ADR0030, docs/specs/runner.md)"
+          },
+          {
+            "line": 27,
+            "text": "Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+          }
+        ],
+        "censusEdges": [
+          "instructions-008",
+          "instructions-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_b6a2f63cbcbe03a3e9d07fe3",
+          "line": 9,
+          "targetPath": "docs/specs/system-overview.md",
+          "path": "AGENTS.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/system-overview.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 9,
+            "text": "- docs/specs/system-overview.md — area map, shared entities, cross-area flows"
+          }
+        ],
+        "censusEdges": [
+          "instructions-002"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_d650b1d15f093e6b0a3ae176",
+          "path": "src/setup/instruction-projections.mjs",
+          "line": 280,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(projectRoot, computed.effectiveSetRelativePath)",
+          "unresolvedRoot": "projectRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-067",
+          "instructions-068",
+          "instructions-069",
+          "instructions-070",
+          "instructions-071",
+          "instructions-072",
+          "instructions-073",
+          "instructions-074",
+          "instructions-075",
+          "instructions-076",
+          "instructions-077",
+          "instructions-078",
+          "instructions-079",
+          "instructions-080",
+          "instructions-081"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_69d7be84c5989a49c2109605",
+          "path": "src/setup/instruction-projections.mjs",
+          "line": 281,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(projectRoot, computed.destinationRelativePath)",
+          "unresolvedRoot": "projectRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-067",
+          "instructions-068",
+          "instructions-069",
+          "instructions-070",
+          "instructions-071",
+          "instructions-072",
+          "instructions-073",
+          "instructions-074",
+          "instructions-075",
+          "instructions-076",
+          "instructions-077",
+          "instructions-078",
+          "instructions-079",
+          "instructions-080",
+          "instructions-081"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_46664b758c1ef646e54f6fba",
+          "path": "src/setup/instruction-projections.mjs",
+          "line": 282,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(projectRoot, computed.ledgerRelativePath)",
+          "unresolvedRoot": "projectRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-067",
+          "instructions-068",
+          "instructions-069",
+          "instructions-070",
+          "instructions-071",
+          "instructions-072",
+          "instructions-073",
+          "instructions-074",
+          "instructions-075",
+          "instructions-076",
+          "instructions-077",
+          "instructions-078",
+          "instructions-079",
+          "instructions-080",
+          "instructions-081"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_d09c7388da3f9bb7a880a012",
+          "path": "src/setup/instruction-projections.mjs",
+          "line": 331,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(projectRoot, computed.effectiveSetRelativePath)",
+          "unresolvedRoot": "projectRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-067",
+          "instructions-068",
+          "instructions-069",
+          "instructions-070",
+          "instructions-071",
+          "instructions-072",
+          "instructions-073",
+          "instructions-074",
+          "instructions-075",
+          "instructions-076",
+          "instructions-077",
+          "instructions-078",
+          "instructions-079",
+          "instructions-080",
+          "instructions-081"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_59087dde2b3185299738e214",
+          "path": "src/setup/instruction-projections.mjs",
+          "line": 332,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(projectRoot, computed.destinationRelativePath)",
+          "unresolvedRoot": "projectRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-067",
+          "instructions-068",
+          "instructions-069",
+          "instructions-070",
+          "instructions-071",
+          "instructions-072",
+          "instructions-073",
+          "instructions-074",
+          "instructions-075",
+          "instructions-076",
+          "instructions-077",
+          "instructions-078",
+          "instructions-079",
+          "instructions-080",
+          "instructions-081"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_28178f54ec51802240c92d91",
+          "path": "src/setup/instruction-projections.mjs",
+          "line": 333,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(projectRoot, computed.ledgerRelativePath)",
+          "unresolvedRoot": "projectRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-067",
+          "instructions-068",
+          "instructions-069",
+          "instructions-070",
+          "instructions-071",
+          "instructions-072",
+          "instructions-073",
+          "instructions-074",
+          "instructions-075",
+          "instructions-076",
+          "instructions-077",
+          "instructions-078",
+          "instructions-079",
+          "instructions-080",
+          "instructions-081"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_134868ed4cd531acb6ab05fd",
+          "path": "src/setup/instruction-projections.mjs",
+          "line": 60,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(cursor, part)",
+          "unresolvedRoot": "cursor",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-067",
+          "instructions-068",
+          "instructions-069",
+          "instructions-070",
+          "instructions-071",
+          "instructions-072",
+          "instructions-073",
+          "instructions-074",
+          "instructions-075",
+          "instructions-076",
+          "instructions-077",
+          "instructions-078",
+          "instructions-079",
+          "instructions-080",
+          "instructions-081"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_81581d3b97f8e1f58fc87b3a",
+          "path": "src/setup/instruction-registry.mjs",
+          "line": 412,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.resolve(containmentRoot)",
+          "unresolvedRoot": "containmentRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-053",
+          "instructions-054",
+          "instructions-055",
+          "instructions-058",
+          "instructions-059",
+          "instructions-060",
+          "instructions-061",
+          "instructions-062",
+          "instructions-063",
+          "instructions-064",
+          "instructions-065",
+          "instructions-082",
+          "instructions-083",
+          "instructions-084",
+          "instructions-085",
+          "instructions-086",
+          "instructions-087"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_250b7106bbe40d0f01a6ae7c",
+          "path": "src/setup/instruction-registry.mjs",
+          "line": 418,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(dir, entry.name)",
+          "unresolvedRoot": "dir",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-053",
+          "instructions-054",
+          "instructions-055",
+          "instructions-058",
+          "instructions-059",
+          "instructions-060",
+          "instructions-061",
+          "instructions-062",
+          "instructions-063",
+          "instructions-064",
+          "instructions-065",
+          "instructions-082",
+          "instructions-083",
+          "instructions-084",
+          "instructions-085",
+          "instructions-086",
+          "instructions-087"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_59d688e91e35273d6b3a4a00",
+          "path": "src/setup/instruction-registry.mjs",
+          "line": 599,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/components",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(projectRoot, 'components')",
+          "unresolvedRoot": "projectRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-053",
+          "instructions-054",
+          "instructions-055",
+          "instructions-058",
+          "instructions-059",
+          "instructions-060",
+          "instructions-061",
+          "instructions-062",
+          "instructions-063",
+          "instructions-064",
+          "instructions-065",
+          "instructions-082",
+          "instructions-083",
+          "instructions-084",
+          "instructions-085",
+          "instructions-086",
+          "instructions-087"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_8da3eb5e6dfc93642035af95",
+          "path": "src/setup/instruction-registry.mjs",
+          "line": 649,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(componentsRoot, componentName)",
+          "unresolvedRoot": "componentsRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-053",
+          "instructions-054",
+          "instructions-055",
+          "instructions-058",
+          "instructions-059",
+          "instructions-060",
+          "instructions-061",
+          "instructions-062",
+          "instructions-063",
+          "instructions-064",
+          "instructions-065",
+          "instructions-082",
+          "instructions-083",
+          "instructions-084",
+          "instructions-085",
+          "instructions-086",
+          "instructions-087"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    }
+  ]
+}

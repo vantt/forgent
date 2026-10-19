@@ -1,0 +1,310 @@
+{
+  "requestIdentity": "step-02b-census-0689b862e",
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "classesAuthored": [
+    "always-loaded instructions",
+    "skills/prompts/task specs with source/render mapping"
+  ],
+  "edges": 419,
+  "files": 350,
+  "inventoryEdges": 503,
+  "historicalConsumerDispositions": 7,
+  "reviewEntries": 1279,
+  "payloadBytes": 3032760,
+  "parts": [
+    {
+      "part": 1,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-01.json",
+      "entries": 58,
+      "bytes": 399668,
+      "sha256": "c3528324d182bc15ec77919a3a628719d6aacd6ac567e6572113ee2e4a1825cc",
+      "reviewClasses": {
+        "instructions": 58
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-01.md"
+    },
+    {
+      "part": 2,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-02.json",
+      "entries": 60,
+      "bytes": 258384,
+      "sha256": "b0cd4f325c21ab9f872d3078dc35949dab1238ce1ae2e9f19c9d621741b4c43b",
+      "reviewClasses": {
+        "instructions": 29,
+        "skills-prompts": 31
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-02.md"
+    },
+    {
+      "part": 3,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-03.json",
+      "entries": 60,
+      "bytes": 361700,
+      "sha256": "77aa1462847b0445644ad132b1d56075d844a49a7ca965ec98ea32d2527a1e9f",
+      "reviewClasses": {
+        "skills-prompts": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-03.md"
+    },
+    {
+      "part": 4,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-04.json",
+      "entries": 60,
+      "bytes": 289522,
+      "sha256": "3d4e09c931edd287008cfbb66bbb5bbe39f0acff46eac5eb1f6bf85cde7d1b4b",
+      "reviewClasses": {
+        "skills-prompts": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-04.md"
+    },
+    {
+      "part": 5,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-05.json",
+      "entries": 60,
+      "bytes": 268889,
+      "sha256": "691c5fd57eb21ef5f6e4378b9d9939001624e8e32b0f43dd0fb3164a1032b6ca",
+      "reviewClasses": {
+        "skills-prompts": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-05.md"
+    },
+    {
+      "part": 6,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-06.json",
+      "entries": 60,
+      "bytes": 228692,
+      "sha256": "7f58d88f22fe0c617a86921d27a3b2da585b87b6cea4f4e0579ba80c8b71a3ea",
+      "reviewClasses": {
+        "skills-prompts": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-06.md"
+    },
+    {
+      "part": 7,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-07.json",
+      "entries": 60,
+      "bytes": 195616,
+      "sha256": "06e94e432a6dd5b367afb4fabdb0082b4397b67e74c1c729e3705c9884945ae2",
+      "reviewClasses": {
+        "skills-prompts": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-07.md"
+    },
+    {
+      "part": 8,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-08.json",
+      "entries": 60,
+      "bytes": 67574,
+      "sha256": "57543b8e4dde4324ad9e2af4469037059ac4f7f12efe0a716acb101cda72ded2",
+      "reviewClasses": {
+        "skills-prompts": 1,
+        "file-coverage": 59
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-08.md"
+    },
+    {
+      "part": 9,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-09.json",
+      "entries": 60,
+      "bytes": 54888,
+      "sha256": "73e8718dd07a084a2a777be17ac8ae32bf49baf6d7c409934a3e912fe7b53842",
+      "reviewClasses": {
+        "file-coverage": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-09.md"
+    },
+    {
+      "part": 10,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-10.json",
+      "entries": 60,
+      "bytes": 43922,
+      "sha256": "550391821c0697ab9a03f5e56ebb2c04754b1f2be9f7fa030fcdba8ad7699389",
+      "reviewClasses": {
+        "file-coverage": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-10.md"
+    },
+    {
+      "part": 11,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-11.json",
+      "entries": 60,
+      "bytes": 66712,
+      "sha256": "55a8d40a9dd6c0886436175bd704ca0c9f1f7db4d8a3663787357e757b17fd77",
+      "reviewClasses": {
+        "file-coverage": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-11.md"
+    },
+    {
+      "part": 12,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-12.json",
+      "entries": 60,
+      "bytes": 60430,
+      "sha256": "a45b091645c7b09c99b9377c0d65903759071698f2df9556212fce94c9965306",
+      "reviewClasses": {
+        "file-coverage": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-12.md"
+    },
+    {
+      "part": 13,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-13.json",
+      "entries": 60,
+      "bytes": 66058,
+      "sha256": "64486ee1cce109a9b0a75c5b9443f3d4391a11eb6982296c0e8eb724cef2405a",
+      "reviewClasses": {
+        "file-coverage": 51,
+        "inventory-reconciliation": 9
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-13.md"
+    },
+    {
+      "part": 14,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-14.json",
+      "entries": 60,
+      "bytes": 138837,
+      "sha256": "f342977db7ee71a1c2857b12b3c5939151d6787255d3036929bfa52e7e9ff69b",
+      "reviewClasses": {
+        "inventory-reconciliation": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-14.md"
+    },
+    {
+      "part": 15,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-15.json",
+      "entries": 60,
+      "bytes": 64651,
+      "sha256": "99226fc419205ff381ebb865fd416ff8d17da099da442816c7182b6d35093415",
+      "reviewClasses": {
+        "inventory-reconciliation": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-15.md"
+    },
+    {
+      "part": 16,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-16.json",
+      "entries": 60,
+      "bytes": 63689,
+      "sha256": "fad21dc6c8c61d2839ee023dbaa2d3f2b8cc2b620f430747671fb9870fe77792",
+      "reviewClasses": {
+        "inventory-reconciliation": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-16.md"
+    },
+    {
+      "part": 17,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-17.json",
+      "entries": 60,
+      "bytes": 65237,
+      "sha256": "63ca0e8c5d4266a27c6687c0f0413e552e68fa9090bff8929609a6f3149e8e4f",
+      "reviewClasses": {
+        "inventory-reconciliation": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-17.md"
+    },
+    {
+      "part": 18,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-18.json",
+      "entries": 60,
+      "bytes": 61409,
+      "sha256": "30891d0ea244995ddcda518ca25ac54a001f8845b37244e3402f113798169c59",
+      "reviewClasses": {
+        "inventory-reconciliation": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-18.md"
+    },
+    {
+      "part": 19,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-19.json",
+      "entries": 60,
+      "bytes": 53105,
+      "sha256": "2c0688375ef94e953f372ccfa67c2f3f8d07ec989c6867f2ad3a7e546d4c6c91",
+      "reviewClasses": {
+        "inventory-reconciliation": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-19.md"
+    },
+    {
+      "part": 20,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-20.json",
+      "entries": 60,
+      "bytes": 84425,
+      "sha256": "30165cac523d228e4a3138e2a2b674aa3313d47184b6eb4a9d9975d7fe5a0c4b",
+      "reviewClasses": {
+        "inventory-reconciliation": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-20.md"
+    },
+    {
+      "part": 21,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-21.json",
+      "entries": 60,
+      "bytes": 88862,
+      "sha256": "a77998edeb50cba8cd178ead308c9a2819b9aa722980ec0971fa906d99db7e14",
+      "reviewClasses": {
+        "inventory-reconciliation": 60
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-21.md"
+    },
+    {
+      "part": 22,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-22.json",
+      "entries": 21,
+      "bytes": 50490,
+      "sha256": "53838c8ab8af7415079d7c83a2e5d982b6238910e5576db3ee263d8e0decc163",
+      "reviewClasses": {
+        "inventory-reconciliation": 14,
+        "historical-consumers": 7
+      },
+      "minimumDeepReads": 10,
+      "mandatoryAdditional": "All IO/default-root/dynamic, cutover/parked, mismatch, source provenance anomaly and removed/renamed consumer entries; sample minimum does not replace these.",
+      "reportName": "review-a38-step-02b-census-part-22.md"
+    }
+  ],
+  "reviewed": 0,
+  "reviewerElapsedSeconds": 0,
+  "reviewerBudget": "unassigned; Lead sizes/dispatches A38 fresh-context review; no review started",
+  "priorRequestUntouched": "step-02-review-request.md and step-02-review-part-01..09.json"
+}

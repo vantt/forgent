@@ -1,0 +1,1577 @@
+{
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "entries": [
+    {
+      "edgeId": "instructions-007",
+      "consumerPath": "AGENTS.md",
+      "line": 14,
+      "matchedExpression": "docs/specs/<area>.md",
+      "reason": "Generic docs/specs authoring scope needs a reviewed whole-sentence cutover patch against the explicit area-owner map; no universal docs/platform/<area>/spec.md substitution. Concrete future writer population not enumerated.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-008",
+      "consumerPath": "AGENTS.md",
+      "line": 17,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-009",
+      "consumerPath": "AGENTS.md",
+      "line": 27,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-010",
+      "consumerPath": "AGENTS.md",
+      "line": 29,
+      "matchedExpression": "docs/specs/platform-foundations.md",
+      "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-011",
+      "consumerPath": "AGENTS.md",
+      "line": 35,
+      "matchedExpression": "docs/specs/platform-foundations.md",
+      "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-013",
+      "consumerPath": "AGENTS.md",
+      "line": 40,
+      "matchedExpression": "docs/specs/",
+      "reason": "Generic docs/specs authoring scope needs a reviewed whole-sentence cutover patch against the explicit area-owner map; no universal docs/platform/<area>/spec.md substitution. Concrete future writer population not enumerated.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-018",
+      "consumerPath": "AGENTS.md",
+      "line": 71,
+      "matchedExpression": "docs/specs/<area>.md",
+      "reason": "Generic docs/specs authoring scope needs a reviewed whole-sentence cutover patch against the explicit area-owner map; no universal docs/platform/<area>/spec.md substitution. Concrete future writer population not enumerated.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-023",
+      "consumerPath": "AGENTS.md",
+      "line": 139,
+      "matchedExpression": "docs/specs/platform-foundations.md",
+      "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-024",
+      "consumerPath": "AGENTS.md",
+      "line": 151,
+      "matchedExpression": "docs/specs/platform-foundations.md",
+      "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-058",
+      "consumerPath": "src/setup/instruction-registry.mjs",
+      "line": 99,
+      "matchedExpression": "path.join(projectRoot, 'docs', 'decisions', 'index.md')",
+      "reason": "State decision population unproven: no listWork or .fgos access; Lead authorized export required for live parity.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-067",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 247,
+      "matchedExpression": "const destinationPath = options.destinationPath ?? PORTABLE_AGENTS_DESTINATION",
+      "reason": "Concrete nondefault/external destinations not read; Lead export required.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-068",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 347,
+      "matchedExpression": "writeIfChanged(effectivePath, computed.effectiveSetContent)",
+      "reason": "Live effective-set population not read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-069",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 351,
+      "matchedExpression": "writeIfChanged(destinationPath, nextDestination)",
+      "reason": "External project projections not read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-070",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 355,
+      "matchedExpression": "writeIfChanged(ledgerPath, serializeLedger(nextLedger))",
+      "reason": "Live ledger not read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-071",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 294,
+      "matchedExpression": "fs.readFileSync(effectivePath, 'utf8')",
+      "reason": "Live effective files not read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-072",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 302,
+      "matchedExpression": "fs.readFileSync(destinationPath, 'utf8');",
+      "reason": "External/ignored destination population not read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-073",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 311,
+      "matchedExpression": "const ledger = readLedger(ledgerPath);",
+      "reason": "Live ledger not read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-074",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 353,
+      "matchedExpression": "const ledger = readLedger(ledgerPath);",
+      "reason": "Live ledger not read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-075",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 280,
+      "matchedExpression": "path.join(projectRoot, computed.effectiveSetRelativePath)",
+      "reason": "Nondefault/live external projection population remains unproven; no state file read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-076",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 331,
+      "matchedExpression": "path.join(projectRoot, computed.effectiveSetRelativePath)",
+      "reason": "Nondefault/live external projection population remains unproven; no state file read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-077",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 281,
+      "matchedExpression": "path.join(projectRoot, computed.destinationRelativePath)",
+      "reason": "Nondefault/live external projection population remains unproven; no state file read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-078",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 332,
+      "matchedExpression": "path.join(projectRoot, computed.destinationRelativePath)",
+      "reason": "Nondefault/live external projection population remains unproven; no state file read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-079",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 282,
+      "matchedExpression": "path.join(projectRoot, computed.ledgerRelativePath)",
+      "reason": "Nondefault/live external projection population remains unproven; no state file read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-080",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 333,
+      "matchedExpression": "path.join(projectRoot, computed.ledgerRelativePath)",
+      "reason": "Nondefault/live external projection population remains unproven; no state file read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "instructions-081",
+      "consumerPath": "src/setup/instruction-projections.mjs",
+      "line": 60,
+      "matchedExpression": "path.join(cursor, part)",
+      "reason": "Nondefault/live external projection population remains unproven; no state file read.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-001",
+      "consumerPath": ".agents/skills/_shared/citation-format.md",
+      "line": 7,
+      "matchedExpression": "docs/specs/<area>.md",
+      "reason": "Lead must separate repo-specific scope description from external-project convention; checker scope still current/frozen; no universal path substitution approved.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-009",
+      "consumerPath": ".agents/skills/_shared/citation-format.md",
+      "line": 97,
+      "matchedExpression": "docs/specs/*.md",
+      "reason": "Lead must separate repo-specific scope description from external-project convention; checker scope still current/frozen; no universal path substitution approved.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-015",
+      "consumerPath": ".agents/skills/fgos-clarifying/SKILL.md",
+      "line": 91,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-016",
+      "consumerPath": ".agents/skills/fgos-coding-discovering/SKILL.md",
+      "line": 81,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-038",
+      "consumerPath": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "line": 74,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-043",
+      "consumerPath": ".agents/skills/fgos-indexing/SKILL.md",
+      "line": 63,
+      "matchedExpression": "docs/specs/reading-map.md",
+      "reason": "Exact end-user pointer conservation at desired reading-map not yet demonstrated; no writer cutover readiness.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-045",
+      "consumerPath": ".agents/skills/fgos-researching/SKILL.md",
+      "line": 91,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-069",
+      "consumerPath": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+      "line": 14,
+      "matchedExpression": "docs/ui-spec/generated/wireframe-v2.html",
+      "reason": "Fixed frontend path absent from tracked checkout; parity cannot be claimed.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-070",
+      "consumerPath": "core/skills/_shared/citation-format.md",
+      "line": 6,
+      "matchedExpression": "docs/specs/<area>.md",
+      "reason": "Lead must separate repo-specific scope description from external-project convention; checker scope still current/frozen; no universal path substitution approved.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-078",
+      "consumerPath": "core/skills/_shared/citation-format.md",
+      "line": 96,
+      "matchedExpression": "docs/specs/*.md",
+      "reason": "Lead must separate repo-specific scope description from external-project convention; checker scope still current/frozen; no universal path substitution approved.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-084",
+      "consumerPath": "core/skills/fgos-clarifying/SKILL.md",
+      "line": 90,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-085",
+      "consumerPath": "core/skills/fgos-indexing/SKILL.md",
+      "line": 62,
+      "matchedExpression": "docs/specs/reading-map.md",
+      "reason": "Exact end-user pointer conservation at desired reading-map not yet demonstrated; no writer cutover readiness.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-087",
+      "consumerPath": "core/skills/fgos-researching/SKILL.md",
+      "line": 90,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-088",
+      "consumerPath": "core/task-specs/fgos-indexing.md",
+      "line": 12,
+      "matchedExpression": "docs/specs/reading-map.md",
+      "reason": "Exact end-user pointer conservation at desired reading-map not yet demonstrated; no writer cutover readiness.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-090",
+      "consumerPath": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "line": 80,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-112",
+      "consumerPath": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "line": 73,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-118",
+      "consumerPath": "plugins/fgOS/skills/_shared/citation-format.md",
+      "line": 7,
+      "matchedExpression": "docs/specs/<area>.md",
+      "reason": "Lead must separate repo-specific scope description from external-project convention; checker scope still current/frozen; no universal path substitution approved.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-126",
+      "consumerPath": "plugins/fgOS/skills/_shared/citation-format.md",
+      "line": 97,
+      "matchedExpression": "docs/specs/*.md",
+      "reason": "Lead must separate repo-specific scope description from external-project convention; checker scope still current/frozen; no universal path substitution approved.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-148",
+      "consumerPath": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+      "line": 91,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-149",
+      "consumerPath": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+      "line": 81,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-171",
+      "consumerPath": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "line": 74,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-176",
+      "consumerPath": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+      "line": 63,
+      "matchedExpression": "docs/specs/reading-map.md",
+      "reason": "Exact end-user pointer conservation at desired reading-map not yet demonstrated; no writer cutover readiness.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-178",
+      "consumerPath": "plugins/fgOS/skills/fgos-researching/SKILL.md",
+      "line": 91,
+      "matchedExpression": "docs/specs/runner.md",
+      "reason": "Policy gloss/RUL45 correspondence requires Lead/Step 3 semantic check; path/anchor existence is insufficient.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-200",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 122,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\", `${name}.md`)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-201",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 128,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-202",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 129,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-203",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 156,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-204",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 411,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-205",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 141,
+      "matchedExpression": "path.join(root, REFS_DIR, \"taxonomy.txt\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-206",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 148,
+      "matchedExpression": "path.join(root, meta.local || path.join(CLONES_DIR, name))",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-207",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 148,
+      "matchedExpression": "path.join(CLONES_DIR, name)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-208",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 432,
+      "matchedExpression": "path.join(CLONES_DIR, name)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-209",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 169,
+      "matchedExpression": "path.join(root, REFS_DIR, \"deep-dives\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-210",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 173,
+      "matchedExpression": "path.join(dir, f)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-211",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 508,
+      "matchedExpression": "path.join(dir, f)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-212",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 68,
+      "matchedExpression": "path.resolve(args.root)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-213",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 244,
+      "matchedExpression": "path.resolve(args.root)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-214",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 245,
+      "matchedExpression": "path.join(root, REFS_DIR)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-215",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 247,
+      "matchedExpression": "path.join(refs, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-216",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 247,
+      "matchedExpression": "path.join(root, CLONES_DIR)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-217",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 250,
+      "matchedExpression": "path.join(refs, \"taxonomy.txt\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-218",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 251,
+      "matchedExpression": "path.join(refs, \"intake.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-219",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 252,
+      "matchedExpression": "path.join(refs, \"comparison-matrix.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-220",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 253,
+      "matchedExpression": "path.join(refs, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-221",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 258,
+      "matchedExpression": "path.join(root, \".gitignore\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-222",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 292,
+      "matchedExpression": "path.join(repo, \".git\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-223",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 377,
+      "matchedExpression": "path.join(repo, \".git\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-224",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 451,
+      "matchedExpression": "path.join(repo, \".git\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-225",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 587,
+      "matchedExpression": "path.join(root, REFS_DIR, \"state\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-226",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 464,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-227",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 519,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-228",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 546,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-229",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 588,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-230",
+      "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 71,
+      "matchedExpression": "path.join(dir, REFS_DIR)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-231",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 122,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\", `${name}.md`)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-232",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 128,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-233",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 129,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-234",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 156,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-235",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 411,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-236",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 141,
+      "matchedExpression": "path.join(root, REFS_DIR, \"taxonomy.txt\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-237",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 148,
+      "matchedExpression": "path.join(root, meta.local || path.join(CLONES_DIR, name))",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-238",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 148,
+      "matchedExpression": "path.join(CLONES_DIR, name)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-239",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 432,
+      "matchedExpression": "path.join(CLONES_DIR, name)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-240",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 169,
+      "matchedExpression": "path.join(root, REFS_DIR, \"deep-dives\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-241",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 173,
+      "matchedExpression": "path.join(dir, f)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-242",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 508,
+      "matchedExpression": "path.join(dir, f)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-243",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 68,
+      "matchedExpression": "path.resolve(args.root)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-244",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 244,
+      "matchedExpression": "path.resolve(args.root)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-245",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 245,
+      "matchedExpression": "path.join(root, REFS_DIR)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-246",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 247,
+      "matchedExpression": "path.join(refs, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-247",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 247,
+      "matchedExpression": "path.join(root, CLONES_DIR)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-248",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 250,
+      "matchedExpression": "path.join(refs, \"taxonomy.txt\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-249",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 251,
+      "matchedExpression": "path.join(refs, \"intake.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-250",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 252,
+      "matchedExpression": "path.join(refs, \"comparison-matrix.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-251",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 253,
+      "matchedExpression": "path.join(refs, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-252",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 258,
+      "matchedExpression": "path.join(root, \".gitignore\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-253",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 292,
+      "matchedExpression": "path.join(repo, \".git\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-254",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 377,
+      "matchedExpression": "path.join(repo, \".git\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-255",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 451,
+      "matchedExpression": "path.join(repo, \".git\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-256",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 587,
+      "matchedExpression": "path.join(root, REFS_DIR, \"state\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-257",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 464,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-258",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 519,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-259",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 546,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-260",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 588,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-261",
+      "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+      "line": 71,
+      "matchedExpression": "path.join(dir, REFS_DIR)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-262",
+      "consumerPath": ".claude/skills/ui-spec/tools/wireframe/html-shell.mjs",
+      "line": 17,
+      "matchedExpression": "new URL(\"./client/\" + filename, import.meta.url)",
+      "reason": "Dependency installed population not inspected; no tool execution.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-263",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 122,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\", `${name}.md`)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-264",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 128,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-265",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 129,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-266",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 156,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-267",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 411,
+      "matchedExpression": "path.join(root, REFS_DIR, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-268",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 141,
+      "matchedExpression": "path.join(root, REFS_DIR, \"taxonomy.txt\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-269",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 148,
+      "matchedExpression": "path.join(root, meta.local || path.join(CLONES_DIR, name))",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-270",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 148,
+      "matchedExpression": "path.join(CLONES_DIR, name)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-271",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 432,
+      "matchedExpression": "path.join(CLONES_DIR, name)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-272",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 169,
+      "matchedExpression": "path.join(root, REFS_DIR, \"deep-dives\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-273",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 173,
+      "matchedExpression": "path.join(dir, f)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-274",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 508,
+      "matchedExpression": "path.join(dir, f)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-275",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 68,
+      "matchedExpression": "path.resolve(args.root)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-276",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 244,
+      "matchedExpression": "path.resolve(args.root)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-277",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 245,
+      "matchedExpression": "path.join(root, REFS_DIR)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-278",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 247,
+      "matchedExpression": "path.join(refs, \"sources\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-279",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 247,
+      "matchedExpression": "path.join(root, CLONES_DIR)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-280",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 250,
+      "matchedExpression": "path.join(refs, \"taxonomy.txt\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-281",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 251,
+      "matchedExpression": "path.join(refs, \"intake.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-282",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 252,
+      "matchedExpression": "path.join(refs, \"comparison-matrix.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-283",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 253,
+      "matchedExpression": "path.join(refs, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-284",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 258,
+      "matchedExpression": "path.join(root, \".gitignore\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-285",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 292,
+      "matchedExpression": "path.join(repo, \".git\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-286",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 377,
+      "matchedExpression": "path.join(repo, \".git\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-287",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 451,
+      "matchedExpression": "path.join(repo, \".git\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-288",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 587,
+      "matchedExpression": "path.join(root, REFS_DIR, \"state\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-289",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 464,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-290",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 519,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-291",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 546,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-292",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 588,
+      "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-293",
+      "consumerPath": "core/skills/distill/scripts/distill.mjs",
+      "line": 71,
+      "matchedExpression": "path.join(dir, REFS_DIR)",
+      "reason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-294",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 112,
+      "matchedExpression": "path.join(process.env.HOME || \"\", raw.slice(1))",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-295",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 113,
+      "matchedExpression": "path.resolve(path.dirname(file), raw)",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-296",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 134,
+      "matchedExpression": "path.join(ROOT, f)",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-297",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 171,
+      "matchedExpression": "path.join(ROOT, f)",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-298",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 278,
+      "matchedExpression": "path.join(ROOT, f)",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-299",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 138,
+      "matchedExpression": "path.join(ROOT, \".claude/rules\")",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-300",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 159,
+      "matchedExpression": "path.join(dir, e.name)",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-301",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 161,
+      "matchedExpression": "path.join(dir, e.name)",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-302",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 36,
+      "matchedExpression": "path.resolve(opt(\"--root\", process.cwd()))",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-303",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 64,
+      "matchedExpression": "path.join(dir, f)",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-304",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 81,
+      "matchedExpression": "path.resolve(p)",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-305",
+      "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 83,
+      "matchedExpression": "path.join(dir, \".git\")",
+      "reason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-306",
+      "consumerPath": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 33,
+      "matchedExpression": "const specRoot = parseRootArg() ?? findSpecRoot(process.cwd())",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-307",
+      "consumerPath": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 47,
+      "matchedExpression": "yaml.load(readFileSync(configPath, \"utf8\"))",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-308",
+      "consumerPath": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 57,
+      "matchedExpression": "const schemaPath = join(specRoot, config.schema_path ?? \"schema/surface-contract.schema.json\")",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-309",
+      "consumerPath": ".claude/skills/ui-spec/tools/extract.mjs",
+      "line": 20,
+      "matchedExpression": "const abs = join(SPEC_ROOT, dir)",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-310",
+      "consumerPath": ".claude/skills/ui-spec/tools/extract.mjs",
+      "line": 31,
+      "matchedExpression": "const p = f.startsWith(\"/\")",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-311",
+      "consumerPath": ".claude/skills/ui-spec/tools/extract.mjs",
+      "line": 68,
+      "matchedExpression": "const raw = readFileSync(absPath, \"utf8\")",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-312",
+      "consumerPath": ".claude/skills/ui-spec/tools/validate.mjs",
+      "line": 20,
+      "matchedExpression": "const schema = JSON.parse(readFileSync(schemaPath, \"utf8\"))",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-313",
+      "consumerPath": ".claude/skills/ui-spec/tools/validate.mjs",
+      "line": 188,
+      "matchedExpression": "readFileSync(join(SPEC_ROOT, catalogName), \"utf8\")",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-314",
+      "consumerPath": ".claude/skills/ui-spec/tools/validate.mjs",
+      "line": 196,
+      "matchedExpression": "readFileSync(join(SPEC_ROOT, f.file), \"utf8\")",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-315",
+      "consumerPath": ".claude/skills/ui-spec/tools/validate.mjs",
+      "line": 216,
+      "matchedExpression": "readFileSync(join(SPEC_ROOT, ovName), \"utf8\")",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-316",
+      "consumerPath": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 10,
+      "matchedExpression": "const OUT = join(SPEC_ROOT, \"generated\")",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-317",
+      "consumerPath": ".claude/skills/ui-spec/tools/rename.mjs",
+      "line": 51,
+      "matchedExpression": "const files = walk(specRoot)",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-318",
+      "consumerPath": ".claude/skills/ui-spec/tools/rename.mjs",
+      "line": 70,
+      "matchedExpression": "if (hits) writeFileSync(p, content.replace(tokenRe, newTok), \"utf8\")",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-319",
+      "consumerPath": ".claude/skills/ui-spec/tools/interpret.mjs",
+      "line": 69,
+      "matchedExpression": "const rawPath = join(specRoot, item.file.replace",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-320",
+      "consumerPath": ".claude/skills/ui-spec/tools/interpret.mjs",
+      "line": 767,
+      "matchedExpression": "writeFileSync(outPath, html, \"utf8\")",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-321",
+      "consumerPath": ".claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+      "line": 31,
+      "matchedExpression": "const rawPath = join(specRoot, item.file.replace",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-322",
+      "consumerPath": ".claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+      "line": 83,
+      "matchedExpression": "writeFileSync(outPath, html, \"utf8\")",
+      "reason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    },
+    {
+      "edgeId": "skills-323",
+      "consumerPath": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+      "line": 14,
+      "matchedExpression": "const HTML_PATH = resolve(__dir, \"../../../../../frontend/docs/ui-spec/generated/wireframe-v2.html\")",
+      "reason": "Fixed frontend/docs/ui-spec/generated/wireframe-v2.html absent; cannot claim smoke parity or repoint to candidate until Lead settles actual repository invocation root.",
+      "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+      "preCutoverAction": "preserve"
+    }
+  ],
+  "priorCarry": "step-02-dynamic-unresolved.json unchanged: CLI/setup live populations, tests/checkers/runtime/gateway and external/state still open",
+  "resolvedPriorWorkstreams": [
+    {
+      "id": "inventory-dynamic",
+      "resolution": "One bounded streaming export for instructions/skills only; 503 edges including 98 unresolved patterns; entire inventory hash/125 parts checked. Other classes not exported."
+    },
+    {
+      "id": "survey-ui-spec",
+      "resolution": "Whole tracked UI skill/tools traced in skills table; config-selected compiler root differs from fixed frontend smoke path. Live/parity obligation remains open."
+    }
+  ],
+  "remainingClassesInOrder": [
+    "maps/portals/maintained prose and external links",
+    "generators/projections/checkers (outside instruction/skill-owned seams already traced)",
+    "tests/fixtures",
+    "runtime code/comments/gateway, including apps/fgos-gateway/src/gateway.rs:1187"
+  ],
+  "notClaimed": [
+    "Step 2 closure",
+    "independent review acceptance",
+    "live state/ignored/external population",
+    "dynamic absence from non-exported inventory classes",
+    "consumer rewrite or authority flip"
+  ]
+}

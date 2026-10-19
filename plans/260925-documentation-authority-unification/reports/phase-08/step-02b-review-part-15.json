@@ -1,0 +1,1503 @@
+{
+  "requestIdentity": "step-02b-census-0689b862e",
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "part": 15,
+  "entries": [
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_62e370f4b44bb0ca32c48a52",
+          "path": "src/setup/instruction-registry.mjs",
+          "line": 655,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/instructions",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(componentsRoot, componentName, 'instructions')",
+          "unresolvedRoot": "componentsRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-053",
+          "instructions-054",
+          "instructions-055",
+          "instructions-058",
+          "instructions-059",
+          "instructions-060",
+          "instructions-061",
+          "instructions-062",
+          "instructions-063",
+          "instructions-064",
+          "instructions-065",
+          "instructions-082",
+          "instructions-083",
+          "instructions-084",
+          "instructions-085",
+          "instructions-086",
+          "instructions-087"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_9749acc5707b75ea4fbfce41",
+          "path": "src/setup/instruction-registry.mjs",
+          "line": 687,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(domainsRoot, domainName)",
+          "unresolvedRoot": "domainsRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-053",
+          "instructions-054",
+          "instructions-055",
+          "instructions-058",
+          "instructions-059",
+          "instructions-060",
+          "instructions-061",
+          "instructions-062",
+          "instructions-063",
+          "instructions-064",
+          "instructions-065",
+          "instructions-082",
+          "instructions-083",
+          "instructions-084",
+          "instructions-085",
+          "instructions-086",
+          "instructions-087"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_ab8245fe2512d59f13ec87ee",
+          "path": "src/setup/instruction-registry.mjs",
+          "line": 693,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/instructions",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(domainsRoot, domainName, 'instructions')",
+          "unresolvedRoot": "domainsRoot",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "instructions-053",
+          "instructions-054",
+          "instructions-055",
+          "instructions-058",
+          "instructions-059",
+          "instructions-060",
+          "instructions-061",
+          "instructions-062",
+          "instructions-063",
+          "instructions-064",
+          "instructions-065",
+          "instructions-082",
+          "instructions-083",
+          "instructions-084",
+          "instructions-085",
+          "instructions-086",
+          "instructions-087"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_ea7c77012ec1ce3eb67faf8d",
+          "line": 41,
+          "targetPath": "AGENTS.md",
+          "path": ".agents/skills/_shared/capability-matching.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 41,
+            "text": "5. **Parallel execution:** Running independent units concurrently to shorten wall-clock time (Ship Faster, priority #1 in `AGENTS.md`)."
+          },
+          {
+            "line": 43,
+            "text": "An agent never decides the mechanism itself (`AGENTS.md`): it queries `decide --for <capability>` once before execution. When `decide` returns `unavailable`, the unit executes inline."
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_c560f1d192be5cd12043eff7",
+          "line": 43,
+          "targetPath": "AGENTS.md",
+          "path": ".agents/skills/_shared/capability-matching.md",
+          "kind": "dynamic"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 41,
+            "text": "5. **Parallel execution:** Running independent units concurrently to shorten wall-clock time (Ship Faster, priority #1 in `AGENTS.md`)."
+          },
+          {
+            "line": 43,
+            "text": "An agent never decides the mechanism itself (`AGENTS.md`): it queries `decide --for <capability>` once before execution. When `decide` returns `unavailable`, the unit executes inline."
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_a4d15aeff8215b2e6c390255",
+          "line": 75,
+          "targetPath": "AGENTS.md",
+          "path": ".agents/skills/_shared/coordination-driver.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 68,
+            "text": "- **Ask Human:** When an unresolvable requirement ambiguity, conflicting policy constraint, or repeated failure across distinct approaches occurs, ask the human operator in the decision-question template (`decision-question.md`; batching per AGENTS.md priority #2). Never stall unrelated or non-dependent work while awaiting human response."
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_f41daa2f6dc2386863581ca4",
+          "line": 41,
+          "targetPath": "AGENTS.md",
+          "path": ".agents/skills/_shared/decision-question.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 41,
+            "text": "When to ask and how to batch: AGENTS.md product priority #2. Headings may be"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_dca115e82badf9e669abbee6",
+          "line": 302,
+          "targetPath": "AGENTS.md",
+          "path": ".agents/skills/_shared/executor-dispatch-fallback.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 50,
+            "text": "(chạy song song cho nhanh — Ship Faster is priority #1, `AGENTS.md`)."
+          },
+          {
+            "line": 302,
+            "text": "  exact moment a person is waiting, `AGENTS.md`'s priority #1; that skill"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_8c13e10558abf95d7beb2889",
+          "line": 50,
+          "targetPath": "AGENTS.md",
+          "path": ".agents/skills/_shared/executor-dispatch-fallback.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 50,
+            "text": "(chạy song song cho nhanh — Ship Faster is priority #1, `AGENTS.md`)."
+          },
+          {
+            "line": 302,
+            "text": "  exact moment a person is waiting, `AGENTS.md`'s priority #1; that skill"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_0a0e02993dc6ba69307cb13e",
+          "line": 40,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/_shared/capability-matching.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 40,
+            "text": "5. **Parallel execution:** Running independent units concurrently to shorten wall-clock time (Ship Faster, priority #1 in `AGENTS.md`)."
+          },
+          {
+            "line": 42,
+            "text": "An agent never decides the mechanism itself (`AGENTS.md`): it queries `decide --for <capability>` once before execution. When `decide` returns `unavailable`, the unit executes inline."
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_f109986089726964a5e45318",
+          "line": 42,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/_shared/capability-matching.md",
+          "kind": "dynamic"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 40,
+            "text": "5. **Parallel execution:** Running independent units concurrently to shorten wall-clock time (Ship Faster, priority #1 in `AGENTS.md`)."
+          },
+          {
+            "line": 42,
+            "text": "An agent never decides the mechanism itself (`AGENTS.md`): it queries `decide --for <capability>` once before execution. When `decide` returns `unavailable`, the unit executes inline."
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_c48160bfd82668f463be3428",
+          "line": 74,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/_shared/coordination-driver.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 67,
+            "text": "- **Ask Human:** When an unresolvable requirement ambiguity, conflicting policy constraint, or repeated failure across distinct approaches occurs, ask the human operator in the decision-question template (`decision-question.md`; batching per AGENTS.md priority #2). Never stall unrelated or non-dependent work while awaiting human response."
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_0784bcf32461385753cd2b8c",
+          "line": 40,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/_shared/decision-question.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 40,
+            "text": "When to ask and how to batch: AGENTS.md product priority #2. Headings may be"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_a65fa8ed1fddfa8fa28d1539",
+          "line": 301,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/_shared/executor-dispatch-fallback.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 49,
+            "text": "(chạy song song cho nhanh — Ship Faster is priority #1, `AGENTS.md`)."
+          },
+          {
+            "line": 301,
+            "text": "  exact moment a person is waiting, `AGENTS.md`'s priority #1; that skill"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_ad85d4b7e55b31ccab48742b",
+          "line": 49,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/_shared/executor-dispatch-fallback.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 49,
+            "text": "(chạy song song cho nhanh — Ship Faster is priority #1, `AGENTS.md`)."
+          },
+          {
+            "line": 301,
+            "text": "  exact moment a person is waiting, `AGENTS.md`'s priority #1; that skill"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_8f2593853b6e1f804b8665d2",
+          "line": 32,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/instruction-audit/references/lane-prompts.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 32,
+            "text": "worker contracts, nested AGENTS.md). Note any uncommitted changes to these"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_c813f0a8d6fe15e2ff3d8eb2",
+          "line": 10,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 10,
+            "text": "//     writing one block into both CLAUDE.md and AGENTS.md while CLAUDE.md"
+          },
+          {
+            "line": 11,
+            "text": "//     @imports AGENTS.md is the classic case);"
+          },
+          {
+            "line": 160,
+            "text": "      } else if (e.name === \"AGENTS.md\" && dir !== ROOT) {"
+          },
+          {
+            "line": 172,
+            "text": "  const agents = exists(at(\"AGENTS.md\")) ? [at(\"AGENTS.md\")] : [];"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_a106687710d1b142c73d6305",
+          "line": 11,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 10,
+            "text": "//     writing one block into both CLAUDE.md and AGENTS.md while CLAUDE.md"
+          },
+          {
+            "line": 11,
+            "text": "//     @imports AGENTS.md is the classic case);"
+          },
+          {
+            "line": 160,
+            "text": "      } else if (e.name === \"AGENTS.md\" && dir !== ROOT) {"
+          },
+          {
+            "line": 172,
+            "text": "  const agents = exists(at(\"AGENTS.md\")) ? [at(\"AGENTS.md\")] : [];"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_6c186bd63440bd1f3fcef6fa",
+          "line": 160,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 10,
+            "text": "//     writing one block into both CLAUDE.md and AGENTS.md while CLAUDE.md"
+          },
+          {
+            "line": 11,
+            "text": "//     @imports AGENTS.md is the classic case);"
+          },
+          {
+            "line": 160,
+            "text": "      } else if (e.name === \"AGENTS.md\" && dir !== ROOT) {"
+          },
+          {
+            "line": 172,
+            "text": "  const agents = exists(at(\"AGENTS.md\")) ? [at(\"AGENTS.md\")] : [];"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_69080ec8230724f164984056",
+          "line": 172,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 10,
+            "text": "//     writing one block into both CLAUDE.md and AGENTS.md while CLAUDE.md"
+          },
+          {
+            "line": 11,
+            "text": "//     @imports AGENTS.md is the classic case);"
+          },
+          {
+            "line": 160,
+            "text": "      } else if (e.name === \"AGENTS.md\" && dir !== ROOT) {"
+          },
+          {
+            "line": 172,
+            "text": "  const agents = exists(at(\"AGENTS.md\")) ? [at(\"AGENTS.md\")] : [];"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_b02c05fcadfc2325e0b36271",
+          "line": 125,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/instruction-audit/SKILL.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 7,
+            "text": "  what each agent runtime (Claude Code, AGENTS.md readers such as Codex and"
+          },
+          {
+            "line": 14,
+            "text": "  improve CLAUDE.md / AGENTS.md / rules / hooks, asks why agents keep"
+          },
+          {
+            "line": 125,
+            "text": "   nested AGENTS.md, and delete prose that a mechanical check already"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_ba53778fc170edcd4a6681d5",
+          "line": 14,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/instruction-audit/SKILL.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 7,
+            "text": "  what each agent runtime (Claude Code, AGENTS.md readers such as Codex and"
+          },
+          {
+            "line": 14,
+            "text": "  improve CLAUDE.md / AGENTS.md / rules / hooks, asks why agents keep"
+          },
+          {
+            "line": 125,
+            "text": "   nested AGENTS.md, and delete prose that a mechanical check already"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_fe37cbff81cec88727e8ae6f",
+          "line": 7,
+          "targetPath": "AGENTS.md",
+          "path": "core/skills/instruction-audit/SKILL.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 7,
+            "text": "  what each agent runtime (Claude Code, AGENTS.md readers such as Codex and"
+          },
+          {
+            "line": 14,
+            "text": "  improve CLAUDE.md / AGENTS.md / rules / hooks, asks why agents keep"
+          },
+          {
+            "line": 125,
+            "text": "   nested AGENTS.md, and delete prose that a mechanical check already"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_0e318d9ac22a24caf9bfe4d0",
+          "line": 41,
+          "targetPath": "AGENTS.md",
+          "path": "plugins/fgOS/skills/_shared/capability-matching.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 41,
+            "text": "5. **Parallel execution:** Running independent units concurrently to shorten wall-clock time (Ship Faster, priority #1 in `AGENTS.md`)."
+          },
+          {
+            "line": 43,
+            "text": "An agent never decides the mechanism itself (`AGENTS.md`): it queries `decide --for <capability>` once before execution. When `decide` returns `unavailable`, the unit executes inline."
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_e64155f04cb1265cdfaca657",
+          "line": 43,
+          "targetPath": "AGENTS.md",
+          "path": "plugins/fgOS/skills/_shared/capability-matching.md",
+          "kind": "dynamic"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 41,
+            "text": "5. **Parallel execution:** Running independent units concurrently to shorten wall-clock time (Ship Faster, priority #1 in `AGENTS.md`)."
+          },
+          {
+            "line": 43,
+            "text": "An agent never decides the mechanism itself (`AGENTS.md`): it queries `decide --for <capability>` once before execution. When `decide` returns `unavailable`, the unit executes inline."
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_a5b0e84618694f2e96f5c1d9",
+          "line": 75,
+          "targetPath": "AGENTS.md",
+          "path": "plugins/fgOS/skills/_shared/coordination-driver.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 68,
+            "text": "- **Ask Human:** When an unresolvable requirement ambiguity, conflicting policy constraint, or repeated failure across distinct approaches occurs, ask the human operator in the decision-question template (`decision-question.md`; batching per AGENTS.md priority #2). Never stall unrelated or non-dependent work while awaiting human response."
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_d47a81af229650eb3adc2cfa",
+          "line": 41,
+          "targetPath": "AGENTS.md",
+          "path": "plugins/fgOS/skills/_shared/decision-question.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 41,
+            "text": "When to ask and how to batch: AGENTS.md product priority #2. Headings may be"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_347b4b6ba46be603a9a9baa1",
+          "line": 302,
+          "targetPath": "AGENTS.md",
+          "path": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 50,
+            "text": "(chạy song song cho nhanh — Ship Faster is priority #1, `AGENTS.md`)."
+          },
+          {
+            "line": 302,
+            "text": "  exact moment a person is waiting, `AGENTS.md`'s priority #1; that skill"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_4122dcd594a1f788c5bcc689",
+          "line": 50,
+          "targetPath": "AGENTS.md",
+          "path": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 50,
+            "text": "(chạy song song cho nhanh — Ship Faster is priority #1, `AGENTS.md`)."
+          },
+          {
+            "line": 302,
+            "text": "  exact moment a person is waiting, `AGENTS.md`'s priority #1; that skill"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_789d82fa5d7803fc3208abdc",
+          "line": 58,
+          "targetPath": "CLAUDE.md",
+          "path": ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 58,
+            "text": "Query `CLAUDE.md`'s impact-analysis capability gate — the same check"
+          },
+          {
+            "line": 70,
+            "text": "Fold the result into `CLAUDE.md`'s three-way framing"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_d07cc7355cac0a930a7adf71",
+          "line": 70,
+          "targetPath": "CLAUDE.md",
+          "path": ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 58,
+            "text": "Query `CLAUDE.md`'s impact-analysis capability gate — the same check"
+          },
+          {
+            "line": 70,
+            "text": "Fold the result into `CLAUDE.md`'s three-way framing"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_9104f18355a6e546ae8c80b4",
+          "line": 45,
+          "targetPath": "CLAUDE.md",
+          "path": ".agents/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 45,
+            "text": "Either way, before editing a symbol yourself, apply `CLAUDE.md`'s"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_2abb4b7cdf3699b22e0f1cb0",
+          "line": 18,
+          "targetPath": "CLAUDE.md",
+          "path": ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 18,
+            "text": "run `CLAUDE.md`'s impact-analysis capability gate (`fgos tool query"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_f7a5d9449d1397a362dd4a5f",
+          "line": 45,
+          "targetPath": "CLAUDE.md",
+          "path": ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 45,
+            "text": "  `CLAUDE.md`'s impact-analysis capability gate actually reports right"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_eb552dc5188ad5d927319af5",
+          "line": 58,
+          "targetPath": "CLAUDE.md",
+          "path": ".claude/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 58,
+            "text": "Query `CLAUDE.md`'s impact-analysis capability gate — the same check"
+          },
+          {
+            "line": 70,
+            "text": "Fold the result into `CLAUDE.md`'s three-way framing"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_be27425a5980f9b42ee76b05",
+          "line": 70,
+          "targetPath": "CLAUDE.md",
+          "path": ".claude/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 58,
+            "text": "Query `CLAUDE.md`'s impact-analysis capability gate — the same check"
+          },
+          {
+            "line": 70,
+            "text": "Fold the result into `CLAUDE.md`'s three-way framing"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_7bab8879536db2103fbe58ed",
+          "line": 45,
+          "targetPath": "CLAUDE.md",
+          "path": ".claude/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 45,
+            "text": "Either way, before editing a symbol yourself, apply `CLAUDE.md`'s"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_c4cb5e4e0c75eeacf8318703",
+          "line": 18,
+          "targetPath": "CLAUDE.md",
+          "path": ".claude/skills/fgos-coding-planning/references/approach-and-shape.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 18,
+            "text": "run `CLAUDE.md`'s impact-analysis capability gate (`fgos tool query"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_a3e5847535d460a9678c0e26",
+          "line": 45,
+          "targetPath": "CLAUDE.md",
+          "path": ".claude/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 45,
+            "text": "  `CLAUDE.md`'s impact-analysis capability gate actually reports right"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_376de98dcfbea0064e731fbd",
+          "line": 10,
+          "targetPath": "CLAUDE.md",
+          "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 10,
+            "text": "//     writing one block into both CLAUDE.md and AGENTS.md while CLAUDE.md"
+          },
+          {
+            "line": 133,
+            "text": "  const roots = [\"CLAUDE.md\", \".claude/CLAUDE.md\", \"CLAUDE.local.md\"]"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_f378eb47985c0e97d9f9c27b",
+          "line": 133,
+          "targetPath": "CLAUDE.md",
+          "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 10,
+            "text": "//     writing one block into both CLAUDE.md and AGENTS.md while CLAUDE.md"
+          },
+          {
+            "line": 133,
+            "text": "  const roots = [\"CLAUDE.md\", \".claude/CLAUDE.md\", \"CLAUDE.local.md\"]"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_81d16e444320ad59664013e4",
+          "line": 14,
+          "targetPath": "CLAUDE.md",
+          "path": "core/skills/instruction-audit/SKILL.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 14,
+            "text": "  improve CLAUDE.md / AGENTS.md / rules / hooks, asks why agents keep"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_6f6ffe64d21d3c7c58efd855",
+          "line": 57,
+          "targetPath": "CLAUDE.md",
+          "path": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 57,
+            "text": "Query `CLAUDE.md`'s impact-analysis capability gate — the same check"
+          },
+          {
+            "line": 69,
+            "text": "Fold the result into `CLAUDE.md`'s three-way framing"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_46207e7f1e63e3c511d90e79",
+          "line": 69,
+          "targetPath": "CLAUDE.md",
+          "path": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 57,
+            "text": "Query `CLAUDE.md`'s impact-analysis capability gate — the same check"
+          },
+          {
+            "line": 69,
+            "text": "Fold the result into `CLAUDE.md`'s three-way framing"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_0408b85195b4af58a721abc0",
+          "line": 44,
+          "targetPath": "CLAUDE.md",
+          "path": "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 44,
+            "text": "Either way, before editing a symbol yourself, apply `CLAUDE.md`'s"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_f006940196f7be310c52b531",
+          "line": 17,
+          "targetPath": "CLAUDE.md",
+          "path": "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 17,
+            "text": "run `CLAUDE.md`'s impact-analysis capability gate (`fgos tool query"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_9ac7e220414183feecac3494",
+          "line": 44,
+          "targetPath": "CLAUDE.md",
+          "path": "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 44,
+            "text": "  `CLAUDE.md`'s impact-analysis capability gate actually reports right"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_d3f47aa8ee74eea1ad99ebe4",
+          "line": 11,
+          "targetPath": "CLAUDE.md",
+          "path": "domains/coding/task-specs/scout-blast-radius.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 11,
+            "text": "  the impact-analysis capability posture (`CLAUDE.md`'s gate) is"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_13aa065a01f6e9efc8eaf5cf",
+          "line": 58,
+          "targetPath": "CLAUDE.md",
+          "path": "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 58,
+            "text": "Query `CLAUDE.md`'s impact-analysis capability gate — the same check"
+          },
+          {
+            "line": 70,
+            "text": "Fold the result into `CLAUDE.md`'s three-way framing"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_d4c773419ead0d3f9feec4b0",
+          "line": 70,
+          "targetPath": "CLAUDE.md",
+          "path": "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 58,
+            "text": "Query `CLAUDE.md`'s impact-analysis capability gate — the same check"
+          },
+          {
+            "line": 70,
+            "text": "Fold the result into `CLAUDE.md`'s three-way framing"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_fed7710fc90f1c9b0c75ad08",
+          "line": 45,
+          "targetPath": "CLAUDE.md",
+          "path": "plugins/fgOS/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 45,
+            "text": "Either way, before editing a symbol yourself, apply `CLAUDE.md`'s"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_55f3c18f2b35b07d13cd4a8f",
+          "line": 18,
+          "targetPath": "CLAUDE.md",
+          "path": "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 18,
+            "text": "run `CLAUDE.md`'s impact-analysis capability gate (`fgos tool query"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_574d530daa485017170269b8",
+          "line": 45,
+          "targetPath": "CLAUDE.md",
+          "path": "plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+          "kind": "literal"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 45,
+            "text": "  `CLAUDE.md`'s impact-analysis capability gate actually reports right"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_f4ecf7f84ef1f70fad6293ec",
+          "line": null,
+          "targetPath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+          "path": ".agents/skills/fgos-group-thinking/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical inferred shipped-contract edge removed before current census",
+        "reason": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1 intentionally replaced protocol/coordination skill semantics with named Workflow/CollaborationPattern door and removed flow-definition/coordination-session citations. Current skill source and all mapped renders contain neither target; no replacement authority read inferred.",
+        "historyEvidence": {
+          "command": "git log -3 --format='%H %s' -S 'coordination-session.md' -- core/skills/fgos-group-thinking/SKILL.md .agents/skills/fgos-group-thinking/SKILL.md; git show 13f7f01fd50dbf7062fb005de6876a0115d7e8f1 -- core/skills/fgos-group-thinking/SKILL.md",
+          "removalCommit": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1",
+          "currentSource": "core/skills/fgos-group-thinking/SKILL.md",
+          "currentSourceDigest": "17fc268485be03314fc525ffa8110c9e863372921ea424a28f2123179b4caa7e"
+        }
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_393ffe51b1f78846ab9a4644",
+          "line": null,
+          "targetPath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+          "path": "core/skills/fgos-group-thinking/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical inferred shipped-contract edge removed before current census",
+        "reason": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1 intentionally replaced protocol/coordination skill semantics with named Workflow/CollaborationPattern door and removed flow-definition/coordination-session citations. Current skill source and all mapped renders contain neither target; no replacement authority read inferred.",
+        "historyEvidence": {
+          "command": "git log -3 --format='%H %s' -S 'coordination-session.md' -- core/skills/fgos-group-thinking/SKILL.md .agents/skills/fgos-group-thinking/SKILL.md; git show 13f7f01fd50dbf7062fb005de6876a0115d7e8f1 -- core/skills/fgos-group-thinking/SKILL.md",
+          "removalCommit": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1",
+          "currentSource": "core/skills/fgos-group-thinking/SKILL.md",
+          "currentSourceDigest": "17fc268485be03314fc525ffa8110c9e863372921ea424a28f2123179b4caa7e"
+        }
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_fa5bd864fd41155e5dc22b74",
+          "line": null,
+          "targetPath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+          "path": "plugins/fgOS/skills/fgos-group-thinking/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical inferred shipped-contract edge removed before current census",
+        "reason": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1 intentionally replaced protocol/coordination skill semantics with named Workflow/CollaborationPattern door and removed flow-definition/coordination-session citations. Current skill source and all mapped renders contain neither target; no replacement authority read inferred.",
+        "historyEvidence": {
+          "command": "git log -3 --format='%H %s' -S 'coordination-session.md' -- core/skills/fgos-group-thinking/SKILL.md .agents/skills/fgos-group-thinking/SKILL.md; git show 13f7f01fd50dbf7062fb005de6876a0115d7e8f1 -- core/skills/fgos-group-thinking/SKILL.md",
+          "removalCommit": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1",
+          "currentSource": "core/skills/fgos-group-thinking/SKILL.md",
+          "currentSourceDigest": "17fc268485be03314fc525ffa8110c9e863372921ea424a28f2123179b4caa7e"
+        }
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_9e0474d59f1b2ac2ce7569cb",
+          "line": null,
+          "targetPath": "docs/architect/agent-coordination/contracts/flow-definition.md",
+          "path": ".agents/skills/fgos-group-thinking/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical inferred shipped-contract edge removed before current census",
+        "reason": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1 intentionally replaced protocol/coordination skill semantics with named Workflow/CollaborationPattern door and removed flow-definition/coordination-session citations. Current skill source and all mapped renders contain neither target; no replacement authority read inferred.",
+        "historyEvidence": {
+          "command": "git log -3 --format='%H %s' -S 'coordination-session.md' -- core/skills/fgos-group-thinking/SKILL.md .agents/skills/fgos-group-thinking/SKILL.md; git show 13f7f01fd50dbf7062fb005de6876a0115d7e8f1 -- core/skills/fgos-group-thinking/SKILL.md",
+          "removalCommit": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1",
+          "currentSource": "core/skills/fgos-group-thinking/SKILL.md",
+          "currentSourceDigest": "17fc268485be03314fc525ffa8110c9e863372921ea424a28f2123179b4caa7e"
+        }
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_0c4c88266ebe4c8f759c21e3",
+          "line": null,
+          "targetPath": "docs/architect/agent-coordination/contracts/flow-definition.md",
+          "path": "core/skills/fgos-group-thinking/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical inferred shipped-contract edge removed before current census",
+        "reason": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1 intentionally replaced protocol/coordination skill semantics with named Workflow/CollaborationPattern door and removed flow-definition/coordination-session citations. Current skill source and all mapped renders contain neither target; no replacement authority read inferred.",
+        "historyEvidence": {
+          "command": "git log -3 --format='%H %s' -S 'coordination-session.md' -- core/skills/fgos-group-thinking/SKILL.md .agents/skills/fgos-group-thinking/SKILL.md; git show 13f7f01fd50dbf7062fb005de6876a0115d7e8f1 -- core/skills/fgos-group-thinking/SKILL.md",
+          "removalCommit": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1",
+          "currentSource": "core/skills/fgos-group-thinking/SKILL.md",
+          "currentSourceDigest": "17fc268485be03314fc525ffa8110c9e863372921ea424a28f2123179b4caa7e"
+        }
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_caff7e13ebf433f8f10371bd",
+          "line": null,
+          "targetPath": "docs/architect/agent-coordination/contracts/flow-definition.md",
+          "path": "plugins/fgOS/skills/fgos-group-thinking/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical inferred shipped-contract edge removed before current census",
+        "reason": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1 intentionally replaced protocol/coordination skill semantics with named Workflow/CollaborationPattern door and removed flow-definition/coordination-session citations. Current skill source and all mapped renders contain neither target; no replacement authority read inferred.",
+        "historyEvidence": {
+          "command": "git log -3 --format='%H %s' -S 'coordination-session.md' -- core/skills/fgos-group-thinking/SKILL.md .agents/skills/fgos-group-thinking/SKILL.md; git show 13f7f01fd50dbf7062fb005de6876a0115d7e8f1 -- core/skills/fgos-group-thinking/SKILL.md",
+          "removalCommit": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1",
+          "currentSource": "core/skills/fgos-group-thinking/SKILL.md",
+          "currentSourceDigest": "17fc268485be03314fc525ffa8110c9e863372921ea424a28f2123179b4caa7e"
+        }
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_b9daf5133349351bcf31ecd2",
+          "line": null,
+          "targetPath": "docs/architect/knowledge-registry-redesign.md",
+          "path": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 45,
+            "text": "   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a"
+          }
+        ],
+        "censusEdges": [
+          "skills-031"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    }
+  ]
+}

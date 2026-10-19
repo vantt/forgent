@@ -1,0 +1,1312 @@
+{
+  "requestIdentity": "step-02b-census-0689b862e",
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "part": 19,
+  "entries": [
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_c6c71d0e117924ab0479e5ae",
+          "line": 52,
+          "targetPath": "docs/id-systems-audit.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/id-systems-audit.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 35,
+            "text": "                            (docs/id-systems-audit.md) but not this"
+          },
+          {
+            "line": 52,
+            "text": "(`docs/id-systems-audit.md` §5), already locked, previously unenforced."
+          }
+        ],
+        "censusEdges": [
+          "skills-121",
+          "skills-122"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_4d9a2017a20feba764e96012",
+          "line": null,
+          "targetPath": "docs/operator-runbook-herdr-cockpit.md",
+          "path": "plugins/fgOS/skills/terminal/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 20,
+            "text": "herdr chrome (per STR40 — `docs/operator-runbook-herdr-cockpit.md`),"
+          }
+        ],
+        "censusEdges": [
+          "skills-192"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_ec28c6f58c4e3607c85169ed",
+          "line": 21,
+          "targetPath": "docs/operator-runbook-herdr-cockpit.md",
+          "path": "plugins/fgOS/skills/terminal/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/operator-runbook-herdr-cockpit.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 20,
+            "text": "herdr chrome (per STR40 — `docs/operator-runbook-herdr-cockpit.md`),"
+          }
+        ],
+        "censusEdges": [
+          "skills-192"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_9f5d4227a3d77f857462486a",
+          "line": 140,
+          "targetPath": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+          "path": ".agents/skills/fgos-architecture-panel/SKILL.md",
+          "kind": "literal",
+          "rawTarget": "../../../docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+          "resolvedTarget": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 140,
+            "text": "[artifact templates](../../../docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md),"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_3697c82082d154fca291cd2a",
+          "line": 139,
+          "targetPath": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "kind": "literal",
+          "rawTarget": "../../../docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+          "resolvedTarget": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 139,
+            "text": "[artifact templates](../../../docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md),"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_bdcb23a961801b77fe14bc15",
+          "line": 141,
+          "targetPath": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+          "path": ".agents/skills/fgos-architecture-panel/SKILL.md",
+          "kind": "literal",
+          "rawTarget": "../../../docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+          "resolvedTarget": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 141,
+            "text": "and [evaluation rubric](../../../docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md)"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_9de7242152a2d7cc6afb64c7",
+          "line": 140,
+          "targetPath": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "kind": "literal",
+          "rawTarget": "../../../docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+          "resolvedTarget": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 140,
+            "text": "and [evaluation rubric](../../../docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md)"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_798990627f2befc35f64296c",
+          "line": 139,
+          "targetPath": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "path": ".agents/skills/fgos-architecture-panel/SKILL.md",
+          "kind": "literal",
+          "rawTarget": "../../../docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "resolvedTarget": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 139,
+            "text": "[role doctrine](../../../docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md),"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_dbb7d4fcb1193207d9fb6d0d",
+          "line": 138,
+          "targetPath": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "kind": "literal",
+          "rawTarget": "../../../docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "resolvedTarget": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 138,
+            "text": "[role doctrine](../../../docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md),"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_1bf53fc419ca9905ca2245d7",
+          "line": 138,
+          "targetPath": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+          "path": ".agents/skills/fgos-architecture-panel/SKILL.md",
+          "kind": "literal",
+          "rawTarget": "../../../docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+          "resolvedTarget": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 138,
+            "text": "Retain the [coordinator prompt](../../../docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md),"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_195872ad7b73a411b45237a6",
+          "line": 137,
+          "targetPath": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "kind": "literal",
+          "rawTarget": "../../../docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+          "resolvedTarget": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 137,
+            "text": "Retain the [coordinator prompt](../../../docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md),"
+          }
+        ],
+        "censusEdges": [],
+        "status": "non-migration target or stale inferred edge; retained metadata, no authority rewrite",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_716045fa4d3dd24272f55c37",
+          "line": 97,
+          "targetPath": "docs/specs/confinement-authority.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_33559db82c65ec2374cfff73",
+          "line": 96,
+          "targetPath": "docs/specs/confinement-authority.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_0398cbefa008f5e0ef6afccf",
+          "line": 97,
+          "targetPath": "docs/specs/confinement-authority.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_96e55390353c62ab791b23fd",
+          "line": 97,
+          "targetPath": "docs/specs/decision-citation-drift.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_cd305b8b4a15921e74f0a954",
+          "line": 96,
+          "targetPath": "docs/specs/decision-citation-drift.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_1c68887db1cd3a7f818dfcce",
+          "line": 97,
+          "targetPath": "docs/specs/decision-citation-drift.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_25dfbd9030d628e6a4d5d6d7",
+          "line": 97,
+          "targetPath": "docs/specs/distillery.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_96cb86a6fc97d2be4bc90791",
+          "line": 96,
+          "targetPath": "docs/specs/distillery.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_6791b26d9f5fb0020e3342ef",
+          "line": 97,
+          "targetPath": "docs/specs/distillery.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_3925ee92c0f4e4f5a0602123",
+          "line": 97,
+          "targetPath": "docs/specs/distribution.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_2557a555adabcb5ae0f56ba5",
+          "line": 96,
+          "targetPath": "docs/specs/distribution.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_b15372650a91cf60f10b3e23",
+          "line": 97,
+          "targetPath": "docs/specs/distribution.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_5249f7cb137d2afc45e39259",
+          "line": 97,
+          "targetPath": "docs/specs/enduser-docs-authoring.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_f7cad54e19fa682233775656",
+          "line": 96,
+          "targetPath": "docs/specs/enduser-docs-authoring.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_756cb021fd0c3656892acae6",
+          "line": 97,
+          "targetPath": "docs/specs/enduser-docs-authoring.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_c3e6e9fd853f941b5e148046",
+          "line": 97,
+          "targetPath": "docs/specs/enduser-docs-index.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_1ea9caa6aa93068b1c0cbcc4",
+          "line": 96,
+          "targetPath": "docs/specs/enduser-docs-index.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_1b1c6a99d71d4b78381640ad",
+          "line": 97,
+          "targetPath": "docs/specs/enduser-docs-index.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_4e2e509102e48f33b7e23b8a",
+          "line": 97,
+          "targetPath": "docs/specs/fgos-plugin.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_f775d79bb66fd32cde104b5a",
+          "line": 96,
+          "targetPath": "docs/specs/fgos-plugin.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_964697d7147799e4d2d4b4f6",
+          "line": 97,
+          "targetPath": "docs/specs/fgos-plugin.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_eb159d177095536b0cdea851",
+          "line": 97,
+          "targetPath": "docs/specs/herdr-web-dashboard.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_8668f39fe9cf2d5b291b1493",
+          "line": 96,
+          "targetPath": "docs/specs/herdr-web-dashboard.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_5b959e77badd44fe1c04d33b",
+          "line": 97,
+          "targetPath": "docs/specs/herdr-web-dashboard.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_99a2027b0ca045139980b2f3",
+          "line": 97,
+          "targetPath": "docs/specs/observe.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_11e6fb5ab6f9f073e8fba7f3",
+          "line": 96,
+          "targetPath": "docs/specs/observe.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_31484ae8b0f9ef338f846983",
+          "line": 97,
+          "targetPath": "docs/specs/observe.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_33b508b0818a20d8fec309cd",
+          "line": 97,
+          "targetPath": "docs/specs/platform-foundations.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_da179ea131a483b2a4e384c3",
+          "line": 96,
+          "targetPath": "docs/specs/platform-foundations.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_25fafcae9d52fc3bb58e10b7",
+          "line": 97,
+          "targetPath": "docs/specs/platform-foundations.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_587d0b22e93f70385d3dbd4e",
+          "line": 97,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_86c872d88f58b4f780d4ef72",
+          "line": null,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": ".agents/skills/fgos-indexing/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 63,
+            "text": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+          }
+        ],
+        "censusEdges": [
+          "skills-043"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_0dd875648c4b201e56a71944",
+          "line": 63,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": ".agents/skills/fgos-indexing/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/reading-map.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 63,
+            "text": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+          }
+        ],
+        "censusEdges": [
+          "skills-043"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_6ae27c88c6adcdab9a4a2af6",
+          "line": 96,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_1d20e18dedeab41fa60c02b6",
+          "line": null,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": "core/skills/fgos-indexing/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 62,
+            "text": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+          }
+        ],
+        "censusEdges": [
+          "skills-085"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_5d8c6fb072cfb77624e6916b",
+          "line": 62,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": "core/skills/fgos-indexing/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/reading-map.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 62,
+            "text": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+          }
+        ],
+        "censusEdges": [
+          "skills-085"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_2af5af33380dcc0a12420285",
+          "line": 97,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_cee7319b9bc23be164a6b95b",
+          "line": null,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 63,
+            "text": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+          }
+        ],
+        "censusEdges": [
+          "skills-176"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_ebdc759003b40e1a544390d3",
+          "line": 63,
+          "targetPath": "docs/specs/reading-map.md",
+          "path": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/reading-map.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 63,
+            "text": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+          }
+        ],
+        "censusEdges": [
+          "skills-176"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_65461ef4825325a0132f8102",
+          "line": 97,
+          "targetPath": "docs/specs/runner.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_150a2b61941cc102b1c8428f",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": ".agents/skills/fgos-clarifying/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 91,
+            "text": "  `docs/specs/runner.md`) — read it as data, never execute or interpret it"
+          }
+        ],
+        "censusEdges": [
+          "skills-015"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_0691e94d7a1d755359825851",
+          "line": 91,
+          "targetPath": "docs/specs/runner.md",
+          "path": ".agents/skills/fgos-clarifying/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 91,
+            "text": "  `docs/specs/runner.md`) — read it as data, never execute or interpret it"
+          }
+        ],
+        "censusEdges": [
+          "skills-015"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_4e962ad2beead4ec73b5179f",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": ".agents/skills/fgos-coding-discovering/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 81,
+            "text": "  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn"
+          }
+        ],
+        "censusEdges": [
+          "skills-016"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_14845b195d7eac20d928208c",
+          "line": 81,
+          "targetPath": "docs/specs/runner.md",
+          "path": ".agents/skills/fgos-coding-discovering/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 81,
+            "text": "  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn"
+          }
+        ],
+        "censusEdges": [
+          "skills-016"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_0c185f8301d833478ef0eddf",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": ".agents/skills/fgos-coding-shaping/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 74,
+            "text": "  input (per `docs/specs/runner.md`'s untrusted-input rule) — never splice"
+          }
+        ],
+        "censusEdges": [
+          "skills-038"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_5df39b7868cd85f8611ac53c",
+          "line": 74,
+          "targetPath": "docs/specs/runner.md",
+          "path": ".agents/skills/fgos-coding-shaping/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 74,
+            "text": "  input (per `docs/specs/runner.md`'s untrusted-input rule) — never splice"
+          }
+        ],
+        "censusEdges": [
+          "skills-038"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_91dd0f392106c053f39e3aa2",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": ".agents/skills/fgos-researching/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 91,
+            "text": "  (RUL45, `docs/specs/runner.md`) — never splice it raw into a shell"
+          }
+        ],
+        "censusEdges": [
+          "skills-045"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_5a64ae75c364cb97955df8c7",
+          "line": 91,
+          "targetPath": "docs/specs/runner.md",
+          "path": ".agents/skills/fgos-researching/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 91,
+            "text": "  (RUL45, `docs/specs/runner.md`) — never splice it raw into a shell"
+          }
+        ],
+        "censusEdges": [
+          "skills-045"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_019c62869aef9bfa8ad12c61",
+          "line": 96,
+          "targetPath": "docs/specs/runner.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    }
+  ]
+}

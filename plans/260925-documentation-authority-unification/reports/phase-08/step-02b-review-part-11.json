@@ -1,0 +1,1591 @@
+{
+  "requestIdentity": "step-02b-census-0689b862e",
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "part": 11,
+  "entries": [
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/_shared/coding-worker-contract.md",
+        "fileDigest": "e76250e9dc79a8c161f6e7e4c22e85069461e4c4b29d919b10bbff6059185185",
+        "sourcePath": "core/skills/_shared/coding-worker-contract.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "e76250e9dc79a8c161f6e7e4c22e85069461e4c4b29d919b10bbff6059185185",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 3,
+            "text": "tsk-2uf-2 (`docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md`):"
+          },
+          {
+            "line": 5,
+            "text": "this fgOS repo, \"worker\" is a role, not an identity (`CONTEXT.md`'s pinned"
+          },
+          {
+            "line": 121,
+            "text": "close (`CONTEXT.md`'s own V3 finding: the dispatch prompt already tells"
+          },
+          {
+            "line": 159,
+            "text": "`docs/history/pi-executor-runtime-capacity/RESEARCH.md` Round 4."
+          },
+          {
+            "line": 172,
+            "text": "Full evidence: `docs/history/claude-named-executor/RESEARCH.md` Rounds 3"
+          },
+          {
+            "line": 184,
+            "text": "Full evidence: `docs/history/tsk-5gd/RESEARCH.md` Round 1."
+          },
+          {
+            "line": 188,
+            "text": "- `docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md` —"
+          }
+        ],
+        "edgeIds": [
+          "skills-079",
+          "skills-080",
+          "skills-081",
+          "skills-082",
+          "skills-083"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/_shared/coordination-driver.md",
+        "fileDigest": "7cdefc3fa3ab4d8a12d4b8d1856843bdb59031b88b29d67ccbd02ad0d0f14bc4",
+        "sourcePath": "core/skills/_shared/coordination-driver.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "7cdefc3fa3ab4d8a12d4b8d1856843bdb59031b88b29d67ccbd02ad0d0f14bc4",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/_shared/decision-question.md",
+        "fileDigest": "b53bfbc91ef5fbe5833c2dec5c7181df1d1b5d276248d795722095d2f1d2c8b7",
+        "sourcePath": "core/skills/_shared/decision-question.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "b53bfbc91ef5fbe5833c2dec5c7181df1d1b5d276248d795722095d2f1d2c8b7",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/_shared/executor-dispatch-fallback.md",
+        "fileDigest": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+        "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+        "priorHistoryEdges": [
+          "history-016",
+          "history-017",
+          "history-018",
+          "history-019"
+        ],
+        "bareSiblingMentions": [
+          {
+            "line": 12,
+            "text": "`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2)."
+          },
+          {
+            "line": 33,
+            "text": "(`docs/history/agent-coordination-foundation/plan.md`):"
+          },
+          {
+            "line": 151,
+            "text": "`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor"
+          },
+          {
+            "line": 224,
+            "text": "`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,"
+          }
+        ],
+        "edgeIds": [],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/_shared/fgos-cli-fallback.md",
+        "fileDigest": "923bc223a8cd0b81bc2cd5785083e9650f304f87b40f595645f227a383797dd5",
+        "sourcePath": "core/skills/_shared/fgos-cli-fallback.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "923bc223a8cd0b81bc2cd5785083e9650f304f87b40f595645f227a383797dd5",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/_shared/planning-capability-awareness.md",
+        "fileDigest": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94",
+        "sourcePath": "core/skills/_shared/planning-capability-awareness.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94",
+        "priorHistoryEdges": [
+          "history-020"
+        ],
+        "bareSiblingMentions": [
+          {
+            "line": 7,
+            "text": "(`docs/history/agent-coordination-foundation/plan.md`), not hidden inside"
+          }
+        ],
+        "edgeIds": [],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/_shared/private-cell-worktree.md",
+        "fileDigest": "1464561d491b83d7f752cf1e2a73e44aac5d6f47ffab6928d696ff3812699b37",
+        "sourcePath": "core/skills/_shared/private-cell-worktree.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "1464561d491b83d7f752cf1e2a73e44aac5d6f47ffab6928d696ff3812699b37",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/distill/CREATION-LOG.md",
+        "fileDigest": "15a662efd1f47e8ba07be655d4f3397e45901f9666676584c264c43511943486",
+        "sourcePath": "core/skills/distill/CREATION-LOG.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "15a662efd1f47e8ba07be655d4f3397e45901f9666676584c264c43511943486",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/distill/SKILL.md",
+        "fileDigest": "4b45bcab0699be58354933be096ebd4943a8ca7b26f81e91f40d356a01643ca7",
+        "sourcePath": "core/skills/distill/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "4b45bcab0699be58354933be096ebd4943a8ca7b26f81e91f40d356a01643ca7",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/distill/references/consult-protocol.md",
+        "fileDigest": "f435be045fea0a10a367d0dac428a512444694041877cff9a57991dada0a73e4",
+        "sourcePath": "core/skills/distill/references/consult-protocol.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "f435be045fea0a10a367d0dac428a512444694041877cff9a57991dada0a73e4",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/distill/references/deep-dive-protocol.md",
+        "fileDigest": "dc6c43de2ffdb23e581b19f2d46a72affbc2279d92f7ccb971fd567c5e7d9961",
+        "sourcePath": "core/skills/distill/references/deep-dive-protocol.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "dc6c43de2ffdb23e581b19f2d46a72affbc2279d92f7ccb971fd567c5e7d9961",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/distill/references/extract-rules.md",
+        "fileDigest": "bd27a5dde54a78556fb4e7603dd7930217d2e6972b049bc99ea8e33402d316de",
+        "sourcePath": "core/skills/distill/references/extract-rules.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "bd27a5dde54a78556fb4e7603dd7930217d2e6972b049bc99ea8e33402d316de",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/distill/scripts/distill.mjs",
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-263",
+          "skills-264",
+          "skills-265",
+          "skills-266",
+          "skills-267",
+          "skills-268",
+          "skills-269",
+          "skills-270",
+          "skills-271",
+          "skills-272",
+          "skills-273",
+          "skills-274",
+          "skills-275",
+          "skills-276",
+          "skills-277",
+          "skills-278",
+          "skills-279",
+          "skills-280",
+          "skills-281",
+          "skills-282",
+          "skills-283",
+          "skills-284",
+          "skills-285",
+          "skills-286",
+          "skills-287",
+          "skills-288",
+          "skills-289",
+          "skills-290",
+          "skills-291",
+          "skills-292",
+          "skills-293",
+          "skills-330",
+          "skills-331",
+          "skills-332"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "fileDigest": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+        "sourcePath": "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-advise/SKILL.md",
+        "fileDigest": "fc3dcbf9953bcc16ca71d77a8d09ed4a34c32b1eebc07a5c7448832eccaad88d",
+        "sourcePath": "core/skills/fgos-advise/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "fc3dcbf9953bcc16ca71d77a8d09ed4a34c32b1eebc07a5c7448832eccaad88d",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-advise/references/request-kinds-and-routes.md",
+        "fileDigest": "dacf826724674d3dc92a6638c0e806be4a613792d889b7b42c41632711fdc1d9",
+        "sourcePath": "core/skills/fgos-advise/references/request-kinds-and-routes.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "dacf826724674d3dc92a6638c0e806be4a613792d889b7b42c41632711fdc1d9",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-architecture-panel/SKILL.md",
+        "fileDigest": "b82218093ebe293c00c47d59a7dea6802da7bf5d9bd27a18fe7038a24da42a47",
+        "sourcePath": "core/skills/fgos-architecture-panel/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "b82218093ebe293c00c47d59a7dea6802da7bf5d9bd27a18fe7038a24da42a47",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-clarifying/SKILL.md",
+        "fileDigest": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+        "sourcePath": "core/skills/fgos-clarifying/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 78,
+            "text": "  CONTEXT.md).** `domain` is a required field on the verdict (never"
+          }
+        ],
+        "edgeIds": [
+          "skills-084"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-fanout/SKILL.md",
+        "fileDigest": "03dc71d49ddb0ecc44d05f3ef8377d2473531e5dc94684802623851a3197624a",
+        "sourcePath": "core/skills/fgos-fanout/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "03dc71d49ddb0ecc44d05f3ef8377d2473531e5dc94684802623851a3197624a",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+        "fileDigest": "6aaaa2f8c3704b7c36dbcbf9f9603880c3704cf2b878ace806607c4202f19925",
+        "sourcePath": "core/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "6aaaa2f8c3704b7c36dbcbf9f9603880c3704cf2b878ace806607c4202f19925",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-group-thinking/SKILL.md",
+        "fileDigest": "17fc268485be03314fc525ffa8110c9e863372921ea424a28f2123179b4caa7e",
+        "sourcePath": "core/skills/fgos-group-thinking/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "17fc268485be03314fc525ffa8110c9e863372921ea424a28f2123179b4caa7e",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-indexing/SKILL.md",
+        "fileDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+        "sourcePath": "core/skills/fgos-indexing/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-085"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-lock-fence/SKILL.md",
+        "fileDigest": "582332cc26e747b37b1529a3f8bd548888a3daf21b975cdd5617de2f5bef4a14",
+        "sourcePath": "core/skills/fgos-lock-fence/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "582332cc26e747b37b1529a3f8bd548888a3daf21b975cdd5617de2f5bef4a14",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-researching/SKILL.md",
+        "fileDigest": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+        "sourcePath": "core/skills/fgos-researching/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 77,
+            "text": "  `docs/history/<feature>/RESEARCH.md` — **accumulate, never overwrite** an"
+          },
+          {
+            "line": 113,
+            "text": "4. **Write the round to `RESEARCH.md`**, accumulating under its own dated"
+          },
+          {
+            "line": 135,
+            "text": "- overwriting `RESEARCH.md` instead of appending a new dated round"
+          },
+          {
+            "line": 149,
+            "text": "Findings recorded in `RESEARCH.md`, verdict returned to the caller."
+          }
+        ],
+        "edgeIds": [
+          "skills-086",
+          "skills-087"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-routing/SKILL.md",
+        "fileDigest": "b1e259da39eee39c9b213f3ae156ec1680ffd816ff40a8a51e78379ccb3b05ce",
+        "sourcePath": "core/skills/fgos-routing/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "b1e259da39eee39c9b213f3ae156ec1680ffd816ff40a8a51e78379ccb3b05ce",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 67,
+            "text": "`fgos-coding-planning`'s own `plan.md` has always recorded — only the deciding"
+          },
+          {
+            "line": 68,
+            "text": "moved here; the recording still happens in `plan.md` itself, written by"
+          }
+        ],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/fgos-run/SKILL.md",
+        "fileDigest": "8fd267a429aa393cbc936e7d583e2dc432962a0dcda8da849bbd0dc9dbf4c82d",
+        "sourcePath": "core/skills/fgos-run/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "8fd267a429aa393cbc936e7d583e2dc432962a0dcda8da849bbd0dc9dbf4c82d",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/instruction-audit/SKILL.md",
+        "fileDigest": "5c92ed16fc98e2326d9cfcc5c1a5c181d322c46dc436f669dd41d66eceedd7d6",
+        "sourcePath": "core/skills/instruction-audit/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "5c92ed16fc98e2326d9cfcc5c1a5c181d322c46dc436f669dd41d66eceedd7d6",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/instruction-audit/references/lane-prompts.md",
+        "fileDigest": "7768d7562c9d45d2c40fb5602ed542c7711df2d31978351c1751f801ac6de112",
+        "sourcePath": "core/skills/instruction-audit/references/lane-prompts.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "7768d7562c9d45d2c40fb5602ed542c7711df2d31978351c1751f801ac6de112",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/instruction-audit/references/report-template.md",
+        "fileDigest": "c1f2f637b2ba40ec03b3a6a99c65a9ca851283d20e03140b3bec45f08f222b24",
+        "sourcePath": "core/skills/instruction-audit/references/report-template.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "c1f2f637b2ba40ec03b3a6a99c65a9ca851283d20e03140b3bec45f08f222b24",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-294",
+          "skills-295",
+          "skills-296",
+          "skills-297",
+          "skills-298",
+          "skills-299",
+          "skills-300",
+          "skills-301",
+          "skills-302",
+          "skills-303",
+          "skills-304",
+          "skills-305"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/task-specs/distill.md",
+        "fileDigest": "39b202917739ec53f91c27c0fa14232f784fb09128f25213bc1010668839ca6d",
+        "sourcePath": "core/task-specs/distill.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "39b202917739ec53f91c27c0fa14232f784fb09128f25213bc1010668839ca6d",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/task-specs/fgos-clarifying.md",
+        "fileDigest": "4f913c455f68e78ec196da9998e082836bafa1f7cb04ecbf17509f646bb88ac4",
+        "sourcePath": "core/task-specs/fgos-clarifying.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "4f913c455f68e78ec196da9998e082836bafa1f7cb04ecbf17509f646bb88ac4",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/task-specs/fgos-fanout.md",
+        "fileDigest": "1911466e3581797ad549c74184d1e154818baeab8e8c610f4b932cd27c48e2fc",
+        "sourcePath": "core/task-specs/fgos-fanout.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "1911466e3581797ad549c74184d1e154818baeab8e8c610f4b932cd27c48e2fc",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/task-specs/fgos-indexing.md",
+        "fileDigest": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+        "sourcePath": "core/task-specs/fgos-indexing.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-088"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/task-specs/fgos-lock-fence.md",
+        "fileDigest": "910440495093062e9b4522ad6df978f2dd7c131a0ae85a990c75c7839551e6a9",
+        "sourcePath": "core/task-specs/fgos-lock-fence.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "910440495093062e9b4522ad6df978f2dd7c131a0ae85a990c75c7839551e6a9",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/task-specs/fgos-researching.md",
+        "fileDigest": "e0ddb50a83351347eeb60d3b345cd1ad9d7e827485ded1cb65aad134ee0f9226",
+        "sourcePath": "core/task-specs/fgos-researching.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "e0ddb50a83351347eeb60d3b345cd1ad9d7e827485ded1cb65aad134ee0f9226",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 11,
+            "text": "- Accumulating log entries appended under dated sections in `docs/history/<feature>/RESEARCH.md`."
+          },
+          {
+            "line": 17,
+            "text": "- Hard: Stage-agnostic (never assumes or reads caller stage). Never decides scope, architecture, or code changes; never overwrites `RESEARCH.md`."
+          },
+          {
+            "line": 29,
+            "text": "| No trigger matches | — record findings in RESEARCH.md and return verdict — | | | |"
+          }
+        ],
+        "edgeIds": [
+          "skills-089"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/task-specs/fgos-routing.md",
+        "fileDigest": "993e2201ec9e6b4df23aed6ccffbf1508609921a47c65b26d01d030a7c7e3a54",
+        "sourcePath": "core/task-specs/fgos-routing.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "993e2201ec9e6b4df23aed6ccffbf1508609921a47c65b26d01d030a7c7e3a54",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/_shared/coding-cell-policy.md",
+        "fileDigest": "5860d544eaeb4d9a5f83a61204a6fea8122a9bd3976a5e4e396e11b21e13fbb1",
+        "sourcePath": "domains/coding/skills/_shared/coding-cell-policy.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "5860d544eaeb4d9a5f83a61204a6fea8122a9bd3976a5e4e396e11b21e13fbb1",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "fileDigest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+        "sourcePath": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 76,
+            "text": "- Không mở lại hay diễn giải khác một quyết định đã khoá ở `CONTEXT.md`"
+          },
+          {
+            "line": 126,
+            "text": "   `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`"
+          },
+          {
+            "line": 133,
+            "text": "   `docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về"
+          },
+          {
+            "line": 202,
+            "text": "- mở lại một quyết định đã khoá ở `CONTEXT.md` thay vì trích D-ID"
+          }
+        ],
+        "edgeIds": [
+          "skills-090",
+          "skills-091",
+          "skills-092",
+          "skills-093"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-driving/SKILL.md",
+        "fileDigest": "e241360f3670b6c54d8c730ff6028f4455174c6019b426338e93312cae2d71bd",
+        "sourcePath": "domains/coding/skills/fgos-coding-driving/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "e241360f3670b6c54d8c730ff6028f4455174c6019b426338e93312cae2d71bd",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-driving/references/caller-contract.md",
+        "fileDigest": "e24b2edec6a8c260be7be810537e324c9dcf2a8be322f42531644a719c7cc418",
+        "sourcePath": "domains/coding/skills/fgos-coding-driving/references/caller-contract.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "e24b2edec6a8c260be7be810537e324c9dcf2a8be322f42531644a719c7cc418",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md",
+        "fileDigest": "fa1d4c0f277f05e5213486db2709fda6caec91f6c4ff0e0c67028cee21275713",
+        "sourcePath": "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "fa1d4c0f277f05e5213486db2709fda6caec91f6c4ff0e0c67028cee21275713",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-driving/references/reclaim-and-role-graph.md",
+        "fileDigest": "47e1ad800ea1f15ed59e81ef3f12149015a218fe496c2909331fa25064e7dc16",
+        "sourcePath": "domains/coding/skills/fgos-coding-driving/references/reclaim-and-role-graph.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "47e1ad800ea1f15ed59e81ef3f12149015a218fe496c2909331fa25064e7dc16",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+        "fileDigest": "9427b9e7d3bfe654519419ec2ec8632b66b69bca11218c2279238cc4f3289d3f",
+        "sourcePath": "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "9427b9e7d3bfe654519419ec2ec8632b66b69bca11218c2279238cc4f3289d3f",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 15,
+            "text": "`docs/history/<feature>/CONTEXT.md`. This skill normally runs while a"
+          },
+          {
+            "line": 18,
+            "text": "mid-`planning`, when that skill finds `CONTEXT.md` silent on something"
+          },
+          {
+            "line": 66,
+            "text": "- Commit `CONTEXT.md` to the item's `fgw/<id>` branch before this session"
+          },
+          {
+            "line": 68,
+            "text": "  once the item reaches `executing`, and an uncommitted `CONTEXT.md` at"
+          },
+          {
+            "line": 105,
+            "text": "Write `docs/history/<feature>/CONTEXT.md` — feature boundary, the locked"
+          },
+          {
+            "line": 115,
+            "text": "CONTEXT.md is written and approved, it is the session's own judgment —"
+          },
+          {
+            "line": 131,
+            "text": "fgos gate-check \"<item-id>\" --gate contextApprove --artifact \"docs/history/<feature>/CONTEXT.md\""
+          },
+          {
+            "line": 139,
+            "text": "  `auto-approved: CONTEXT.md (gate-bypass level <level>)`, and continue"
+          },
+          {
+            "line": 143,
+            "text": "  CONTEXT.md linked, then ask exactly: \"Decisions locked. Approve"
+          },
+          {
+            "line": 144,
+            "text": "  CONTEXT.md before planning?\" Once approved, continue to"
+          },
+          {
+            "line": 162,
+            "text": "- CONTEXT.md left with placeholders, or handed off without the gate"
+          },
+          {
+            "line": 189,
+            "text": "  logging, and the CONTEXT.md writing mechanics for Steps 2-3"
+          }
+        ],
+        "edgeIds": [
+          "skills-094",
+          "skills-095",
+          "skills-096"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        "fileDigest": "b0bc2aeacea29dbe5f4ea8d46a684ca9f907453f8813f02accf226f1549463bc",
+        "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "b0bc2aeacea29dbe5f4ea8d46a684ca9f907453f8813f02accf226f1549463bc",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 12,
+            "text": "fgos gate-check \"<item-id>\" --gate contextApprove --artifact \"docs/history/<feature>/CONTEXT.md\""
+          },
+          {
+            "line": 52,
+            "text": "Skip the question. Post the non-question line `auto-approved: CONTEXT.md"
+          },
+          {
+            "line": 56,
+            "text": "fgos decision --id \"<item-id>\" --text \"auto-approved CONTEXT.md gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation none --dir \"$root\""
+          },
+          {
+            "line": 67,
+            "text": "can be trusted, what it costs if wrong — with CONTEXT.md linked, then ask"
+          },
+          {
+            "line": 68,
+            "text": "exactly: \"Decisions locked. Approve CONTEXT.md before planning?\""
+          },
+          {
+            "line": 69,
+            "text": "CONTEXT.md is the source of truth for every downstream step; its decision"
+          }
+        ],
+        "edgeIds": [
+          "skills-097",
+          "skills-098"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "fileDigest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+        "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 1,
+            "text": "# Lock decisions and write CONTEXT.md — full mechanics"
+          },
+          {
+            "line": 46,
+            "text": "fgos decision --text \"<D-ID>: <one-line summary>\" --rationale \"see CONTEXT.md for the full scout evidence and reasoning\" --relation none"
+          },
+          {
+            "line": 50,
+            "text": "an earlier one already locked in this same CONTEXT.md — every `fgos"
+          },
+          {
+            "line": 54,
+            "text": "is required — this call is additive alongside writing CONTEXT.md in Step"
+          },
+          {
+            "line": 55,
+            "text": "3, never a replacement for it: CONTEXT.md stays the source of truth for"
+          },
+          {
+            "line": 108,
+            "text": "## Writing CONTEXT.md"
+          },
+          {
+            "line": 110,
+            "text": "Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,"
+          },
+          {
+            "line": 134,
+            "text": "the log — CONTEXT.md's table becomes a VIEW, never a second, hand-typed"
+          }
+        ],
+        "edgeIds": [
+          "skills-099",
+          "skills-100"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-exploring/references/re-entry-from-planning.md",
+        "fileDigest": "bf05e294c104a9c413c6bdb41c3ce0443dcf90d3bf180239dc0a187e8bd58d8c",
+        "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/re-entry-from-planning.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "bf05e294c104a9c413c6bdb41c3ce0443dcf90d3bf180239dc0a187e8bd58d8c",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 4,
+            "text": "when `CONTEXT.md` turns out silent on something material to the plan."
+          },
+          {
+            "line": 16,
+            "text": "  not generate a fresh 2-4 question set — CONTEXT.md's existing decisions"
+          },
+          {
+            "line": 22,
+            "text": "  CONTEXT.md's existing decisions table, and leave `## Outstanding"
+          },
+          {
+            "line": 25,
+            "text": "  already ran once for this CONTEXT.md; the re-entry adds one decision,"
+          },
+          {
+            "line": 26,
+            "text": "  and asking \"Approve CONTEXT.md before planning?\" immediately after a"
+          }
+        ],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "fileDigest": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+        "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 71,
+            "text": "CONTEXT.md in Step 3, next to the other scout evidence. This is"
+          },
+          {
+            "line": 74,
+            "text": "get asked here; it exists so a later reader of this item's CONTEXT.md"
+          }
+        ],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+        "fileDigest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+        "sourcePath": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 71,
+            "text": "  locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;"
+          }
+        ],
+        "edgeIds": [
+          "skills-101",
+          "skills-102"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+        "fileDigest": "1be49dfb43f958ffd5d54aa73ba8a4e29f4591332f3f46316970f1dcab34ad37",
+        "sourcePath": "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "1be49dfb43f958ffd5d54aa73ba8a4e29f4591332f3f46316970f1dcab34ad37",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-implement/references/return-mechanics.md",
+        "fileDigest": "ef6e11b880c3b1e55f42d0963f17b9127e530aaad576ff034a0afe98cdc09067",
+        "sourcePath": "domains/coding/skills/fgos-coding-implement/references/return-mechanics.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "ef6e11b880c3b1e55f42d0963f17b9127e530aaad576ff034a0afe98cdc09067",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "fileDigest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+        "sourcePath": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 32,
+            "text": "earlier plan.md/CONTEXT.md commits), so the classification comes back"
+          }
+        ],
+        "edgeIds": [
+          "skills-103"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+        "fileDigest": "ea2d3891915949c1e9764240b81af748393713f00685ac173eb5c64ed1df9043",
+        "sourcePath": "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "ea2d3891915949c1e9764240b81af748393713f00685ac173eb5c64ed1df9043",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 6,
+            "text": "`docsRef` (the feature's `docs/history/<feature>/` directory: CONTEXT.md's"
+          },
+          {
+            "line": 7,
+            "text": "locked decisions and plan.md's shape, when either exists). An item that"
+          }
+        ],
+        "edgeIds": [
+          "skills-104"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+        "fileDigest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+        "sourcePath": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-105"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+        "fileDigest": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+        "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+        "priorHistoryEdges": [
+          "history-021",
+          "history-022"
+        ],
+        "bareSiblingMentions": [
+          {
+            "line": 15,
+            "text": "Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into"
+          },
+          {
+            "line": 16,
+            "text": "`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a"
+          },
+          {
+            "line": 31,
+            "text": "  Split children are written as specs in `plan.md` and materialized later,"
+          },
+          {
+            "line": 55,
+            "text": "- Do not reopen or reinterpret a decision already locked in CONTEXT.md."
+          },
+          {
+            "line": 64,
+            "text": "  decision. It lives in `plan.md` prose, nothing else."
+          },
+          {
+            "line": 72,
+            "text": "- Commit `plan.md` (and `CONTEXT.md` if not already committed) to the"
+          },
+          {
+            "line": 75,
+            "text": "  `executing`, and an uncommitted `plan.md` at that point is invisible to"
+          },
+          {
+            "line": 87,
+            "text": "Read `docsRef`/CONTEXT.md; register a freshly-created feature dir's"
+          },
+          {
+            "line": 90,
+            "text": "handed off, derive) the lane and record it into `plan.md` as `Mode:"
+          },
+          {
+            "line": 98,
+            "text": "`criticalPath`/`topUnblock`, never guessed. Cite the CONTEXT.md decision"
+          },
+          {
+            "line": 104,
+            "text": "Write (or enrich) `plan.md` scaled to the mode — a direct note for"
+          },
+          {
+            "line": 111,
+            "text": "independently workable ones. Each independently executable piece described in `plan.md` (whether pass-through or split child) must specify its canonical dispatch capability, per the shared cluster this planner specializes:"
+          },
+          {
+            "line": 113,
+            "text": "`../../../core/skills/_shared/capability-catalog.md` (vocabulary) — for coding implementation execution, use `code:implement`; a piece that is independently reviewable, testable, or debuggable in its own right uses `code:review`/`code:test`/`code:debug` instead. Capability boundaries serve as a decomposition signal (units needing different capabilities should be split), not a forced over-splitting rule. Never pin executor, provider, or model names in `plan.md` — execution-time `decide` is the sole authority for dispatch selection. If a split is right, write each piece's spec"
+          },
+          {
+            "line": 114,
+            "text": "into `plan.md` as a validated JSON array and **create nothing** — no work"
+          },
+          {
+            "line": 127,
+            "text": "`action` and `footprint` fields (pointing to `plan.md` and touched files)"
+          },
+          {
+            "line": 130,
+            "text": "### Step 6: Mid-planning CONTEXT.md gap"
+          },
+          {
+            "line": 131,
+            "text": "If CONTEXT.md turns out silent on something this plan actually needs,"
+          },
+          {
+            "line": 140,
+            "text": "**This skill has no gate.** It ends at a written `plan.md` and hands"
+          },
+          {
+            "line": 150,
+            "text": "What this skill owes that single gate instead: a `plan.md` whose every"
+          },
+          {
+            "line": 151,
+            "text": "claim traces back to a specific passage of itself or CONTEXT.md (an"
+          },
+          {
+            "line": 158,
+            "text": "without a person, it is either a CONTEXT.md gap (Step 6) or one of the"
+          },
+          {
+            "line": 169,
+            "text": "Once `plan.md` is written, hand off for validation. Before Step 05 adoption, load `fgos-coding-validating` directly as the compatibility path. After Step 05 adoption, the driver should represent this as `planning.validate-plan` reviewer Assignment and the driver owns the eventual `fgos plan` call. This skill's own job ends at a written plan; it never proves the plan against reality itself, and it never approves it."
+          },
+          {
+            "line": 175,
+            "text": "- a claim in `plan.md` that cannot be traced back to a specific passage"
+          },
+          {
+            "line": 176,
+            "text": "  of itself or CONTEXT.md, asserted instead of raised as an Outstanding"
+          },
+          {
+            "line": 178,
+            "text": "- reopening a decision CONTEXT.md already locked, instead of citing it"
+          },
+          {
+            "line": 182,
+            "text": "  `plan.md` for the single gate to materialize"
+          },
+          {
+            "line": 189,
+            "text": "  `plan.md` prose"
+          },
+          {
+            "line": 193,
+            "text": "- guessing a product assumption for a material CONTEXT.md gap instead of"
+          },
+          {
+            "line": 224,
+            "text": "  sync mechanics, split-root verify-sync mechanics, and the mid-planning CONTEXT.md"
+          }
+        ],
+        "edgeIds": [],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+        "fileDigest": "f6d79063ae11e9e48db33b5876ea414292f9023c1da4b2adc70478e4785ce576",
+        "sourcePath": "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "f6d79063ae11e9e48db33b5876ea414292f9023c1da4b2adc70478e4785ce576",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 12,
+            "text": "judgment alone. Cite the CONTEXT.md decision each choice honors. A medium"
+          },
+          {
+            "line": 20,
+            "text": "(`impact-analysis: inactive|degraded|full`) in `plan.md` next to that"
+          },
+          {
+            "line": 24,
+            "text": "If a named library/precedent surfaces that neither CONTEXT.md nor a"
+          },
+          {
+            "line": 34,
+            "text": "Write (or enrich) `plan.md` scaled to the mode: a direct note for `tiny`,"
+          },
+          {
+            "line": 42,
+            "text": "Every `plan.md` states its approved frame near the top, in one line each:"
+          },
+          {
+            "line": 47,
+            "text": "End `plan.md` with a section using this exact heading (nothing appended"
+          },
+          {
+            "line": 57,
+            "text": "Same convention `fgos-coding-exploring` already writes into CONTEXT.md,"
+          },
+          {
+            "line": 62,
+            "text": "CONTEXT.md before this section is ever written, so a real item here"
+          }
+        ],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "fileDigest": "4eca5e5f5db1c61d2582cced415a1b283d3663274760fea6e76e9ffb3ad3b3e7",
+        "sourcePath": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "4eca5e5f5db1c61d2582cced415a1b283d3663274760fea6e76e9ffb3ad3b3e7",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 5,
+            "text": "## Read CONTEXT.md"
+          },
+          {
+            "line": 8,
+            "text": "read that feature's `CONTEXT.md` — the locked decisions are the only"
+          },
+          {
+            "line": 17,
+            "text": "`CONTEXT.md`/`docsRef` written for it — this skill still picks a"
+          },
+          {
+            "line": 20,
+            "text": "that path is decided, BEFORE writing anything into it (`plan.md`,"
+          },
+          {
+            "line": 21,
+            "text": "`RESEARCH.md` from a `fgos-researching` call, etc.), register it on the"
+          },
+          {
+            "line": 30,
+            "text": "heavy-tier gate has no way to find `plan.md` unless `<feature>` happens"
+          },
+          {
+            "line": 33,
+            "text": "`fgos-coding-exploring`'s own CONTEXT.md-creation step registers `docsRef`"
+          },
+          {
+            "line": 59,
+            "text": "`plan.md` itself using the literal `Mode: <lane>` label (e.g. `Mode:"
+          },
+          {
+            "line": 63,
+            "text": "exact literal token from `plan.md` to skip a real model call on a"
+          },
+          {
+            "line": 66,
+            "text": "`plan.md` files matching the old `Mode:` token while a lane recorded as"
+          },
+          {
+            "line": 69,
+            "text": "item. This is prose in `plan.md` — never a new field on the item, never a"
+          },
+          {
+            "line": 79,
+            "text": "1. Does `plan.md` already record a `Mode:` line from an earlier round (a"
+          },
+          {
+            "line": 81,
+            "text": "   after a mid-planning CONTEXT.md gap) — if so, that recorded lane IS the"
+          }
+        ],
+        "edgeIds": [
+          "skills-106",
+          "skills-107",
+          "skills-108"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+        "fileDigest": "5d48fdf43978474a8339f75bf2b1bc9e215e02545a2cbda4019845d6feb42297",
+        "sourcePath": "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "5d48fdf43978474a8339f75bf2b1bc9e215e02545a2cbda4019845d6feb42297",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 11,
+            "text": "into `plan.md` and create nothing** — no work item exists until"
+          },
+          {
+            "line": 19,
+            "text": "Write the specs as a fenced JSON array in `plan.md`, in exactly the shape"
+          },
+          {
+            "line": 42,
+            "text": "  per-item decision id from this feature's own CONTEXT.md \"## Locked"
+          },
+          {
+            "line": 56,
+            "text": "CONTEXT.md gap (Step 6), or it is a question for the gate."
+          },
+          {
+            "line": 70,
+            "text": "as itself. Say so plainly in `plan.md`; `fgos-coding-validating` reads"
+          }
+        ],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "fileDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+        "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+        "priorHistoryEdges": [
+          "history-023",
+          "history-024"
+        ],
+        "bareSiblingMentions": [
+          {
+            "line": 4,
+            "text": "Step 6 (Mid-planning CONTEXT.md gap)."
+          },
+          {
+            "line": 64,
+            "text": "  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`"
+          },
+          {
+            "line": 68,
+            "text": "  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\""
+          },
+          {
+            "line": 72,
+            "text": "  sentence citing `plan.md` (or the primary CONTEXT.md decision if applicable):"
+          },
+          {
+            "line": 75,
+            "text": "  fgos edit \"<item-id>\" --action \"<directive sentence citing plan.md>\""
+          },
+          {
+            "line": 122,
+            "text": "## Mid-planning CONTEXT.md gap"
+          },
+          {
+            "line": 124,
+            "text": "If, at any step, CONTEXT.md's locked decisions turn out to be silent on"
+          },
+          {
+            "line": 131,
+            "text": "  CONTEXT.md correctly left unaddressed. Pin it as a labeled assumption"
+          },
+          {
+            "line": 132,
+            "text": "  in `plan.md`'s own Assumptions instead of asking anyone —"
+          },
+          {
+            "line": 140,
+            "text": "  read a CONTEXT.md that is silent by definition and had no trace that"
+          },
+          {
+            "line": 156,
+            "text": "  appending a new decision id to CONTEXT.md) while `item.workflowStep` stays"
+          },
+          {
+            "line": 161,
+            "text": "  `planning`). Never reopen or reinterpret a decision CONTEXT.md already"
+          }
+        ],
+        "edgeIds": [],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "fileDigest": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+        "sourcePath": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 7,
+            "text": "  keeping one coherent docs/history/<feature>/DISCUSSION.md per feature"
+          },
+          {
+            "line": 14,
+            "text": "  doc into a DISCUSSION.md and hand it off\"."
+          },
+          {
+            "line": 21,
+            "text": "living `docs/history/<feature>/DISCUSSION.md` per feature. Once the"
+          },
+          {
+            "line": 26,
+            "text": "`CONTEXT.md`/`plan.md` itself, never designs implementation, and never"
+          },
+          {
+            "line": 37,
+            "text": "- Never write `docs/history/<feature>/CONTEXT.md` or `plan.md` — that stays"
+          },
+          {
+            "line": 39,
+            "text": "  This skill's only artifact is `DISCUSSION.md`."
+          },
+          {
+            "line": 61,
+            "text": "- One `DISCUSSION.md` per feature, never one file per task — a"
+          },
+          {
+            "line": 80,
+            "text": "- Commit `DISCUSSION.md` to the item's `fgw/<id>` branch at the end of"
+          },
+          {
+            "line": 86,
+            "text": "## `DISCUSSION.md` shape"
+          },
+          {
+            "line": 88,
+            "text": "`docs/history/<feature>/DISCUSSION.md`, seven fixed sections, in order:"
+          },
+          {
+            "line": 128,
+            "text": "   create `DISCUSSION.md`.** Every `DISCUSSION.md` write must land on the"
+          },
+          {
+            "line": 130,
+            "text": "   what makes the \"commit `DISCUSSION.md` to `fgw/<id>`\" hard rule below"
+          },
+          {
+            "line": 148,
+            "text": "     locating `DISCUSSION.md` below."
+          },
+          {
+            "line": 163,
+            "text": "   `docsRef`/`refs` pointing at an existing `DISCUSSION.md`, open it and"
+          },
+          {
+            "line": 167,
+            "text": "   `docs/history/<feature>/DISCUSSION.md` where `<feature>` is a"
+          },
+          {
+            "line": 219,
+            "text": "Once the person confirms the discussion in `DISCUSSION.md` has converged"
+          },
+          {
+            "line": 224,
+            "text": "   `DISCUSSION.md` — never the whole file:"
+          },
+          {
+            "line": 227,
+            "text": "   fgos edit \"<item-id>\" --refs \"docs/history/<feature>/DISCUSSION.md#task-<slug>\""
+          },
+          {
+            "line": 247,
+            "text": "- writing `CONTEXT.md`/`plan.md` directly instead of leaving that to"
+          },
+          {
+            "line": 253,
+            "text": "- splitting `DISCUSSION.md` into one file per task"
+          },
+          {
+            "line": 257,
+            "text": "- setting `refs` to the whole `DISCUSSION.md` instead of a task's own"
+          },
+          {
+            "line": 264,
+            "text": "Discussion converged, `DISCUSSION.md` written and committed. Invoke"
+          }
+        ],
+        "edgeIds": [
+          "skills-109",
+          "skills-110",
+          "skills-111",
+          "skills-112",
+          "skills-113",
+          "skills-114",
+          "skills-115"
+        ],
+        "noMigrationReference": false
+      }
+    }
+  ]
+}

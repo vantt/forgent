@@ -1,0 +1,663 @@
+{
+  "requestIdentity": "step-02b-census-0689b862e",
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "part": 22,
+  "entries": [
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_7cae44452fc3abe739cf3851",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": "domains/coding/skills/fgos-code-panel/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "removalOrRenameCommit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "currentSuccessor": "core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_a80479423330e615940109ae",
+          "line": null,
+          "targetPath": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+          "path": "plugins/fgOS/skills/cook/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/cook/SKILL.md",
+        "removalOrRenameCommit": "ad6c3d6b2c4652d68f27e2a3a5a6b43633485b64",
+        "currentSuccessor": "plugins/fgOS/skills/deliver/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_dae59296d9d235d237a17b63",
+          "line": 33,
+          "targetPath": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+          "path": "plugins/fgOS/skills/cook/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/cook/SKILL.md",
+        "removalOrRenameCommit": "ad6c3d6b2c4652d68f27e2a3a5a6b43633485b64",
+        "currentSuccessor": "plugins/fgOS/skills/deliver/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_7b84ef8dd31a2052657c88d0",
+          "line": null,
+          "targetPath": "docs/history/gate-bypass/CONTEXT.md",
+          "path": "plugins/fgOS/skills/cook/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/cook/SKILL.md",
+        "removalOrRenameCommit": "ad6c3d6b2c4652d68f27e2a3a5a6b43633485b64",
+        "currentSuccessor": "plugins/fgOS/skills/deliver/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_ddcf417d868231d30f55e55c",
+          "line": 36,
+          "targetPath": "docs/history/gate-bypass/CONTEXT.md",
+          "path": "plugins/fgOS/skills/cook/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/history/gate-bypass/CONTEXT.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/cook/SKILL.md",
+        "removalOrRenameCommit": "ad6c3d6b2c4652d68f27e2a3a5a6b43633485b64",
+        "currentSuccessor": "plugins/fgOS/skills/deliver/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_dba282786a2f8f9c20546ead",
+          "line": null,
+          "targetPath": "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md",
+          "path": "plugins/fgOS/skills/cook/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/cook/SKILL.md",
+        "removalOrRenameCommit": "ad6c3d6b2c4652d68f27e2a3a5a6b43633485b64",
+        "currentSuccessor": "plugins/fgOS/skills/deliver/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_6bab899e83f64eeff3178575",
+          "line": null,
+          "targetPath": "docs/journals/260803-1612-main-checkout-direct-branch-checkout-tsk-4hk.md",
+          "path": "plugins/fgOS/skills/cook/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/cook/SKILL.md",
+        "removalOrRenameCommit": "ad6c3d6b2c4652d68f27e2a3a5a6b43633485b64",
+        "currentSuccessor": "plugins/fgOS/skills/deliver/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_cb680324f9302c5c515b2733",
+          "line": null,
+          "targetPath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+          "path": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+        "removalOrRenameCommit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "currentSuccessor": "core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_fa18fb57bbdb7ff7ccca174d",
+          "line": null,
+          "targetPath": "docs/how-to/author-a-plan-loop-track.md",
+          "path": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "consumer-project-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+        "removalOrRenameCommit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "currentSuccessor": "core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_7dc4f8858eb1c89a5e0d07ab",
+          "line": null,
+          "targetPath": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+          "path": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+        "removalOrRenameCommit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "currentSuccessor": "core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_de23e120a43e61a7fda330ee",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+        "removalOrRenameCommit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "currentSuccessor": "core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_ac4578dad691a01bededd97c",
+          "line": null,
+          "targetPath": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+          "path": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+        "removalOrRenameCommit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "currentSuccessor": "core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_d2660a8bf27ac2d3ba971ca0",
+          "line": null,
+          "targetPath": "docs/how-to/author-a-plan-loop-track.md",
+          "path": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "consumer-project-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+        "removalOrRenameCommit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "currentSuccessor": "core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_b85077b84d80bf54dedb226c",
+          "line": null,
+          "targetPath": "docs/how-to/run-a-coordination-session.md",
+          "path": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "consumer-project-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [],
+        "status": "historical consumer renamed/deleted before census",
+        "reason": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historicalDispositionPath": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+        "removalOrRenameCommit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "currentSuccessor": "core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "historical-consumers",
+      "data": {
+        "path": ".agents/skills/fgos-code-panel/SKILL.md",
+        "status": "deleted before census",
+        "commit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "oldFileDigest": "4152fa4477b81927540f8ae7f421e9caf65b083bef2aaf20d94da06817b32505",
+        "oldText": "---\nname: fgos-code-panel\nuser-invocable: false\ndescription: >-\n  Deprecated: use fgos-code-change. Kept loadable only for the Phase 7\n  compatibility window.\n---\n\n# fgos-code-panel (deprecated)\n\nDeprecated: use [`fgos-code-change`](../fgos-code-change/SKILL.md) instead.\n`fgos-code-change` replaces both this skill's direct-single-cell mode and\n`fgos-plan-loop`'s planned-multi-cell mode with one merged open/fix/close/\nworktree lifecycle (its own Mode Selection picks between them) -- the same\n`fgos coordination` CLI doors, the same `standalone-master-coordination-loop`\nFlowDefinition, and the same mutation-gating/quorum-close engine this skill\nused. This stub is kept loadable only for the Phase 7 compatibility window;\nit carries no operational content of its own.\n",
+        "successor": "core/skills/fgos-run/SKILL.md",
+        "successorDigest": "8fd267a429aa393cbc936e7d583e2dc432962a0dcda8da849bbd0dc9dbf4c82d",
+        "successorEdges": [],
+        "inventoryEdges": [
+          {
+            "edgeId": "consumer_996e427b5b9103f840c31328",
+            "line": null,
+            "targetPath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+            "path": ".agents/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_f80c9f12d2b5a784e88d4e5b",
+            "line": null,
+            "targetPath": "docs/how-to/author-a-plan-loop-track.md",
+            "path": ".agents/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "consumer-project-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_b390ff76f841fa0af80097ba",
+            "line": null,
+            "targetPath": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+            "path": ".agents/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_d5ccbe3e46c417eae9a0dfb5",
+            "line": null,
+            "targetPath": "docs/specs/runner.md",
+            "path": ".agents/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          }
+        ],
+        "disposition": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historyCommand": "git show 6527596eb6228bc44cb1380c6a5b5ea503094b8c -- .agents/skills/fgos-code-panel/SKILL.md core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "historical-consumers",
+      "data": {
+        "path": ".agents/skills/fgos-plan-loop/SKILL.md",
+        "status": "deleted before census",
+        "commit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "oldFileDigest": "90c0519445f7b8966474e7221594bea427318c37fc741a9de02a30cac31ad4cb",
+        "oldText": "---\nname: fgos-plan-loop\nuser-invocable: false\ndescription: >-\n  Deprecated: use fgos-code-change. Kept loadable only for the Phase 7\n  compatibility window.\n---\n\n# fgos-plan-loop (deprecated)\n\nDeprecated: use [`fgos-code-change`](../../../domains/coding/skills/fgos-code-change/SKILL.md)\ninstead. `fgos-code-change`'s plan mode replaces this skill's\nWork-independent, plan-driven track coordination (`fgos coordination\nchain/status/start/operation/authorize-and-dispatch/disposition/close`\ndoors, the `standalone-master-coordination-loop` FlowDefinition) --\nsee [`references/plan-mode.md`](../../../domains/coding/skills/fgos-code-change/references/plan-mode.md)\nfor track-level cell selection and closeout. This stub is kept loadable\nonly for the Phase 7 compatibility window; it carries no operational\ncontent of its own.\n",
+        "successor": "core/skills/fgos-run/SKILL.md",
+        "successorDigest": "8fd267a429aa393cbc936e7d583e2dc432962a0dcda8da849bbd0dc9dbf4c82d",
+        "successorEdges": [],
+        "inventoryEdges": [
+          {
+            "edgeId": "consumer_6f7064fdf156fb99233fedbb",
+            "line": null,
+            "targetPath": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+            "path": ".agents/skills/fgos-plan-loop/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_33e5f1f4b33acd00b1002378",
+            "line": null,
+            "targetPath": "docs/how-to/author-a-plan-loop-track.md",
+            "path": ".agents/skills/fgos-plan-loop/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "consumer-project-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_2a4c2e7b51bda44b8541ca7e",
+            "line": null,
+            "targetPath": "docs/how-to/run-a-coordination-session.md",
+            "path": ".agents/skills/fgos-plan-loop/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "consumer-project-contract",
+            "referenceKind": "literal-current-path"
+          }
+        ],
+        "disposition": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historyCommand": "git show 6527596eb6228bc44cb1380c6a5b5ea503094b8c -- .agents/skills/fgos-plan-loop/SKILL.md core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "historical-consumers",
+      "data": {
+        "path": "core/skills/fgos-plan-loop/SKILL.md",
+        "status": "deleted before census",
+        "commit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "oldFileDigest": "90c0519445f7b8966474e7221594bea427318c37fc741a9de02a30cac31ad4cb",
+        "oldText": "---\nname: fgos-plan-loop\nuser-invocable: false\ndescription: >-\n  Deprecated: use fgos-code-change. Kept loadable only for the Phase 7\n  compatibility window.\n---\n\n# fgos-plan-loop (deprecated)\n\nDeprecated: use [`fgos-code-change`](../../../domains/coding/skills/fgos-code-change/SKILL.md)\ninstead. `fgos-code-change`'s plan mode replaces this skill's\nWork-independent, plan-driven track coordination (`fgos coordination\nchain/status/start/operation/authorize-and-dispatch/disposition/close`\ndoors, the `standalone-master-coordination-loop` FlowDefinition) --\nsee [`references/plan-mode.md`](../../../domains/coding/skills/fgos-code-change/references/plan-mode.md)\nfor track-level cell selection and closeout. This stub is kept loadable\nonly for the Phase 7 compatibility window; it carries no operational\ncontent of its own.\n",
+        "successor": "core/skills/fgos-run/SKILL.md",
+        "successorDigest": "8fd267a429aa393cbc936e7d583e2dc432962a0dcda8da849bbd0dc9dbf4c82d",
+        "successorEdges": [],
+        "inventoryEdges": [
+          {
+            "edgeId": "consumer_c0fd6bc648918b3f6f694cee",
+            "line": null,
+            "targetPath": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+            "path": "core/skills/fgos-plan-loop/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_f4ee8b4b5fa05f67ef84ede6",
+            "line": null,
+            "targetPath": "docs/how-to/author-a-plan-loop-track.md",
+            "path": "core/skills/fgos-plan-loop/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "consumer-project-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_e817fd457f7422a0da99abe8",
+            "line": null,
+            "targetPath": "docs/how-to/run-a-coordination-session.md",
+            "path": "core/skills/fgos-plan-loop/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "consumer-project-contract",
+            "referenceKind": "literal-current-path"
+          }
+        ],
+        "disposition": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historyCommand": "git show 6527596eb6228bc44cb1380c6a5b5ea503094b8c -- core/skills/fgos-plan-loop/SKILL.md core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "historical-consumers",
+      "data": {
+        "path": "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "status": "deleted before census",
+        "commit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "oldFileDigest": "4152fa4477b81927540f8ae7f421e9caf65b083bef2aaf20d94da06817b32505",
+        "oldText": "---\nname: fgos-code-panel\nuser-invocable: false\ndescription: >-\n  Deprecated: use fgos-code-change. Kept loadable only for the Phase 7\n  compatibility window.\n---\n\n# fgos-code-panel (deprecated)\n\nDeprecated: use [`fgos-code-change`](../fgos-code-change/SKILL.md) instead.\n`fgos-code-change` replaces both this skill's direct-single-cell mode and\n`fgos-plan-loop`'s planned-multi-cell mode with one merged open/fix/close/\nworktree lifecycle (its own Mode Selection picks between them) -- the same\n`fgos coordination` CLI doors, the same `standalone-master-coordination-loop`\nFlowDefinition, and the same mutation-gating/quorum-close engine this skill\nused. This stub is kept loadable only for the Phase 7 compatibility window;\nit carries no operational content of its own.\n",
+        "successor": "core/skills/fgos-run/SKILL.md",
+        "successorDigest": "8fd267a429aa393cbc936e7d583e2dc432962a0dcda8da849bbd0dc9dbf4c82d",
+        "successorEdges": [],
+        "inventoryEdges": [
+          {
+            "edgeId": "consumer_50162d98da99a25670b21270",
+            "line": null,
+            "targetPath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+            "path": "domains/coding/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_405784fc3626a648f2aa6c03",
+            "line": null,
+            "targetPath": "docs/how-to/author-a-plan-loop-track.md",
+            "path": "domains/coding/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "consumer-project-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_93a3e38e679a2320a0c1410c",
+            "line": null,
+            "targetPath": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+            "path": "domains/coding/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_7cae44452fc3abe739cf3851",
+            "line": null,
+            "targetPath": "docs/specs/runner.md",
+            "path": "domains/coding/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          }
+        ],
+        "disposition": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historyCommand": "git show 6527596eb6228bc44cb1380c6a5b5ea503094b8c -- domains/coding/skills/fgos-code-panel/SKILL.md core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "historical-consumers",
+      "data": {
+        "path": "plugins/fgOS/skills/cook/SKILL.md",
+        "status": "renamed before census",
+        "commit": "ad6c3d6b2c4652d68f27e2a3a5a6b43633485b64",
+        "oldFileDigest": "a13ff20cd22db7417d71f3b624d5a42dba990152b60444ae3a9f9e4d48215014",
+        "oldText": "---\nname: cook\ndescription: >-\n  Use when the user wants a free-text task driven end-to-end through fgOS's\n  whole lifecycle in one session — submit, discovery, planning, real\n  implementation, and return — invoked as /fgOS:cook <free-text task\n  description>. Each dev-skill gate (fgos-coding-exploring's context gate,\n  fgos-coding-validating's single merged plan/proof gate) auto-approves\n  when the repo's configured gate-bypass level covers it, otherwise pauses\n  for real human approval — auto-\n  implements at stage executing, and stops once the item (and every\n  child it split into) reaches status awaiting-approval — final merge\n  review always stays a human decision, never auto-approved, regardless\n  of gate-bypass. Examples: \"/fgOS:cook add pagination to the list view\",\n  \"/fgOS:cook fix the flaky retry test\".\n---\n\n# fgOS cook\n\nDrives a task from a single sentence to a real, verified, `awaiting-approval`\nchange — chaining the same verbs and dev-skills a person would use one at a\ntime (`submit` → `fgos-coding-exploring` → `fgos-coding-planning`/`fgos-coding-validating` →\nreal implementation → `return`), so the user doesn't have to drive each\nstage by hand. Every state transition goes through the `fgos` CLI (one-door-\nwrite, CTR001) — this skill never writes `.fgos/` state directly, and it\nnever re-implements a dev-skill's substance inline; it invokes them.\n\n## Hard rules\n\n- **Never bypass a gate beyond what its own dev-skill already permits.**\n  `fgos-coding-exploring`'s CONTEXT.md gate and `fgos-coding-validating`'s\n  single merged plan/proof gate (the one gate in stage `planning`, per\n  `docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1 —\n  `fgos-coding-planning` itself has no gate) each check the repo's\n  configured gate-bypass level themselves (`canAutoApprove`/\n  `canAutoApproveMergedGate`, `docs/history/gate-bypass/CONTEXT.md` D1-D6,\n  superseded by `coding-planning-validating-gate-redesign/CONTEXT.md`\n  D9-D11) and only skip their own question when that check returns true —\n  this skill's driver invokes those dev-skills unchanged either way (see\n  step 2 below) and never second-guesses, forces, or fakes an\n  auto-approve/human-approve record on its own authority. When a gate's\n  own check does NOT clear it, that gate asks a real question — answer it\n  for real, wait for it, and never skip it because the answer \"seems\n  obvious.\"\n- **Stop at `awaiting-approval`, never merge.** Once `fgos return <id>` succeeds the\n  id is `awaiting-approval`. That is the finish line for this skill — never call\n  `fgos approve`/`fgos reject`/`fgos review` yourself; the internal PR\n  review gate is a human decision, always.\n- **This skill now claims before handing an id to the driver, one id at a\n  time** — `fgos-coding-driving`'s own claim-timing hard rule (tsk-19j-4)\n  still only claims a worktree right before the `executing`-stage skill\n  when the caller hasn't already claimed it, but nothing forces a caller\n  to wait that long: without an earlier claim, every stage before\n  `executing` (`discovery`/`exploring`/`planning`) writes and commits its\n  own docs (`CONTEXT.md`, `plan.md`) straight onto whatever checkout this\n  skill was invoked from, dirtying it the same way\n  `fgos-coding-shaping`'s own branch-isolation fix found and closed for\n  its caller. Step 2 below claims (`fgos pick <id>` + `EnterWorktree`)\n  before its FIRST `fgos-coding-driving` invocation for the id at the\n  front of the queue — the same pattern `/fgOS:pick`'s own step 2/4 and\n  `fgos-coding-shaping`'s own claim step already use — so the driver's own\n  claim-timing rule reads `status: doing` on its first check and skips its\n  own claim, exactly as it already does whenever `/fgOS:pick` claims\n  first. `take`/`pick` both accept an explicit `--id` claim on a\n  pre-`executing` item too (`choke-point-take-vs-pick-claim-eligibility`\n  fixed the prior disagreement between the two verbs — see \"Known gap\"\n  below).\n- **Reuse, never duplicate.** `fgos-coding-exploring`, `fgos-coding-planning`,\n  `fgos-coding-validating`, and `fgos-coding-driving` (tsk-19j-4) already define\n  the Socratic/shaping/proving/driving substance — invoke them (Skill tool)\n  for their real work; this skill only owns the id QUEUE the driver has no\n  concept of, one id at a time, never split into concurrent flows.\n  `fgos-fanout` is a real capability (`fgos-coding-driving`'s own \"Caller\n  contract\" section says a caller MAY opt into it for concurrency) but this\n  skill deliberately never opts in — one item, one queue, one flow, so the\n  person driving `/fgOS:cook` never has to reason about what several\n  concurrent Agents did to the backlog while it ran (see step 2).\n- **Never bypass the driver's own claim step with a raw `git checkout\n  <fgw/branch>` on the main checkout** (tsk-4hk: `docs/journals/260803-1612-\n  main-checkout-direct-branch-checkout-tsk-4hk.md`) — the main checkout is\n  the one shared working tree every session's `fgos <verb>` call resolves\n  against; checking a work branch out there instead of letting the driver's\n  claim step (`fgos pick <id>` + `EnterWorktree`) isolate it mixes that\n  branch's tree with whatever else is in flight elsewhere in the backlog.\n- **Never run a raw `git reset --hard` on the main checkout without a full\n  `git status` first** (tsk-3au: `docs/history/main-checkout-destructive-\n  git-safety-net/CONTEXT.md`) — checking only the files you meant to touch\n  can silently discard another in-flight session's uncommitted work, with\n  no stash/reflog/blob to recover it. Use `fgos main-checkout-reset --sha\n  <sha> [--confirm]` instead — it shows the full whole-repo status and\n  refuses without `--confirm` when the tree is dirty.\n\n## Steps\n\n1. **Submit.** Follow the exact same protocol as the `submit` skill\n   (`plugins/fgOS/skills/submit/SKILL.md`) against the free-text argument:\n   scan `fgos list --all --json` for a textually-grounded dependency candidate,\n   present it and require an explicit confirm/edit/reject before attaching\n   anything, then call `fgos submit \"<text>\" [--deps <ids>]`. Capture the\n   returned id as the root id and push it onto a work queue.\n\n2. **Drain the queue, one id at a time, via `fgos-coding-driving`\n   (tsk-19j-4).** While the queue is non-empty, take the id at its front.\n   Before this id's FIRST `fgos-coding-driving` invocation this pass —\n   never before a later re-invocation of the SAME id after a\n   person-shaped stop, the claim already holds by then — claim it\n   (`fgos pick <id>`) and `EnterWorktree` into the returned\n   `data.worktree.path`, the same claim+enter pattern `/fgOS:pick`'s own\n   step 2/4 and `fgos-coding-shaping`'s own claim step already use. If\n   `EnterWorktree` is unavailable or refuses, fall back exactly the way\n   `/fgOS:pick`'s own step 4 does: print the worktree path and tell the\n   user to open a new session there, rather than failing or retrying. Only\n   once claimed and (when the fallback didn't fire) switched into the\n   worktree, invoke the `fgos-coding-driving` skill for it, no `ceiling` (omit it —\n   the driver's own implicit stops already cover everything this step used\n   to hand-roll: `awaiting-approval`, an anchor by open children, a\n   person-shaped stop, or a no-progress read). This skill never re-derives\n   which skill a stage maps to, never applies a stage/status transition\n   itself, and never decides claim-timing on its own — the driver already\n   owns all three (its own hard rules: registry-only stage lookup, \"engine's\n   verb always wins\", \"claim right before the first `executing`-stage\n   invocation, never earlier\"). This step's whole job is the QUEUE the\n   driver itself has no concept of — one id at a time, front to back — and\n   relaying the driver's stop reason:\n\n   - **`awaiting-approval` reached** — the id is done for this pass. Pop it\n     off the queue and continue draining.\n   - **anchored by open children** — the driver just reports which child\n     ids are open (it never resolves this itself, by design).\n     `fgos-coding-driving`'s own \"Caller contract: what to do with an\n     anchored-by-open-children report\" section makes concurrency\n     (`fgos-fanout`) an OPTION a caller may take, never a requirement —\n     this skill does not take it. Push every reported open child id onto\n     the FRONT of the queue (in the order reported), then push the\n     anchoring parent id back onto the queue directly after them, and\n     continue draining. Each child then runs through this same step's\n     dispatch on its own later turn — one id at a time, front to back,\n     never concurrently and never through `fgos-fanout`. Once every child a\n     parent anchored on reaches a terminal status, that parent's own anchor\n     clears on the fresh read its queued turn does, and it proceeds\n     normally from there — the same as any other id's turn, no special\n     case.\n   - **a person-shaped stop (`status: awaiting-human`)** — read the parked\n     question (`data.work[id]`'s own gate, or `data.discovery[\"<id>\"]`'s\n     latest entry) and ask the user directly in this chat. Get a real\n     answer, then `fgos answer <id> --text \"<answer>\"`, and invoke the\n     driver again for the SAME id (never skip it or move on) — this is\n     this skill's own approval-gate contract (see Hard rules): the driver\n     stops at every real question, it never answers on the user's behalf.\n   - **a real block (`status: blocked`)** — stop and report this to the\n     user rather than silently retrying; this mirrors the old `invalid`\n     outcome's own stop (a judgment or a verify that came back unusable is\n     never something to route around).\n   - **no-progress** — same treatment as a real block: stop, report, let a\n     person look at it.\n\n   Every real gate a stage-skill hits along the way (`fgos-coding-exploring`'s\n   \"Approve CONTEXT.md?\", `fgos-coding-planning`'s \"Approve before execution?\",\n   `fgos-coding-validating`'s \"Approve moving to executing?\") still surfaces\n   exactly as before — the driver invokes those skills unchanged, it does\n   not swallow or pre-answer their own gates. The `planning`→`executing`\n   edge itself releases the claim this step took above back to `todo`\n   (`releaseClaimOnExecuting`, claim-lock §3b) the moment the item reaches\n   `executing` — so the driver's own claim-timing rule re-claims\n   (`fgos pick <id>` + `EnterWorktree`) right before its own first\n   `fgos-coding-implement` invocation, exactly the point this step used to\n   do it by hand before this fix, unaffected by the earlier claim above.\n   `fgos-coding-implement` then implements, verifies, and calls\n   `fgos return <id>` itself — never taking anyone's word for real progress,\n   the same \"measures real progress itself\" contract this step always\n   relied on.\n\n3. **Report.** Once the queue is empty, summarize every id touched and its\n   final status (`awaiting-approval`), list every `CONTEXT.md`/`plan.md` path written\n   along the way, and tell the user the review gate\n   (`fgos review`/`fgos approve`/`fgos reject`) is theirs to run next — this\n   skill never calls it.\n\n## Known gap (fixed)\n\n`fgos-routing`'s own \"Claim\" section states an item still at\n`discovery`/`exploring`/`planning` can be claimed directly with `fgos take\n--id <id>`.\nThat prose used to be wrong — `take --id <id>` on a pre-`executing` item\nwas rejected outright (\"not in the frontier yet (stage/deps/lineage)\"),\nwhile `pick --id <id>` accepted the same claim. `choke-point-\ntake-vs-pick-claim-eligibility` closed that gap: `take`'s explicit `--id`\nbranch now checks deps-done + no-open-descendant only, the same\nstage-independent stance `pick` already took, so the prose is accurate\nagain. This skill's own sequencing now uses that same `take`/`pick`\neligibility directly — it claims before stage `executing` too (see the\nhard rule above), the fix this file's own branch-isolation follow-up\nmade, not a workaround for a broken `take`.\n",
+        "successor": "plugins/fgOS/skills/deliver/SKILL.md",
+        "successorDigest": "55ea600a67fb3de0c179bedba1c9c843dbe9df85fd18cba8c555e42ed722ea50",
+        "successorEdges": [
+          "skills-140",
+          "skills-141",
+          "skills-142"
+        ],
+        "inventoryEdges": [
+          {
+            "edgeId": "consumer_a80479423330e615940109ae",
+            "line": null,
+            "targetPath": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "path": "plugins/fgOS/skills/cook/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_dae59296d9d235d237a17b63",
+            "line": 33,
+            "targetPath": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "path": "plugins/fgOS/skills/cook/SKILL.md",
+            "kind": "literal",
+            "resolvedTarget": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md"
+          },
+          {
+            "edgeId": "consumer_7b84ef8dd31a2052657c88d0",
+            "line": null,
+            "targetPath": "docs/history/gate-bypass/CONTEXT.md",
+            "path": "plugins/fgOS/skills/cook/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_ddcf417d868231d30f55e55c",
+            "line": 36,
+            "targetPath": "docs/history/gate-bypass/CONTEXT.md",
+            "path": "plugins/fgOS/skills/cook/SKILL.md",
+            "kind": "literal",
+            "resolvedTarget": "docs/history/gate-bypass/CONTEXT.md"
+          },
+          {
+            "edgeId": "consumer_dba282786a2f8f9c20546ead",
+            "line": null,
+            "targetPath": "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md",
+            "path": "plugins/fgOS/skills/cook/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_6bab899e83f64eeff3178575",
+            "line": null,
+            "targetPath": "docs/journals/260803-1612-main-checkout-direct-branch-checkout-tsk-4hk.md",
+            "path": "plugins/fgOS/skills/cook/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          }
+        ],
+        "disposition": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historyCommand": "git show ad6c3d6b2c4652d68f27e2a3a5a6b43633485b64 -- plugins/fgOS/skills/cook/SKILL.md plugins/fgOS/skills/deliver/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "historical-consumers",
+      "data": {
+        "path": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+        "status": "deleted before census",
+        "commit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "oldFileDigest": "4152fa4477b81927540f8ae7f421e9caf65b083bef2aaf20d94da06817b32505",
+        "oldText": "---\nname: fgos-code-panel\nuser-invocable: false\ndescription: >-\n  Deprecated: use fgos-code-change. Kept loadable only for the Phase 7\n  compatibility window.\n---\n\n# fgos-code-panel (deprecated)\n\nDeprecated: use [`fgos-code-change`](../fgos-code-change/SKILL.md) instead.\n`fgos-code-change` replaces both this skill's direct-single-cell mode and\n`fgos-plan-loop`'s planned-multi-cell mode with one merged open/fix/close/\nworktree lifecycle (its own Mode Selection picks between them) -- the same\n`fgos coordination` CLI doors, the same `standalone-master-coordination-loop`\nFlowDefinition, and the same mutation-gating/quorum-close engine this skill\nused. This stub is kept loadable only for the Phase 7 compatibility window;\nit carries no operational content of its own.\n",
+        "successor": "core/skills/fgos-run/SKILL.md",
+        "successorDigest": "8fd267a429aa393cbc936e7d583e2dc432962a0dcda8da849bbd0dc9dbf4c82d",
+        "successorEdges": [],
+        "inventoryEdges": [
+          {
+            "edgeId": "consumer_cb680324f9302c5c515b2733",
+            "line": null,
+            "targetPath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+            "path": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_fa18fb57bbdb7ff7ccca174d",
+            "line": null,
+            "targetPath": "docs/how-to/author-a-plan-loop-track.md",
+            "path": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "consumer-project-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_7dc4f8858eb1c89a5e0d07ab",
+            "line": null,
+            "targetPath": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+            "path": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_de23e120a43e61a7fda330ee",
+            "line": null,
+            "targetPath": "docs/specs/runner.md",
+            "path": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          }
+        ],
+        "disposition": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historyCommand": "git show 6527596eb6228bc44cb1380c6a5b5ea503094b8c -- plugins/fgOS/skills/fgos-code-panel/SKILL.md core/skills/fgos-run/SKILL.md"
+      }
+    },
+    {
+      "reviewClass": "historical-consumers",
+      "data": {
+        "path": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+        "status": "deleted before census",
+        "commit": "6527596eb6228bc44cb1380c6a5b5ea503094b8c",
+        "oldFileDigest": "90c0519445f7b8966474e7221594bea427318c37fc741a9de02a30cac31ad4cb",
+        "oldText": "---\nname: fgos-plan-loop\nuser-invocable: false\ndescription: >-\n  Deprecated: use fgos-code-change. Kept loadable only for the Phase 7\n  compatibility window.\n---\n\n# fgos-plan-loop (deprecated)\n\nDeprecated: use [`fgos-code-change`](../../../domains/coding/skills/fgos-code-change/SKILL.md)\ninstead. `fgos-code-change`'s plan mode replaces this skill's\nWork-independent, plan-driven track coordination (`fgos coordination\nchain/status/start/operation/authorize-and-dispatch/disposition/close`\ndoors, the `standalone-master-coordination-loop` FlowDefinition) --\nsee [`references/plan-mode.md`](../../../domains/coding/skills/fgos-code-change/references/plan-mode.md)\nfor track-level cell selection and closeout. This stub is kept loadable\nonly for the Phase 7 compatibility window; it carries no operational\ncontent of its own.\n",
+        "successor": "core/skills/fgos-run/SKILL.md",
+        "successorDigest": "8fd267a429aa393cbc936e7d583e2dc432962a0dcda8da849bbd0dc9dbf4c82d",
+        "successorEdges": [],
+        "inventoryEdges": [
+          {
+            "edgeId": "consumer_ac4578dad691a01bededd97c",
+            "line": null,
+            "targetPath": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+            "path": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "repository-local-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_d2660a8bf27ac2d3ba971ca0",
+            "line": null,
+            "targetPath": "docs/how-to/author-a-plan-loop-track.md",
+            "path": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "consumer-project-contract",
+            "referenceKind": "literal-current-path"
+          },
+          {
+            "edgeId": "consumer_b85077b84d80bf54dedb226c",
+            "line": null,
+            "targetPath": "docs/how-to/run-a-coordination-session.md",
+            "path": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+            "kind": "shipped-contract",
+            "contractScope": "consumer-project-contract",
+            "referenceKind": "literal-current-path"
+          }
+        ],
+        "disposition": "Historical consumer no longer exists; preserve metadata as provenance. Successor is an execution/skill route, not a document writing alias or target-path substitution. Current successor is independently in tracked class coverage.",
+        "historyCommand": "git show 6527596eb6228bc44cb1380c6a5b5ea503094b8c -- plugins/fgOS/skills/fgos-plan-loop/SKILL.md core/skills/fgos-run/SKILL.md"
+      }
+    }
+  ]
+}

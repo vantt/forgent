@@ -1,0 +1,931 @@
+{
+  "requestIdentity": "step-02b-census-0689b862e",
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "part": 10,
+  "entries": [
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/references/METHODOLOGY.md",
+        "fileDigest": "dfea06bf13a58c7bdaf4e2fb84189f0bce022ea44463c8702c40964d22b5d80a",
+        "sourcePath": ".claude/skills/ui-spec/references/METHODOLOGY.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "dfea06bf13a58c7bdaf4e2fb84189f0bce022ea44463c8702c40964d22b5d80a",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/README.md",
+        "fileDigest": "bbc7c21d5b2ae96bbcdc7e95c7e9c68c1530930d3658217646ca418cd5853fcf",
+        "sourcePath": ".claude/skills/ui-spec/templates/README.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "bbc7c21d5b2ae96bbcdc7e95c7e9c68c1530930d3658217646ca418cd5853fcf",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/schema/surface-contract.schema.json",
+        "fileDigest": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+        "sourcePath": ".claude/skills/ui-spec/templates/schema/surface-contract.schema.json",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/spec.config.yaml",
+        "fileDigest": "1c033c98f1fa8098264e2f7b7f5773232e2a1cc1c363774ab763d672cd919886",
+        "sourcePath": ".claude/skills/ui-spec/templates/spec.config.yaml",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "1c033c98f1fa8098264e2f7b7f5773232e2a1cc1c363774ab763d672cd919886",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/surfaces/component.md",
+        "fileDigest": "7f7da74b37d5b1121b235281d5978293ef70d635da597697c21a39eb3ca6ac17",
+        "sourcePath": ".claude/skills/ui-spec/templates/surfaces/component.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "7f7da74b37d5b1121b235281d5978293ef70d635da597697c21a39eb3ca6ac17",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/surfaces/domain-rules.md",
+        "fileDigest": "2a8192e1d9decf610381878d3881f07274c51e7222a9995c1aee691838f4ed60",
+        "sourcePath": ".claude/skills/ui-spec/templates/surfaces/domain-rules.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "2a8192e1d9decf610381878d3881f07274c51e7222a9995c1aee691838f4ed60",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/surfaces/flow.md",
+        "fileDigest": "2e43e7e9a942a7f3d4d68fbe4383c8e82a01b5736ccfd035aafdaa17fd13e8c7",
+        "sourcePath": ".claude/skills/ui-spec/templates/surfaces/flow.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "2e43e7e9a942a7f3d4d68fbe4383c8e82a01b5736ccfd035aafdaa17fd13e8c7",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/surfaces/modal.md",
+        "fileDigest": "e98674df134e22bf88760f05b696ca96bccc931e7d955c47f89d2880320fb6db",
+        "sourcePath": ".claude/skills/ui-spec/templates/surfaces/modal.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "e98674df134e22bf88760f05b696ca96bccc931e7d955c47f89d2880320fb6db",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/surfaces/overlay.md",
+        "fileDigest": "da11661c37b619720b426cfc65afb7ad8c7df3c8e2e9ed3b76e798b1322e0b45",
+        "sourcePath": ".claude/skills/ui-spec/templates/surfaces/overlay.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "da11661c37b619720b426cfc65afb7ad8c7df3c8e2e9ed3b76e798b1322e0b45",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/surfaces/overview.md",
+        "fileDigest": "b05553c44d231e4dbe84ec3f034fb91f5475f092fdb87c14d851c26937c88875",
+        "sourcePath": ".claude/skills/ui-spec/templates/surfaces/overview.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "b05553c44d231e4dbe84ec3f034fb91f5475f092fdb87c14d851c26937c88875",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/surfaces/panel.md",
+        "fileDigest": "bf22faafb977a33bcebe0d5c0b4cdb4d7b0cd1d702970d07c354ae9f72482a52",
+        "sourcePath": ".claude/skills/ui-spec/templates/surfaces/panel.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "bf22faafb977a33bcebe0d5c0b4cdb4d7b0cd1d702970d07c354ae9f72482a52",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/surfaces/screen.md",
+        "fileDigest": "4a55d6e2e615d88a2d11720d8d7c842e2db7f86726ac079bcedf0908b6852398",
+        "sourcePath": ".claude/skills/ui-spec/templates/surfaces/screen.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "4a55d6e2e615d88a2d11720d8d7c842e2db7f86726ac079bcedf0908b6852398",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/templates/surfaces/system-events.md",
+        "fileDigest": "6107c42dd0079598b9043604c1075d0324e6e63529b15d8f283e48bd736fdd6b",
+        "sourcePath": ".claude/skills/ui-spec/templates/surfaces/system-events.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "6107c42dd0079598b9043604c1075d0324e6e63529b15d8f283e48bd736fdd6b",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/.gitignore",
+        "fileDigest": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+        "sourcePath": ".claude/skills/ui-spec/tools/.gitignore",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/build.mjs",
+        "fileDigest": "a68cfd1d507c0d8eb106488df3c060f6b9b1b26a4e3b269aefbd6b94267d0003",
+        "sourcePath": ".claude/skills/ui-spec/tools/build.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "a68cfd1d507c0d8eb106488df3c060f6b9b1b26a4e3b269aefbd6b94267d0003",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-316"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/config.mjs",
+        "fileDigest": "b0d0321a9cecd2583a2c74c540d13d9bc25a49ce63c4fecd8de5b56caef7571d",
+        "sourcePath": ".claude/skills/ui-spec/tools/config.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "b0d0321a9cecd2583a2c74c540d13d9bc25a49ce63c4fecd8de5b56caef7571d",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-068",
+          "skills-306",
+          "skills-307",
+          "skills-308"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/extract.mjs",
+        "fileDigest": "7b4d776b9890c720852a7353a4a2ccd01b1aee644a70622cb1759b8226d1868f",
+        "sourcePath": ".claude/skills/ui-spec/tools/extract.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "7b4d776b9890c720852a7353a4a2ccd01b1aee644a70622cb1759b8226d1868f",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-309",
+          "skills-310",
+          "skills-311"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+        "fileDigest": "8c0fa98aa67c8634a415a95dfaa75c9162aeddeb6b1423ab6b2f9e250cfb7a38",
+        "sourcePath": ".claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "8c0fa98aa67c8634a415a95dfaa75c9162aeddeb6b1423ab6b2f9e250cfb7a38",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-321",
+          "skills-322"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/interpret.mjs",
+        "fileDigest": "c2df4cf371ca7560dd550b4347bf02eada70fdbc08c8dfc53b306453698d7360",
+        "sourcePath": ".claude/skills/ui-spec/tools/interpret.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "c2df4cf371ca7560dd550b4347bf02eada70fdbc08c8dfc53b306453698d7360",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-319",
+          "skills-320"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/package-lock.json",
+        "fileDigest": "5f0ee14ee4b3ff0b9c629190e87facf07e03fd46af281e21b374fe7fcb88d074",
+        "sourcePath": ".claude/skills/ui-spec/tools/package-lock.json",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "5f0ee14ee4b3ff0b9c629190e87facf07e03fd46af281e21b374fe7fcb88d074",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/package.json",
+        "fileDigest": "0a42a6bd51312dd1a15683cc06b4a82c5cbdfae0c2837b3f748c4a623000da37",
+        "sourcePath": ".claude/skills/ui-spec/tools/package.json",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "0a42a6bd51312dd1a15683cc06b4a82c5cbdfae0c2837b3f748c4a623000da37",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/rename.mjs",
+        "fileDigest": "2ac5be25f8c9862d71132fd87a95d5cd2642973d1cb5fa19de566dfcfdedd23d",
+        "sourcePath": ".claude/skills/ui-spec/tools/rename.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "2ac5be25f8c9862d71132fd87a95d5cd2642973d1cb5fa19de566dfcfdedd23d",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-317",
+          "skills-318"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/validate.mjs",
+        "fileDigest": "3aad75b05175fc29da2855be2f3d5cc70948161e131b53286d4874a9ae9e969b",
+        "sourcePath": ".claude/skills/ui-spec/tools/validate.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "3aad75b05175fc29da2855be2f3d5cc70948161e131b53286d4874a9ae9e969b",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-312",
+          "skills-313",
+          "skills-314",
+          "skills-315"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/ascii-normalize.mjs",
+        "fileDigest": "e4b826eae06be27e2453542874696829f218910d214d8669879a1dadae25cd9b",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/ascii-normalize.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "e4b826eae06be27e2453542874696829f218910d214d8669879a1dadae25cd9b",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/client/app-chrome.js",
+        "fileDigest": "0af66631f1b8b55c567e757494ad2b4e115931d6d6b0b8a1822a249814e2499a",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/client/app-chrome.js",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "0af66631f1b8b55c567e757494ad2b4e115931d6d6b0b8a1822a249814e2499a",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/client/app.js",
+        "fileDigest": "03a0ffae79c2a6b678d78832f9ddc08ff2beb8161d30481a2680a3c03e28c50b",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/client/app.js",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "03a0ffae79c2a6b678d78832f9ddc08ff2beb8161d30481a2680a3c03e28c50b",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/client/flow-play.js",
+        "fileDigest": "8a1bd380e42b13d5269826cbbe011fd66737db9a26192bccefd979da9ea688c9",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/client/flow-play.js",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "8a1bd380e42b13d5269826cbbe011fd66737db9a26192bccefd979da9ea688c9",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/client/graph-controls.js",
+        "fileDigest": "7e8ecdbfc2dcb4799e69c87bd458986d8fe41bcfb67c911081ecc8f4f4328044",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/client/graph-controls.js",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "7e8ecdbfc2dcb4799e69c87bd458986d8fe41bcfb67c911081ecc8f4f4328044",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/client/graph-layout.js",
+        "fileDigest": "9fbdcec4807863252c5cea5664fbf1a0212c2153d309241a6c3b64b6932ae616",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/client/graph-layout.js",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "9fbdcec4807863252c5cea5664fbf1a0212c2153d309241a6c3b64b6932ae616",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/client/region-model.js",
+        "fileDigest": "966bb3c3c3404f546b31d366e1a716c579af79d596c82b0697aa0ea750779894",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/client/region-model.js",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "966bb3c3c3404f546b31d366e1a716c579af79d596c82b0697aa0ea750779894",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/client/render-graph.js",
+        "fileDigest": "5245b1ef104aed5800d9f4a9557ace216b70a95fc217846e4c44b0040ea415bc",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/client/render-graph.js",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "5245b1ef104aed5800d9f4a9557ace216b70a95fc217846e4c44b0040ea415bc",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/client/render-regionbox.js",
+        "fileDigest": "4e2f412b4ded2164ecd70c3b84585dd37208113e821743388845777375bba2d4",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/client/render-regionbox.js",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "4e2f412b4ded2164ecd70c3b84585dd37208113e821743388845777375bba2d4",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/client/render-storyboard.js",
+        "fileDigest": "1a9e07d5af13941cf947f80668c9470f064907a884bb272c558838618d0b6691",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/client/render-storyboard.js",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "1a9e07d5af13941cf947f80668c9470f064907a884bb272c558838618d0b6691",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/extract-prose.mjs",
+        "fileDigest": "2c67ed531ab3a2bdfee5cec36c40b966576949210a7a7c3b4770112883a800a7",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/extract-prose.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "2c67ed531ab3a2bdfee5cec36c40b966576949210a7a7c3b4770112883a800a7",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/html-shell.mjs",
+        "fileDigest": "be786ba9d49df8bce5ec09cf28ee934b71785872166bd16e85cb52fa3a5fcc1b",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/html-shell.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "be786ba9d49df8bce5ec09cf28ee934b71785872166bd16e85cb52fa3a5fcc1b",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-262"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/styles-phase2.mjs",
+        "fileDigest": "c0a1b71da4898e05665c738cf59c80bf33ca735c37d17f34ed173f258c73bdc5",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/styles-phase2.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "c0a1b71da4898e05665c738cf59c80bf33ca735c37d17f34ed173f258c73bdc5",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/styles-phase3.mjs",
+        "fileDigest": "672eebd932e21fcff882529387b5e16d0b860029e4af1a84784adf4f6c5d15e8",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/styles-phase3.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "672eebd932e21fcff882529387b5e16d0b860029e4af1a84784adf4f6c5d15e8",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/styles.mjs",
+        "fileDigest": "ae8a007053200cf3cbd3dc589424949acd15fea7b50515551b8dae9018840eb6",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/styles.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "ae8a007053200cf3cbd3dc589424949acd15fea7b50515551b8dae9018840eb6",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+        "fileDigest": "4ccfe507ee89995f39dd6aacc368c483a1b97ac9beacd101a7c9e93d2666db78",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "4ccfe507ee89995f39dd6aacc368c483a1b97ac9beacd101a7c9e93d2666db78",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [
+          "skills-069",
+          "skills-323"
+        ],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-alternative-proposal.md",
+        "fileDigest": "0e5eaecfa5fb2621b0249c4b72c41f0cd7ecd6478a4574cbb8cf287a1dbdfdef",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-alternative-proposal.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "0e5eaecfa5fb2621b0249c4b72c41f0cd7ecd6478a4574cbb8cf287a1dbdfdef",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-close-dialogue.md",
+        "fileDigest": "9868f3a35da6f8db3a12e742f0bcf2b0d19cd37e572934fd436c91d68a38e129",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-close-dialogue.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "9868f3a35da6f8db3a12e742f0bcf2b0d19cd37e572934fd436c91d68a38e129",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-constraint-findings.md",
+        "fileDigest": "e9b87fef1763676f322fb5c4fd6c579d00c853d732d78cc028da975506d0bef7",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-constraint-findings.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "e9b87fef1763676f322fb5c4fd6c579d00c853d732d78cc028da975506d0bef7",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-constraint-proposal.md",
+        "fileDigest": "7d0f139ada13a0951c48f1c56cd1816ed10150cb2a6dc30ff623654ff747cc09",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-constraint-proposal.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "7d0f139ada13a0951c48f1c56cd1816ed10150cb2a6dc30ff623654ff747cc09",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-critique.md",
+        "fileDigest": "6c5e9dba6e73d5a811ca36fff56e561cc8353d0d71d3daeea9861c23aa12c6cb",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-critique.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "6c5e9dba6e73d5a811ca36fff56e561cc8353d0d71d3daeea9861c23aa12c6cb",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-explanation.md",
+        "fileDigest": "ef5e1657c2ebbea2eb7bd05c7b848c9ba6bb37789a250b7199480b3bffbaf380",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-explanation.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "ef5e1657c2ebbea2eb7bd05c7b848c9ba6bb37789a250b7199480b3bffbaf380",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-interpretation.md",
+        "fileDigest": "f9cd09565608d47a25be3d9af896fdf7b0b6c7a13199c207f9ba3edd7f9250ca",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-interpretation.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "f9cd09565608d47a25be3d9af896fdf7b0b6c7a13199c207f9ba3edd7f9250ca",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-redteam.md",
+        "fileDigest": "647f3bf8bf33b09218493230245a29307c86c0e9323ac43d645a0041c8f55e7b",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-redteam.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "647f3bf8bf33b09218493230245a29307c86c0e9323ac43d645a0041c8f55e7b",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-scout-report.md",
+        "fileDigest": "c6e2ca003ad92273fe28e9bb1e3483b14f16bc1882511b29d7bda95281c12328",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-scout-report.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "c6e2ca003ad92273fe28e9bb1e3483b14f16bc1882511b29d7bda95281c12328",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-specialist-answer.md",
+        "fileDigest": "bdca13c23486c0496093c88d03a453b8ef99ea0b1af37698156991b30f6e9cc0",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-specialist-answer.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "bdca13c23486c0496093c88d03a453b8ef99ea0b1af37698156991b30f6e9cc0",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-synthesis.md",
+        "fileDigest": "81791d488e930ae5a4bfb10ecaef78d0367bd6b5f0642b7710a6a9bb560d8927",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-synthesis.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "81791d488e930ae5a4bfb10ecaef78d0367bd6b5f0642b7710a6a9bb560d8927",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/architecture-advisory-panel-v1-system-proposal.md",
+        "fileDigest": "223e15b4b5f53aa635ff472f8033501e95e58d9adad4731a27f1e1589ce9c17d",
+        "sourcePath": "core/prompt-templates/architecture-advisory-panel-v1-system-proposal.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "223e15b4b5f53aa635ff472f8033501e95e58d9adad4731a27f1e1589ce9c17d",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/master-loop-review-candidate.md",
+        "fileDigest": "099024973d44de95f9fc252e38a0d17c049476ab3acc695b750fced5c98a553b",
+        "sourcePath": "core/prompt-templates/master-loop-review-candidate.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "099024973d44de95f9fc252e38a0d17c049476ab3acc695b750fced5c98a553b",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/rfc-review-lite-convene.md",
+        "fileDigest": "f248d79fe1049436d17019d78af98ebcff364271b98d99bf7d232f3046f65ce6",
+        "sourcePath": "core/prompt-templates/rfc-review-lite-convene.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "f248d79fe1049436d17019d78af98ebcff364271b98d99bf7d232f3046f65ce6",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/rfc-review-lite-object.md",
+        "fileDigest": "058c182ef39aa22caf4b0426f4bbb6f88901b37d2c0651a43ac34f8f68f3afbe",
+        "sourcePath": "core/prompt-templates/rfc-review-lite-object.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "058c182ef39aa22caf4b0426f4bbb6f88901b37d2c0651a43ac34f8f68f3afbe",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/rfc-review-lite-propose.md",
+        "fileDigest": "355d71ab2a7204bdf79dcaa572277c72509046116f3fc63e66f51e5a67145e28",
+        "sourcePath": "core/prompt-templates/rfc-review-lite-propose.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "355d71ab2a7204bdf79dcaa572277c72509046116f3fc63e66f51e5a67145e28",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/prompt-templates/rfc-review-lite-respond.md",
+        "fileDigest": "28989a77b07ec43878aec45baaf85203f243eac9b51eed7574d67e5f162c4df7",
+        "sourcePath": "core/prompt-templates/rfc-review-lite-respond.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "28989a77b07ec43878aec45baaf85203f243eac9b51eed7574d67e5f162c4df7",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/_shared/capability-catalog.md",
+        "fileDigest": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
+        "sourcePath": "core/skills/_shared/capability-catalog.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
+        "priorHistoryEdges": [
+          "history-015"
+        ],
+        "bareSiblingMentions": [
+          {
+            "line": 5,
+            "text": "together form one shared awareness cluster (`docs/history/agent-coordination-foundation/plan.md`):"
+          }
+        ],
+        "edgeIds": [],
+        "noMigrationReference": false
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/_shared/capability-matching.md",
+        "fileDigest": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
+        "sourcePath": "core/skills/_shared/capability-matching.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/_shared/catchup-self-recovery.md",
+        "fileDigest": "84afa75b23b685d1357210eb31f0b257fbbe959fc519598e9992e1fcf3e091a8",
+        "sourcePath": "core/skills/_shared/catchup-self-recovery.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "84afa75b23b685d1357210eb31f0b257fbbe959fc519598e9992e1fcf3e091a8",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [],
+        "edgeIds": [],
+        "noMigrationReference": true
+      }
+    },
+    {
+      "reviewClass": "file-coverage",
+      "data": {
+        "path": "core/skills/_shared/citation-format.md",
+        "fileDigest": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "sourcePath": "core/skills/_shared/citation-format.md",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourceDigest": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "priorHistoryEdges": [],
+        "bareSiblingMentions": [
+          {
+            "line": 7,
+            "text": "`docs/history/<feature>/CONTEXT.md`). That 3-tier shape is correct and"
+          },
+          {
+            "line": 10,
+            "text": "`docs/history/self-contained-id-references/DISCUSSION.md`. What was"
+          },
+          {
+            "line": 49,
+            "text": "**D-local — never cite outside its own `CONTEXT.md` at all, gloss or"
+          },
+          {
+            "line": 53,
+            "text": "`docs/history/<feature>/CONTEXT.md` and is not a portable reference the"
+          },
+          {
+            "line": 61,
+            "text": "Never write CONTEXT.md/plan.md itself (D2)."
+          },
+          {
+            "line": 67,
+            "text": "Never write CONTEXT.md/plan.md itself."
+          },
+          {
+            "line": 75,
+            "text": "Never write CONTEXT.md/plan.md itself -- that stays fgos-coding-exploring's"
+          },
+          {
+            "line": 92,
+            "text": "`docs/history/self-contained-id-references/CONTEXT.md` for the full"
+          },
+          {
+            "line": 96,
+            "text": "`CONTEXT.md`) — across `docs/backlog.md`, `docs/specs/*.md`, and any"
+          }
+        ],
+        "edgeIds": [
+          "skills-070",
+          "skills-071",
+          "skills-072",
+          "skills-073",
+          "skills-074",
+          "skills-075",
+          "skills-076",
+          "skills-077",
+          "skills-078"
+        ],
+        "noMigrationReference": false
+      }
+    }
+  ]
+}

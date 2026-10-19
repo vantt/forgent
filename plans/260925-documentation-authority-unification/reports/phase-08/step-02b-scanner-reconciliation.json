@@ -1,0 +1,1310 @@
+{
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "scannerSha256": "04c26e8a5a5087cd0f16081cd0960898b49182ade4b7ec589d3ec5e9c29ad1ac",
+  "stdoutSha256": "76aa159d432a77d61655e2f0164fefa4e851365413268490bc8be0300fa8a3d3",
+  "scannedFiles": 8852,
+  "hitFiles": 2489,
+  "identicalToFirstSliceScannerOutput": true,
+  "classHitRows": [
+    {
+      "path": ".agents/skills/_shared/capability-catalog.md",
+      "line": 6,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/agent-coordination-foundation/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-001"
+      ]
+    },
+    {
+      "path": ".agents/skills/_shared/citation-format.md",
+      "line": 7,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/"
+      ],
+      "currentFullSpanEdges": [
+        "skills-001"
+      ]
+    },
+    {
+      "path": ".agents/skills/_shared/citation-format.md",
+      "line": 35,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/id-systems-audit.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-004"
+      ]
+    },
+    {
+      "path": ".agents/skills/_shared/citation-format.md",
+      "line": 52,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/id-systems-audit.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-005"
+      ]
+    },
+    {
+      "path": ".agents/skills/_shared/citation-format.md",
+      "line": 97,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/backlog.md",
+        "docs/specs/*.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-008",
+        "skills-009"
+      ]
+    },
+    {
+      "path": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "line": 34,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/agent-coordination-foundation/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-003"
+      ]
+    },
+    {
+      "path": ".agents/skills/_shared/planning-capability-awareness.md",
+      "line": 8,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/agent-coordination-foundation/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-006"
+      ]
+    },
+    {
+      "path": ".agents/skills/fgos-clarifying/SKILL.md",
+      "line": 91,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-015"
+      ]
+    },
+    {
+      "path": ".agents/skills/fgos-coding-discovering/SKILL.md",
+      "line": 81,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-016"
+      ]
+    },
+    {
+      "path": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+      "line": 45,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/architect/knowledge-registry-redesign.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-031"
+      ]
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/SKILL.md",
+      "line": 17,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-008"
+      ]
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "line": 65,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-009"
+      ]
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "line": 69,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-010"
+      ]
+    },
+    {
+      "path": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "line": 74,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-038"
+      ]
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/SKILL.md",
+      "line": 16,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-011"
+      ]
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "line": 15,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-012"
+      ]
+    },
+    {
+      "path": ".agents/skills/fgos-indexing/SKILL.md",
+      "line": 63,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/reading-map.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-043"
+      ]
+    },
+    {
+      "path": ".agents/skills/fgos-researching/SKILL.md",
+      "line": 91,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-045"
+      ]
+    },
+    {
+      "path": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "line": 65,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-055"
+      ]
+    },
+    {
+      "path": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "line": 69,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-056"
+      ]
+    },
+    {
+      "path": ".claude/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "line": 15,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-059"
+      ]
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 173,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/ui-spec/tools"
+      ],
+      "currentFullSpanEdges": [
+        "skills-062"
+      ]
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 20,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/ui-spec"
+      ],
+      "currentFullSpanEdges": [
+        "skills-063"
+      ]
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 31,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/ui-spec"
+      ],
+      "currentFullSpanEdges": [
+        "skills-064"
+      ]
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 36,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/ui-spec/"
+      ],
+      "currentFullSpanEdges": [
+        "skills-065"
+      ]
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 246,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/ui-spec/tools/"
+      ],
+      "currentFullSpanEdges": [
+        "skills-066"
+      ]
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 173,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/ui-spec/tools"
+      ],
+      "currentFullSpanEdges": [
+        "skills-067"
+      ]
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 39,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/ui-spec"
+      ],
+      "currentFullSpanEdges": [
+        "skills-068"
+      ]
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+      "line": 14,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/ui-spec/generated/wireframe-v2.html"
+      ],
+      "currentFullSpanEdges": [
+        "skills-069",
+        "skills-323"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 8,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-001"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 9,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/system-overview.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-002"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 10,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/reading-map.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-003"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 11,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/backlog.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-004"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 13,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/routing-handoff-contract.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-005"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 14,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-006",
+        "instructions-007"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 17,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-008"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 27,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-009"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 29,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-010"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 35,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-011"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 40,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/reading-map.md",
+        "docs/specs/"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-012",
+        "instructions-013"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 57,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/reading-map.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-014"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 59,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/backlog.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-015"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 60,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/routing-handoff-contract.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-016"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 63,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-017"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 71,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-018"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 116,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/distribution-vision.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-019"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 128,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/distribution-vision.md",
+        "docs/specs/distribution.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-020",
+        "instructions-021"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 136,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-022"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 139,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-023"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 151,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-024"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 339,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-025"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 341,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-026"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 342,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-027"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 343,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-028"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 344,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-029"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 345,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-030"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 346,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-031"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 347,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-032"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 348,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-033"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 349,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-034"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 350,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-035"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 352,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-036"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "line": 378,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/architect"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-037"
+      ]
+    },
+    {
+      "path": "core/instructions/design-principles.md",
+      "line": 30,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/architect"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-038"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 15,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-039"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 17,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-040"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 18,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-041"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 19,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-042"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 20,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-043"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 21,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-044"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 22,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-045"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 23,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-046"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 24,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-047"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 25,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-048"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 26,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-049"
+      ]
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "line": 28,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/platform-foundations.md"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-050"
+      ]
+    },
+    {
+      "path": "core/skills/_shared/capability-catalog.md",
+      "line": 5,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/agent-coordination-foundation/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-015"
+      ]
+    },
+    {
+      "path": "core/skills/_shared/citation-format.md",
+      "line": 6,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/"
+      ],
+      "currentFullSpanEdges": [
+        "skills-070"
+      ]
+    },
+    {
+      "path": "core/skills/_shared/citation-format.md",
+      "line": 34,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/id-systems-audit.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-073"
+      ]
+    },
+    {
+      "path": "core/skills/_shared/citation-format.md",
+      "line": 51,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/id-systems-audit.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-074"
+      ]
+    },
+    {
+      "path": "core/skills/_shared/citation-format.md",
+      "line": 96,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/backlog.md",
+        "docs/specs/*.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-077",
+        "skills-078"
+      ]
+    },
+    {
+      "path": "core/skills/_shared/executor-dispatch-fallback.md",
+      "line": 33,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/agent-coordination-foundation/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-017"
+      ]
+    },
+    {
+      "path": "core/skills/_shared/planning-capability-awareness.md",
+      "line": 7,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/agent-coordination-foundation/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-020"
+      ]
+    },
+    {
+      "path": "core/skills/fgos-clarifying/SKILL.md",
+      "line": 90,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-084"
+      ]
+    },
+    {
+      "path": "core/skills/fgos-indexing/SKILL.md",
+      "line": 62,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/reading-map.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-085"
+      ]
+    },
+    {
+      "path": "core/skills/fgos-researching/SKILL.md",
+      "line": 90,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-087"
+      ]
+    },
+    {
+      "path": "core/task-specs/fgos-indexing.md",
+      "line": 12,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/reading-map.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-088"
+      ]
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "line": 80,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-090"
+      ]
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "line": 44,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/architect/knowledge-registry-redesign.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-105"
+      ]
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "line": 16,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-022"
+      ]
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "line": 64,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-023"
+      ]
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "line": 68,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-024"
+      ]
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "line": 73,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-112"
+      ]
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+      "line": 15,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-025"
+      ]
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "line": 14,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-026"
+      ]
+    },
+    {
+      "path": "domains/coding/task-specs/shape-plan.md",
+      "line": 12,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-029"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/capability-catalog.md",
+      "line": 6,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/agent-coordination-foundation/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-030"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/citation-format.md",
+      "line": 7,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/"
+      ],
+      "currentFullSpanEdges": [
+        "skills-118"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/citation-format.md",
+      "line": 35,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/id-systems-audit.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-121"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/citation-format.md",
+      "line": 52,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/id-systems-audit.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-122"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/citation-format.md",
+      "line": 97,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/backlog.md",
+        "docs/specs/*.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-125",
+        "skills-126"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "line": 34,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/agent-coordination-foundation/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-032"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+      "line": 8,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/agent-coordination-foundation/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-035"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+      "line": 91,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-148"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+      "line": 81,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-149"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+      "line": 45,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/architect/knowledge-registry-redesign.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-164"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+      "line": 17,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-037"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "line": 65,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-038"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "line": 69,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-039"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "line": 74,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-171"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+      "line": 16,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-040"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "line": 15,
+      "pattern": "planning",
+      "scannerReferences": [
+        "docs/history/<feature>/plan.md"
+      ],
+      "currentFullSpanEdges": [
+        "history-041"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+      "line": 63,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/reading-map.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-176"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-researching/SKILL.md",
+      "line": 91,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/specs/runner.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-178"
+      ]
+    },
+    {
+      "path": "plugins/fgOS/skills/terminal/SKILL.md",
+      "line": 20,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/operator-runbook-herdr-cockpit.md"
+      ],
+      "currentFullSpanEdges": [
+        "skills-192"
+      ]
+    },
+    {
+      "path": "src/setup/instruction-registry.mjs",
+      "line": 450,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/architect"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-054"
+      ]
+    },
+    {
+      "path": "src/setup/instruction-registry.mjs",
+      "line": 583,
+      "pattern": "legacy",
+      "scannerReferences": [
+        "docs/architect"
+      ],
+      "currentFullSpanEdges": [
+        "instructions-055"
+      ]
+    }
+  ],
+  "limits": "Unchanged scanner patterns include partial prefixes and omit sibling/wrapped paths. Full current spans/IO inventory and tracked coverage supplement them; scanner is not a semantic authority judgment. First slice reconciliation remains byte-identical."
+}

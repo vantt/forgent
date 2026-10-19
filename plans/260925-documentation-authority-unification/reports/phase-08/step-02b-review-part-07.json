@@ -1,0 +1,4069 @@
+{
+  "requestIdentity": "step-02b-census-0689b862e",
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "part": 7,
+  "entries": [
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-272",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 169,
+        "columnStart": 15,
+        "columnEndExclusive": 54,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(root, REFS_DIR, \"deep-dives\")",
+        "callSite": "  const dir = path.join(root, REFS_DIR, \"deep-dives\");",
+        "context": [
+          {
+            "line": 167,
+            "text": "// [name@cursor]); when a source moves past a pin, the dive is stale."
+          },
+          {
+            "line": 168,
+            "text": "function deepDiveStaleness(root) {"
+          },
+          {
+            "line": 169,
+            "text": "  const dir = path.join(root, REFS_DIR, \"deep-dives\");"
+          },
+          {
+            "line": 170,
+            "text": "  const stale = [];"
+          },
+          {
+            "line": 171,
+            "text": "  if (!fs.existsSync(dir)) return stale;"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(root, REFS_DIR, \"deep-dives\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(root, REFS_DIR, \"deep-dives\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_7033fe9c0e9d20057cd8d180"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-273",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 173,
+        "columnStart": 49,
+        "columnEndExclusive": 66,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(dir, f)",
+        "callSite": "    const fm = parseFrontmatter(fs.readFileSync(path.join(dir, f), \"utf8\"));",
+        "context": [
+          {
+            "line": 171,
+            "text": "  if (!fs.existsSync(dir)) return stale;"
+          },
+          {
+            "line": 172,
+            "text": "  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith(\".md\"))) {"
+          },
+          {
+            "line": 173,
+            "text": "    const fm = parseFrontmatter(fs.readFileSync(path.join(dir, f), \"utf8\"));"
+          },
+          {
+            "line": 174,
+            "text": "    const based = Array.isArray(fm?.data.based_on) ? fm.data.based_on : [];"
+          },
+          {
+            "line": 175,
+            "text": "    for (const pin of based) {"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(dir, f)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(dir, f)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_59722e01ac913d1a89d8517a"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-274",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 508,
+        "columnStart": 43,
+        "columnEndExclusive": 60,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(dir, f)",
+        "callSite": "      for (const block of fs.readFileSync(path.join(dir, f), \"utf8\").split(/^(?=#{2,3} )/m))",
+        "context": [
+          {
+            "line": 506,
+            "text": "    if (!fs.existsSync(dir)) continue;"
+          },
+          {
+            "line": 507,
+            "text": "    for (const f of fs.readdirSync(dir).filter((f) => f.endsWith(\".md\")))"
+          },
+          {
+            "line": 508,
+            "text": "      for (const block of fs.readFileSync(path.join(dir, f), \"utf8\").split(/^(?=#{2,3} )/m))"
+          },
+          {
+            "line": 509,
+            "text": "        if (block.startsWith(\"### \") && rx.test(block)) {"
+          },
+          {
+            "line": 510,
+            "text": "          console.log(`== ${sub}/${f} :: ${block.split(\"\\n\")[0].slice(4)} ==\\n${block.trim()}\\n`);"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(dir, f)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(dir, f)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_59722e01ac913d1a89d8517a"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-275",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 68,
+        "columnStart": 25,
+        "columnEndExclusive": 48,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.resolve(args.root)",
+        "callSite": "  if (args.root) return path.resolve(args.root);",
+        "context": [
+          {
+            "line": 66,
+            "text": ""
+          },
+          {
+            "line": 67,
+            "text": "function findRoot(args) {"
+          },
+          {
+            "line": 68,
+            "text": "  if (args.root) return path.resolve(args.root);"
+          },
+          {
+            "line": 69,
+            "text": "  let dir = process.cwd();"
+          },
+          {
+            "line": 70,
+            "text": "  while (true) {"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.resolve(args.root)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.resolve(args.root)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_1f43c1be04aba4c05c7a9645",
+          "consumer_unresolved_653446e77b9df592f4c791d3"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-276",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 244,
+        "columnStart": 28,
+        "columnEndExclusive": 51,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.resolve(args.root)",
+        "callSite": "  const root = args.root ? path.resolve(args.root) : process.cwd();",
+        "context": [
+          {
+            "line": 242,
+            "text": ""
+          },
+          {
+            "line": 243,
+            "text": "function cmdInit(args) {"
+          },
+          {
+            "line": 244,
+            "text": "  const root = args.root ? path.resolve(args.root) : process.cwd();"
+          },
+          {
+            "line": 245,
+            "text": "  const refs = path.join(root, REFS_DIR);"
+          },
+          {
+            "line": 246,
+            "text": "  const created = [];"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.resolve(args.root)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.resolve(args.root)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_1f43c1be04aba4c05c7a9645",
+          "consumer_unresolved_653446e77b9df592f4c791d3"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-277",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 245,
+        "columnStart": 16,
+        "columnEndExclusive": 41,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(root, REFS_DIR)",
+        "callSite": "  const refs = path.join(root, REFS_DIR);",
+        "context": [
+          {
+            "line": 243,
+            "text": "function cmdInit(args) {"
+          },
+          {
+            "line": 244,
+            "text": "  const root = args.root ? path.resolve(args.root) : process.cwd();"
+          },
+          {
+            "line": 245,
+            "text": "  const refs = path.join(root, REFS_DIR);"
+          },
+          {
+            "line": 246,
+            "text": "  const created = [];"
+          },
+          {
+            "line": 247,
+            "text": "  for (const d of [path.join(refs, \"sources\"), path.join(root, CLONES_DIR)])"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(root, REFS_DIR)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(root, REFS_DIR)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_8ddf891b95bb1de6ccdfec93"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-278",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 247,
+        "columnStart": 20,
+        "columnEndExclusive": 46,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(refs, \"sources\")",
+        "callSite": "  for (const d of [path.join(refs, \"sources\"), path.join(root, CLONES_DIR)])",
+        "context": [
+          {
+            "line": 245,
+            "text": "  const refs = path.join(root, REFS_DIR);"
+          },
+          {
+            "line": 246,
+            "text": "  const created = [];"
+          },
+          {
+            "line": 247,
+            "text": "  for (const d of [path.join(refs, \"sources\"), path.join(root, CLONES_DIR)])"
+          },
+          {
+            "line": 248,
+            "text": "    if (!fs.existsSync(d)) { fs.mkdirSync(d, { recursive: true }); created.push(path.relative(root, d) + \"/\"); }"
+          },
+          {
+            "line": 249,
+            "text": "  const files = {"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(refs, \"sources\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(refs, \"sources\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_aa79bfc94faa2a3aaee32e63"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-279",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 247,
+        "columnStart": 48,
+        "columnEndExclusive": 75,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(root, CLONES_DIR)",
+        "callSite": "  for (const d of [path.join(refs, \"sources\"), path.join(root, CLONES_DIR)])",
+        "context": [
+          {
+            "line": 245,
+            "text": "  const refs = path.join(root, REFS_DIR);"
+          },
+          {
+            "line": 246,
+            "text": "  const created = [];"
+          },
+          {
+            "line": 247,
+            "text": "  for (const d of [path.join(refs, \"sources\"), path.join(root, CLONES_DIR)])"
+          },
+          {
+            "line": 248,
+            "text": "    if (!fs.existsSync(d)) { fs.mkdirSync(d, { recursive: true }); created.push(path.relative(root, d) + \"/\"); }"
+          },
+          {
+            "line": 249,
+            "text": "  const files = {"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(root, CLONES_DIR)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(root, CLONES_DIR)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_7c50e8f64e57204ed25017fa"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-280",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 250,
+        "columnStart": 6,
+        "columnEndExclusive": 37,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(refs, \"taxonomy.txt\")",
+        "callSite": "    [path.join(refs, \"taxonomy.txt\")]: T.taxonomy,",
+        "context": [
+          {
+            "line": 248,
+            "text": "    if (!fs.existsSync(d)) { fs.mkdirSync(d, { recursive: true }); created.push(path.relative(root, d) + \"/\"); }"
+          },
+          {
+            "line": 249,
+            "text": "  const files = {"
+          },
+          {
+            "line": 250,
+            "text": "    [path.join(refs, \"taxonomy.txt\")]: T.taxonomy,"
+          },
+          {
+            "line": 251,
+            "text": "    [path.join(refs, \"intake.md\")]: T.intake,"
+          },
+          {
+            "line": 252,
+            "text": "    [path.join(refs, \"comparison-matrix.md\")]: T.matrix,"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(refs, \"taxonomy.txt\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(refs, \"taxonomy.txt\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_7921a2576cf9ffe66c7754a4"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-281",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 251,
+        "columnStart": 6,
+        "columnEndExclusive": 34,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(refs, \"intake.md\")",
+        "callSite": "    [path.join(refs, \"intake.md\")]: T.intake,",
+        "context": [
+          {
+            "line": 249,
+            "text": "  const files = {"
+          },
+          {
+            "line": 250,
+            "text": "    [path.join(refs, \"taxonomy.txt\")]: T.taxonomy,"
+          },
+          {
+            "line": 251,
+            "text": "    [path.join(refs, \"intake.md\")]: T.intake,"
+          },
+          {
+            "line": 252,
+            "text": "    [path.join(refs, \"comparison-matrix.md\")]: T.matrix,"
+          },
+          {
+            "line": 253,
+            "text": "    [path.join(refs, \"porting-log.md\")]: T.portingLog,"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(refs, \"intake.md\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(refs, \"intake.md\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_4b4b60326995a6897f921ecd"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-282",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 252,
+        "columnStart": 6,
+        "columnEndExclusive": 45,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(refs, \"comparison-matrix.md\")",
+        "callSite": "    [path.join(refs, \"comparison-matrix.md\")]: T.matrix,",
+        "context": [
+          {
+            "line": 250,
+            "text": "    [path.join(refs, \"taxonomy.txt\")]: T.taxonomy,"
+          },
+          {
+            "line": 251,
+            "text": "    [path.join(refs, \"intake.md\")]: T.intake,"
+          },
+          {
+            "line": 252,
+            "text": "    [path.join(refs, \"comparison-matrix.md\")]: T.matrix,"
+          },
+          {
+            "line": 253,
+            "text": "    [path.join(refs, \"porting-log.md\")]: T.portingLog,"
+          },
+          {
+            "line": 254,
+            "text": "  };"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(refs, \"comparison-matrix.md\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(refs, \"comparison-matrix.md\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_87261ad5ce09cc435c338938"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-283",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 253,
+        "columnStart": 6,
+        "columnEndExclusive": 39,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(refs, \"porting-log.md\")",
+        "callSite": "    [path.join(refs, \"porting-log.md\")]: T.portingLog,",
+        "context": [
+          {
+            "line": 251,
+            "text": "    [path.join(refs, \"intake.md\")]: T.intake,"
+          },
+          {
+            "line": 252,
+            "text": "    [path.join(refs, \"comparison-matrix.md\")]: T.matrix,"
+          },
+          {
+            "line": 253,
+            "text": "    [path.join(refs, \"porting-log.md\")]: T.portingLog,"
+          },
+          {
+            "line": 254,
+            "text": "  };"
+          },
+          {
+            "line": 255,
+            "text": "  for (const [f, content] of Object.entries(files))"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(refs, \"porting-log.md\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(refs, \"porting-log.md\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_f2c12a8039cb24ee7efb7506"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-284",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 258,
+        "columnStart": 14,
+        "columnEndExclusive": 43,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(root, \".gitignore\")",
+        "callSite": "  const gi = path.join(root, \".gitignore\");",
+        "context": [
+          {
+            "line": 256,
+            "text": "    if (!fs.existsSync(f)) { writeAtomic(f, content); created.push(path.relative(root, f)); }"
+          },
+          {
+            "line": 257,
+            "text": "  // Managed .gitignore block — never touch bytes outside the markers."
+          },
+          {
+            "line": 258,
+            "text": "  const gi = path.join(root, \".gitignore\");"
+          },
+          {
+            "line": 259,
+            "text": "  const giText = fs.existsSync(gi) ? fs.readFileSync(gi, \"utf8\") : \"\";"
+          },
+          {
+            "line": 260,
+            "text": "  const alreadyIgnored = giText.split(\"\\n\").some((l) => l.trim() === `/${CLONES_DIR}/` || l.trim() === `${CLONES_DIR}/`);"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(root, \".gitignore\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(root, \".gitignore\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_5e0359f8e0db2887a1d77eda"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-285",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 292,
+        "columnStart": 22,
+        "columnEndExclusive": 45,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(repo, \".git\")",
+        "callSite": "  if (!fs.existsSync(path.join(repo, \".git\")))",
+        "context": [
+          {
+            "line": 290,
+            "text": "function deltaGitRepo(root, name, meta) {"
+          },
+          {
+            "line": 291,
+            "text": "  const repo = cloneDir(root, name, meta);"
+          },
+          {
+            "line": 292,
+            "text": "  if (!fs.existsSync(path.join(repo, \".git\")))"
+          },
+          {
+            "line": 293,
+            "text": "    fail(`clone missing at ${path.relative(root, repo)}`, `git-repo deltas are computed against a local clone`, `git clone ${meta.url} ${path.relative(root, repo)}`);"
+          },
+          {
+            "line": 294,
+            "text": "  if (git(repo, [\"pull\", \"--ff-only\", \"--quiet\"], { soft: true, quietErr: true }) === null)"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(repo, \".git\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(repo, \".git\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_17ec336eecba714287ad9eda",
+          "consumer_unresolved_9013768f01472a890a27b9c5"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-286",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 377,
+        "columnStart": 24,
+        "columnEndExclusive": 47,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(repo, \".git\")",
+        "callSite": "    if (!fs.existsSync(path.join(repo, \".git\"))) problems.push(`clone missing at ${path.relative(root, repo)}`);",
+        "context": [
+          {
+            "line": 375,
+            "text": "  if (meta.type === \"git-repo\" && meta.last_analyzed_commit) {"
+          },
+          {
+            "line": 376,
+            "text": "    const repo = cloneDir(root, name, meta);"
+          },
+          {
+            "line": 377,
+            "text": "    if (!fs.existsSync(path.join(repo, \".git\"))) problems.push(`clone missing at ${path.relative(root, repo)}`);"
+          },
+          {
+            "line": 378,
+            "text": "    else {"
+          },
+          {
+            "line": 379,
+            "text": "      if (git(repo, [\"rev-parse\", `${meta.last_analyzed_commit}^{commit}`], { soft: true, quietErr: true }) === null)"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(repo, \".git\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(repo, \".git\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_17ec336eecba714287ad9eda",
+          "consumer_unresolved_9013768f01472a890a27b9c5"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-287",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 451,
+        "columnStart": 26,
+        "columnEndExclusive": 49,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(repo, \".git\")",
+        "callSite": "      if (!fs.existsSync(path.join(repo, \".git\"))) s.behind = \"no-clone\";",
+        "context": [
+          {
+            "line": 449,
+            "text": "    if (meta.type === \"git-repo\" && s.cursor) {"
+          },
+          {
+            "line": 450,
+            "text": "      const repo = cloneDir(root, name, meta);"
+          },
+          {
+            "line": 451,
+            "text": "      if (!fs.existsSync(path.join(repo, \".git\"))) s.behind = \"no-clone\";"
+          },
+          {
+            "line": 452,
+            "text": "      else {"
+          },
+          {
+            "line": 453,
+            "text": "        const n = git(repo, [\"rev-list\", \"--count\", `${s.cursor}..HEAD`], { soft: true, quietErr: true });"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(repo, \".git\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(repo, \".git\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_17ec336eecba714287ad9eda",
+          "consumer_unresolved_9013768f01472a890a27b9c5"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-288",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 587,
+        "columnStart": 20,
+        "columnEndExclusive": 54,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(root, REFS_DIR, \"state\")",
+        "callSite": "  const stateDir = path.join(root, REFS_DIR, \"state\");",
+        "context": [
+          {
+            "line": 585,
+            "text": "    );"
+          },
+          {
+            "line": 586,
+            "text": "  const root = requireRoot(args);"
+          },
+          {
+            "line": 587,
+            "text": "  const stateDir = path.join(root, REFS_DIR, \"state\");"
+          },
+          {
+            "line": 588,
+            "text": "  const logFile = path.join(root, REFS_DIR, \"porting-log.md\");"
+          },
+          {
+            "line": 589,
+            "text": ""
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(root, REFS_DIR, \"state\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(root, REFS_DIR, \"state\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_6de0e1313be290b08ca33dba"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-289",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 464,
+        "columnStart": 19,
+        "columnEndExclusive": 62,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+        "callSite": "  const logFile = path.join(root, REFS_DIR, \"porting-log.md\");",
+        "context": [
+          {
+            "line": 462,
+            "text": "    : 0);"
+          },
+          {
+            "line": 463,
+            "text": "  let candidates = 0, unscored = 0;"
+          },
+          {
+            "line": 464,
+            "text": "  const logFile = path.join(root, REFS_DIR, \"porting-log.md\");"
+          },
+          {
+            "line": 465,
+            "text": "  if (fs.existsSync(logFile))"
+          },
+          {
+            "line": 466,
+            "text": "    for (const line of fs.readFileSync(logFile, \"utf8\").split(\"\\n\")) {"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(root, REFS_DIR, \"porting-log.md\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(root, REFS_DIR, \"porting-log.md\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_950d1c4c4bf5e17f82033a8b"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-290",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 519,
+        "columnStart": 19,
+        "columnEndExclusive": 62,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+        "callSite": "  const logFile = path.join(root, REFS_DIR, \"porting-log.md\");",
+        "context": [
+          {
+            "line": 517,
+            "text": "function cmdRank(args) {"
+          },
+          {
+            "line": 518,
+            "text": "  const root = requireRoot(args);"
+          },
+          {
+            "line": 519,
+            "text": "  const logFile = path.join(root, REFS_DIR, \"porting-log.md\");"
+          },
+          {
+            "line": 520,
+            "text": "  if (!fs.existsSync(logFile))"
+          },
+          {
+            "line": 521,
+            "text": "    fail(\"porting-log.md not found\", \"rank reads candidate rows from the porting log\", `run \"distill.mjs init\" or create ${REFS_DIR}/porting-log.md`);"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(root, REFS_DIR, \"porting-log.md\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(root, REFS_DIR, \"porting-log.md\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_950d1c4c4bf5e17f82033a8b"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-291",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 546,
+        "columnStart": 19,
+        "columnEndExclusive": 62,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+        "callSite": "  const logFile = path.join(root, REFS_DIR, \"porting-log.md\");",
+        "context": [
+          {
+            "line": 544,
+            "text": "  const [term] = args._;"
+          },
+          {
+            "line": 545,
+            "text": "  const root = requireRoot(args);"
+          },
+          {
+            "line": 546,
+            "text": "  const logFile = path.join(root, REFS_DIR, \"porting-log.md\");"
+          },
+          {
+            "line": 547,
+            "text": "  if (!fs.existsSync(logFile))"
+          },
+          {
+            "line": 548,
+            "text": "    fail(\"porting-log.md not found\", \"map reads ported/adapted rows from the porting log\", `run \"distill.mjs init\" first`);"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(root, REFS_DIR, \"porting-log.md\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(root, REFS_DIR, \"porting-log.md\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_950d1c4c4bf5e17f82033a8b"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-292",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 588,
+        "columnStart": 19,
+        "columnEndExclusive": 62,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(root, REFS_DIR, \"porting-log.md\")",
+        "callSite": "  const logFile = path.join(root, REFS_DIR, \"porting-log.md\");",
+        "context": [
+          {
+            "line": 586,
+            "text": "  const root = requireRoot(args);"
+          },
+          {
+            "line": 587,
+            "text": "  const stateDir = path.join(root, REFS_DIR, \"state\");"
+          },
+          {
+            "line": 588,
+            "text": "  const logFile = path.join(root, REFS_DIR, \"porting-log.md\");"
+          },
+          {
+            "line": 589,
+            "text": ""
+          },
+          {
+            "line": 590,
+            "text": "  // Lazy import: distill.mjs declares zero npm deps and runs standalone in any"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(root, REFS_DIR, \"porting-log.md\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(root, REFS_DIR, \"porting-log.md\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_950d1c4c4bf5e17f82033a8b"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-293",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 71,
+        "columnStart": 23,
+        "columnEndExclusive": 47,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(dir, REFS_DIR)",
+        "callSite": "    if (fs.existsSync(path.join(dir, REFS_DIR))) return dir;",
+        "context": [
+          {
+            "line": 69,
+            "text": "  let dir = process.cwd();"
+          },
+          {
+            "line": 70,
+            "text": "  while (true) {"
+          },
+          {
+            "line": 71,
+            "text": "    if (fs.existsSync(path.join(dir, REFS_DIR))) return dir;"
+          },
+          {
+            "line": 72,
+            "text": "    const parent = path.dirname(dir);"
+          },
+          {
+            "line": 73,
+            "text": "    if (parent === dir) return null;"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(dir, REFS_DIR)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "consumer-project docs/distillery/ or explicit clone/local root",
+        "desiredAnchor": "source learning/cursor contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Actual external learning/clone/local-root population not read. Dynamic meta.local may reach user-selected paths; not proof of absent legacy authority references.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/{sources/<name>.md,porting-log.md,state/...} as traced by command; clone <root>/<meta.local or upstreams/name>",
+          "activeAlias": false,
+          "status": "code-derived external-project destinations; concrete population unproven"
+        },
+        "normalizedReference": "path.join(dir, REFS_DIR)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_b2cac78314ecc99cacd0312d"
+        ],
+        "dispositionReason": "REFS_DIR is fixed docs/distillery; root is explicit --root or upward search. sources/<name>.md, taxonomy, deep-dives, comparison-matrix, porting-log, state are learning data; CLONES_DIR=upstreams, meta.local can override clone path. Atomic source/porting updates are not platform authority writers.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-294",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 112,
+        "columnStart": 11,
+        "columnEndExclusive": 58,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(process.env.HOME || \"\", raw.slice(1))",
+        "callSite": "        ? path.join(process.env.HOME || \"\", raw.slice(1))",
+        "context": [
+          {
+            "line": 110,
+            "text": "      if (raw.includes(\"@\") || !/[./]/.test(raw)) continue;"
+          },
+          {
+            "line": 111,
+            "text": "      const target = raw.startsWith(\"~\")"
+          },
+          {
+            "line": 112,
+            "text": "        ? path.join(process.env.HOME || \"\", raw.slice(1))"
+          },
+          {
+            "line": 113,
+            "text": "        : path.resolve(path.dirname(file), raw);"
+          },
+          {
+            "line": 114,
+            "text": "      if (exists(target)) found.push(target);"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(process.env.HOME || \"\", raw.slice(1))",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.join(process.env.HOME || \"\", raw.slice(1))",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_33a910f6212c5cac7409dc69"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-295",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 113,
+        "columnStart": 11,
+        "columnEndExclusive": 48,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.resolve(path.dirname(file), raw)",
+        "callSite": "        : path.resolve(path.dirname(file), raw);",
+        "context": [
+          {
+            "line": 111,
+            "text": "      const target = raw.startsWith(\"~\")"
+          },
+          {
+            "line": 112,
+            "text": "        ? path.join(process.env.HOME || \"\", raw.slice(1))"
+          },
+          {
+            "line": 113,
+            "text": "        : path.resolve(path.dirname(file), raw);"
+          },
+          {
+            "line": 114,
+            "text": "      if (exists(target)) found.push(target);"
+          },
+          {
+            "line": 115,
+            "text": "    }"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.resolve(path.dirname(file), raw)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.resolve(path.dirname(file), raw)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_3d536fb4d62d12a9ba2c344f"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-296",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 134,
+        "columnStart": 17,
+        "columnEndExclusive": 35,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(ROOT, f)",
+        "callSite": "    .map((f) => path.join(ROOT, f))",
+        "context": [
+          {
+            "line": 132,
+            "text": "  const conditional = [];"
+          },
+          {
+            "line": 133,
+            "text": "  const roots = [\"CLAUDE.md\", \".claude/CLAUDE.md\", \"CLAUDE.local.md\"]"
+          },
+          {
+            "line": 134,
+            "text": "    .map((f) => path.join(ROOT, f))"
+          },
+          {
+            "line": 135,
+            "text": "    .filter(exists);"
+          },
+          {
+            "line": 136,
+            "text": "  const seen = new Set();"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(ROOT, f)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.join(ROOT, f)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_c36fb48899704afb8d0c55f0",
+          "consumer_unresolved_f07ffd68907453e78754d433"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-297",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 171,
+        "columnStart": 21,
+        "columnEndExclusive": 39,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(ROOT, f)",
+        "callSite": "  const at = (f) => path.join(ROOT, f);",
+        "context": [
+          {
+            "line": 169,
+            "text": "function surfaces() {"
+          },
+          {
+            "line": 170,
+            "text": "  const claude = claudeSurface();"
+          },
+          {
+            "line": 171,
+            "text": "  const at = (f) => path.join(ROOT, f);"
+          },
+          {
+            "line": 172,
+            "text": "  const agents = exists(at(\"AGENTS.md\")) ? [at(\"AGENTS.md\")] : [];"
+          },
+          {
+            "line": 173,
+            "text": "  const nested = nestedAgentsFiles();"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(ROOT, f)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.join(ROOT, f)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_c36fb48899704afb8d0c55f0",
+          "consumer_unresolved_f07ffd68907453e78754d433"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-298",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 278,
+        "columnStart": 85,
+        "columnEndExclusive": 103,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(ROOT, f)",
+        "callSite": "  const files = [\".claude/settings.json\", \".claude/settings.local.json\"].map((f) => path.join(ROOT, f)).filter(exists);",
+        "context": [
+          {
+            "line": 276,
+            "text": ""
+          },
+          {
+            "line": 277,
+            "text": "function hooksReport() {"
+          },
+          {
+            "line": 278,
+            "text": "  const files = [\".claude/settings.json\", \".claude/settings.local.json\"].map((f) => path.join(ROOT, f)).filter(exists);"
+          },
+          {
+            "line": 279,
+            "text": "  const registrations = [];"
+          },
+          {
+            "line": 280,
+            "text": "  const foreign = [];"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(ROOT, f)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.join(ROOT, f)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_c36fb48899704afb8d0c55f0",
+          "consumer_unresolved_f07ffd68907453e78754d433"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-299",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 138,
+        "columnStart": 27,
+        "columnEndExclusive": 59,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(ROOT, \".claude/rules\")",
+        "callSite": "  for (const f of listDir(path.join(ROOT, \".claude/rules\"), /\\.md$/)) {",
+        "context": [
+          {
+            "line": 136,
+            "text": "  const seen = new Set();"
+          },
+          {
+            "line": 137,
+            "text": "  for (const r of roots) expandClaude(r, seen, always);"
+          },
+          {
+            "line": 138,
+            "text": "  for (const f of listDir(path.join(ROOT, \".claude/rules\"), /\\.md$/)) {"
+          },
+          {
+            "line": 139,
+            "text": "    const fm = frontmatter(readText(f) || \"\");"
+          },
+          {
+            "line": 140,
+            "text": "    if (/^paths\\s*:/m.test(fm)) conditional.push(f);"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(ROOT, \".claude/rules\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.join(ROOT, \".claude/rules\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_b283f4c1dc0d8f4d1c5280c3"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-300",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 159,
+        "columnStart": 64,
+        "columnEndExclusive": 86,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(dir, e.name)",
+        "callSite": "        if (!skip.has(e.name) && !e.name.startsWith(\".\")) walk(path.join(dir, e.name), depth + 1);",
+        "context": [
+          {
+            "line": 157,
+            "text": "    for (const e of entries) {"
+          },
+          {
+            "line": 158,
+            "text": "      if (e.isDirectory()) {"
+          },
+          {
+            "line": 159,
+            "text": "        if (!skip.has(e.name) && !e.name.startsWith(\".\")) walk(path.join(dir, e.name), depth + 1);"
+          },
+          {
+            "line": 160,
+            "text": "      } else if (e.name === \"AGENTS.md\" && dir !== ROOT) {"
+          },
+          {
+            "line": 161,
+            "text": "        out.push(path.join(dir, e.name));"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(dir, e.name)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.join(dir, e.name)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_e8c805b1bdcccfeae129869d",
+          "consumer_unresolved_fafc8e5c1249adb303586299"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-301",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 161,
+        "columnStart": 18,
+        "columnEndExclusive": 40,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(dir, e.name)",
+        "callSite": "        out.push(path.join(dir, e.name));",
+        "context": [
+          {
+            "line": 159,
+            "text": "        if (!skip.has(e.name) && !e.name.startsWith(\".\")) walk(path.join(dir, e.name), depth + 1);"
+          },
+          {
+            "line": 160,
+            "text": "      } else if (e.name === \"AGENTS.md\" && dir !== ROOT) {"
+          },
+          {
+            "line": 161,
+            "text": "        out.push(path.join(dir, e.name));"
+          },
+          {
+            "line": 162,
+            "text": "      }"
+          },
+          {
+            "line": 163,
+            "text": "    }"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(dir, e.name)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.join(dir, e.name)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_e8c805b1bdcccfeae129869d",
+          "consumer_unresolved_fafc8e5c1249adb303586299"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-302",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 36,
+        "columnStart": 14,
+        "columnEndExclusive": 56,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.resolve(opt(\"--root\", process.cwd()))",
+        "callSite": "const ROOT = path.resolve(opt(\"--root\", process.cwd()));",
+        "context": [
+          {
+            "line": 34,
+            "text": "};"
+          },
+          {
+            "line": 35,
+            "text": ""
+          },
+          {
+            "line": 36,
+            "text": "const ROOT = path.resolve(opt(\"--root\", process.cwd()));"
+          },
+          {
+            "line": 37,
+            "text": "const MIN_CHARS = Number(opt(\"--min-chars\", \"120\"));"
+          },
+          {
+            "line": 38,
+            "text": "const AS_JSON = flag(\"--json\");"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.resolve(opt(\"--root\", process.cwd()))",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.resolve(opt(\"--root\", process.cwd()))",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_62189f192cbf2223ae0152da"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-303",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 64,
+        "columnStart": 19,
+        "columnEndExclusive": 36,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(dir, f)",
+        "callSite": "      .map((f) => path.join(dir, f));",
+        "context": [
+          {
+            "line": 62,
+            "text": "      .filter((f) => re.test(f))"
+          },
+          {
+            "line": 63,
+            "text": "      .sort()"
+          },
+          {
+            "line": 64,
+            "text": "      .map((f) => path.join(dir, f));"
+          },
+          {
+            "line": 65,
+            "text": "  } catch {"
+          },
+          {
+            "line": 66,
+            "text": "    return [];"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(dir, f)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.join(dir, f)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_90ceb95cbfdd3dbea2c7edb9"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-304",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 81,
+        "columnStart": 13,
+        "columnEndExclusive": 28,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.resolve(p)",
+        "callSite": "  let dir = path.resolve(p);",
+        "context": [
+          {
+            "line": 79,
+            "text": ""
+          },
+          {
+            "line": 80,
+            "text": "function gitCheckoutOf(p) {"
+          },
+          {
+            "line": 81,
+            "text": "  let dir = path.resolve(p);"
+          },
+          {
+            "line": 82,
+            "text": "  while (dir !== path.dirname(dir)) {"
+          },
+          {
+            "line": 83,
+            "text": "    if (exists(path.join(dir, \".git\"))) return dir;"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.resolve(p)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.resolve(p)",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_721e2a38e116a0dc4d8072b8"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-305",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "line": 83,
+        "columnStart": 16,
+        "columnEndExclusive": 38,
+        "pattern": "inventory-dynamic-trace",
+        "matchedExpression": "path.join(dir, \".git\")",
+        "callSite": "    if (exists(path.join(dir, \".git\"))) return dir;",
+        "context": [
+          {
+            "line": 81,
+            "text": "  let dir = path.resolve(p);"
+          },
+          {
+            "line": 82,
+            "text": "  while (dir !== path.dirname(dir)) {"
+          },
+          {
+            "line": 83,
+            "text": "    if (exists(path.join(dir, \".git\"))) return dir;"
+          },
+          {
+            "line": 84,
+            "text": "    dir = path.dirname(dir);"
+          },
+          {
+            "line": 85,
+            "text": "  }"
+          }
+        ],
+        "fileDigest": "d7ab00b63c5f18998e904851de0ae53a8e2f0fe4ddb771c5f024e1cb044c5bdf",
+        "edgeKind": "dynamic-path-construction",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "path.join(dir, \".git\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "read-only audit surface discovery",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Independent full source/IO trace, source/render byte comparison; no live state/local/ignored reads authorized",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Ignored/global imports and settings not opened; audit not executed, concrete user-local population unproven.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "path.join(dir, \".git\")",
+        "inventoryEdgeIds": [
+          "consumer_unresolved_7e8c9380a5185af92fa8fa82"
+        ],
+        "dispositionReason": "ROOT is --root or cwd; at/listDir/nestedAgents walk host instruction/rule/hook files, Claude imports may resolve HOME/relative paths; recursion skips .fgos. Script reports read-only stdout. No authority writer or docs/specs fallback.",
+        "accessRole": "path-construction"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-306",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/config.mjs",
+        "line": 33,
+        "columnStart": 3,
+        "columnEndExclusive": 65,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const specRoot = parseRootArg() ?? findSpecRoot(process.cwd())",
+        "callSite": "  const specRoot = parseRootArg() ?? findSpecRoot(process.cwd());",
+        "context": [
+          {
+            "line": 31,
+            "text": "/** Load and validate spec.config.yaml. Exits with helpful message on failure. */"
+          },
+          {
+            "line": 32,
+            "text": "function loadConfig() {"
+          },
+          {
+            "line": 33,
+            "text": "  const specRoot = parseRootArg() ?? findSpecRoot(process.cwd());"
+          },
+          {
+            "line": 34,
+            "text": ""
+          },
+          {
+            "line": 35,
+            "text": "  if (!specRoot) {"
+          }
+        ],
+        "fileDigest": "b0d0321a9cecd2583a2c74c540d13d9bc25a49ce63c4fecd8de5b56caef7571d",
+        "edgeKind": "root-selection",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const specRoot = parseRootArg() ?? findSpecRoot(process.cwd())",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/config.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "const specRoot = parseRootArg() ?? findSpecRoot(process.cwd())",
+        "dispositionReason": "--root wins; else upward cwd walk (max ten) finds spec.config.yaml. Example docs/ui-spec is not a hardcoded runtime default.",
+        "accessRole": "instruction-or-citation"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-307",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/config.mjs",
+        "line": 47,
+        "columnStart": 14,
+        "columnEndExclusive": 57,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "yaml.load(readFileSync(configPath, \"utf8\"))",
+        "callSite": "    config = yaml.load(readFileSync(configPath, \"utf8\")) || {};",
+        "context": [
+          {
+            "line": 45,
+            "text": "  let config;"
+          },
+          {
+            "line": 46,
+            "text": "  try {"
+          },
+          {
+            "line": 47,
+            "text": "    config = yaml.load(readFileSync(configPath, \"utf8\")) || {};"
+          },
+          {
+            "line": 48,
+            "text": "  } catch (e) {"
+          },
+          {
+            "line": 49,
+            "text": "    console.error(`ERROR: Cannot read spec.config.yaml at ${configPath}\\n  ${e.message}`);"
+          }
+        ],
+        "fileDigest": "b0d0321a9cecd2583a2c74c540d13d9bc25a49ce63c4fecd8de5b56caef7571d",
+        "edgeKind": "config-reader",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "yaml.load(readFileSync(configPath, \"utf8\"))",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/config.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "yaml.load(readFileSync(configPath, \"utf8\"))",
+        "dispositionReason": "Reads selected root/spec.config.yaml; surface_dirs/cross_cutting/schema_path determine actual input graph.",
+        "accessRole": "file-read"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-308",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/config.mjs",
+        "line": 57,
+        "columnStart": 3,
+        "columnEndExclusive": 97,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const schemaPath = join(specRoot, config.schema_path ?? \"schema/surface-contract.schema.json\")",
+        "callSite": "  const schemaPath = join(specRoot, config.schema_path ?? \"schema/surface-contract.schema.json\");",
+        "context": [
+          {
+            "line": 55,
+            "text": "  const surfaceDirs = config.surface_dirs ?? [\"screens\", \"panels\", \"modals\", \"overlays\", \"components\"];"
+          },
+          {
+            "line": 56,
+            "text": "  const crossCutting = config.cross_cutting ?? [];"
+          },
+          {
+            "line": 57,
+            "text": "  const schemaPath = join(specRoot, config.schema_path ?? \"schema/surface-contract.schema.json\");"
+          },
+          {
+            "line": 58,
+            "text": ""
+          },
+          {
+            "line": 59,
+            "text": "  return { specRoot, config, contractTag, surfaceDirs, crossCutting, schemaPath };"
+          }
+        ],
+        "fileDigest": "b0d0321a9cecd2583a2c74c540d13d9bc25a49ce63c4fecd8de5b56caef7571d",
+        "edgeKind": "schema-default",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const schemaPath = join(specRoot, config.schema_path ?? \"schema/surface-contract.schema.json\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/config.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "const schemaPath = join(specRoot, config.schema_path ?? \"schema/surface-contract.schema.json\")",
+        "dispositionReason": "Schema root override or schema/surface-contract.schema.json under selected root; no alias resolver.",
+        "accessRole": "instruction-or-citation"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-309",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/extract.mjs",
+        "line": 20,
+        "columnStart": 5,
+        "columnEndExclusive": 37,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const abs = join(SPEC_ROOT, dir)",
+        "callSite": "    const abs = join(SPEC_ROOT, dir);",
+        "context": [
+          {
+            "line": 18,
+            "text": ""
+          },
+          {
+            "line": 19,
+            "text": "  for (const dir of surfaceDirs) {"
+          },
+          {
+            "line": 20,
+            "text": "    const abs = join(SPEC_ROOT, dir);"
+          },
+          {
+            "line": 21,
+            "text": "    let entries = [];"
+          },
+          {
+            "line": 22,
+            "text": "    try { entries = readdirSync(abs); } catch { continue; }"
+          }
+        ],
+        "fileDigest": "7b4d776b9890c720852a7353a4a2ccd01b1aee644a70622cb1759b8226d1868f",
+        "edgeKind": "surface-directory-root",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const abs = join(SPEC_ROOT, dir)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/extract.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "const abs = join(SPEC_ROOT, dir)",
+        "dispositionReason": "Enumerates configured surfaceDirs, one directory level; despite recursive comment, no recursive call. .md files only; extractFile then reads/parses frontmatter + contract-tag blocks.",
+        "accessRole": "instruction-or-citation"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-310",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/extract.mjs",
+        "line": 31,
+        "columnStart": 5,
+        "columnEndExclusive": 32,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const p = f.startsWith(\"/\")",
+        "callSite": "    const p = f.startsWith(\"/\") || /^[A-Za-z]:/.test(f) ? f : join(SPEC_ROOT, f);",
+        "context": [
+          {
+            "line": 29,
+            "text": "  for (const f of crossCutting) {"
+          },
+          {
+            "line": 30,
+            "text": "    // Support both bare filenames (relative to spec root) and absolute paths"
+          },
+          {
+            "line": 31,
+            "text": "    const p = f.startsWith(\"/\") || /^[A-Za-z]:/.test(f) ? f : join(SPEC_ROOT, f);"
+          },
+          {
+            "line": 32,
+            "text": "    try { if (statSync(p).isFile()) files.push(p); } catch { /* optional */ }"
+          },
+          {
+            "line": 33,
+            "text": "  }"
+          }
+        ],
+        "fileDigest": "7b4d776b9890c720852a7353a4a2ccd01b1aee644a70622cb1759b8226d1868f",
+        "edgeKind": "cross-cutting-root",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const p = f.startsWith(\"/\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/extract.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "const p = f.startsWith(\"/\")",
+        "dispositionReason": "Absolute cross-cutting path passes through; relative path joins SPEC_ROOT. Concrete project config may name legacy paths; not assumed absent.",
+        "accessRole": "instruction-or-citation"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-311",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/extract.mjs",
+        "line": 68,
+        "columnStart": 3,
+        "columnEndExclusive": 44,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const raw = readFileSync(absPath, \"utf8\")",
+        "callSite": "  const raw = readFileSync(absPath, \"utf8\");",
+        "context": [
+          {
+            "line": 66,
+            "text": "/** Parse one file -> { file, id, meta, contract, blockCount, errors[] } */"
+          },
+          {
+            "line": 67,
+            "text": "export function extractFile(absPath) {"
+          },
+          {
+            "line": 68,
+            "text": "  const raw = readFileSync(absPath, \"utf8\");"
+          },
+          {
+            "line": 69,
+            "text": "  const rel = relative(SPEC_ROOT, absPath).replace(/\\\\/g, \"/\");"
+          },
+          {
+            "line": 70,
+            "text": "  const errors = [];"
+          }
+        ],
+        "fileDigest": "7b4d776b9890c720852a7353a4a2ccd01b1aee644a70622cb1759b8226d1868f",
+        "edgeKind": "surface-reader",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const raw = readFileSync(absPath, \"utf8\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/extract.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "const raw = readFileSync(absPath, \"utf8\")",
+        "dispositionReason": "Actual surface file read; configured root/list above determines input. extractAll returns parsed contracts in memory.",
+        "accessRole": "file-read"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-312",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/validate.mjs",
+        "line": 20,
+        "columnStart": 1,
+        "columnEndExclusive": 60,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const schema = JSON.parse(readFileSync(schemaPath, \"utf8\"))",
+        "callSite": "const schema = JSON.parse(readFileSync(schemaPath, \"utf8\"));",
+        "context": [
+          {
+            "line": 18,
+            "text": "  process.exit(1);"
+          },
+          {
+            "line": 19,
+            "text": "}"
+          },
+          {
+            "line": 20,
+            "text": "const schema = JSON.parse(readFileSync(schemaPath, \"utf8\"));"
+          },
+          {
+            "line": 21,
+            "text": "const ajv = new Ajv({ allErrors: true, strict: false });"
+          },
+          {
+            "line": 22,
+            "text": "const validateSchema = ajv.compile(schema);"
+          }
+        ],
+        "fileDigest": "3aad75b05175fc29da2855be2f3d5cc70948161e131b53286d4874a9ae9e969b",
+        "edgeKind": "schema-reader",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const schema = JSON.parse(readFileSync(schemaPath, \"utf8\"))",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/validate.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "const schema = JSON.parse(readFileSync(schemaPath, \"utf8\"))",
+        "dispositionReason": "Validation reads selected schema path, then direct configured catalog/overview/flow reads below.",
+        "accessRole": "file-read"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-313",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/validate.mjs",
+        "line": 188,
+        "columnStart": 17,
+        "columnEndExclusive": 67,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "readFileSync(join(SPEC_ROOT, catalogName), \"utf8\")",
+        "callSite": "    const raw = readFileSync(join(SPEC_ROOT, catalogName), \"utf8\");",
+        "context": [
+          {
+            "line": 186,
+            "text": "  const catalogName = readdirSync(SPEC_ROOT).find((n) => /states/i.test(n) && n.endsWith(\".md\"));"
+          },
+          {
+            "line": 187,
+            "text": "  if (catalogName) {"
+          },
+          {
+            "line": 188,
+            "text": "    const raw = readFileSync(join(SPEC_ROOT, catalogName), \"utf8\");"
+          },
+          {
+            "line": 189,
+            "text": "    for (const mm of raw.matchAll(/^#{2,4}\\s+(ST-[A-Za-z0-9-]+)/gm)) stateCatalog.add(mm[1]);"
+          },
+          {
+            "line": 190,
+            "text": "  }"
+          }
+        ],
+        "fileDigest": "3aad75b05175fc29da2855be2f3d5cc70948161e131b53286d4874a9ae9e969b",
+        "edgeKind": "catalog-reader",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "readFileSync(join(SPEC_ROOT, catalogName), \"utf8\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/validate.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "readFileSync(join(SPEC_ROOT, catalogName), \"utf8\")",
+        "dispositionReason": "Reads surface catalog directly from spec root; configured filename default checked in source.",
+        "accessRole": "file-read"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-314",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/validate.mjs",
+        "line": 196,
+        "columnStart": 17,
+        "columnEndExclusive": 62,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "readFileSync(join(SPEC_ROOT, f.file), \"utf8\")",
+        "callSite": "    try { raw = readFileSync(join(SPEC_ROOT, f.file), \"utf8\"); } catch { continue; }",
+        "context": [
+          {
+            "line": 194,
+            "text": "    if (!f.meta?.id || f.meta.id === \"states-errors\") continue;"
+          },
+          {
+            "line": 195,
+            "text": "    let raw;"
+          },
+          {
+            "line": 196,
+            "text": "    try { raw = readFileSync(join(SPEC_ROOT, f.file), \"utf8\"); } catch { continue; }"
+          },
+          {
+            "line": 197,
+            "text": "    const flagged = new Set();"
+          },
+          {
+            "line": 198,
+            "text": "    for (const mm of raw.matchAll(/\\bST-[A-Za-z0-9-]+/g)) {"
+          }
+        ],
+        "fileDigest": "3aad75b05175fc29da2855be2f3d5cc70948161e131b53286d4874a9ae9e969b",
+        "edgeKind": "flow-reader",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "readFileSync(join(SPEC_ROOT, f.file), \"utf8\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/validate.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "readFileSync(join(SPEC_ROOT, f.file), \"utf8\")",
+        "dispositionReason": "Reads flow files from extracted specs to validate references.",
+        "accessRole": "file-read"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-315",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/validate.mjs",
+        "line": 216,
+        "columnStart": 17,
+        "columnEndExclusive": 62,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "readFileSync(join(SPEC_ROOT, ovName), \"utf8\")",
+        "callSite": "    const raw = readFileSync(join(SPEC_ROOT, ovName), \"utf8\");",
+        "context": [
+          {
+            "line": 214,
+            "text": "  const ovName = readdirSync(SPEC_ROOT).find((n) => /overview/i.test(n) && n.endsWith(\".md\"));"
+          },
+          {
+            "line": 215,
+            "text": "  if (ovName && surfaceNameById.size) {"
+          },
+          {
+            "line": 216,
+            "text": "    const raw = readFileSync(join(SPEC_ROOT, ovName), \"utf8\");"
+          },
+          {
+            "line": 217,
+            "text": "    const inOverview = new Set();"
+          },
+          {
+            "line": 218,
+            "text": "    for (const mm of raw.matchAll(/^\\|\\s*([A-Z]{1,2}\\d+)\\s*\\|\\s*([^|]+?)\\s*\\|/gm)) {"
+          }
+        ],
+        "fileDigest": "3aad75b05175fc29da2855be2f3d5cc70948161e131b53286d4874a9ae9e969b",
+        "edgeKind": "overview-reader",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "readFileSync(join(SPEC_ROOT, ovName), \"utf8\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/validate.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "readFileSync(join(SPEC_ROOT, ovName), \"utf8\")",
+        "dispositionReason": "Reads overview directly from spec root to check required catalog linkage.",
+        "accessRole": "file-read"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-316",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/build.mjs",
+        "line": 10,
+        "columnStart": 1,
+        "columnEndExclusive": 41,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const OUT = join(SPEC_ROOT, \"generated\")",
+        "callSite": "const OUT = join(SPEC_ROOT, \"generated\");",
+        "context": [
+          {
+            "line": 8,
+            "text": "import { extractAll, SPEC_ROOT } from \"./extract.mjs\";"
+          },
+          {
+            "line": 9,
+            "text": ""
+          },
+          {
+            "line": 10,
+            "text": "const OUT = join(SPEC_ROOT, \"generated\");"
+          },
+          {
+            "line": 11,
+            "text": "mkdirSync(OUT, { recursive: true });"
+          },
+          {
+            "line": 12,
+            "text": ""
+          }
+        ],
+        "fileDigest": "a68cfd1d507c0d8eb106488df3c060f6b9b1b26a4e3b269aefbd6b94267d0003",
+        "edgeKind": "projection-output-root",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const OUT = join(SPEC_ROOT, \"generated\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<SPEC_ROOT>/generated/{surface-registry.yaml,navigation-graph.yaml,action-registry.csv,coverage-report.md}",
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/build.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<SPEC_ROOT>/generated/{surface-registry.yaml,navigation-graph.yaml,action-registry.csv,coverage-report.md}",
+          "activeAlias": false,
+          "status": "code trace only; config-selected external project root"
+        },
+        "normalizedReference": "const OUT = join(SPEC_ROOT, \"generated\")",
+        "dispositionReason": "Existing compiler produces surface-registry.yaml, navigation-graph.yaml, action-registry.csv, coverage-report.md under selected root/generated. No platform prose owner inference.",
+        "accessRole": "file-write"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-317",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/rename.mjs",
+        "line": 51,
+        "columnStart": 1,
+        "columnEndExclusive": 29,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const files = walk(specRoot)",
+        "callSite": "const files = walk(specRoot);",
+        "context": [
+          {
+            "line": 49,
+            "text": "}"
+          },
+          {
+            "line": 50,
+            "text": ""
+          },
+          {
+            "line": 51,
+            "text": "const files = walk(specRoot);"
+          },
+          {
+            "line": 52,
+            "text": "let totalHits = 0, filesChanged = 0, filesRenamed = 0;"
+          },
+          {
+            "line": 53,
+            "text": ""
+          }
+        ],
+        "fileDigest": "2ac5be25f8c9862d71132fd87a95d5cd2642973d1cb5fa19de566dfcfdedd23d",
+        "edgeKind": "rename-scope",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const files = walk(specRoot)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<SPEC_ROOT>/<matched spec files>, --apply only",
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/rename.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<SPEC_ROOT>/<matched spec files>, --apply only",
+          "activeAlias": false,
+          "status": "code trace only; config-selected external project root"
+        },
+        "normalizedReference": "const files = walk(specRoot)",
+        "dispositionReason": "Walk recursively selects .md files, skipping generated and node_modules; preview default, --apply writes token replacements/renames inside selected root. Does not activate authority aliases.",
+        "accessRole": "instruction-or-citation"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-318",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/rename.mjs",
+        "line": 70,
+        "columnStart": 5,
+        "columnEndExclusive": 73,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "if (hits) writeFileSync(p, content.replace(tokenRe, newTok), \"utf8\")",
+        "callSite": "    if (hits) writeFileSync(p, content.replace(tokenRe, newTok), \"utf8\");",
+        "context": [
+          {
+            "line": 68,
+            "text": ""
+          },
+          {
+            "line": 69,
+            "text": "  if (apply) {"
+          },
+          {
+            "line": 70,
+            "text": "    if (hits) writeFileSync(p, content.replace(tokenRe, newTok), \"utf8\");"
+          },
+          {
+            "line": 71,
+            "text": "    if (willRename) renameSync(p, join(dirname(p), newBase));"
+          },
+          {
+            "line": 72,
+            "text": "  }"
+          }
+        ],
+        "fileDigest": "2ac5be25f8c9862d71132fd87a95d5cd2642973d1cb5fa19de566dfcfdedd23d",
+        "edgeKind": "rename-writer",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "if (hits) writeFileSync(p, content.replace(tokenRe, newTok), \"utf8\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<SPEC_ROOT>/<matched file>",
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/rename.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<SPEC_ROOT>/<matched file>",
+          "activeAlias": false,
+          "status": "code trace only; config-selected external project root"
+        },
+        "normalizedReference": "if (hits) writeFileSync(p, content.replace(tokenRe, newTok), \"utf8\")",
+        "dispositionReason": "Apply gate controls byte rewrite in existing selected files; root graph above must be pinned for repository cutover.",
+        "accessRole": "file-write"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-319",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/interpret.mjs",
+        "line": 69,
+        "columnStart": 5,
+        "columnEndExclusive": 53,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const rawPath = join(specRoot, item.file.replace",
+        "callSite": "    const rawPath = join(specRoot, item.file.replace(/\\//g, require_sep()));",
+        "context": [
+          {
+            "line": 67,
+            "text": "  const surfaces = [];"
+          },
+          {
+            "line": 68,
+            "text": "  for (const item of extractAll()) {"
+          },
+          {
+            "line": 69,
+            "text": "    const rawPath = join(specRoot, item.file.replace(/\\//g, require_sep()));"
+          },
+          {
+            "line": 70,
+            "text": "    let prose = \"\";"
+          },
+          {
+            "line": 71,
+            "text": "    let asciiLayout = null;"
+          }
+        ],
+        "fileDigest": "c2df4cf371ca7560dd550b4347bf02eada70fdbc08c8dfc53b306453698d7360",
+        "edgeKind": "interpreter-reader-root",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const rawPath = join(specRoot, item.file.replace",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/interpret.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "const rawPath = join(specRoot, item.file.replace",
+        "dispositionReason": "Selected spec root plus item.file; read raw surface markdown to render cards.",
+        "accessRole": "file-read"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-320",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/interpret.mjs",
+        "line": 767,
+        "columnStart": 1,
+        "columnEndExclusive": 37,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "writeFileSync(outPath, html, \"utf8\")",
+        "callSite": "writeFileSync(outPath, html, \"utf8\");",
+        "context": [
+          {
+            "line": 765,
+            "text": "const outPath = join(genDir, \"wireframe.html\");"
+          },
+          {
+            "line": 766,
+            "text": "const html = buildHtml(surfaces);"
+          },
+          {
+            "line": 767,
+            "text": "writeFileSync(outPath, html, \"utf8\");"
+          },
+          {
+            "line": 768,
+            "text": ""
+          },
+          {
+            "line": 769,
+            "text": "console.log(`  Wireframe written: ${outPath}`);"
+          }
+        ],
+        "fileDigest": "c2df4cf371ca7560dd550b4347bf02eada70fdbc08c8dfc53b306453698d7360",
+        "edgeKind": "html-writer",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "writeFileSync(outPath, html, \"utf8\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<SPEC_ROOT>/generated/wireframe.html",
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/interpret.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<SPEC_ROOT>/generated/wireframe.html",
+          "activeAlias": false,
+          "status": "code trace only; config-selected external project root"
+        },
+        "normalizedReference": "writeFileSync(outPath, html, \"utf8\")",
+        "dispositionReason": "Generated selected-root HTML output; retain exact filename from surrounding code, no generic authority root substitution.",
+        "accessRole": "file-write"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-321",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+        "line": 31,
+        "columnStart": 5,
+        "columnEndExclusive": 53,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const rawPath = join(specRoot, item.file.replace",
+        "callSite": "    const rawPath = join(specRoot, item.file.replace(/\\//g, sep));",
+        "context": [
+          {
+            "line": 29,
+            "text": "  for (const item of extractAll()) {"
+          },
+          {
+            "line": 30,
+            "text": "    // Normalise '/' → platform sep for Windows readFileSync"
+          },
+          {
+            "line": 31,
+            "text": "    const rawPath = join(specRoot, item.file.replace(/\\//g, sep));"
+          },
+          {
+            "line": 32,
+            "text": "    let prose = \"\";"
+          },
+          {
+            "line": 33,
+            "text": "    let asciiLayout = null;"
+          }
+        ],
+        "fileDigest": "8c0fa98aa67c8634a415a95dfaa75c9162aeddeb6b1423ab6b2f9e250cfb7a38",
+        "edgeKind": "wireframe-reader-root",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const rawPath = join(specRoot, item.file.replace",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "const rawPath = join(specRoot, item.file.replace",
+        "dispositionReason": "Selected root plus surface-relative item.file normalized to platform separators; contract parser drives render.",
+        "accessRole": "file-read"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-322",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+        "line": 83,
+        "columnStart": 1,
+        "columnEndExclusive": 37,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "writeFileSync(outPath, html, \"utf8\")",
+        "callSite": "writeFileSync(outPath, html, \"utf8\");",
+        "context": [
+          {
+            "line": 81,
+            "text": "const outPath = join(genDir, \"wireframe-v2.html\");"
+          },
+          {
+            "line": 82,
+            "text": "const html = buildHtml(surfaces);"
+          },
+          {
+            "line": 83,
+            "text": "writeFileSync(outPath, html, \"utf8\");"
+          },
+          {
+            "line": 84,
+            "text": ""
+          },
+          {
+            "line": 85,
+            "text": "console.log(`  Wireframe v2 written: ${outPath}`);"
+          }
+        ],
+        "fileDigest": "8c0fa98aa67c8634a415a95dfaa75c9162aeddeb6b1423ab6b2f9e250cfb7a38",
+        "edgeKind": "wireframe-writer",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "writeFileSync(outPath, html, \"utf8\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<SPEC_ROOT>/generated/wireframe-v2.html",
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete project configs/absolute cross-cutting inputs and generated behavior parity not executed; keep dependent cutover parked.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<SPEC_ROOT>/generated/wireframe-v2.html",
+          "activeAlias": false,
+          "status": "code trace only; config-selected external project root"
+        },
+        "normalizedReference": "writeFileSync(outPath, html, \"utf8\")",
+        "dispositionReason": "Generates wireframe HTML beneath selected root/generated; parity includes linked/client assets.",
+        "accessRole": "file-write"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-323",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+        "line": 14,
+        "columnStart": 1,
+        "columnEndExclusive": 101,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const HTML_PATH = resolve(__dir, \"../../../../../frontend/docs/ui-spec/generated/wireframe-v2.html\")",
+        "callSite": "const HTML_PATH = resolve(__dir, \"../../../../../frontend/docs/ui-spec/generated/wireframe-v2.html\");",
+        "context": [
+          {
+            "line": 12,
+            "text": "const __dir = dirname(fileURLToPath(import.meta.url));"
+          },
+          {
+            "line": 13,
+            "text": "// __dir = .agents/skills/ui-spec/tools/wireframe → 5 levels up to git root"
+          },
+          {
+            "line": 14,
+            "text": "const HTML_PATH = resolve(__dir, \"../../../../../frontend/docs/ui-spec/generated/wireframe-v2.html\");"
+          },
+          {
+            "line": 15,
+            "text": ""
+          },
+          {
+            "line": 16,
+            "text": "const errors = [];"
+          }
+        ],
+        "fileDigest": "4ccfe507ee89995f39dd6aacc368c483a1b97ac9beacd101a7c9e93d2666db78",
+        "edgeKind": "hardcoded-smoke-reader-root",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const HTML_PATH = resolve(__dir, \"../../../../../frontend/docs/ui-spec/generated/wireframe-v2.html\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": null,
+        "desiredAnchor": "compiler/config IO contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Pin explicit root/config/schema/surface set; compare compiler outputs and DOM smoke behavior with the same inputs in an authorized parity batch; do not run write-producing tools here",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Fixed frontend/docs/ui-spec/generated/wireframe-v2.html absent; cannot claim smoke parity or repoint to candidate until Lead settles actual repository invocation root.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": null,
+        "normalizedReference": "const HTML_PATH = resolve(__dir, \"../../../../../frontend/docs/ui-spec/generated/wireframe-v2.html\")",
+        "dispositionReason": "This smoke checker does NOT use config.mjs/--root. It reads a fixed frontend/docs/ui-spec generated HTML path, then jsdom drives DOM events. frontend path is absent in tracked checkout; portability/parity gap, not evidence of clean behavior.",
+        "accessRole": "file-read"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-324",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+        "line": 26,
+        "columnStart": 1,
+        "columnEndExclusive": 35,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const REFS_DIR = \"docs/distillery\"",
+        "callSite": "const REFS_DIR = \"docs/distillery\";",
+        "context": [
+          {
+            "line": 24,
+            "text": "import process from \"node:process\";"
+          },
+          {
+            "line": 25,
+            "text": ""
+          },
+          {
+            "line": 26,
+            "text": "const REFS_DIR = \"docs/distillery\";"
+          },
+          {
+            "line": 27,
+            "text": "const CLONES_DIR = \"upstreams\";"
+          },
+          {
+            "line": 28,
+            "text": "const MARK_START = \"# DISTILL:START\";"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "learning-root",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const REFS_DIR = \"docs/distillery\"",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<root>/docs/distillery/",
+        "desiredAnchor": "project learning contract",
+        "sourceVsRender": "generated byte-identical copy; existing assembly/wrapper/mirror source rule",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Exact bytes/context and route/target passage review; no authority inferred from candidate path",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/",
+          "activeAlias": false,
+          "status": "code-derived; external project population not read"
+        },
+        "normalizedReference": "const REFS_DIR = \"docs/distillery\"",
+        "regeneration": "npm run build:skills in a later authorized batch; never hand-edit render; deterministic second run and every declared render path needed",
+        "dispositionReason": "Learning area stays docs/distillery under consumer-project root; not an authority migration root.",
+        "accessRole": "instruction-or-citation",
+        "canonicalEdgeIds": [
+          "skills-330"
+        ],
+        "priorCanonicalHistoryEdges": []
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-325",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+        "line": 41,
+        "columnStart": 3,
+        "columnEndExclusive": 33,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "fs.writeFileSync(tmp, content)",
+        "callSite": "  fs.writeFileSync(tmp, content);",
+        "context": [
+          {
+            "line": 39,
+            "text": "function writeAtomic(file, content) {"
+          },
+          {
+            "line": 40,
+            "text": "  const tmp = `${file}.tmp`;"
+          },
+          {
+            "line": 41,
+            "text": "  fs.writeFileSync(tmp, content);"
+          },
+          {
+            "line": 42,
+            "text": "  fs.renameSync(tmp, file);"
+          },
+          {
+            "line": 43,
+            "text": "}"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "atomic-learning-writer",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "fs.writeFileSync(tmp, content)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<root>/docs/distillery/<selected learning artifact>",
+        "desiredAnchor": "project learning contract",
+        "sourceVsRender": "generated byte-identical copy; existing assembly/wrapper/mirror source rule",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Exact bytes/context and route/target passage review; no authority inferred from candidate path",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/<selected learning artifact>",
+          "activeAlias": false,
+          "status": "code-derived; external project population not read"
+        },
+        "normalizedReference": "fs.writeFileSync(tmp, content)",
+        "regeneration": "npm run build:skills in a later authorized batch; never hand-edit render; deterministic second run and every declared render path needed",
+        "dispositionReason": "writeAtomic writes file.tmp then renames, used by init/add/seal/move. Source/cursor and porting log destinations traced by dynamic rows.",
+        "accessRole": "file-write",
+        "canonicalEdgeIds": [
+          "skills-331"
+        ],
+        "priorCanonicalHistoryEdges": []
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-326",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".agents/skills/distill/scripts/distill.mjs",
+        "line": 587,
+        "columnStart": 3,
+        "columnEndExclusive": 54,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const stateDir = path.join(root, REFS_DIR, \"state\")",
+        "callSite": "  const stateDir = path.join(root, REFS_DIR, \"state\");",
+        "context": [
+          {
+            "line": 585,
+            "text": "    );"
+          },
+          {
+            "line": 586,
+            "text": "  const root = requireRoot(args);"
+          },
+          {
+            "line": 587,
+            "text": "  const stateDir = path.join(root, REFS_DIR, \"state\");"
+          },
+          {
+            "line": 588,
+            "text": "  const logFile = path.join(root, REFS_DIR, \"porting-log.md\");"
+          },
+          {
+            "line": 589,
+            "text": ""
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "learning-state-root",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const stateDir = path.join(root, REFS_DIR, \"state\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<root>/docs/distillery/state/",
+        "desiredAnchor": "project learning contract",
+        "sourceVsRender": "generated byte-identical copy; existing assembly/wrapper/mirror source rule",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Exact bytes/context and route/target passage review; no authority inferred from candidate path",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/state/",
+          "activeAlias": false,
+          "status": "code-derived; external project population not read"
+        },
+        "normalizedReference": "const stateDir = path.join(root, REFS_DIR, \"state\")",
+        "regeneration": "npm run build:skills in a later authorized batch; never hand-edit render; deterministic second run and every declared render path needed",
+        "dispositionReason": "Porting state layer below docs/distillery/state, not .fgos state; path cannot prove current live/external population.",
+        "accessRole": "instruction-or-citation",
+        "canonicalEdgeIds": [
+          "skills-332"
+        ],
+        "priorCanonicalHistoryEdges": []
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-327",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+        "line": 26,
+        "columnStart": 1,
+        "columnEndExclusive": 35,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const REFS_DIR = \"docs/distillery\"",
+        "callSite": "const REFS_DIR = \"docs/distillery\";",
+        "context": [
+          {
+            "line": 24,
+            "text": "import process from \"node:process\";"
+          },
+          {
+            "line": 25,
+            "text": ""
+          },
+          {
+            "line": 26,
+            "text": "const REFS_DIR = \"docs/distillery\";"
+          },
+          {
+            "line": 27,
+            "text": "const CLONES_DIR = \"upstreams\";"
+          },
+          {
+            "line": 28,
+            "text": "const MARK_START = \"# DISTILL:START\";"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "learning-root",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const REFS_DIR = \"docs/distillery\"",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<root>/docs/distillery/",
+        "desiredAnchor": "project learning contract",
+        "sourceVsRender": "generated byte-identical copy; existing assembly/wrapper/mirror source rule",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Exact bytes/context and route/target passage review; no authority inferred from candidate path",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/",
+          "activeAlias": false,
+          "status": "code-derived; external project population not read"
+        },
+        "normalizedReference": "const REFS_DIR = \"docs/distillery\"",
+        "regeneration": "npm run build:skills in a later authorized batch; never hand-edit render; deterministic second run and every declared render path needed",
+        "dispositionReason": "Learning area stays docs/distillery under consumer-project root; not an authority migration root.",
+        "accessRole": "instruction-or-citation",
+        "canonicalEdgeIds": [
+          "skills-330"
+        ],
+        "priorCanonicalHistoryEdges": []
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-328",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+        "line": 41,
+        "columnStart": 3,
+        "columnEndExclusive": 33,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "fs.writeFileSync(tmp, content)",
+        "callSite": "  fs.writeFileSync(tmp, content);",
+        "context": [
+          {
+            "line": 39,
+            "text": "function writeAtomic(file, content) {"
+          },
+          {
+            "line": 40,
+            "text": "  const tmp = `${file}.tmp`;"
+          },
+          {
+            "line": 41,
+            "text": "  fs.writeFileSync(tmp, content);"
+          },
+          {
+            "line": 42,
+            "text": "  fs.renameSync(tmp, file);"
+          },
+          {
+            "line": 43,
+            "text": "}"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "atomic-learning-writer",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "fs.writeFileSync(tmp, content)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<root>/docs/distillery/<selected learning artifact>",
+        "desiredAnchor": "project learning contract",
+        "sourceVsRender": "generated byte-identical copy; existing assembly/wrapper/mirror source rule",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Exact bytes/context and route/target passage review; no authority inferred from candidate path",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/<selected learning artifact>",
+          "activeAlias": false,
+          "status": "code-derived; external project population not read"
+        },
+        "normalizedReference": "fs.writeFileSync(tmp, content)",
+        "regeneration": "npm run build:skills in a later authorized batch; never hand-edit render; deterministic second run and every declared render path needed",
+        "dispositionReason": "writeAtomic writes file.tmp then renames, used by init/add/seal/move. Source/cursor and porting log destinations traced by dynamic rows.",
+        "accessRole": "file-write",
+        "canonicalEdgeIds": [
+          "skills-331"
+        ],
+        "priorCanonicalHistoryEdges": []
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-329",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": ".claude/skills/distill/scripts/distill.mjs",
+        "line": 587,
+        "columnStart": 3,
+        "columnEndExclusive": 54,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const stateDir = path.join(root, REFS_DIR, \"state\")",
+        "callSite": "  const stateDir = path.join(root, REFS_DIR, \"state\");",
+        "context": [
+          {
+            "line": 585,
+            "text": "    );"
+          },
+          {
+            "line": 586,
+            "text": "  const root = requireRoot(args);"
+          },
+          {
+            "line": 587,
+            "text": "  const stateDir = path.join(root, REFS_DIR, \"state\");"
+          },
+          {
+            "line": 588,
+            "text": "  const logFile = path.join(root, REFS_DIR, \"porting-log.md\");"
+          },
+          {
+            "line": 589,
+            "text": ""
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "learning-state-root",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const stateDir = path.join(root, REFS_DIR, \"state\")",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<root>/docs/distillery/state/",
+        "desiredAnchor": "project learning contract",
+        "sourceVsRender": "generated byte-identical copy; existing assembly/wrapper/mirror source rule",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Exact bytes/context and route/target passage review; no authority inferred from candidate path",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/state/",
+          "activeAlias": false,
+          "status": "code-derived; external project population not read"
+        },
+        "normalizedReference": "const stateDir = path.join(root, REFS_DIR, \"state\")",
+        "regeneration": "npm run build:skills in a later authorized batch; never hand-edit render; deterministic second run and every declared render path needed",
+        "dispositionReason": "Porting state layer below docs/distillery/state, not .fgos state; path cannot prove current live/external population.",
+        "accessRole": "instruction-or-citation",
+        "canonicalEdgeIds": [
+          "skills-332"
+        ],
+        "priorCanonicalHistoryEdges": []
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-330",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 26,
+        "columnStart": 1,
+        "columnEndExclusive": 35,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "const REFS_DIR = \"docs/distillery\"",
+        "callSite": "const REFS_DIR = \"docs/distillery\";",
+        "context": [
+          {
+            "line": 24,
+            "text": "import process from \"node:process\";"
+          },
+          {
+            "line": 25,
+            "text": ""
+          },
+          {
+            "line": 26,
+            "text": "const REFS_DIR = \"docs/distillery\";"
+          },
+          {
+            "line": 27,
+            "text": "const CLONES_DIR = \"upstreams\";"
+          },
+          {
+            "line": 28,
+            "text": "const MARK_START = \"# DISTILL:START\";"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "learning-root",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "const REFS_DIR = \"docs/distillery\"",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<root>/docs/distillery/",
+        "desiredAnchor": "project learning contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Exact bytes/context and route/target passage review; no authority inferred from candidate path",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/",
+          "activeAlias": false,
+          "status": "code-derived; external project population not read"
+        },
+        "normalizedReference": "const REFS_DIR = \"docs/distillery\"",
+        "dispositionReason": "Learning area stays docs/distillery under consumer-project root; not an authority migration root.",
+        "accessRole": "instruction-or-citation"
+      }
+    },
+    {
+      "reviewClass": "skills-prompts",
+      "data": {
+        "edgeId": "skills-331",
+        "surfaceClass": "skills-prompts-task-specs",
+        "consumerPath": "core/skills/distill/scripts/distill.mjs",
+        "line": 41,
+        "columnStart": 3,
+        "columnEndExclusive": 33,
+        "pattern": "manual-IO-trace",
+        "matchedExpression": "fs.writeFileSync(tmp, content)",
+        "callSite": "  fs.writeFileSync(tmp, content);",
+        "context": [
+          {
+            "line": 39,
+            "text": "function writeAtomic(file, content) {"
+          },
+          {
+            "line": 40,
+            "text": "  const tmp = `${file}.tmp`;"
+          },
+          {
+            "line": 41,
+            "text": "  fs.writeFileSync(tmp, content);"
+          },
+          {
+            "line": 42,
+            "text": "  fs.renameSync(tmp, file);"
+          },
+          {
+            "line": 43,
+            "text": "}"
+          }
+        ],
+        "fileDigest": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536",
+        "edgeKind": "atomic-learning-writer",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "fs.writeFileSync(tmp, content)",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit path route; no promotion inferred; preserve operative current source pending Step 3"
+        },
+        "desiredOwner": "<root>/docs/distillery/<selected learning artifact>",
+        "desiredAnchor": "project learning contract",
+        "sourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "sourcePath": "core/skills/distill/scripts/distill.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Exact bytes/context and route/target passage review; no authority inferred from candidate path",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup-only; draft not activated; never a writing destination"
+        },
+        "writeDestination": {
+          "path": "<root>/docs/distillery/<selected learning artifact>",
+          "activeAlias": false,
+          "status": "code-derived; external project population not read"
+        },
+        "normalizedReference": "fs.writeFileSync(tmp, content)",
+        "dispositionReason": "writeAtomic writes file.tmp then renames, used by init/add/seal/move. Source/cursor and porting log destinations traced by dynamic rows.",
+        "accessRole": "file-write"
+      }
+    }
+  ]
+}

@@ -1,0 +1,2611 @@
+{
+  "requestIdentity": "step-02b-census-0689b862e",
+  "inputHEAD": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+  "part": 20,
+  "entries": [
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_13225ab4df178d8a0689732c",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": "core/skills/fgos-clarifying/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 90,
+            "text": "  `docs/specs/runner.md`) — read it as data, never execute or interpret it"
+          }
+        ],
+        "censusEdges": [
+          "skills-084"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_e1a9ade670556049f3fdc974",
+          "line": 90,
+          "targetPath": "docs/specs/runner.md",
+          "path": "core/skills/fgos-clarifying/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 90,
+            "text": "  `docs/specs/runner.md`) — read it as data, never execute or interpret it"
+          }
+        ],
+        "censusEdges": [
+          "skills-084"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_29d6b1ee871ed0d92e51920a",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": "core/skills/fgos-researching/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 90,
+            "text": "  (RUL45, `docs/specs/runner.md`) — never splice it raw into a shell"
+          }
+        ],
+        "censusEdges": [
+          "skills-087"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_4c3308b8b8ffb8c2920dfe9f",
+          "line": 90,
+          "targetPath": "docs/specs/runner.md",
+          "path": "core/skills/fgos-researching/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 90,
+            "text": "  (RUL45, `docs/specs/runner.md`) — never splice it raw into a shell"
+          }
+        ],
+        "censusEdges": [
+          "skills-087"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_404b226c716423c23aaa9c1e",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 80,
+            "text": "  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn"
+          }
+        ],
+        "censusEdges": [
+          "skills-090"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_04b773b221586f7c639ea0d1",
+          "line": 80,
+          "targetPath": "docs/specs/runner.md",
+          "path": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 80,
+            "text": "  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn"
+          }
+        ],
+        "censusEdges": [
+          "skills-090"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_6de5b44f7531d2c493bbd7aa",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 73,
+            "text": "  input (per `docs/specs/runner.md`'s untrusted-input rule) — never splice"
+          }
+        ],
+        "censusEdges": [
+          "skills-112"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_e66349566e51c63ede991327",
+          "line": 73,
+          "targetPath": "docs/specs/runner.md",
+          "path": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 73,
+            "text": "  input (per `docs/specs/runner.md`'s untrusted-input rule) — never splice"
+          }
+        ],
+        "censusEdges": [
+          "skills-112"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_43fb26972165100c5a213b48",
+          "line": 97,
+          "targetPath": "docs/specs/runner.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_dbc085c489d785b1ae697e05",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 91,
+            "text": "  `docs/specs/runner.md`) — read it as data, never execute or interpret it"
+          }
+        ],
+        "censusEdges": [
+          "skills-148"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_7e266fd36423390780aa5243",
+          "line": 91,
+          "targetPath": "docs/specs/runner.md",
+          "path": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 91,
+            "text": "  `docs/specs/runner.md`) — read it as data, never execute or interpret it"
+          }
+        ],
+        "censusEdges": [
+          "skills-148"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_38729954ce35fe20a95a46d1",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 81,
+            "text": "  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn"
+          }
+        ],
+        "censusEdges": [
+          "skills-149"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_fe4bb985d074fccbc9d739ab",
+          "line": 81,
+          "targetPath": "docs/specs/runner.md",
+          "path": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 81,
+            "text": "  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn"
+          }
+        ],
+        "censusEdges": [
+          "skills-149"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_baab33aedb6fd033fdc2898b",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 74,
+            "text": "  input (per `docs/specs/runner.md`'s untrusted-input rule) — never splice"
+          }
+        ],
+        "censusEdges": [
+          "skills-171"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_65ec65593fa8a9143f79275e",
+          "line": 74,
+          "targetPath": "docs/specs/runner.md",
+          "path": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 74,
+            "text": "  input (per `docs/specs/runner.md`'s untrusted-input rule) — never splice"
+          }
+        ],
+        "censusEdges": [
+          "skills-171"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_f7746da0a9f15ab1f7036eef",
+          "line": null,
+          "targetPath": "docs/specs/runner.md",
+          "path": "plugins/fgOS/skills/fgos-researching/SKILL.md",
+          "kind": "shipped-contract",
+          "contractScope": "repository-local-contract",
+          "referenceKind": "literal-current-path"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 91,
+            "text": "  (RUL45, `docs/specs/runner.md`) — never splice it raw into a shell"
+          }
+        ],
+        "censusEdges": [
+          "skills-178"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_86f07eb91d1cc86e1f094678",
+          "line": 91,
+          "targetPath": "docs/specs/runner.md",
+          "path": "plugins/fgOS/skills/fgos-researching/SKILL.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentExactTargetOccurrences": [
+          {
+            "line": 91,
+            "text": "  (RUL45, `docs/specs/runner.md`) — never splice it raw into a shell"
+          }
+        ],
+        "censusEdges": [
+          "skills-178"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_a3b664d8a2dca49d859ccac0",
+          "line": 97,
+          "targetPath": "docs/specs/system-overview.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_7036fe90479303764d2ef3c9",
+          "line": 96,
+          "targetPath": "docs/specs/system-overview.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_1d3f23d0265bb2137a93c4b8",
+          "line": 97,
+          "targetPath": "docs/specs/system-overview.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_3816eb292891488741a7a989",
+          "line": 97,
+          "targetPath": "docs/specs/work-state.md",
+          "path": ".agents/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-008",
+          "skills-009"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_3e45f024194d0137d63c7ce3",
+          "line": 96,
+          "targetPath": "docs/specs/work-state.md",
+          "path": "core/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-077",
+          "skills-078"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_7ac9945bfb3c16056abede64",
+          "line": 97,
+          "targetPath": "docs/specs/work-state.md",
+          "path": "plugins/fgOS/skills/_shared/citation-format.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/specs/*.md"
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-125",
+          "skills-126"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_ef4807119dbe6fad689eda28",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 122,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/sources/**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"sources\", `${name}.md`)",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_af934f6e58fc0f60a2ccd263",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 128,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/sources",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"sources\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_13cccdbf3ee4e9ac5f8bd5e8",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 129,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/sources",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"sources\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_7ae3a51d6b4a2d98cf2af19f",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 141,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/taxonomy.txt",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"taxonomy.txt\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_143ef0cfff6da1a4a5333958",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 148,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, meta.local || path.join(CLONES_DIR, name))",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_0b65e509abb6b2fb4ca85c02",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 148,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(CLONES_DIR, name)",
+          "unresolvedRoot": "CLONES_DIR",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_d5755771f2fa78222e911494",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 156,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/sources",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"sources\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_26f58b11462a4c4b0397744a",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 169,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/deep-dives",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"deep-dives\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_9cf79142d27e6aec36c75157",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 173,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(dir, f)",
+          "unresolvedRoot": "dir",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_3ea9f27204177ce241c6b64e",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 244,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.resolve(args.root)",
+          "unresolvedRoot": "args.root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_e6ba0001900bfd8e7b2a16b0",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 245,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR)",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_0873d891e4b25727216b81ff",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 247,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/sources",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(refs, \"sources\")",
+          "unresolvedRoot": "refs",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_38ad2e8aa060d06c02a49203",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 247,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, CLONES_DIR)",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_98f00fe07e32322400ca6b39",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 250,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/taxonomy.txt",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(refs, \"taxonomy.txt\")",
+          "unresolvedRoot": "refs",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_3628b066d3f0d2fc9682daa4",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 251,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/intake.md",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(refs, \"intake.md\")",
+          "unresolvedRoot": "refs",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_f140713a76dcf7b37ef4677c",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 252,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/comparison-matrix.md",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(refs, \"comparison-matrix.md\")",
+          "unresolvedRoot": "refs",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_4dbb5d2f6b6cbecc8b7a38bf",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 253,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/porting-log.md",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(refs, \"porting-log.md\")",
+          "unresolvedRoot": "refs",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_a7467e70777a5401f25becaf",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 258,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/.gitignore",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, \".gitignore\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_14ba267715fe2e6d96cf3bd5",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 292,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/.git",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(repo, \".git\")",
+          "unresolvedRoot": "repo",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_956045b4afb0a72e4e11b432",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 377,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/.git",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(repo, \".git\")",
+          "unresolvedRoot": "repo",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_7ad4f7d4576a83e0511d0d33",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 587,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/state",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"state\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_5cdff980d1d0b4d6af491352",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 588,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/porting-log.md",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"porting-log.md\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_2499074f6264ed525ed90fc5",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 68,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.resolve(args.root)",
+          "unresolvedRoot": "args.root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_37d691b740fae0ccb09a7358",
+          "path": ".agents/skills/distill/scripts/distill.mjs",
+          "line": 71,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(dir, REFS_DIR)",
+          "unresolvedRoot": "dir",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-200",
+          "skills-201",
+          "skills-202",
+          "skills-203",
+          "skills-204",
+          "skills-205",
+          "skills-206",
+          "skills-207",
+          "skills-208",
+          "skills-209",
+          "skills-210",
+          "skills-211",
+          "skills-212",
+          "skills-213",
+          "skills-214",
+          "skills-215",
+          "skills-216",
+          "skills-217",
+          "skills-218",
+          "skills-219",
+          "skills-220",
+          "skills-221",
+          "skills-222",
+          "skills-223",
+          "skills-224",
+          "skills-225",
+          "skills-226",
+          "skills-227",
+          "skills-228",
+          "skills-229",
+          "skills-230",
+          "skills-324",
+          "skills-325",
+          "skills-326"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_87e00fe4f69db28b7ea40277",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 122,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/sources/**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"sources\", `${name}.md`)",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_4a03636faaac25ae112f13c4",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 128,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/sources",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"sources\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_1234c26a3a381755fbdc862f",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 129,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/sources",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"sources\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_c44775c33d928f41706a1f23",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 141,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/taxonomy.txt",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"taxonomy.txt\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_f222df6c396a00826160a423",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 148,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, meta.local || path.join(CLONES_DIR, name))",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_e08db3603a9d051e76a2d625",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 148,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(CLONES_DIR, name)",
+          "unresolvedRoot": "CLONES_DIR",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_65778d69be02c60a7a9b3e81",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 156,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/sources",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"sources\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_e5718d77154fb39b02eaf00f",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 169,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/deep-dives",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR, \"deep-dives\")",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_34a18a9362296836b5ceb542",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 173,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(dir, f)",
+          "unresolvedRoot": "dir",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_740609c40ce6b63aed311d2c",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 244,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.resolve(args.root)",
+          "unresolvedRoot": "args.root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_6be27a9725082be82eeb37c0",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 245,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, REFS_DIR)",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_c7f64fbf95d1bc2b0cccc897",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 247,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**/sources",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(refs, \"sources\")",
+          "unresolvedRoot": "refs",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    },
+    {
+      "reviewClass": "inventory-reconciliation",
+      "data": {
+        "inventoryEdge": {
+          "edgeId": "consumer_unresolved_0f3752b1e52f85e1731b5e74",
+          "path": ".claude/skills/distill/scripts/distill.mjs",
+          "line": 247,
+          "kind": "dynamic",
+          "unresolvedDynamicPattern": "**",
+          "targetPath": null,
+          "identityStatus": "unresolved-dynamic-pattern",
+          "rawTarget": "path.join(root, CLONES_DIR)",
+          "unresolvedRoot": "root",
+          "targetPaths": []
+        },
+        "currentExactTargetOccurrences": [],
+        "censusEdges": [
+          "skills-231",
+          "skills-232",
+          "skills-233",
+          "skills-234",
+          "skills-235",
+          "skills-236",
+          "skills-237",
+          "skills-238",
+          "skills-239",
+          "skills-240",
+          "skills-241",
+          "skills-242",
+          "skills-243",
+          "skills-244",
+          "skills-245",
+          "skills-246",
+          "skills-247",
+          "skills-248",
+          "skills-249",
+          "skills-250",
+          "skills-251",
+          "skills-252",
+          "skills-253",
+          "skills-254",
+          "skills-255",
+          "skills-256",
+          "skills-257",
+          "skills-258",
+          "skills-259",
+          "skills-260",
+          "skills-261",
+          "skills-327",
+          "skills-328",
+          "skills-329"
+        ],
+        "status": "joined to current full span/trace; line alone not authority",
+        "reason": "Old inventory commit/line may differ. Current exact spans and IO traces govern this author table; every exported edge retained for reviewer cross-check."
+      }
+    }
+  ]
+}
