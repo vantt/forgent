@@ -87,6 +87,8 @@ L12-4 reserves the literal repository-wide reader/writer legacy-authority search
 9. enable no-legacy-path enforcement;
 10. run semantic-remnant search and the full verification suite.
 
+L12-17 dependency: carry legacy `docs/specs/work-state.md` RUL10 "bổ chú 3" (hot mutex `withStateTx`, main `dc8acf9bf`/`247d2d1a1`/`08d754c30`) into candidate `docs/platform/work-state/spec.md` RUL10 before applying the cutover patches for Pilot B rows 16 and 17 (`fgos-participant-contract.md:213,248`).
+
 ## Architecture
 
 Program-level data model and execution boundary: `plan.md` §5 (Execution Boundary) and §6 (Minimum Migration Data Model).
