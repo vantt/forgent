@@ -30,7 +30,7 @@ test('the domain registry loads from compiled.json using only its own few source
   // vendored parser), and load it in a child process.
   const tmp = fs.mkdtempSync(path.join(root, '..', 'fgos-registry-nodeps-'));
   try {
-    for (const rel of ['src/state/domain-registry.mjs', 'src/workflow/definition.mjs', 'src/runner/dispatch/write-scope.mjs', 'src/runner/dispatch/run-timeout.mjs', 'src/workflow/steps.mjs', 'domains/coding/compiled.json']) {
+    for (const rel of ['src/state/domain-registry.mjs', 'src/workflow/definition.mjs', 'src/workflow/guide-schema.mjs', 'src/runner/dispatch/write-scope.mjs', 'src/runner/dispatch/run-timeout.mjs', 'src/workflow/steps.mjs', 'domains/coding/compiled.json']) {
       fs.mkdirSync(path.dirname(path.join(tmp, rel)), { recursive: true });
       fs.copyFileSync(path.join(root, rel), path.join(tmp, rel));
     }

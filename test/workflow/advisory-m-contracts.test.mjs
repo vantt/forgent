@@ -9,6 +9,10 @@ import { withProviderFamilies } from '../helpers/provider-families.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 
+// The validate-plan and implement-item unit templates the coding workflow carried before its
+// lifecycle file dropped its runner fields; the reviewed pattern is what these tests exercise.
+const CODING_UNIT_TEMPLATES = JSON.parse(fs.readFileSync(new URL('../fixtures/workflow/coding-advisory-unit-templates.json', import.meta.url), 'utf8'));
+
 seedFileLocalBwrapRegistry();
 
 // Mock only the external worker, leaving settlement, bounded review, report handoff,
@@ -171,10 +175,9 @@ for (const flow of [
 for (const [stepId, unitId] of [['planning', 'validate-plan'], ['executing', 'implement-item']]) {
   test(`coding/feature ${unitId}: done reviewer findings cause one revision then fail the step`, async (t) => {
     const root = fixture(t, 'findings');
-    const definition = loadWorkflow('coding/feature');
-    const registeredUnit = definition.steps.find((step) => step.id === stepId).units.find((unit) => unit.id === unitId);
+    const registeredUnit = CODING_UNIT_TEMPLATES[`${stepId}/${unitId}`];
     const state = await startWorkflow({ repoRoot: root, cwd: root, workflow: {
-      id: definition.id, steps: [
+      id: 'coding/feature', steps: [
         { id: stepId, units: [registeredUnit] },
         { id: 'after-review', dependsOn: [stepId], gate: { kind: 'human', question: 'Approve delivery?' } },
       ],

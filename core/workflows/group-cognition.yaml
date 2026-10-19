@@ -6,6 +6,17 @@ id: group-cognition
 title: Group Cognition Deliberation Workflow
 description: Group cognition workflow with divergent sense-making, dialectical inquiry critique with red-team, and convergent action synthesis.
 
+# --- Guide head: what the playbook promises, beside the steps below (the steps are unchanged) ---
+kind: playbook
+purpose: Sense-making by independent lenses, a dialectical critique, then one action synthesis.
+must:
+  - id: independent-lenses
+    guard: independence-blind
+    subject: sense-making.settled
+    reason: a seat that has read another seat's output is no longer an independent lens
+frameDefaults: { dispatches: 3, mutatingDispatches: 0, fallbackPerSeat: 2, deviationsBeforeAsk: 0, rigorFloor: standard }
+closure: [action-synthesis.settled]
+
 steps:
   - id: sense-making
     title: Sense Making

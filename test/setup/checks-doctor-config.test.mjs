@@ -494,7 +494,7 @@ test('workflow-capabilities-configured warns, naming each Workflow capability wi
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(passed, true, 'a taste-free fresh setup is a warning, not a failure');
   assert.match(message, /^warning: .*no "prefer" pool/);
-  assert.match(message, /coding:plan/);
+  assert.doesNotMatch(message, /coding:/, 'the coding workflow declares no runner units, so it names no capability');
   assert.match(message, /delphi:propose/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
