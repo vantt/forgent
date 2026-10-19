@@ -1,0 +1,539 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "inventoryPopulation": {
+    "files": 1037,
+    "edges": 8496
+  },
+  "retiringMaintainedPopulation": {
+    "files": 125,
+    "edges": 1417,
+    "members": [
+      {
+        "file": "docs/architect/README.md",
+        "edges": 15
+      },
+      {
+        "file": "docs/architect/agent-coordination/README.md",
+        "edges": 45
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/README.md",
+        "edges": 18
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md",
+        "edges": 2
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md",
+        "edges": 21
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+        "edges": 12
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/evidence-and-results.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md",
+        "edges": 2
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "edges": 3
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/protocol-model.md",
+        "edges": 6
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/run-handle.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/runtime-model.md",
+        "edges": 5
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+        "edges": 7
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/system-context.md",
+        "edges": 7
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/visibility-and-herdr.md",
+        "edges": 3
+      },
+      {
+        "file": "docs/architect/agent-coordination/architecture/work-integration.md",
+        "edges": 5
+      },
+      {
+        "file": "docs/architect/agent-coordination/contracts/README.md",
+        "edges": 5
+      },
+      {
+        "file": "docs/architect/agent-coordination/contracts/assignment-run-runresult.md",
+        "edges": 7
+      },
+      {
+        "file": "docs/architect/agent-coordination/contracts/coordination-session.md",
+        "edges": 23
+      },
+      {
+        "file": "docs/architect/agent-coordination/contracts/flow-definition.md",
+        "edges": 21
+      },
+      {
+        "file": "docs/architect/agent-coordination/contracts/workflow-stage-operation.md",
+        "edges": 2
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/ADR-004-reserve-job.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+        "edges": 5
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+        "edges": 15
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+        "edges": 11
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+        "edges": 8
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/agent-coordination/decisions/README.md",
+        "edges": 13
+      },
+      {
+        "file": "docs/architect/agent-coordination/documentation-governance.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+        "edges": 130
+      },
+      {
+        "file": "docs/architect/agent-coordination/history/README.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "edges": 3
+      },
+      {
+        "file": "docs/architect/agent-coordination/intent-preservation-ledger.md",
+        "edges": 28
+      },
+      {
+        "file": "docs/architect/agent-coordination/playbooks/README.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "edges": 5
+      },
+      {
+        "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+        "edges": 1
+      },
+      {
+        "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "edges": 5
+      },
+      {
+        "file": "docs/architect/agent-coordination/playbooks/coordination-operating-harness.md",
+        "edges": 7
+      },
+      {
+        "file": "docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+        "edges": 21
+      },
+      {
+        "file": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+        "edges": 10
+      },
+      {
+        "file": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+        "edges": 8
+      },
+      {
+        "file": "docs/architect/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
+        "edges": 19
+      },
+      {
+        "file": "docs/architect/agent-coordination/proposals/README.md",
+        "edges": 14
+      },
+      {
+        "file": "docs/architect/agent-coordination/proposals/dag-request-scheduler.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "edges": 29
+      },
+      {
+        "file": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+        "edges": 8
+      },
+      {
+        "file": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+        "edges": 27
+      },
+      {
+        "file": "docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/agent-coordination/roadmap/README.md",
+        "edges": 6
+      },
+      {
+        "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
+        "edges": 13
+      },
+      {
+        "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+        "edges": 13
+      },
+      {
+        "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+        "edges": 10
+      },
+      {
+        "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+        "edges": 7
+      },
+      {
+        "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+        "edges": 2
+      },
+      {
+        "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+        "edges": 3
+      },
+      {
+        "file": "docs/architect/agent-coordination/verification/README.md",
+        "edges": 2
+      },
+      {
+        "file": "docs/architect/agent-coordination/vision.md",
+        "edges": 10
+      },
+      {
+        "file": "docs/architect/agent-coordination/vocabulary/README.md",
+        "edges": 6
+      },
+      {
+        "file": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+        "edges": 12
+      },
+      {
+        "file": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+        "edges": 1
+      },
+      {
+        "file": "docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/architecture-intent.md",
+        "edges": 12
+      },
+      {
+        "file": "docs/architect/component-boundary/README.md",
+        "edges": 24
+      },
+      {
+        "file": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "edges": 46
+      },
+      {
+        "file": "docs/architect/component-boundary/repo-layout-vision.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/dispatch-control-plane-redesign.md",
+        "edges": 3
+      },
+      {
+        "file": "docs/architect/documentation-system-design.md",
+        "edges": 9
+      },
+      {
+        "file": "docs/architect/documentation-system-discussion.md",
+        "edges": 79
+      },
+      {
+        "file": "docs/architect/doing-coordination-redesign.md",
+        "edges": 3
+      },
+      {
+        "file": "docs/architect/domainization/README.md",
+        "edges": 6
+      },
+      {
+        "file": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+        "edges": 26
+      },
+      {
+        "file": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "edges": 17
+      },
+      {
+        "file": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+        "edges": 7
+      },
+      {
+        "file": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "edges": 11
+      },
+      {
+        "file": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "edges": 12
+      },
+      {
+        "file": "docs/architect/knowledge-registry-redesign.md",
+        "edges": 12
+      },
+      {
+        "file": "docs/architect/packaging-distribution/README.md",
+        "edges": 6
+      },
+      {
+        "file": "docs/architect/packaging-distribution/future-constraints.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+        "edges": 11
+      },
+      {
+        "file": "docs/architect/packaging-distribution/migration-map.md",
+        "edges": 23
+      },
+      {
+        "file": "docs/architect/packaging-distribution/rewrite-plan.md",
+        "edges": 19
+      },
+      {
+        "file": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/packaging-distribution/scope-map.md",
+        "edges": 7
+      },
+      {
+        "file": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/proposals/README.md",
+        "edges": 6
+      },
+      {
+        "file": "docs/architect/proposals/architecture-advisory-panel.md",
+        "edges": 6
+      },
+      {
+        "file": "docs/architect/proposals/component-authority-boundary-map.md",
+        "edges": 15
+      },
+      {
+        "file": "docs/architect/proposals/coordination-capability-envelope.md",
+        "edges": 14
+      },
+      {
+        "file": "docs/architect/proposals/coordination-dispatch-contract.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/architect/proposals/coordination-envelope-probe-contract.md",
+        "edges": 5
+      },
+      {
+        "file": "docs/architect/proposals/coordination-envelope-progress.md",
+        "edges": 15
+      },
+      {
+        "file": "docs/architect/proposals/coordination-worker-provider-boundary.md",
+        "edges": 8
+      },
+      {
+        "file": "docs/architect/proposals/group-thinking-plan-loop.md",
+        "edges": 11
+      },
+      {
+        "file": "docs/architect/proposals/step-09-group-thinking-substrate.md",
+        "edges": 19
+      },
+      {
+        "file": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+        "edges": 18
+      },
+      {
+        "file": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+        "edges": 12
+      },
+      {
+        "file": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "edges": 17
+      },
+      {
+        "file": "docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+        "edges": 18
+      },
+      {
+        "file": "docs/architect/roadmap.md",
+        "edges": 5
+      },
+      {
+        "file": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "edges": 0
+      },
+      {
+        "file": "docs/architect/workspace-topology-audit.md",
+        "edges": 1
+      },
+      {
+        "file": "docs/architect/workspace-topology-roadmap.md",
+        "edges": 3
+      },
+      {
+        "file": "docs/architect/workspace-topology.md",
+        "edges": 2
+      },
+      {
+        "file": "docs/specs/confinement-authority.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/specs/decision-citation-drift.md",
+        "edges": 13
+      },
+      {
+        "file": "docs/specs/distillery.md",
+        "edges": 3
+      },
+      {
+        "file": "docs/specs/distribution.md",
+        "edges": 8
+      },
+      {
+        "file": "docs/specs/enduser-docs-authoring.md",
+        "edges": 3
+      },
+      {
+        "file": "docs/specs/enduser-docs-index.md",
+        "edges": 4
+      },
+      {
+        "file": "docs/specs/fgos-plugin.md",
+        "edges": 3
+      },
+      {
+        "file": "docs/specs/herdr-web-dashboard.md",
+        "edges": 16
+      },
+      {
+        "file": "docs/specs/observe.md",
+        "edges": 2
+      },
+      {
+        "file": "docs/specs/platform-foundations.md",
+        "edges": 23
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edges": 113
+      },
+      {
+        "file": "docs/specs/system-overview.md",
+        "edges": 8
+      }
+    ]
+  },
+  "newStep3InventoryPopulation": {
+    "files": 912,
+    "edges": 7079
+  },
+  "authoredPacket": {
+    "files": 96,
+    "coverageEdges": 1233,
+    "retiredFiles": 33,
+    "retiredEdges": 505,
+    "fullRecordFiles": 63,
+    "fullRecordEdges": 728,
+    "fullRecordInventoryEdges": 644,
+    "fullRecordAddedEdges": 84,
+    "dispositions": {
+      "patch": 98,
+      "preserve": 493,
+      "parked": 74,
+      "phase9-row-flip": 63
+    }
+  },
+  "notes": [
+    "Whole docs/specs/work-state.md retained as permitted full-record fallback; the per-file diff schema has no fragment application contract. RUL10/citing material carries under L12-17.",
+    "No relocated evidence payload is present in the class-3 census; the sole verification-path file is a maintained README index. Evidence payloads in later classes are not waived.",
+    "Supplemental edges are counted only in the authored packet, never guessed for unauthored files. Inventory population totals are separate from authored coverage."
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "status": "AUTHOR checks pass; independent expansion review pending",
+  "verifiedAt": "2026-10-19T19:57:49.235789+00:00",
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "supersededRecordCommit": "04913b160eac95a199718176ca75780573a3573d",
+  "checker": {
+    "failureCount": 0,
+    "files": 96,
+    "edges": 1233,
+    "activeFiles": 63,
+    "activeEdges": 728,
+    "retiredFiles": 33,
+    "retiredEdges": 505
+  },
+  "population": {
+    "inventoryPopulation": {
+      "files": 1037,
+      "edges": 8496
+    },
+    "newStep3InventoryPopulation": {
+      "files": 912,
+      "edges": 7079
+    },
+    "authoredPacket": {
+      "files": 96,
+      "coverageEdges": 1233,
+      "retiredFiles": 33,
+      "retiredEdges": 505,
+      "fullRecordFiles": 63,
+      "fullRecordEdges": 728,
+      "fullRecordInventoryEdges": 644,
+      "fullRecordAddedEdges": 84,
+      "dispositions": {
+        "patch": 98,
+        "preserve": 493,
+        "parked": 74,
+        "phase9-row-flip": 63
+      }
+    }
+  },
+  "retiringInventoryFiles": 125,
+  "retiringInventoryEdges": 1417,
+  "changes": {
+    "existingOutcomeChanges": 45,
+    "addedReferenceCount": 27,
+    "outcomeTotal": 72,
+    "recordTextOnly": 73,
+    "unitMetadataOnly": 583
+  },
+  "probes": {
+    "inherited": 87,
+    "new": 23,
+    "allRejected": true,
+    "inheritedFixtures": "All original 87 mutation cases retained through the current checker. Full pre-ruling records of now-retiring sources are loaded from committed 04913b160 with unit metadata only; no predicate is bypassed. Packet retirement paths are separately tested in 23 new probes."
+  },
+  "lightTests": {
+    "passed": 131,
+    "failed": 0,
+    "skipped": 0
+  },
+  "review": {
+    "parts": 11,
+    "files": 48,
+    "edges": 644,
+    "breachedSets": [
+      "batch-013",
+      "batch-015",
+      "batch-016",
+      "batch-025",
+      "batch-028",
+      "batch-030",
+      "batch-033"
+    ],
+    "coverageAndHashesVerified": true,
+    "started": 0,
+    "accepted": 0
+  },
+  "checks": {
+    "gitDiffCheck": "pass",
+    "pythonSyntax": "pass (ast.parse; no pycache writes)",
+    "jsonSyntax": "pass",
+    "scopeOnly": "pass",
+    "noPhase6Writes": "pass",
+    "originalManifestsSamplesResolverOwnerAnswers": "byte-identical to input HEAD",
+    "protectedConsumersAndCode": "no worktree changes outside the declared plan scope"
+  },
+  "commands": [
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-check.py"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "--author-commit",
+      "ae141550c2e022310de7a0efea757580c0b2479f"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-probes.py"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "node",
+      "--test",
+      "test/scripts/doc-link-pass.test.mjs",
+      "test/scripts/check-doc-candidate-status.test.mjs",
+      "test/scripts/check-doc-constitution.test.mjs",
+      "test/scripts/check-doc-retirement.test.mjs"
+    ],
+    [
+      "git",
+      "diff",
+      "--check"
+    ]
+  ],
+  "artifactSha256": {
+    "step-03-check.py": "35baf681c4f67228403637e68acf697b60948ace64eaa969c46b99a5e2981463",
+    "step-03-probes.py": "1157615254b3ff33c5f6c3533e09020bcc430fb70399ae97436f6651f90a2446",
+    "step-03-wave1-check.py": "f62e2a6b25e743cf8e0dc52a0c7105df40817344223366c23b40b82972b1e36b",
+    "step-03-wave1-r2-author.py": "5655eeadc23fc89206174f443852105fe294bc86bac5adb9e5d32eec8797bec3",
+    "step-03-wave1-r2-probes.py": "78628374948e8ae6c07aeea3f2ec476777a102dd8f99b0c79c9c58c965cae8b0",
+    "step-03-wave1-r2-check-result.json": "81aae524804d3c58d04302b6af585064e51f082b327487365053257d9cf5eaf0",
+    "step-03-wave1-r2-inherited-probes-result.json": "0bfe4a127eb30ad86ac319b1b572a7bf386a415b3d2f2ef9253cb2e0bd55acf9",
+    "step-03-wave1-r2-probes-result.json": "b8f9b9c9ce9475f22a5791c16228718fbf4308f9283d2a4969da135268d02541",
+    "step-03-wave1-r2-light-tests.log": "fa08c2b90462dbd6945cc01718f4a36c40c06663dc4669b01b4744b8a536b64f",
+    "step-03-pilot-r5-manifest.json": "e2ebd2b32e3ccf6dded4005d27cdb2d117a8dc17eb4f9cc1f5bb394c8905b95d",
+    "step-03-wave1-r2-manifest.json": "e14dc9bb8466cdad5a890a5dad09e85e663253d793b5c176ae5e76c99522415f",
+    "step-03-wave1-r2-changes.json": "85413e87963f18a3e5ef9b46b893c87822ffa42d8a68b7a09b29b9777a074357",
+    "step-03-wave1-r2-retirements.json": "01ba9632765ad4117381b58c6ea5ca313a19dd232e33fe650bacf66837cb0195",
+    "step-03-wave1-r2-population.json": "88e5fc5a87fc50dcaa26d9d793bb0d8d93826d3d36892ac8a52f09ca862e778a",
+    "step-03-wave1-expansion-review-request.md": "4ad409a739b8160876ea57e27a56af8271818f1a64d1121f794c0584237d5eae",
+    "step-03-wave1-expansion-review-index.json": "0ac7d8808df500c08503f4b54d0b3cb70fb0454a433f02218ca33c4e0f3177ff"
+  },
+  "limits": [
+    "Step 3 records only; no consumer patch or authority flip applied.",
+    "Work-state uses the allowed whole-file full-record fallback: all 39 edges retained, RUL10/citing material subject to L12-17 carry.",
+    "Fresh independent file review, actual runner-commit accounting in both unchanged Phase 6 manifests and clean committed-byte acceptance remain with Lead.",
+    "No full runtime suite: production runtime behavior is unchanged; current plan-local checker, all inherited/new probes and existing light documentation tests ran.",
+    "No author blocker or additional write scope; carry and Step 5 parity dependencies remain, no self-acceptance or gate waiver."
+  ]
+}

@@ -1,0 +1,256 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "negativeProbes": 23,
+  "allRejected": true,
+  "probes": [
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "retirement forbidden for docs/README.md",
+      "expectedCheck": "retirement-eligibility",
+      "rejected": true,
+      "observedChecks": [
+        "digest",
+        "retirement-added-coverage",
+        "retirement-edge-coverage",
+        "retirement-eligibility",
+        "retirement-supplemental-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "retirement forbidden for docs/specs/workflow.md",
+      "expectedCheck": "retirement-eligibility",
+      "rejected": true,
+      "observedChecks": [
+        "digest",
+        "retirement-added-coverage",
+        "retirement-edge-coverage",
+        "retirement-eligibility",
+        "retirement-supplemental-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "retirement forbidden for docs/specs/reading-map.md",
+      "expectedCheck": "retirement-eligibility",
+      "rejected": true,
+      "observedChecks": [
+        "digest",
+        "retirement-added-coverage",
+        "retirement-edge-coverage",
+        "retirement-eligibility",
+        "retirement-supplemental-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "retirement forbidden for docs/specs/work-state.md",
+      "expectedCheck": "retirement-eligibility",
+      "rejected": true,
+      "observedChecks": [
+        "digest",
+        "retirement-added-coverage",
+        "retirement-edge-coverage",
+        "retirement-eligibility",
+        "retirement-supplemental-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34(2)",
+      "probe": "relocated evidence payload cannot retire",
+      "expectedCheck": "retirement-eligibility",
+      "rejected": true
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "retirement cannot carry a diff",
+      "expectedCheck": "retirement-no-diff",
+      "rejected": true,
+      "observedChecks": [
+        "retirement-no-diff"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "retirement cannot carry per-edge dispositions",
+      "expectedCheck": "retirement-no-diff",
+      "rejected": true,
+      "observedChecks": [
+        "retirement-no-diff"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "retirement inventory id jointly omitted",
+      "expectedCheck": "retirement-edge-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "retirement-edge-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "retirement supplemental id and declaration jointly omitted",
+      "expectedCheck": "retirement-supplemental-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "retirement-supplemental-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "retirement duplicate id",
+      "expectedCheck": "retirement-edge-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "retirement-edge-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "retirement wrong source digest",
+      "expectedCheck": "digest",
+      "rejected": true,
+      "observedChecks": [
+        "digest"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "retirement false marker value",
+      "expectedCheck": "retirement-schema",
+      "rejected": true,
+      "observedChecks": [
+        "retirement-schema"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "unit id omitted",
+      "expectedCheck": "unit-consistency",
+      "rejected": true,
+      "observedChecks": [
+        "unit-consistency"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "unit id invented per edge",
+      "expectedCheck": "unit-consistency",
+      "rejected": true,
+      "observedChecks": [
+        "unit-consistency"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "migration bullet siblings have mixed dispositions",
+      "expectedCheck": "unit-consistency",
+      "rejected": true,
+      "observedChecks": [
+        "preserve-state",
+        "unit-consistency"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "Canonical current-source line cannot preserve",
+      "expectedCheck": "unit-consistency",
+      "rejected": true,
+      "observedChecks": [
+        "preserve-state",
+        "retiring-preserve-wording",
+        "unit-consistency"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "Related retiring source incorrectly preserved",
+      "expectedCheck": "related-retiring-preserve",
+      "rejected": true,
+      "observedChecks": [
+        "diff-correspondence",
+        "orphan-hunk",
+        "preserve-state",
+        "related-retiring-preserve"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34(5)",
+      "probe": "tree-relative file cannot escape census coverage",
+      "expectedCheck": "author-added-search-coverage",
+      "rejected": true,
+      "scannerFindsOmittedForm": "proposals/step-09-group-thinking-substrate.md"
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34(5)",
+      "probe": "tree-relative locator remains complete",
+      "expectedCheck": "author-added-search-coverage",
+      "rejected": true,
+      "scannerFindsOmittedForm": "proposals/step-09-group-thinking-substrate.md:26"
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34(5)",
+      "probe": "backticked sibling directory cannot escape coverage",
+      "expectedCheck": "author-added-search-coverage",
+      "rejected": true,
+      "scannerFindsOmittedForm": "agent-coordination/"
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34(5)",
+      "probe": "source-area relative path in carriage is still counted",
+      "expectedCheck": "author-added-search-coverage",
+      "rejected": true,
+      "scannerFindsOmittedForm": "proposals/step-10-coding-domain-adoption.md"
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34(5)",
+      "probe": "relative Markdown link is one complete unit",
+      "expectedCheck": "author-added-search-coverage",
+      "rejected": true,
+      "scannerFindsOmittedForm": "[Step 09](proposals/step-09-group-thinking-substrate.md)"
+    },
+    {
+      "surfaceClass": 3,
+      "rule": "L12-34",
+      "probe": "relative edge and scan receipt jointly omitted",
+      "expectedCheck": "author-added-search-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "author-added-search-coverage"
+      ]
+    }
+  ],
+  "positiveCases": [
+    "valid retirement record",
+    "mixed unit with reasons on every edge",
+    "Provenance is not Related",
+    "original Related in source carriage is not wrapper navigation",
+    "wrapper Related detected",
+    "native candidate-relative target takes precedence",
+    "complete Markdown link matched once"
+  ],
+  "limits": "Negative probe rejection is mechanical evidence; context/holder/disposition truth remains independent reviewer work."
+}

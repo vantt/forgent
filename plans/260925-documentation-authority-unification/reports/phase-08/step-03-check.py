@@ -38,7 +38,7 @@ def records():
 
 def selected(rs,commit,batch):
     seed='A51-step03-file-v1\0'+commit+'\0'+batch
-    group=[r for r in rs if r['reviewSet']=='batch-'+batch]
+    group=[r for r in rs if r['reviewSet']=='batch-'+batch and not r.get('retiresWithTree')]
     pop=sorted(r['file'] for r in group if r['diff'])
     ranks=sorted([{'file':p,'rankHash':sha(seed+'\0'+p)} for p in pop],key=lambda x:(x['rankHash'],x['file']))
     witnesses=[{'file':r['file'],'bytes':len(blob(commit,r['file'])),'edges':len(r['edges']),
@@ -116,6 +116,90 @@ def heading_sections(commit,target):
         result.append({**a,'level':level,'sectionEndLine':end,'body':'\n'.join(lines[n-1:end])})
     return result
 
+RETIRING_ROOTS = ('docs/specs/', 'docs/architect/')
+RETIREMENT_EXCEPTIONS = {'docs/specs/workflow.md', 'docs/specs/reading-map.md', 'docs/specs/work-state.md'}
+
+def evidence_payload(file):
+    # Maintained indexes/READMEs are not relocated evidence payloads.
+    return file.startswith(RETIRING_ROOTS) and '/verification/' in file and not file.endswith('/README.md')
+
+def may_retire(file):
+    return file.startswith(RETIRING_ROOTS) and file not in RETIREMENT_EXCEPTIONS and not evidence_payload(file)
+
+def edge_count(record):
+    return len(record.get('edgeIds', [])) if record.get('retiresWithTree') else len(record['edges'])
+
+def related_header(text, line):
+    # A wrapper header ends at a blank line, code fence, or heading. A Related
+    # block inside Literal Snapshot is source bytes, not wrapper navigation.
+    lines=text.splitlines()
+    if not re.match(r'^\s*(?:[-*] |Related:)',lines[line-1]):return False
+    fences=[i for i,l in enumerate(lines,1) if l.startswith('```')]
+    if len(fences)>=2 and fences[0]<15 and line>fences[1]:return False
+    if any(re.match(r'^## ',l) for l in lines[:line]):return False
+    start=line-1
+    while start>=0 and lines[start].strip() and not lines[start].startswith(('```','~~~','#')):
+        if re.match(r'^Related:\s*', lines[start]):return True
+        if start<line-1 and not re.match(r'^\s*[-*] ',lines[start]):return False
+        start-=1
+    return False
+
+def unit_id(text, spans):
+    n=spans[0]['line'];lines=text.splitlines();line=lines[n-1]
+    if line.lstrip().startswith('|'):return 'row-L'+str(n)
+    if 'Canonical for:' in line and 'current source remains' in line:return 'canonical-L'+str(n)
+    # Every status/migration bullet group has one unit, bounded by headings,
+    # blank lines and non-list paragraphs (continuations remain in the group).
+    heading='';heading_line=0
+    for i,l in enumerate(lines[:n],1):
+        if re.match(r'^#{1,6} ',l):heading=l;heading_line=i
+    if re.search(r'migration|transitional status|current (?:source|authority)|legacy source',heading,re.I) and re.match(r'^\s*[-*] ',line):
+        a=n-1
+        while a>heading_line and lines[a-1].strip() and not lines[a-1].startswith('#'):a-=1
+        return 'status-bullets-L'+str(a+1)
+    return 'line-L'+str(n)
+
+def retirement_failures(r, checker):
+    failures=[]
+    def require(name, predicate):
+        if not predicate:failures.append({'file':r.get('file'),'check':name})
+    f=r['file'];before=blob(checker.commit,f);old=blob(INVENTORY,f)
+    require('retirement-eligibility', may_retire(f))
+    require('retirement-no-diff', r.get('diff')=='' and r.get('edges')==[])
+    require('retirement-schema', set(r)=={'file','inventoryInputCommit','authorInputCommit','inventoryFileDigest','digest','inventoryEdgeIds','edgeIds','authorAddedEdges','diff','edges','reviewSet','authoringRules','retiresWithTree','reason'} and r['retiresWithTree'] is True and bool(r['reason']))
+    require('digest', r['authorInputCommit']==checker.commit and r['inventoryInputCommit']==INVENTORY and r['digest']==sha(before) and r['inventoryFileDigest']==sha(old)==checker.files[f]['sha256'])
+    ids=r['inventoryEdgeIds'];added=r['authorAddedEdges'];allids=ids+[e['edgeId'] for e in added]
+    require('retirement-supplemental-coverage', collections.Counter(e['edgeId'] for e in added)==collections.Counter(e['edgeId'] for e in prior_added_edges(f,r['reviewSet'])))
+    require('retirement-edge-coverage', collections.Counter(ids)==collections.Counter(checker.files[f]['edgeIds']) and len(allids)==len(set(allids)) and collections.Counter(r['edgeIds'])==collections.Counter(allids))
+    for e in added:
+        try:
+            assert set(e)=={'edgeId','sourceSpans','matchedExpression','authorAddedEdge'}
+            assert e['edgeId'] not in checker.entries and e['authorAddedEdge']['normalizedReference']
+            assert spans_text(before.decode(),e['sourceSpans'])==e['matchedExpression']
+        except (AssertionError,KeyError):require('retirement-added-coverage',False)
+    return failures
+
+def reference_roots(file, text):
+    roots=[posixpath.dirname(file)]
+    if file.startswith('docs/platform/'):
+        roots.append('/'.join(file.split('/')[:3]))
+        # Source-carriage subpaths retain their source-area coordinates. Bind
+        # this fallback to the explicit wrapper provenance, never to a basename
+        # match elsewhere in the repository.
+        header=text.split('```',2)[1] if '```' in text[:150] else text[:2500]
+        for line in header.splitlines():
+            if not re.match(r'^(?:Provenance|Source type):',line):continue
+            for hit in re.findall(r'docs/(?:specs|architect)/[^\s`;,]+',line):
+                path=hit.rstrip('.')
+                roots.append(posixpath.dirname(path) if path.endswith('.md') else re.split(r'[*<{]',path)[0].rstrip('/'))
+    return list(dict.fromkeys(roots))
+
+@functools.lru_cache(None)
+def prior_added_edges(file, review_set):
+    path=str(REL/'step-03-records'/(review_set+'.jsonl'))
+    records=[json.loads(line) for line in blob('04913b160eac95a199718176ca75780573a3573d',path).decode().splitlines()]
+    return [e for r in records if r['file']==file for e in r['edges'] if e.get('authorAddedEdge')]
+
 def scan_candidates(commit,file,inventory_spans):
     """Whole-file supplemental search; candidates need an edge or an explicit exclusion.
     Basename set comes from committed retiring trees. Full paths include retained legacy
@@ -128,10 +212,33 @@ def scan_candidates(commit,file,inventory_spans):
     partial=r'(?<![\w/-])(?:\.\./)?(?:specs|architect)/[^\s`<>"\]\[),;|}]+\.md(?::\d+(?:[-–]\d+)?)?(?:#[^\s`<>"\]\[),;|}]+)?'
     pattern=re.compile(full+'|'+partial+'|'+bare)
     result=[]
+    tree_set=set(tree);dirs={p[:i] for p in tree for i,c in enumerate(p) if c=='/'}
+    roots=reference_roots(file,blob(commit,file).decode())
+    relative=re.compile(r'(?<![\w/.-])(?:[.]{1,2}/)*(?:[\w.-]+/)+[\w.-]*\.md(?::\d+(?:[-–]\d+)?)?(?:#[^\s`<>\"\]\[),;|}]+)?|`([^`\n]+)`')
     for n,line in enumerate(blob(commit,file).decode().splitlines(),1):
-        for m in pattern.finditer(line):
-            if any(x['line']==n and x['columnStart']<=m.start()+1<x['columnEndExclusive'] for x in inventory_spans):continue
-            result.append({'line':n,'columnStart':m.start()+1,'columnEndExclusive':m.end()+1,'text':m.group()})
+        matches=[(m.start(),m.end(),m.group()) for m in pattern.finditer(line)]
+        for hit in relative.finditer(line):
+            a,b=hit.span(1) if hit.group(1) is not None else hit.span();token=line[a:b]
+            raw=re.sub(r':\d+(?:[-–]\d+)?$','',token.split('#')[0])
+            if not re.fullmatch(r'(?:[.]{1,2}/)*[\w./-]+/?',raw):continue
+            targets={posixpath.normpath(posixpath.join(root,raw)) for root in roots}
+            local_roots=[posixpath.dirname(file)]+(['/'.join(file.split('/')[:3])] if file.startswith('docs/platform/') else [])
+            if any((p in tree_set or p in dirs) and not p.startswith(RETIRING_ROOTS) for p in [posixpath.normpath(posixpath.join(root,raw)) for root in local_roots]):continue
+            if not any(p.startswith(RETIRING_ROOTS) and (p in tree_set or p in dirs) for p in targets):continue
+            if not any(x<=a and b<=y for x,y,_ in matches):matches=[x for x in matches if not (a<=x[0] and x[1]<=b)];matches.append((a,b,token))
+        # A Markdown link is one reference, including its label. Never add
+        # separate sibling-path edges for the label and destination.
+        for link in re.finditer(r'!?\[[^\]\n]+\]\(([^)\n]+)\)',line):
+            raw=link[1].split('#')[0]
+            local_roots=[posixpath.dirname(file)]+(['/'.join(file.split('/')[:3])] if file.startswith('docs/platform/') else [])
+            resolved=[posixpath.normpath(posixpath.join(root,raw)) for root in roots]
+            local=[posixpath.normpath(posixpath.join(root,raw)) for root in local_roots]
+            if any(p in tree_set or p in dirs for p in local if not p.startswith(RETIRING_ROOTS)):continue
+            if not any(p.startswith(RETIRING_ROOTS) and (p in tree_set or p in dirs) for p in resolved):continue
+            a,b=link.span();matches=[x for x in matches if not (a<=x[0] and x[1]<=b)];matches.append((a,b,link[0]))
+        for a,b,token in sorted(matches):
+            if any(x['line']==n and x['columnStart']<=a+1<x['columnEndExclusive'] for x in inventory_spans):continue
+            result.append({'line':n,'columnStart':a+1,'columnEndExclusive':b+1,'text':token})
     return result
 
 def history_at(text,line,target=''):
@@ -240,11 +347,12 @@ class Checker:
         self.dirs={str(pathlib.PurePosixPath(p).parent) for p in self.tree}
         self.dirs.update('/'.join(p.split('/')[:i]) for p in self.tree for i in range(1,len(p.split('/'))))
     def check_record(self,r,apply=True):
+        if r.get('retiresWithTree'):return retirement_failures(r,self)
         failures=[]
         def check(name,fn):
             try: assert fn() is not False
             except (AssertionError,KeyError,ValueError,IndexError,TypeError,StopIteration,subprocess.CalledProcessError) as ex: failures.append({'file':r.get('file'),'check':name,'detail':str(ex)[:300]})
-        check('schema',lambda: set(r)==FIELDS and all(EDGE_FIELDS<=set(e)<=EDGE_FIELDS|{'searchWitness','authorAddedEdge','targetFacts'} for e in r['edges']) and isinstance(r['diff'],str) and all(isinstance(r['checks'][k],dict) for k in ['coverage','anchors','relativeResolution','labelForm']))
+        check('schema',lambda: set(r)==FIELDS and all(EDGE_FIELDS<=set(e)<=EDGE_FIELDS|{'searchWitness','authorAddedEdge','targetFacts','unitId','unitDispositionReason'} for e in r['edges']) and isinstance(r['diff'],str) and all(isinstance(r['checks'][k],dict) for k in ['coverage','anchors','relativeResolution','labelForm']))
         f=r['file']; before=blob(self.commit,f).decode(); old=blob(INVENTORY,f).decode()
         check('digest',lambda:r['authorInputCommit']==self.commit and r['inventoryInputCommit']==INVENTORY and r['digest']==sha(before) and r['inventoryFileDigest']==sha(old)==self.files[f]['sha256'])
         expected=self.files[f]['edgeIds'];actual=[e['edgeId'] for e in r['edges'] if not e.get('authorAddedEdge')]
@@ -293,6 +401,20 @@ class Checker:
                 for q in queries:
                     assert q['result']==resolver.query(self.commit,q['query']) and q['category'] in HIT_CATEGORIES
         check('supplemental-locator-replay',extra_locator_searches)
+        def units():
+            groups=collections.defaultdict(list)
+            for e in r['edges']:
+                expected_unit=unit_id(before,e['sourceSpans'])
+                # Complete real records carry unitId; synthetic unit fixtures also
+                # bind it explicitly. No ordinal or edge-id unit escape.
+                assert e.get('unitId')==expected_unit
+                groups[expected_unit].append(e)
+            for edges in groups.values():
+                if len({e['disposition'] for e in edges})>1:
+                    assert all(isinstance(e.get('unitDispositionReason'),str) and e['unitDispositionReason'].strip() for e in edges), 'mixed unit lacks per-edge reason'
+                if edges and edges[0]['unitId'].startswith('canonical-'):
+                    assert all(e['disposition']=='phase9-row-flip' for e in edges)
+        check('unit-consistency',units)
         changes=[]; used_hunks=set()
         for e in r['edges']:
             eid=e['edgeId']; inv=self.entries.get(eid)
@@ -300,6 +422,7 @@ class Checker:
                 inv={'consumerPath':f,'physicalSpans':e['sourceSpans'],'matchedExpression':e['matchedExpression'],
                      'normalizedReference':e['authorAddedEdge']['normalizedReference'],'locatorTokens':[]}
             if not inv: continue
+            check('related-retiring-preserve',lambda e=e,inv=inv:not (e['disposition']=='preserve' and inv['normalizedReference'].startswith(RETIRING_ROOTS) and related_header(before,e['sourceSpans'][0]['line'])))
             check('source-span',lambda e=e:spans_text(before,e['sourceSpans'])==e['matchedExpression'])
             def correspondence(e=e,inv=inv):
                 if e.get('authorAddedEdge'): return
@@ -343,7 +466,7 @@ class Checker:
             check('hunk-binding',lambda h=h:h in [x.splitlines()[0] for x in hunks(r['diff'])])
             check('authority-timing',lambda e=e:e['timing'] in ['now','Phase 9'] and (not f.startswith(('docs/specs/','docs/architect/')) or e['timing']=='Phase 9') and r['checks']['relativeResolution'][e['edgeId']]['authorityStatus']==('current-switchboard' if e['timing']=='now' else 'cutover-patch-only'))
             check('writer-boundary',lambda e=e:r['checks']['coverage']['writerTrace'][e['edgeId']]=='read-only citation; no writer/default-root/schema/identity change' and not e['blockedReason'])
-            check('source-region',lambda e=e:not history_at(before,e['sourceSpans'][0]['line'],f))
+            check('source-region',lambda e=e:related_header(before,e['sourceSpans'][0]['line']) or not history_at(before,e['sourceSpans'][0]['line'],f))
             target=e['target']; anchor=e['anchor']
             def target_anchor(e=e,inv=inv):
                 proof=r['checks']['anchors'][e['edgeId']]
@@ -457,13 +580,13 @@ class Checker:
                     review.append({'file':r['file'],'edgeId':e['edgeId'],'check':'patch-locator-review',
                                    'locatorTokens':terms,'reason':'No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.',
                                    'recordedScopeReason':proof.get('locatorScopeReason'),'correspondence':proof.get('locatorCorrespondence')})
-        return {'authorCommit':self.commit,'files':len(rs),'edges':sum(len(r['edges']) for r in rs),'failures':fail,'failureCount':len(fail),'locatorReviewFlags':review}
+        return {'authorCommit':self.commit,'files':len(rs),'edges':sum(edge_count(r) for r in rs),'failures':fail,'failureCount':len(fail),'locatorReviewFlags':review}
 
 def manifest_view(rs,commit):
     files=[]
     for r in rs:
         data=(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\n').encode()
-        files.append({'file':r['file'],'set':r['reviewSet'],'sourceBytes':len(blob(commit,r['file'])),'digest':r['digest'],'inventoryFileDigest':r['inventoryFileDigest'],'diffSha256':sha(r['diff']),'recordSha256':sha(data),'recordBytes':len(data),'edgeCount':len(r['edges']),'dispositions':dict(collections.Counter(e['disposition'] for e in r['edges']))})
+        files.append({'file':r['file'],'set':r['reviewSet'],'sourceBytes':len(blob(commit,r['file'])),'digest':r['digest'],'inventoryFileDigest':r['inventoryFileDigest'],'diffSha256':sha(r['diff']),'recordSha256':sha(data),'recordBytes':len(data),'retiresWithTree':bool(r.get('retiresWithTree')),'edgeCount':edge_count(r),'dispositions':dict(collections.Counter(e['disposition'] for e in r['edges']))})
     return {'authorInputCommit':commit,'inventoryInputCommit':INVENTORY,'files':files,'sets':[selected(rs,commit,b) for b in SETS]}
 
 def verify_manifest(rs,commit,manifest):
@@ -480,7 +603,7 @@ def main():
     rs=[json.loads(x) for x in args.records.read_text().splitlines()] if args.records else records()
     out={'sets':[selected(rs,commit,b) for b in SETS]} if args.select else Checker(commit).all(rs)
     if not args.select and not args.records:
-        manifest=json.loads((ROOT/REL/'step-03-pilot-manifest.json').read_text())
+        manifest=json.loads((ROOT/REL/'step-03-pilot-r5-manifest.json').read_text())
         for key in verify_manifest(rs,commit,manifest):out['failures'].append({'check':'manifest-freeze','field':key})
         out['failureCount']=len(out['failures'])
     print(json.dumps(out,ensure_ascii=False,indent=2));return bool(out.get('failureCount',0))

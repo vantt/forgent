@@ -1,0 +1,240 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/architect/README.md",
+      "set": "batch-003",
+      "inventoryEdges": 15,
+      "addedEdges": 0,
+      "edges": 15
+    },
+    {
+      "file": "docs/architect/agent-coordination/README.md",
+      "set": "batch-004",
+      "inventoryEdges": 45,
+      "addedEdges": 1,
+      "edges": 46
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/README.md",
+      "set": "batch-004",
+      "inventoryEdges": 18,
+      "addedEdges": 0,
+      "edges": 18
+    },
+    {
+      "file": "docs/architect/agent-coordination/contracts/README.md",
+      "set": "batch-004",
+      "inventoryEdges": 5,
+      "addedEdges": 0,
+      "edges": 5
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/README.md",
+      "set": "batch-004",
+      "inventoryEdges": 13,
+      "addedEdges": 0,
+      "edges": 13
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/README.md",
+      "set": "batch-004",
+      "inventoryEdges": 0,
+      "addedEdges": 0,
+      "edges": 0
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "set": "batch-004",
+      "inventoryEdges": 3,
+      "addedEdges": 3,
+      "edges": 6
+    },
+    {
+      "file": "docs/architect/agent-coordination/proposals/README.md",
+      "set": "batch-004",
+      "inventoryEdges": 14,
+      "addedEdges": 0,
+      "edges": 14
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/README.md",
+      "set": "batch-004",
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "edges": 6
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
+      "set": "batch-004",
+      "inventoryEdges": 13,
+      "addedEdges": 0,
+      "edges": 13
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/README.md",
+      "set": "batch-004",
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "edges": 2
+    },
+    {
+      "file": "docs/architect/agent-coordination/vocabulary/README.md",
+      "set": "batch-004",
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "edges": 6
+    },
+    {
+      "file": "docs/architect/component-boundary/README.md",
+      "set": "batch-005",
+      "inventoryEdges": 24,
+      "addedEdges": 4,
+      "edges": 28
+    },
+    {
+      "file": "docs/architect/domainization/README.md",
+      "set": "batch-006",
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "edges": 6
+    },
+    {
+      "file": "docs/architect/packaging-distribution/README.md",
+      "set": "batch-007",
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "edges": 6
+    },
+    {
+      "file": "docs/architect/packaging-distribution/migration-map.md",
+      "set": "batch-007",
+      "inventoryEdges": 23,
+      "addedEdges": 2,
+      "edges": 25
+    },
+    {
+      "file": "docs/architect/packaging-distribution/scope-map.md",
+      "set": "batch-007",
+      "inventoryEdges": 7,
+      "addedEdges": 5,
+      "edges": 12
+    },
+    {
+      "file": "docs/architect/proposals/README.md",
+      "set": "batch-008",
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "edges": 6
+    },
+    {
+      "file": "docs/architect/proposals/component-authority-boundary-map.md",
+      "set": "batch-008",
+      "inventoryEdges": 15,
+      "addedEdges": 10,
+      "edges": 25
+    },
+    {
+      "file": "docs/architect/roadmap.md",
+      "set": "batch-009",
+      "inventoryEdges": 5,
+      "addedEdges": 6,
+      "edges": 11
+    },
+    {
+      "file": "docs/architect/workspace-topology-roadmap.md",
+      "set": "batch-010",
+      "inventoryEdges": 3,
+      "addedEdges": 1,
+      "edges": 4
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "set": "batch-040",
+      "inventoryEdges": 4,
+      "addedEdges": 6,
+      "edges": 10
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "set": "batch-040",
+      "inventoryEdges": 13,
+      "addedEdges": 1,
+      "edges": 14
+    },
+    {
+      "file": "docs/specs/distillery.md",
+      "set": "batch-040",
+      "inventoryEdges": 3,
+      "addedEdges": 0,
+      "edges": 3
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "set": "batch-040",
+      "inventoryEdges": 8,
+      "addedEdges": 2,
+      "edges": 10
+    },
+    {
+      "file": "docs/specs/enduser-docs-authoring.md",
+      "set": "batch-040",
+      "inventoryEdges": 3,
+      "addedEdges": 0,
+      "edges": 3
+    },
+    {
+      "file": "docs/specs/enduser-docs-index.md",
+      "set": "batch-040",
+      "inventoryEdges": 4,
+      "addedEdges": 0,
+      "edges": 4
+    },
+    {
+      "file": "docs/specs/fgos-plugin.md",
+      "set": "batch-040",
+      "inventoryEdges": 3,
+      "addedEdges": 0,
+      "edges": 3
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "set": "batch-040",
+      "inventoryEdges": 16,
+      "addedEdges": 0,
+      "edges": 16
+    },
+    {
+      "file": "docs/specs/observe.md",
+      "set": "batch-040",
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "edges": 2
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "set": "batch-040",
+      "inventoryEdges": 23,
+      "addedEdges": 0,
+      "edges": 23
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "set": "batch-041",
+      "inventoryEdges": 113,
+      "addedEdges": 18,
+      "edges": 131
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "set": "batch-041",
+      "inventoryEdges": 8,
+      "addedEdges": 11,
+      "edges": 19
+    }
+  ],
+  "fileCount": 33,
+  "edges": 505,
+  "workStateFallback": "Full records retained for entire docs/specs/work-state.md; existing per-file diff schema has no fragment applicability contract. RUL10 passage and citing edges remain under L12-17 carry. No non-RUL10 patch is applied in Step 3.",
+  "evidenceExceptions": "No relocated non-authority evidence payload occurs in this 96-file authored population. Maintained verification README indexes and the vocabulary design-history document are maintained consumers, not proof payloads."
+}

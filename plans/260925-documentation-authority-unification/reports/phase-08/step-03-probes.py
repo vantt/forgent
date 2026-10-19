@@ -9,6 +9,20 @@ spec=importlib.util.spec_from_file_location('pilot_check',P/'step-03-check.py');
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--author-commit',required=True);a=ap.parse_args();c=m.Checker(a.author_commit);rs=m.records()
+    # Keep every inherited mutation, including proofs on now-retiring sources.
+    # Load those complete round-4 records as historical positive fixtures; they
+    # still exercise the current checker. Actual packet retirement records are
+    # tested separately in step-03-wave1-r2-probes.py. Add only unit metadata
+    # required by L12-34, without disabling any checker predicate.
+    for i,r in enumerate(rs):
+        if r.get('retiresWithTree'):
+            archived=[json.loads(line) for line in m.blob('04913b160eac95a199718176ca75780573a3573d',str(m.REL/'step-03-records'/(r['reviewSet']+'.jsonl'))).decode().splitlines()]
+            rs[i]=next(x for x in archived if x['file']==r['file'])
+    for r in rs:
+        before=m.blob(a.author_commit,r['file']).decode()
+        for e in r['edges']:
+            e['unitId']=m.unit_id(before,e['sourceSpans'])
+            e.setdefault('unitDispositionReason','Historical positive-fixture source role: '+e['reason'])
     baseline=c.all(rs);assert not baseline['failures'],baseline
     patch=next(r for r in rs if r['file']=='docs/routing-handoff-contract.md')
     plain=next(r for r in rs if r['file']=='README.md')
@@ -204,6 +218,7 @@ def main():
         r['checks']['coverage']['descriptionTruth']={e['edgeId']:{'sourcePassage':old,'adjacentPassage':m.adjacent_passage(before,e['sourceSpans']),'targetEvidence':[{'line':1,'text':m.blob(a.author_commit,target).decode().splitlines()[0]}],'targetCommit':a.author_commit,'target':target,'targetDigest':m.sha(m.blob(a.author_commit,target)), 'comparisons':{k:{'verdict':'not-asserted','note':'Fixture asserts no '+k} for k in ['counts','ports','defaults','verbFileLists','versions','shippedStatus']},'assessment':'Complete area pointer fixture.'}}
         original_blob=m.blob
         def fake_blob(commit,path):return before.encode() if path==f else original_blob(commit,path)
+        e['unitId']=m.unit_id(before,e['sourceSpans'])
         return r,inv,fake_blob
     for name,old,target,wrong in [
         ('image marker','![old.md](./old.md)','docs/platform/work-state/spec.md','[spec.md](./platform/work-state/spec.md)'),

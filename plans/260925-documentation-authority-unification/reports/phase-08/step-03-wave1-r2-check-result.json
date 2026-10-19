@@ -1,0 +1,90 @@
+{
+  "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 96,
+  "edges": 1233,
+  "failures": [],
+  "failureCount": 0,
+  "locatorReviewFlags": [
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07977",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "Dev checkout shell helpers"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "Old shell-helper heading maps to live §3.3 Dev Checkout Channel, which documents sourcing the same helper; literal old title remains only in carriage.",
+      "correspondence": {
+        "source": "Dev checkout shell helpers",
+        "target": "Dev Checkout Channel",
+        "reason": "L12-30(3): live dev-checkout section documents sourcing scripts/fgos-shell-integration.sh; the old heading is inside carriage."
+      }
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08011",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§13.1."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08012), which remains parked separately.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "edgeId": "maps-j-08056",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "ADR-0005"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "ADR-0005 is headed 0005 in the live decision file. The source D3/D4 clause labels remain verbatim; this pointer targets the complete Runner isolation decision, not an area portal.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08150",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "Dev checkout shell helpers"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "Old shell-helper heading maps to live §3.3 Dev Checkout Channel, which documents sourcing the same helper; literal old title remains only in carriage.",
+      "correspondence": {
+        "source": "Dev checkout shell helpers",
+        "target": "Dev Checkout Channel",
+        "reason": "L12-30(3): live dev-checkout section documents sourcing scripts/fgos-shell-integration.sh; the old heading is inside carriage."
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08184",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§13.1."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08185), which remains parked separately.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "maps-j-08379",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "0027"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "The source labels this as Lifecycle Work and universal tail, a whole-file current lifecycle pointer. The dated 0027 decision number is kept; its narrative remains in retired decision history, not an executable target.",
+      "correspondence": null
+    }
+  ],
+  "checker": "step-03-check.py: L12-34 retirement, units, Related and relative scan; pilot + wave 1",
+  "waveFiles": 75,
+  "retiredFiles": 33,
+  "retiredEdges": 505,
+  "activeFiles": 63,
+  "activeEdges": 728,
+  "waveEdges": 738
+}
