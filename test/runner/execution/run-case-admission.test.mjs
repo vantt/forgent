@@ -154,14 +154,14 @@ test('every answer but unbound refuses a standalone writing run before custody a
   }
 });
 
-test('a worktree some case binds refuses a standalone writing run through the real port, a masked view does too', async () => {
+test('a worktree some case binds refuses a standalone writing run through the real port, a masked view of a nested caller is a confined write', async () => {
   const { repoRoot, worktreeDir } = setup();
   const port = createCaseAdmissionPort({ repoRoot });
   const made = createPendingBinding({ mainRoot: repoRoot, caseId: 'wf-owner', generation: 1, worktree: worktreeDir });
   commitBinding({ mainRoot: repoRoot, key: made.key, caseId: 'wf-owner', generation: 1 });
   await assert.rejects(
     () => runUnit({ unitData: WRITE_UNIT, caseAdmission: port, repoRoot, cwd: worktreeDir, worktree: worktreeDir }),
-    (err) => err.code === 'worktree-already-bound' && /wf-owner/.test(err.message),
+    (err) => err.code === 'bound-worktree-requires-case-authority' && /wf-owner/.test(err.message),
   );
   assert.deepEqual(assignmentsOf(repoRoot), []);
 
@@ -173,7 +173,7 @@ test('a worktree some case binds refuses a standalone writing run through the re
     const masked = createCaseAdmissionPort({ repoRoot: other.repoRoot });
     await assert.rejects(
       () => runUnit({ unitData: WRITE_UNIT, caseAdmission: masked, repoRoot: other.repoRoot, cwd: other.worktreeDir, worktree: other.worktreeDir }),
-      { code: 'binding-view-unavailable' },
+      { code: 'nested-write-from-confined-worker' },
     );
   } finally {
     if (before === undefined) delete process.env.FGOS_DISPATCH_DEPTH; else process.env.FGOS_DISPATCH_DEPTH = before;

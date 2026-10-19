@@ -5,9 +5,12 @@
 // child case open. A child that cannot open calls `refundParentFrame` in a section of its own. Two
 // `advance` holds are never held in one scope. Both calls are idempotent on the reservation id.
 
+import crypto from 'node:crypto';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { projectCase } from './case-projection.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
+import { tryAcquireAdvanceLock } from './case-lock.mjs';
+import { writeSettlePending } from './case-runtime.mjs';
 
 /**
  * Charge a nested case's counters to the parent's frame.
@@ -48,6 +51,45 @@ export function reserveParentFrame({ mainRoot, parentCaseId, hold, reservationId
     },
   });
   return { reserved: true, reservationId };
+}
+
+/**
+ * Charge a nested case to its parent before the child opens, in a short section of the parent's
+ * `advance` that is released before anything else happens. Throws a named refusal when the parent is
+ * held (`case-admission-busy`, retry), closed, or has no room (`frame-exhausted`, `frame-remaining-unknown`).
+ *
+ * @returns {{ parentCaseId: string, reservationId: string }}
+ */
+export function chargeNestedCase({ mainRoot, parentCaseId, counters, childRef }) {
+  const reservationId = `rsv-nested-${Date.now().toString(36)}-${crypto.randomBytes(4).toString('hex')}`;
+  const hold = tryAcquireAdvanceLock(mainRoot, parentCaseId);
+  if (hold === null) throw new RunnerConfigError(`case ${parentCaseId} is being advanced by another process; its frame cannot be charged now, ask again`, { code: 'case-admission-busy' });
+  let charged;
+  try {
+    charged = reserveParentFrame({ mainRoot, parentCaseId, hold, reservationId, childRef, counters });
+  } finally {
+    hold.release();
+  }
+  if (charged.refused) throw new RunnerConfigError(`the nested case was not opened: ${charged.refused.condition}`, { code: charged.refused.code });
+  return { parentCaseId, reservationId };
+}
+
+/**
+ * Give a nested case's charge back after the child could not open, in a section of its own (never two
+ * `advance` holds in one scope). A parent that is held keeps the refund as a settle-pending file, which
+ * the next holder of `advance` folds in first; both ways are idempotent on the reservation id.
+ */
+export function refundNestedCase({ mainRoot, parentCaseId, reservationId }) {
+  const hold = tryAcquireAdvanceLock(mainRoot, parentCaseId);
+  if (hold === null) {
+    writeSettlePending({ mainRoot, caseId: parentCaseId, settle: { reservationId, outcome: 'refunded', receipts: [], achieved: [], seatLaunchesUsed: 0 } });
+    return { refunded: false, pending: true };
+  }
+  try {
+    return refundParentFrame({ mainRoot, parentCaseId, hold, reservationId });
+  } finally {
+    hold.release();
+  }
 }
 
 /** Give a nested case's charge back to the parent. Does nothing when the charge was already settled or refunded. */

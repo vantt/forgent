@@ -1,5 +1,7 @@
 # Phase 07 — AdmissionPort at every `runUnit` writer (F2 ceiling, F3 port, B3′)
 
+Status: done (report: plans/reports/phase-lead-261019-2239-workflow-case-p07-p08.md)
+
 ## Context
 
 - Spec §5.2 (Execution Core owns the port interface, never the decision; three operations or equivalent; `runUnit` takes it via options; **every** `runUnit` caller with `writes` injects the real port on landing; fail-closed by structure; port reaches the write gate; optional existing `advance` hold; admission after pattern resolution, before `bind()`), §5.3 (A4 one-way Workflow → Execution Core), RUL-WF-11.7, RUL-WF-12 (counting units; seat-launch ceiling delivered to the Unit; settle once; Execution Core never writes the ledger mid-run), §8 rows "Skill trong phiên lái Work item…", "Chi tiêu dưới cửa", §11.2, battery 4 (write-gate half), 5, 12, 13, 24, 25.

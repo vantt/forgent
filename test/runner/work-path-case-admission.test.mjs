@@ -53,7 +53,7 @@ test('a Work driver step with writes in an unbound claim worktree runs as before
   const owned = fixture();
   const made = createPendingBinding({ mainRoot: owned.repoRoot, caseId: 'wf-owner', generation: 1, worktree: owned.worktree });
   commitBinding({ mainRoot: owned.repoRoot, key: made.key, caseId: 'wf-owner', generation: 1 });
-  await assert.rejects(() => owned.run(), (err) => err.code === 'worktree-already-bound' && /wf-owner/.test(err.message));
+  await assert.rejects(() => owned.run(), (err) => err.code === 'bound-worktree-requires-case-authority' && /wf-owner/.test(err.message));
   const assignments = path.join(owned.repoRoot, '.fgos', 'assignments');
   assert.deepEqual(fs.existsSync(assignments) ? fs.readdirSync(assignments) : [], [], 'refused before a unit run exists');
 });

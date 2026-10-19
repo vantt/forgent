@@ -270,6 +270,7 @@ export function admitProposal({ projection, proposal, bindingAnswers = {}, reser
           unitId: proposal.unitId ?? null,
           routeKind,
           ...(proposal.reason ? { reason: proposal.reason } : {}),
+          ...(proposal.claimedRoute ? { claimedRoute: proposal.claimedRoute } : {}),
           guideVersion: projection.guideRef?.sha256 ?? null,
           reservationId,
         },

@@ -16,8 +16,10 @@ import {
   answerWorkflow,
   answerWorkflowDetached,
   statusWorkflow,
+  closeWorkflow,
   readWorkflowEvents,
 } from '../../src/workflow/index.mjs';
+import { conductorWorkflow } from '../helpers/workflow-case-fixture.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { projectCase } from '../../src/workflow/case-projection.mjs';
 import { readReservationFiles } from '../../src/workflow/case-runtime.mjs';
@@ -284,4 +286,41 @@ test('a panel Unit is admitted under a ceiling of its planned seats times the fa
   assert.equal(settle.payload.frameExhausted, undefined);
   const between = events.filter((e) => e.seq > reservation.seq && e.seq < settle.seq).map((e) => e.type);
   assert.deepEqual(between.filter((t) => !['unit.scheduled', 'unit.started', 'unit.complete', 'step.start'].includes(t)), [], 'the Execution Core wrote nothing to the ledger between admit and settle');
+});
+
+test('a Playbook case that ran to a pass closes itself by the rules of close; failed, parked and conductor cases stay open', async () => {
+  const tmp = setupRepo();
+  const done = await startWorkflow({
+    workflow: validateWorkflow({ id: 'auto-close', frameDefaults: FRAME, steps: [{ id: 'write', units: [unit('u-write', 'WRITE:out/y.txt', { writes: ['out/**'] })] }] }),
+    ...opts(tmp),
+  });
+  assert.equal(done.status, 'completed', JSON.stringify(done.steps));
+  const events = eventsOf(tmp, done.workflowRunId);
+  const closed = events.find((e) => e.type === 'case.closed');
+  assert.equal(closed.payload.reason, 'completed');
+  assert.ok(closed.seq > events.find((e) => e.type === 'workflow.complete').seq, 'closed after the case completed');
+  assert.deepEqual(events.filter((e) => e.type === 'binding').map((e) => e.payload.state), ['bound', 'unbound']);
+  assert.equal(statusWorkflow(done.workflowRunId, opts(tmp)).case.open, false);
+  assert.throws(() => closeWorkflow(done.workflowRunId, opts(tmp)), { code: 'case-closed' }, 'the verb agrees: already closed');
+
+  // A failed case stays open: resume and answer keep working on it.
+  const failed = await startWorkflow({
+    workflow: validateWorkflow({ id: 'no-auto-close-failed', frameDefaults: { ...FRAME, dispatches: 1 }, steps: [{ id: 's', units: [unit('first'), unit('second')] }] }),
+    ...opts(tmp),
+  });
+  assert.equal(failed.status, 'failed');
+  assert.equal(projectCase(eventsOf(tmp, failed.workflowRunId)).open, true);
+
+  // A case parked at its gate stays open.
+  const parked = await startWorkflow({ workflow: validateWorkflow(APPROVAL_GUIDE), ...opts(tmp) });
+  assert.equal(parked.status, 'parked');
+  assert.equal(projectCase(eventsOf(tmp, parked.workflowRunId)).open, true);
+  const finished = await answerWorkflow(parked.workflowRunId, { stepId: 'approval', answer: 'yes', approved: true, ...opts(tmp) });
+  assert.equal(finished.status, 'completed');
+  assert.equal(projectCase(eventsOf(tmp, parked.workflowRunId)).open, false, 'the answer that finishes the case closes it');
+
+  // A conductor case closes only through its close verb.
+  const conductor = await startWorkflow({ workflow: conductorWorkflow({ id: 'conductor-stays' }), ...opts(tmp) });
+  assert.equal(projectCase(eventsOf(tmp, conductor.workflowRunId)).open, true);
+  assert.equal(closeWorkflow(conductor.workflowRunId, opts(tmp)).closed, true);
 });

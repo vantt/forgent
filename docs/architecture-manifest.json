@@ -308,6 +308,7 @@
     "src/workflow/case-runtime.mjs": "infra",
     "src/workflow/case-frame.mjs": "infra",
     "src/workflow/case-lock.mjs": "infra",
+    "src/workflow/case-close.mjs": "infra",
     "src/workflow/case-admission-port.mjs": "infra",
     "src/workflow/unit-handoff.mjs": "infra",
     "src/workflow/case-start.mjs": "use-case",

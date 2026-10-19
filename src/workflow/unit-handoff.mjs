@@ -6,6 +6,7 @@
 // paths a Unit wrote outside its scope, and the worktrees left behind when a case ends.
 
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -367,6 +368,34 @@ export function stepSubjectDigest({ state, workflow, stepId, mainRoot }) {
   const step = workflow.steps.find((s) => s.id === stepId);
   const from = step && !step.gate && step.units.length > 0 ? [stepId] : (step?.dependsOn ?? []);
   return digestUnitRunReports(unitRunsOf(state, from), mainRoot);
+}
+
+/**
+ * The revisions of settled reports a fresh approval stands behind: for each human gate whose latest approval
+ * is bound to the digest of what its subject is NOW, the sha256 of the bytes of each report that subject is made
+ * of. The Execution Core refuses a settled report whose bytes changed (`report-changed-after-settle`); this is
+ * the authority that lets it hand over the one a person approved after the change, and only that one. An edit
+ * no approval covers is not here, so it is still refused.
+ *
+ * @param {object} params
+ * @param {Array<object>} params.events the case's ledger
+ * @returns {string[]} sha256 hex digests
+ */
+export function approvedReportDigests({ events, state, workflow, mainRoot }) {
+  const accepted = new Set();
+  for (const step of workflow.steps) {
+    if (!step.gate || step.gate.kind !== 'human' || state.steps[step.id]?.approved !== true) continue;
+    const approval = [...events].reverse().find((e) => e.type === 'gate.answer' && e.payload?.stepId === step.id && e.payload.approved === true);
+    const current = approval?.payload?.subjectDigest;
+    if (!current || current !== stepSubjectDigest({ state, workflow, stepId: step.id, mainRoot })) continue;
+    const refs = unitRunsOf(state, step.dependsOn).flatMap(({ unitRunId, roles }) => roles.map((role) => `unit-run:${unitRunId}/${role}`));
+    try {
+      for (const file of resolveUnitInputs(refs, mainRoot, { accept: 'any' }).refs) accepted.add(crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'));
+    } catch {
+      // A report that cannot be read is not accepted; the Unit that needs it is refused by name.
+    }
+  }
+  return [...accepted];
 }
 
 /** The digest every milestone of a completed step has now, by milestone id: what the case recheck compares to. */

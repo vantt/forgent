@@ -306,6 +306,15 @@ function declaredOperationOf(declared, unit, patternName, { taskSpecRoot } = {})
   return fields;
 }
 
+/** The sha256 hex digests of report revisions the caller stands behind; anything else is refused before the run. */
+function checkedAcceptedReports(accepted) {
+  if (accepted === undefined) return [];
+  if (!Array.isArray(accepted) || accepted.some((d) => typeof d !== 'string' || !/^[0-9a-f]{64}$/.test(d))) {
+    throw new RunnerConfigError('runUnit: acceptedReports must be sha256 hex digests');
+  }
+  return [...new Set(accepted)];
+}
+
 /** Absolute paths whose bytes a result is bound to; anything else is refused before the run. */
 function checkedPinInputs(pinInputs) {
   if (pinInputs === undefined) return [];
@@ -358,7 +367,7 @@ function requireFreeWorktree(port, worktree) {
   if (binding?.answer === 'unbound') return;
   const answer = binding?.answer ?? 'binding-view-unavailable';
   const owner = binding?.record?.caseId ? ` (case ${binding.record.caseId})` : '';
-  throw new CaseAdmissionRefusedError({ code: answer, condition: `worktree ${worktree} is not free for a run that names no case: ${answer}${owner}` });
+  throw new CaseAdmissionRefusedError({ code: answer, condition: binding?.condition ?? `worktree ${worktree} is not free for a run that names no case: ${answer}${owner}` });
 }
 
 /**
@@ -503,6 +512,9 @@ async function runUnitBody(options, scope) {
   let declaredOp = null;
   // The seat launches the admission handed this run (kept in unit.json, so a resume keeps the same bound).
   let admittedCeiling = null;
+  // sha256 of the revisions of a settled report its caller stands behind (see handoff-refs `accept`); kept in
+  // unit.json so a resume and every seat's own inputs read the same.
+  let acceptedReports = [];
   const assignmentsDir = path.join(mainRoot, '.fgos', 'assignments');
 
   if (options.resumeUnitRunId) {
@@ -586,6 +598,7 @@ async function runUnitBody(options, scope) {
       declaredOp = declaredOperationOf(options.declared, unit, chosenPattern(options, unit), { taskSpecRoot: mainRoot });
     }
     const pinInputs = options.declared !== undefined ? checkedPinInputs(options.pinInputs) : [];
+    acceptedReports = checkedAcceptedReports(options.acceptedReports);
     // A run timeout in an override is checked before the unit run exists (bind() checks it again).
     for (const ov of options.overrides ?? []) {
       if (ov && typeof ov === 'object' && ov.timeoutMs !== undefined) assertRunTimeoutMs(ov.timeoutMs, 'override timeoutMs');
@@ -638,9 +651,12 @@ async function runUnitBody(options, scope) {
       resolved = resolveUnitInputs(
         unit.inputs,
         mainRoot,
-        unit.blind
-          ? { blind: true, anonymize: unit.anonymizeInputs === true }
-          : unit.anonymizeInputs ? { anonymizeInto: path.join(unitDir, 'inputs') } : {},
+        {
+          accept: acceptedReports,
+          ...(unit.blind
+            ? { blind: true, anonymize: unit.anonymizeInputs === true }
+            : unit.anonymizeInputs ? { anonymizeInto: path.join(unitDir, 'inputs') } : {}),
+        },
       );
     } catch (err) {
       fs.rmSync(unitDir, { recursive: true, force: true });
@@ -660,6 +676,7 @@ async function runUnitBody(options, scope) {
       writeScope: expandGenerated(unit.writes, configSnapshot.runner.generatedPaths ?? []),
       ...(personaPin ? { personaPin } : {}),
       resolvedInputs: resolved.refs,
+      ...(acceptedReports.length > 0 ? { acceptedReports } : {}),
       // Which input each neutral name stands for; only the owner reads this, never a role.
       ...(unit.anonymizeInputs || unit.blind ? { inputMap: resolved.inputMap } : {}),
       worktree: fs.realpathSync(worktreePath),
@@ -778,7 +795,7 @@ async function runUnitBody(options, scope) {
     // What an earlier run's same seat left for this role: the role's own previous result, copied
     // into its own directory whether the unit is blind or not.
     if (unit.inputs.some(isSeatInput)) {
-      contextRefs = [...contextRefs, ...copyHandoffsInto(assignmentDir, resolveUnitInputs(unit.inputs, mainRoot, { seat: role }).inputMap)];
+      contextRefs = [...contextRefs, ...copyHandoffsInto(assignmentDir, resolveUnitInputs(unit.inputs, mainRoot, { seat: role, accept: unitRecord.acceptedReports ?? [] }).inputMap)];
     }
 
     // A unit that runs a Work step operation is that operation's assignment: its seat keeps its
@@ -840,6 +857,8 @@ async function runUnitBody(options, scope) {
       cwd: unitRecord.worktree,
       repoRoot: mainRoot,
       custody: readOnly ? null : scope.custody,
+      // The case this launch was admitted into, so the worker's environment names it and no other.
+      ...(scope.admission ? { caseContext: { caseId: scope.admission.caseId, reservationId: scope.admission.reservationId } } : {}),
       runnerConfig,
       // The admission identity of this dispatch: a resume of an attempt whose outcome was never read
       // finds that attempt again (and its settled result) instead of admitting a new one.

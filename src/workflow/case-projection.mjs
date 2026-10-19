@@ -213,7 +213,8 @@ export function projectCase(events, { currentDigests = {} } = {}) {
     milestones,
     refusedAchievements,
     reservations: all,
-    liveReservations: all.filter((r) => !r.settled),
+    // A nested case's charge spends frame but is no attempt that may still be running.
+    liveReservations: all.filter((r) => !r.settled && !r.nested),
     blindUnitRuns,
     frameUsed: used,
     frameRemaining,

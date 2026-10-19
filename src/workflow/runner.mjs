@@ -26,6 +26,7 @@ import {
   cleanupWorkflowWorktree,
 } from './integrate.mjs';
 import {
+  approvedReportDigests,
   buildUnitHandoff,
   canResumeUnitRun,
   gitOut,
@@ -41,6 +42,7 @@ import {
 import { runUnit, snapshotRunnerConfig, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
+import { closeCaseUnderHold } from './case-close.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
@@ -131,6 +133,10 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
               payload: { outcome: 'pass', completedAt: new Date().toISOString() },
             },
           });
+          // A Playbook case that ran to a pass is finished: the proposer that holds `advance` closes it by
+          // the rules of `fgos workflow close`. One that cannot close (a closure milestone is stale)
+          // stays open, as does every case that failed, is blocked or is parked.
+          closeCaseUnderHold({ mainRoot, workflowRunId, hold, reason: 'completed' });
           state = reread().state;
         }
         break;
@@ -336,8 +342,12 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 recordScheduled();
                 throw new RunnerConfigError(prepError);
               }
+              // Reports a fresh approval stands behind may be handed over although their bytes changed after
+              // settlement; an edit no approval covers is still refused by the Execution Core.
+              const fresh = reread();
               const runOptions = {
                 unitData,
+                acceptedReports: approvedReportDigests({ events: fresh.events, state: fresh.state, workflow, mainRoot }),
                 repoRoot: mainRoot,
                 cwd: unitWorktree,
                 worktree: unitWorktree,
