@@ -9,6 +9,7 @@
 // implementation, never two.
 
 import { spawn } from 'node:child_process';
+import { runBorrowed } from '../holder-lock/index.mjs';
 
 // ASYNC CONVERSION (D16 wiring surface, fan-out-parallel): converted from
 // spawnSync to the event-based `spawn` API. The defined timeout contract is
@@ -36,16 +37,25 @@ import { spawn } from 'node:child_process';
 // (docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D3) share ONE
 // implementation of the timeout semantics tsk-53o pinned -- a second copy
 // would be a second place for `timedOut` to drift.
-export function runCommand(command, cwd, timeoutMs) {
+//
+// `custody` (optional): an acquired lock handle the caller holds over `cwd`.
+// The shell then runs as a borrower of that handle (runBorrowed), so the
+// command and everything it spawns keep the lease while they run, and the
+// result settles only after the borrow's leftover sweep. A sweep that cannot
+// prove the lease alone again rejects: that is an authority failure, not a
+// verify verdict.
+export function runCommand(command, cwd, timeoutMs, { custody } = {}) {
   const maxBuffer = 10 * 1024 * 1024;
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     // `stdin: 'ignore'` (never the 'pipe' default): a verify command that
     // checks for piped stdin (codex's own "Reading additional input from
     // stdin..." probe, tsk-3tkc) blocks forever on an open-but-unwritten
     // pipe here, since nothing in this runner ever writes to or closes
     // child.stdin -- same fix as src/runner/dispatch/transport.mjs's
     // cliSpawnAdapter.
-    const child = spawn(command, { shell: true, cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = custody
+      ? runBorrowed(custody, { command: shellCommand(), args: shellArgs(command), cwd, detached: true, stdin: 'ignore', maxOutputBytes: maxBuffer }, { sync: false })
+      : spawn(command, { shell: true, cwd, stdio: ['ignore', 'pipe', 'pipe'] });
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
 
@@ -105,7 +115,7 @@ export function runCommand(command, cwd, timeoutMs) {
     // shell) is confirmed dead, never waiting on any grandchild — 'exit'
     // reproduces that same timing exactly.
     child.on('exit', (code) => {
-      finish(() => {
+      const settle = () => finish(() => {
         resolve({
           passed: !timedOut && code === 0,
           status: timedOut ? null : code,
@@ -113,8 +123,21 @@ export function runCommand(command, cwd, timeoutMs) {
           output: `${stdout}${stderr}`,
         });
       });
+      if (!child.borrowed) return settle();
+      // A borrowed shell settles after its sweep has killed whatever still
+      // holds the lease, grandchildren included, so a timeout cannot hang.
+      child.borrowed.then(settle, (err) => finish(() => reject(err)));
     });
   });
+}
+
+// The same shell `spawn(..., { shell: true })` uses, spelled out because a
+// borrowed child takes a command and an argument list.
+function shellCommand() {
+  return process.platform === 'win32' ? (process.env.ComSpec || 'cmd.exe') : '/bin/sh';
+}
+function shellArgs(command) {
+  return process.platform === 'win32' ? ['/d', '/s', '/c', command] : ['-c', command];
 }
 
 const FGOS_HINT_RE = /\.fgos\b/;

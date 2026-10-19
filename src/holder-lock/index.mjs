@@ -45,7 +45,7 @@ import {
   ROUTE_CALL_TIMEOUT_MS,
   ROUTE_SLACK_MS,
 } from './driver.mjs';
-import { startHold, waitReady, waitReadySync, readyBoundMs, releaseHold, removeWorkDir, borrowSync, borrowAsync } from './hold-transport.mjs';
+import { startHold, waitReady, waitReadySync, readyBoundMs, releaseHold, removeWorkDir, borrowSync, borrowAsync, clearDomainHold } from './hold-transport.mjs';
 
 export { runProcessObserveRoute };
 export { HolderLockError, LOCK_FD_ENV, LOCK_FD_SLOT, LOCK_JOB_ENV, readPredecessorKillWaitMs } from './protocol.mjs';
@@ -86,6 +86,24 @@ export class LockHandle {
 
   get released() {
     return descriptionOf(this).released;
+  }
+
+  /** The existing hold-helper request channel, for a supervisor to declare
+   * its domain under this acquired handle before GO (no OS handle escapes). */
+  domainEndpoint() {
+    const entry = descriptionOf(this);
+    if (entry.released) throw new HolderLockError('lock-handle-released', 'domain declaration needs a held handle', {});
+    return entry.hold ? entry.hold.work : null;
+  }
+
+  /** Record a completed handoff while this holder still excludes successors. */
+  clearDomain() {
+    const entry = descriptionOf(this);
+    if (entry.released || entry.borrows > 0) throw new HolderLockError('lock-handle-invalid', 'clearDomain requires an idle held handle', {});
+    const answer = entry.hold
+      ? clearDomainHold(entry.hold, this.killWaitMs + ROUTE_SLACK_MS)
+      : runLockRouteSync({ bin: hostBin({ fgosDir: this.projectRoot && path.join(this.projectRoot, '.fgos') }), args: ['--clear-domain', this.path, '--kill-wait-ms', String(this.killWaitMs)], fd: entry.fd, timeoutMs: this.killWaitMs + ROUTE_SLACK_MS });
+    if (answer.result !== 'cleared') throw new HolderLockError('lock-domain-not-empty', 'the holder domain was not proven empty', { answer });
   }
 
   /** Close the description (hold transport: end the helper). The kernel drops
@@ -158,7 +176,7 @@ function prepareAcquire(scope, name, params) {
   const bin = hostBin({ fgosDir: params.fgosDir });
   ensureLockFile(lock);
   assertDriverUsable(lock.v3Path, { fgosDir: params.fgosDir });
-  return { lock, bin, projectRoot, killWaitMs, env: routeEnv() };
+  return { lock, bin, projectRoot, killWaitMs, predecessorKinds: params.predecessorKinds, env: routeEnv() };
 }
 
 /** The lock file exists (created once, never removed while the resource
@@ -168,9 +186,9 @@ function ensureLockFile(lock) {
   closeQuietly(openLockFile(lock.v3Path));
 }
 
-function modeArgs(wait, killWaitMs) {
+function modeArgs(wait, killWaitMs, predecessorKinds) {
   const mode = wait.kind === 'ms' ? ['--wait-ms', String(wait.ms)] : ['--try'];
-  return [...mode, '--kill-wait-ms', String(killWaitMs)];
+  return [...mode, '--kill-wait-ms', String(killWaitMs), ...(predecessorKinds ? ['--predecessor-kinds', predecessorKinds.join(',')] : [])];
 }
 
 function routeTimeoutMs(wait, killWaitMs) {
@@ -233,7 +251,7 @@ export function acquireSync(scope, name, params = {}, { waitMs } = {}) {
     const fd = openLockFile(lock.v3Path);
     let line;
     try {
-      line = runLockRouteSync({ bin, args: modeArgs(wait, killWaitMs), fd, timeoutMs: routeTimeoutMs(wait, killWaitMs), env });
+      line = runLockRouteSync({ bin, args: modeArgs(wait, killWaitMs, prepared.predecessorKinds), fd, timeoutMs: routeTimeoutMs(wait, killWaitMs), env });
     } catch (err) {
       closeQuietly(fd);
       throw err;
@@ -254,7 +272,7 @@ export function acquireSync(scope, name, params = {}, { waitMs } = {}) {
  * helper and reports `timeout`. */
 function acquireHoldSync(scope, prepared, wait) {
   const { lock, bin, killWaitMs, env } = prepared;
-  const hold = startHold({ bin, lockPath: lock.v3Path, wait, killWaitMs, env });
+  const hold = startHold({ bin, lockPath: lock.v3Path, wait, killWaitMs, predecessorKinds: prepared.predecessorKinds, env });
   const { line } = waitReadySync(hold, bin, readyBoundMs(wait, killWaitMs, ROUTE_SLACK_MS));
   if (line === null) return settleNotAcquired({ result: 'killed' }, lock, wait, killWaitMs);
   if (line.result === 'acquired') return { result: 'acquired', handle: makeHandle(prepared, scope, { hold }) };
@@ -291,7 +309,7 @@ async function attemptFd(prepared, tryOnce) {
     const fd = openLockFile(lock.v3Path);
     let answer;
     try {
-      answer = await runLockRoute({ bin, args: modeArgs(tryOnce, killWaitMs), fd, timeoutMs: routeTimeoutMs(tryOnce, killWaitMs), env });
+      answer = await runLockRoute({ bin, args: modeArgs(tryOnce, killWaitMs, prepared.predecessorKinds), fd, timeoutMs: routeTimeoutMs(tryOnce, killWaitMs), env });
     } catch (err) {
       closeQuietly(fd);
       throw err;
@@ -309,7 +327,7 @@ async function attemptFd(prepared, tryOnce) {
 /** One `--try` helper on the hold transport, same shape as `attemptFd`. */
 async function attemptHold(prepared, tryOnce) {
   const { lock, bin, killWaitMs, env } = prepared;
-  const hold = startHold({ bin, lockPath: lock.v3Path, wait: tryOnce, killWaitMs, env });
+  const hold = startHold({ bin, lockPath: lock.v3Path, wait: tryOnce, killWaitMs, predecessorKinds: prepared.predecessorKinds, env });
   const { line } = await waitReady(hold, bin, readyBoundMs(tryOnce, killWaitMs, ROUTE_SLACK_MS));
   if (line === null) return { line: { result: 'killed' }, claim: null };
   if (line.result !== 'acquired') removeWorkDir(hold.work);
@@ -492,7 +510,9 @@ function runBorrowedHold(handle, entry, spec, sync) {
 
 /**
  * runBorrowed(handle, spec, { sync }) -- the one way a child command runs
- * with the holder's authority. `spec = { command, args, cwd, env, stdin, detached }`.
+ * with the holder's authority. `spec = { command, args, cwd, env, stdin, input, detached, maxOutputBytes }`.
+ * `input` supplies synchronous fd-transport stdin when `stdin: pipe`; the
+ * hold transport retains its null-stdin contract.
  * The description goes to the child at slot 3 and `FGOS_LOCK_FD=<name>:3`
  * names it; a git command gets `-c gc.auto=0 -c maintenance.auto=false`
  * in front of its arguments. After the child exits, whatever still holds
@@ -510,6 +530,8 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
   if (!spec || typeof spec.command !== 'string' || !spec.command) {
     throw new HolderLockError('borrow-spec-invalid', 'runBorrowed needs spec.command', {});
   }
+  if (spec.maxOutputBytes !== undefined && (!Number.isSafeInteger(spec.maxOutputBytes) || spec.maxOutputBytes < 1)) throw new HolderLockError('borrow-spec-invalid', 'maxOutputBytes must be a positive safe integer', {});
+  if (entry.fd !== null && !sameInode(entry.fd, handle.path)) throw new HolderLockError('lock-resource-replaced', `${handle.name}: the held lock resource was replaced`, {});
   if (entry.hold) return runBorrowedHold(handle, entry, spec, sync);
   const argv = borrowedArgv(spec.command, spec.args);
   const childEnv = { ...(spec.env ?? process.env), [LOCK_FD_ENV]: `${handle.name}:${LOCK_FD_SLOT}` };
@@ -522,22 +544,21 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
     entry.borrows += 1;
     let res;
     try {
-      res = spawnSync(spec.command, argv, { cwd: spec.cwd, env: childEnv, stdio, detached, encoding: 'utf8', maxBuffer: MAX_OUTPUT_BYTES, windowsHide: true });
+      res = spawnSync(spec.command, argv, { cwd: spec.cwd, env: childEnv, stdio, detached, encoding: 'utf8', maxBuffer: spec.maxOutputBytes ?? MAX_OUTPUT_BYTES, ...(spec.input === undefined ? {} : { input: spec.input }), windowsHide: true });
     } catch (err) {
       entry.borrows -= 1;
       throw err;
     }
-    if (res.error) {
-      entry.borrows -= 1;
-      throw new HolderLockError('borrow-spawn-failed', `${handle.name}: cannot run ${spec.command}: ${res.error.message}`, { lock: handle.name, cause: res.error.code ?? null });
-    }
     let sweep;
     try {
-      sweep = sweepLeftoversSync(handle, res.pid);
+      sweep = res.pid ? sweepLeftoversSync(handle, res.pid) : { remaining: [], leftoversKilled: 0 };
     } finally {
       entry.borrows -= 1;
     }
     if (sweep.remaining.length > 0) throw leftoverError(handle, sweep.remaining, { exit: res.status, signal: res.signal });
+    if (res.error) {
+      throw new HolderLockError('borrow-spawn-failed', `${handle.name}: cannot run ${spec.command}: ${res.error.message}`, { lock: handle.name, cause: res.error.code ?? null });
+    }
     return { exit: res.status, signal: res.signal, stdout: res.stdout, stderr: res.stderr, leftoversKilled: sweep.leftoversKilled };
   }
 
@@ -649,6 +670,11 @@ function checkBorrowedJob(lockPath, { env, fgosDir }) {
   const bin = hostBin({ fgosDir });
   const line = runLockRouteSync({ bin, args: ['--borrowed-check', path.resolve(lockPath)], timeoutMs: ROUTE_CALL_TIMEOUT_MS, env: routeEnv({ ...process.env, ...env }) });
   return borrowedAnswer(line, name);
+}
+
+/** Read-only predecessor observation; never acquires or edits the record. */
+export function predecessorState(lockPath, { fgosDir } = {}) {
+  return runLockRouteSync({ bin: hostBin({ fgosDir }), args: ['--predecessor-state', path.resolve(lockPath)], timeoutMs: ROUTE_CALL_TIMEOUT_MS });
 }
 
 /** Private registration seam, imported only by native-handover.mjs. No

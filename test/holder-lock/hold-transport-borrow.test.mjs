@@ -150,3 +150,15 @@ test('a child that cannot start is reported as an error event, not a pid', async
     endHold(hold);
   }
 });
+
+test('sync hold capture honors per-call limits and refuses oversized path lists', () => {
+  const hold = makeHold();
+  try {
+    const script = "process.stdout.write('a'.repeat(17 * 1024 * 1024) + '\\0')";
+    const answer = borrowSync(hold, { ...node(script), maxOutputBytes: 64 * 1024 * 1024 }, { killWaitMs: 2000 });
+    assert.equal(answer.stdout.length, 17 * 1024 * 1024 + 1);
+    assert.equal(answer.stdout.at(-1), '\0');
+    assert.throws(() => borrowSync(hold, { ...node(script), maxOutputBytes: 1024 }, { killWaitMs: 2000 }), { code: 'borrow-output-limit' });
+    assert.deepEqual(fs.readdirSync(hold.work).filter((f) => /^(req|started|out|err|result)-/.test(f)), []);
+  } finally { endHold(hold); }
+});

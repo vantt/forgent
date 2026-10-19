@@ -246,7 +246,7 @@ test('the gate kill grace reader follows the same merge and refuses an unusable 
   writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { gateKillGraceMs: 3000 } });
   assert.equal(readGateKillGraceMs({ projectRoot: root }), 3000);
   writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { gateKillGraceMs: 10 } });
-  assert.throws(() => readGateKillGraceMs({ projectRoot: root }), /at least 1000/);
+  assert.throws(() => readGateKillGraceMs({ projectRoot: root }), { name: 'RunnerConfigError', category: 'validation', code: 'invalid-gate-kill-grace', message: /dispatch\.gateKillGraceMs must be an integer of at least 1000/ });
 });
 
 // ─── run-attempts-stuck ─────────────────────────────────────────────────
@@ -300,6 +300,23 @@ test('run-attempts-stuck: the fix sends the attempt through adopt and names what
   const fixed = fixRunAttemptsStuck(root);
   assert.equal(fixed.changed, false);
   assert.match(fixed.message, /adopted 0 attempt\(s\); 1 still open: .*runs\/01/);
+});
+
+test('run-attempts-stuck: an attempt whose release was removed is named with the remedy, by the check and by the fix', () => {
+  process.env.FGOS_HOST_BIN = HOST_BIN;
+  const root = workspace('stuck-release-gone');
+  const gone = path.join(scratch, 'pruned-release', 'fgos');
+  const dir = attemptDir(root, 'gone');
+  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: gone }));
+  const res = checkRunAttemptsStuck(root);
+  assert.equal(res.passed, false, res.message);
+  assert.match(res.message, new RegExp(`runs/01 \\(the release that wrote it was removed \\(${gone} is gone\\)`));
+  assert.match(res.message, /restore that release directory, then run "fgos doctor --fix" again/);
+  assert.match(fixRunAttemptsStuck(root).message, /1 still open: .*the release that wrote it was removed/);
+
+  // A release that is still there is not blamed: adopt's own reason stands.
+  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: HOST_BIN }));
+  assert.doesNotMatch(checkRunAttemptsStuck(root).message, /was removed/);
 });
 
 test('run-attempts-stuck: a held lock is a running attempt, not a finding', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
@@ -451,5 +468,7 @@ test('the cancel wait reader shares the gate kill grace merge and refuses an unu
   writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { gateKillGraceMs: 3000 } });
   assert.equal(readCancelWaitMs({ projectRoot: root }), 8000);
   writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { cancelWaitMs: 10 } });
-  assert.throws(() => readCancelWaitMs({ projectRoot: root }), /cancelWaitMs must be an integer of at least 1000/);
+  assert.throws(() => readCancelWaitMs({ projectRoot: root }), { name: 'RunnerConfigError', category: 'validation', code: 'invalid-cancel-wait', message: /dispatch\.cancelWaitMs must be an integer of at least 1000/ });
+  // The doctor check names the same key with the same words.
+  assert.match(checkCancelWait(root, { globalConfigPath: path.join(scratch, 'no-global-config.json') }).message, /dispatch\.cancelWaitMs must be an integer of at least 1000/);
 });

@@ -6,6 +6,39 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
+// Every ledger line is written while its writer holds the run's `advance` lock. The hold is the
+// proof: a hold made by `createAdvanceHold`, for this run, not yet released. Nothing else appends.
+const holds = new WeakMap();
+
+/**
+ * Wrap the release of a run's `advance` lock as the hold the ledger demands.
+ *
+ * @param {object} params
+ * @param {string} params.workflowRunId
+ * @param {() => void} params.release Releases the underlying lock
+ * @returns {{ workflowRunId: string, release: () => void }}
+ */
+export function createAdvanceHold({ workflowRunId, release }) {
+  const state = { workflowRunId, released: false };
+  const hold = {
+    workflowRunId,
+    release() {
+      if (state.released) return;
+      state.released = true;
+      release();
+    },
+  };
+  holds.set(hold, state);
+  return Object.freeze(hold);
+}
+
+function assertAdvanceHold(hold, workflowRunId, what) {
+  const state = hold ? holds.get(hold) : undefined;
+  if (!state || state.released || state.workflowRunId !== workflowRunId) {
+    throw new RunnerConfigError(`${what} requires the advance lock of Workflow run "${workflowRunId}"`);
+  }
+}
+
 function workflowRunDir(repoRoot, workflowRunId) {
   return path.join(repoRoot, '.fgos', 'workflow-runs', workflowRunId);
 }
@@ -31,7 +64,15 @@ export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflo
 
   const runId = workflowRunId || `wf-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
   const runDir = workflowRunDir(repoRoot, runId);
-  fs.mkdirSync(runDir, { recursive: true });
+  fs.mkdirSync(path.dirname(runDir), { recursive: true });
+  // The run directory is created exclusively: a run id is never reused, and the first line below is
+  // the first thing in it.
+  try {
+    fs.mkdirSync(runDir);
+  } catch (err) {
+    if (err.code === 'EEXIST') throw new RunnerConfigError(`Workflow run "${runId}" already exists`);
+    throw err;
+  }
 
   const startEvent = {
     seq: 1,
@@ -54,8 +95,9 @@ export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflo
     },
   };
 
-  const file = eventsFilePath(repoRoot, runId);
-  fs.writeFileSync(file, JSON.stringify(startEvent) + '\n');
+  writeDurably(eventsFilePath(repoRoot, runId), JSON.stringify(startEvent) + '\n', { create: true });
+  fsyncDirectory(runDir);
+  fsyncDirectory(path.dirname(runDir));
 
   return {
     workflowRunId: runId,
@@ -64,18 +106,45 @@ export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflo
 }
 
 /**
- * Append an event to a Workflow run event log.
+ * Write `text` at the end of `file` and force it to disk before returning: open, write, fsync,
+ * close. `create` makes the file and fails if it exists.
+ */
+function writeDurably(file, text, { create = false } = {}) {
+  const fd = fs.openSync(file, create ? 'wx' : 'a');
+  try {
+    fs.writeSync(fd, text);
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+function fsyncDirectory(dir) {
+  const fd = fs.openSync(dir, 'r');
+  try {
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+/**
+ * Append an event to a Workflow run event log. The only way a line reaches the ledger after the
+ * run exists: the caller proves it holds the run's `advance` lock, and the line is on disk when
+ * this returns, so the lock is never released over an event that could still be lost.
  *
  * @param {object} params
  * @param {string} params.repoRoot
  * @param {string} params.workflowRunId
  * @param {object} params.event { type, payload }
+ * @param {object} params.hold The run's advance hold (`createAdvanceHold`)
  * @returns {object} Stored event with seq and ts
  */
-export function appendWorkflowEvent({ repoRoot, workflowRunId, event }) {
+export function appendWorkflowEvent({ repoRoot, workflowRunId, event, hold }) {
   if (!repoRoot || !workflowRunId || !event || !event.type) {
     throw new RunnerConfigError('appendWorkflowEvent requires repoRoot, workflowRunId, and event with type');
   }
+  assertAdvanceHold(hold, workflowRunId, 'appendWorkflowEvent');
 
   const file = eventsFilePath(repoRoot, workflowRunId);
   if (!fs.existsSync(file)) {
@@ -83,20 +152,21 @@ export function appendWorkflowEvent({ repoRoot, workflowRunId, event }) {
   }
 
   const existing = readWorkflowEvents({ repoRoot, workflowRunId });
-  const nextSeq = existing.length + 1;
   const stored = {
-    seq: nextSeq,
+    seq: existing.length + 1,
     ts: new Date().toISOString(),
     type: event.type,
     payload: event.payload || {},
   };
 
-  fs.appendFileSync(file, JSON.stringify(stored) + '\n');
+  writeDurably(file, JSON.stringify(stored) + '\n');
   return stored;
 }
 
 /**
- * Read all events of a Workflow run.
+ * Read all events of a Workflow run. Fails closed: a non-empty line that is not an event, or a
+ * `seq` that is not the next one, is a corrupt ledger; a last line without its newline is an
+ * unterminated tail, which only `recoverWorkflowLedgerTail` removes.
  *
  * @param {object} params
  * @param {string} params.repoRoot
@@ -110,16 +180,60 @@ export function readWorkflowEvents({ repoRoot, workflowRunId }) {
   }
 
   const lines = fs.readFileSync(file, 'utf8').split('\n');
+  const unterminated = lines.pop() !== '';
+  const corrupt = (lineNo, why) => new RunnerConfigError(
+    `Workflow ledger "${file}" is corrupt at line ${lineNo}: ${why}`,
+    { code: 'workflow-ledger-corrupt' },
+  );
   const events = [];
-  for (const line of lines) {
-    if (!line.trim()) continue;
+  lines.forEach((line, i) => {
+    if (!line.trim()) return;
+    let event;
     try {
-      events.push(JSON.parse(line));
-    } catch {
-      // Ignore corrupted trailing line
+      event = JSON.parse(line);
+    } catch (err) {
+      throw corrupt(i + 1, `not JSON (${err.message})`);
     }
+    if (typeof event?.type !== 'string' || event.seq !== events.length + 1) {
+      throw corrupt(i + 1, `expected an event with seq ${events.length + 1}, found ${line.slice(0, 80)}`);
+    }
+    events.push(event);
+  });
+  if (unterminated) {
+    throw new RunnerConfigError(
+      `Workflow ledger "${file}" ends in a line without its newline (an append that did not finish); the next holder of the run's advance lock removes it`,
+      { code: 'workflow-ledger-unterminated' },
+    );
   }
   return events;
+}
+
+/**
+ * Remove the unterminated last line of a run's ledger and record that it was removed. The only
+ * path that shortens a ledger: it needs the run's `advance` lock, drops that one line and nothing
+ * else, and leaves a `ledger.recovered` event behind. A ledger that ends in a newline is left alone.
+ *
+ * @returns {{ recovered: boolean, droppedBytes: number }}
+ */
+export function recoverWorkflowLedgerTail({ repoRoot, workflowRunId, hold }) {
+  assertAdvanceHold(hold, workflowRunId, 'recoverWorkflowLedgerTail');
+  const file = eventsFilePath(repoRoot, workflowRunId);
+  if (!fs.existsSync(file)) return { recovered: false, droppedBytes: 0 };
+
+  const text = fs.readFileSync(file);
+  if (text.length === 0 || text[text.length - 1] === 0x0a) return { recovered: false, droppedBytes: 0 };
+
+  const keep = text.lastIndexOf(0x0a) + 1;
+  const fd = fs.openSync(file, 'r+');
+  try {
+    fs.ftruncateSync(fd, keep);
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+  const droppedBytes = text.length - keep;
+  appendWorkflowEvent({ repoRoot, workflowRunId, event: { type: 'ledger.recovered', payload: { droppedBytes } }, hold });
+  return { recovered: true, droppedBytes };
 }
 
 /**

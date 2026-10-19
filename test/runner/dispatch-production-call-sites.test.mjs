@@ -101,7 +101,7 @@ test('a herdr-spawn executor cannot be executed directly: a pane launch is an at
   const root = fixtureRepo();
   try {
     await assert.rejects(
-      () => executeExecutorCli('herdr-worker', { prompt: 'do the thing', repoRoot: root, cwd: root, tier: 'standard' }),
+      () => executeExecutorCli('herdr-worker', { sharedCwd: true, prompt: 'do the thing', repoRoot: root, cwd: root, tier: 'standard' }),
       /herdr-spawn runs as an attempt of the run supervisor/,
     );
   } finally {
@@ -115,7 +115,7 @@ test('in-process dispatch through executeExecutorCli gets authorityScope: extern
     agentType: 'general-assistant',
   }));
   try {
-    const res = await executeExecutorCli('herdr-worker', {
+    const res = await executeExecutorCli('herdr-worker', { sharedCwd: true,
       prompt: 'in process prompt',
       repoRoot: root,
       cwd: root,
@@ -145,7 +145,7 @@ test('in-process dispatch with required confinement refuses without trusted harn
 
   try {
     await assert.rejects(
-      () => executeExecutorCli('herdr-worker', {
+      () => executeExecutorCli('herdr-worker', { sharedCwd: true,
         prompt: 'in process prompt',
         repoRoot: root,
         cwd: root,
@@ -184,7 +184,7 @@ test('http adapter routes through executeThroughConfinement and returns result w
   }));
 
   try {
-    const res = await executeExecutorCli('herdr-worker', {
+    const res = await executeExecutorCli('herdr-worker', { sharedCwd: true,
       prompt: 'ping',
       repoRoot: root,
       cwd: root,
@@ -205,7 +205,7 @@ test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.jso
   try {
     const fgosDir = path.join(root, '.fgos');
     const cfg = loadRunnerConfigFromDir(root);
-    await executeExecutorCli('mock-non-assignment', {
+    await executeExecutorCli('mock-non-assignment', { sharedCwd: true,
       prompt: 'hello world',
       cwd: root,
       repoRoot: root,

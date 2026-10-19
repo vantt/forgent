@@ -315,7 +315,7 @@ test("M2: executeExecutorCli in-process required confinement goes through execut
 
   await assert.rejects(
     () =>
-      executeExecutorCli("in-proc-exec", {
+      executeExecutorCli("in-proc-exec", { sharedCwd: true,
         for: "code:implement",
         repoRoot: root,
         runnerConfig: cfg,
@@ -530,7 +530,7 @@ test("MED-2: the loop worker Unit and executeExecutorCli agree on capability ide
     try {
       // Dispatch's door runs a registered executor; the Work layer derives the capability hints
       // from the step's own executor identity and dispatch takes them as given.
-      await executeExecutorCli("agy-cli", {
+      await executeExecutorCli("agy-cli", { sharedCwd: true,
         ...workDispatchContext({ work: researchWork, stage: "executing", cwd: tmpDir, executorId: "fgos-coding-implement" }),
         repoRoot: tmpDir,
         cwd: tmpDir,
@@ -594,7 +594,7 @@ test("MED-3: a tool executor's for[] order does not affect capability resolution
 
     let refusedCapA;
     try {
-      await executeExecutorCli("multi-order-a", {
+      await executeExecutorCli("multi-order-a", { sharedCwd: true,
         repoRoot: tmpDir,
         cwd: tmpDir,
         runnerConfig: cfgA,
@@ -607,7 +607,7 @@ test("MED-3: a tool executor's for[] order does not affect capability resolution
 
     let refusedCapB;
     try {
-      await executeExecutorCli("multi-order-b", {
+      await executeExecutorCli("multi-order-b", { sharedCwd: true,
         repoRoot: tmpDir,
         cwd: tmpDir,
         runnerConfig: cfgB,

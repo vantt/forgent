@@ -4,10 +4,12 @@
   "description": "Cold-path helper for Node, which cannot call flock. Node opens the lock file (O_RDWR) and hands that fd in slot 3; the helper locks the inherited description and exits. The lock stays with the description Node owns. The helper is never the owner.",
   "argv": {
     "required": ["--protocol 1"],
+    "predecessorKinds": "--predecessor-kinds <kind,kind>: on acquire reject other recorded kinds under the kernel lock before ordinary cleanup",
     "mode": {
       "exactlyOne": [
         { "flag": "--try", "meaning": "one non-blocking LOCK_EX attempt on fd 3" },
         { "flag": "--wait-ms N", "meaning": "LOCK_EX attempts until N milliseconds elapsed (N integer >= 1); the caller still kills the helper on its own deadline" },
+        { "flag": "--clear-domain <lockFile>", "meaning": "validate the held description at fd 3; observe the unchanged predecessor domain empty without killing, then clear its record" },
         { "flag": "--shared-try", "meaning": "one non-blocking LOCK_SH attempt on fd 3; result free or held; the caller closes fd 3 afterwards" },
         { "flag": "--borrowed-check <path>", "meaning": "borrower test for hooks: fd 3 must have the same dev:ino as <path> and a non-blocking LOCK_EX on it must succeed (a description that already holds the lock succeeds; a sibling that opened the file itself fails). On Windows it takes no slot and uses FGOS_LOCK_JOB (holder-lock.port.v1.json borrowerCheck)" },
         { "flag": "--probe <lockFile>", "meaning": "path-based shared try, no fd needed (Node on Windows): result free or held; the shared lock is dropped at once" },

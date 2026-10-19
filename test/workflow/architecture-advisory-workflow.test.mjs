@@ -4,9 +4,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
-import { execFileSync } from 'node:child_process';
-import { withProviderFamilies } from '../helpers/provider-families.mjs';
 
 import {
   startWorkflow,
@@ -15,79 +12,28 @@ import {
   loadWorkflow,
 } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 
 seedFileLocalBwrapRegistry();
-// bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
-import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 
 function setupTestRepo() {
-  const tmp = makeFixtureDir('fgos-arch-wf-test-');
-  execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.name', 'Workflow Test'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.email', 'wf@test.local'], { cwd: tmp, stdio: 'ignore' });
-
-  fs.writeFileSync(path.join(tmp, 'README.md'), '# Architecture Advisory Workflow Test\n');
-  execFileSync('git', ['add', 'README.md'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'initial commit'], { cwd: tmp, stdio: 'ignore' });
-
-  // Create fake echo worker that writes valid agent-result.json and agent-report.md
-  const echoScript = path.join(tmp, 'echo-worker.mjs');
-  fs.writeFileSync(
-    echoScript,
-    `
-    import fs from 'node:fs';
-    import path from 'node:path';
-    const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-    if (match) {
-      const runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
-      fs.mkdirSync(runDir, { recursive: true });
+  return setupWorkflowFixtureRepo({
+    prefix: 'fgos-arch-wf-test-',
+    readme: '# Architecture Advisory Workflow Test',
+    gitName: 'Workflow Test',
+    capabilities: ['architecture:frame', 'architecture:shape', 'architecture:critique', 'architecture:synthesize', 'architecture:explain'],
+    modelPolicies: { node: { standard: 'node-std', flagship: 'node-high' } },
+    reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'], high: ['reviewer', 'red-team'] } },
+    workerBody: `
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), JSON.stringify({
         verdict: 'Reversible advisory recommendation with dissent preserved',
         evidence: ['The fixed fixture report, not a production architecture judgement'],
         'missing expertise': ['authorization boundaries'],
       }));
       fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Advisory report settled', assessment: { verdict: 'pass' } }));
-    }
     `,
-  );
-
-  const fgosDir = path.join(tmp, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
-
-  const cfg = {
-    runner: {
-      defaultExecutor: 'test-node',
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-      modelPolicies: { node: { standard: 'node-std', flagship: 'node-high' } },
-      executors: {
-        'test-node': {
-          kind: 'agent',
-          description: 'Test node executor',
-          allowCrossProvider: true,
-          command: process.execPath,
-          args: [echoScript, '{prompt}'],
-          providerModel: 'node',
-          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [echoScript, '{prompt}'] }],
-        },
-      },
-      capabilities: {
-        'architecture:frame': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'architecture:shape': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'architecture:critique': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'architecture:synthesize': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'architecture:explain': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-      },
-      patterns: {
-        defaultRule: { mutatingMinRigor: 'standard' },
-        reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'], high: ['reviewer', 'red-team'] } },
-      },
-    },
-  };
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(withProviderFamilies(cfg), null, 2));
-
-  return tmp;
+  });
 }
 
 

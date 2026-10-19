@@ -33,19 +33,19 @@ export function lockEntry(name) {
 
 const PLACEHOLDER = /<([^<>]+)>/g;
 
-/** `<dev>-<ino>` of the directory `cwd` names after realpath: one key for
+/** `<dev>-<ino>-<birthtimeNs>` of the directory `cwd` names after realpath: one key for
  * every spelling of the same directory, symlinked or not. A cwd that does
  * not exist has no key (strict resolution then names the missing param). */
 function cwdDevIno(cwd) {
   if (typeof cwd !== 'string' || !cwd) return undefined;
   let stat;
   try {
-    stat = fs.statSync(fs.realpathSync(path.resolve(cwd)));
+    stat = fs.statSync(fs.realpathSync(path.resolve(cwd)), { bigint: true });
   } catch (err) {
     if (err.code === 'ENOENT' || err.code === 'ENOTDIR') return undefined;
     throw err;
   }
-  return `${stat.dev}-${stat.ino}`;
+  return `${stat.dev}-${stat.ino}-${stat.birthtimeNs}`;
 }
 
 function placeholderValue(key, params) {

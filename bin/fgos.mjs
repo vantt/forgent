@@ -54,6 +54,7 @@ import { formatDeprecation } from '../src/cli/deprecation.mjs';
 import { checkDirDiffersFromCwd, attachDirWarning } from '../src/workflow/dir-guard.mjs';
 import { lintPlanCapabilityAnnotations, lintPhaseUnits } from '../src/report/capability-plan-lint.mjs';
 import { appendWorkerLog } from '../src/runner/worker-log.mjs';
+import { enableCancelOnSignal } from '../src/run-supervisor/cancel-opt-in.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
 // `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
@@ -4995,6 +4996,8 @@ async function handleHook(rest) {
 
 async function main() {
   const [, , verb, ...rest] = process.argv;
+  // This process is a controller: Ctrl-C and SIGTERM cancel the attempts it started (the library asks for it, never assumes it).
+  enableCancelOnSignal();
   // `hook` keeps the agent's raw argv, but its help is still the manifest door.
   if (verb === 'hook' && (rest.includes('--help') || rest.includes('-h'))) {
     handleVerbHelp(verb, { help: true, ...(rest.includes('--json') ? { json: true } : {}) }, []);

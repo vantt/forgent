@@ -8,20 +8,21 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { installCancelOnSignal, register, registeredRuns, requestCancel, unregister } from '../../src/run-supervisor/cancel-registry.mjs';
+import { RunCancelledError, assertNotCancelled, beginLaunch, endLaunch, installCancelOnSignal, register, registeredRuns, requestCancel, resetCancelRequest, unregister } from '../../src/run-supervisor/cancel-registry.mjs';
 import { readCancelWaitMs } from '../../src/run-supervisor/gate-kill-grace.mjs';
 import { bwrapUsable, createProject, readJson, sleep, waitUntil } from './support/direct-harness.mjs';
 
 seedFileLocalBwrapRegistry();
 
 const skip = !bwrapUsable() && 'bwrap with a pid namespace is not usable on this machine';
-const CONTROLLER = path.resolve('test/run-supervisor/fixtures/cancel-controller.mjs');
+const FGOS_CLI = path.resolve('bin/fgos.mjs');
 const here = (dir, name) => path.join(dir, name);
 const exists = (dir, name) => fs.existsSync(here(dir, name));
 
-function startController(project, unitFile, { cancelWaitMs = 60_000 } = {}) {
-  const child = spawn(process.execPath, [CONTROLLER, 'run', '--unit', unitFile, '--dir', project.repoDir], {
-    cwd: project.repoDir, env: { ...project.env, CANCEL_WAIT_MS: String(cancelWaitMs) }, stdio: ['ignore', 'pipe', 'pipe'],
+// The real CLI is the controller: it asks for the signal handling itself, the wait is the configured one.
+function startController(project, unitFile) {
+  const child = spawn(process.execPath, [FGOS_CLI, 'run', '--unit', unitFile, '--dir', project.repoDir], {
+    cwd: project.repoDir, env: project.env, stdio: ['ignore', 'pipe', 'pipe'],
   });
   let stderr = '';
   child.stderr.on('data', (chunk) => { stderr += chunk; });
@@ -106,7 +107,7 @@ test('3. SIGTERM exits 143', { skip, timeout: 240_000 }, async () => {
   assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'cancelled');
 });
 
-test('4. a signal before any binding writes no cancel file: the controller still holds the attempt lock and dying is enough', async () => {
+test('4. a signal with nothing handed over writes no cancel file and leaves at once', async () => {
   const dir = makeFixtureDir('cancel-before-binding-');
   fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ attemptId: 'att-early', unitRunId: 'unit-early' }));
   // Nothing is registered for this attempt, which is the state until the supervisor binds it.
@@ -117,7 +118,73 @@ test('4. a signal before any binding writes no cancel file: the controller still
     await waitUntil(() => exits.length > 0, { timeoutMs: 5000, what: 'the exit' });
   } finally {
     uninstall();
+    resetCancelRequest();
   }
   assert.deepEqual(exits, [130]);
   assert.equal(exists(dir, 'cancel-requested.json'), false);
+});
+
+/** Installs the handlers with a stand-in exit, sends a signal, and always puts the process back as it was. */
+async function withSignalHandlers(fn, { cancelWaitMs = 2000 } = {}) {
+  const exits = [];
+  let stderr = '';
+  const uninstall = installCancelOnSignal({ cancelWaitMs, exit: (code) => exits.push(code), stderr: { write: (text) => { stderr += text; } } });
+  try {
+    await fn({ exits, stderr: () => stderr });
+  } finally {
+    uninstall();
+    resetCancelRequest();
+    for (const dir of registeredRuns()) unregister(dir);
+  }
+}
+
+const attemptWithEnvelope = (name, unitRunId) => {
+  const dir = makeFixtureDir(`cancel-${name}-`);
+  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ attemptId: `att-${name}`, unitRunId }));
+  return dir;
+};
+
+test('5. a signal while an attempt is handed over waits for its binding, then cancels it and names the unit', async () => {
+  const dir = attemptWithEnvelope('handover', 'unit-handover');
+  await withSignalHandlers(async ({ exits, stderr }) => {
+    beginLaunch(dir);
+    process.emit('SIGINT');
+    await sleep(300);
+    assert.deepEqual(exits, [], 'the controller keeps waiting while the binding is unknown');
+    register(dir);
+    endLaunch(dir);
+    await waitUntil(() => exists(dir, 'cancel-requested.json'), { timeoutMs: 5000, what: 'the cancel request of the bound attempt' });
+    assert.equal(readJson(here(dir, 'cancel-requested.json')).by, 'signal:SIGINT');
+    assert.deepEqual(exits, [], 'and for the receipt');
+    fs.writeFileSync(here(dir, 'receipt.json'), JSON.stringify({ outcome: 'cancelled' }));
+    await waitUntil(() => exits.length > 0, { timeoutMs: 5000, what: 'the exit' });
+    assert.deepEqual(exits, [130]);
+    assert.match(stderr(), /unit unit-handover chờ resume: fgos run --resume unit-handover/);
+  });
+});
+
+test('6. a launch that fails before any binding ends the wait and still prints the resume line', async () => {
+  const dir = attemptWithEnvelope('failed-launch', 'unit-failed-launch');
+  await withSignalHandlers(async ({ exits, stderr }) => {
+    beginLaunch(dir);
+    process.emit('SIGTERM');
+    await sleep(150);
+    endLaunch(dir);
+    await waitUntil(() => exits.length > 0, { timeoutMs: 5000, what: 'the exit' });
+    assert.deepEqual(exits, [143]);
+    assert.match(stderr(), /unit unit-failed-launch chờ resume/);
+    assert.equal(exists(dir, 'cancel-requested.json'), false, 'nothing was bound, nothing to cancel');
+  });
+});
+
+test('7. after a signal no launch and no step starts', async () => {
+  const dir = attemptWithEnvelope('refused', 'unit-refused');
+  await withSignalHandlers(async ({ exits }) => {
+    assert.doesNotThrow(assertNotCancelled);
+    process.emit('SIGINT');
+    await waitUntil(() => exits.length > 0, { timeoutMs: 5000, what: 'the exit' });
+    assert.throws(assertNotCancelled, RunCancelledError);
+    assert.throws(() => beginLaunch(dir), { code: 'run-cancelled', signal: 'SIGINT' });
+  });
+  assert.doesNotThrow(assertNotCancelled, 'a host that outlives its controller can clear the request');
 });
