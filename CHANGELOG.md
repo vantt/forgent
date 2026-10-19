@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git: defer foreign-checkout cleanup failures after durable closure, preserve Sync receipt replay across branch changes, name detached-HEAD refusal, and document reflog-only recovery.
+
 - Restore WAL exclusion between checkout and worktree lifecycle operations; refuse reflog-only commit attribution, bind Sync recovery to its recorded branch, close foreign attempted chains honestly, and retain sync warnings in runner results.
 
 - Bind checkout WAL to directory identity, recover hook-modified and reflog-visible commits, preserve terminal causes and landed receipts across compaction failures, protect async siblings during native Git loans, and retain clean-file permissions during rollback. Add an aged-floor Node-loan E3 row for host acceptance.

@@ -170,7 +170,8 @@ impl GitDriver {
         scope: &LockScope<'_>,
         wal: &Wal,
         id: &str,
-    ) -> Result<()> {
+    ) -> Result<Vec<String>> {
+        let mut warnings = vec![];
         let resources = checkout_resources(repo)?;
         let legacy = format!("worktree:{}", root(repo)?.display());
         let current_binding = binding(handle(scope, repo)?)?;
@@ -192,25 +193,25 @@ impl GitDriver {
                 // Current custody proves that this directory is a different
                 // checkout. Close only its old WAL, never touch its index or
                 // replay an effect. Existing terminal causes stay unchanged.
-                (|| -> Result<()> {
-                    if chain.outcome().is_none() {
-                        chain = wal
-                            .append(
-                                &chain,
-                                Phase::Outcome(Outcome::CommitRejected {
-                                    cause: if matches!(
-                                        chain.last().phase,
-                                        Phase::Intent(_) | Phase::Prepared
-                                    ) {
-                                        "foreign-checkout-abandoned"
-                                    } else {
-                                        "foreign-checkout-effect-unknown"
-                                    }
-                                    .into(),
-                                }),
-                            )
-                            .map_err(failure)?;
-                    }
+                if chain.outcome().is_none() {
+                    chain = wal
+                        .append(
+                            &chain,
+                            Phase::Outcome(Outcome::CommitRejected {
+                                cause: if matches!(
+                                    chain.last().phase,
+                                    Phase::Intent(_) | Phase::Prepared
+                                ) {
+                                    "foreign-checkout-abandoned"
+                                } else {
+                                    "foreign-checkout-effect-unknown"
+                                }
+                                .into(),
+                            }),
+                        )
+                        .map_err(failure)?;
+                }
+                if let Err(error) = (|| -> Result<()> {
                     if matches!(chain.intent().kind, OperationKind::Sync(_)) {
                         crate::refs::release_pin(self, repo, handle(scope, repo)?, wal, &chain)?;
                         chain = wal.inspect(&chain.last().operation_id).map_err(failure)?;
@@ -225,7 +226,9 @@ impl GitDriver {
                     )
                     .map_err(failure)?;
                     Ok(())
-                })()?;
+                })() {
+                    warnings.push(format!("checkout-compaction-deferred: {error:?}"));
+                }
                 continue;
             }
             if chain.last().operation_id == id {
@@ -262,7 +265,8 @@ impl GitDriver {
                 return Err(recovery("resource-recovery-required"));
             }
         }
-        crate::refs::admission(wal, id, &resources)
+        crate::refs::admission(wal, id, &resources)?;
+        Ok(warnings)
     }
     pub(crate) fn compact_checkout(
         &self,
@@ -934,7 +938,7 @@ impl GitDriver {
                 _ => Err(recovery("commit-attempt-recovery-required")),
             };
         }
-        self.admit_checkout(repo, scope, &wal, id)?;
+        let admission_warnings = self.admit_checkout(repo, scope, &wal, id)?;
         if self.merge_head(repo, scope)?.is_some() {
             return Err(failure("foreign-merge-head"));
         }
@@ -1020,7 +1024,8 @@ impl GitDriver {
             wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                 .map_err(failure)?;
             let terminal = wal.inspect(id).map_err(failure)?;
-            let warnings = self.compact_checkout_warning(repo, scope, &wal, &terminal);
+            let mut warnings = admission_warnings;
+            warnings.extend(self.compact_checkout_warning(repo, scope, &wal, &terminal));
             return Ok(CommitResult {
                 warnings,
                 status: ResultCode::Unchanged,
@@ -1222,7 +1227,10 @@ impl GitDriver {
             })
         })();
         if let (Ok(receipt), Some(terminal)) = (&mut prepared, recorded_terminal) {
-            receipt.warnings = self.compact_checkout_warning(repo, scope, &wal, &terminal);
+            receipt.warnings = admission_warnings;
+            receipt
+                .warnings
+                .extend(self.compact_checkout_warning(repo, scope, &wal, &terminal));
             return prepared;
         }
         if prepared.is_err()

@@ -688,7 +688,7 @@ fn pre_attempt_recovery_does_not_unstage_a_changed_index() {
 #[test]
 fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
     use std::os::unix::fs::MetadataExt;
-    for phase in [0, 2] {
+    for (phase, residue) in [(0, false), (2, false), (0, true), (2, true)] {
         let mut f = Fixture::new();
         interrupted_resources(&f, "dead", phase, false, true);
         drop(f.lease.take());
@@ -723,7 +723,43 @@ fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
                 other => panic!("{other:?}"),
             },
         );
-        fresh_commit(&f, "new-checkout");
+        let residue_path = f
+            .repo
+            .common_dir()
+            .join("fgos/git/operations/dead/.durable-file-stray.tmp");
+        if residue {
+            fs::write(&residue_path, "interrupted append").unwrap();
+        }
+        let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+        fs::write(f.tree.join("fresh"), "new checkout").unwrap();
+        let receipt = f
+            .driver
+            .scoped_commit(
+                &f.repo,
+                f.held(),
+                &baseline,
+                &CommitRequest {
+                    writes: vec!["fresh".into()],
+                    message: "fresh".into(),
+                    cutover_grant: None,
+                },
+                "fixture",
+                "new-checkout",
+            )
+            .unwrap();
+        assert_eq!(receipt.status, ResultCode::Committed);
+        assert_eq!(
+            receipt
+                .warnings
+                .iter()
+                .any(|w| w.starts_with("checkout-compaction-deferred:")),
+            residue
+        );
+        if residue {
+            assert!(residue_path.exists());
+            fs::remove_file(&residue_path).unwrap();
+            fresh_commit(&f, "retry-cleanup");
+        }
         let old = wal::Wal::open(&f.repo)
             .unwrap()
             .compacted("dead")
@@ -1003,10 +1039,129 @@ fn preexisting_reset_away_commit_is_evidence_not_a_receipt() {
     let old = git(&f.tree, &["rev-parse", "HEAD"]);
     git(&f.tree, &["reset", "--hard", &baseline]);
     interrupted(&f, "never-ran", 2, false);
-    let err = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", "never-ran").unwrap_err();
+    let err = f
+        .driver
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "never-ran")
+        .unwrap_err();
     assert_eq!(err.code, ResultCode::RecoveryRequired);
     assert!(format!("{err:?}").contains(&old));
     assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), baseline);
     assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "a");
-    assert!(wal::Wal::open(&f.repo).unwrap().inspect("never-ran").unwrap().outcome().is_none());
+    assert!(wal::Wal::open(&f.repo)
+        .unwrap()
+        .inspect("never-ran")
+        .unwrap()
+        .outcome()
+        .is_none());
+}
+
+#[test]
+fn sync_terminal_replay_ignores_live_branch_and_detached_head() {
+    for retained in [false, true] {
+        let f = Fixture::new();
+        fs::write(f.main.join("a"), "incoming").unwrap();
+        git(&f.main, &["add", "a"]);
+        git(&f.main, &["commit", "-qm", "target"]);
+        fs::write(f.tree.join("a"), "producer").unwrap();
+        git(&f.tree, &["add", "a"]);
+        git(&f.tree, &["commit", "-qm", "producer"]);
+        let target = Oid::parse(&git(&f.main, &["rev-parse", "HEAD"]), ObjectFormat::Sha1).unwrap();
+        assert_eq!(
+            f.driver
+                .start_sync(&f.repo, f.held(), &target, "sync", "fixture", "replay")
+                .unwrap()
+                .state,
+            "conflicted-open"
+        );
+        if retained {
+            fs::write(
+                f.repo
+                    .common_dir()
+                    .join("fgos/git/operations/replay/.durable-file-stray.tmp"),
+                "evidence",
+            )
+            .unwrap();
+        }
+        assert_eq!(
+            f.driver
+                .abort_sync(&f.repo, f.held(), "fixture", "replay")
+                .unwrap()
+                .state,
+            "conflict-aborted"
+        );
+        git(&f.tree, &["switch", "-c", "other"]);
+        for detached in [false, true] {
+            if detached {
+                git(&f.tree, &["checkout", "--detach"]);
+            }
+            assert_eq!(
+                f.driver
+                    .start_sync(&f.repo, f.held(), &target, "sync", "fixture", "replay")
+                    .unwrap()
+                    .state,
+                "conflict-aborted"
+            );
+            if detached {
+                assert_eq!(
+                    f.driver
+                        .start_sync(
+                            &f.repo,
+                            f.held(),
+                            &target,
+                            "sync",
+                            "fixture",
+                            "new-detached"
+                        )
+                        .unwrap_err()
+                        .cause,
+                    "sync-detached-head-refused"
+                );
+            }
+        }
+        if !retained {
+            // A receipt written before Sync recorded references hashes None.
+            let wal = wal::Wal::open(&f.repo).unwrap();
+            let mut old = wal.compacted("replay").unwrap().unwrap();
+            assert_eq!(old.reference.as_deref(), Some("refs/heads/producer"));
+            let kind = wal::OperationKind::Sync(Box::new(wal::SyncIntent {
+                reference: None,
+                worktree: f.tree.to_string_lossy().into_owned(),
+                head: old.expected.clone(),
+                target: target.as_str().into(),
+                message: "sync".into(),
+            }));
+            old.v = 2;
+            old.reference = None;
+            old.request = wal::canonical_digest(&(&kind, "fixture")).unwrap();
+            old.digest = wal::canonical_digest(&(
+                old.v,
+                &old.id,
+                &old.request,
+                &old.binding,
+                &old.receipt,
+                &old.expected,
+                &old.next,
+            ))
+            .unwrap();
+            fs::write(
+                f.repo.common_dir().join("fgos/git/compacted/replay"),
+                serde_json::to_vec(&old).unwrap(),
+            )
+            .unwrap();
+            assert_eq!(
+                f.driver
+                    .start_sync(&f.repo, f.held(), &target, "sync", "fixture", "replay")
+                    .unwrap()
+                    .state,
+                "conflict-aborted"
+            );
+            assert_eq!(
+                f.driver
+                    .start_sync(&f.repo, f.held(), &target, "different", "fixture", "replay")
+                    .unwrap_err()
+                    .cause,
+                "operation-id-reused"
+            );
+        }
+    }
 }

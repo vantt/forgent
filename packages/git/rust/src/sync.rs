@@ -57,11 +57,7 @@ impl GitDriver {
         let wal = Wal::open(repo).map_err(failure)?;
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
             let kind = OperationKind::Sync(Box::new(wal::SyncIntent {
-                reference: Some(self.checkout_text(
-                    repo,
-                    &scope,
-                    &["symbolic-ref", "-q", "HEAD"],
-                )?),
+                reference: compact.reference.clone(),
                 worktree: root(repo)?.to_string_lossy().into(),
                 head: compact.expected.clone(),
                 target: target.as_str().into(),
@@ -81,7 +77,16 @@ impl GitDriver {
             }
             return self.continue_sync_scoped(repo, &scope, &wal, writer, id, false);
         }
-        self.admit_checkout(repo, &scope, &wal, id)?;
+        let symbolic =
+            self.checkout_call(repo, &scope, &["symbolic-ref", "-q", "HEAD"], &[], false)?;
+        if !symbolic.success {
+            return Err(symbolic.error("sync-detached-head-refused"));
+        }
+        let reference = String::from_utf8(symbolic.stdout)
+            .map_err(failure)?
+            .trim()
+            .to_owned();
+        let admission_warnings = self.admit_checkout(repo, &scope, &wal, id)?;
         if self.merge_head(repo, &scope)?.is_some() {
             return Err(failure("foreign-merge-head"));
         }
@@ -103,13 +108,15 @@ impl GitDriver {
         let head = self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])?;
         let head_oid = Oid::parse(&head, repo.object_format()).map_err(failure)?;
         if self.ancestry(repo, target, &head_oid)? {
-            return Ok(info(id, &head, target.as_str(), "up-to-date", vec![], None));
+            let mut receipt = info(id, &head, target.as_str(), "up-to-date", vec![], None);
+            receipt.warnings = admission_warnings;
+            return Ok(receipt);
         }
         let resources = checkout_resources(repo)?;
         crate::refs::admission(&wal, id, &resources)?;
         let binding = binding(handle(&scope, repo)?)?;
         let kind = OperationKind::Sync(Box::new(wal::SyncIntent {
-            reference: Some(self.checkout_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"])?),
+            reference: Some(reference),
             worktree: root(repo)?.to_string_lossy().into_owned(),
             head: head.clone(),
             target: target.as_str().into(),
@@ -255,7 +262,7 @@ impl GitDriver {
                 },
             )
             .map_err(failure)?;
-        if conflicts.is_empty() {
+        let mut receipt = if conflicts.is_empty() {
             self.finish_sync(repo, &scope, &wal, &state)
         } else {
             Ok(info(
@@ -266,7 +273,9 @@ impl GitDriver {
                 conflicts,
                 None,
             ))
-        }
+        }?;
+        receipt.warnings.extend(admission_warnings);
+        Ok(receipt)
     }
     fn sync_index_digest(
         &self,
@@ -335,11 +344,7 @@ impl GitDriver {
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
             let intent = Intent {
                 kind: OperationKind::Sync(Box::new(wal::SyncIntent {
-                    reference: Some(self.checkout_text(
-                        repo,
-                        scope,
-                        &["symbolic-ref", "-q", "HEAD"],
-                    )?),
+                    reference: compact.reference.clone(),
                     worktree: root(repo)?.to_string_lossy().into(),
                     head: compact.expected.clone(),
                     target: compact.next.clone(),
@@ -359,7 +364,9 @@ impl GitDriver {
             }
             let outcome = compact.outcome().map_err(failure)?;
             if let Outcome::CommitRejected { cause } = &outcome {
-                if cause == "foreign-checkout-effect-unknown" { return Err(recovery(cause)); }
+                if cause == "foreign-checkout-effect-unknown" {
+                    return Err(recovery(cause));
+                }
             }
             let state = match &outcome {
                 Outcome::Commit { .. } => "done",
@@ -424,13 +431,10 @@ impl GitDriver {
         {
             return Err(failure("sync-authority-mismatch"));
         }
-        let current_reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
-        let reference = payload.reference.as_ref().ok_or_else(|| recovery("sync-reference-unrecorded"))?;
-        if reference != &current_reference {
-            return Err(recovery("checkout-reference-changed"));
-        }
         if let Some(Outcome::CommitRejected { cause }) = chain.outcome() {
-            if cause == "foreign-checkout-effect-unknown" { return Err(recovery(cause)); }
+            if cause == "foreign-checkout-effect-unknown" {
+                return Err(recovery(cause));
+            }
         }
         let now = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
         let merge = self.merge_head(repo, scope)?;
@@ -495,6 +499,15 @@ impl GitDriver {
         // A commit may have moved HEAD and then died before its receipt.
         // Never infer a safe retry from HEAD equality (including ABA).
         if let Phase::SyncCommitAttempt { .. } = &chain.last().phase {
+            let current_reference =
+                self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
+            let reference = payload
+                .reference
+                .as_ref()
+                .ok_or_else(|| recovery("sync-reference-unrecorded"))?;
+            if reference != &current_reference {
+                return Err(recovery("checkout-reference-changed"));
+            }
             fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
             match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),

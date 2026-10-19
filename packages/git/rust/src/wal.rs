@@ -1544,6 +1544,8 @@ pub struct CompactReceipt {
     pub expected: String,
     #[serde(default, rename = "n", with = "ledger_hex")]
     pub next: String,
+    #[serde(default, skip_serializing_if = "Option::is_none", rename = "f")]
+    pub reference: Option<String>,
     #[serde(with = "ledger_hex")]
     pub digest: String,
 }
@@ -1839,6 +1841,17 @@ impl<F: FileSystem> Wal<F> {
         // exact-request replay readable; missing facts must never be guessed.
         let d = if c.v == 1 {
             canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt))?
+        } else if c.v == 3 {
+            canonical_digest(&(
+                c.v,
+                &c.id,
+                &c.request,
+                &c.binding,
+                &c.receipt,
+                &c.expected,
+                &c.next,
+                &c.reference,
+            ))?
         } else {
             canonical_digest(&(
                 c.v,
@@ -1857,7 +1870,11 @@ impl<F: FileSystem> Wal<F> {
                 *s == "-" || matches!(s.len(), 40 | 64) && s.bytes().all(|b| b.is_ascii_hexdigit())
             })
         };
-        if !matches!(c.v, 1 | 2)
+        if !matches!(c.v, 1..=3)
+            || (c.v < 3 && c.reference.is_some())
+            || c.reference
+                .as_ref()
+                .is_some_and(|r| RefName::parse(r).is_err())
             || c.id != id
             || c.digest != d
             || !digest_valid(&c.request)
@@ -1906,24 +1923,45 @@ impl<F: FileSystem> Wal<F> {
         }
         let i = actual.intent();
         let mut c = CompactReceipt {
-            v: 2,
+            v: if matches!(&i.kind, OperationKind::Sync(p) if p.reference.is_some()) {
+                3
+            } else {
+                2
+            },
             id: id.clone(),
             request: i.request_digest.clone(),
             binding: binding_digest(i)?,
             expected: compact_tip(&i.expected),
             next: compact_tip(&i.next),
             receipt: compact_outcome(actual.outcome().ok_or(WalError::RecoveryRequired)?),
+            reference: match &i.kind {
+                OperationKind::Sync(p) => p.reference.clone(),
+                _ => None,
+            },
             digest: String::new(),
         };
-        c.digest = canonical_digest(&(
-            c.v,
-            &c.id,
-            &c.request,
-            &c.binding,
-            &c.receipt,
-            &c.expected,
-            &c.next,
-        ))?;
+        c.digest = if c.v == 3 {
+            canonical_digest(&(
+                c.v,
+                &c.id,
+                &c.request,
+                &c.binding,
+                &c.receipt,
+                &c.expected,
+                &c.next,
+                &c.reference,
+            ))?
+        } else {
+            canonical_digest(&(
+                c.v,
+                &c.id,
+                &c.request,
+                &c.binding,
+                &c.receipt,
+                &c.expected,
+                &c.next,
+            ))?
+        };
         if serde_json::to_vec(&c)
             .map_err(|_| corrupt("ledger serialize"))?
             .len()
@@ -2906,6 +2944,7 @@ mod tests {
             expected: "e".repeat(64),
             next: "f".repeat(64),
             receipt: compact_outcome(&o),
+            reference: None,
             digest: "d".repeat(64),
         };
         let bytes = serde_json::to_vec(&c).unwrap();
