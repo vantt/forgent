@@ -25,7 +25,7 @@ Date 2026-10-19 10:26 (Asia/Saigon), session `forgentx-95`, following [the 09:15
     - codex through herdr in forgentX (account `tetnu`): `unit-run-1792380024687-1500a594` **pass**; the brief was submitted on the first try (prompt door active).
     - claude through cli (herdr env removed) in the scratch clone: `unit-run-1792380133554-b031603e` **pass**.
     - claude through herdr in forgentX: `unit-run-1792380086595-540b5d9e` and `unit-run-1792380365267-e3cef0b0` **pass**.
-    - Ctrl-C/resume: **not exercised** this time (the agent finished in 17 s before the interrupt landed); the path was proven by T8 in 6.4 P07A.
+    - Ctrl-C/resume: first try not exercised (the agent finished in 17 s). Redone 13:05 on this release: herdr claude run `unit-run-1792389928103-fd662ac5` interrupted with SIGINT after ack → exit 130, line `chờ resume: fgos run --resume …`, attempt 01 receipt `cancelled`; `fgos run --resume` → exit 0, `runs/02` pass, `unit-summary.json` outcome pass, `show-run` reads attempt 01 as `superseded` by `…_02`. Retained pane of attempt 01 closed by hand. **Smoke complete.**
     - Seen, not regressions: codex in the scratch clone `smoke-6.2` is blocked by `terminal:blocked:trust-dialog` (the clone is its own git root, trusted by no codex account; lane TRUST); a cli read-only run with a bare "reply ok" prompt is `inconclusive` because no report artifact is written (no-evidence by design).
 
 ## Follow-ups
