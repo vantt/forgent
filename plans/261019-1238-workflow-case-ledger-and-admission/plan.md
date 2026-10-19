@@ -1,7 +1,7 @@
 ---
 title: "Workflow case ledger and admission (D-ADR0070 cutover, lane AGENT-WF)"
 description: "Implement docs/specs/workflow.md: guide schema, hardened case ledger, Playbook proposer on admission (Shape C), AdmissionPort at every runUnit writer, N1 authority context at both doors"
-status: pending
+status: in-progress
 priority: P1
 effort: 76h
 branch: main
@@ -23,9 +23,9 @@ created: 2026-10-19
 
 | # | Phase | Touches the `fgos run` door? | Effort | Status |
 |---|---|---|---|---|
-| 00 | [Facts and prior art](phase-00-facts-and-prior-art.md) (read-only) | no | 3h | pending |
-| 01 | [Playbook order regression guard](phase-01-playbook-order-regression-guard.md) | no | 3h | pending |
-| 02 | [Harden the JSONL ledger in place](phase-02-harden-jsonl-ledger.md) (F11) | no | 4h | pending |
+| 00 | [Facts and prior art](phase-00-facts-and-prior-art.md) (read-only) | no | 3h | done (main `78b0921d2`) |
+| 01 | [Playbook order regression guard](phase-01-playbook-order-regression-guard.md) | no | 3h | done (main `78b0921d2`) |
+| 02 | [Harden the JSONL ledger in place](phase-02-harden-jsonl-ledger.md) (F11) | no | 4h | done (main `78b0921d2`) |
 | 03 | [Retire `--plan` and dead `feature.yaml` runner fields](phase-03-retire-plan-source-and-dead-runner-fields.md) (F9) | no | 5h | pending |
 | 04 | [Guide schema](phase-04-guide-schema.md) (F5, part of F1) | no | 8h | pending |
 | 05 | [Case model: events, projection, bindings, admission predicate](phase-05-case-model-bindings-admission-predicate.md) (F1, F2 counters, F4, F7 predicate) | no | 12h | pending |
