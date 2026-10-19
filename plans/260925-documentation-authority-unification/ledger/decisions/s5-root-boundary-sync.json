@@ -192,37 +192,39 @@
       "claimId": "claim_f7459f118bd93b8769e6c90ace8c68fe",
       "sourceUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-91",
+      "targetAnchor": "unheaded-block-92",
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-92 SHA256 8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e; source identity unchanged, no native identity assignment or approval carry.",
       "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Business Rules"
-      ]
+      ],
+      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_53838c4268148341ce0069394572d0eb",
       "sourceUnitDigest": "b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-96",
+      "targetAnchor": "unheaded-block-97",
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-97 SHA256 b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7; source identity unchanged, no native identity assignment or approval carry.",
       "targetUnitDigest": "b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Edge Cases Settled"
-      ]
+      ],
+      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_d76334798a7de5ca967d48855418497f",
@@ -1129,12 +1131,12 @@
       "claimId": "claim_daaf3726036adad15b2529ad43f71d44",
       "sourceUnitDigest": "b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-85",
+      "targetAnchor": "unheaded-block-86",
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 554401219ddbc4676c3b57381a468904442855e9); unit SHA256 b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval.",
+      "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 554401219ddbc4676c3b57381a468904442855e9); unit SHA256 b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-86 SHA256 652c4935e9cd747ffdb08e497333f31a461605453d08d7553283985cf4ead7be; source identity unchanged, no native identity assignment or approval carry.",
       "sourcePath": "docs/specs/distribution.md",
       "targetUnitDigest": "652c4935e9cd747ffdb08e497333f31a461605453d08d7553283985cf4ead7be",
       "targetAncestry": [
@@ -1142,7 +1144,8 @@
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
     },
     {
       "sourcePath": "docs/architecture-manifest.json",
@@ -1173,12 +1176,12 @@
       "claimId": "claim_f703aeda7755ab376e6e3eee88eb82c2",
       "sourceUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-95",
+      "targetAnchor": "unheaded-block-96",
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "Source: docs/specs/distribution.md:324-325#unheaded-block-15 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399.\nTarget: docs/platform/packaging-distribution/spec.md:708-710#unheaded-block-92 (current lines); unit SHA256 87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval.",
+      "rationale": "Source: docs/specs/distribution.md:324-325#unheaded-block-15 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399.\nTarget: docs/platform/packaging-distribution/spec.md:708-710#unheaded-block-92 (current lines); unit SHA256 87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-96 SHA256 4599fc3ec109b2d879d8b76e5a841b4452d69865da0f4517e5a267003628c104; source identity unchanged, no native identity assignment or approval carry.",
       "targetUnitDigest": "4599fc3ec109b2d879d8b76e5a841b4452d69865da0f4517e5a267003628c104",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -1187,7 +1190,8 @@
         "Lịch sử quyết định"
       ],
       "sourcePath": "docs/specs/distribution.md",
-      "sourceAnchor": "unheaded-block-15"
+      "sourceAnchor": "unheaded-block-15",
+      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_9be8a10fa3ce503d2ebc2ffe6ffc76ad",

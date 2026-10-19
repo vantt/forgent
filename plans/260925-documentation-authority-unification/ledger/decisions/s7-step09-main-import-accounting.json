@@ -6268,11 +6268,12 @@
       "sourceUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-75",
+      "targetAnchor": "unheaded-block-76",
       "targetUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18",
-      "rationale": "L11-21 mechanical predecessor accounting using the s10-round4-native-predecessors registryGaps mechanism: historical source docs/platform/packaging-distribution/spec.md#unheaded-block-75 at 8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a (SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a) is present as the unique complete unit at frozen e6b7efeec:docs/platform/packaging-distribution/spec.md#unheaded-block-75 (same SHA256). Distinct source commit and native predecessor/current IDs are explicit; no identity reassignment or approval. Supersede records conservation only; current truth and authority await their existing gates."
+      "rationale": "L11-21 mechanical predecessor accounting using the s10-round4-native-predecessors registryGaps mechanism: historical source docs/platform/packaging-distribution/spec.md#unheaded-block-75 at 8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a (SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a) is present as the unique complete unit at frozen e6b7efeec:docs/platform/packaging-distribution/spec.md#unheaded-block-75 (same SHA256). Distinct source commit and native predecessor/current IDs are explicit; no identity reassignment or approval. Supersede records conservation only; current truth and authority await their existing gates. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-76 SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a; source identity unchanged, no native identity assignment or approval carry.",
+      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_c3d76ad2ec1234576e2dffba0b2980b9",

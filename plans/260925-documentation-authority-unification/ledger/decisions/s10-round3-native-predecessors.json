@@ -40,8 +40,8 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-75",
-      "rationale": "A22/A31/L10-23–L10-27: native predecessor from 345f15d95 is superseded by the current same-section unit after authorized legacy destination restoration or scaffold/refuseHelp code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync287-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "targetAnchor": "unheaded-block-76",
+      "rationale": "A22/A31/L10-23–L10-27: native predecessor from 345f15d95 is superseded by the current same-section unit after authorized legacy destination restoration or scaffold/refuseHelp code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync287-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-76 SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a; source identity unchanged, no native identity assignment or approval carry.",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
@@ -49,7 +49,8 @@
         "Spec: Packaging-Distribution",
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
-      ]
+      ],
+      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_c0f157804addf46fdb20b9c61882794b",
