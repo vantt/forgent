@@ -1,3 +1,49 @@
+# Step 03 pilot round 2 — AUTHOR handback; independent full-file re-review pending
+
+Author pin `ae141550c2e022310de7a0efea757580c0b2479f`; all 21 consumer files unchanged. The 14 rework records are rebuilt from pinned complete-file spans and explicit per-edge target/blocker decisions; the seven ok files receive only applicable ruling notes/search receipts. Round-1 JSONL files and manifest are retained byte-for-byte in `step-03-records-r1/`. No consumer patch is applied.
+
+**437 edges, 21 files. Counts (patch / parked / row-flip / preserve): 58/97/8/274 → 104/53/12/268. 69 dispositions changed.**
+
+| File | Before → after (P/K/R/S) | Changed disposition ids |
+|---|---|---|
+| `docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md` | 0/1/0/1 → 1/0/0/1 | 07239 |
+| `README.md` | 0/0/0/3 → 0/0/0/3 | none |
+| `docs/doc-governance.md` | 0/0/2/6 → 0/0/2/6 | none |
+| `docs/platform-foundations.md` | 0/0/0/6 → 0/0/0/6 | none |
+| `docs/reading-map.md` | 21/28/3/37 → 34/16/7/32 | 07958, 07959, 07960, 07961, 07977, 07985, 07992, 07993, 07994, 07995, 07996, 07998, 08008, 08009, 08010, 08014, 08016, 08017, 08018, 08019, 08031, 08033 |
+| `docs/routing-handoff-contract.md` | 2/1/0/2 → 3/0/0/2 | 08056 |
+| `docs/specs/confinement-authority.md` | 2/0/0/2 → 2/0/0/2 | none |
+| `docs/specs/decision-citation-drift.md` | 0/4/0/9 → 0/5/0/8 | 08064 |
+| `docs/specs/distillery.md` | 0/0/0/3 → 1/0/0/2 | 08074 |
+| `docs/specs/distribution.md` | 1/1/0/6 → 2/0/0/6 | 08082 |
+| `docs/specs/enduser-docs-authoring.md` | 0/1/0/2 → 0/0/0/3 | 08085 |
+| `docs/specs/enduser-docs-index.md` | 0/1/0/3 → 0/0/0/4 | 08088 |
+| `docs/specs/fgos-plugin.md` | 2/0/0/1 → 2/0/0/1 | none |
+| `docs/specs/herdr-web-dashboard.md` | 2/4/0/10 → 5/1/0/10 | 08096, 08102, 08110 |
+| `docs/specs/observe.md` | 0/0/0/2 → 0/0/0/2 | none |
+| `docs/specs/platform-foundations.md` | 0/0/0/23 → 0/0/0/23 | none |
+| `docs/specs/reading-map.md` | 24/30/3/25 → 37/17/3/25 | 08150, 08158, 08165, 08166, 08167, 08168, 08171, 08181, 08182, 08183, 08187, 08189, 08191, 08192, 08194, 08207, 08210 |
+| `docs/specs/runner.md` | 2/15/0/96 → 10/8/0/95 | 08223, 08224, 08227, 08231, 08241, 08248, 08255, 08256, 08258, 08259, 08260, 08329, 08330 |
+| `docs/specs/system-overview.md` | 1/3/0/4 → 4/0/0/4 | 08331, 08332, 08333 |
+| `docs/specs/work-state.md` | 0/4/0/32 → 1/3/0/32 | 08342, 08349, 08355 |
+| `docs/specs/workflow.md` | 1/4/0/1 → 2/3/0/1 | 08375 |
+
+All edge ids above use prefix `maps-j-`. [Exact record delta](step-03-r2-changes.json) also lists every reason/target change and record-only field change. The seven previously ok files: README and observe unchanged; doc-governance 01904/01909 get factual retained-path/carriage notes; root platform-foundations 05091 gets the true never-existing historical-target reason; specs/platform-foundations gets GAP-02 carry note; confinement and fgos-plugin keep accepted edge records/diffs and gain non-preserve resolver receipts.
+
+**Resolver/checker:** [step-03-resolve.py](step-03-resolve.py) reads both alias sources and runs pinned fixed-string Git searches for every physical-passage locator across all L12-30 roots; candidate output has file:line, extractor/GitHub anchor and carriage status. Every non-preserve edge was resolved. All 53 parks have replayable pin/query/hit-count/hit-set/alias witnesses and smallest blocker, including why live hits cannot execute that source unit. Snapshot headers and the paired Architecture carriage cases are excluded; candidate-status Area specs and decision records remain eligible. Existing anchor APIs are reused. The Related check now stops at the actual list boundary; ordinary `git apply --check` uses scratch source files without initializing or staging any Git repository.
+
+**Proof:** [verification](step-03-r2-verification.json): checker **0 failures** on 21/437; selector rerun with all four original set seeds and refreshed manifest; **55/55 negative probes rejected** (all 48 earlier retained, seven new witness/count/query/pin/alias/locator/snapshot probes); **131/131** existing light documentation tests pass, zero failures/skips. Checker, selector and probes replay byte-identically from checkout and `/tmp/fgos-work`. All consumer/target/control hashes and both protected manifests are unchanged. `git diff --check` passes; writes remain inside the plan (required atomic outbox excepted).
+
+**13 locator flags remain explicit semantic review work**, not hidden acceptance: `maps-j-07977`, `maps-j-07998`, `maps-j-08011`, `maps-j-08056`, `maps-j-08150`, `maps-j-08171`, `maps-j-08184`, `maps-j-08224`, `maps-j-08231`, `maps-j-08232`, `maps-j-08256`, `maps-j-08332`, `maps-j-08379`. [Flag explanations](step-03-r2-review-flags.json) distinguish translated/prefix-normalized headings, unrelated sibling citations, and source-rule context from an actual target locator. The wrong-passage probe proves both rejection and flagging. Reviewers must confirm every scope explanation against source and target.
+
+**One replacement review request:** [step-03-pilot-r2-review-request.md](step-03-pilot-r2-review-request.md), by the six Lead groups g01–g06, with `review-a38-step-03-pilot-r2-g01.md` … `g06.md`, original defect checklists and changed edge ids. Review source directly at the author pin and JSONL records directly; old streamed packets are historical. No reviewer was launched. Every set already breached 3%, so full-file review remains required, with separate per-set denominators/numerators.
+
+**Remaining dependencies:** 53 exact rewrites park on GAP-02 / workflow and D-ADR0070 carry, missing non-carriage recipe/contract/ADR, legacy-tree or legacy-authority description rewrite, Step 5 checker/default parity, or never-existing live evidence links. Illustrative values preserve. Both reading-maps agree on carriage and tree descriptions. Workflow own links remain Phase 9 source-coordinate specs to be re-resolved by carry. No new rule question blocks this author assignment; semantic re-review, carry, Step 5 parity, later actual-commit accounting and Phase 9 approval remain outside this handback. No full/heavy suite, fgOS CLI, Git write, secrets/state access, service, native/global sync, consumer edit or authority flip occurred. Preview remains with the Lead; no preview service was started.
+
+Earlier checkpoints below are historical.
+
+---
+
 # Step 03 pilot handoff — per-file AUTHOR records, independent review pending
 
 Input HEAD `ae141550c2e022310de7a0efea757580c0b2479f`; inventory input `1a0f61ac53433292e08fb378ebbb6c1c72fd3b74`. **21/21 files / 437/437 edges authored**, one schema record and one complete unified diff (possibly empty) per file. All consumer files are byte-identical between the two pins; no drift rebind was needed. Every source byte is included in the bounded full-file review stream, every edge has a rule/source-passage reason, and no advisory step-02j action was treated as acceptance. No consumer edit was applied.

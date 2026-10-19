@@ -70,6 +70,28 @@ def main():
     def overlap(r):
         es=[e for e in r['edges'] if e['disposition']=='patch'];es[1]['sourceSpans']=copy.deepcopy(es[0]['sourceSpans']);es[1]['sourceSpans'][0]['columnStart']+=1
     probe('overlapping distinct replacements',patch,overlap,'overlap')
+    # L12-30: deliberately wrong complete records, after real records pass.
+    witnessed=next(r for r in rs if any(e.get('searchWitness') for e in r['edges']))
+    probe('missing-target park without search witness',witnessed,lambda r:parked_e(r).pop('searchWitness'),'park-search-witness')
+    def count_lie(r):parked_e(r)['searchWitness']['queries'][0]['hitCount']+=1
+    probe('invented zero or wrong hit count at pin',witnessed,count_lie,'park-search-witness')
+    probe('omitted locator query',witnessed,lambda r:parked_e(r)['searchWitness']['queries'].pop(),'park-search-witness')
+    probe('witness at wrong pin',witnessed,lambda r:parked_e(r)['searchWitness'].update(pin='0'*40),'park-search-witness')
+    probe('alias search omitted',witnessed,lambda r:parked_e(r)['searchWitness']['aliasLookups'].pop(),'park-search-witness')
+    located=next(r for r in rs if any(p.get('sourceLocatorTokens') for p in r['checks']['anchors'].values()))
+    def absent_locator(r):
+        key=next(k for k,v in r['checks']['anchors'].items() if v.get('sourceLocatorTokens'))
+        r['checks']['anchors'][key]['passage']='This target passage has none of the edge locator tokens.'
+        r['checks']['anchors'][key].pop('locatorCorrespondence',None)
+    probe('patch target passage has no edge locator token',located,absent_locator,'patch-locator-review')
+    flagged=copy.deepcopy(rs)
+    flagged_record=next(r for r in flagged if r['file']==located['file']);absent_locator(flagged_record)
+    assert any(f['file']==located['file'] for f in c.all(flagged)['locatorReviewFlags'])
+    checks[-1]['reviewFlagObserved']=True
+    def snapshot_target(r):
+        e=pe(r);e['target']='docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md';e['anchor']=None
+        r['checks']['anchors'][e['edgeId']]={'targetCommit':a.author_commit,'targetDigest':m.sha(m.blob(a.author_commit,e['target']))}
+    probe('whole-file source snapshot used as live target',patch,snapshot_target,'anchor-carriage-locator')
     manifest=m.manifest_view(rs,a.author_commit)
     bad=copy.deepcopy(manifest);bad['files'][0]['diffSha256']='0'*64;assert 'files' in m.verify_manifest(rs,a.author_commit,bad)
     checks.append({'surfaceClass':3,'probe':'frozen record manifest diff hash mutation','expectedCheck':'manifest-freeze','rejected':True})

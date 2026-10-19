@@ -1,0 +1,712 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "checkoutHead": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+  "status": "AUTHOR mechanical checks pass; full independent semantic re-review pending",
+  "checker": {
+    "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "files": 21,
+    "edges": 437,
+    "failures": [],
+    "failureCount": 0,
+    "locatorReviewFlags": [
+      {
+        "file": "docs/reading-map.md",
+        "edgeId": "maps-j-07977",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "Dev checkout shell helpers"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "Old shell-helper heading maps to live §3.3 Dev Checkout Channel, which documents sourcing the same helper; literal old title remains only in carriage.",
+        "correspondence": {
+          "source": "Dev checkout shell helpers",
+          "target": "Dev Checkout Channel",
+          "reason": "L12-30(3): live dev-checkout section documents sourcing scripts/fgos-shell-integration.sh; the old heading is inside carriage."
+        }
+      },
+      {
+        "file": "docs/reading-map.md",
+        "edgeId": "maps-j-07998",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "0014"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "The same source line cites gateway product decision 0014 before the separate UI/wireframe layout pointer; 0014 is not a locator on this layout reference. Registry alias binds the exact layout document.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/reading-map.md",
+        "edgeId": "maps-j-08011",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "§13.1."
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08012), which remains parked separately.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/routing-handoff-contract.md",
+        "edgeId": "maps-j-08056",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "ADR-0005"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "ADR-0005 is headed 0005 in the live decision file. The source D3/D4 clause labels remain verbatim; this pointer targets the complete Runner isolation decision, not an area portal.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/specs/reading-map.md",
+        "edgeId": "maps-j-08150",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "Dev checkout shell helpers"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "Old shell-helper heading maps to live §3.3 Dev Checkout Channel, which documents sourcing the same helper; literal old title remains only in carriage.",
+        "correspondence": {
+          "source": "Dev checkout shell helpers",
+          "target": "Dev Checkout Channel",
+          "reason": "L12-30(3): live dev-checkout section documents sourcing scripts/fgos-shell-integration.sh; the old heading is inside carriage."
+        }
+      },
+      {
+        "file": "docs/specs/reading-map.md",
+        "edgeId": "maps-j-08171",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "0014"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "The same source line cites gateway product decision 0014 before the separate UI/wireframe layout pointer; 0014 is not a locator on this layout reference. Registry alias binds the exact layout document.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/specs/reading-map.md",
+        "edgeId": "maps-j-08184",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "§13.1."
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08185), which remains parked separately.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08224",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "0032",
+          "RUL64"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "RUL64 and decision 0032 identify the enclosing runner rule; the cited gate-bypass explanation moved via the registry alias and retains its own complete design content, without adopting those rule ids as target headings.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08231",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "RUL11",
+          "curated capability catalog"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "RUL11 and curated capability catalog describe the enclosing policy gloss. Registry aliases identify the exact moved configuration reference; no target heading with those policy labels is asserted.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08232",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "0061",
+          "0062",
+          "<prompt>",
+          "RUL76",
+          "RUL77",
+          "RUL88",
+          "RUL90",
+          "an agent executor declares no `for`",
+          "each door carries one posture lane",
+          "must declare",
+          "this provider if it can, else any"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "The enclosing RUL77 paragraph includes RUL76/88/90 and decisions 0061/0062. This citation specifically asserts direct executor calls require a capability anchor and must not infer it from executor.for, held in confinement-authority-v1.md:148-149; it does not cite a target RUL77 heading.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/specs/runner.md",
+        "edgeId": "maps-j-08256",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "Từ vựng dispatch hiện hành"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "The quoted Từ vựng dispatch hiện hành is an internal runner-section cross-reference before the separate bare dispatch-control-plane pointer; it is not a heading locator on the latter.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/specs/system-overview.md",
+        "edgeId": "maps-j-08332",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "Cửa pull giao–nhận việc"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "The quoted Cửa pull giao–nhận việc title is translated to live §7 Pull Door Take And Return, which contains the take/return contract.",
+        "correspondence": {
+          "source": "Cửa pull giao–nhận việc",
+          "target": "Pull Door Take And Return",
+          "reason": "L12-30 live §7 is the translated take/return door, with take/return contract in the section."
+        }
+      },
+      {
+        "file": "docs/specs/workflow.md",
+        "edgeId": "maps-j-08379",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "0027"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "The source labels this as Lifecycle Work and universal tail, a whole-file current lifecycle pointer. The dated 0027 decision number is kept; its narrative remains in retired decision history, not an executable target.",
+        "correspondence": null
+      }
+    ]
+  },
+  "negativeProbes": 55,
+  "earlierProbesRetained": 48,
+  "newProbes": 7,
+  "allNegativeProbesRejected": true,
+  "replays": [
+    {
+      "label": "checker",
+      "command": [
+        "python3",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+        "--author-commit",
+        "ae141550c2e022310de7a0efea757580c0b2479f"
+      ],
+      "exit": 0,
+      "twoCwdByteIdentical": true,
+      "bytes": 8758,
+      "sha256": "7d22906e88672d5a94ac04cd609b7e9387a930958fe9b0a5f1e8efe766229034"
+    },
+    {
+      "label": "selector",
+      "command": [
+        "python3",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+        "--author-commit",
+        "ae141550c2e022310de7a0efea757580c0b2479f",
+        "--select"
+      ],
+      "exit": 0,
+      "twoCwdByteIdentical": true,
+      "bytes": 7428,
+      "sha256": "37cea997426d5d60a33677575eba46aced36fd4306e63b4c4f58e0e59e2257c8"
+    },
+    {
+      "label": "probes",
+      "command": [
+        "python3",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+        "--author-commit",
+        "ae141550c2e022310de7a0efea757580c0b2479f"
+      ],
+      "exit": 0,
+      "twoCwdByteIdentical": true,
+      "bytes": 12754,
+      "sha256": "c7c748ffa364da56e9583f5a0c7fb7a164d73fe5ee5f8dcc9e2174e913f7ede4"
+    }
+  ],
+  "tests": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-link-pass.test.mjs test/scripts/check-doc-candidate-status.test.mjs test/scripts/check-doc-constitution.test.mjs test/scripts/check-doc-retirement.test.mjs",
+    "passed": 131,
+    "failed": 0,
+    "skipped": 0,
+    "log": "step-03-r2-light-tests.log"
+  },
+  "dispositions": {
+    "before": {
+      "parked": 97,
+      "preserve": 274,
+      "phase9-row-flip": 8,
+      "patch": 58
+    },
+    "after": {
+      "patch": 104,
+      "preserve": 268,
+      "phase9-row-flip": 12,
+      "parked": 53
+    },
+    "changedEdgeCount": 69
+  },
+  "parkedEdgesWithReplayedWitness": [
+    "maps-j-07965",
+    "maps-j-07972",
+    "maps-j-07979",
+    "maps-j-07981",
+    "maps-j-07984",
+    "maps-j-08003",
+    "maps-j-08004",
+    "maps-j-08007",
+    "maps-j-08012",
+    "maps-j-08013",
+    "maps-j-08014",
+    "maps-j-08015",
+    "maps-j-08018",
+    "maps-j-08019",
+    "maps-j-08028",
+    "maps-j-08029",
+    "maps-j-08062",
+    "maps-j-08064",
+    "maps-j-08066",
+    "maps-j-08068",
+    "maps-j-08070",
+    "maps-j-08107",
+    "maps-j-08138",
+    "maps-j-08145",
+    "maps-j-08152",
+    "maps-j-08154",
+    "maps-j-08157",
+    "maps-j-08176",
+    "maps-j-08177",
+    "maps-j-08180",
+    "maps-j-08185",
+    "maps-j-08186",
+    "maps-j-08187",
+    "maps-j-08188",
+    "maps-j-08190",
+    "maps-j-08193",
+    "maps-j-08194",
+    "maps-j-08203",
+    "maps-j-08204",
+    "maps-j-08228",
+    "maps-j-08230",
+    "maps-j-08241",
+    "maps-j-08254",
+    "maps-j-08257",
+    "maps-j-08261",
+    "maps-j-08329",
+    "maps-j-08330",
+    "maps-j-08349",
+    "maps-j-08353",
+    "maps-j-08354",
+    "maps-j-08376",
+    "maps-j-08377",
+    "maps-j-08378"
+  ],
+  "locatorScopeReviewFlags": 13,
+  "sourceAndControlsProtected": [
+    {
+      "file": "README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "b5cb1938a264c4a6ffdf7693d5c518428a98b90f88381d9c4c9eb4f7fd29f5a5",
+      "unchanged": true
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "a2b0df6a5910c3d5e12ce7f9cd5db3f587095ff3c57f4d1978f933d308d2bfc7",
+      "unchanged": true
+    },
+    {
+      "file": "docs/doc-registry.json",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+      "unchanged": true
+    },
+    {
+      "file": "docs/knowledge/forgentx-repo-s-tool-registry-configuration/forgentx-tool-registry-configuration.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "5eb79d4ff8ab48d0252da6e962b80d120fa49075c51f3fadfd78447d9c498c18",
+      "unchanged": true
+    },
+    {
+      "file": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "0c5fb0a517eabc77270d2fdc9dbe9511b7161e580d4394d6927c8256fb209b82",
+      "unchanged": true
+    },
+    {
+      "file": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "062af6c9bf24067dd2c739af0ad913014dc068b95ea6165393a51e324a19522f",
+      "unchanged": true
+    },
+    {
+      "file": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "d6a3fe8f3bb758e1f6cea7b8f3ce75a22d455a8e79672170264aae7f09803aeb",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "efda4957905c9cf31d86278a9af77b61987eb9c5998c8f8210a1d79c6defaea5",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/agent-confinement/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "29a94c3bac47c039b65b9ab0879e5867de4035fe6962b27d33cf4957e9d4574d",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/work-integration.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "12741378ece5a65b7d8c01bbb3e98eb568ab7ca2514018f08733700c0220c05d",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "3e3784c6d5b9f6be51f824483be037040395a263cfb26eadae4a1762dc44427b",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/claude-plugin/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/decision-citation-drift/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "43e2f1bf7f664a981125a4afe802d4abcda3621580c13c6d4e6f2f5bdb5ef2f3",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/distillery/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "2a208ae64a9fc79022a1afd30c3fa525367ea2a9374aed6a2fb5680a58e4b166",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/herdr-web-dashboard/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/observe/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "65d6f6e8e17fca248a7b027eb427c034205c3a70e5aab8b479eee1c374396460",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "2873f7a9a716621c2e9d44164f5a760fad473343ed817138f57a524954447511",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/packaging-distribution/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/runner/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "e99f04b005e41adab13ff07aa37c124cfc9d916d612f064ecf6d963641d13306",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/system-overview/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "a8bb798b7a717c66a41427065d17c4ba261a81c42faf14d0e06895330ef5f68e",
+      "unchanged": true
+    },
+    {
+      "file": "docs/platform/work-state/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+      "unchanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+      "unchanged": true
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "535dd0f61113aab54dcc9637c9f19ef5eb409a21fe515feddbae239a33ec1e81",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "4774f723f8d3ab5e4a753cd2b74919f27c62c2c7857644606337def5bd922cff",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/distillery.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "518accb5c959ac5dc42b154cb735f3f3af962a51afca4a4976972d059d0c7196",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/enduser-docs-authoring.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "1d306eedfc56a43f3d5a01e0e888ec7009a103c72e7e6d22347bbfa5c816143b",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/enduser-docs-index.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "10774136285a478f23fc87bc573621444f72162d33de7d9cc958e5b3f5973f0e",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/fgos-plugin.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "2e7632ffbcbaae5c7ba4e3c7d6e0a3e7fe888ee278b5bc0bf9039f3ff276b687",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/observe.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "bf89de13303aeb0ae9c30141e96b1833646b89b54431a46e87552586a893d348",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "5691c41135cf442388902d8d0c63d43fe30bad26fac9e8467c1559c385079905",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "8287db544b755d4360911fdc899b69265a50de9fb58b1209782a2767f8395697",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "70cd094041f425dac24ac931eac690bb339b541ddeabd7299efe01b0195468f1",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "499ec68376dd202ea6c55b1c7db136cc1523605dc7c83bb9d964dded970eb3a8",
+      "unchanged": true
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "ff97bdc6edda92075ca34013604efc7e1328bdb7cb647352c6b806bdb498e6c6",
+      "unchanged": true
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "unchanged": true
+    },
+    {
+      "file": "scripts/list-doc-anchors.mjs",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sha256": "6dd1711a91a22f5359b827473bc21e1b8acf0d72fb95d3ec28358d0ba4140c80",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "ba09124427ff32d83ceb69aeeeb796082c4ee4be2ed59b252f3fbe62e821ec40",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "07eec04e3c259250930901bcf918a7511ccd1c95bf254f8eeccc636909326e06",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/transitional-switchboard.json",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/alias-table.json",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/minimum-constitution.json",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "cb83849c0ec657badc28726a2a25727de4c6631de1dc659199664dfda97da39c",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "b330d32d5aae06ce64a508fd054a908e5024c43ced2f29195b4b9b9d9898e7cb",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "c2b45448a25e2d81b1b3a3599025df32f84ca6b034fb9ae2403e2848a9159df7",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-census-maps-portals-prose.json",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "cbe8775fd759b3dfbe41e4baac078f6790fd0a45a6bc96aac4cd886f05fbaae4",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-authoring-request.md",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "b20042db4a54e24e8e5c92e468f13b7984300a7fc3e1da3184fcecea2ab7aec6",
+      "unchanged": true
+    },
+    {
+      "file": "AGENTS.md",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "f6582e14f5fd4e3a616eebbd5d6af1187ff0276e456cfc460d96b74f8a3c568b",
+      "unchanged": true
+    },
+    {
+      "file": "CLAUDE.md",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
+      "unchanged": true
+    },
+    {
+      "file": "docs/transitional-switchboard.md",
+      "pin": "67eb29c5e31b411d77c4297c976a8f05461f0b92",
+      "sha256": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "unchanged": true
+    }
+  ],
+  "round1ArchivesExact": true,
+  "scriptPins": [
+    {
+      "file": "step-03-resolve.py",
+      "sha256": "74d8b1179e0bee654fb7de4d81740a5650895906385d29d62bb4b024cb46ac97"
+    },
+    {
+      "file": "step-03-check.py",
+      "sha256": "e4306ba879a028e92e1ba3557e3bb8aa0cadf8631e1dcc9e050e0c190edb3a6b"
+    },
+    {
+      "file": "step-03-probes.py",
+      "sha256": "fdddd8777333de5582fa8afaf43b918d9197fe1732c04e2241ce8a721ed53c18"
+    },
+    {
+      "file": "step-03-author-r2.py",
+      "sha256": "a641e430e7a2db8a3e62320e2531985d9aa7bc01f8f6f1ef7868e3b6d64924ba"
+    }
+  ],
+  "scope": {
+    "changedPaths": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-author-r2.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-manifest.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-r2-review-request.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-r2-changes.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-r2-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-r2-light-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-r2-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-r2-resolution-witnesses.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-r2-review-flags.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-r2-sample-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-r2-whole-file-reads.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-001.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-002.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-040.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-041.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/pilot-manifest.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-001.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-002.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-resolve.py"
+    ],
+    "outsideScope": [],
+    "scratch": "/tmp/fgos-work/ only; no Git index/ref/commit writes"
+  },
+  "limits": [
+    "No consumer edits, production checker/test/baseline changes, alias activation or authority flip.",
+    "No fgOS CLI, state/secrets access, service/native/global sync or full-suite acceptance.",
+    "13 explicit locator scope/translation flags require independent confirmation; author explanations are not acceptance.",
+    "53 remaining parks block only their exact carry, description, parity or dead-link dependency.",
+    "Lead performs actual runner-commit accounting in the two protected reproduction manifests; no author self-acceptance.",
+    "No MDView MCP available; no CLI/service preview started."
+  ]
+}

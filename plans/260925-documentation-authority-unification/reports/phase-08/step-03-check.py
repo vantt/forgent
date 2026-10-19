@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""Pinned-tree record checks. All Git mutations are confined to disposable /tmp repos.
+"""Pinned-tree record checks. Git apply checks use disposable /tmp files; no Git writes.
 No consumer edit, production resolver, or second anchor slugger is implemented here.
 """
+import sys
+sys.dont_write_bytecode=True
+import importlib.util
 import argparse, collections, difflib, functools, hashlib, json, math, os, pathlib, posixpath, re, subprocess, tempfile
+_spec=importlib.util.spec_from_file_location('step03_resolve',pathlib.Path(__file__).with_name('step-03-resolve.py'))
+resolver=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(resolver)
 ROOT = pathlib.Path(__file__).resolve().parents[4]
 REL = pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-08')
 INVENTORY = '1a0f61ac53433292e08fb378ebbb6c1c72fd3b74'
@@ -122,7 +127,7 @@ class Checker:
         def check(name,fn):
             try: assert fn() is not False
             except (AssertionError,KeyError,ValueError,IndexError,TypeError,subprocess.CalledProcessError) as ex: failures.append({'file':r.get('file'),'check':name,'detail':str(ex)[:300]})
-        check('schema',lambda: set(r)==FIELDS and all(set(e)==EDGE_FIELDS for e in r['edges']) and isinstance(r['diff'],str) and all(isinstance(r['checks'][k],dict) for k in ['coverage','anchors','relativeResolution','labelForm']))
+        check('schema',lambda: set(r)==FIELDS and all(EDGE_FIELDS<=set(e)<=EDGE_FIELDS|{'searchWitness'} for e in r['edges']) and isinstance(r['diff'],str) and all(isinstance(r['checks'][k],dict) for k in ['coverage','anchors','relativeResolution','labelForm']))
         f=r['file']; before=blob(self.commit,f).decode(); old=blob(INVENTORY,f).decode()
         check('digest',lambda:r['authorInputCommit']==self.commit and r['inventoryInputCommit']==INVENTORY and r['digest']==sha(before) and r['inventoryFileDigest']==sha(old)==self.files[f]['sha256'])
         expected=self.files[f]['edgeIds'];actual=[e['edgeId'] for e in r['edges']]
@@ -145,6 +150,11 @@ class Checker:
             check('passage-correspondence',correspondence)
             check('disposition',lambda e=e:e['disposition'] in ['patch','preserve','parked','phase9-row-flip'] and bool(e['reason']) and bool(re.search(r'L12-|A51|Step [345]',e['reason'])))
             if e['disposition']=='parked':check('parked-state',lambda e=e:bool(e['blockedReason']) and bool(e['dependency']) and e['timing']=='none' and e['diffHunk'] is None and e['target'] is None)
+            source_passage=resolver.passage(before,e['sourceSpans'])
+            if e['disposition']=='parked':
+                # Explicit semantic/parity parks also replay a search; absence claims cannot escape
+                # the check by changing one wording of 'missing target'.
+                check('park-search-witness',lambda e=e: resolver.verify(e['searchWitness'],self.commit,inv['normalizedReference'].split('#')[0],source_passage))
             if e['disposition']=='phase9-row-flip':check('row-semantics',lambda e=e:e['timing']=='Phase 9' and e['diffHunk'] is None and e['target'] is None and 'row' in e['reason'].lower() and bool(e['dependency']))
             if e['disposition']=='preserve':check('preserve-state',lambda e=e:e['timing']=='none' and e['diffHunk'] is None)
             if e['target']:
@@ -167,17 +177,30 @@ class Checker:
                 hits=[a for a in aa if (a['githubSlug'] if e['matchedExpression'].startswith(('[','![')) else a['anchor'])==e['anchor']]
                 assert not e['anchor'] or hits
                 line=hits[0]['startLine'] if hits else 1
-                assert not history_at(t,line,e['target'])
+                assert not resolver.carriage(t,line,e['target'])
                 assert e['target']!=f
                 proof=r['checks']['anchors'][e['edgeId']]
                 assert proof['targetCommit']==self.commit and proof['targetDigest']==sha(t)
-                if inv['locatorTokens']:
+                locators=proof.get('sourceLocatorTokens',inv['locatorTokens'])
+                if locators:
                     assert e['anchor'] and proof.get('passage') and proof['passage'] in t
                     start=hits[0]['startLine']; lines=t.splitlines(); heading=re.match(r'^(#+) ',lines[start-1]); level=len(heading[1]) if heading else 6
                     end=next((i for i in range(start,len(lines)) if re.match(r'^#{1,'+str(level)+r'} ',lines[i])),len(lines))
                     assert proof['passage'] in '\n'.join(lines[start-1:end])
-                    assert all(tok.lstrip('§') in proof['passage'] for tok in inv['locatorTokens'])
+                    assert all(tok.lstrip('§') in proof['passage'] or (proof.get('locatorCorrespondence',{}).get('source')==tok and proof['locatorCorrespondence'].get('target') in proof['passage'] and proof['locatorCorrespondence'].get('reason')) for tok in locators)
             check('anchor-carriage-locator',target_anchor)
+            def locator_review(e=e):
+                proof=r['checks']['anchors'][e['edgeId']]
+                terms=resolver.tokens(source_passage)
+                # A locator-free area pointer is distinguished from nearby, unrelated locators
+                # by the explicit source binding; translated headings require exact correspondence.
+                terms=proof.get('sourceLocatorTokens',terms)
+                if not terms:return
+                passage=proof.get('passage','')
+                if not any(tok.lstrip('§').casefold() in passage.casefold() for tok in terms):
+                    correspond=proof.get('locatorCorrespondence',{})
+                    assert correspond.get('source') in terms and correspond.get('target') in passage and correspond.get('reason'),'patch locator absent from target passage: review required'
+            check('patch-locator-review',locator_review)
             if not target: continue
             entry=r['checks']['relativeResolution'].get(eid,{})
             replacement=entry.get('replacement','')
@@ -190,7 +213,10 @@ class Checker:
             def related(e=e):
                 lines=before.splitlines();n=e['sourceSpans'][0]['line'];start=max(0,n-35);pre='\n'.join(lines[start:n])
                 if 'Related:' not in pre:return
-                rest=pre.split('Related:')[-1]+'\n'+'\n'.join(lines[n:n+20]).split('```')[0]
+                block=pre.split('Related:')[-1].strip('\n')
+                # Related ends at its blank line, fence, or heading; it is not a 35-line window.
+                if any(not l.strip() or l.startswith(('```','~~~','#')) for l in block.splitlines()):return
+                rest=block+'\n'+'\n'.join(lines[n:n+20]).split('\n\n')[0].split('```')[0]
                 assert e['target'] not in rest
             check('related-duplicate',related)
             bs=bounds(before,e['sourceSpans'])
@@ -206,10 +232,9 @@ class Checker:
                 scratch=pathlib.Path('/tmp/fgos-work');scratch.mkdir(exist_ok=True)
                 with tempfile.TemporaryDirectory(prefix='step03-',dir=scratch) as td:
                     env={k:v for k,v in ENV.items() if not k.startswith(('GIT_', 'FGOS_'))};env['GIT_CONFIG_NOSYSTEM']='1';env['GIT_CONFIG_GLOBAL']='/dev/null'
-                    subprocess.run(['git','init','-q',td],check=True,env=env)
+                    env['GIT_CEILING_DIRECTORIES']=td
                     path=pathlib.Path(td)/f;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(before.encode())
-                    subprocess.run(['git','-C',td,'add','--',f],check=True,env=env)
-                    run=subprocess.run(['git','-C',td,'apply','--check','--cached','-'],input=r['diff'].encode(),capture_output=True,env=env)
+                    run=subprocess.run(['git','-C',td,'apply','--check','-'],input=r['diff'].encode(),capture_output=True,env=env)
                     assert run.returncode==0,run.stderr.decode()
             check('git-apply',apply_check)
         return failures
@@ -220,7 +245,19 @@ class Checker:
         for r in rs:
             if r['reviewSet']!='batch-'+expected.get(r['file'],'?'):fail.append({'check':'set-membership','file':r['file']})
             fail.extend(self.check_record(r))
-        return {'authorCommit':self.commit,'files':len(rs),'edges':sum(len(r['edges']) for r in rs),'failures':fail,'failureCount':len(fail)}
+        review=[]
+        for r in rs:
+            source=blob(self.commit,r['file']).decode()
+            for e in r['edges']:
+                if e['disposition']!='patch' or e['target'] not in self.tree:continue
+                proof=r['checks']['anchors'].get(e['edgeId'],{})
+                terms=resolver.tokens(resolver.passage(source,e['sourceSpans']))
+                passage=proof.get('passage',blob(self.commit,e['target']).decode())
+                if terms and not any(t.lstrip('§').casefold() in passage.casefold() for t in terms):
+                    review.append({'file':r['file'],'edgeId':e['edgeId'],'check':'patch-locator-review',
+                                   'locatorTokens':terms,'reason':'No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.',
+                                   'recordedScopeReason':proof.get('locatorScopeReason'),'correspondence':proof.get('locatorCorrespondence')})
+        return {'authorCommit':self.commit,'files':len(rs),'edges':sum(len(r['edges']) for r in rs),'failures':fail,'failureCount':len(fail),'locatorReviewFlags':review}
 
 def manifest_view(rs,commit):
     files=[]
