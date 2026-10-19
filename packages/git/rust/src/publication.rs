@@ -588,7 +588,6 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     ) -> Result<Receipt> {
         // Only outcomes without an observed tip of their own report the
         // current one; the others never read the ref again.
-        if matches!(outcome, Outcome::Worktree { .. }) { return Err(crate::refs::failure("not-a-publication-outcome")); }
         let current = match outcome {
             Outcome::ConfigApproved
             | Outcome::AbandonedBeforeAttempt

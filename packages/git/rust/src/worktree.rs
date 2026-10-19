@@ -5,10 +5,9 @@ use crate::{
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
-use fgos_holder_lock::{BorrowedHandle, LockScope, Wait};
+use fgos_holder_lock::{BorrowedHandle, LockScope};
 use serde::Serialize;
 use std::{
-    collections::BTreeMap,
     fs,
     path::{Path, PathBuf},
     time::Duration,
@@ -73,32 +72,6 @@ fn canonical_destination(path: &Path) -> Result<PathBuf> {
         path.file_name()
             .ok_or_else(|| failure("worktree-root-refused"))?,
     ))
-}
-fn resources(kind: &OperationKind) -> Result<Vec<String>> {
-    let mut paths = match kind {
-        OperationKind::WorktreeCreate { path, .. } | OperationKind::WorktreeRemove { path, .. } => {
-            vec![format!("worktree:{path}")]
-        }
-        OperationKind::WorktreeMove {
-            source,
-            destination,
-            ..
-        } => vec![
-            format!("worktree:{source}"),
-            format!("worktree:{destination}"),
-        ],
-        _ => return Err(failure("not-a-worktree-operation")),
-    };
-    if let OperationKind::WorktreeCreate {
-        branch: Some(branch),
-        ..
-    } = kind
-    {
-        paths.push(branch.to_string());
-    }
-    paths.sort();
-    paths.dedup();
-    Ok(paths)
 }
 fn registration(kind: &OperationKind) -> Result<&str> {
     match kind {
@@ -169,25 +142,7 @@ impl GitDriver {
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'a>>,
     ) -> Result<LockScope<'a>> {
-        require_lock_scope_platform()?;
-        let mut scope = LockScope::seeded(held).map_err(failure)?;
-        scope
-            .assert_can_acquire("worktree-admin")
-            .map_err(failure)?;
-        scope
-            .acquire(
-                "worktree-admin",
-                &BTreeMap::from([(
-                    "fgosDir".into(),
-                    repo.trusted_main_root()
-                        .join(".fgos")
-                        .to_string_lossy()
-                        .into_owned(),
-                )]),
-                Wait::Ms(5000),
-            )
-            .map_err(failure)?;
-        Ok(scope)
+        crate::refs::acquire_worktree_admin(repo, held)
     }
     fn worktree_call(&self, repo: &RepoHandle, scope: &LockScope<'_>, args: &[&str]) -> Result<()> {
         scope.validate().map_err(failure)?;
@@ -231,7 +186,10 @@ impl GitDriver {
             } else {
                 registered.canonicalize().map_err(failure)?
             };
-            if path.starts_with(&registered) || registered.starts_with(path) {
+            if (registered != repo.trusted_main_root() && path.starts_with(&registered))
+                || registered.starts_with(path)
+                || path.starts_with(repo.common_dir())
+            {
                 return Err(failure("worktree-nested-path-refused"));
             }
         }
@@ -290,6 +248,7 @@ impl GitDriver {
                 &[
                     "ls-files",
                     "--others",
+                    "--directory",
                     "--ignored",
                     "--exclude-standard",
                     "-z",
@@ -299,6 +258,17 @@ impl GitDriver {
             .is_empty()
         {
             return Err(failure("worktree-ignored-bytes-preserved"));
+        }
+        if !missing(&target.git_dir().join("locked"))? {
+            return Err(failure("worktree-user-locked"));
+        }
+        if !missing(&path.join(".gitmodules"))?
+            || self
+                .checked(&target, &["ls-files", "--stage"], Policy::Inspect)?
+                .split(|b| *b == b'\n')
+                .any(|line| line.starts_with(b"160000 "))
+        {
+            return Err(failure("worktree-submodules-preserved"));
         }
         for name in [
             "MERGE_HEAD",
@@ -323,13 +293,7 @@ impl GitDriver {
     ) -> Result<()> {
         #[cfg(unix)]
         {
-            use std::os::unix::fs::MetadataExt;
-            let m = fs::metadata(path).map_err(failure)?;
-            let lock = repo.trusted_main_root().join(format!(
-                ".fgos/locks/dispatch-cwd--{}-{}.lock",
-                m.dev(),
-                m.ino()
-            ));
+            let lock = crate::refs::custody_lock_path(repo, path)?;
             if let Some(held) = scope.handle("dispatch-cwd") {
                 if held.path() == lock {
                     scope.validate().map_err(failure)?;
@@ -366,7 +330,12 @@ impl GitDriver {
                     if row.cwd.as_ref().is_some_and(|p| p.starts_with(path)) {
                         return Err(failure("worktree-live-cwd-preserved"));
                     }
-                    if row.cwd.is_none() && row.unreadable.iter().any(|s| s.starts_with("cwd:")) {
+                    if row.cwd.is_none()
+                        && row.unreadable.iter().any(|s| s.starts_with("cwd:"))
+                        && cwd_owner_requires_judgment(row.effective_uid, unsafe {
+                            libc::geteuid()
+                        })
+                    {
                         use fgos_process::facts::{observe, Observed};
                         if !matches!(observe(row.pid), Observed::Absent | Observed::Zombie) {
                             return Err(recovery("worktree-cwd-unknown"));
@@ -393,7 +362,7 @@ impl GitDriver {
         if writer.is_empty() {
             return Err(failure("writer-required"));
         }
-        let resource_set = resources(&kind)?;
+        let resource_set = wal::worktree_resources(&kind).map_err(failure)?;
         admission(wal, id, &resource_set)?;
         let request_digest =
             wal::canonical_digest(&(&kind, &old, &next, writer)).map_err(failure)?;
@@ -435,6 +404,7 @@ impl GitDriver {
         scope: &LockScope<'_>,
         wal: &Wal<F>,
         chain: &wal::Chain,
+        completed: bool,
         details: Vec<String>,
     ) -> Result<()> {
         let admin_root = repo.common_dir().join("worktrees");
@@ -444,10 +414,7 @@ impl GitDriver {
         let terminal = wal
             .append(
                 chain,
-                Phase::Outcome(Outcome::Worktree {
-                    completed: true,
-                    details,
-                }),
+                Phase::Outcome(Outcome::Worktree { completed, details }),
             )
             .map_err(failure)?;
         release_pin(
@@ -483,11 +450,7 @@ impl GitDriver {
         id: &str,
     ) -> Result<WorktreeHandle> {
         let scope = self.worktree_scope(repo, held)?;
-        if session_id.is_empty()
-            || !session_id
-                .bytes()
-                .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
-        {
+        if !wal::valid_id(session_id) {
             return Err(failure("invalid-session-id"));
         }
         let parent = parent.canonicalize().map_err(failure)?;
@@ -538,12 +501,7 @@ impl GitDriver {
         id: &str,
         owned_empty: bool,
     ) -> Result<WorktreeHandle> {
-        if input.session_id.as_ref().is_some_and(|s| {
-            s.is_empty()
-                || !s
-                    .bytes()
-                    .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
-        }) {
+        if input.session_id.as_ref().is_some_and(|s| !wal::valid_id(s)) {
             return Err(failure("invalid-session-id"));
         }
         let path = canonical_destination(&input.path)?;
@@ -567,6 +525,22 @@ impl GitDriver {
                 || chain.intent().next != Tip::Oid(input.base.as_str().into())
             {
                 return Err(failure("operation-id-conflict"));
+            }
+            if matches!(
+                chain.outcome(),
+                Some(Outcome::Worktree {
+                    completed: false,
+                    ..
+                })
+            ) {
+                release_pin(
+                    self,
+                    repo,
+                    scope.handle("worktree-admin").expect("acquired"),
+                    &wal,
+                    &chain,
+                )?;
+                return Err(failure("worktree-operation-not-completed"));
             }
             if !matches!(
                 chain.outcome(),
@@ -613,12 +587,10 @@ impl GitDriver {
             if !branch.as_str().starts_with("refs/heads/") {
                 return Err(failure("worktree-branch-invalid"));
             }
-            if self
-                .worktree_rows(repo)?
-                .iter()
-                .any(|r| r.branch.as_ref() == Some(branch))
-            {
-                return Err(failure("branch-in-use"));
+            for (fact, target) in self.checkouts(repo)? {
+                if crate::refs::branch_in_use(&fact, target.as_ref(), branch)? {
+                    return Err(failure("branch-in-use"));
+                }
             }
             match self.resolve_ref(repo, branch)? {
                 RefValue::Absent => (),
@@ -634,7 +606,6 @@ impl GitDriver {
         if !missing(&repo.common_dir().join("worktrees").join(&name))? {
             return Err(recovery("worktree-admin-name-in-use"));
         }
-        let wal = Wal::open(repo).map_err(failure)?;
         let kind = OperationKind::WorktreeCreate {
             path: text(&path)?.into(),
             registration: name.into(),
@@ -699,37 +670,42 @@ impl GitDriver {
                 args.extend(batch.iter().copied());
                 self.worktree_call(&worker_repo, scope, &args)?;
             }
-            // Never follow a worker .fgos symlink into the shared state.
-            let worker_state = path.join(".fgos");
-            if !missing(&worker_state)? {
-                let metadata = fs::symlink_metadata(&worker_state).map_err(failure)?;
-                let strip = if metadata.is_dir() && !metadata.file_type().is_symlink() {
-                    fs::remove_dir_all(&worker_state)
-                } else {
-                    fs::remove_file(&worker_state)
-                };
-                if let Err(cause) = strip {
-                    // A failed strip is normally dirty. Git's guarded non-force
-                    // remove decides whether our own registered effects are safe.
-                    let _ = self.worktree_call(
-                        repo,
-                        scope,
-                        &["worktree", "remove", "--", text(&path)?],
-                    );
-                    return Err(failure(cause));
-                }
-            }
+            self.strip_worktree_state(repo, scope, &path)?;
             let handle = self.worktree_handle(repo, &path)?;
             self.finish_worktree(
                 repo,
                 scope,
                 &wal,
                 &attempted,
+                true,
                 vec!["registered-and-stripped".into()],
             )?;
             Ok(handle)
         })();
-        result.map_err(|e| pending(e, id))
+        result.map_err(|e| self.reconcile_worktree_error(repo, scope, id, e))
+    }
+    fn strip_worktree_state(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        path: &Path,
+    ) -> Result<()> {
+        // Never follow a worker .fgos symlink into the shared state.
+        let worker_state = path.join(".fgos");
+        if !missing(&worker_state)? {
+            let metadata = fs::symlink_metadata(&worker_state).map_err(failure)?;
+            let strip = if metadata.is_dir() && !metadata.file_type().is_symlink() {
+                fs::remove_dir_all(&worker_state)
+            } else {
+                fs::remove_file(&worker_state)
+            };
+            if let Err(cause) = strip {
+                // Only Git may roll back registered effects, without force.
+                let _ = self.worktree_call(repo, scope, &["worktree", "remove", "--", text(path)?]);
+                return Err(failure(cause));
+            }
+        }
+        Ok(())
     }
     pub fn remove_worktree(
         &self,
@@ -761,6 +737,22 @@ impl GitDriver {
                 || chain.intent().expected != Tip::Oid(proof.expected_tip.as_str().into())
             {
                 return Err(failure("operation-id-conflict"));
+            }
+            if matches!(
+                chain.outcome(),
+                Some(Outcome::Worktree {
+                    completed: false,
+                    ..
+                })
+            ) {
+                release_pin(
+                    self,
+                    repo,
+                    scope.handle("worktree-admin").expect("acquired"),
+                    &wal,
+                    &chain,
+                )?;
+                return Err(failure("worktree-operation-not-completed"));
             }
             if !matches!(
                 chain.outcome(),
@@ -797,6 +789,21 @@ impl GitDriver {
         {
             return Err(failure("worktree-delivery-unproven"));
         }
+        let reachable = self.checked(
+            repo,
+            &[
+                "for-each-ref",
+                "--format=%(refname)",
+                &format!("--contains={}", proof.delivered_to.as_str()),
+            ],
+            Policy::Inspect,
+        )?;
+        if !reachable
+            .split(|b| *b == b'\n')
+            .any(|name| name.starts_with(b"refs/") && !name.starts_with(b"refs/fgos/"))
+        {
+            return Err(failure("worktree-delivery-unreachable"));
+        }
         let registration = text(
             handle
                 .git_dir
@@ -805,7 +812,6 @@ impl GitDriver {
                 .ok_or_else(|| failure("worktree-registration-missing"))?,
         )?
         .into();
-        let wal = Wal::open(repo).map_err(failure)?;
         let chain = self.begin_worktree(
             repo,
             &scope,
@@ -824,6 +830,8 @@ impl GitDriver {
             Tip::Oid(handle.tip.as_str().into()),
             Tip::Absent,
         )?;
+        self.worktree_custody(repo, &scope, &path)?;
+        self.worktree_not_live(&path)?;
         let attempted = wal
             .append(
                 &chain,
@@ -834,8 +842,10 @@ impl GitDriver {
                 },
             )
             .map_err(failure)?;
+        self.worktree_custody(repo, &scope, &path)?;
+        self.worktree_not_live(&path)?;
         self.worktree_call(repo, &scope, &["worktree", "remove", "--", text(&path)?])
-            .map_err(|e| pending(e, id))?;
+            .map_err(|e| self.reconcile_worktree_error(repo, &scope, id, e))?;
         if !missing(&path)? || !missing(&handle.git_dir)? {
             return Err(pending(recovery("worktree-remove-incomplete"), id));
         }
@@ -844,6 +854,7 @@ impl GitDriver {
             &scope,
             &wal,
             &attempted,
+            true,
             vec![proof.evidence_digest.clone()],
         )?;
         Ok(())
@@ -880,6 +891,22 @@ impl GitDriver {
                 || chain.intent().expected != Tip::Oid(expected.as_str().into())
             {
                 return Err(failure("operation-id-conflict"));
+            }
+            if matches!(
+                chain.outcome(),
+                Some(Outcome::Worktree {
+                    completed: false,
+                    ..
+                })
+            ) {
+                release_pin(
+                    self,
+                    repo,
+                    scope.handle("worktree-admin").expect("acquired"),
+                    &wal,
+                    &chain,
+                )?;
+                return Err(failure("worktree-operation-not-completed"));
             }
             if !matches!(
                 chain.outcome(),
@@ -920,7 +947,6 @@ impl GitDriver {
             .and_then(|s| s.to_str())
             .ok_or_else(|| failure("worktree-registration-missing"))?
             .into();
-        let wal = Wal::open(repo).map_err(failure)?;
         let tip = Tip::Oid(expected.as_str().into());
         let chain = self.begin_worktree(
             repo,
@@ -937,6 +963,8 @@ impl GitDriver {
             tip.clone(),
             tip.clone(),
         )?;
+        self.worktree_custody(repo, &scope, &source)?;
+        self.worktree_not_live(&source)?;
         let attempted = wal
             .append(
                 &chain,
@@ -947,6 +975,8 @@ impl GitDriver {
                 },
             )
             .map_err(failure)?;
+        self.worktree_custody(repo, &scope, &source)?;
+        self.worktree_not_live(&source)?;
         self.worktree_call(
             repo,
             &scope,
@@ -958,11 +988,18 @@ impl GitDriver {
                 text(&destination)?,
             ],
         )
-        .map_err(|e| pending(e, id))?;
+        .map_err(|e| self.reconcile_worktree_error(repo, &scope, id, e))?;
         let handle = self
             .worktree_handle(repo, &destination)
             .map_err(|e| pending(e, id))?;
-        self.finish_worktree(repo, &scope, &wal, &attempted, vec!["relocated".into()])?;
+        self.finish_worktree(
+            repo,
+            &scope,
+            &wal,
+            &attempted,
+            true,
+            vec!["relocated".into()],
+        )?;
         Ok(handle)
     }
     /// Includes raw admin directories omitted by worktree list after a partial prune.
@@ -986,7 +1023,12 @@ impl GitDriver {
             let entry = entry.map_err(failure)?;
             let name = entry.file_name().to_string_lossy().into_owned();
             if !entry.file_type().map_err(failure)?.is_dir() {
-                return Err(recovery("worktree-admin-untrusted"));
+                issues.push(WorktreeIssue {
+                    path: entry.path(),
+                    registration: name,
+                    reason: "partial-admin-entry".into(),
+                });
+                continue;
             }
             let admin = entry.path();
             let backlink = fs::read_to_string(admin.join("gitdir"));
@@ -1049,7 +1091,6 @@ impl GitDriver {
     }
     fn prune_owned_registration(
         &self,
-        _repo: &RepoHandle,
         scope: &LockScope<'_>,
         admin: &Path,
         removed_path: &str,
@@ -1106,6 +1147,42 @@ impl GitDriver {
         fs::remove_dir(admin).map_err(failure)?;
         fgos_durable_file::sync_directory(admin.parent().expect("admin parent")).map_err(failure)
     }
+    fn reconcile_worktree_error(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        id: &str,
+        mut error: OperationError,
+    ) -> OperationError {
+        if self.repair_worktree_locked(repo, scope, id).is_ok() {
+            error.operation_id = Some(id.into());
+            error
+        } else {
+            pending(error, id)
+        }
+    }
+    fn unchanged_registration(
+        &self,
+        repo: &RepoHandle,
+        path: &Path,
+        admin: &Path,
+        identity: &str,
+        chain: &wal::Chain,
+    ) -> Result<bool> {
+        if missing(path)? || missing(admin)? {
+            return Ok(false);
+        }
+        if admin_identity(admin)? != identity {
+            return Err(recovery("worktree-admin-identity-changed"));
+        }
+        let handle = self.worktree_handle(repo, path)?;
+        Ok(handle.git_dir == admin
+            && Tip::Oid(handle.tip.as_str().into()) == chain.intent().expected
+            && fs::read_to_string(admin.join("gitdir"))
+                .map_err(failure)?
+                .trim_end()
+                == format!("{}/.git", text(path)?))
+    }
     /// Reconciliation never repeats a TargetAttempt's move/destroy/create.
     pub fn repair_worktree_registration(
         &self,
@@ -1117,10 +1194,18 @@ impl GitDriver {
             return Err(failure("worktree-repair-custody-not-allowed"));
         }
         let scope = self.worktree_scope(repo, held)?;
+        self.repair_worktree_locked(repo, &scope, id)
+    }
+    fn repair_worktree_locked(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        id: &str,
+    ) -> Result<()> {
         let wal = Wal::open(repo).map_err(failure)?;
         let chain = wal.inspect(id).map_err(failure)?;
         let kind = &chain.intent().kind;
-        resources(kind)?;
+        wal::worktree_resources(kind).map_err(failure)?;
         if chain.outcome().is_some() {
             return release_pin(
                 self,
@@ -1150,6 +1235,55 @@ impl GitDriver {
             .common_dir()
             .join("worktrees")
             .join(registration(kind)?);
+        // Record-only reconciliation: never repeat a possibly attempted effect.
+        let unchanged = match kind {
+            OperationKind::WorktreeCreate { path, .. } => {
+                missing(&admin)?
+                    && (missing(Path::new(&**path))?
+                        || (admin_identity(Path::new(&**path)).is_ok()
+                            && fs::read_dir(&**path).map_err(failure)?.next().is_none()))
+            }
+            OperationKind::WorktreeMove {
+                source,
+                destination,
+                registration_identity,
+                ..
+            } => {
+                missing(Path::new(&**destination))?
+                    && self.unchanged_registration(
+                        repo,
+                        Path::new(&**source),
+                        &admin,
+                        registration_identity,
+                        &chain,
+                    )?
+            }
+            OperationKind::WorktreeRemove {
+                path,
+                registration_identity,
+                ..
+            } => self.unchanged_registration(
+                repo,
+                Path::new(&**path),
+                &admin,
+                registration_identity,
+                &chain,
+            )?,
+            _ => false,
+        };
+        if unchanged {
+            return self.finish_worktree(
+                repo,
+                scope,
+                &wal,
+                &chain,
+                false,
+                vec![format!(
+                    "effect-not-observed: {:?}; registration/backlink/path/tip checked",
+                    kind
+                )],
+            );
+        }
         match kind {
             OperationKind::WorktreeMove {
                 source,
@@ -1169,7 +1303,7 @@ impl GitDriver {
                 if gitfile.trim_end() != format!("gitdir: {}", text(&admin)?) {
                     return Err(recovery("worktree-destination-identity-unknown"));
                 }
-                self.worktree_call(repo, &scope, &["worktree", "repair", "--", destination])?;
+                self.worktree_call(repo, scope, &["worktree", "repair", "--", destination])?;
                 let handle = self.worktree_handle(repo, Path::new(&**destination))?;
                 if handle.git_dir != admin
                     || Tip::Oid(handle.tip.as_str().into()) != chain.intent().next
@@ -1190,7 +1324,7 @@ impl GitDriver {
                     if fs::read_to_string(&lock).map_err(failure)?.trim() != "initializing" {
                         return Err(recovery("worktree-lock-not-operation-owned"));
                     }
-                    self.worktree_call(repo, &scope, &["worktree", "unlock", "--", path])?;
+                    self.worktree_call(repo, scope, &["worktree", "unlock", "--", path])?;
                 }
                 if !missing(&Path::new(&**path).join(".fgos"))? {
                     return Err(recovery("worktree-create-strip-incomplete"));
@@ -1207,22 +1341,17 @@ impl GitDriver {
                     return Err(recovery("worktree-remove-outcome-unknown"));
                 }
                 if !missing(&admin)? {
-                    self.prune_owned_registration(
-                        repo,
-                        &scope,
-                        &admin,
-                        path,
-                        registration_identity,
-                    )?;
+                    self.prune_owned_registration(scope, &admin, path, registration_identity)?;
                 }
             }
             _ => unreachable!(),
         }
         self.finish_worktree(
             repo,
-            &scope,
+            scope,
             &wal,
             &chain,
+            true,
             vec!["effect-observed-only".into()],
         )?;
         Ok(())
@@ -1264,5 +1393,83 @@ fn existing<F: wal::FileSystem>(wal: &Wal<F>, id: &str) -> Result<Option<wal::Ch
         Ok(chain) => Ok(Some(chain)),
         Err(wal::WalError::Io(e)) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
         Err(e) => Err(recovery(e)),
+    }
+}
+
+fn cwd_owner_requires_judgment(owner: Option<u32>, current: u32) -> bool {
+    owner.is_none_or(|uid| uid == current)
+}
+#[cfg(test)]
+mod review_tests {
+    use super::*;
+    #[test]
+    fn unreadable_foreign_cwd_is_outside_scope_but_unknown_and_own_are_not() {
+        assert!(!cwd_owner_requires_judgment(Some(0), 1000));
+        assert!(!cwd_owner_requires_judgment(Some(1001), 1000));
+        assert!(cwd_owner_requires_judgment(Some(1000), 1000));
+        assert!(cwd_owner_requires_judgment(None, 1000));
+    }
+}
+
+#[cfg(all(test, target_os = "linux"))]
+mod strip_tests {
+    use super::*;
+    use std::{os::unix::fs::PermissionsExt, process::Command};
+    #[test]
+    fn failed_strip_keeps_original_error_and_nonforce_rollback_preserves_bytes() {
+        let root = std::env::temp_dir().join(format!("fgos-strip-review-{}", std::process::id()));
+        fs::create_dir(&root).unwrap();
+        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        let git = |args: &[&str]| {
+            let output = Command::new("git")
+                .arg("-C")
+                .arg(&root)
+                .args(args)
+                .output()
+                .unwrap();
+            assert!(
+                output.status.success(),
+                "{}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+        };
+        git(&["init", "-q", "--initial-branch=trunk"]);
+        git(&[
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.invalid",
+            "commit",
+            "--allow-empty",
+            "-qm",
+            "fixture",
+        ]);
+        let worker = root.join("worker");
+        git(&["worktree", "add", "--detach", worker.to_str().unwrap()]);
+        let state = worker.join(".fgos");
+        fs::create_dir(&state).unwrap();
+        fs::write(state.join("valuable"), [0, 255, 1]).unwrap();
+        fs::set_permissions(&state, fs::Permissions::from_mode(0o500)).unwrap();
+        fs::create_dir_all(root.join(".fgos/locks/activation.lock")).unwrap();
+        fs::write(
+            root.join(".fgos/locks/activation.lock/TOMBSTONE"),
+            r#"{"lock":"activation","by":"fixture","at":"fixture"}"#,
+        )
+        .unwrap();
+        let driver = GitDriver::new(&root).unwrap();
+        let repo = match driver.resolve_repo(&root, &root).unwrap() {
+            ResolveRepo::Repository(r) => r,
+            _ => panic!(),
+        };
+        let scope = driver.worktree_scope(&repo, vec![]).unwrap();
+        let error = driver
+            .strip_worktree_state(&repo, &scope, &worker)
+            .unwrap_err();
+        assert!(error.cause.contains("Permission denied"), "{error:?}");
+        assert_eq!(fs::read(state.join("valuable")).unwrap(), [0, 255, 1]);
+        assert!(root.join(".git/worktrees/worker/gitdir").exists());
+        drop(scope);
+        fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+        fs::remove_dir_all(root).unwrap();
     }
 }

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { fixture } from './worktree-fixture.mjs';
 for (const backend of ['files','reftable']) test(`Worktree create, move, guarded remove (${backend})`, { skip: process.platform === 'win32' }, () => {
@@ -94,5 +94,48 @@ test('stripped tracked state is clean for removal and reappearing worker state i
     assert.deepEqual(fs.readFileSync(path.join(worker,'ignored')),Buffer.from([0,255]));
     fs.unlinkSync(path.join(worker,'ignored'));
     f.port.remove(proof); assert.equal(fs.existsSync(worker),false);
+  } finally {f.cleanup();}
+});
+test('main checkout allocation supports .claude/worktrees and rejects admin or linked nesting', {skip:process.platform==='win32'},()=>{
+  const f=fixture();
+  try {
+    fs.appendFileSync(path.join(f.repoPath,'.git/info/exclude'),'\n.claude/\n');
+    const parent=path.join(f.repoPath,'.claude/worktrees'); fs.mkdirSync(parent,{recursive:true});
+    const worker=path.join(parent,'worker');
+    f.port.createDetached({path:worker,operationId:'nested-main'});
+    assert.equal(fs.existsSync(path.join(worker,'.git')),true);
+    assert.throws(()=>f.port.createDetached({path:path.join(worker,'unsafe'),operationId:'unsafe'}),/nested/);
+    assert.throws(()=>f.port.createDetached({path:path.join(f.repoPath,'.git','unsafe'),operationId:'admin'}),/nested/);
+  } finally { f.cleanup(); }
+});
+test('locked worktrees and submodules refuse before attempting removal or relocation', {skip:process.platform==='win32'},()=>{
+  const f=fixture(); const worker=path.join(f.temp,'worker');
+  try {
+    f.port.createDetached({path:worker,operationId:'create'});
+    const remove={path:worker,expectedTip:f.tip,deliveredTo:f.tip,evidenceDigest:'a'.repeat(64),operationId:'remove'};
+    const move={source:worker,destination:path.join(f.temp,'moved'),expectedTip:f.tip,operationId:'move'};
+    f.git('worktree','lock',worker);
+    assert.throws(()=>f.port.remove(remove),/user-locked/);
+    assert.throws(()=>f.port.relocate(move),/user-locked/);
+    f.git('worktree','unlock',worker);
+    execFileSync('git',['-C',worker,'update-index','--add','--cacheinfo',`160000,${f.tip},submodule`]);
+    execFileSync('git',['-C',worker,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','submodule']);
+    fs.mkdirSync(path.join(worker,'submodule'));
+    assert.throws(()=>f.port.remove(remove),/submodules/);
+    assert.throws(()=>f.port.relocate(move),/submodules/);
+  } finally {f.cleanup();}
+});
+test('detached undelivered tip requires a surviving non-fgos ref', {skip:process.platform==='win32'},()=>{
+  const f=fixture(); const worker=path.join(f.temp,'worker');
+  try {
+    f.port.createDetached({path:worker,operationId:'create'});
+    const tree=f.git('rev-parse','HEAD^{tree}');
+    const tip=f.git('commit-tree',tree,'-p',f.tip,'-m','undelivered');
+    // This commit is deliberately reachable only through the detached HEAD.
+    execFileSync('git',['-C',worker,'update-ref','--no-deref','HEAD',tip]);
+    const proof={path:worker,expectedTip:tip,deliveredTo:tip,evidenceDigest:'a'.repeat(64),operationId:'remove'};
+    assert.throws(()=>f.port.remove(proof),/delivery-unreachable/);
+    f.git('update-ref','refs/heads/delivered',tip);
+    f.port.remove(proof);
   } finally {f.cleanup();}
 });

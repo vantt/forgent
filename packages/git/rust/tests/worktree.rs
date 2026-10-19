@@ -441,3 +441,146 @@ fn killed_remove_and_partial_prune_are_owned_and_never_repeat_destroy() {
         f.driver.prune_worktree(&f.repo, vec![], "remove").unwrap();
     }
 }
+
+#[test]
+fn clean_git_refusals_settle_attempts_without_replaying_effects() {
+    for action in ["create", "remove", "move"] {
+        let f = Fixture::new();
+        let path = f.root.join("worker");
+        let destination = f.root.join("moved");
+        if action != "create" {
+            f.create(&path);
+        }
+        let admin = f.path.join(".git/worktrees/worker");
+        let scope = f.scope();
+        let kind = match action {
+            "create" => OperationKind::WorktreeCreate {
+                path: path.to_str().unwrap().into(),
+                registration: "worker".into(),
+                branch: None,
+                session_id: None,
+            },
+            "remove" => OperationKind::WorktreeRemove {
+                path: path.to_str().unwrap().into(),
+                registration: "worker".into(),
+                registration_identity: identity(&admin).into(),
+                delivery: Box::new(wal::WorktreeDeliveryBinding {
+                    delivered_to: f.tip.as_str().into(),
+                    evidence_digest: "a".repeat(64),
+                }),
+            },
+            _ => OperationKind::WorktreeMove {
+                source: path.to_str().unwrap().into(),
+                destination: destination.to_str().unwrap().into(),
+                registration: "worker".into(),
+                registration_identity: identity(&admin).into(),
+            },
+        };
+        f.attempt(&scope, action, kind);
+        let mut command = Command::new("git");
+        command.arg("-C").arg(&f.path).arg("worktree");
+        match action {
+            "create" => {
+                // Git validates the base before any destination effect.
+                command
+                    .args(["add", "--detach"])
+                    .arg(&path)
+                    .arg("missing-base");
+            }
+            "remove" => {
+                git(&f.path, &["worktree", "lock", path.to_str().unwrap()]);
+                command.arg("remove").arg(&path);
+            }
+            _ => {
+                git(&f.path, &["worktree", "lock", path.to_str().unwrap()]);
+                command.arg("move").arg(&path).arg(&destination);
+            }
+        }
+        assert!(!command.output().unwrap().status.success());
+        drop(scope);
+        f.driver
+            .repair_worktree_registration(&f.repo, vec![], action)
+            .unwrap();
+        let wal = Wal::open(&f.repo).unwrap();
+        assert!(matches!(
+            wal.inspect(action).unwrap().outcome(),
+            Some(wal::Outcome::Worktree {
+                completed: false,
+                ..
+            })
+        ));
+        assert_eq!(
+            git(
+                &f.path,
+                &[
+                    "for-each-ref",
+                    "--format=%(refname)",
+                    &format!("refs/fgos/git-operations/{action}")
+                ]
+            ),
+            ""
+        );
+        f.driver
+            .repair_worktree_registration(&f.repo, vec![], action)
+            .unwrap();
+        if action != "create" {
+            assert_payload(&path);
+        }
+        assert!(!destination.exists());
+    }
+}
+
+#[test]
+fn successful_registered_create_rollback_settles_as_not_completed() {
+    let f = Fixture::new();
+    let path = f.root.join("rolled-back");
+    let scope = f.scope();
+    f.attempt(
+        &scope,
+        "rollback",
+        OperationKind::WorktreeCreate {
+            path: path.to_str().unwrap().into(),
+            registration: "rolled-back".into(),
+            branch: None,
+            session_id: None,
+        },
+    );
+    git(
+        &f.path,
+        &[
+            "worktree",
+            "add",
+            "--detach",
+            path.to_str().unwrap(),
+            f.tip.as_str(),
+        ],
+    );
+    git(&f.path, &["worktree", "remove", path.to_str().unwrap()]);
+    drop(scope);
+    f.driver
+        .repair_worktree_registration(&f.repo, vec![], "rollback")
+        .unwrap();
+    assert!(matches!(
+        Wal::open(&f.repo)
+            .unwrap()
+            .inspect("rollback")
+            .unwrap()
+            .outcome(),
+        Some(wal::Outcome::Worktree {
+            completed: false,
+            ..
+        })
+    ));
+    assert!(!path.exists());
+    assert_eq!(
+        git(
+            &f.path,
+            &[
+                "for-each-ref",
+                "--format=%(refname)",
+                "refs/fgos/git-operations/rollback"
+            ]
+        ),
+        ""
+    );
+}

@@ -413,6 +413,11 @@ fn view_of(pid: ProcId, tuple: Option<ProcTuple>, filter: &ScanFilter, mut unrea
     let base = PathBuf::from(format!("/proc/{}", pid.0));
     let mut note = |field: &str, err: io::Error| unreadable.push(format!("{field}: {err}"));
 
+    let effective_uid = fs::read_to_string(base.join("status"))
+        .map_err(|err| note("uid", err)).ok()
+        .and_then(|status| status.lines().find(|line| line.starts_with("Uid:"))
+            .and_then(|line| line.split_whitespace().nth(2))
+            .and_then(|uid| uid.parse().ok()));
     let exe = fs::read_link(base.join("exe")).map_err(|err| note("exe", err)).ok();
     let cwd = fs::read_link(base.join("cwd")).map_err(|err| note("cwd", err)).ok();
     let cmdline = fs::read(base.join("cmdline"))
@@ -434,7 +439,7 @@ fn view_of(pid: ProcId, tuple: Option<ProcTuple>, filter: &ScanFilter, mut unrea
             Err(err) => note("environ", err),
         }
     }
-    ProcView { pid, tuple, exe, cmdline, cwd, env_subset, unreadable }
+    ProcView { effective_uid, pid, tuple, exe, cmdline, cwd, env_subset, unreadable }
 }
 
 fn split_nul(bytes: &[u8]) -> Vec<String> {

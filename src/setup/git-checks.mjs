@@ -22,7 +22,7 @@ export function checkGit(cwd, kind, loaderOptions) {
       if (facts.notARepository) return { passed: true, message: 'info: not a Git repository' };
       // Each producer owns its diagnostic row; custody adds its own facts here
       // in phase 04. This check never repairs or clears predecessor evidence.
-      return { passed: facts.issues.length === 0 && facts.pendingOperations.length === 0, message: JSON.stringify(facts) };
+      return { passed: facts.issues.every(issue => issue.reason === 'dirty-or-stale-checkout-preserved') && facts.pendingOperations.length === 0, message: JSON.stringify(facts) };
     }
     const versions = native.versions();
     const facts = native.inspectGit(stateRoot, cwd, root, remote);

@@ -253,7 +253,7 @@ fn record_digest(record: &Record) -> WalResult<String> {
         .remove("digest");
     canonical_digest(&v)
 }
-fn valid_id(s: &str) -> bool {
+pub(crate) fn valid_id(s: &str) -> bool {
     !s.is_empty()
         && s.len() <= 80
         && s.bytes()
@@ -270,6 +270,34 @@ fn validate_tip(tip: &Tip, format: ObjectFormat) -> WalResult<()> {
     }
     Ok(())
 }
+
+pub(crate) fn worktree_resources(kind: &OperationKind) -> WalResult<Vec<String>> {
+    let mut paths = match kind {
+        OperationKind::WorktreeCreate { path, .. } | OperationKind::WorktreeRemove { path, .. } => {
+            vec![format!("worktree:{path}")]
+        }
+        OperationKind::WorktreeMove {
+            source,
+            destination,
+            ..
+        } => vec![
+            format!("worktree:{source}"),
+            format!("worktree:{destination}"),
+        ],
+        _ => return Err(corrupt("not-a-worktree-operation")),
+    };
+    if let OperationKind::WorktreeCreate {
+        branch: Some(branch),
+        ..
+    } = kind
+    {
+        paths.push(branch.to_string());
+    }
+    paths.sort();
+    paths.dedup();
+    Ok(paths)
+}
+
 impl Intent {
     /// Delete keeps the old object reachable until its terminal receipt.
     pub fn candidate(&self) -> &Tip {
@@ -304,19 +332,7 @@ impl Intent {
             _ => None,
         };
         if let Some((paths, registration)) = paths {
-            let mut resources = paths
-                .iter()
-                .map(|p| format!("worktree:{p}"))
-                .collect::<Vec<_>>();
-            if let OperationKind::WorktreeCreate {
-                branch: Some(branch),
-                ..
-            } = &self.kind
-            {
-                resources.push(branch.to_string());
-            }
-            resources.sort();
-            resources.dedup();
+            let resources = worktree_resources(&self.kind)?;
             if paths.iter().any(|p| {
                 !Path::new(&***p).is_absolute()
                     || Path::new(&***p).components().any(|c| {

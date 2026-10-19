@@ -3784,20 +3784,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return paginateVerbResult(rankImpact(listWork(dir), { includeDone: Boolean(flags.all) }), flags, 'triage-v1', 'triage');
     }
 
-    // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
-    // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's
-    // createSession/endSession/listSessions/reclaimOrphanedSessions. `start`
-    // opens a detached-HEAD worktree on the current HEAD (zero new branches)
-    // with a `.fgos` symlink back to the one shared store (D10) and prints
-    // where to `cd`; `end` removes it, refusing a diverged (dangling-commit)
-    // session without --force and naming the sha(s); `list` prints the
-    // registry; `gc` (p-fgos-session-gc) sweeps entries whose worktree is gone
-    // from git or whose one-shot `start` CLI pid has since exited, sparing any
-    // that are diverged or have uncommitted work. session.mjs raises
-    // SessionError for every lifecycle failure (unknown id, divergence
-    // refusal, git failure) — surfaced here as `validation` (exit 4) so a bad
-    // input is a clean categorized exit, never an uncaught crash. repoRoot is
-    // the caller's cwd, the same root every other git-backed verb uses.
     case 'worktree': {
       const sub = requireField(positional[0], 'worktree requires create <path>');
       if (sub === 'create') {
@@ -3813,6 +3799,20 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       throw new Error(`unknown worktree sub-verb: ${sub}`);
     }
+    // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
+    // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's
+    // createSession/endSession/listSessions/reclaimOrphanedSessions. `start`
+    // opens a detached-HEAD worktree on the current HEAD (zero new branches)
+    // with a `.fgos` symlink back to the one shared store (D10) and prints
+    // where to `cd`; `end` removes it, refusing a diverged (dangling-commit)
+    // session without --force and naming the sha(s); `list` prints the
+    // registry; `gc` (p-fgos-session-gc) sweeps entries whose worktree is gone
+    // from git or whose one-shot `start` CLI pid has since exited, sparing any
+    // that are diverged or have uncommitted work. session.mjs raises
+    // SessionError for every lifecycle failure (unknown id, divergence
+    // refusal, git failure) — surfaced here as `validation` (exit 4) so a bad
+    // input is a clean categorized exit, never an uncaught crash. repoRoot is
+    // the caller's cwd, the same root every other git-backed verb uses.
     case 'session': {
       const sub = requireField(positional[0], 'session requires a sub-verb: fgos session <start|end|list|gc> ...');
       const repoRoot = process.cwd();

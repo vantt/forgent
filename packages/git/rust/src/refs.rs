@@ -302,7 +302,10 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
     Ok(())
 }
 impl GitDriver {
-    fn checkouts(&self, repo: &RepoHandle) -> Result<Vec<(WorktreeFact, Option<RepoHandle>)>> {
+    pub(crate) fn checkouts(
+        &self,
+        repo: &RepoHandle,
+    ) -> Result<Vec<(WorktreeFact, Option<RepoHandle>)>> {
         let mut cursor = None;
         let mut result = vec![];
         loop {
@@ -463,43 +466,12 @@ impl GitDriver {
             .iter()
             .find(|h| h.as_ref().name() == "dispatch-cwd")
             .map(|h| h.as_ref().path().to_owned());
-        let mut scope = LockScope::seeded(held).map_err(failure)?;
-        scope
-            .assert_can_acquire("worktree-admin")
-            .map_err(failure)?;
-        let params = BTreeMap::from([(
-            "fgosDir".into(),
-            repo.trusted_main_root()
-                .join(".fgos")
-                .to_string_lossy()
-                .into_owned(),
-        )]);
-        scope
-            .acquire("worktree-admin", &params, Wait::Ms(5000))
-            .map_err(failure)?;
+        let scope = acquire_worktree_admin(repo, held)?;
         let admin = scope.handle("worktree-admin").expect("acquired");
         let before = self.checkouts(repo)?;
         let mut used = vec![];
         for row in &before {
-            let mut in_use = row.0.branch.as_ref() == Some(name);
-            if let Some(r) = &row.1 {
-                for state in [
-                    "rebase-merge/head-name",
-                    "rebase-apply/head-name",
-                    "BISECT_START",
-                ] {
-                    match fs::read(r.git_dir.join(state)) {
-                        Ok(bytes) => {
-                            let branch = std::str::from_utf8(&bytes).map_err(failure)?.trim();
-                            in_use |= branch == name.as_str()
-                                || (state == "BISECT_START"
-                                    && format!("refs/heads/{branch}") == name.as_str());
-                        }
-                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                        Err(e) => return Err(failure(e)),
-                    }
-                }
-            }
+            let in_use = branch_in_use(&row.0, row.1.as_ref(), name)?;
             if in_use {
                 used.push(row);
             }
@@ -520,17 +492,11 @@ impl GitDriver {
             }
             #[cfg(unix)]
             {
-                use std::os::unix::fs::MetadataExt;
                 let root = target
                     .work_tree
                     .as_ref()
                     .ok_or_else(|| failure("checkout-custody-required"))?;
-                let m = fs::metadata(root).map_err(failure)?;
-                let lock = repo.trusted_main_root().join(format!(
-                    ".fgos/locks/dispatch-cwd--{}-{}.lock",
-                    m.dev(),
-                    m.ino()
-                ));
+                let lock = custody_lock_path(repo, root)?;
                 if custody_path.as_ref() != Some(&lock) {
                     return Err(failure("checkout-custody-required"));
                 }
@@ -884,4 +850,62 @@ impl GitDriver {
             }
         })
     }
+}
+
+pub(crate) fn acquire_worktree_admin<'a>(
+    repo: &RepoHandle,
+    held: Vec<BorrowedHandle<'a>>,
+) -> Result<LockScope<'a>> {
+    require_lock_scope_platform()?;
+    let mut scope = LockScope::seeded(held).map_err(failure)?;
+    scope
+        .assert_can_acquire("worktree-admin")
+        .map_err(failure)?;
+    let params = BTreeMap::from([(
+        "fgosDir".into(),
+        repo.trusted_main_root()
+            .join(".fgos")
+            .to_string_lossy()
+            .into_owned(),
+    )]);
+    scope
+        .acquire("worktree-admin", &params, Wait::Ms(5000))
+        .map_err(failure)?;
+    Ok(scope)
+}
+#[cfg(unix)]
+pub(crate) fn custody_lock_path(repo: &RepoHandle, root: &Path) -> Result<PathBuf> {
+    use std::os::unix::fs::MetadataExt;
+    let m = fs::metadata(root).map_err(failure)?;
+    Ok(repo.trusted_main_root().join(format!(
+        ".fgos/locks/dispatch-cwd--{}-{}.lock",
+        m.dev(),
+        m.ino()
+    )))
+}
+pub(crate) fn branch_in_use(
+    fact: &WorktreeFact,
+    repo: Option<&RepoHandle>,
+    name: &RefName,
+) -> Result<bool> {
+    let mut in_use = fact.branch.as_ref() == Some(name);
+    if let Some(r) = repo {
+        for state in [
+            "rebase-merge/head-name",
+            "rebase-apply/head-name",
+            "BISECT_START",
+        ] {
+            match fs::read(r.git_dir.join(state)) {
+                Ok(bytes) => {
+                    let branch = std::str::from_utf8(&bytes).map_err(failure)?.trim();
+                    in_use |= branch == name.as_str()
+                        || (state == "BISECT_START"
+                            && format!("refs/heads/{branch}") == name.as_str());
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+                Err(e) => return Err(failure(e)),
+            }
+        }
+    }
+    Ok(in_use)
 }

@@ -338,6 +338,8 @@ The same stop-everything rule as section 12 applies; each lock moves to its new 
 
 ## 19. Known limits
 
+- Git Worktree remove/move cannot acquire rank 30 while holding rank 40. It rechecks custody and live cwd immediately before TargetAttempt and again before the Git call, but a new rank-30 acquirer can still race the final probe. Cross-user unreadable cwd and privileged actors are outside its same-user process guarantee; shared cross-user checkout custody is not certified.
+
 - A live holder that is wedged keeps its lock until it exits: a dispatcher stuck on a cwd blocks that cwd with no time limit (the legacy lock had a 4-hour ttl and a reconcile clear; `dispatch reconcile clear-cwd-lock` now only reports held or free). The worker it started is still killed at its run timeout.
 - A hung live holder is never taken over. A person fences it (section 17); the lock releases when it dies.
 - `holders()` is `unlistable` on macOS and Windows, so `lock-holders` and the leftover kill of `run_borrowed` rely on the process group there (best-effort).
