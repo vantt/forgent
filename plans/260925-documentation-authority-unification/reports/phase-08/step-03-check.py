@@ -97,6 +97,40 @@ def anchors(commit,target):
     js="import {listAnchors} from './scripts/list-doc-anchors.mjs'; let s=''; for await (const x of process.stdin) s+=x; console.log(JSON.stringify(listAnchors(s)));"
     return json.loads(subprocess.check_output(['node','--input-type=module','-e',js],cwd=ROOT,input=blob(commit,target),env=ENV))
 
+def locator_present(token,body):
+    token=token.lstrip('§')
+    if re.fullmatch(r'(?:RUL\d+[a-z]?|D-ADR\d+|ADR-\d+|00\d{2})',token):
+        return bool(re.search(r'(?<![\w])'+re.escape(token)+r'(?![\w])',body,re.I))
+    return token.casefold() in body.casefold()
+
+@functools.lru_cache(None)
+def heading_sections(commit,target):
+    lines=blob(commit,target).decode().splitlines();result=[]
+    for a in anchors(commit,target):
+        if a['kind']!='heading':continue
+        n=a['startLine'];h=re.match(r'^(#{1,6})\s',lines[n-1])
+        if not h:continue
+        level=len(h[1]);end=next((i for i in range(n,len(lines)) if re.match(r'^#{1,'+str(level)+r'} ',lines[i])),len(lines))
+        result.append({**a,'level':level,'sectionEndLine':end,'body':'\n'.join(lines[n-1:end])})
+    return result
+
+def scan_candidates(commit,file,inventory_spans):
+    """Whole-file supplemental search; candidates need an edge or an explicit exclusion.
+    Basename set comes from committed retiring trees. Full paths include retained legacy
+    user/history roots too; boundary prevents matching docs/how-to inside how-to-X.md.
+    """
+    tree=git('ls-tree','-r','--name-only',commit).decode().splitlines()
+    names=sorted({p.rsplit('/',1)[-1] for p in tree if p.startswith(('docs/specs/','docs/architect/')) and p.endswith('.md')},key=lambda x:(-len(x),x))
+    full=r'(?<![\w/-])(?:repo/)?docs/(?:specs|architect|how-to|explanation|decisions|history|reference|tutorials|distillery)(?=/|[\s`),;]|$)(?:/[^\s`<>"\]\[),;|}]*)?'
+    bare=r'(?<![\w/-])(?:'+'|'.join(re.escape(n) for n in names)+r')(?::\d+(?:[-–]\d+)?)?(?![\w.-])'
+    pattern=re.compile(full+'|'+bare)
+    result=[]
+    for n,line in enumerate(blob(commit,file).decode().splitlines(),1):
+        for m in pattern.finditer(line):
+            if any(x['line']==n and x['columnStart']<=m.start()+1<x['columnEndExclusive'] for x in inventory_spans):continue
+            result.append({'line':n,'columnStart':m.start()+1,'columnEndExclusive':m.end()+1,'text':m.group()})
+    return result
+
 def history_at(text,line,target=''):
     if '/history/' in target or re.search(r'^Document type:\s*History',text[:7000],re.M|re.I): return True
     stack=[]; framed=False
@@ -126,19 +160,60 @@ class Checker:
         failures=[]
         def check(name,fn):
             try: assert fn() is not False
-            except (AssertionError,KeyError,ValueError,IndexError,TypeError,subprocess.CalledProcessError) as ex: failures.append({'file':r.get('file'),'check':name,'detail':str(ex)[:300]})
-        check('schema',lambda: set(r)==FIELDS and all(EDGE_FIELDS<=set(e)<=EDGE_FIELDS|{'searchWitness'} for e in r['edges']) and isinstance(r['diff'],str) and all(isinstance(r['checks'][k],dict) for k in ['coverage','anchors','relativeResolution','labelForm']))
+            except (AssertionError,KeyError,ValueError,IndexError,TypeError,StopIteration,subprocess.CalledProcessError) as ex: failures.append({'file':r.get('file'),'check':name,'detail':str(ex)[:300]})
+        check('schema',lambda: set(r)==FIELDS and all(EDGE_FIELDS<=set(e)<=EDGE_FIELDS|{'searchWitness','authorAddedEdge'} for e in r['edges']) and isinstance(r['diff'],str) and all(isinstance(r['checks'][k],dict) for k in ['coverage','anchors','relativeResolution','labelForm']))
         f=r['file']; before=blob(self.commit,f).decode(); old=blob(INVENTORY,f).decode()
         check('digest',lambda:r['authorInputCommit']==self.commit and r['inventoryInputCommit']==INVENTORY and r['digest']==sha(before) and r['inventoryFileDigest']==sha(old)==self.files[f]['sha256'])
-        expected=self.files[f]['edgeIds'];actual=[e['edgeId'] for e in r['edges']]
+        expected=self.files[f]['edgeIds'];actual=[e['edgeId'] for e in r['edges'] if not e.get('authorAddedEdge')]
         check('projection-source',lambda:not r['diff'] or (pathlib.PurePosixPath(f).name not in ['AGENTS.md','CLAUDE.md'] and f!='README.md' and 'fgos:instruction-projection:start' not in before and not re.search(r'^Do not edit:\s*true',before[:6000],re.M|re.I)))
         check('edge-coverage',lambda:collections.Counter(expected)==collections.Counter(actual)==collections.Counter(r['inventoryEdgeIds']) and len(actual)==len(set(actual)))
+        def added_coverage():
+            added=[e for e in r['edges'] if e.get('authorAddedEdge')]
+            declared=r['checks']['coverage'].get('authorAddedEdgeIds',[])
+            ids=[e['edgeId'] for e in added]
+            assert collections.Counter(ids)==collections.Counter(declared) and len(ids)==len(set(ids))
+            assert not set(ids)&set(self.entries)
+            units=[]
+            for e in added:
+                meta=e['authorAddedEdge']
+                assert meta['normalizedReference'] and meta['discoveryReason'] and meta['searchMethod']
+                assert spans_text(before,e['sourceSpans'])==e['matchedExpression']
+                units.append(tuple(bounds(before,e['sourceSpans'])))
+            assert len(units)==len(set(units))
+            for e in added:
+                assert all(not (a<d and c<b) for a,b in bounds(before,e['sourceSpans'])
+                           for other in r['edges'] if other is not e for c,d in bounds(before,other['sourceSpans']))
+        check('author-added-coverage',added_coverage)
+        def supplemental_search():
+            coverage=r['checks']['coverage']
+            if f in population():assert 'legacyScan' in coverage
+            if 'legacyScan' not in coverage:
+                assert not any(e.get('authorAddedEdge') for e in r['edges'])
+                return # Synthetic probe records predate the complete-file author receipt.
+            receipt=coverage['legacyScan']
+            inv_spans=[x for key in expected for x in self.entries[key]['physicalSpans']]
+            found=scan_candidates(self.commit,f,inv_spans)
+            assert [x['span'] for x in receipt['candidates']]==found
+            assert receipt['method'] and receipt['pin']==self.commit
+            joins=[]
+            for item in receipt['candidates']:
+                if item.get('edgeId'):
+                    e=next(e for e in r['edges'] if e['edgeId']==item['edgeId'])
+                    assert e.get('authorAddedEdge') and e['sourceSpans']==[item['span']]
+                    joins.append(e['edgeId'])
+                else:assert item.get('excludedReason')
+            assert collections.Counter(joins)==collections.Counter(coverage.get('authorAddedEdgeIds',[]))
+        check('author-added-search-coverage',supplemental_search)
         changes=[]; used_hunks=set()
         for e in r['edges']:
             eid=e['edgeId']; inv=self.entries.get(eid)
+            if not inv and e.get('authorAddedEdge'):
+                inv={'consumerPath':f,'physicalSpans':e['sourceSpans'],'matchedExpression':e['matchedExpression'],
+                     'normalizedReference':e['authorAddedEdge']['normalizedReference'],'locatorTokens':[]}
             if not inv: continue
             check('source-span',lambda e=e:spans_text(before,e['sourceSpans'])==e['matchedExpression'])
             def correspondence(e=e,inv=inv):
+                if e.get('authorAddedEdge'): return
                 assert inv['consumerPath']==f
                 assert spans_text(old,inv['physicalSpans'])==inv['matchedExpression']
                 # Equal blobs require exact complete unit binding; drift needs explicit before/after passage journal.
@@ -156,7 +231,13 @@ class Checker:
                 # the check by changing one wording of 'missing target'.
                 check('park-search-witness',lambda e=e: resolver.verify(e['searchWitness'],self.commit,inv['normalizedReference'].split('#')[0],source_passage))
             if e['disposition']=='phase9-row-flip':check('row-semantics',lambda e=e:e['timing']=='Phase 9' and e['diffHunk'] is None and e['target'] is None and 'row' in e['reason'].lower() and bool(e['dependency']))
-            if e['disposition']=='preserve':check('preserve-state',lambda e=e:e['timing']=='none' and e['diffHunk'] is None)
+            if e['disposition']=='preserve':
+                check('preserve-state',lambda e=e:e['timing']=='none' and e['diffHunk'] is None)
+                check('retiring-preserve-wording',lambda e=e,inv=inv:not (inv['normalizedReference'].startswith(('docs/specs/','docs/architect/')) and re.search(r'\bretained\b',e['reason'],re.I)))
+            witness=e.get('searchWitness') or r['checks']['coverage'].get('resolutionSearches',{}).get(eid)
+            if witness:
+                groups=witness.get('hitGroups',[])
+                check('distinct-hit-assessments',lambda groups=groups:len(groups)<=1 or len({g['liveAssessment'].strip() for g in groups})>1)
             if e['target']:
                 check('target-tree',lambda e=e:e['target'] in self.tree|self.dirs)
                 check('alias-destination',lambda e=e:not e['target'].startswith(('alias:','lookup:')) and e['target'] not in self.aliases and not e['target'].startswith(('docs/specs/','docs/architect/')))
@@ -189,6 +270,16 @@ class Checker:
                     assert proof['passage'] in '\n'.join(lines[start-1:end])
                     assert all(tok.lstrip('§') in proof['passage'] or (proof.get('locatorCorrespondence',{}).get('source')==tok and proof['locatorCorrespondence'].get('target') in proof['passage'] and proof['locatorCorrespondence'].get('reason')) for tok in locators)
             check('anchor-carriage-locator',target_anchor)
+            def precise_anchor(e=e,inv=inv):
+                if not e['anchor'] or e['target'] not in self.tree:return
+                aa=heading_sections(self.commit,e['target'])
+                current=next(a for a in aa if e['anchor'] in (a['anchor'],a['githubSlug']))
+                if current['level']!=1:return
+                proof=r['checks']['anchors'][e['edgeId']]
+                terms=proof.get('sourceLocatorTokens',inv.get('locatorTokens',[]))
+                # Any narrower holder makes the title an imprecise locator anchor.
+                assert not any(a['level']>1 and any(locator_present(tok,a['body']) for tok in terms) for a in aa), 'file H1 hides a narrower locator holder'
+            check('anchor-precision',precise_anchor)
             def locator_review(e=e):
                 proof=r['checks']['anchors'][e['edgeId']]
                 terms=resolver.tokens(source_passage)

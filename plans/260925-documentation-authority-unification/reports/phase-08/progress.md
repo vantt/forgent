@@ -1,3 +1,99 @@
+# Step 03 pilot round 3 — AUTHOR handback; independent full-file review pending
+
+Author pin `ae141550c2e022310de7a0efea757580c0b2479f`; same 21 consumer files, unchanged. Round-2 records and manifest are byte-identical to input HEAD in [step-03-records-r2/](step-03-records-r2/). Records are Phase 9 patch specifications only; no consumer edit is applied.
+
+**437 inventory edges + 57 author-added edges = 494 edges.** Dispositions (patch / parked / row-flip / preserve): **104/53/12/268 → 111/97/12/274**. Three existing dispositions change: **08215, 08218, 08244 preserve → parked**. The complete [delta](step-03-r3-changes.json) enumerates **304 changed existing edge objects or per-edge proofs**, every authorAddedEdge, and per-ruling ids; companion-proof changes are included, never hidden as record-only metadata.
+
+## Defects and rulings applied
+
+- Dead live links 08215/08218/08244 now state never-existing evidence and the exact missing-report/source-row dependency. Other never-existing historical/illustrative/external citations retain their passage-based role with quoted markers; 08349/08351 stay as ruled.
+- 08019/08194 and their added five-file siblings give per-file facts: legacy-cli-transition/external-provider-protocol are under architecture/, provider-routing/node-to-rust-migration are renames, rust-cli-and-proof-components-plan is not found. No false “all five absent” reason remains.
+- All patch anchors were checked through the pinned existing `scripts/list-doc-anchors.mjs:listAnchors` API. Every patch records `enclosingHeadingProof`, including explicit whole-file/directory cases. H1 rule anchors move to Business Rules; 08191/08375 move to the H2 common parent of 0048/0049. Exact source scopes and translated headings remain explicit independent-review work.
+- Retiring-tree preserves state existence at pin and Phase 9 retirement, with a live file-level successor where available. 08249–08252 quote the historical Step 08 framing; retired decision preserves quote their region. 08271/08287 state removal at 4722361ae, no successor file, and point non-executably to D-ADR0025/0030 narratives. Intended mission-boundary 0035 is distinguished from the unrelated runner 0035.
+- Full-file supplemental search adds 57 occurrences, including bare basenames. [Traversal receipts](step-03-r3-whole-file-reads.json) account every ordered source chunk; records contain every candidate, contextual exclusion, normalized owner and one-to-one coverage join. This is accounting evidence, not independent semantic approval. RUL105's two new citations park because candidate-root search finds no holder; RUL78/80 patch. The plugin area's “12 wrapper” gloss parks on the candidate's explicit unshipped check; stale vocabulary coordinates park with actual cited-line evidence. Behavioral directory/default/allowlist strings retain Step 5 parity blockers.
+- All 220 non-preserve edges replay pinned alias/query/count/hash witnesses. Each query group has its own location/count/excerpt-based assessment and exact source-unit verdict; matching citations are not automatically executable holders.
+
+| Ruling | Existing ids affected | Added ids affected |
+|---|---:|---:|
+| L12-26(10) | 1 | 0 |
+| L12-30(5) | 19 | 0 |
+| L12-30(5,6) | 2 | 0 |
+| L12-31(1) | 12 | 2 |
+| L12-31(2) | 28 | 6 |
+| L12-31(3) | 10 | 0 |
+| L12-31(4) | 2 | 0 |
+| L12-31(5) | 113 | 7 |
+| L12-31(6) | 0 | 57 |
+| L12-31(7) | 172 | 48 |
+
+L12-31(8) is deliberately unchanged: 08379 keeps the work-state spec, 08101 stays preserve with runtime tracing separate, and 08349/08351 remain split by live navigation versus explicit “Đã đóng”. Ruling counts overlap; exact ids are in the delta.
+
+## Per-file coverage and review
+
+| Consumer file | Changed existing edges/proofs | authorAddedEdge count |
+|---|---:|---:|
+| `docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md` | 1 | 0 |
+| `README.md` | 0 | 0 |
+| `docs/doc-governance.md` | 5 | 0 |
+| `docs/platform-foundations.md` | 6 | 0 |
+| `docs/reading-map.md` | 61 | 8 |
+| `docs/routing-handoff-contract.md` | 3 | 0 |
+| `docs/specs/confinement-authority.md` | 3 | 6 |
+| `docs/specs/decision-citation-drift.md` | 5 | 1 |
+| `docs/specs/distillery.md` | 1 | 0 |
+| `docs/specs/distribution.md` | 2 | 2 |
+| `docs/specs/enduser-docs-authoring.md` | 0 | 0 |
+| `docs/specs/enduser-docs-index.md` | 0 | 0 |
+| `docs/specs/fgos-plugin.md` | 2 | 0 |
+| `docs/specs/herdr-web-dashboard.md` | 6 | 0 |
+| `docs/specs/observe.md` | 0 | 0 |
+| `docs/specs/platform-foundations.md` | 20 | 0 |
+| `docs/specs/reading-map.md` | 58 | 8 |
+| `docs/specs/runner.md` | 94 | 17 |
+| `docs/specs/system-overview.md` | 8 | 11 |
+| `docs/specs/work-state.md` | 24 | 3 |
+| `docs/specs/workflow.md` | 5 | 1 |
+
+[Round-3 review request](step-03-pilot-r3-review-request.md) assigns the original six groups to `review-a38-step-03-pilot-r3-g01.md` … `g06.md`, listing every changed and added edge per file. It launches no reviewer. Each set already breached 3%, so all 21 complete records/diffs require verdicts; keep per-set denominators/numerators separate. The immutable [manifest](step-03-pilot-manifest.json) freezes current records and the rerun selector.
+
+## Verification and remaining dependencies
+
+[Verification](step-03-r3-verification.json): checker **0 failures / 21 files / 494 edges**; selector rerun; **64/64 negative probes rejected** (all 55 inherited retained, nine new probes for H1 precision, retiring wording, added-edge coverage/search joins and per-group assessment). An inherited missing-anchor probe first exposed an uncaught empty lookup in the new precision check; it now records a normal rejection, and the complete suite was rerun. **131/131 existing light documentation tests pass, 0 fail/skip**. 13 explicit [locator-review flags](step-03-r3-review-flags.json) remain semantic review scope.
+
+Protected source/target/control files and both Phase 6 manifests are byte-identical to input HEAD; the 21 sources also equal the author pin. Round-2 archives compare exactly against their pre-author committed source. `git diff --check` passes. Writes are within the plan; scratch is only `/tmp/fgos-work/` (required atomic outbox excepted). No fgOS CLI, Git write, consumer edit, state/secrets access, service, census regeneration, full/heavy suite, authority flip or baseline/production-test change occurred. No mdview MCP is available; preview remains with the Lead's authorized environment.
+
+No author blocker or extra write scope is requested. The 97 parks name their own carry, description, Step 5 parity or missing-evidence dependency; GAP-02 and workflow full-content carry remain, and workflow source-coordinate links must be re-resolved on carry. Independent full-file acceptance and actual runner-commit two-manifest accounting are next with Lead; scaling waits for a clean round 3 and Phase 9 remains separately gated.
+
+## Authoring rules digest — give scaled batches this checklist verbatim
+
+- [ ] A51: inventory classes 3–6 are mechanical coverage, never semantic acceptance. Read every complete consumer file at the explicit author pin; disposition every inventory occurrence plus every missed legacy reference (bare basenames included) as `authorAddedEdge`, with source spans, search method and one-to-one coverage. Do not regenerate the census.
+- [ ] Bind source/target existence, digests, spans and correspondence to committed Git trees, never cwd/filesystem existence. Verify real commit/blob pins; prose hex ids and nearby pins do not convert navigation into provenance. Journal any changed passage rather than rebinding by ordinal.
+- [ ] Treat a Markdown label+destination as one complete unit; retain image `!`, backticks, `repo/`, consumer-relative coordinates, `./` and directory `/`. No partial prefixes, glued labels, directory double-prefixing or path substrings inside longer names. Expand brace lists; join indented/list/blockquote/comment and hyphen-wrapped continuations; include final table rows.
+- [ ] Exclude actual import/require/config/JSON/minified-code tokens with evidence; prose in comments remains prose. Judge fenced commands as complete units; pasted prompt templates are not commands. Writer detection uses the complete paragraph/list/fence, including Create/PERSISTENT STATE/EVIDENCE_DIR; operative reads require whole-word or explicit read-list context.
+- [ ] Classify migration-state cells before inherited provenance. Source-locator columns in migration ledgers/plans/audits, proven pins, track-closeout/merge-conflict lists, audit/errata/correction/lineage and completed past actions preserve original spelling; removed targets get non-executable successor notes. Exact-match contract keys preserve.
+- [ ] Carriage needs an explicit current heading/header/framing sentence; stop heading-scoped history at the next boundary. Quote any framing sentence used to justify preserve. Retained-snapshot/Full-source/History copies and the paired architecture-intent/domainization whole-source carriers are never patch targets; candidate “Carriage only / Canonical: No” status alone does not exclude live specs or decision records.
+- [ ] Before parking, search Phase 6 aliases AND doc-registry aliases, then every passage locator plus literal legacy path at the author pin across all `docs/platform/**` subtrees, `docs/knowledge/**`, `docs/reference/**`, `docs/tutorials/**`. Distinguish actual claim holders from incidental citations/partial holders. Record replayable pin/queries/counts/hashes/aliases and a concrete assessment for EACH hit group, including semantic/parity parks.
+- [ ] Patch to the exact live file and most specific enclosing heading containing the cited claim; multiple decisions use their nearest common parent. Use `scripts/list-doc-anchors.mjs`, record enclosing-heading/locator-line proof, and preserve explicit translated-heading correspondence. Never use H1 when a narrower locator holder exists; never drop line ranges without proven passage correspondence.
+- [ ] Bare area pointers go to the candidate area's actual `spec.md`; operative/single-file references use the exact file. Whole-file split navigation alone may use the portal. Use same-path mirrors for concrete files/directories (verification/vocabulary/playbooks included), not invented area paths; observe maps to its spec. Promoted-from provenance and registry name-drift successors matter.
+- [ ] Every park names the smallest real missing claim/decision/carry, description rewrite or behavioral parity blocker. A live exact holder permits a patch unless the source unit has a concrete independent blocker. GAP-01/02/03 are cited only where applicable; no boilerplate absence claim or self-accepted resolver result.
+- [ ] Preserve/park reasons state true source/target facts: exists at pin, never existed in pin ancestry, or removed at the actual commit. Retiring `docs/specs/**` / `docs/architect/**` preserves never say “retained”; say “exists at author pin; tree retires at Phase 9; preserved as retired history/lineage/self-reference”, naming a live successor where available.
+- [ ] Never-existing live Pointers/“xem”/“tại” references park as dead links; an explicit dated past action quotes its marker when preserving. Upstream/external-project evidence has no fgOS owner. Illustrative placeholders and patterns/globs preserve, with true directory state; examples never become missing-file blockers.
+- [ ] Deleted decision short ids say “removed at <commit> with no successor file”, not “never existed”; add a non-executable D-ADR narrative-holder note where one exists. Preserve the historical source spelling.
+- [ ] All adjacent glosses, labels, file counts and authority descriptions must remain true. Rewrite the whole description from target facts or park as “description needs rewrite”; never redirect a “legacy spec”/five-file/tree-shape sentence by path substitution alone.
+- [ ] Existing paths outside retiring trees preserve unless an approved alias retires them; root authorities, history, ui-spec, retained how-to/reference/explanation/distillery and root reading-map stay. `docs/specs/reading-map.md` navigation follows the frozen root reading-map destination; obsolete quoted map text stays history.
+- [ ] Related lists outside snapshots are live navigation, but self/duplicate-sibling destinations preserve as lineage and enter the Phase 9 baseline. “Superseded by” preserves only in History-typed/history files; live spec headers patch. Do not infer operative “read” from incidental prose or substrings.
+- [ ] Migration headers, canonical/source owner cells, switchboards (including the candidate copy), Law Summary source cells and generic spec-template rows are Phase 9 whole-row flips; retained roots flip status only, leaving paths intact. Concrete `spec:` pointers remain navigation. Legacy-tree descriptions require semantic authoring, not prefix replacement.
+- [ ] Generated surfaces change through the verified generator source in Step 5, never hand patches. Backlog is hand-maintained despite its stale generated header (GAP-03); the frozen knowledge decision-record index is historical, not generated. Verify generator names in code; stale rendered-only text is noted. YAML comments are prose, not contract keys.
+- [ ] Checker scope/defaults, runtime readers/writers, free-form `--scope` help, shipped allowlists and documented commands park on their own Step 5 parity/tracing work. Keep 08101's retained gateway YAML preserve under L12-31(8); its runtime read is separately class 6. Untraced dynamic writers block only their own rewrite batches.
+- [ ] GAP-02 records for enduser-docs-authoring/index and specs/platform-foundations carry a full-content obligation, never invent a destination or allow delete-without-carry. Workflow references park on candidate carry; workflow's own Phase 9 diffs use source coordinates and the carry step must re-resolve all relative links. Keep 08379's work-state spec target and 08349 park / 08351 explicit “Đã đóng” preserve.
+- [ ] Distinguish pre-existing broken links from links broken by relocation into verbatim history; exclude placeholders, record findable successors, and exclude verbatim carriage from the post-cutover executable link check. Phase 9 computes its own baseline; the census is not exhaustive.
+- [ ] Emit one complete applicable diff per file plus all non-patch dispositions, explicit timing and blockers; candidate patches are `cutover-patch-only`. Check coverage, anchors, labels, relative resolution, source/target carriage and ordinary diff applicability. Step 3 applies no consumer edit or authority flip.
+- [ ] Freeze selector seeds/set membership; review at least 15% of patched files plus all size/edge witnesses. Rework >3% expands to every file of THAT set; never pool denominators/numerators. This pilot already requires full-file review of all 21 records, including preserve/park/row-flip and added edges; mechanical green never accepts semantics. Actual-commit accounting/rebinding and independent acceptance stay with Lead; neither protected reproduction manifest is an author write.
+
+Earlier checkpoints below are historical.
+
+---
+
 # Step 03 pilot round 2 — AUTHOR handback; independent full-file re-review pending
 
 Author pin `ae141550c2e022310de7a0efea757580c0b2479f`; all 21 consumer files unchanged. The 14 rework records are rebuilt from pinned complete-file spans and explicit per-edge target/blocker decisions; the seven ok files receive only applicable ruling notes/search receipts. Round-1 JSONL files and manifest are retained byte-for-byte in `step-03-records-r1/`. No consumer patch is applied.

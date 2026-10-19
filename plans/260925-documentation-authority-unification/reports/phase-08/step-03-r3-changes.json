@@ -1,0 +1,2392 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "set": "batch-001",
+      "before": {
+        "patch": 1,
+        "preserve": 1
+      },
+      "after": {
+        "patch": 1,
+        "preserve": 1
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-07239"
+      ],
+      "edgeObjectChanged": [],
+      "edgeProofChanged": [
+        "maps-j-07239"
+      ],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "README.md",
+      "set": "batch-002",
+      "before": {
+        "preserve": 3
+      },
+      "after": {
+        "preserve": 3
+      },
+      "dispositionChanged": [],
+      "recordChanged": [],
+      "edgeObjectChanged": [],
+      "edgeProofChanged": [],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "set": "batch-002",
+      "before": {
+        "preserve": 6,
+        "phase9-row-flip": 2
+      },
+      "after": {
+        "preserve": 6,
+        "phase9-row-flip": 2
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-01902",
+        "maps-j-01904",
+        "maps-j-01905",
+        "maps-j-01906",
+        "maps-j-01909"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-01902",
+        "maps-j-01904",
+        "maps-j-01909"
+      ],
+      "edgeProofChanged": [
+        "maps-j-01905",
+        "maps-j-01906"
+      ],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "set": "batch-002",
+      "before": {
+        "preserve": 6
+      },
+      "after": {
+        "preserve": 6
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-05086",
+        "maps-j-05087",
+        "maps-j-05088",
+        "maps-j-05089",
+        "maps-j-05090",
+        "maps-j-05091"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-05086",
+        "maps-j-05087",
+        "maps-j-05088",
+        "maps-j-05089",
+        "maps-j-05090",
+        "maps-j-05091"
+      ],
+      "edgeProofChanged": [],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/reading-map.md",
+      "set": "batch-002",
+      "before": {
+        "preserve": 32,
+        "phase9-row-flip": 7,
+        "parked": 16,
+        "patch": 34
+      },
+      "after": {
+        "preserve": 32,
+        "phase9-row-flip": 7,
+        "parked": 24,
+        "patch": 34
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-07953",
+        "maps-j-07955",
+        "maps-j-07958",
+        "maps-j-07959",
+        "maps-j-07960",
+        "maps-j-07961",
+        "maps-j-07963",
+        "maps-j-07965",
+        "maps-j-07969",
+        "maps-j-07970",
+        "maps-j-07972",
+        "maps-j-07976",
+        "maps-j-07977",
+        "maps-j-07979",
+        "maps-j-07981",
+        "maps-j-07984",
+        "maps-j-07985",
+        "maps-j-07988",
+        "maps-j-07989",
+        "maps-j-07990",
+        "maps-j-07991",
+        "maps-j-07992",
+        "maps-j-07993",
+        "maps-j-07994",
+        "maps-j-07995",
+        "maps-j-07996",
+        "maps-j-07997",
+        "maps-j-07998",
+        "maps-j-08003",
+        "maps-j-08004",
+        "maps-j-08007",
+        "maps-j-08008",
+        "maps-j-08009",
+        "maps-j-08010",
+        "maps-j-08011",
+        "maps-j-08012",
+        "maps-j-08013",
+        "maps-j-08014",
+        "maps-j-08015",
+        "maps-j-08016",
+        "maps-j-08017",
+        "maps-j-08018",
+        "maps-j-08019",
+        "maps-j-08020",
+        "maps-j-08021",
+        "maps-j-08022",
+        "maps-j-08023",
+        "maps-j-08024",
+        "maps-j-08025",
+        "maps-j-08026",
+        "maps-j-08027",
+        "maps-j-08028",
+        "maps-j-08029",
+        "maps-j-08030",
+        "maps-j-08031",
+        "maps-j-08032",
+        "maps-j-08033",
+        "maps-j-08034",
+        "maps-j-08037",
+        "maps-j-08038",
+        "maps-j-08040"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-07953",
+        "maps-j-07963",
+        "maps-j-07965",
+        "maps-j-07972",
+        "maps-j-07979",
+        "maps-j-07981",
+        "maps-j-07984",
+        "maps-j-08003",
+        "maps-j-08004",
+        "maps-j-08007",
+        "maps-j-08008",
+        "maps-j-08009",
+        "maps-j-08012",
+        "maps-j-08013",
+        "maps-j-08014",
+        "maps-j-08015",
+        "maps-j-08016",
+        "maps-j-08017",
+        "maps-j-08018",
+        "maps-j-08019",
+        "maps-j-08028",
+        "maps-j-08029",
+        "maps-j-08037",
+        "maps-j-08038"
+      ],
+      "edgeProofChanged": [
+        "maps-j-07955",
+        "maps-j-07958",
+        "maps-j-07959",
+        "maps-j-07960",
+        "maps-j-07961",
+        "maps-j-07969",
+        "maps-j-07970",
+        "maps-j-07976",
+        "maps-j-07977",
+        "maps-j-07985",
+        "maps-j-07988",
+        "maps-j-07989",
+        "maps-j-07990",
+        "maps-j-07991",
+        "maps-j-07992",
+        "maps-j-07993",
+        "maps-j-07994",
+        "maps-j-07995",
+        "maps-j-07996",
+        "maps-j-07997",
+        "maps-j-07998",
+        "maps-j-08008",
+        "maps-j-08009",
+        "maps-j-08010",
+        "maps-j-08011",
+        "maps-j-08016",
+        "maps-j-08017",
+        "maps-j-08020",
+        "maps-j-08021",
+        "maps-j-08022",
+        "maps-j-08023",
+        "maps-j-08024",
+        "maps-j-08025",
+        "maps-j-08026",
+        "maps-j-08027",
+        "maps-j-08030",
+        "maps-j-08031",
+        "maps-j-08032",
+        "maps-j-08033",
+        "maps-j-08034",
+        "maps-j-08040"
+      ],
+      "authorAddedEdge": [
+        {
+          "edgeId": "author-r3-docs-reading-map-L163C154",
+          "normalizedReference": "docs/architect/agent-coordination/README.md",
+          "sourceSpans": [
+            {
+              "line": 163,
+              "columnStart": 154,
+              "columnEndExclusive": 163,
+              "text": "README.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-reading-map-L163C237",
+          "normalizedReference": "docs/architect/agent-coordination/contracts/coordination-session.md",
+          "sourceSpans": [
+            {
+              "line": 163,
+              "columnStart": 237,
+              "columnEndExclusive": 260,
+              "text": "coordination-session.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-reading-map-L163C264",
+          "normalizedReference": "docs/architect/agent-coordination/contracts/flow-definition.md",
+          "sourceSpans": [
+            {
+              "line": 163,
+              "columnStart": 264,
+              "columnEndExclusive": 282,
+              "text": "flow-definition.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-reading-map-L164C98",
+          "normalizedReference": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+          "sourceSpans": [
+            {
+              "line": 164,
+              "columnStart": 98,
+              "columnEndExclusive": 133,
+              "text": "host-invocation-provider-routing.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-reading-map-L164C230",
+          "normalizedReference": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+          "sourceSpans": [
+            {
+              "line": 164,
+              "columnStart": 230,
+              "columnEndExclusive": 254,
+              "text": "legacy-cli-transition.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-reading-map-L164C337",
+          "normalizedReference": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+          "sourceSpans": [
+            {
+              "line": 164,
+              "columnStart": 337,
+              "columnEndExclusive": 366,
+              "text": "external-provider-protocol.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-reading-map-L164C403",
+          "normalizedReference": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+          "sourceSpans": [
+            {
+              "line": 164,
+              "columnStart": 403,
+              "columnEndExclusive": 438,
+              "text": "node-to-rust-component-migration.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-reading-map-L164C493",
+          "normalizedReference": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+          "sourceSpans": [
+            {
+              "line": 164,
+              "columnStart": 493,
+              "columnEndExclusive": 530,
+              "text": "rust-cli-and-proof-components-plan.md"
+            }
+          ],
+          "disposition": "parked"
+        }
+      ],
+      "recordOnlyChanges": [
+        "diff",
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "set": "batch-002",
+      "before": {
+        "preserve": 2,
+        "patch": 3
+      },
+      "after": {
+        "preserve": 2,
+        "patch": 3
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-08053",
+        "maps-j-08054",
+        "maps-j-08056"
+      ],
+      "edgeObjectChanged": [],
+      "edgeProofChanged": [
+        "maps-j-08053",
+        "maps-j-08054",
+        "maps-j-08056"
+      ],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "set": "batch-040",
+      "before": {
+        "preserve": 2,
+        "patch": 2
+      },
+      "after": {
+        "preserve": 4,
+        "patch": 4,
+        "parked": 2
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-08057",
+        "maps-j-08058",
+        "maps-j-08059"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-08057",
+        "maps-j-08058"
+      ],
+      "edgeProofChanged": [
+        "maps-j-08058",
+        "maps-j-08059"
+      ],
+      "authorAddedEdge": [
+        {
+          "edgeId": "author-r3-docs-specs-confinement-authority-L13C53",
+          "normalizedReference": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P04.md",
+          "sourceSpans": [
+            {
+              "line": 13,
+              "columnStart": 53,
+              "columnEndExclusive": 59,
+              "text": "P04.md"
+            }
+          ],
+          "disposition": "preserve"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-confinement-authority-L582C69",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 582,
+              "columnStart": 69,
+              "columnEndExclusive": 78,
+              "text": "runner.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-confinement-authority-L1255C211",
+          "normalizedReference": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P04.md",
+          "sourceSpans": [
+            {
+              "line": 1255,
+              "columnStart": 211,
+              "columnEndExclusive": 217,
+              "text": "P04.md"
+            }
+          ],
+          "disposition": "preserve"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-confinement-authority-L1359C157",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1359,
+              "columnStart": 157,
+              "columnEndExclusive": 166,
+              "text": "runner.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-confinement-authority-L1360C1158",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1360,
+              "columnStart": 1158,
+              "columnEndExclusive": 1167,
+              "text": "runner.md"
+            }
+          ],
+          "disposition": "patch"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-confinement-authority-L1361C297",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1361,
+              "columnStart": 297,
+              "columnEndExclusive": 306,
+              "text": "runner.md"
+            }
+          ],
+          "disposition": "patch"
+        }
+      ],
+      "recordOnlyChanges": [
+        "diff",
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "set": "batch-040",
+      "before": {
+        "preserve": 8,
+        "parked": 5
+      },
+      "after": {
+        "preserve": 8,
+        "parked": 6
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-08062",
+        "maps-j-08064",
+        "maps-j-08066",
+        "maps-j-08068",
+        "maps-j-08070"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-08062",
+        "maps-j-08064",
+        "maps-j-08066",
+        "maps-j-08068",
+        "maps-j-08070"
+      ],
+      "edgeProofChanged": [],
+      "authorAddedEdge": [
+        {
+          "edgeId": "author-r3-docs-specs-decision-citation-drift-L26C13",
+          "normalizedReference": "docs/decisions",
+          "sourceSpans": [
+            {
+              "line": 26,
+              "columnStart": 13,
+              "columnEndExclusive": 27,
+              "text": "docs/decisions"
+            }
+          ],
+          "disposition": "parked"
+        }
+      ],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/distillery.md",
+      "set": "batch-040",
+      "before": {
+        "patch": 1,
+        "preserve": 2
+      },
+      "after": {
+        "patch": 1,
+        "preserve": 2
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-08074"
+      ],
+      "edgeObjectChanged": [],
+      "edgeProofChanged": [
+        "maps-j-08074"
+      ],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "set": "batch-040",
+      "before": {
+        "preserve": 6,
+        "patch": 2
+      },
+      "after": {
+        "preserve": 6,
+        "patch": 2,
+        "parked": 2
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-08078",
+        "maps-j-08082"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-08078",
+        "maps-j-08082"
+      ],
+      "edgeProofChanged": [
+        "maps-j-08078",
+        "maps-j-08082"
+      ],
+      "authorAddedEdge": [
+        {
+          "edgeId": "author-r3-docs-specs-distribution-L61C267",
+          "normalizedReference": "docs/how-to",
+          "sourceSpans": [
+            {
+              "line": 61,
+              "columnStart": 267,
+              "columnEndExclusive": 278,
+              "text": "docs/how-to"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-distribution-L61C282",
+          "normalizedReference": "docs/explanation",
+          "sourceSpans": [
+            {
+              "line": 61,
+              "columnStart": 282,
+              "columnEndExclusive": 298,
+              "text": "docs/explanation"
+            }
+          ],
+          "disposition": "parked"
+        }
+      ],
+      "recordOnlyChanges": [
+        "diff",
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/enduser-docs-authoring.md",
+      "set": "batch-040",
+      "before": {
+        "preserve": 3
+      },
+      "after": {
+        "preserve": 3
+      },
+      "dispositionChanged": [],
+      "recordChanged": [],
+      "edgeObjectChanged": [],
+      "edgeProofChanged": [],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/enduser-docs-index.md",
+      "set": "batch-040",
+      "before": {
+        "preserve": 4
+      },
+      "after": {
+        "preserve": 4
+      },
+      "dispositionChanged": [],
+      "recordChanged": [],
+      "edgeObjectChanged": [],
+      "edgeProofChanged": [],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/fgos-plugin.md",
+      "set": "batch-040",
+      "before": {
+        "patch": 2,
+        "preserve": 1
+      },
+      "after": {
+        "patch": 2,
+        "preserve": 1
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-08092",
+        "maps-j-08094"
+      ],
+      "edgeObjectChanged": [],
+      "edgeProofChanged": [
+        "maps-j-08092",
+        "maps-j-08094"
+      ],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "set": "batch-040",
+      "before": {
+        "preserve": 10,
+        "patch": 5,
+        "parked": 1
+      },
+      "after": {
+        "preserve": 10,
+        "patch": 5,
+        "parked": 1
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-08096",
+        "maps-j-08098",
+        "maps-j-08102",
+        "maps-j-08107",
+        "maps-j-08109",
+        "maps-j-08110"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-08107"
+      ],
+      "edgeProofChanged": [
+        "maps-j-08096",
+        "maps-j-08098",
+        "maps-j-08102",
+        "maps-j-08109",
+        "maps-j-08110"
+      ],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/observe.md",
+      "set": "batch-040",
+      "before": {
+        "preserve": 2
+      },
+      "after": {
+        "preserve": 2
+      },
+      "dispositionChanged": [],
+      "recordChanged": [],
+      "edgeObjectChanged": [],
+      "edgeProofChanged": [],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "set": "batch-040",
+      "before": {
+        "preserve": 23
+      },
+      "after": {
+        "preserve": 23
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-08116",
+        "maps-j-08117",
+        "maps-j-08118",
+        "maps-j-08119",
+        "maps-j-08120",
+        "maps-j-08121",
+        "maps-j-08122",
+        "maps-j-08123",
+        "maps-j-08124",
+        "maps-j-08125",
+        "maps-j-08126",
+        "maps-j-08127",
+        "maps-j-08128",
+        "maps-j-08129",
+        "maps-j-08130",
+        "maps-j-08131",
+        "maps-j-08132",
+        "maps-j-08133",
+        "maps-j-08134",
+        "maps-j-08135"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-08116",
+        "maps-j-08117",
+        "maps-j-08118",
+        "maps-j-08119",
+        "maps-j-08120",
+        "maps-j-08121",
+        "maps-j-08122",
+        "maps-j-08123",
+        "maps-j-08124",
+        "maps-j-08125",
+        "maps-j-08126",
+        "maps-j-08127",
+        "maps-j-08128",
+        "maps-j-08129",
+        "maps-j-08130",
+        "maps-j-08131",
+        "maps-j-08132",
+        "maps-j-08133",
+        "maps-j-08134",
+        "maps-j-08135"
+      ],
+      "edgeProofChanged": [],
+      "authorAddedEdge": [],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "set": "batch-040",
+      "before": {
+        "phase9-row-flip": 3,
+        "preserve": 25,
+        "parked": 17,
+        "patch": 37
+      },
+      "after": {
+        "phase9-row-flip": 3,
+        "preserve": 24,
+        "parked": 26,
+        "patch": 37
+      },
+      "dispositionChanged": [
+        "maps-j-08215"
+      ],
+      "recordChanged": [
+        "maps-j-08136",
+        "maps-j-08138",
+        "maps-j-08142",
+        "maps-j-08143",
+        "maps-j-08145",
+        "maps-j-08149",
+        "maps-j-08150",
+        "maps-j-08152",
+        "maps-j-08154",
+        "maps-j-08157",
+        "maps-j-08158",
+        "maps-j-08161",
+        "maps-j-08162",
+        "maps-j-08163",
+        "maps-j-08164",
+        "maps-j-08165",
+        "maps-j-08166",
+        "maps-j-08167",
+        "maps-j-08168",
+        "maps-j-08169",
+        "maps-j-08170",
+        "maps-j-08171",
+        "maps-j-08176",
+        "maps-j-08177",
+        "maps-j-08180",
+        "maps-j-08181",
+        "maps-j-08182",
+        "maps-j-08183",
+        "maps-j-08184",
+        "maps-j-08185",
+        "maps-j-08186",
+        "maps-j-08187",
+        "maps-j-08188",
+        "maps-j-08189",
+        "maps-j-08190",
+        "maps-j-08191",
+        "maps-j-08192",
+        "maps-j-08193",
+        "maps-j-08194",
+        "maps-j-08195",
+        "maps-j-08196",
+        "maps-j-08197",
+        "maps-j-08198",
+        "maps-j-08199",
+        "maps-j-08200",
+        "maps-j-08201",
+        "maps-j-08202",
+        "maps-j-08203",
+        "maps-j-08204",
+        "maps-j-08205",
+        "maps-j-08206",
+        "maps-j-08207",
+        "maps-j-08208",
+        "maps-j-08209",
+        "maps-j-08210",
+        "maps-j-08212",
+        "maps-j-08215",
+        "maps-j-08217"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-08138",
+        "maps-j-08145",
+        "maps-j-08152",
+        "maps-j-08154",
+        "maps-j-08157",
+        "maps-j-08176",
+        "maps-j-08177",
+        "maps-j-08180",
+        "maps-j-08181",
+        "maps-j-08182",
+        "maps-j-08185",
+        "maps-j-08186",
+        "maps-j-08187",
+        "maps-j-08188",
+        "maps-j-08189",
+        "maps-j-08190",
+        "maps-j-08191",
+        "maps-j-08192",
+        "maps-j-08193",
+        "maps-j-08194",
+        "maps-j-08203",
+        "maps-j-08204",
+        "maps-j-08215"
+      ],
+      "edgeProofChanged": [
+        "maps-j-08136",
+        "maps-j-08142",
+        "maps-j-08143",
+        "maps-j-08149",
+        "maps-j-08150",
+        "maps-j-08158",
+        "maps-j-08161",
+        "maps-j-08162",
+        "maps-j-08163",
+        "maps-j-08164",
+        "maps-j-08165",
+        "maps-j-08166",
+        "maps-j-08167",
+        "maps-j-08168",
+        "maps-j-08169",
+        "maps-j-08170",
+        "maps-j-08171",
+        "maps-j-08181",
+        "maps-j-08182",
+        "maps-j-08183",
+        "maps-j-08184",
+        "maps-j-08189",
+        "maps-j-08191",
+        "maps-j-08192",
+        "maps-j-08195",
+        "maps-j-08196",
+        "maps-j-08197",
+        "maps-j-08198",
+        "maps-j-08199",
+        "maps-j-08200",
+        "maps-j-08201",
+        "maps-j-08202",
+        "maps-j-08205",
+        "maps-j-08206",
+        "maps-j-08207",
+        "maps-j-08208",
+        "maps-j-08209",
+        "maps-j-08210",
+        "maps-j-08212",
+        "maps-j-08217"
+      ],
+      "authorAddedEdge": [
+        {
+          "edgeId": "author-r3-docs-specs-reading-map-L44C154",
+          "normalizedReference": "docs/architect/agent-coordination/README.md",
+          "sourceSpans": [
+            {
+              "line": 44,
+              "columnStart": 154,
+              "columnEndExclusive": 163,
+              "text": "README.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-reading-map-L44C237",
+          "normalizedReference": "docs/architect/agent-coordination/contracts/coordination-session.md",
+          "sourceSpans": [
+            {
+              "line": 44,
+              "columnStart": 237,
+              "columnEndExclusive": 260,
+              "text": "coordination-session.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-reading-map-L44C264",
+          "normalizedReference": "docs/architect/agent-coordination/contracts/flow-definition.md",
+          "sourceSpans": [
+            {
+              "line": 44,
+              "columnStart": 264,
+              "columnEndExclusive": 282,
+              "text": "flow-definition.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-reading-map-L45C98",
+          "normalizedReference": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+          "sourceSpans": [
+            {
+              "line": 45,
+              "columnStart": 98,
+              "columnEndExclusive": 133,
+              "text": "host-invocation-provider-routing.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-reading-map-L45C230",
+          "normalizedReference": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+          "sourceSpans": [
+            {
+              "line": 45,
+              "columnStart": 230,
+              "columnEndExclusive": 254,
+              "text": "legacy-cli-transition.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-reading-map-L45C337",
+          "normalizedReference": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+          "sourceSpans": [
+            {
+              "line": 45,
+              "columnStart": 337,
+              "columnEndExclusive": 366,
+              "text": "external-provider-protocol.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-reading-map-L45C403",
+          "normalizedReference": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+          "sourceSpans": [
+            {
+              "line": 45,
+              "columnStart": 403,
+              "columnEndExclusive": 438,
+              "text": "node-to-rust-component-migration.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-reading-map-L45C493",
+          "normalizedReference": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+          "sourceSpans": [
+            {
+              "line": 45,
+              "columnStart": 493,
+              "columnEndExclusive": 530,
+              "text": "rust-cli-and-proof-components-plan.md"
+            }
+          ],
+          "disposition": "parked"
+        }
+      ],
+      "recordOnlyChanges": [
+        "diff",
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "set": "batch-041",
+      "before": {
+        "preserve": 95,
+        "patch": 10,
+        "parked": 8
+      },
+      "after": {
+        "parked": 24,
+        "preserve": 96,
+        "patch": 10
+      },
+      "dispositionChanged": [
+        "maps-j-08218",
+        "maps-j-08244"
+      ],
+      "recordChanged": [
+        "maps-j-08218",
+        "maps-j-08219",
+        "maps-j-08223",
+        "maps-j-08224",
+        "maps-j-08227",
+        "maps-j-08228",
+        "maps-j-08230",
+        "maps-j-08231",
+        "maps-j-08232",
+        "maps-j-08235",
+        "maps-j-08236",
+        "maps-j-08241",
+        "maps-j-08243",
+        "maps-j-08244",
+        "maps-j-08248",
+        "maps-j-08249",
+        "maps-j-08250",
+        "maps-j-08251",
+        "maps-j-08252",
+        "maps-j-08254",
+        "maps-j-08255",
+        "maps-j-08256",
+        "maps-j-08257",
+        "maps-j-08260",
+        "maps-j-08261",
+        "maps-j-08262",
+        "maps-j-08263",
+        "maps-j-08264",
+        "maps-j-08265",
+        "maps-j-08266",
+        "maps-j-08267",
+        "maps-j-08268",
+        "maps-j-08269",
+        "maps-j-08270",
+        "maps-j-08271",
+        "maps-j-08272",
+        "maps-j-08273",
+        "maps-j-08274",
+        "maps-j-08275",
+        "maps-j-08276",
+        "maps-j-08277",
+        "maps-j-08278",
+        "maps-j-08279",
+        "maps-j-08280",
+        "maps-j-08281",
+        "maps-j-08282",
+        "maps-j-08283",
+        "maps-j-08284",
+        "maps-j-08285",
+        "maps-j-08286",
+        "maps-j-08287",
+        "maps-j-08288",
+        "maps-j-08289",
+        "maps-j-08290",
+        "maps-j-08291",
+        "maps-j-08292",
+        "maps-j-08293",
+        "maps-j-08294",
+        "maps-j-08295",
+        "maps-j-08296",
+        "maps-j-08297",
+        "maps-j-08298",
+        "maps-j-08299",
+        "maps-j-08300",
+        "maps-j-08301",
+        "maps-j-08302",
+        "maps-j-08303",
+        "maps-j-08304",
+        "maps-j-08305",
+        "maps-j-08306",
+        "maps-j-08307",
+        "maps-j-08308",
+        "maps-j-08309",
+        "maps-j-08310",
+        "maps-j-08311",
+        "maps-j-08312",
+        "maps-j-08313",
+        "maps-j-08314",
+        "maps-j-08315",
+        "maps-j-08316",
+        "maps-j-08317",
+        "maps-j-08318",
+        "maps-j-08319",
+        "maps-j-08320",
+        "maps-j-08321",
+        "maps-j-08322",
+        "maps-j-08323",
+        "maps-j-08324",
+        "maps-j-08325",
+        "maps-j-08326",
+        "maps-j-08327",
+        "maps-j-08328",
+        "maps-j-08329",
+        "maps-j-08330"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-08218",
+        "maps-j-08219",
+        "maps-j-08228",
+        "maps-j-08230",
+        "maps-j-08235",
+        "maps-j-08236",
+        "maps-j-08241",
+        "maps-j-08244",
+        "maps-j-08249",
+        "maps-j-08250",
+        "maps-j-08251",
+        "maps-j-08252",
+        "maps-j-08254",
+        "maps-j-08257",
+        "maps-j-08261",
+        "maps-j-08262",
+        "maps-j-08263",
+        "maps-j-08264",
+        "maps-j-08265",
+        "maps-j-08266",
+        "maps-j-08267",
+        "maps-j-08268",
+        "maps-j-08269",
+        "maps-j-08270",
+        "maps-j-08271",
+        "maps-j-08272",
+        "maps-j-08273",
+        "maps-j-08274",
+        "maps-j-08275",
+        "maps-j-08276",
+        "maps-j-08277",
+        "maps-j-08278",
+        "maps-j-08279",
+        "maps-j-08280",
+        "maps-j-08281",
+        "maps-j-08282",
+        "maps-j-08283",
+        "maps-j-08284",
+        "maps-j-08285",
+        "maps-j-08286",
+        "maps-j-08287",
+        "maps-j-08288",
+        "maps-j-08289",
+        "maps-j-08290",
+        "maps-j-08291",
+        "maps-j-08292",
+        "maps-j-08293",
+        "maps-j-08294",
+        "maps-j-08295",
+        "maps-j-08296",
+        "maps-j-08297",
+        "maps-j-08298",
+        "maps-j-08299",
+        "maps-j-08300",
+        "maps-j-08301",
+        "maps-j-08302",
+        "maps-j-08303",
+        "maps-j-08304",
+        "maps-j-08305",
+        "maps-j-08306",
+        "maps-j-08307",
+        "maps-j-08308",
+        "maps-j-08309",
+        "maps-j-08310",
+        "maps-j-08311",
+        "maps-j-08312",
+        "maps-j-08313",
+        "maps-j-08314",
+        "maps-j-08315",
+        "maps-j-08316",
+        "maps-j-08317",
+        "maps-j-08318",
+        "maps-j-08319",
+        "maps-j-08320",
+        "maps-j-08321",
+        "maps-j-08322",
+        "maps-j-08323",
+        "maps-j-08324",
+        "maps-j-08325",
+        "maps-j-08326",
+        "maps-j-08327",
+        "maps-j-08328",
+        "maps-j-08329",
+        "maps-j-08330"
+      ],
+      "edgeProofChanged": [
+        "maps-j-08223",
+        "maps-j-08224",
+        "maps-j-08227",
+        "maps-j-08231",
+        "maps-j-08232",
+        "maps-j-08243",
+        "maps-j-08248",
+        "maps-j-08255",
+        "maps-j-08256",
+        "maps-j-08260"
+      ],
+      "authorAddedEdge": [
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1298C98",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1298,
+              "columnStart": 98,
+              "columnEndExclusive": 112,
+              "text": "runner.md:1958"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1299C76",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1299,
+              "columnStart": 76,
+              "columnEndExclusive": 90,
+              "text": "runner.md:1959"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1300C129",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1300,
+              "columnStart": 129,
+              "columnEndExclusive": 143,
+              "text": "runner.md:2434"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1301C128",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1301,
+              "columnStart": 128,
+              "columnEndExclusive": 142,
+              "text": "runner.md:2434"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1301C157",
+          "normalizedReference": "docs/architect/dispatch-control-plane-redesign.md",
+          "sourceSpans": [
+            {
+              "line": 1301,
+              "columnStart": 157,
+              "columnEndExclusive": 195,
+              "text": "dispatch-control-plane-redesign.md:125"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1302C132",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1302,
+              "columnStart": 132,
+              "columnEndExclusive": 146,
+              "text": "runner.md:1871"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1303C92",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1303,
+              "columnStart": 92,
+              "columnEndExclusive": 106,
+              "text": "runner.md:1986"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1303C121",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1303,
+              "columnStart": 121,
+              "columnEndExclusive": 135,
+              "text": "runner.md:2172"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1304C96",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1304,
+              "columnStart": 96,
+              "columnEndExclusive": 110,
+              "text": "runner.md:1995"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1304C125",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1304,
+              "columnStart": 125,
+              "columnEndExclusive": 139,
+              "text": "runner.md:2172"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1305C141",
+          "normalizedReference": "docs/architect/dispatch-control-plane-redesign.md",
+          "sourceSpans": [
+            {
+              "line": 1305,
+              "columnStart": 141,
+              "columnEndExclusive": 179,
+              "text": "dispatch-control-plane-redesign.md:175"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1306C129",
+          "normalizedReference": "docs/architect/dispatch-control-plane-redesign.md",
+          "sourceSpans": [
+            {
+              "line": 1306,
+              "columnStart": 129,
+              "columnEndExclusive": 167,
+              "text": "dispatch-control-plane-redesign.md:210"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1314C80",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1314,
+              "columnStart": 80,
+              "columnEndExclusive": 99,
+              "text": "runner.md:2172-2180"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L1315C103",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 1315,
+              "columnStart": 103,
+              "columnEndExclusive": 117,
+              "text": "runner.md:2434"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L3356C212",
+          "normalizedReference": "docs/how-to",
+          "sourceSpans": [
+            {
+              "line": 3356,
+              "columnStart": 212,
+              "columnEndExclusive": 223,
+              "text": "docs/how-to"
+            }
+          ],
+          "disposition": "preserve"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L3356C227",
+          "normalizedReference": "docs/reference",
+          "sourceSpans": [
+            {
+              "line": 3356,
+              "columnStart": 227,
+              "columnEndExclusive": 241,
+              "text": "docs/reference"
+            }
+          ],
+          "disposition": "preserve"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-runner-L3356C343",
+          "normalizedReference": "docs/explanation",
+          "sourceSpans": [
+            {
+              "line": 3356,
+              "columnStart": 343,
+              "columnEndExclusive": 359,
+              "text": "docs/explanation"
+            }
+          ],
+          "disposition": "preserve"
+        }
+      ],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "set": "batch-041",
+      "before": {
+        "patch": 4,
+        "preserve": 4
+      },
+      "after": {
+        "patch": 9,
+        "preserve": 5,
+        "parked": 5
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-08331",
+        "maps-j-08332",
+        "maps-j-08333",
+        "maps-j-08334",
+        "maps-j-08335",
+        "maps-j-08336",
+        "maps-j-08337",
+        "maps-j-08338"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-08335",
+        "maps-j-08336",
+        "maps-j-08337",
+        "maps-j-08338"
+      ],
+      "edgeProofChanged": [
+        "maps-j-08331",
+        "maps-j-08332",
+        "maps-j-08333",
+        "maps-j-08334"
+      ],
+      "authorAddedEdge": [
+        {
+          "edgeId": "author-r3-docs-specs-system-overview-L14C95",
+          "normalizedReference": "docs/specs/platform-foundations.md",
+          "sourceSpans": [
+            {
+              "line": 14,
+              "columnStart": 95,
+              "columnEndExclusive": 118,
+              "text": "platform-foundations.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-system-overview-L15C129",
+          "normalizedReference": "docs/specs/work-state.md",
+          "sourceSpans": [
+            {
+              "line": 15,
+              "columnStart": 129,
+              "columnEndExclusive": 142,
+              "text": "work-state.md"
+            }
+          ],
+          "disposition": "patch"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-system-overview-L16C254",
+          "normalizedReference": "docs/specs/enduser-docs-authoring.md",
+          "sourceSpans": [
+            {
+              "line": 16,
+              "columnStart": 254,
+              "columnEndExclusive": 279,
+              "text": "enduser-docs-authoring.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-system-overview-L17C254",
+          "normalizedReference": "docs/specs/enduser-docs-index.md",
+          "sourceSpans": [
+            {
+              "line": 17,
+              "columnStart": 254,
+              "columnEndExclusive": 275,
+              "text": "enduser-docs-index.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-system-overview-L18C122",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 18,
+              "columnStart": 122,
+              "columnEndExclusive": 131,
+              "text": "runner.md"
+            }
+          ],
+          "disposition": "patch"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-system-overview-L19C240",
+          "normalizedReference": "docs/specs/workflow.md",
+          "sourceSpans": [
+            {
+              "line": 19,
+              "columnStart": 240,
+              "columnEndExclusive": 251,
+              "text": "workflow.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-system-overview-L20C129",
+          "normalizedReference": "docs/specs/fgos-plugin.md",
+          "sourceSpans": [
+            {
+              "line": 20,
+              "columnStart": 129,
+              "columnEndExclusive": 143,
+              "text": "fgos-plugin.md"
+            }
+          ],
+          "disposition": "parked"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-system-overview-L21C82",
+          "normalizedReference": "docs/specs/distribution.md",
+          "sourceSpans": [
+            {
+              "line": 21,
+              "columnStart": 82,
+              "columnEndExclusive": 97,
+              "text": "distribution.md"
+            }
+          ],
+          "disposition": "patch"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-system-overview-L22C168",
+          "normalizedReference": "docs/specs/decision-citation-drift.md",
+          "sourceSpans": [
+            {
+              "line": 22,
+              "columnStart": 168,
+              "columnEndExclusive": 194,
+              "text": "decision-citation-drift.md"
+            }
+          ],
+          "disposition": "patch"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-system-overview-L23C106",
+          "normalizedReference": "docs/specs/distillery.md",
+          "sourceSpans": [
+            {
+              "line": 23,
+              "columnStart": 106,
+              "columnEndExclusive": 119,
+              "text": "distillery.md"
+            }
+          ],
+          "disposition": "patch"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-system-overview-L83C151",
+          "normalizedReference": "docs/specs/platform-foundations.md",
+          "sourceSpans": [
+            {
+              "line": 83,
+              "columnStart": 151,
+              "columnEndExclusive": 174,
+              "text": "platform-foundations.md"
+            }
+          ],
+          "disposition": "preserve"
+        }
+      ],
+      "recordOnlyChanges": [
+        "diff",
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "set": "batch-041",
+      "before": {
+        "preserve": 32,
+        "parked": 3,
+        "patch": 1
+      },
+      "after": {
+        "preserve": 35,
+        "parked": 3,
+        "patch": 1
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-08349",
+        "maps-j-08351",
+        "maps-j-08353",
+        "maps-j-08354",
+        "maps-j-08355",
+        "maps-j-08356",
+        "maps-j-08357",
+        "maps-j-08358",
+        "maps-j-08359",
+        "maps-j-08360",
+        "maps-j-08361",
+        "maps-j-08362",
+        "maps-j-08363",
+        "maps-j-08364",
+        "maps-j-08365",
+        "maps-j-08366",
+        "maps-j-08367",
+        "maps-j-08368",
+        "maps-j-08369",
+        "maps-j-08370",
+        "maps-j-08371",
+        "maps-j-08372",
+        "maps-j-08373",
+        "maps-j-08374"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-08349",
+        "maps-j-08351",
+        "maps-j-08353",
+        "maps-j-08354",
+        "maps-j-08356",
+        "maps-j-08357",
+        "maps-j-08358",
+        "maps-j-08359",
+        "maps-j-08360",
+        "maps-j-08361",
+        "maps-j-08362",
+        "maps-j-08363",
+        "maps-j-08364",
+        "maps-j-08365",
+        "maps-j-08366",
+        "maps-j-08367",
+        "maps-j-08368",
+        "maps-j-08369",
+        "maps-j-08370",
+        "maps-j-08371",
+        "maps-j-08372",
+        "maps-j-08373",
+        "maps-j-08374"
+      ],
+      "edgeProofChanged": [
+        "maps-j-08355"
+      ],
+      "authorAddedEdge": [
+        {
+          "edgeId": "author-r3-docs-specs-work-state-L1642C58",
+          "normalizedReference": "docs/specs/work-state.md",
+          "sourceSpans": [
+            {
+              "line": 1642,
+              "columnStart": 58,
+              "columnEndExclusive": 75,
+              "text": "work-state.md:703"
+            }
+          ],
+          "disposition": "preserve"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-work-state-L1891C21",
+          "normalizedReference": "docs/specs/work-state.md",
+          "sourceSpans": [
+            {
+              "line": 1891,
+              "columnStart": 21,
+              "columnEndExclusive": 34,
+              "text": "work-state.md"
+            }
+          ],
+          "disposition": "preserve"
+        },
+        {
+          "edgeId": "author-r3-docs-specs-work-state-L1894C28",
+          "normalizedReference": "docs/specs/work-state.md",
+          "sourceSpans": [
+            {
+              "line": 1894,
+              "columnStart": 28,
+              "columnEndExclusive": 41,
+              "text": "work-state.md"
+            }
+          ],
+          "disposition": "preserve"
+        }
+      ],
+      "recordOnlyChanges": [
+        "checks",
+        "authoringRules"
+      ]
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "set": "batch-041",
+      "before": {
+        "patch": 2,
+        "parked": 3,
+        "preserve": 1
+      },
+      "after": {
+        "patch": 2,
+        "parked": 4,
+        "preserve": 1
+      },
+      "dispositionChanged": [],
+      "recordChanged": [
+        "maps-j-08375",
+        "maps-j-08376",
+        "maps-j-08377",
+        "maps-j-08378",
+        "maps-j-08379"
+      ],
+      "edgeObjectChanged": [
+        "maps-j-08375",
+        "maps-j-08376",
+        "maps-j-08377",
+        "maps-j-08378"
+      ],
+      "edgeProofChanged": [
+        "maps-j-08375",
+        "maps-j-08379"
+      ],
+      "authorAddedEdge": [
+        {
+          "edgeId": "author-r3-docs-specs-workflow-L639C102",
+          "normalizedReference": "docs/specs/runner.md",
+          "sourceSpans": [
+            {
+              "line": 639,
+              "columnStart": 102,
+              "columnEndExclusive": 111,
+              "text": "runner.md"
+            }
+          ],
+          "disposition": "parked"
+        }
+      ],
+      "recordOnlyChanges": [
+        "diff",
+        "checks",
+        "authoringRules"
+      ]
+    }
+  ],
+  "edgesByRuling": {
+    "L12-26(10)": [
+      "maps-j-08358"
+    ],
+    "L12-30(5)": [
+      "maps-j-05086",
+      "maps-j-05087",
+      "maps-j-05088",
+      "maps-j-05089",
+      "maps-j-05090",
+      "maps-j-08057",
+      "maps-j-08116",
+      "maps-j-08117",
+      "maps-j-08118",
+      "maps-j-08119",
+      "maps-j-08120",
+      "maps-j-08121",
+      "maps-j-08122",
+      "maps-j-08124",
+      "maps-j-08125",
+      "maps-j-08127",
+      "maps-j-08129",
+      "maps-j-08130",
+      "maps-j-08131"
+    ],
+    "L12-30(5,6)": [
+      "maps-j-08019",
+      "maps-j-08194"
+    ],
+    "L12-31(1)": [
+      "author-r3-docs-specs-confinement-authority-L1360C1158",
+      "author-r3-docs-specs-confinement-authority-L1361C297",
+      "maps-j-08008",
+      "maps-j-08009",
+      "maps-j-08016",
+      "maps-j-08017",
+      "maps-j-08078",
+      "maps-j-08082",
+      "maps-j-08181",
+      "maps-j-08182",
+      "maps-j-08189",
+      "maps-j-08191",
+      "maps-j-08192",
+      "maps-j-08375"
+    ],
+    "L12-31(2)": [
+      "author-r3-docs-specs-confinement-authority-L1255C211",
+      "author-r3-docs-specs-confinement-authority-L13C53",
+      "author-r3-docs-specs-system-overview-L83C151",
+      "author-r3-docs-specs-work-state-L1642C58",
+      "author-r3-docs-specs-work-state-L1891C21",
+      "author-r3-docs-specs-work-state-L1894C28",
+      "maps-j-01902",
+      "maps-j-01904",
+      "maps-j-01909",
+      "maps-j-07953",
+      "maps-j-07963",
+      "maps-j-08123",
+      "maps-j-08126",
+      "maps-j-08128",
+      "maps-j-08132",
+      "maps-j-08133",
+      "maps-j-08134",
+      "maps-j-08135",
+      "maps-j-08249",
+      "maps-j-08250",
+      "maps-j-08251",
+      "maps-j-08252",
+      "maps-j-08265",
+      "maps-j-08295",
+      "maps-j-08302",
+      "maps-j-08303",
+      "maps-j-08322",
+      "maps-j-08324",
+      "maps-j-08325",
+      "maps-j-08358",
+      "maps-j-08360",
+      "maps-j-08361",
+      "maps-j-08362",
+      "maps-j-08364"
+    ],
+    "L12-31(3)": [
+      "maps-j-05091",
+      "maps-j-08037",
+      "maps-j-08038",
+      "maps-j-08215",
+      "maps-j-08218",
+      "maps-j-08219",
+      "maps-j-08235",
+      "maps-j-08236",
+      "maps-j-08244",
+      "maps-j-08351"
+    ],
+    "L12-31(4)": [
+      "maps-j-08271",
+      "maps-j-08287"
+    ],
+    "L12-31(5)": [
+      "author-r3-docs-specs-runner-L3356C212",
+      "author-r3-docs-specs-runner-L3356C227",
+      "author-r3-docs-specs-runner-L3356C343",
+      "author-r3-docs-specs-system-overview-L83C151",
+      "author-r3-docs-specs-work-state-L1642C58",
+      "author-r3-docs-specs-work-state-L1891C21",
+      "author-r3-docs-specs-work-state-L1894C28",
+      "maps-j-08117",
+      "maps-j-08118",
+      "maps-j-08119",
+      "maps-j-08120",
+      "maps-j-08121",
+      "maps-j-08122",
+      "maps-j-08123",
+      "maps-j-08124",
+      "maps-j-08125",
+      "maps-j-08126",
+      "maps-j-08127",
+      "maps-j-08128",
+      "maps-j-08129",
+      "maps-j-08130",
+      "maps-j-08131",
+      "maps-j-08132",
+      "maps-j-08133",
+      "maps-j-08134",
+      "maps-j-08135",
+      "maps-j-08249",
+      "maps-j-08250",
+      "maps-j-08251",
+      "maps-j-08252",
+      "maps-j-08262",
+      "maps-j-08263",
+      "maps-j-08264",
+      "maps-j-08265",
+      "maps-j-08266",
+      "maps-j-08267",
+      "maps-j-08268",
+      "maps-j-08269",
+      "maps-j-08270",
+      "maps-j-08271",
+      "maps-j-08272",
+      "maps-j-08273",
+      "maps-j-08274",
+      "maps-j-08275",
+      "maps-j-08276",
+      "maps-j-08277",
+      "maps-j-08278",
+      "maps-j-08279",
+      "maps-j-08280",
+      "maps-j-08281",
+      "maps-j-08282",
+      "maps-j-08283",
+      "maps-j-08284",
+      "maps-j-08285",
+      "maps-j-08286",
+      "maps-j-08287",
+      "maps-j-08288",
+      "maps-j-08289",
+      "maps-j-08290",
+      "maps-j-08291",
+      "maps-j-08292",
+      "maps-j-08293",
+      "maps-j-08294",
+      "maps-j-08295",
+      "maps-j-08296",
+      "maps-j-08297",
+      "maps-j-08298",
+      "maps-j-08299",
+      "maps-j-08300",
+      "maps-j-08301",
+      "maps-j-08302",
+      "maps-j-08303",
+      "maps-j-08304",
+      "maps-j-08305",
+      "maps-j-08306",
+      "maps-j-08307",
+      "maps-j-08308",
+      "maps-j-08309",
+      "maps-j-08310",
+      "maps-j-08311",
+      "maps-j-08312",
+      "maps-j-08313",
+      "maps-j-08314",
+      "maps-j-08315",
+      "maps-j-08316",
+      "maps-j-08317",
+      "maps-j-08318",
+      "maps-j-08319",
+      "maps-j-08320",
+      "maps-j-08321",
+      "maps-j-08322",
+      "maps-j-08323",
+      "maps-j-08324",
+      "maps-j-08325",
+      "maps-j-08326",
+      "maps-j-08327",
+      "maps-j-08328",
+      "maps-j-08335",
+      "maps-j-08336",
+      "maps-j-08337",
+      "maps-j-08338",
+      "maps-j-08356",
+      "maps-j-08357",
+      "maps-j-08358",
+      "maps-j-08359",
+      "maps-j-08360",
+      "maps-j-08361",
+      "maps-j-08362",
+      "maps-j-08363",
+      "maps-j-08364",
+      "maps-j-08365",
+      "maps-j-08366",
+      "maps-j-08367",
+      "maps-j-08368",
+      "maps-j-08369",
+      "maps-j-08370",
+      "maps-j-08371",
+      "maps-j-08372",
+      "maps-j-08373",
+      "maps-j-08374"
+    ],
+    "L12-31(6)": [
+      "author-r3-docs-reading-map-L163C154",
+      "author-r3-docs-reading-map-L163C237",
+      "author-r3-docs-reading-map-L163C264",
+      "author-r3-docs-reading-map-L164C230",
+      "author-r3-docs-reading-map-L164C337",
+      "author-r3-docs-reading-map-L164C403",
+      "author-r3-docs-reading-map-L164C493",
+      "author-r3-docs-reading-map-L164C98",
+      "author-r3-docs-specs-confinement-authority-L1255C211",
+      "author-r3-docs-specs-confinement-authority-L1359C157",
+      "author-r3-docs-specs-confinement-authority-L1360C1158",
+      "author-r3-docs-specs-confinement-authority-L1361C297",
+      "author-r3-docs-specs-confinement-authority-L13C53",
+      "author-r3-docs-specs-confinement-authority-L582C69",
+      "author-r3-docs-specs-decision-citation-drift-L26C13",
+      "author-r3-docs-specs-distribution-L61C267",
+      "author-r3-docs-specs-distribution-L61C282",
+      "author-r3-docs-specs-reading-map-L44C154",
+      "author-r3-docs-specs-reading-map-L44C237",
+      "author-r3-docs-specs-reading-map-L44C264",
+      "author-r3-docs-specs-reading-map-L45C230",
+      "author-r3-docs-specs-reading-map-L45C337",
+      "author-r3-docs-specs-reading-map-L45C403",
+      "author-r3-docs-specs-reading-map-L45C493",
+      "author-r3-docs-specs-reading-map-L45C98",
+      "author-r3-docs-specs-runner-L1298C98",
+      "author-r3-docs-specs-runner-L1299C76",
+      "author-r3-docs-specs-runner-L1300C129",
+      "author-r3-docs-specs-runner-L1301C128",
+      "author-r3-docs-specs-runner-L1301C157",
+      "author-r3-docs-specs-runner-L1302C132",
+      "author-r3-docs-specs-runner-L1303C121",
+      "author-r3-docs-specs-runner-L1303C92",
+      "author-r3-docs-specs-runner-L1304C125",
+      "author-r3-docs-specs-runner-L1304C96",
+      "author-r3-docs-specs-runner-L1305C141",
+      "author-r3-docs-specs-runner-L1306C129",
+      "author-r3-docs-specs-runner-L1314C80",
+      "author-r3-docs-specs-runner-L1315C103",
+      "author-r3-docs-specs-runner-L3356C212",
+      "author-r3-docs-specs-runner-L3356C227",
+      "author-r3-docs-specs-runner-L3356C343",
+      "author-r3-docs-specs-system-overview-L14C95",
+      "author-r3-docs-specs-system-overview-L15C129",
+      "author-r3-docs-specs-system-overview-L16C254",
+      "author-r3-docs-specs-system-overview-L17C254",
+      "author-r3-docs-specs-system-overview-L18C122",
+      "author-r3-docs-specs-system-overview-L19C240",
+      "author-r3-docs-specs-system-overview-L20C129",
+      "author-r3-docs-specs-system-overview-L21C82",
+      "author-r3-docs-specs-system-overview-L22C168",
+      "author-r3-docs-specs-system-overview-L23C106",
+      "author-r3-docs-specs-system-overview-L83C151",
+      "author-r3-docs-specs-work-state-L1642C58",
+      "author-r3-docs-specs-work-state-L1891C21",
+      "author-r3-docs-specs-work-state-L1894C28",
+      "author-r3-docs-specs-workflow-L639C102"
+    ],
+    "L12-31(7)": [
+      "author-r3-docs-reading-map-L163C154",
+      "author-r3-docs-reading-map-L163C237",
+      "author-r3-docs-reading-map-L163C264",
+      "author-r3-docs-reading-map-L164C230",
+      "author-r3-docs-reading-map-L164C337",
+      "author-r3-docs-reading-map-L164C403",
+      "author-r3-docs-reading-map-L164C493",
+      "author-r3-docs-reading-map-L164C98",
+      "author-r3-docs-specs-confinement-authority-L1359C157",
+      "author-r3-docs-specs-confinement-authority-L1360C1158",
+      "author-r3-docs-specs-confinement-authority-L1361C297",
+      "author-r3-docs-specs-confinement-authority-L582C69",
+      "author-r3-docs-specs-decision-citation-drift-L26C13",
+      "author-r3-docs-specs-distribution-L61C267",
+      "author-r3-docs-specs-distribution-L61C282",
+      "author-r3-docs-specs-reading-map-L44C154",
+      "author-r3-docs-specs-reading-map-L44C237",
+      "author-r3-docs-specs-reading-map-L44C264",
+      "author-r3-docs-specs-reading-map-L45C230",
+      "author-r3-docs-specs-reading-map-L45C337",
+      "author-r3-docs-specs-reading-map-L45C403",
+      "author-r3-docs-specs-reading-map-L45C493",
+      "author-r3-docs-specs-reading-map-L45C98",
+      "author-r3-docs-specs-runner-L1298C98",
+      "author-r3-docs-specs-runner-L1299C76",
+      "author-r3-docs-specs-runner-L1300C129",
+      "author-r3-docs-specs-runner-L1301C128",
+      "author-r3-docs-specs-runner-L1301C157",
+      "author-r3-docs-specs-runner-L1302C132",
+      "author-r3-docs-specs-runner-L1303C121",
+      "author-r3-docs-specs-runner-L1303C92",
+      "author-r3-docs-specs-runner-L1304C125",
+      "author-r3-docs-specs-runner-L1304C96",
+      "author-r3-docs-specs-runner-L1305C141",
+      "author-r3-docs-specs-runner-L1306C129",
+      "author-r3-docs-specs-runner-L1314C80",
+      "author-r3-docs-specs-runner-L1315C103",
+      "author-r3-docs-specs-system-overview-L14C95",
+      "author-r3-docs-specs-system-overview-L15C129",
+      "author-r3-docs-specs-system-overview-L16C254",
+      "author-r3-docs-specs-system-overview-L17C254",
+      "author-r3-docs-specs-system-overview-L18C122",
+      "author-r3-docs-specs-system-overview-L19C240",
+      "author-r3-docs-specs-system-overview-L20C129",
+      "author-r3-docs-specs-system-overview-L21C82",
+      "author-r3-docs-specs-system-overview-L22C168",
+      "author-r3-docs-specs-system-overview-L23C106",
+      "author-r3-docs-specs-workflow-L639C102",
+      "maps-j-01905",
+      "maps-j-01906",
+      "maps-j-07239",
+      "maps-j-07955",
+      "maps-j-07958",
+      "maps-j-07959",
+      "maps-j-07960",
+      "maps-j-07961",
+      "maps-j-07965",
+      "maps-j-07969",
+      "maps-j-07970",
+      "maps-j-07972",
+      "maps-j-07976",
+      "maps-j-07977",
+      "maps-j-07979",
+      "maps-j-07981",
+      "maps-j-07984",
+      "maps-j-07985",
+      "maps-j-07988",
+      "maps-j-07989",
+      "maps-j-07990",
+      "maps-j-07991",
+      "maps-j-07992",
+      "maps-j-07993",
+      "maps-j-07994",
+      "maps-j-07995",
+      "maps-j-07996",
+      "maps-j-07997",
+      "maps-j-07998",
+      "maps-j-08003",
+      "maps-j-08004",
+      "maps-j-08007",
+      "maps-j-08008",
+      "maps-j-08009",
+      "maps-j-08010",
+      "maps-j-08011",
+      "maps-j-08012",
+      "maps-j-08013",
+      "maps-j-08014",
+      "maps-j-08015",
+      "maps-j-08016",
+      "maps-j-08017",
+      "maps-j-08018",
+      "maps-j-08019",
+      "maps-j-08020",
+      "maps-j-08021",
+      "maps-j-08022",
+      "maps-j-08023",
+      "maps-j-08024",
+      "maps-j-08025",
+      "maps-j-08026",
+      "maps-j-08027",
+      "maps-j-08028",
+      "maps-j-08029",
+      "maps-j-08030",
+      "maps-j-08031",
+      "maps-j-08032",
+      "maps-j-08033",
+      "maps-j-08034",
+      "maps-j-08040",
+      "maps-j-08053",
+      "maps-j-08054",
+      "maps-j-08056",
+      "maps-j-08058",
+      "maps-j-08059",
+      "maps-j-08062",
+      "maps-j-08064",
+      "maps-j-08066",
+      "maps-j-08068",
+      "maps-j-08070",
+      "maps-j-08074",
+      "maps-j-08078",
+      "maps-j-08082",
+      "maps-j-08092",
+      "maps-j-08094",
+      "maps-j-08096",
+      "maps-j-08098",
+      "maps-j-08102",
+      "maps-j-08107",
+      "maps-j-08109",
+      "maps-j-08110",
+      "maps-j-08136",
+      "maps-j-08138",
+      "maps-j-08142",
+      "maps-j-08143",
+      "maps-j-08145",
+      "maps-j-08149",
+      "maps-j-08150",
+      "maps-j-08152",
+      "maps-j-08154",
+      "maps-j-08157",
+      "maps-j-08158",
+      "maps-j-08161",
+      "maps-j-08162",
+      "maps-j-08163",
+      "maps-j-08164",
+      "maps-j-08165",
+      "maps-j-08166",
+      "maps-j-08167",
+      "maps-j-08168",
+      "maps-j-08169",
+      "maps-j-08170",
+      "maps-j-08171",
+      "maps-j-08176",
+      "maps-j-08177",
+      "maps-j-08180",
+      "maps-j-08181",
+      "maps-j-08182",
+      "maps-j-08183",
+      "maps-j-08184",
+      "maps-j-08185",
+      "maps-j-08186",
+      "maps-j-08187",
+      "maps-j-08188",
+      "maps-j-08189",
+      "maps-j-08190",
+      "maps-j-08191",
+      "maps-j-08192",
+      "maps-j-08193",
+      "maps-j-08194",
+      "maps-j-08195",
+      "maps-j-08196",
+      "maps-j-08197",
+      "maps-j-08198",
+      "maps-j-08199",
+      "maps-j-08200",
+      "maps-j-08201",
+      "maps-j-08202",
+      "maps-j-08203",
+      "maps-j-08204",
+      "maps-j-08205",
+      "maps-j-08206",
+      "maps-j-08207",
+      "maps-j-08208",
+      "maps-j-08209",
+      "maps-j-08210",
+      "maps-j-08212",
+      "maps-j-08215",
+      "maps-j-08217",
+      "maps-j-08218",
+      "maps-j-08223",
+      "maps-j-08224",
+      "maps-j-08227",
+      "maps-j-08228",
+      "maps-j-08230",
+      "maps-j-08231",
+      "maps-j-08232",
+      "maps-j-08241",
+      "maps-j-08243",
+      "maps-j-08244",
+      "maps-j-08248",
+      "maps-j-08254",
+      "maps-j-08255",
+      "maps-j-08256",
+      "maps-j-08257",
+      "maps-j-08260",
+      "maps-j-08261",
+      "maps-j-08329",
+      "maps-j-08330",
+      "maps-j-08331",
+      "maps-j-08332",
+      "maps-j-08333",
+      "maps-j-08334",
+      "maps-j-08349",
+      "maps-j-08353",
+      "maps-j-08354",
+      "maps-j-08355",
+      "maps-j-08375",
+      "maps-j-08376",
+      "maps-j-08377",
+      "maps-j-08378",
+      "maps-j-08379"
+    ]
+  },
+  "before": {
+    "patch": 104,
+    "preserve": 268,
+    "phase9-row-flip": 12,
+    "parked": 53
+  },
+  "after": {
+    "patch": 111,
+    "preserve": 274,
+    "phase9-row-flip": 12,
+    "parked": 97
+  }
+}

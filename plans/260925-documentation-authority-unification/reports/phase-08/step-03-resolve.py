@@ -102,6 +102,13 @@ def witness(result,assessment):
 
 def verify(recorded,pin,legacy,source_passage):
     expected=witness(resolve(pin,legacy,source_passage),recorded.get('assessment'))
+    actual_groups=recorded.get('hitGroups',[])
+    assert len(actual_groups)==len(expected['hitGroups']),'missing hit group'
+    for actual,want in zip(actual_groups,expected['hitGroups']):
+        assert isinstance(actual.get('liveAssessment'),str) and actual['liveAssessment'].strip()
+        assert isinstance(actual.get('carriageAssessment'),str) and actual['carriageAssessment'].strip()
+        for key in ('query','carriageCount','liveCount'):assert actual[key]==want[key]
+    expected['hitGroups']=actual_groups
     assert recorded==expected,'search witness differs from pinned replay'
     assert isinstance(recorded.get('assessment'),str) and recorded['assessment'].strip(),'missing per-hit usability assessment'
 

@@ -92,6 +92,35 @@ def main():
         e=pe(r);e['target']='docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md';e['anchor']=None
         r['checks']['anchors'][e['edgeId']]={'targetCommit':a.author_commit,'targetDigest':m.sha(m.blob(a.author_commit,e['target']))}
     probe('whole-file source snapshot used as live target',patch,snapshot_target,'anchor-carriage-locator')
+    # L12-31: all original probes above/below remain; each new rule is mutated independently.
+    anchored=next(r for r in rs if any(e['disposition']=='patch' and r['checks']['anchors'][e['edgeId']].get('sourceLocatorTokens')==['RUL53'] for e in r['edges']))
+    def h1_instead_of_holder(r):
+        e=next(e for e in r['edges'] if r['checks']['anchors'].get(e['edgeId'],{}).get('sourceLocatorTokens')==['RUL53'])
+        h=next(h for h in m.heading_sections(a.author_commit,e['target']) if h['level']==1)
+        e['anchor']=h['githubSlug'] if e['matchedExpression'].startswith(('[','![')) else h['anchor']
+        r['checks']['anchors'][e['edgeId']]['passage']=h['body']
+    probe('H1 anchor hides narrower rule holder',anchored,h1_instead_of_holder,'anchor-precision')
+    retiring=next(r for r in rs if any(e['disposition']=='preserve' and e['matchedExpression'].startswith('docs/specs/') for e in r['edges']))
+    def retained_word(r):
+        e=next(e for e in r['edges'] if e['disposition']=='preserve' and e['matchedExpression'].startswith('docs/specs/'))
+        e['reason']='L12-31: retained path exists at author pin'
+    probe('retiring-tree preserve falsely says retained',retiring,retained_word,'retiring-preserve-wording')
+    added=next(r for r in rs if any(e.get('authorAddedEdge') for e in r['edges']))
+    def ae(r):return next(e for e in r['edges'] if e.get('authorAddedEdge'))
+    probe('author-added disposition omitted',added,lambda r:r['edges'].remove(ae(r)),'author-added-coverage')
+    probe('author-added disposition duplicated',added,lambda r:r['edges'].append(copy.deepcopy(ae(r))),'author-added-coverage')
+    probe('author-added coverage join omitted',added,lambda r:r['checks']['coverage']['authorAddedEdgeIds'].pop(),'author-added-coverage')
+    def scan_omission(r):
+        e=ae(r);r['edges'].remove(e);r['checks']['coverage']['authorAddedEdgeIds'].remove(e['edgeId'])
+    probe('author-added edge and declaration jointly omitted',added,scan_omission,'author-added-search-coverage')
+    def scan_lie(r):r['checks']['coverage']['legacyScan']['candidates'].pop()
+    probe('whole-file supplemental candidate omitted',added,scan_lie,'author-added-search-coverage')
+    probe('whole-file supplemental receipt omitted',added,lambda r:r['checks']['coverage'].pop('legacyScan'),'author-added-search-coverage')
+    many=next(r for r in rs if any(len(e.get('searchWitness',{}).get('hitGroups',[]))>1 for e in r['edges']))
+    def boilerplate(r):
+        e=next(e for e in r['edges'] if len(e.get('searchWitness',{}).get('hitGroups',[]))>1)
+        for g in e['searchWitness']['hitGroups']:g['liveAssessment']='Every hit is unusable.'
+    probe('identical live assessments for all hit groups',many,boilerplate,'distinct-hit-assessments')
     manifest=m.manifest_view(rs,a.author_commit)
     bad=copy.deepcopy(manifest);bad['files'][0]['diffSha256']='0'*64;assert 'files' in m.verify_manifest(rs,a.author_commit,bad)
     checks.append({'surfaceClass':3,'probe':'frozen record manifest diff hash mutation','expectedCheck':'manifest-freeze','rejected':True})

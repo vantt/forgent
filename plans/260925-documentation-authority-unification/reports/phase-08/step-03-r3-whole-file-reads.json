@@ -1,0 +1,1016 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "limit": "Ordered traversal and search receipts are accounting evidence; independent semantic full-file review remains required.",
+  "files": [
+    {
+      "file": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10573,
+      "lines": 244,
+      "sha256": "2873f7a9a716621c2e9d44164f5a760fad473343ed817138f57a524954447511",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "13fbbaa44203b91e9a140fd6654c76c94ad20cfee7d3dbb2574fef1e9f9da368"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "949bb2a11db622d33ff8fd36b22eb0327a1cd714e4f41501b80bfa46df43c0fc"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "ec01198230f833ef74b46af5aaf4769474c0bcaa03192fb287659a6b3871a01a"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 244,
+          "sha256": "0d709b8552aa2f0543bc0269b7788c9bec799c94e734ab19c19dc11475ee52f0"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8740,
+      "lines": 205,
+      "sha256": "b5cb1938a264c4a6ffdf7693d5c518428a98b90f88381d9c4c9eb4f7fd29f5a5",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "bf9266527fb66905799a7887daf257a489b86d45bf3fedaf7322c1ae2ce094da"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "b64701be215c87ac40ad565041bd4b6b88f193ae0eec79e5dded5e4f13c10512"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 205,
+          "sha256": "3ee253294f7affc303b2d651649a3349da1d66eef8c98f8d2f9df26921500b0f"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 18420,
+      "lines": 475,
+      "sha256": "a2b0df6a5910c3d5e12ce7f9cd5db3f587095ff3c57f4d1978f933d308d2bfc7",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b6552a30258e0928821ad074ded04dbb88a1b0a7951d531482b46ac0a4a71867"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "5746abc18d2d4fb736270e4d822ff6ef1d440b76262428a55106f421c4828bea"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "e5a514a60eac6fcf51f993506ed6fd16b55bac3ff5fe9880e6735bcf7850872b"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "f1b79895b2fc2c039c47ecb1140a103aad99f9ff48fce6c24439ba96792b36b6"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "0f70bac9a91b8c5c7129c221df63f903324605ad92d2e15e052e4acd8c393eaa"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 475,
+          "sha256": "3574af1fd43d5081f15df36986c838061eaa60ae696f82d61a815bf4d1f56031"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 16932,
+      "lines": 294,
+      "sha256": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "452cf4e63cfe52fcc91d54b7b79d29af0490e8a8f929243a0cf44c73f186a209"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "58fb15734495777b2cbd1019ce3e09ebc765dceec8e0be0b0e0e354630246952"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "c755c039bafe98a1998b30616d6a7cc5c735dbe3bb4e1cec3f54189c88f982d4"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 294,
+          "sha256": "5131540ed4e8bb467db66034fde8c7c6338786cb431579a43b9bf791622956f1"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/reading-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 35359,
+      "lines": 184,
+      "sha256": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a556b1b74232636719d175a19d7db8c2f43b663d03a8cf987566be2082ea3573"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "b0e857077f0f0de099086a0b2c40fe01895a6717f285192f694c3a43865b9329"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 184,
+          "sha256": "bc8214d1a316f7d4ff9ba87980af8195f11837746879c469ef8f114a23dc42a1"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7045,
+      "lines": 94,
+      "sha256": "535dd0f61113aab54dcc9637c9f19ef5eb409a21fe515feddbae239a33ec1e81",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7a50fe357f48399bfa578a1535eb6a0d95de8644a0cd9e12cd49f9005c42231d"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 94,
+          "sha256": "50e10d5593e858d21a03b5912248b30c70d78775045d87f7c4b3fcbeef31bf50"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 95294,
+      "lines": 1401,
+      "sha256": "7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8c599195f24bc4969886a9fa8a07bc453c72776649cd8dff0373e9cf295b600b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "b3db73ee78ff0d31b7240ab76ec351fd75e6f2c0ce39d8873552974f3d15184e"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "33289cba16c6fdbb87ace1d5f8ceeec652e128fce2bd0aafa03fbe7b86dfb4ab"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "d2c0b8e4d233e5d6da6191a13b95af82213bd8aae77031d0a3232c6f6ee5a904"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "6491406c53bbaeddfb213853d9b02e74002da05a892c8249049c37ebf8b2094b"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "cc783bae13b131bb775abecb3e441117eb00de72434a1537370503e624e55834"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "aa5f770f885b56ca561db1285ae0ec5727abf19e24b5ff98c6bb9215e2843172"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "1e58ca31f267c87db8e6ec3e1717a0738145c73bbe7ff252d26da997059ea76d"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "3ffb1750ac8bc25bffb8e740d3a7fb66926871aaee7c4ec8279f92e4f96f1d78"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "ad2c566abdbd7c4a33cb69841750db3057304ae67a25ee303cca15182aa890f6"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "79d9ad5c1a0d6366bcb2ac00546abb5c824dc7a2bf2c9a73f90b344f1a98fdfb"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "2bfb2419f35aec150328b39f3f1539675505185b94ad13145bcbbb2c63b74b47"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "bad12e5ef3e6caa1b51013d34e2f074a5ea48daff8d3c7cb29dfc5db8c31d39d"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "37e035e4bacbef6d5fd8e5c484fa5d28287663e5b7a7d3f9cfc17e4b75aa16f3"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "29d15814289936dcec4db34a39c77f5dc027b7341947dbf0e670d6a2f6c326a9"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1280,
+          "sha256": "0f120aad4585ace9e3c951a302e4e6461b8e199751113297424d0c20fc45dc9d"
+        },
+        {
+          "firstLine": 1281,
+          "lastLine": 1360,
+          "sha256": "99da609fb319ba94e0e6fc2335b7745a8734131c163cca4f941b014ad17e3260"
+        },
+        {
+          "firstLine": 1361,
+          "lastLine": 1401,
+          "sha256": "b9c2fadcd8ec6148823688fa8f0f2219f241f645f83cbafcf91ecb6da67246f4"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6045,
+      "lines": 115,
+      "sha256": "4774f723f8d3ab5e4a753cd2b74919f27c62c2c7857644606337def5bd922cff",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "bf03c38da97cc445c9237b0db0ca40cb0a767bc4bc4d10e7649e89a03112d431"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 115,
+          "sha256": "53ad7c57468e123a642fa6b5b8172c0feeda1db3ff07f18cbaa9e151a19f3cbd"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/distillery.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7355,
+      "lines": 138,
+      "sha256": "518accb5c959ac5dc42b154cb735f3f3af962a51afca4a4976972d059d0c7196",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1ab346ae38807a36fbd46836341729bb80d7a24777d05280d590fc1c52213ba1"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 138,
+          "sha256": "58c94bdc30a4350494e85b542c96e34704e5c6c681369f28da44e1603f84d393"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 83387,
+      "lines": 462,
+      "sha256": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "008b22a8ad489696db5d95c9482b65685131892203af94b9e42b2fc59f78f3be"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e5eb88d6dc1a67309815d6110df90cbde7792f368b96818b538199e6f6bdd80c"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "5db119f2330f7abaab969fe702d0d2933833c07ac9f18576af570a0ecbda5002"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "45eee816f8bbba4375d8b0b9fe957e883e0ff13072bb7ac7ced611ccc41870e8"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "5c66330540b272d1f27c1364743d1ec55baac3be255aa5f6d06d08878eff930f"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 462,
+          "sha256": "8844faa8391b17f542cc1521640bf56bfc04bb1b47d804120ffccec151c0da7c"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/enduser-docs-authoring.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8989,
+      "lines": 125,
+      "sha256": "1d306eedfc56a43f3d5a01e0e888ec7009a103c72e7e6d22347bbfa5c816143b",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "086128c20a3149f49f32ddca2a32aff81119f2f2cb417af22aca6a191d24d61f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 125,
+          "sha256": "6e1b3b269e61e78ad6ea677f5cdd72e8a2b99f90dfb55205280dfc7d15d7f918"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/enduser-docs-index.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 19960,
+      "lines": 244,
+      "sha256": "10774136285a478f23fc87bc573621444f72162d33de7d9cc958e5b3f5973f0e",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4146f37c13799bb56e5b8ce55d437a06668e24c304320e6410cf9817babf7a59"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "bb7e5d7e3dfe927803b661d2a27f73f7c6e41836aecd55d5754e3174c5712dd0"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "97e754e2ca36567e1de028d3b583aef240d8241ff896cf3e65dab0b8e2ccd003"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 244,
+          "sha256": "9964a6592ba76ccd10c169f19afa9fd8e048801036225cc61df0ecb2bc5662e2"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/fgos-plugin.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10199,
+      "lines": 169,
+      "sha256": "2e7632ffbcbaae5c7ba4e3c7d6e0a3e7fe888ee278b5bc0bf9039f3ff276b687",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "809be85ab5a255fccb69c19938f0f568ccdafda5c99a17e1f07124e3519e4a40"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "214689b61648f43925b8bcb3dfeeb75c5c7632b67e35b502c3c2e97e06bdd74f"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 169,
+          "sha256": "d35fbec913fab456e18a2629c555dea7bb7a9b0e4891ed8b2aec57bade78b685"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 21374,
+      "lines": 331,
+      "sha256": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "0c8de76cba9cb122159f1541129362685202e40c28216c93d7beace8bd359e32"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "65e12aef27a1a759ad5c5e0fd215115fbb10153137c8ed9567460b9e0d73ad55"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "ed9c9636a3c7a5e375748db8e418b1ca98fa620f129a71f353897189c1881b4d"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "f6675beee5db4b79e413284545508ea2ed55d2e193524c381fba16e61a7d1964"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 331,
+          "sha256": "3e86e206d159cd0acf525646f33b22bda4f609571912f171030334c70fbec4fe"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/observe.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 20737,
+      "lines": 95,
+      "sha256": "bf89de13303aeb0ae9c30141e96b1833646b89b54431a46e87552586a893d348",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a74ff66ddefd0bb71d6550574986ad64ecacc28fea7e91e7cc728628f07b5d72"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 95,
+          "sha256": "02debb2d81db2fd231ac296565e49028be4ac46c8ee4e61bd9200998b165ebf6"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 41031,
+      "lines": 533,
+      "sha256": "5691c41135cf442388902d8d0c63d43fe30bad26fac9e8467c1559c385079905",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1e6eb978fce3c3e1d2e0bd6a3654c9d55dfdb6ee9292a4a358b4c33a690c6bb8"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "ac9c937c5f460d127a59527fd2d58468c48bd131ddb3968959dc74982f08992a"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "0c80673afc773cff5a63e138429da7628f89a880c22c780cdf3921527dcd529a"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "fa7bbd2679749dc98976996f00fb4ab2d3733835b6998ee2dc878854c1b0663e"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "081961511baa566086507660eed3c2e97a1ceb6b722739df4f88346868e8c792"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "cbd4e040d5b9bf298f54e6b532faf2bcb7b143d6cadc46b868f1df7dfbbd2156"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 533,
+          "sha256": "726ccd0c64d71f14243c7e8dac5e3da1f281f9992e240ff7ef7a3010fd381a34"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 35721,
+      "lines": 72,
+      "sha256": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 72,
+          "sha256": "f536c0f1514193f95ead809ef5c0ecb75c0bcf362a83c97600a8fcda70935343"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 635616,
+      "lines": 3452,
+      "sha256": "8287db544b755d4360911fdc899b69265a50de9fb58b1209782a2767f8395697",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "9e29f80c7078053c549ed5a9aa2a0ccdf305abcc13e02110c63e2799dfb3d5cf"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "9982474f292b3af8deec00231ac65ece8e26573ad3b78ec0516757550736e9d9"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "75fee53505b9c7a9201d4506b58bbe5b481e8770728e5fb7037d26d2782c9e53"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "cf54c590fb2df39f14e739d7e8d4687d10fc1a5103809ef326cc418e79918573"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "092b2137aedf983a1f4af227ac5d267728aebb1e02ed7f243d9575c0ebc8b0e2"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "c435421b1ee73c5ac7725bc808bfd414d682c64f410136650b1c6857b625d2b3"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "f9aeac94285b86345ea70a04148e1165f874542c331e2feb0719c3fd55e3f6cf"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "c213623bd4bcf145c9e19d5bb81be9d82e943bd89bacd51cadfca478923384ba"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "2811a85c33bb63f49155ba809c38fc2f39815736ad24fea8bf59f19431fdb2e4"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "1b8b22eeb06c668887616d6129d00fddff18c643707bd1f5480e533fed47e46d"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "b09e00cd38d773178c5b51ff2e29ac1634d1fbf22e86c68fa33e98f135327349"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "cf401e13bfc362d7a21eda93f3c1d6ab7ad4a4c4a82f22645e69dae750da2225"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "441ebf7c115057ac86cb7cc857d0b5d1ee8e0ef305948bd2e46d06c23770219e"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "3bf417f81fb1487291de15c63b43024a79f0526f66f86bd20a2f767d486b102e"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "1b0029325ae919115557b5a08bd85ebb5203b8721b31f83a1f49e1fc7a175ef3"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1280,
+          "sha256": "f03ad43b066d54938556450ae4871335f6eabf9dc86b5b3ffe87e75b49241562"
+        },
+        {
+          "firstLine": 1281,
+          "lastLine": 1360,
+          "sha256": "1ad58723836c7c4629ecb3f5e9ca912f369eb8e8aa6002b0d5149530e0fe08d9"
+        },
+        {
+          "firstLine": 1361,
+          "lastLine": 1440,
+          "sha256": "95c8e28fe6928843f49242504490bd3617f54f7933e8076b595e61d21fd64395"
+        },
+        {
+          "firstLine": 1441,
+          "lastLine": 1520,
+          "sha256": "8f16bf4cb67cac798562ec69349ad90305258cd82a2daf8da1569d0ffbf086e9"
+        },
+        {
+          "firstLine": 1521,
+          "lastLine": 1600,
+          "sha256": "42453f67d14b52b65eb592dd8d147d1d8103c595c1e63d4f7cf744fc1a278134"
+        },
+        {
+          "firstLine": 1601,
+          "lastLine": 1680,
+          "sha256": "48ca3eae907f2520f310207cc325ece6775017e07863dddffc0b59658f56d3ba"
+        },
+        {
+          "firstLine": 1681,
+          "lastLine": 1760,
+          "sha256": "224681d104eb1b92904989158696df3cdd70ac4b32159de7772bc6e7f221fa82"
+        },
+        {
+          "firstLine": 1761,
+          "lastLine": 1840,
+          "sha256": "8363c276b9e076c1a3445a548cf99862b394dfeb0d782406fbd50cf0a1d4f9a1"
+        },
+        {
+          "firstLine": 1841,
+          "lastLine": 1920,
+          "sha256": "48e1d564cd8f5433300a1fb72c546c6df83583d2a4c74670e07e4744c3a2c3df"
+        },
+        {
+          "firstLine": 1921,
+          "lastLine": 2000,
+          "sha256": "f9ebb12fb8f6a3d6674e42879272fcf3b7feb99d9e6d7d22547f98147315e4c5"
+        },
+        {
+          "firstLine": 2001,
+          "lastLine": 2080,
+          "sha256": "57635b900f6c6a6555456c3de366f25f981255aac0614dd2a85594ece4134934"
+        },
+        {
+          "firstLine": 2081,
+          "lastLine": 2160,
+          "sha256": "a73264f6d98ac3789c8b0eb83b110477ad691d47d7deb6113c22ae19994c8066"
+        },
+        {
+          "firstLine": 2161,
+          "lastLine": 2240,
+          "sha256": "32c2cbd34f00b9142c2766e7159b4d82826bec24cac6092a331fb73277a61309"
+        },
+        {
+          "firstLine": 2241,
+          "lastLine": 2320,
+          "sha256": "f72db3a27d6b1e53ad2fd5718b195530372a14a2b6ecaccd1e7807070e5e768e"
+        },
+        {
+          "firstLine": 2321,
+          "lastLine": 2400,
+          "sha256": "04a5fbed7e696a8247a96b0db5563328413b769ae5564d30b684b1e7eae6cc53"
+        },
+        {
+          "firstLine": 2401,
+          "lastLine": 2480,
+          "sha256": "6afce8759e09bf49311622928b8c2032e25f760c565de849f3c2e34bba9ece68"
+        },
+        {
+          "firstLine": 2481,
+          "lastLine": 2560,
+          "sha256": "539290fdbb57b0910460d5a918f6934795e77b5062959d0fe01862c69597c551"
+        },
+        {
+          "firstLine": 2561,
+          "lastLine": 2640,
+          "sha256": "f23c8ff462be0bb5f3a91c32af07a5fdbd4cf389af669b2077d863447ccf1bd4"
+        },
+        {
+          "firstLine": 2641,
+          "lastLine": 2720,
+          "sha256": "6457e0ea381ed91971ee6bdfa46e92e4dd699627435adaa174d266a8cdba5700"
+        },
+        {
+          "firstLine": 2721,
+          "lastLine": 2800,
+          "sha256": "7b4c2e11eb1adf52e8723b3e2a5fcb4290c168629e990b387eafe752304295a5"
+        },
+        {
+          "firstLine": 2801,
+          "lastLine": 2880,
+          "sha256": "bf29bd65dac6a3c912549ef332d0b044d7b19c6b570f7bcdb3b76760e1b687ba"
+        },
+        {
+          "firstLine": 2881,
+          "lastLine": 2960,
+          "sha256": "41a5b954c4abbed3a88a20b315959fe7ac29505ecfa5b615f10cf63fac19d1de"
+        },
+        {
+          "firstLine": 2961,
+          "lastLine": 3040,
+          "sha256": "2318232a6a315681fe037f3d14dec5a0685b3e862705e9ceb59f2b2bd813ea93"
+        },
+        {
+          "firstLine": 3041,
+          "lastLine": 3120,
+          "sha256": "bbdcf7db32cdf572e3de8282add99cc17f877cd7500675e59dee36a0087f8810"
+        },
+        {
+          "firstLine": 3121,
+          "lastLine": 3200,
+          "sha256": "5c6110b8e04930def3ec882b7cd80ec41eb3859a4d0730e635c38a8ccbb7aca2"
+        },
+        {
+          "firstLine": 3201,
+          "lastLine": 3280,
+          "sha256": "9d884a2564d853625abacef49481dd48c070a3f0b445dd23e0a811ee04938eff"
+        },
+        {
+          "firstLine": 3281,
+          "lastLine": 3360,
+          "sha256": "cd9d4f8a6e9cda00c5b6398b34a9e4f63a2582f0f9ce28b18ca56d9276c84ded"
+        },
+        {
+          "firstLine": 3361,
+          "lastLine": 3440,
+          "sha256": "faad6805f98c602e53c805ee996e2b5ffff6ebef7308d22355a93b3363258993"
+        },
+        {
+          "firstLine": 3441,
+          "lastLine": 3452,
+          "sha256": "3b182d5ed980b54edb04ff64b9b1a8e019cabc6e1645bc2abfbb6e23e4c2344a"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 18940,
+      "lines": 171,
+      "sha256": "70cd094041f425dac24ac931eac690bb339b541ddeabd7299efe01b0195468f1",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "30cce9486ae02c6d3971256e3c917a56623a8557323755579892ab9f30788328"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "b5bc766e9c4b64fe6bf8da70edfe39f0f30381b767b06972f73d533ae0571fd7"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 171,
+          "sha256": "d909d16d90a46460edb1844b105e10675c96fb327d555ee455f53421ab1e13bb"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 327843,
+      "lines": 2352,
+      "sha256": "499ec68376dd202ea6c55b1c7db136cc1523605dc7c83bb9d964dded970eb3a8",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a7729c01bb5fce9cdf2f4d89b1c3eaca02f987537fd85e33d712d0b3e52d97b4"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "82086387214454630086b8fc777b12984efbe409cfaa5e4699007dcbba6379fb"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "4105cff8c0baab2223923aaacde3d9847a4c48c06be3cd77b97a76335b328ef0"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "4811a5bf1d2d70a0738abd5cb448f6da37ec26bcfcea6d14739fdb0d45dd3c45"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "f9a0e44d8f976affd8d3bed0982b7f3eecd5c2cb980968c472018cff2997e55a"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "88867e2792164efe0ecaabfb0b916d21b36a8213c32fd9b17a3e3bfea6576175"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "6d17631bc40bb365fc79c9cdcfc12ecc8370d43bb042a114c6cdca3a0777368b"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "d1b5548817d78f3b7f76b840e5314d7bd80b741200445b463734e29ed7517595"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "da1c1441caf724fe85e022af958f9b7f94c15e2b63eef4f69c1e69cfbac17320"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "f475d218a87733984a899a0632cd0c3fa87842939d838b8513ffc1ee41f04db6"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "21e28c8841956cca8de7a5a2a11b3bcf4e5a4c69f46331ec4c8c15c47ddd9a07"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "ab47125202ed377c8993ba18c349b54863ae9de7a6afdf12a911506735204bb2"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "82b16ff1fac980c29571db862fcd38daef6104adf0b77533428e42c29b4062a4"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "c1d783efc7c69441eea892f5f0bdb502f11bb9581a2f95d1658427b7da9eddb6"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "25e384e4626ba757fdd39b6fe9d4fe989a77fdc506a11d4561474be68bbb9db6"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1280,
+          "sha256": "88e3f63bc4a263684fbdeaa637287f2f144f9d62f1ca38de62b5e69001f5fcee"
+        },
+        {
+          "firstLine": 1281,
+          "lastLine": 1360,
+          "sha256": "15b5aec275915b379ca35e063a2011bb525df4c03e9dc016a56a74a59f9d761b"
+        },
+        {
+          "firstLine": 1361,
+          "lastLine": 1440,
+          "sha256": "29f7a1e66cb7b02614684e45f1ba02d1a11fd734b0ff4007e14b1c19478de180"
+        },
+        {
+          "firstLine": 1441,
+          "lastLine": 1520,
+          "sha256": "88efb9d9f07f842f9f35c645ba4d16f750804fdc835630b4785e8b679dd04e85"
+        },
+        {
+          "firstLine": 1521,
+          "lastLine": 1600,
+          "sha256": "9b5d3f7be9358572235b171b7177006fa4ccf0332526ec18c79d0d7aeba7caac"
+        },
+        {
+          "firstLine": 1601,
+          "lastLine": 1680,
+          "sha256": "44e0f9de8aa463a3ddfb0dfccb4204396bf204105076f91fbb9bb3bd7d27fff8"
+        },
+        {
+          "firstLine": 1681,
+          "lastLine": 1760,
+          "sha256": "7410bf515f1658faeac04c4103611bde8418dcfb40937aca7ac6dd03fd1b6bc5"
+        },
+        {
+          "firstLine": 1761,
+          "lastLine": 1840,
+          "sha256": "2f946fb2daee60289fba459792d5169c4780afbeb8dc750503d133410859c3ed"
+        },
+        {
+          "firstLine": 1841,
+          "lastLine": 1920,
+          "sha256": "bb4179e2562068563b7b26964023d1139fa7508f6be4722f2b440f141ac41724"
+        },
+        {
+          "firstLine": 1921,
+          "lastLine": 2000,
+          "sha256": "bd4bd09d93efff215bd61c8d8a7d8abcbda0879a3d91daadee516f723a5ac820"
+        },
+        {
+          "firstLine": 2001,
+          "lastLine": 2080,
+          "sha256": "c430809ba38da638b26c1ea055fc3fb41369c13b5767529904c9f0f2c05709de"
+        },
+        {
+          "firstLine": 2081,
+          "lastLine": 2160,
+          "sha256": "1ffb16f63753a5d4d87f9109e5d9031125d4fa31af6ee1222e8edcdf21d91ec2"
+        },
+        {
+          "firstLine": 2161,
+          "lastLine": 2240,
+          "sha256": "c01d62970fe81c9e268236c180b532a27b3bf3dd8bd6ddbac583897a20fdb184"
+        },
+        {
+          "firstLine": 2241,
+          "lastLine": 2320,
+          "sha256": "f154823d9a0966f02c6e0cd888dcabbe1b18f7069ea006103aefc7c3d089967c"
+        },
+        {
+          "firstLine": 2321,
+          "lastLine": 2352,
+          "sha256": "6e5ad892219618171d2ee21e594dbb5a2b7acfbb47f68564f667ea7116371622"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 99377,
+      "lines": 675,
+      "sha256": "ff97bdc6edda92075ca34013604efc7e1328bdb7cb647352c6b806bdb498e6c6",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8f912f81ef2a202ae7f73419ac3619c9de73caad555caf9ee645cc883658c151"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6ab225b0fb86b0405a9e331e66e8b30742f1e3cfdaf242574bec8731f37523dd"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "b2d8272b6a5050f56ca96341702fda1a3ff37988184ea4fa04d432b958b4ad28"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "e909988501c35d7adc47e57724cfee2a52a1ba7717eaefff558d2760bb06b0de"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "97a96bdde758e42c1e5cfdef76cea36e38152fea50937691a8e5f26c4eea2ddb"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "316e32f6b1b6ced5312576d653c900794deef9d58c0a06312c456504896ce3db"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "4cbd0e65652f558c811cef54825fc6ca0d8b84a996c8e4021a4f4cdddb74433d"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "a5546d5cebe283c45b0ffc5412e10d412951f2a8970e7a6f1c6c6d9aa6ed2024"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 675,
+          "sha256": "a9ec7771eb3cfb0f42e3b321a8a785bb8b531fd0933f9953dece23d8f5590018"
+        }
+      ],
+      "search": "Every line traversed; full legacy-root paths and bare basenames of all committed retiring-tree Markdown files; source spans excluded only when already inventoried. Each remaining candidate is joined or explicitly excluded in checks.coverage.legacyScan."
+    }
+  ]
+}
