@@ -1,0 +1,408 @@
+{
+  "schema": "pilot-b-step-01-author-verification.v1",
+  "inputHead": "8b1d910781a6f4dae6cee29eed9c26ae8e18a964",
+  "proposalsPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-01-pilot-b-proposals.json",
+  "proposalsSha256": "8f3e7e5b1197cf8854eead8cd79e39c13b77ad1f8c7b9d60e636c094cb898046",
+  "proposalsBytes": 360104,
+  "proof": {
+    "queueRows": 47,
+    "uniqueOriginalJoins": 47,
+    "sourceOccurrencesResolved": 47,
+    "primaryTargetPathsExist": 47,
+    "primaryTargetAnchorsChecked": 22,
+    "additionalTargetAnchorsChecked": 4,
+    "contentDriftRows": [
+      36,
+      37
+    ],
+    "missingRows": [],
+    "requiredLegacyCutoverOnly": 12,
+    "codeTestGateFixtureRows": [
+      0,
+      1,
+      2,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "codeTestGateFixtureDispositions": {
+      "cutover-patch-only": [
+        0,
+        43,
+        44,
+        45
+      ],
+      "preserve": [
+        1,
+        2,
+        40,
+        41,
+        42,
+        46
+      ]
+    },
+    "plannerApplicableRows": [
+      3,
+      4
+    ],
+    "claim": "Author mechanical receipts only; semantic review and Lead decisions pending."
+  },
+  "counts": {
+    "rewrite": 2,
+    "cutover-patch-only": 19,
+    "preserve": 24,
+    "parked": 2
+  },
+  "commands": [
+    {
+      "command": "python3 -c \"import json; q=json.load(open('plans/260925-documentation-authority-unification/reports/phase-05/pilot-b-link-judgment-queue.json')); assert len(q)==47; print(len(q))\"",
+      "exit": 0,
+      "stdout": "47"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-link-pass.test.mjs test/scripts/check-doc-candidate-status.test.mjs test/scripts/check-doc-constitution.test.mjs",
+      "result": "95 passed, 0 failed, 0 skipped; shell wrapper exit 0; test output retained",
+      "log": "step-01-pilot-b-light-tests.log"
+    },
+    {
+      "command": "node scripts/check-legacy-docs-ratchet.mjs",
+      "result": "clean; 995 legacy files, 26 accounted edits, one accounted new; shell wrapper exit 0",
+      "log": "step-01-pilot-b-ratchet.log"
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    }
+  ],
+  "protectedPins": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "f6582e14f5fd4e3a616eebbd5d6af1187ff0276e456cfc460d96b74f8a3c568b",
+      "equalToInputHead": true
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
+      "equalToInputHead": true
+    },
+    {
+      "path": "README.md",
+      "sha256": "b5cb1938a264c4a6ffdf7693d5c518428a98b90f88381d9c4c9eb4f7fd29f5a5",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "sha256": "913cbbc9419fc059e5ce1dcaeb7d06d6d90d6e9d3ef45195c15cd59ff0359bf3",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/architect/domainization/README.md",
+      "sha256": "bf4126c6b5fa6cc77d983800e778e669e0d8a664709df5ef8e89b2f73c013de0",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "sha256": "9a78209b05b2780633e232c529e3be9b55157e56a20802f8e4b7a3e33e776532",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "sha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/parallel-decomposition-and-merge.md",
+      "sha256": "ff64302e08910767ca3d5077c2ae9de767fcae93ed04349f97291638ea1e9ad3",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/explanation/citation-baseline-cleanup-calibration-slice.md",
+      "sha256": "412f376096ecf490e19dc8eef685e18181a4aa35162e0095030bd159e769a94b",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md",
+      "sha256": "d37229fa17df43f9c92e446413478c8c65c8e344f2f353f0d69c58e47eda7bc5",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/explanation/citation-drift-runner-md-cleanup.md",
+      "sha256": "77af26bebee60e5ace5ff9cb551565bf7e46233c6c5513a8908c71ad61cbee62",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/explanation/runtime-claim-doing-separation.md",
+      "sha256": "0c15425e509ef07dd4853f7e1a0a494b2a6f0efba9ce3535118d0cbbcb7b45c7",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/how-to/fix-bare-citation-findings.md",
+      "sha256": "11d8cb55ff745f5cce515eb3617327fd396b4e25a0adbddb682ebbc32caf9961",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+      "sha256": "ad742609be038caf09f1539018617985e8005b0108b89ebeced77b4e038b6f1d",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+      "sha256": "eeecd80731364b8e5798d5de7c1ecb8d9c893fa42b070003e498b394b68fc05e",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+      "sha256": "e552fb38bc9b1fbb415512b2ab0975703dfe8295621a89bb9a25e61efcda7144",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+      "sha256": "1fc6b5faad80b9e0b4eb164806999e711dd96511d54390aafbeb811c1a456e0d",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+      "sha256": "2bab2783bc48545322b04d82c43f26402b5a6f574475bbadcfd54bb14a9a569c",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md",
+      "sha256": "c2992e44ed10dfe403beedcb77001594c6863b82c8e841e6a58ae47d448ce0cb",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md",
+      "sha256": "c9a802661b09e00aa8b6eabdec333866f3f8c57c251c0677798394e674cc966c",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-answer-s-real-resume-behavior-is-statusatask-rather/why-fgos-answer-resumes-to-statusatask-not-always-todo.md",
+      "sha256": "2a1f3f7f0f747bb16f545835568f913e3941e2cb27c93cc658519a3123645a27",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+      "sha256": "108ec9e58c3f720454a6949aad1a687f28d507e504cb416bec1d571ee8f0ab02",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md",
+      "sha256": "cd6d69131eab5bcef9abb5a41bb1af1c432fb328932900525919295b3348cc78",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "sha256": "72223e1528842280083af278a8c3cf15db24ab1494f364dbb65d9bf94d70571a",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/platform/migration-authoring-rules.md",
+      "sha256": "7b7d5bd462e55d6ac9ee993bbbb12607e37c8de19cb004e9d8bd4b020c605163",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "sha256": "a8bb798b7a717c66a41427065d17c4ba261a81c42faf14d0e06895330ef5f68e",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "sha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/platform/work-state/spec.md",
+      "sha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/routing-handoff-contract.md",
+      "sha256": "535dd0f61113aab54dcc9637c9f19ef5eb409a21fe515feddbae239a33ec1e81",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/specs/fgos-plugin.md",
+      "sha256": "2e7632ffbcbaae5c7ba4e3c7d6e0a3e7fe888ee278b5bc0bf9039f3ff276b687",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/specs/herdr-web-dashboard.md",
+      "sha256": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "sha256": "252e6601a5de0df68be6bd559d636ea4d76528166a71b17bec8fa4ad8a7d2d8d",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/specs/system-overview.md",
+      "sha256": "214c64c60cc3b3d2dfaeb6550b2ebbe6c38a4c759104086d238e96223895c7a8",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/specs/work-state.md",
+      "sha256": "499ec68376dd202ea6c55b1c7db136cc1523605dc7c83bb9d964dded970eb3a8",
+      "equalToInputHead": true
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "sha256": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "equalToInputHead": true
+    },
+    {
+      "path": "dogfood-fixture/scenarios/expr-eval-chain.md",
+      "sha256": "ed0e24118278d77c1e00dd19ab4e99231fb220c4b961f52e2592efafd3004491",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/alias-table.json",
+      "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+      "sha256": "3b2dde55bded3b48408a741eb451bd59da94f66c830cb090fc1a831986a3479f",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/alias-table.pilot-b.json",
+      "sha256": "7ab04316f5dfa9995808afb4a94ba202da09ac41cfc1b314c7680597862ac8a6",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-05/pilot-b-link-rewrite-preview.md",
+      "sha256": "6a8b673609fc0eaed7729589fafcab1777e7842889fac2e2a7117c755d09e3d2",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-05/pilot-b-target-map.md",
+      "sha256": "298c5f6fac0dc34efdfe8078fbb4411c53f2c0455b7ff5f1f253593260d5a6e2",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
+      "sha256": "2fd4944f0003f38d5048d7d2a623792c6cabc8631a5e0e042f6707331660d1ef",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/preview-261014-2105-root-alias-consumer-edges.json",
+      "sha256": "7cea0c6c2a1a3ab4eb36acabb2bd8e0d4904e026bf7acf0f779b34d6fa3b4535",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-alias-05.md",
+      "sha256": "2259ee83ff480d513565d277cd29ce06033914bc6ccca1d27788c0d73c51479d",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "3e82400f58e60690d0b68a27416a08e8184541324f15fda29522d9d24f01e640",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "388cab579c6c1c23e3d31b50345f04c2fb60517f5f9daec69d2631e19bf6afc9",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
+      "sha256": "76edb32ec6280453e15b5123664910e0f717bf983cac0674249167b328776882",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "sha256": "0316e2674d2fb4075e41b2d804e5a5ce7c3db681fb256988ef1c917169a02db8",
+      "equalToInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/transitional-switchboard.json",
+      "sha256": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+      "equalToInputHead": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "sha256": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8",
+      "equalToInputHead": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "sha256": "74097c9864d1c74e840b0deced0645ed4dc249d0e9923fee9f3d379358f9c38a",
+      "equalToInputHead": true
+    },
+    {
+      "path": "scripts/doc-link-pass.mjs",
+      "sha256": "90c4821cac2f9e9e5a039cfa42af6ac896dd0acc38d8a8374c9e0c96af302555",
+      "equalToInputHead": true
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "sha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "equalToInputHead": true
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "equalToInputHead": true
+    },
+    {
+      "path": "scripts/list-doc-anchors.mjs",
+      "sha256": "6dd1711a91a22f5359b827473bc21e1b8acf0d72fb95d3ec28358d0ba4140c80",
+      "equalToInputHead": true
+    },
+    {
+      "path": "test/docs/decisions-corpus-retired.test.mjs",
+      "sha256": "ff5471f688362574fd5a9b9e8fc15a6237beabfd7277289751211fe25aaf2284",
+      "equalToInputHead": true
+    },
+    {
+      "path": "test/scripts/check-decision-citation-drift.test.mjs",
+      "sha256": "a4be4b03c9a073c3658409d4b5fe6f01408f89cad87560b888799a522bae324f",
+      "equalToInputHead": true
+    },
+    {
+      "path": "test/scripts/check-doc-candidate-status.test.mjs",
+      "sha256": "e8a6498e7f68f1e2068e8f0d41741340916d7f6296fb90bf6e34427e7e06a91b",
+      "equalToInputHead": true
+    },
+    {
+      "path": "test/scripts/check-doc-conservation.test.mjs",
+      "sha256": "bf697f710b586c9e74d5e4a67a17ae4d3de95fdaaaab683efe4a89ea05d00d22",
+      "equalToInputHead": true
+    },
+    {
+      "path": "test/scripts/check-doc-constitution.test.mjs",
+      "sha256": "8a8ee46f147829962f637dadcd068564548908e6f1d4c09af07e902ee36ddf8f",
+      "equalToInputHead": true
+    },
+    {
+      "path": "test/scripts/doc-link-pass.test.mjs",
+      "sha256": "479cc0c5b5ecaf27bafbf81a056cd3035e0fbaa8c8b61a33b7aefa23342de437",
+      "equalToInputHead": true
+    }
+  ],
+  "limits": [
+    "No consumer edits; all 47 dispositions pending independent review.",
+    "No full npm suite or heavy job; no runtime/CLI/state/native/global operations.",
+    "Post-author committed-pair accounting requires separate Lead-dispatched manifest-only Unit with actual runner commit id (L12-11). No accounting or clean committed-byte batch-end acceptance claimed.",
+    "Scratch helpers only in /tmp/fgos-work; portable replay commands in review request reproduce the meaningful checks without those helpers."
+  ],
+  "reviewRequest": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-01-pilot-b-review-request.md",
+    "bytes": 10207,
+    "sha256": "b5844c7008567fbbf18b7dc620fa9166d5943aa58bb86c142ba853862348dffe",
+    "logicalParts": 1,
+    "entries": 47,
+    "reviewStatus": "pending-Lead-dispatch"
+  },
+  "portableReplay": {
+    "command": "First shell block embedded verbatim in step-01-pilot-b-review-request.md",
+    "exit": 0,
+    "stdout": "{\"joins\":47,\"counts\":{\"rewrite\":2,\"cutover-patch-only\":19,\"preserve\":24,\"parked\":2},\"anchors\":\"all supplied anchors exist\",\"protectedPins\":61}",
+    "note": "Initial replay hit Node default 1 MiB execFileSync output limit while hashing large existing Phase 6 input. Request now uses bounded 64 MiB buffers; corrected embedded command passed. No production change."
+  }
+}
