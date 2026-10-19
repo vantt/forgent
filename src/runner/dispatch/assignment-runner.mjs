@@ -98,7 +98,7 @@ import {
   writeSettleContext,
 } from '../../run-supervisor/direct-launch.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
-import { register as registerDeliveredAttempt, unregister as unregisterDeliveredAttempt } from '../../run-supervisor/cancel-registry.mjs';
+import { register as registerDeliveredAttempt, unregister as unregisterDeliveredAttempt, beginLaunch as beginAttemptLaunch, endLaunch as endAttemptLaunch } from '../../run-supervisor/cancel-registry.mjs';
 import { watchWritesOutsideWorkspace } from './stray-writes.mjs';
 import { resolveLock } from '../../holder-lock/index.mjs';
 import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, DEFAULT_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
@@ -2479,15 +2479,20 @@ export async function executeAssignment(assignment, opts = {}) {
       // outcome, only the attempt copy closes here; the controller keeps cwd custody.
       let bound;
       let supervisor;
+      const attemptRunDir = path.resolve(runDir);
+      // A Ctrl-C from here until the binding is known waits for the binding and then cancels the
+      // attempt; one that came earlier refuses the launch (cancel-registry.mjs).
+      beginAttemptLaunch(attemptRunDir);
       try {
         supervisor = startSupervisor({ envelope: attemptEnvelope, locks: attemptLocks, stepEnv: attemptStepEnv, extraEnv: terminalPrep?.endpointEnv });
         attemptHandedOver = true;
         if (process.platform === 'win32') attemptLocks.releaseAttempt();
-        bound = await waitForBinding(path.resolve(runDir), supervisor.child);
+        bound = await waitForBinding(attemptRunDir, supervisor.child);
+        if (bound.state === 'bound') registerDeliveredAttempt(attemptRunDir);
       } finally {
         attemptLocks.releaseAttempt();
+        endAttemptLaunch(attemptRunDir);
       }
-      const attemptRunDir = path.resolve(runDir);
       if (bound.state !== 'bound') {
         // The supervisor may have finished the attempt (or refused it) in the same breath: adopt
         // judges what is on disk. Without a settled answer the launch is unknown, never "not started".
@@ -2510,11 +2515,12 @@ export async function executeAssignment(assignment, opts = {}) {
       // result.json that the settle step writes after the receipt.
       // A terminal attempt writes no capture files; what a person watching this controller sees is the
       // pane's screen, read only to show it (nothing here decides anything from it).
-      const stopScreen = terminalPrep ? followPaneScreen({ tc: terminalPrep.tc, key: terminalPrep.slot.key, onChunk: opts.onChunk }) : null;
+      let stopScreen = null;
       let settledResult;
-      // From the binding until the answer is read, a Ctrl-C of this controller asks the supervisor to cancel.
-      registerDeliveredAttempt(attemptRunDir);
+      // From the binding until the answer is read, a Ctrl-C of this controller asks the supervisor to cancel
+      // (registered with the binding above).
       try {
+        stopScreen = terminalPrep ? followPaneScreen({ tc: terminalPrep.tc, key: terminalPrep.slot.key, onChunk: opts.onChunk }) : null;
         settledResult = await awaitSettledResult({
           runDir: attemptRunDir,
           runId,

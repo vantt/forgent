@@ -11,6 +11,7 @@ import { runUnit, recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detect
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
+import { installCancelOnSignal, resetCancelRequest } from '../../../src/run-supervisor/cancel-registry.mjs';
 
 // posture filtering consults the machine backend registry; keep it file-local
 seedFileLocalBwrapRegistry();
@@ -1940,4 +1941,63 @@ test('a solo run needs no verify and does not claim to have skipped one', async 
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-solo-no-verify', pattern: 'solo' }, 'solo');
   assert.equal(res.outcome, 'pass');
   assert.equal(res.verify, undefined);
+});
+
+// A signal handled the way the CLI does it, with a stand-in exit so the test process survives.
+async function withCancelHandlers(fn) {
+  const exits = [];
+  const uninstall = installCancelOnSignal({ cancelWaitMs: 1000, exit: (code) => exits.push(code), stderr: { write() {} } });
+  try { await fn(exits); } finally { uninstall(); resetCancelRequest(); }
+}
+
+test('a signal that lands while the unit is set up stops it before any seat starts and leaves the run resumable', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  const unitData = { id: 'cancelled-midway', capability: 'not-configured:answer', objective: 'Answer question', writes: [] };
+  await withCancelHandlers(async () => {
+    await assert.rejects(
+      runUnit({ unitData, repoRoot, cwd: worktreeDir, onUnitRunCreated: () => { process.emit('SIGINT'); } }),
+      { name: 'RunCancelledError', code: 'run-cancelled' },
+    );
+    const assignments = path.join(repoRoot, '.fgos', 'assignments');
+    const [unitRunId] = fs.readdirSync(assignments);
+    const record = JSON.parse(fs.readFileSync(path.join(assignments, unitRunId, 'unit.json'), 'utf8'));
+    assert.equal(record.settlement, undefined, 'a cancel is not a failed settlement');
+    assert.deepEqual(record.execution, { status: 'running' });
+    assert.equal(fs.existsSync(path.join(assignments, unitRunId, 'unit-summary.json')), false);
+    assert.deepEqual(record.bindings ?? {}, {}, 'no seat was bound');
+  });
+});
+
+test('after a signal a new unit is refused before anything is created', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  await withCancelHandlers(async (exits) => {
+    process.emit('SIGTERM');
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    assert.deepEqual(exits, [143]);
+    await assert.rejects(
+      runUnit({ unitData: { id: 'late', capability: 'not-configured:answer', objective: 'x', writes: [] }, repoRoot, cwd: worktreeDir }),
+      { code: 'run-cancelled', signal: 'SIGTERM' },
+    );
+    assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'assignments')), false);
+  });
+});
+
+test('an in-process caller keeps its own signal handling: runUnit installs no SIGINT or SIGTERM handler unless the process asked', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  const counts = () => [process.listenerCount('SIGINT'), process.listenerCount('SIGTERM')];
+  const before = counts();
+  let during = null;
+  const res = await runUnit({
+    unitData: { id: 'own-handlers', capability: 'not-configured:answer', objective: 'x', writes: [] },
+    repoRoot, cwd: worktreeDir, onUnitRunCreated: () => { during = counts(); },
+  });
+  assert.equal(res.outcome, 'policy-refusal');
+  assert.deepEqual(during, before);
+  assert.deepEqual(counts(), before);
 });
