@@ -150,6 +150,38 @@ Worktree WAL kinds bind canonical paths and registration names; move/remove addi
 
 `fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]` is available now under the owner's plan Q2 answer of 2026-10-18. Without a branch it creates a detached checkout. Base accepts a full OID, HEAD or a literal branch/tag/remote ref. Other production Worktree callers migrate together in phase 07. `git-worktree-recovery` reads raw admin entries (including partial entries omitted by Git listing), dirty/stale checkouts and pending Worktree WAL records without repairing; phase 04 adds its producing-custody row to this same diagnostic.
 
+### Dormant Recovery and GitHub adapter contract (phase 06 unit 9)
+
+`createGitRecovery(options)` exposes `inspectOperation({operationId})`,
+`listPending({bound?})`, and `reconcile({operationId}, held?)`. Inspection
+returns the request digest, payload kind, terminal state and retained intent;
+compacted operations return their retained request digest and terminal outcome.
+Pending scans return `{operations, complete}`; corruption refuses by operation
+id rather than silently omitting evidence. Unsupported payload variants refuse
+with their variant name through WAL decoding. Reconciliation delegates to the
+owning port and returns its Rust result (a receipt for Land/Publication, an
+outcome for ref/transfer/ScopedCommit, the existing result for Restore/Sync,
+and inspection after Worktree repair). A compacted operation returns its
+terminal WAL outcome without introducing any new effect. Recovery holds are
+released before returning to consumer settlement; no consumer state is written.
+
+**Completion blocked:** ConfigChange reconciliation currently refuses with
+`recovery-config-lock-order-unavailable`. Both `repo-config` and `recovery` are
+registered at rank 80, while Holder-lock requires strictly increasing ranks.
+The required resource-then-recovery order cannot be implemented by dropping
+resource authority or opening an unseeded second scope. The shared lock
+contract must settle this conflict before this port is complete. The full
+interrupted-operation matrix is not yet acceptance evidence. Production
+callers remain for phase 07.
+
+GitHub API merge stays in the GitHub adapter under **consumer authorization**;
+Git ports do not grant approval or perform API merges. A merge timeout is
+**outcome-unknown until queried**, including the adapter's existing
+`blocked` transport result: it does not prove the server declined the merge.
+The consumer queries PR state/merge commit before considering another request.
+Any local mutation the adapter needs must go through the typed Git ports.
+Phase 06 adds the contract and test only; it does not move adapter code.
+
 ## 4. Publication port: refs/fgos/*
 
 Event Store's crate-internal driver (event-store spec §3/§20) moves behind this port **without a protocol change**. Node reaches publication through the **combined N-API addon** (below) with **no exception** to the exec guard under the `state` lock. Git is forbidden under state 60. Event Store bounded append/read inside state remains its own in-process/open-log path; no DAG walk or Git call there.
@@ -432,7 +464,7 @@ The digest-verified snapshot at `<common-dir>/fgos/git/restore-snapshots/<digest
 
 Reapplication preserves staged/worktree separation. To refuse offset/fuzz guesses, any locally modified path whose content also changed at the destination refuses before the attempt with `restore-overlapping-content` (under `restore-reapply-required`). Incoming executable-bit changes survive local content edits, retaining local non-executable permission bits; a competing local executable-bit change refuses with `restore-local-mode-conflict`. Reapply failure after the attempt retains the original snapshot and requires observation. Recovery never repeats reset or reapply. Pre-attempt chains close abandoned; exact recorded post-state may close `effectObservedOnly`; mixed/old/third-party state closes `recoveryRequired` with evidence retained. An unreadable original or post snapshot closes the active chain with its exact `restore-snapshot-unreadable` cause and `closed-with-evidence-retained`; it leaves damaged files untouched and permits a fresh fully checked operation. Native lock residue remains a named refusal.
 
-Retention is **caller-acknowledgement bounded**: callers must recover/extract needed bytes and call `acknowledge({operationId}, held?)` on terminal operations. Before acknowledgement, snapshot bytes and full WAL remain available without a time limit, including uncertain/corrupt evidence. `listSnapshot({operationId}, held?)` lists original snapshot entries (clean paths are reconstructed from the expected commit); `extractPath({operationId, path, destination}, held?)` writes one retained file's bytes, or a symlink's literal target bytes, into a caller-given existing directory outside the repository. It uses the original basename, refuses overwrite, and creates regular files with private permissions. Absent entries have no extractable bytes. Both use the existing Restore authority/custody checks. Acknowledgement durably records `restore-acknowledged`, releases the operation's original/post snapshots only when no unacknowledged retained chain references them, then compacts through the normal terminal receipt ledger. An interrupted byte cleanup can be retried while its complete WAL binding is still present. On snapshot storage, valid unreferenced digest snapshots and recognized durable-write temporary files older than seven days are removed (the orphan retention rule); referenced, corrupt and unknown artifacts are never aged out or recursively deleted. After acknowledgement, extraction/replay requires a new operation id; acknowledgement authorizes releasing bytes. Callers must not acknowledge valuable evidence before extraction. Production migration remains phase 07; the general Recovery port remains later work. Impact-analysis: inactive on the implementation machine.
+Retention is **caller-acknowledgement bounded**: callers must recover/extract needed bytes and call `acknowledge({operationId}, held?)` on terminal operations. Before acknowledgement, snapshot bytes and full WAL remain available without a time limit, including uncertain/corrupt evidence. `listSnapshot({operationId}, held?)` lists original snapshot entries (clean paths are not listed; read them from `expectedHead`); `extractPath({operationId, path, destination}, held?)` writes one retained file's bytes, or a symlink's literal target bytes, into a caller-given existing directory outside the repository. It uses the original basename, refuses overwrite, and creates regular files with private permissions. Absent entries have no extractable bytes. Both use the existing Restore authority/custody checks. Acknowledgement durably records `restore-acknowledged`, releases the operation's original/post snapshots only when no unacknowledged retained chain references them, then compacts through the normal terminal receipt ledger. An interrupted byte cleanup can be retried while its complete WAL binding is still present. On snapshot storage, valid unreferenced digest snapshots and recognized durable-write temporary files older than seven days are removed (the orphan retention rule); referenced, corrupt and unknown artifacts are never aged out or recursively deleted. After acknowledgement, extraction/replay requires a new operation id; acknowledgement authorizes releasing bytes. Callers must not acknowledge valuable evidence before extraction. Production migration remains phase 07; the general Recovery port is partially implemented with the rank-80 ConfigChange blocker described above. Impact-analysis: inactive on the implementation machine.
 
 
 2026-10-20 (phase 06 unit 8, dormant): `createGitNativeLockRepair(...).repairNativeIndexLock({operationId}, held?)` uses the existing checkout authority (main 50 or the exact linked producer custody loan). It returns `absent`, `quarantined`, `ownerLiveOrUnknown` or `inspectedRepairRequired`, with the inspected device/inode/state digest when readable. Only `NativeLockOwned` evidence already recorded in that operation's WAL authorizes quarantine. The Rust producer recorder requires the operation-owned open descriptor and the live child's full process tuple; discovering a path never grants ownership, and Node has no ownership-assertion entry point. Repair proves death through the shared process-facts judge, checks exact inode and state again immediately before rename, and syncs the preserved bytes and quarantine directories. Unknown, unreadable, substituted and live artifacts stay intact. Existing records without ownership evidence remain inspection-only. Land, ScopedCommit, Sync and SafeRestore index-lock refusals name this door; repair clears only the native artifact and the caller then resumes the original observe-only recovery.

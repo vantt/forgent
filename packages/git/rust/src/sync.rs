@@ -321,7 +321,8 @@ impl GitDriver {
     ) -> Result<SyncResult> {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
-        let scope = scope(repo, held)?;
+        let mut scope = scope(repo, held)?;
+        crate::recovery::leaf(&mut scope, repo)?;
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
         self.continue_sync_scoped(repo, &scope, &wal, writer, id, false)
     }

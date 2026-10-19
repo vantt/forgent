@@ -228,3 +228,16 @@ fn exact_old_guard_rechecks_after_target_attempt_before_the_effect() {
     );
     assert!(!f.main.join(".git/config.lock").exists());
 }
+
+#[test]
+fn unified_recovery_refuses_conflicting_rank_eighty_contract_without_dropping_authority() {
+    let f = Fixture::new();
+    let path = f.main.join(".githooks");
+    f.driver.ensure_hooks(&f.repo, &path, "config-ranks").unwrap();
+    assert_eq!(f.driver.inspect_operation(&f.repo,"config-ranks").unwrap()["kind"], "ConfigChange");
+    let before = fs::read(f.main.join(".git/config")).unwrap();
+    let error = f.driver.reconcile_operation(&f.repo,vec![],"fixture","config-ranks",None).unwrap_err();
+    assert!(error.cause.contains("recovery-config-lock-order-unavailable"));
+    assert_eq!(fs::read(f.main.join(".git/config")).unwrap(),before);
+    assert_eq!(f.driver.recover_hooks_config(&f.repo,"config-ranks").unwrap().status,"owned");
+}

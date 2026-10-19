@@ -192,6 +192,7 @@ pub struct GitDriver {
     config_sources: Mutex<BTreeMap<ConfigEnvironment, Vec<PathBuf>>>,
 }
 impl GitDriver {
+    pub(crate) fn state_root(&self) -> &Path { &self.state_root }
     /// Setup-only repair. Canonicalizes the root; hooks use a no-follow descriptor.
     /// Existing unrelated roots and foreign owners are never chmodded.
     pub fn prepare_directories(state_root: &Path) -> Result<bool> {

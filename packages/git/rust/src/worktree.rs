@@ -1321,7 +1321,8 @@ impl GitDriver {
         if held.iter().any(|h| h.as_ref().name() == "dispatch-cwd") {
             return Err(failure("worktree-repair-custody-not-allowed"));
         }
-        let scope = self.worktree_scope(repo, held)?;
+        let mut scope = self.worktree_scope(repo, held)?;
+        crate::recovery::leaf(&mut scope, repo)?;
         self.repair_worktree_locked(repo, &scope, id)
     }
     fn repair_worktree_locked(

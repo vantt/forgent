@@ -194,7 +194,7 @@ impl GitDriver {
         push: bool,
         filesystem: &F,
     ) -> Result<Receipt> {
-        let scope = self.remote_scope(held)?;
+        let scope = crate::refs::acquire_worktree_admin(repo, held)?;
         if writer.is_empty() || mappings.is_empty() || mappings.len() > 256 {
             return Err(failure("invalid-remote-mappings"));
         }
@@ -620,6 +620,27 @@ pub(crate) fn url_has_credentials_or_controls(url: &str) -> bool {
     match authority.rsplit_once('@') {
         None => false,
         Some((user, _)) => scheme != "ssh" || user.is_empty() || user.contains([':', '%', '@']),
+    }
+}
+
+
+impl GitDriver {
+    /// A transport timeout stays unknown: observation never repeats the request.
+    pub fn recover_transfer(&self, repo: &RepoHandle, held: Vec<BorrowedHandle<'_>>, writer: &str, id: &str) -> Result<Outcome> {
+        let mut scope = crate::refs::acquire_worktree_admin(repo, held)?;
+        crate::recovery::leaf(&mut scope, repo)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
+        let chain = wal.inspect(id).map_err(failure)?;
+        if !matches!(chain.intent().kind, OperationKind::RemoteFetch {..} | OperationKind::RemotePush {..}) { return Err(failure("not-remote-transfer-operation")); }
+        if chain.intent().writer_identity != writer || chain.intent().repo_identity != wal.repository_identity() { return Err(failure("remote-authority-mismatch")); }
+        if let Some(o) = chain.outcome() { return Ok(o.clone()); }
+        let attempted = chain.records().iter().any(|r| matches!(r.phase, Phase::TargetAttempt {..}));
+        let outcome = if !attempted { Outcome::AbandonedBeforeAttempt } else {
+            let observations = chain.intent().resource_set.iter().map(|n| Ok((n.clone(), tip(&direct(self,repo,&RefName::parse(n).map_err(failure)?)?)))).collect::<Result<Vec<_>>>()?;
+            Outcome::Transfer {acknowledged:false,unknown:true,observations,details:vec!["outcome-unknown; query remote before any new request".into()]}
+        };
+        wal.append(&chain,Phase::Outcome(outcome.clone())).map_err(failure)?;
+        Ok(outcome)
     }
 }
 

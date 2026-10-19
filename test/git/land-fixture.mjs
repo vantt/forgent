@@ -15,7 +15,8 @@ export function fixture() {
   fs.writeFileSync(path.join(repo, 'a'), 'base\n'); fs.writeFileSync(path.join(repo, 'b'), 'base\n'); git('add', '.'); git('commit', '-qm', 'base'); const target = git('rev-parse', 'HEAD');
   git('checkout', '-qb', 'source'); fs.writeFileSync(path.join(repo, 'a'), 'incoming\n'); git('commit', '-qam', 'source'); const source = git('rev-parse', 'HEAD'); git('checkout', '-q', 'trunk');
   const fence = path.join(repo, '.fgos/locks/activation.lock'); fs.mkdirSync(fence, { recursive: true }); fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
-  const options = { stateRoot: temp, repoPath: repo, trustedMain: repo, writer: 'fixture' };
+  const state = path.join(temp, "state"); fs.mkdirSync(state, { mode: 0o700 });
+  const options = { stateRoot: state, repoPath: repo, trustedMain: repo, writer: 'fixture' };
   const ports = [];
   const port = () => { const p = createGitLand(options, loader); ports.push(p); return p; };
   return { temp, repo, git, port, options, loader, request: { source, target, destination: 'refs/heads/trunk', message: 'consumer land', squash: false, footprint: [], subtree: null, files: [] }, close() { for (const p of ports) p.close(); fs.rmSync(temp, { recursive: true, force: true }); } };

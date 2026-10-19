@@ -225,7 +225,24 @@ impl GitDriver {
             }
         }
         for p in &collision_paths {
-            if !tracked.contains(p) && !request.allowed_replacements.contains(p) {
+            // A case-only alias is tracked only when it names the same index
+            // entry on disk. Case folding alone would admit a distinct file on
+            // case-sensitive filesystems (or an untracked hard link).
+            let tracked_alias = tracked.iter().any(|indexed| {
+                #[cfg(unix)]
+                {
+                    use std::os::unix::fs::MetadataExt;
+                    match (fs::symlink_metadata(root.join(indexed)), fs::symlink_metadata(root.join(p))) {
+                        (Ok(a), Ok(b)) => a.dev() == b.dev() && a.ino() == b.ino()
+                            && fs::read_dir(root.join(Path::new(p).parent().unwrap_or(Path::new(""))))
+                                .is_ok_and(|mut entries| !entries.any(|e| e.is_ok_and(|e| e.file_name() == Path::new(p).file_name().unwrap_or_default()))),
+                        _ => false,
+                    }
+                }
+                #[cfg(not(unix))]
+                { false }
+            });
+            if !tracked.contains(p) && !tracked_alias && !request.allowed_replacements.contains(p) {
                 return Err(failure(format!("restore-untracked-target-collision: {p}; list in allowedReplacements to replace")));
             }
         }
@@ -697,30 +714,58 @@ impl GitDriver {
         if !fs::symlink_metadata(destination).map_err(failure)?.is_dir() {
             return Err(failure("restore-extract-directory-required"));
         }
+        #[cfg(unix)]
+        let extraction_directory = {
+            use std::os::unix::fs::OpenOptionsExt;
+            fs::OpenOptions::new().read(true)
+                .custom_flags(libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC)
+                .open(destination).map_err(failure)?
+        };
         let destination = destination.canonicalize().map_err(failure)?;
         if destination.starts_with(checkout::root(&repo)?)
             || destination.starts_with(repo.trusted_main_root())
             || destination.starts_with(repo.common_dir())
+            || destination.starts_with(self.state_root())
         {
             return Err(failure("restore-extract-outside-repository-required"));
         }
-        let filename = Path::new(name)
-            .file_name()
-            .ok_or_else(|| failure("restore-extract-path"))?;
-        let mut options = fs::OpenOptions::new();
-        options.write(true).create_new(true);
+        let mut cursor = None;
+        loop {
+            let page = self.list_worktrees(&repo, cursor, 4096)?;
+            for row in page.entries {
+                let registered = Path::new(std::str::from_utf8(&row.path).map_err(failure)?);
+                if destination.starts_with(registered.canonicalize().map_err(failure)?) {
+                    return Err(failure("restore-extract-outside-repository-required"));
+                }
+            }
+            if page.complete { break; }
+            cursor = page.next_cursor;
+        }
+        let filename = Path::new(name).file_name().ok_or_else(|| failure("restore-extract-path"))?;
         #[cfg(unix)]
         {
-            use std::os::unix::fs::OpenOptionsExt;
-            options.mode(0o600);
+            use std::{ffi::CString, os::{fd::{AsRawFd, FromRawFd}, unix::{ffi::OsStrExt, fs::MetadataExt}}};
+            let checked = fs::metadata(&destination).map_err(failure)?;
+            let dir = extraction_directory;
+            // Bind the checked canonical directory to its held descriptor before
+            // creation. A parent rename after this point cannot redirect openat.
+            let held = dir.metadata().map_err(failure)?;
+            if held.dev() != checked.dev() || held.ino() != checked.ino() {
+                return Err(failure("restore-extract-directory-changed"));
+            }
+            let filename = CString::new(filename.as_bytes()).map_err(failure)?;
+            // SAFETY: dir is held, filename is a single validated basename;
+            // successful openat transfers ownership to File exactly once.
+            let fd = unsafe { libc::openat(dir.as_raw_fd(), filename.as_ptr(),
+                libc::O_WRONLY | libc::O_CREAT | libc::O_EXCL | libc::O_NOFOLLOW | libc::O_CLOEXEC, 0o600) };
+            if fd < 0 { return Err(failure(std::io::Error::last_os_error())); }
+            let mut output = unsafe { fs::File::from_raw_fd(fd) };
+            output.write_all(&bytes).map_err(failure)?;
+            output.sync_all().map_err(failure)?;
+            dir.sync_all().map_err(failure)?;
         }
-        let mut output = options.open(destination.join(filename)).map_err(failure)?;
-        output.write_all(&bytes).map_err(failure)?;
-        output.sync_all().map_err(failure)?;
-        fs::File::open(destination)
-            .map_err(failure)?
-            .sync_all()
-            .map_err(failure)?;
+        #[cfg(not(unix))]
+        return Err(failure("restore-extract-platform-unsupported"));
         Ok(())
     }
     fn restore_evidence_authority<'a>(
@@ -809,7 +854,8 @@ impl GitDriver {
         id: &str,
     ) -> Result<RestoreResult> {
         let repo = self.checkout_repository(repo)?;
-        let scope = checkout::scope(&repo, held)?;
+        let mut scope = checkout::scope(&repo, held)?;
+        crate::recovery::leaf(&mut scope, &repo)?;
         let wal = Wal::open(&repo).map_err(failure)?;
         if wal.compacted(id).map_err(failure)?.is_some() {
             return Err(failure("restore-already-acknowledged"));

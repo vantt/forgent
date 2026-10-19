@@ -479,7 +479,8 @@ impl GitDriver {
     ) -> Result<Outcome> {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
-        let scope = scope(repo, held)?;
+        let mut scope = scope(repo, held)?;
+        crate::recovery::leaf(&mut scope, repo)?;
         let wal = Wal::open(repo).map_err(failure)?;
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
             let intent = Intent {

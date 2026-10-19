@@ -869,6 +869,8 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
 
     /// Observe/recover this id; an attempted CAS is never reissued.
     pub fn recover(&self, repo: &RepoHandle, id: &str) -> Result<Receipt> {
+        let mut recovery_scope = fgos_holder_lock::LockScope::seeded(vec![fgos_holder_lock::BorrowedHandle::new(self.authority.handle).map_err(crate::refs::failure)?]).map_err(crate::refs::failure)?;
+        crate::recovery::leaf(&mut recovery_scope, repo)?;
         let wal = self.wal(repo)?;
         if let Some(c) = wal.compacted(id).map_err(werr)? {
             if c.v == 1 {

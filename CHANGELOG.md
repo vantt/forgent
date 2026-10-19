@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- SafeRestore extraction refuses sibling worktrees and the state root, binds creation to a directory descriptor, and recognizes tracked case-only aliases. Add a dormant partial Recovery facade (ConfigChange remains blocked by the shared rank-80 lock contract), a GitHub timeout/query contract test, and paired typed-operation E3 budget rows.
+
 - Git adds dormant native index-lock inspection/quarantine and owned hooks configuration APIs, with exact inode/value guards and WAL recovery; existing setup and mutation callers remain on their current paths.
 
 - Git Land can recover an observed candidate after later destination commits without touching checkout/index; unrelated main merge/bisect state no longer blocks prepare/publish or terminal receipt replay.

@@ -3,6 +3,7 @@
 //! Publication uses caller-held opaque holder-lock authority, hardened borrowed
 //! children and a file WAL. There is no public raw-argv escape hatch.
 mod driver;
+mod recovery;
 mod restore;
 pub use restore::{RestoreRequest, RestorePreview, RestoreResult};
 mod land;

@@ -1007,3 +1007,42 @@ pub(crate) fn branch_in_use(
     }
     Ok(in_use)
 }
+
+impl GitDriver {
+    /// Observe one interrupted ref mutation; never repeat its CAS or checkout.
+    pub fn recover_ref_operation(&self, repo: &RepoHandle, held: Vec<BorrowedHandle<'_>>, writer: &str, id: &str) -> Result<Outcome> {
+        let mut scope = acquire_worktree_admin(repo, held)?;
+        crate::recovery::leaf(&mut scope, repo)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
+        let chain = wal.inspect(id).map_err(failure)?;
+        let i = chain.intent();
+        if !matches!(i.kind, OperationKind::RefUpdate {..} | OperationKind::RefDelete) { return Err(failure("not-ref-operation")); }
+        if i.writer_identity != writer || i.repo_identity != wal.repository_identity()
+            || i.authority_binding != wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root())).map_err(failure)? {
+            return Err(failure("ref-authority-mismatch"));
+        }
+        if let Some(o) = chain.outcome() { return Ok(o.clone()); }
+        let attempted = chain.records().iter().any(|r| matches!(r.phase, Phase::TargetAttempt {..}));
+        let outcome = if !attempted { Outcome::AbandonedBeforeAttempt } else {
+            if let OperationKind::RefUpdate { worktree: Some(path) } = &i.kind {
+                let target = match self.resolve_repo(Path::new(path), repo.trusted_main_root())? {
+                    ResolveRepo::Repository(r) => r, _ => return Err(recovery("ref-checkout-missing")),
+                };
+                let custody = scope.handle("dispatch-cwd").ok_or_else(|| failure("checkout-custody-required"))?;
+                if custody.path() != custody_lock_path(repo,Path::new(path))? { return Err(failure("checkout-custody-mismatch")); }
+                if !self.status(&target,Untracked::All,None,1)?.entries.is_empty() {
+                    return Err(recovery("ref-checkout-recovery-required"));
+                }
+            }
+            if wal.native_lock_present(i).map_err(failure)? {
+                return Err(recovery("ref-checkout-or-native-state-recovery-required"));
+            }
+            let name = RefName::parse(&i.resource_set[0]).map_err(failure)?;
+            let observed = tip(&direct(self, repo, &name)?);
+            if observed == i.next { Outcome::Success { observed, attribution: wal::Attribution::EffectObservedOnly } }
+            else { return Err(recovery("ref-effect-unknown")); }
+        };
+        wal.append(&chain, Phase::Outcome(outcome.clone())).map_err(failure)?;
+        Ok(outcome)
+    }
+}

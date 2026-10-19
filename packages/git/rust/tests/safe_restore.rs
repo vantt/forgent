@@ -730,3 +730,52 @@ fn acknowledged_compaction_suffix_does_not_block_fresh_checkout_work() {
         .apply_restore(&f.repo, vec![], &fresh, "fixture", "after-ack-interrupt")
         .unwrap();
 }
+
+#[test]
+fn extraction_refuses_sibling_worktree_and_state_root() {
+    let f = Fixture::new();
+    dirty(&f);
+    f.driver.apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "extract-roots").unwrap();
+    let sibling = f.temp.join("sibling");
+    git(&f.main, &["worktree", "add", "--detach", sibling.to_str().unwrap()]);
+    for destination in [&sibling, &f.temp.join("state")] {
+        let err = f.driver.extract_restore_path(&f.repo, vec![], "fixture", "extract-roots", "b", destination).unwrap_err();
+        assert!(err.cause.contains("outside-repository"), "{}", err.cause);
+        assert!(!destination.join("b").exists() || destination == &sibling);
+    }
+    let destination = f.temp.join("safe-extraction");
+    fs::create_dir(&destination).unwrap();
+    f.driver.extract_restore_path(&f.repo, vec![], "fixture", "extract-roots", "b", &destination).unwrap();
+    assert_eq!(fs::read(destination.join("b")).unwrap(), b"working\0binary\xfe\n");
+}
+#[test]
+fn case_only_target_rename_preserves_index_identity() {
+    let f = Fixture::new();
+    fs::write(f.main.join("Readme"), "tracked").unwrap();
+    git(&f.main, &["add", "Readme"]); git(&f.main, &["commit", "-qm", "name"]);
+    let expected = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["mv", "Readme", "README"]); git(&f.main, &["commit", "-qm", "rename"]);
+    let target = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["reset", "--hard", &expected]);
+    let r = RestoreRequest { expected_head: expected, target, reason: "case rename".into(), reapply_local_delta: false, allowed_replacements: vec![] };
+    f.driver.apply_restore(&f.repo, vec![], &r, "fixture", "case-rename").unwrap();
+    assert_eq!(fs::read(f.main.join("README")).unwrap(), b"tracked");
+}
+
+#[test]
+fn case_sensitive_untracked_hardlink_is_not_an_index_alias() {
+    let f = Fixture::new();
+    fs::write(f.main.join("Readme"), "tracked").unwrap();
+    git(&f.main, &["add", "Readme"]); git(&f.main, &["commit", "-qm", "name"]);
+    let expected = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["mv", "Readme", "README"]); git(&f.main, &["commit", "-qm", "rename"]);
+    let target = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["reset", "--hard", &expected]);
+    // This assertion applies only where the two spellings are distinct names.
+    if !f.main.join("README").exists() {
+        fs::hard_link(f.main.join("Readme"), f.main.join("README")).unwrap();
+        let r = RestoreRequest { expected_head: expected, target, reason: "hardlink collision".into(), reapply_local_delta: false, allowed_replacements: vec![] };
+        let error = f.driver.preview_restore(&f.repo,vec![],&r).unwrap_err();
+        assert!(error.cause.contains("untracked-target-collision"));
+    }
+}

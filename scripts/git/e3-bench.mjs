@@ -206,13 +206,92 @@ async function scopedCensusWorker(args) {
   } finally { claim.handle.release(); }
 }
 
+// Paired fresh fixtures keep the legacy and typed writers on identical bytes,
+// branch topology, disk and custody. Fixture setup is outside every sample.
+async function typedOperationRows(root, state, index, loader, samples) {
+  const { acquireSync, createLockScope } = await import('../../src/holder-lock/index.mjs');
+  const { commitUnitWork } = await import('../../src/runner/execution/commit-unit-work.mjs');
+  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const make = label => {
+    const repo = path.join(root, label); git(['init', '-q', '--initial-branch=trunk', repo]);
+    git(['-C', repo, 'config', 'user.name', IDENTITY.name]); git(['-C', repo, 'config', 'user.email', IDENTITY.email]);
+    fs.writeFileSync(path.join(repo, 'payload'), 'base\n'); git(['-C', repo, 'add', 'payload']); git(['-C', repo, 'commit', '-qm', 'base']);
+    prepareRepo(repo, path.join(repo, '.git'));
+    return repo;
+  };
+  const scoped = { legacy: [], port: [] }, land = { legacy: [], port: [] };
+  for (let i = 0; i < samples; i++) for (const mode of ['legacy', 'port']) {
+    const repo = make(`typed-commit-${mode}-${i}`), linked = `${repo}-linked`;
+    git(['-C', repo, 'worktree', 'add', '-qb', 'producer', linked]);
+    const claim = acquireSync(createLockScope(), 'dispatch-cwd', { fgosDir:path.join(repo,'.fgos'), cwd:linked });
+    if (claim.result !== 'acquired') throw new Error(`typed custody: ${claim.result}`);
+    try {
+      fs.writeFileSync(path.join(linked, 'payload'), 'producer\n');
+      let elapsed, out;
+      if (mode === 'legacy') [elapsed, out] = time(() => commitUnitWork({ worktree:linked, repoRoot:repo, custody:claim.handle, unitId:`e3-${i}`, summary:'E3 commit', scope:['payload'] }));
+      else {
+        const port = index.createGitScopedCommit({stateRoot:state,repoPath:linked,trustedMain:repo,writer:WRITER},loader);
+        // Preflight precedes producer edits in the real consumer flow.
+        fs.writeFileSync(path.join(linked,'payload'),'base\n');
+        const [preMs, baseline] = time(() => port.preflight({},[claim.handle]));
+        fs.writeFileSync(path.join(linked,'payload'),'producer\n');
+        [elapsed,out] = time(() => port.commit({operationId:`e3-${i}`,baseline,request:{writes:['payload'],message:'E3 commit',cutoverGrant:null}},[claim.handle]));
+        elapsed += preMs;
+      }
+      if (out.status !== 'committed') throw new Error(JSON.stringify(out));
+      scoped[mode].push(elapsed);
+    } finally { claim.handle.release(); }
+    const main = make(`typed-land-${mode}-${i}`);
+    const target = git(['-C',main,'rev-parse','HEAD']);
+    git(['-C',main,'checkout','-qb','source']); fs.writeFileSync(path.join(main,'payload'),'producer\n'); git(['-C',main,'commit','-qam','producer']);
+    const source = git(['-C',main,'rev-parse','HEAD']); git(['-C',main,'checkout','-q','trunk']);
+    let elapsed;
+    if (mode === 'legacy') {
+      const start = performance.now();
+      // Identical already-verified source tree lets the existing merge path
+      // omit verify through its normal immutable-tree check.
+      const previousTmpdir = process.env.TMPDIR;
+      let out;
+      try {
+        // The existing merge path chooses os.tmpdir(): keep its candidate on
+        // the same fixture disk through the ordinary OS temp-directory input.
+        process.env.TMPDIR = root;
+        out = await mergeRootIntoMainCas(main,{id:`e3-${i}`,branchHeadAtReturn:source},'source',{ownFileSet:['payload']});
+      } finally {
+        if (previousTmpdir === undefined) delete process.env.TMPDIR;
+        else process.env.TMPDIR = previousTmpdir;
+      }
+      elapsed = performance.now() - start;
+      if (out.outcome !== 'merged') throw new Error(JSON.stringify(out));
+    } else {
+      const port = index.createGitLand({stateRoot:state,repoPath:main,trustedMain:main,writer:WRITER},loader);
+      try {
+        const [prepareMs,prepared] = time(() => port.prepare({operationId:`land-${i}`,request:{source,target,destination:'refs/heads/trunk',message:'E3 merge',squash:false,footprint:['payload'],subtree:null,files:[]}}));
+        const candidate = prepared.candidate;
+        if (!candidate) throw new Error("Land preparation returned no candidate");
+        const evidence = {source:candidate.source,target:candidate.target,candidate:candidate.candidate,treeDigest:candidate.treeDigest,evidenceDigest:'e3-verified-fixture'};
+        const [publishMs] = time(() => port.publish(evidence));
+        elapsed = prepareMs + publishMs;
+      } finally { port.close(); }
+    }
+    if (fs.readFileSync(path.join(main,'payload'),'utf8') !== 'producer\n') throw new Error('land checkout mismatch');
+    land[mode].push(elapsed);
+  }
+  const row = (runs, multiplier) => {
+    const legacy = stats(runs.legacy), port = stats(runs.port);
+    return {legacy,port,multiplier,p95Ratio:port.p95 / legacy.p95,passed:port.p95 <= multiplier * legacy.p95,fixture:'one tracked payload; fresh linked producer / source descendant; same filesystem',verifyExcluded:true};
+  };
+  return {scopedCommit:row(scoped,1.5),land:row(land,1.2)};
+}
+
 // ---- the experiment ------------------------------------------------------------
 
 function compileArtifacts() {
-  const env = { ...process.env, CARGO_TARGET_DIR: path.resolve(CHECKOUT, process.env.CARGO_TARGET_DIR || 'target') };
+  const env = { ...process.env };
+  const metadata = JSON.parse(execFileSync('cargo', ['metadata', '--format-version', '1', '--no-deps'], { cwd: CHECKOUT, env, encoding: 'utf8' }));
   execFileSync('cargo', ['build', '--release', '--locked', '-p', 'fgos-node-addon', '--lib', '--example', 'e3_fixture'], { cwd: CHECKOUT, env, stdio: 'inherit' });
   execFileSync('cargo', ['build', '--release', '--locked', '-p', 'fgctl', '-p', 'fgos'], { cwd: CHECKOUT, env, stdio: 'inherit' });
-  const release = path.join(env.CARGO_TARGET_DIR, 'release');
+  const release = path.join(metadata.target_directory, 'release');
   return { addon: path.join(release, 'libfgos_node_addon.so'), fixture: path.join(release, 'examples/e3_fixture'), fgctl: path.join(release, 'fgctl'), host: path.join(release, 'fgos') };
 }
 
@@ -258,6 +337,11 @@ async function run(args) {
   const say = (row, value) => { results.rows[row] = value; console.error(`${row}: ${JSON.stringify(value)}`); };
   const fixture = (...a) => JSON.parse(execFileSync(artifacts.fixture, a, { encoding: 'utf8', maxBuffer: 64 << 20 }));
   const state = privateDir(path.join(root, 'state'));
+
+  const typedLoader = await loaders(descriptor);
+  const typedRows = await typedOperationRows(root, state, typedLoader.index, typedLoader.loader, Number(args.typedSamples ?? 30));
+  say('scopedCommit', typedRows.scopedCommit);
+  say('land', typedRows.land);
 
   // Addon load and first call: one fresh process each.
   {

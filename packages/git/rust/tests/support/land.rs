@@ -61,7 +61,10 @@ impl Fixture {
             r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#,
         )
         .unwrap();
-        let driver = GitDriver::new(&temp).unwrap();
+        let state = temp.join("state");
+        fs::create_dir(&state).unwrap();
+        fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+        let driver = GitDriver::new(&state).unwrap();
         let repo = match driver.resolve_repo(&main, &main).unwrap() {
             ResolveRepo::Repository(r) => r,
             _ => panic!(),
