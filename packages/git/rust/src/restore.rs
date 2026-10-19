@@ -739,7 +739,7 @@ impl GitDriver {
                 let registered = Path::new(std::str::from_utf8(&row.path).map_err(failure)?);
                 let registered = match registered.canonicalize() {
                     Ok(path) => path,
-                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => registered.to_path_buf(),
                     Err(e) => return Err(failure(e)),
                 };
                 if destination.starts_with(registered) {

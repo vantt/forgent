@@ -487,7 +487,7 @@ The shared exact-owned quarantine path remains production for ConfigChange stagi
 
 Frozen fd-table attribution at fgOS's own kill door is deferred. Its explicit trigger is an observed **`killed-after-grace` with retained `index.lock` residue**. Only then consider freeze → observe exact writable descriptor inode → kill → post-death state verification. Spawn-time pid/start-time/absence evidence is not inode ownership and is not planned.
 
-`createGitRepositoryConfig(...)` provides `inspectHooks({ownedPath})`, `ensureHooks({ownedPath, operationId})`, `removeOwnedHooksConfig({ownedPath, operationId})` and `recover({operationId})`. Hooks paths must be absolute. A hooks slot is empty only when no file-backed config scope supplies core.hooksPath. Global/system/included values are preserved and reported as `skippedExisting` with missing fgOS enforcement. Ownership and exact-old removal checks use only the common local config file; removal reveals any inherited value. Custom/pre-existing unproven values return `skippedExisting`; inspection reports the configured path, successful WAL provenance and missing executable pre-commit enforcement. Ensure fills an empty slot; removal requires both successful owned provenance and the exact current owned value. Both use the **same config writer as ensureFetchMapping**, now admitted through LockScope repo-config 80: native `config.lock`, a private draft, full old-file plus stamp-validated exact-old-value checks immediately before replacement, WAL `ConfigChange`/Prepared/TargetAttempt/Outcome and read-back. The driver's command-line safety hooks override is excluded from stored hooks facts. Effect-free owned re-approval may use `configApproved` under §10 rule 4c. Optional hooks/staging evidence preserves historical ConfigChange digests. The writer records its exclusively-created staging inode and process tuple; after writer death the shared quarantine code preserves that exact staging artifact under repo-config 80. Recovery abandons pre-attempt changes or observes post-attempt values without replaying an effect. ConfigChange is available through the general Recovery port under repo-config 80 without the recovery leaf; production setup/doctor caller migration remains phase 07. Impact-analysis: inactive (no provider registered).
+`createGitRepositoryConfig(...)` provides `inspectHooks({ownedPath})`, `ensureHooks({ownedPath, operationId})`, `removeOwnedHooksConfig({ownedPath, operationId})` and `recover({operationId})`. Hooks paths must be absolute. A hooks slot is empty only when no file-backed config scope supplies core.hooksPath. Global/system/included values are preserved and reported as `skippedExisting` with missing fgOS enforcement. Ownership and exact-old removal checks require the exact repository-owned local config origin (`<common>/config`, or the repository’s own `config.worktree` when used), read with `--show-scope --show-origin`; included files remain user-owned even when Git labels their scope local. Read-only hooks inspection reports includes without granting checkout or transport trust; the existing mutation admission can still refuse `repository-config-untrusted: include.path` when removing a local value alongside an include. Removal reveals any inherited value. Custom/pre-existing unproven values return `skippedExisting`; inspection reports the configured path, successful WAL provenance and missing executable pre-commit enforcement. Ensure fills an empty slot; removal requires both successful owned provenance and the exact current owned value. Both use the **same config writer as ensureFetchMapping**, now admitted through LockScope repo-config 80: native `config.lock`, a private draft, full old-file plus stamp-validated exact-old-value checks immediately before replacement, WAL `ConfigChange`/Prepared/TargetAttempt/Outcome and read-back. The driver's command-line safety hooks override is excluded from stored hooks facts. Effect-free owned re-approval may use `configApproved` under §10 rule 4c. Optional hooks/staging evidence preserves historical ConfigChange digests. The writer records its exclusively-created staging inode and process tuple; after writer death the shared quarantine code preserves that exact staging artifact under repo-config 80. Recovery abandons pre-attempt changes or observes post-attempt values without replaying an effect. ConfigChange is available through the general Recovery port under repo-config 80 without the recovery leaf; production setup/doctor caller migration remains phase 07. Impact-analysis: inactive (no provider registered).
 
 
 Phase 06 unit 13 review facts: SafeRestore extraction skips non-existent/prunable
@@ -502,9 +502,7 @@ directory guard. A substituted inode is exchanged back while that guard still
 excludes ordinary Git lock creation. If the kernel/filesystem does not support
 exchange, quarantine retains the non-overwriting hard-link fallback: a foreign
 lock created during restoration is preserved and the substituted inode remains
-in quarantine, explicitly reported. If a crash leaves a directory guard at the
-native path, preserve it and the operation's quarantine evidence for inspection;
-never delete it by age. A replaced guard is also preserved and reported.
+in quarantine, explicitly reported. Before exchange, a synced `guard-<device>-<inode>` marker in the operation’s quarantine directory records the empty guard identity. After an interruption, repair itself removes only that exact empty native-path guard when the destination retains the recorded owned artifact inode, completing the move. It also retries an interruption before exchange. Replaced or nonempty guards remain preserved and reported; age never authorizes removal.
 
 ## 12. Distribution, setup and doctor
 
@@ -1211,3 +1209,19 @@ inode: a foreign Git can create index.lock after the absence check and before
 the stopped child resumes. No such residue may be adopted merely because the
 recorded child later died. Native repair callers must not be wired until both
 the spawn boundary and artifact attribution are established.
+
+### Cooperative termination host acceptance
+
+Real Git read-tree/index.lock cleanup tests live in the Git crate’s
+`borrow_deadline` suite; holder-lock retains generic cooperative/forced deadline
+coverage. Readiness budgets allow five seconds for the generic handler and eight
+seconds for Git’s filter (ten-second Git deadline).
+The Linux namespace-init case is explicitly ignored in ordinary runs. An eligible
+host must run this exact merge gate, which fails if its bwrap probe fails:
+
+```sh
+cargo test -p fgos-git --test borrow_deadline real_read_tree_deadline_as_namespace_init_cleans_its_native_lock -- --exact --ignored --nocapture
+```
+
+An ignored test is not passing acceptance evidence. Full `npm test` and E3 remain
+separate required host merge gates.

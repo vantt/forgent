@@ -289,3 +289,44 @@ fn inherited_global_hooks_preserved_and_owned_local_removal_reveals_global() {
         .output().unwrap();
     assert!(out.status.success(), "{}\n{}", String::from_utf8_lossy(&out.stdout), String::from_utf8_lossy(&out.stderr));
 }
+
+#[test]
+fn included_hooks_remain_user_owned_even_with_matching_wal_provenance() {
+    let f = Fixture::new();
+    let path = f.main.join(".githooks");
+    f.driver.ensure_hooks(&f.repo, &path, "local-original").unwrap();
+    let included = f.temp.join("included-config");
+    let contents = format!("[core]\n hooksPath = {}\n", path.display());
+    fs::write(&included, &contents).unwrap();
+    git(&f.main, &["config", "include.path", included.to_str().unwrap()]);
+    // Same value in both files is not an ambiguous owned-local setting.
+    assert_eq!(f.driver.inspect_hooks(&f.repo, &path).unwrap().status, "owned");
+    // The existing mutation admission still refuses included repository config.
+    // It must not misdiagnose the two origins as ambiguous or remove user bytes.
+    let error = f.driver.remove_owned_hooks_config(&f.repo, &path, "local-remove-include").unwrap_err();
+    assert!(error.cause.contains("repository-config-untrusted: include.path"));
+    assert_eq!(fs::read_to_string(&included).unwrap(), contents);
+    git(&f.main, &["config", "--unset", "core.hooksPath"]);
+    // Historical provenance for the same bytes cannot confer ownership on an include.
+    assert_eq!(f.driver.ensure_hooks(&f.repo, &path, "include-preserved").unwrap().status, "skippedExisting");
+    assert_eq!(f.driver.remove_owned_hooks_config(&f.repo, &path, "include-remove").unwrap().status, "skippedExisting");
+    assert_eq!(fs::read_to_string(&included).unwrap(), contents);
+    assert!(!fs::read_to_string(f.main.join(".git/config")).unwrap().contains("hooksPath"));
+}
+
+#[test]
+fn included_value_cannot_reuse_an_owned_local_wal_record() {
+    let f = Fixture::new();
+    let path = f.main.join(".githooks");
+    f.driver.ensure_hooks(&f.repo, &path, "previous-local").unwrap();
+    git(&f.main, &["config", "--unset", "core.hooksPath"]);
+    let included = f.temp.join("included-config");
+    let contents = format!("[core]\n hooksPath = {}\n", path.display());
+    fs::write(&included, &contents).unwrap();
+    git(&f.main, &["config", "include.path", included.to_str().unwrap()]);
+    let report = f.driver.ensure_hooks(&f.repo, &path, "preserve-included").unwrap();
+    assert_eq!(report.status, "skippedExisting");
+    assert!(report.provenance.is_none());
+    assert_eq!(f.driver.remove_owned_hooks_config(&f.repo, &path, "preserve-included-remove").unwrap().status, "skippedExisting");
+    assert_eq!(fs::read_to_string(included).unwrap(), contents);
+}

@@ -744,12 +744,17 @@ fn extraction_refuses_sibling_worktree_and_state_root() {
         assert!(err.cause.contains("outside-repository"), "{}", err.cause);
         assert!(!destination.join("b").exists() || destination == &sibling);
     }
-    // A prunable registration cannot contain an existing destination.
+    // A missing registered directory does not block an unrelated destination.
     fs::remove_dir_all(&sibling).unwrap();
     let destination = f.temp.join("safe-extraction");
     fs::create_dir(&destination).unwrap();
     f.driver.extract_restore_path(&f.repo, vec![], "fixture", "extract-roots", "b", &destination).unwrap();
     assert_eq!(fs::read(destination.join("b")).unwrap(), b"working\0binary\xfe\n");
+    // Recreating the registered path must not make it an extraction target.
+    fs::create_dir(&sibling).unwrap();
+    assert!(f.driver.extract_restore_path(&f.repo, vec![], "fixture", "extract-roots", "b", &sibling)
+        .unwrap_err().cause.contains("outside-repository"));
+    assert!(!sibling.join("b").exists());
 }
 #[test]
 fn case_only_target_rename_preserves_index_identity() {

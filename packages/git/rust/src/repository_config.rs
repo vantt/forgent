@@ -6,6 +6,7 @@ use fgos_holder_lock::{Handle, Wait};
 use std::fs::{self, File, OpenOptions};
 use std::io::{Seek, SeekFrom, Write};
 use std::time::Duration;
+use std::path::Path;
 
 fn error(cause: impl std::fmt::Display) -> OperationError {
     let cause = cause.to_string();
@@ -603,20 +604,48 @@ pub struct HooksReport {
 }
 impl GitDriver {
     fn hooks_value(&self, repo: &RepoHandle) -> Result<Option<String>> {
-        // Git emits config in precedence order. A lower-scope setting must
-        // keep the installation slot occupied even without a local setting.
-        crate::driver::config_facts(self, repo, "core.hookspath")?
-            .into_iter().last()
-            .map(|v| String::from_utf8(v.value).map_err(error)).transpose()
-    }
-    fn local_hooks_value(&self, repo: &RepoHandle) -> Result<Option<String>> {
+        // This read-only config query must report included hooks rather than
+        // apply checkout/transport admission (which refuses include.path).
+        // Reading config executes no configured command; mutation still uses
+        // the native exact-old config writer below.
         let out = self.invoke(None, repo.trusted_main_root(),
-            &["config", "--null", "--show-scope", "--list"],
+            &["config", "--null", "--show-origin", "--list"],
             crate::driver::Policy::Inspect, None, false, 1024 * 1024,
             Duration::from_secs(30))?;
         if !out.success { return Err(error("hooks-config-read-failed")); }
-        let values: Vec<_> = crate::driver::parse_config(&out.stdout)?
-            .into_iter().filter(|(scope, key, _)| scope == b"local" && key == "core.hookspath").collect();
+        crate::driver::parse_config(&out.stdout)?.into_iter()
+            .rfind(|(origin, key, _)| origin.starts_with(b"file:") && key == "core.hookspath").map(|(_, _, value)| String::from_utf8(value).map_err(error)).transpose()
+    }
+    fn local_hooks_value(&self, repo: &RepoHandle) -> Result<Option<String>> {
+        let out = self.invoke(None, repo.trusted_main_root(),
+            &["config", "--null", "--show-scope", "--show-origin", "--list"],
+            crate::driver::Policy::Inspect, None, false, 1024 * 1024,
+            Duration::from_secs(30))?;
+        if !out.success { return Err(error("hooks-config-read-failed")); }
+        // With both flags Git emits scope\0origin\0key\nvalue\0. Keep
+        // the existing key/value parser, but admit only our own config files.
+        let fields: Vec<_> = out.stdout.split_inclusive(|b| *b == 0).collect();
+        if fields.len() % 3 != 0 || fields.iter().any(|v| v.last() != Some(&0)) {
+            return Err(error("hooks-config-protocol"));
+        }
+        let local = repo.common_dir().join("config");
+        let worktree = repo.git_dir().join("config.worktree");
+        let mut records = Vec::new();
+        for row in fields.as_chunks::<3>().0 {
+            let scope = &row[0][..row[0].len() - 1];
+            let origin = &row[1][..row[1].len() - 1];
+            let Some(file) = origin.strip_prefix(b"file:") else { continue; };
+            let file = Path::new(std::str::from_utf8(file).map_err(error)?);
+            let file = if file.is_absolute() { file.to_path_buf() } else { repo.trusted_main_root().join(file) };
+            if (scope == b"local" && file == local)
+                || (scope == b"worktree" && file == worktree)
+            {
+                records.extend_from_slice(row[1]);
+                records.extend_from_slice(row[2]);
+            }
+        }
+        let values: Vec<_> = crate::driver::parse_config(&records)?
+            .into_iter().filter(|(_, key, _)| key == "core.hookspath").collect();
         if values.len() > 1 {
             return Err(error("hooks-config-ambiguous"));
         }

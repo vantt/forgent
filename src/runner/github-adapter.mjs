@@ -25,8 +25,9 @@
 // conflicting PR, so which mergeable/mergeStateStatus value signals a conflict
 // is unproven, and guessing one would silently fork D3 on an assumption. Any
 // merge-time failure (including a real conflict) folds into `blocked`+reason
-// like any other gh failure. An unreachable merge is queried immediately and
-// retains reason outcome-unknown unless the server confirms MERGED.
+// like any other gh failure. A possibly sent merge is queried immediately and
+// retains reason outcome-unknown unless the server confirms MERGED. Proven
+// pre-connect failures keep the unreachable diagnostic.
 //
 // RETURN SHAPE: every exported call resolves `{outcome, step, ...}` where step
 // is exactly 'create' | 'status' | 'merge' naming which wrapped gh call it came
@@ -120,7 +121,7 @@ export async function createGitHubPR(repoRoot, { head, base, title, body = '' } 
 }
 
 /**
- * Read a PR's merge status, polling while `mergeable === "UNKNOWN"` (S1
+ * Read a PR's merge status, polling while open and `mergeable === "UNKNOWN"` (S1
  * ANSWER2: GitHub computes mergeability asynchronously, so an immediate read
  * can transiently read UNKNOWN). Bounded by `opts.pollTimeoutMs` with
  * `opts.pollIntervalMs` between reads — never a single unconditional read, and
@@ -163,7 +164,7 @@ export async function viewGitHubPRStatus(repoRoot, prNumber, opts = {}) {
         detail: `unparseable gh --json output: ${String(stdout).trim()}`,
       };
     }
-    if (lastFields.mergeable !== 'UNKNOWN' || Date.now() >= deadline) {
+    if (lastFields.state !== 'OPEN' || lastFields.mergeable !== 'UNKNOWN' || Date.now() >= deadline) {
       return { outcome: 'viewed', step: 'status', prNumber, ...lastFields };
     }
     await sleep(pollIntervalMs);
@@ -185,7 +186,7 @@ export async function viewGitHubPRStatus(repoRoot, prNumber, opts = {}) {
  * elsewhere, never silently retried past. Any gh failure resolves
  * `{outcome:'blocked', step, prNumber, reason, detail}` — step is 'status'
  * when a status read failed, 'merge' when the merge call itself failed.
- * An unreachable/timeout merge is queried immediately; observed MERGED returns
+ * A possibly sent unreachable/timeout merge is queried immediately; observed MERGED returns
  * success, otherwise reason outcome-unknown preserves the uncertain effect.
  */
 export async function mergeGitHubPR(repoRoot, prNumber, opts = {}) {
@@ -203,7 +204,8 @@ export async function mergeGitHubPR(repoRoot, prNumber, opts = {}) {
     gh(repoRoot, ['pr', 'merge', String(prNumber), '--merge'], opts);
   } catch (err) {
     const uncertain = blockedFrom('merge', prNumber, err);
-    if (uncertain.reason === 'unreachable' || err.code === 'ETIMEDOUT') {
+    const preConnect = /could not resolve host|no such host|network is unreachable|connection refused|EAI_AGAIN|ENOTFOUND|ECONNREFUSED/i.test(uncertain.detail);
+    if (uncertain.reason === 'unreachable' && !preConnect) {
       const observed = await viewGitHubPRStatus(repoRoot, prNumber, opts);
       if (observed.state === 'MERGED') return { outcome: 'merged', step: 'merge', prNumber, mergeCommit: observed.mergeCommit };
       return { ...uncertain, reason: 'outcome-unknown', observed };

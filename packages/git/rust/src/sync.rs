@@ -518,7 +518,8 @@ impl GitDriver {
             fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
             match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                _ => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
+                Ok(_) => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
+                Err(e) => return Err(failure(e)),
             }
             let reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
             let outcome = if let Some((observed, contract_violation)) =
@@ -557,7 +558,8 @@ impl GitDriver {
             {
                 match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
                     Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                    _ => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
+                    Ok(_) => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
+                    Err(e) => return Err(failure(e)),
                 }
                 let terminal = wal
                     .append(
