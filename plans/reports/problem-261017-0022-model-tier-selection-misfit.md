@@ -648,3 +648,9 @@ MP-COST:
 - **Q1 (ceilings):** code runs on gemini flash, deepseek flash, glm flash, sonnet (big lead derives the tier cells). Councils depend on the kind: software-architecture councils run at rigor critical, and some seats must be frontier.
 - **Q2 (spend signal):** not decided; there is no spend tracking yet. Open.
 - **Q3 (leads):** owner keeps leads on Sonnet to save cost; the "orchestrate" capability proposal is withdrawn (in-process lead model stays a working rule, not config).
+
+## Owner answers (2026-10-19 23:20) and model lookup
+
+- deepseek-v4-pro stays in tier `advanced` (code at `advanced` gets pro, not flash).
+- Software-architecture council: rigor critical; synthesizer and one critique seat at `frontier`, the other seats at `flagship` (owner: "tạm đồng ý").
+- GLM: owner named `glm-5.4`. OpenRouter's model list on 2026-10-19 23:15 has no `glm-5.4`; the newest GLM ids are `z-ai/glm-5.3` ($0.08/$1.40 per M in/out), `z-ai/glm-5.3-flash` ($0.05/$0.16), `z-ai/glm-5.3-flashx` ($0.37/$1.25), `z-ai/glm-5.3-prime` ($2.80/$8.80). fgOS reaches GLM only through OpenRouter (`providers.z-ai.accounts.openrouter`, invocations `pi-*-openrouter`). Also listed: `deepseek/deepseek-v4.1-flash` ($0.03/$0.08), cheaper than the configured `deepseek-v4-flash` ($0.09/$0.18).
