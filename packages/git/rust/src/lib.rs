@@ -5,6 +5,8 @@
 mod driver;
 mod inspect;
 mod refs;
+mod worktree;
+pub use worktree::{WorktreeCreate, WorktreeDelivery, WorktreeHandle, WorktreeIssue};
 mod remote;
 pub use remote::{RefMapping, RemoteRef};
 pub use inspect::*;

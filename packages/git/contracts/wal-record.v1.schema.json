@@ -332,6 +332,125 @@
                       "required": [
                         "ConfigChange"
                       ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "WorktreeCreate": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "path": {
+                              "type": "string"
+                            },
+                            "registration": {
+                              "type": "string"
+                            },
+                            "branch": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "session_id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "path",
+                            "registration",
+                            "branch",
+                            "session_id"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "WorktreeCreate"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "WorktreeMove": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "source": {
+                              "type": "string"
+                            },
+                            "destination": {
+                              "type": "string"
+                            },
+                            "registration": {
+                              "type": "string"
+                            },
+                            "registration_identity": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "source",
+                            "destination",
+                            "registration",
+                            "registration_identity"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "WorktreeMove"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "WorktreeRemove": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "path": {
+                              "type": "string"
+                            },
+                            "registration": {
+                              "type": "string"
+                            },
+                            "registration_identity": {
+                              "type": "string"
+                            },
+                            "delivery": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "deliveredTo": {
+                                  "type": "string"
+                                },
+                                "evidenceDigest": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{64}$"
+                                }
+                              },
+                              "required": [
+                                "deliveredTo",
+                                "evidenceDigest"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "path",
+                            "registration",
+                            "registration_identity",
+                            "delivery"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "WorktreeRemove"
+                      ]
                     }
                   ]
                 },
@@ -792,6 +911,30 @@
                   "required": [
                     "kind"
                   ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "worktree"
+                    },
+                    "completed": {
+                      "type": "boolean"
+                    },
+                    "details": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "maxItems": 64
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "completed",
+                    "details"
+                  ]
                 }
               ]
             }
@@ -924,5 +1067,5 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:fgos:git:wal-record:v1",
   "title": "Git WAL immutable envelope v1",
-  "description": "Immutable Git WAL envelope for Publication, Refs, RepositoryConfig and Remote. RemoteFetch/RemotePush share explicit per-target old/new tips across Publication and non-event transfers. SHA-256 covers recursively key-sorted UTF-8 JSON with digest omitted. Semantic transitions, namespace grants, object-format checks and live authority remain Rust obligations; evidence never grants effect authority."
+  "description": "Immutable Git WAL envelope for Publication, Refs, RepositoryConfig, Remote and Worktree. RemoteFetch/RemotePush share explicit per-target old/new tips across Publication and non-event transfers. SHA-256 covers recursively key-sorted UTF-8 JSON with digest omitted. Semantic transitions, namespace grants, object-format checks and live authority remain Rust obligations; evidence never grants effect authority. Worktree records bind canonical paths, the exact registration identity, tip and consumer delivery digest; interrupted effects are never repeated."
 }

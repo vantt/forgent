@@ -588,6 +588,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     ) -> Result<Receipt> {
         // Only outcomes without an observed tip of their own report the
         // current one; the others never read the ref again.
+        if matches!(outcome, Outcome::Worktree { .. }) { return Err(crate::refs::failure("not-a-publication-outcome")); }
         let current = match outcome {
             Outcome::ConfigApproved
             | Outcome::AbandonedBeforeAttempt
@@ -595,10 +596,10 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             | Outcome::Superseded { .. } => {
                 tip(&self.ref_tip(repo, &i.resource_set[0])?)
             }
-            Outcome::Success { .. } | Outcome::Loss { .. } => Tip::Absent,
+            Outcome::Worktree { .. } | Outcome::Success { .. } | Outcome::Loss { .. } => Tip::Absent,
         };
         let (observed, state, attribution) = match outcome {
-            Outcome::ConfigApproved
+            Outcome::Worktree { .. } | Outcome::ConfigApproved
             | Outcome::AbandonedBeforeAttempt
             | Outcome::Transfer { .. } => (
                 &current,

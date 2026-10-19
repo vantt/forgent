@@ -198,7 +198,49 @@ fn path(bytes: &[u8]) -> Result<PathBuf> {
         Ok(PathBuf::from(std::str::from_utf8(bytes).map_err(failure)?))
     }
 }
-fn release_pin<F: wal::FileSystem>(
+pub(crate) fn install_pin(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    admin: &fgos_holder_lock::Handle,
+    id: &str,
+    candidate: &Oid,
+) -> Result<()> {
+    let pin =
+        RefName::parse(&format!("refs/fgos/git-operations/{id}/candidate")).map_err(failure)?;
+    let zero = "0".repeat(if repo.object_format() == ObjectFormat::Sha1 {
+        40
+    } else {
+        64
+    });
+    let pinned = driver.publication_call(
+        repo,
+        admin,
+        &[
+            "-c",
+            "core.fsync=all",
+            "update-ref",
+            "--no-deref",
+            pin.as_str(),
+            candidate.as_str(),
+            &zero,
+        ],
+        &[],
+        false,
+        Duration::from_secs(30),
+    )?;
+    if !pinned.success || direct(driver, repo, &pin)? != ExpectedTip::Oid(candidate.clone()) {
+        return Err(recovery("pin-recovery-required"));
+    }
+    sync_refs(repo, &pin)?;
+    let objects = repo.common_dir().join("objects");
+    let fanout = objects.join(&candidate.as_str()[..2]);
+    if fanout.is_dir() {
+        fgos_durable_file::sync_directory(&fanout).map_err(failure)?;
+    }
+    fgos_durable_file::sync_directory(&objects).map_err(failure)?;
+    Ok(())
+}
+pub(crate) fn release_pin<F: wal::FileSystem>(
     driver: &GitDriver,
     repo: &RepoHandle,
     admin: &fgos_holder_lock::Handle,
@@ -597,39 +639,7 @@ impl GitDriver {
                 _ => return Err(failure("invalid-ref-delete")),
             },
         };
-        let pin =
-            RefName::parse(&format!("refs/fgos/git-operations/{id}/candidate")).map_err(failure)?;
-        let zero = "0".repeat(if repo.object_format() == ObjectFormat::Sha1 {
-            40
-        } else {
-            64
-        });
-        let pinned = self.publication_call(
-            repo,
-            admin,
-            &[
-                "-c",
-                "core.fsync=all",
-                "update-ref",
-                "--no-deref",
-                pin.as_str(),
-                candidate.as_str(),
-                &zero,
-            ],
-            &[],
-            false,
-            Duration::from_secs(30),
-        )?;
-        if !pinned.success || direct(self, repo, &pin)? != ExpectedTip::Oid(candidate.clone()) {
-            return Err(recovery("pin-recovery-required"));
-        }
-        sync_refs(repo, &pin)?;
-        let objects = repo.common_dir().join("objects");
-        let fanout = objects.join(&candidate.as_str()[..2]);
-        if fanout.is_dir() {
-            fgos_durable_file::sync_directory(&fanout).map_err(failure)?;
-        }
-        fgos_durable_file::sync_directory(&objects).map_err(failure)?;
+        install_pin(self, repo, admin, id, candidate)?;
         let chain = wal.append(&chain, Phase::Prepared).map_err(failure)?;
         scope.validate().map_err(failure)?;
         if let Some(target) = tree {

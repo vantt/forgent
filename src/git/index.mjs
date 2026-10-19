@@ -20,3 +20,4 @@ export { createGitInspect } from './inspect.mjs';
 
 export { createGitRefs } from './refs.mjs';
 export { createGitRemote } from './remote.mjs';
+export { createGitWorktree } from './worktree.mjs';

@@ -111,6 +111,8 @@ import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
 import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn, readBeacon } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
+import { createWorktreeUseCase } from '../src/verbs/worktree/create.mjs';
+import { resolveStateRoot as worktreeStateRoot } from '../src/holder-lock/state-root.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
@@ -3796,6 +3798,21 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // refusal, git failure) — surfaced here as `validation` (exit 4) so a bad
     // input is a clean categorized exit, never an uncaught crash. repoRoot is
     // the caller's cwd, the same root every other git-backed verb uses.
+    case 'worktree': {
+      const sub = requireField(positional[0], 'worktree requires create <path>');
+      if (sub === 'create') {
+        if (positional.length !== 2) throw new Error('usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');
+        const cwd = process.cwd();
+        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
+        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
+        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);
+        return createWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
+          path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),
+          detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),
+        });
+      }
+      throw new Error(`unknown worktree sub-verb: ${sub}`);
+    }
     case 'session': {
       const sub = requireField(positional[0], 'session requires a sub-verb: fgos session <start|end|list|gc> ...');
       const repoRoot = process.cwd();
