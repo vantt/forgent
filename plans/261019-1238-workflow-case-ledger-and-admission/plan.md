@@ -30,8 +30,8 @@ created: 2026-10-19
 | 04 | [Guide schema](phase-04-guide-schema.md) (F5, part of F1) | no | 8h | done (main `c3f2567ab`) |
 | 05 | [Case model: events, projection, bindings, admission predicate](phase-05-case-model-bindings-admission-predicate.md) (F1, F2 counters, F4, F7 predicate) | no | 12h | done (main `b2017d58b`) |
 | 06 | [Playbook proposer on admission, Shape C, case verbs](phase-06-playbook-proposer-shape-c-case-verbs.md) (F6, F12) | no (Workflow door only) | 12h | done (main `b2017d58b`) |
-| 07 | [AdmissionPort at every `runUnit` writer](phase-07-admission-port-every-rununit-writer.md) (F2 ceiling, F3 port, B3′) | yes | 12h | pending |
-| 08 | [N1 authority context at both doors, conductor case](phase-08-n1-authority-context-conductor-case.md) (F3, F7) | yes | 12h | pending |
+| 07 | [AdmissionPort at every `runUnit` writer](phase-07-admission-port-every-rununit-writer.md) (F2 ceiling, F3 port, B3′) | yes | 12h | done (main `f5974213d`) |
+| 08 | [N1 authority context at both doors, conductor case](phase-08-n1-authority-context-conductor-case.md) (F3, F7) | yes | 12h | done (main `f5974213d`) |
 | 09 | [Doctrine, docs, closeout](phase-09-doctrine-docs-closeout.md) (`coordination-driver.md` rewrite) | no | 5h | pending |
 
 Order follows the lead's constraint: 00–06 never touch the `fgos run` door (`bin/fgos.mjs` run verb, `src/runner/execution/run.mjs`); 07–08 add the port and N1 at the doors and every `runUnit` caller with writes; 09 moves doctrine. Coding cutover (Work step FSM → ledger, Units of Work naming case/activity, frame at `validateApprove`) is **out of scope** (spec R2, N12): after this plan the Work paths carry the real port and get `unbound`, nothing more.
