@@ -12,7 +12,7 @@ export function writeTrivialWorkflow(repoRoot) {
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(
     path.join(dir, `${TRIVIAL_WORKFLOW_ID}.yaml`),
-    `id: ${TRIVIAL_WORKFLOW_ID}\nsteps:\n  - id: start\n    title: Start\n`,
+    `id: ${TRIVIAL_WORKFLOW_ID}\nsteps:\n  - id: only-step\n    title: Only step\n`,
   );
   return TRIVIAL_WORKFLOW_ID;
 }

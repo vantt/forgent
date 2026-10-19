@@ -123,3 +123,54 @@ statusSkills:
   retrospective:
     skill: fgos-coding-knowledge
     taskSpec: compound-learn
+
+# --- Guide part: how a coding case may proceed, beside the Work lifecycle above ---
+# Nothing reads this part until the coding cutover; the lifecycle part above stays what Work items
+# walk today. Each activity names the operation it will replace.
+kind: guide
+purpose: Take one coding item from a request to an approved, integrated change, with proof at each step that matters.
+milestones:
+  - { id: request-received, subject: the request text, evidence: intake record, acceptedBy: runner }
+  - { id: decisions-locked, subject: the decisions artifact, evidence: discovery verdict clear or the exploring gate answer, acceptedBy: reviewer or owner }
+  - { id: plan-validated, subject: plan.md, evidence: validate-plan verdict plus the validateApprove consent, acceptedBy: reviewer and owner }
+  - { id: child-verified, subject: the tested paths of a child, evidence: verify receipt, acceptedBy: harness }
+  - { id: integrated, subject: the integrated tree, evidence: verify receipt on that tree, acceptedBy: harness }
+  - { id: approved, subject: the digest of the integrated tree, evidence: consent bound to that tree, acceptedBy: owner }
+  - { id: merged, subject: the merged commit, evidence: approve door with mergedSha, acceptedBy: approve door }
+activities:
+  - { id: judge-ambiguity, operation: discovery/judge-ambiguity, entry: [request-received], produces: [decisions-locked], effects: none, unit: { pattern: solo } }
+  - { id: lock-decisions, operation: exploring/lock-decisions, entry: [request-received], produces: [decisions-locked], effects: none, unit: { pattern: solo } }
+  - { id: shape-plan, operation: planning/shape-plan, entry: [decisions-locked], produces: [plan-validated], effects: none, unit: { pattern: solo } }
+  - { id: validate-plan, operation: planning/validate-plan, entry: [decisions-locked], produces: [plan-validated], effects: none, unit: { pattern: reviewed } }
+  - { id: implement-item, operation: executing/implement-item, entry: [plan-validated], produces: [child-verified], effects: writes, unit: { pattern: reviewed } }
+  - { id: review-item, operation: executing/review-item, entry: [child-verified], produces: [], effects: none }
+  - { id: fix-verify-red, operation: executing/fix-verify-red, entry: [plan-validated], produces: [child-verified], effects: writes }
+  - { id: integrate, operation: none, entry: [child-verified], produces: [integrated], effects: writes, unit: { kind: integrate } }
+  - { id: resolve-question, operation: discovery/resolve-question, entry: [request-received], produces: [], effects: none }
+  - { id: scout-blast-radius, operation: planning/scout-blast-radius, entry: [decisions-locked], produces: [], effects: none }
+  - { id: scoped-subtask, operation: executing/scoped-subtask, entry: [plan-validated], produces: [], effects: writes }
+decisions:
+  - at: request-received
+    should: judge-ambiguity
+    reason: one machine pass is cheaper than a person and it judges clear or unclear
+    mayInstead: [lock-decisions]
+  - at: decisions-locked
+    should: [shape-plan, validate-plan]
+    reason: a validated plan is the frame the children run under
+    mayInstead: [scout-blast-radius]
+  - at: plan-validated
+    should: implement-item for each child with disjoint writes
+    reason: the reviewed pattern catches regressions before integration
+    mayInstead: [fix-verify-red, scoped-subtask]
+  - at: approved
+    listedRoutesOnly: true
+must:
+  - { id: no-writes-outside-unit, guard: write-scope-isolation, reason: a writing activity touches only the paths its Unit declared }
+  - { id: child-receipt, guard: verify-receipt, subject: child-verified, reason: a worker's own claim of passing tests is not a receipt }
+  - { id: integration-receipt, guard: verify-receipt, subject: integrated, reason: tests on a child's tree prove nothing about the integrated tree }
+  - { id: consent-before-merge, guard: human-consent, subject: approved, reason: approving tree A is not approving tree B }
+  - { id: merge-at-approve-door, guard: 'platform:approve-door', subject: merged, reason: the merge happens at the approve door with its Iron Law and post-merge verify }
+unenforced:
+  - { id: tasteful-architecture, becomes: the receipt verdict of review-item, note: design quality is judged by a reviewer verdict and not by a mechanical check }
+frameDefaults: { dispatches: set-at-approval, mutatingDispatches: set-at-approval, seatLaunchesPerDispatch: set-at-approval, fallbackPerSeat: 2, deviationsBeforeAsk: 2, rigorFloor: set-at-approval }
+closure: [approved]
