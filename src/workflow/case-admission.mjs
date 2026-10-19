@@ -10,6 +10,43 @@ import crypto from 'node:crypto';
 import { RIGOR_ORDER } from './case-projection.mjs';
 import { canonicalizeWrites, writeScopesOverlap } from '../runner/dispatch/write-scope.mjs';
 
+// The refusals that mean "what this admission stood on is no longer true". Frame, route and overlap
+// answers belong to the moment of admission and are not asked again.
+const RECHECK_CODES = new Set([
+  'consent-stale', 'consent-missing', 'consent-subject-unknown',
+  'entry-milestone-stale', 'entry-milestone-unmet', 'entry-milestone-blocked',
+  'milestone-not-reached', 'receipt-stale', 'receipt-missing',
+  'independence-not-encapsulated', 'independence-blind-handoff',
+]);
+
+/**
+ * Whether the consent, entry milestones and receipts a live reservation was admitted on still hold for
+ * the subjects as they are now. Asked just before a writing round is committed.
+ *
+ * @param {object} input
+ * @param {object} input.projection `projectCase` of the ledger with the current subject digests applied
+ * @param {object} input.reservation the live reservation
+ * @returns {object[] | null} the violations that no longer hold, or null when all still do
+ */
+export function recheckReservation({ projection, reservation }) {
+  const others = projection.liveReservations.filter((r) => r.reservationId !== reservation.reservationId);
+  const verdict = admitProposal({
+    projection: { ...projection, frame: null, liveReservations: others },
+    proposal: {
+      activity: reservation.activity,
+      writes: reservation.writes,
+      worktree: reservation.worktree ?? undefined,
+      blind: reservation.blind === true,
+      reason: 'recheck',
+    },
+    bindingAnswers: reservation.worktree ? { [reservation.worktree]: { answer: 'bound' } } : {},
+    reservationId: reservation.reservationId,
+  });
+  if (!verdict.refused) return null;
+  const broken = verdict.refused.violations.filter((v) => RECHECK_CODES.has(v.code));
+  return broken.length > 0 ? broken : null;
+}
+
 /** A fresh reservation id; kept out of the predicate so that stays pure. */
 export function newReservationId() {
   return `rsv-${Date.now().toString(36)}-${crypto.randomBytes(4).toString('hex')}`;
@@ -70,7 +107,8 @@ function routeKindOf({ guide, projection, activity, proposal }) {
  * @param {boolean} [input.proposal.blind] the dispatch is encapsulated blind seats
  * @param {string[]} [input.proposal.handoffRefs] `unit-run:<id>/<role>` refs the dispatch is handed
  * @param {string} [input.proposal.rigor]
- * @param {number | null} [input.proposal.seatLaunchCeiling] launches the dispatch may spend; null when not known
+ * @param {number | null} [input.proposal.seatLaunches] seat launches the dispatch plans before any fallback (seats per round times rounds); null when not known
+ * @param {string} [input.proposal.unitRunId] the Unit run the reservation is for, when it is already minted
  * @param {'playbook' | 'agent'} [input.proposal.proposer]
  * @param {Record<string, { answer: string, record?: object }>} [input.bindingAnswers] by worktree path
  * @param {string} input.reservationId
@@ -170,6 +208,7 @@ export function admitProposal({ projection, proposal, bindingAnswers = {}, reser
 
   // Frame: counters reserved before the dispatch; an unknown remainder refuses the next writing dispatch.
   const frame = projection.frame;
+  let seatLaunchCeiling = null;
   if (frame) {
     const left = projection.frameRemaining;
     if (left.dispatches === 0) add('frame-exhausted', 'frame-allowance', 'the approved frame has no dispatch left');
@@ -179,12 +218,16 @@ export function admitProposal({ projection, proposal, bindingAnswers = {}, reser
     }
     const perDispatch = left.seatLaunchesPerDispatch;
     if (perDispatch !== null) {
-      if (proposal.seatLaunchCeiling == null) {
-        if (writing) add('frame-remaining-unknown', 'frame-allowance', 'the seat launches this dispatch may spend are not known, so a writing dispatch is not admitted');
-      } else if (proposal.seatLaunchCeiling > perDispatch) {
-        add('seat-launch-ceiling-exceeded', 'frame-allowance', `the dispatch may launch ${proposal.seatLaunchCeiling} seats; the frame allows ${perDispatch} per dispatch`);
+      if (proposal.seatLaunches == null) {
+        if (writing) add('frame-remaining-unknown', 'frame-allowance', 'the seat launches this dispatch plans are not known, so a writing dispatch is not admitted');
+      } else if (proposal.seatLaunches > perDispatch) {
+        add('seat-launch-ceiling-exceeded', 'frame-allowance', `the dispatch plans ${proposal.seatLaunches} seat launches; the frame allows ${perDispatch} per dispatch`);
+      } else if (left.fallbackPerSeat === null && writing) {
+        add('frame-remaining-unknown', 'frame-allowance', 'the fallback allowance per seat was left to the approver, so a writing dispatch is not admitted');
       }
     }
+    // The ceiling handed to the Unit: planned launches times the fallback allowance of a seat.
+    if (proposal.seatLaunches != null && left.fallbackPerSeat !== null) seatLaunchCeiling = proposal.seatLaunches * left.fallbackPerSeat;
     if (proposal.rigor && RIGOR_ORDER.includes(frame.rigorFloor) && RIGOR_ORDER.indexOf(proposal.rigor) >= 0
       && RIGOR_ORDER.indexOf(proposal.rigor) < RIGOR_ORDER.indexOf(frame.rigorFloor)) {
       add('rigor-below-floor', 'frame-allowance', `rigor ${proposal.rigor} is below the frame's floor ${frame.rigorFloor}`);
@@ -210,9 +253,9 @@ export function admitProposal({ projection, proposal, bindingAnswers = {}, reser
     writes,
     worktree: proposal.worktree ?? null,
     counters: { dispatches: 1, mutatingDispatches: writing ? 1 : 0 },
-    seatLaunchCeiling: proposal.seatLaunchCeiling ?? null,
+    seatLaunchCeiling,
     blind: proposal.blind === true,
-    unitRunId: null,
+    unitRunId: proposal.unitRunId ?? null,
     createdAt: now,
   };
   return {

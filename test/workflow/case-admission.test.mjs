@@ -5,7 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { validateWorkflow } from '../../src/workflow/index.mjs';
-import { admitProposal, newReservationId } from '../../src/workflow/case-admission.mjs';
+import { admitProposal, newReservationId, recheckReservation } from '../../src/workflow/case-admission.mjs';
 import { reserveParentFrame, refundParentFrame } from '../../src/workflow/case-frame.mjs';
 import { appendAll, FRAME, openCase, projectionOf, settle, verifyReceipt, withHold, eventsOf } from '../helpers/workflow-case-fixture.mjs';
 
@@ -118,12 +118,12 @@ test('frame counters: an exhausted frame refuses, and an unknown remainder refus
   assert.ok(propose(unknown, { activity: 'scout' }).reservation, 'a read-only dispatch is not held up by an unknown writing count');
 });
 
-test('the seat-launch ceiling is checked against the frame, and an unknown ceiling refuses a writing dispatch', () => {
+test('the planned seat launches are checked against the frame, the ceiling follows, and unknown launches refuse a writing dispatch', () => {
   const run = plannedCase({ frame: { ...FRAME, seatLaunchesPerDispatch: 6 } });
-  assert.deepEqual(codes(propose(run, { activity: 'build-a', writes: ['src/a'], worktree: '/wt/a', seatLaunchCeiling: 9 })), ['seat-launch-ceiling-exceeded']);
+  assert.deepEqual(codes(propose(run, { activity: 'build-a', writes: ['src/a'], worktree: '/wt/a', seatLaunches: 9 })), ['seat-launch-ceiling-exceeded']);
   assert.deepEqual(codes(propose(run, { activity: 'build-a', writes: ['src/a'], worktree: '/wt/a' })), ['frame-remaining-unknown']);
-  const ok = propose(run, { activity: 'build-a', writes: ['src/a'], worktree: '/wt/a', seatLaunchCeiling: 6 });
-  assert.equal(ok.reservation.seatLaunchCeiling, 6);
+  const ok = propose(run, { activity: 'build-a', writes: ['src/a'], worktree: '/wt/a', seatLaunches: 3 });
+  assert.equal(ok.reservation.seatLaunchCeiling, 6, 'three planned launches times a fallback allowance of two');
 });
 
 test('rigor below the frame floor is refused', () => {
@@ -228,4 +228,22 @@ test('a nested case charges the parent frame in its own section, refunds it idem
   assert.equal(projectionOf(run).frameRemaining.dispatches, 3, 'the child could not open: the parent has its frame back');
   assert.equal(projectionOf(run).frameRemaining.mutatingDispatches, 1);
   assert.equal(projectionOf(run).liveReservations.length, 0);
+});
+
+test('a live reservation is rechecked against the subjects as they are now: a changed approval refuses, frame and overlap do not', () => {
+  const run = deliveredCase();
+  appendAll(run, [
+    { type: 'gate.answer', payload: { stepId: 'approve-gate', answer: 'ship it', approved: true, subjectDigest: 'sha256:tree-A', answeredAt: '2026-10-19T00:00:00.000Z' } },
+  ]);
+  const same = { approved: 'sha256:tree-A', integrated: 'sha256:tree' };
+  const admitted = propose(run, { activity: 'publish', writes: ['content/out'], worktree: '/wt/p' }, { digests: same });
+  assert.ok(admitted.reservation, JSON.stringify(admitted));
+  const live = (digests) => {
+    const projection = projectionOf(run, digests);
+    return { projection, reservation: projection.liveReservations.find((r) => r.reservationId === admitted.reservation.reservationId) };
+  };
+
+  assert.equal(recheckReservation(live(same)), null, 'what was approved is what is there, and the reservation does not collide with itself');
+  assert.ok(recheckReservation(live({ ...same, approved: 'sha256:tree-B' })).map((v) => v.code).includes('consent-stale'));
+  assert.ok(recheckReservation(live({ ...same, approved: null })).map((v) => v.code).includes('consent-subject-unknown'));
 });

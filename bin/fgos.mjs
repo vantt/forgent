@@ -2898,9 +2898,15 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         isLinkedWorktree: () => resolveGitRoots(worktree ? path.resolve(worktree) : process.cwd()).isLinkedWorktree,
       });
 
+      // The Workflow's port, injected here so the Execution Core never imports the Workflow: a writing
+      // run goes on only into a worktree no case owns.
+      const { createCaseAdmissionPort } = await import('../src/workflow/case-admission-port.mjs');
+      const portRoot = repoRoot ? path.resolve(repoRoot) : (() => { try { return resolveGitRoots(process.cwd()).mainCheckoutRoot; } catch { return null; } })();
+
       return attachDirWarning(await runUnit({
         unitPath,
         unitData,
+        ...(portRoot ? { caseAdmission: createCaseAdmissionPort({ repoRoot: portRoot }) } : {}),
         pattern,
         stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
         overrides,

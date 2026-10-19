@@ -16,10 +16,8 @@ import {
   projectWorkflowState,
 } from './store.mjs';
 import { PROGRESS_LINE_LIMIT, ADVANCE_DETACHED_ENV } from './case-lock.mjs';
-import { drainCaseInbox, removeReservationFile, writeReservationFile } from './case-runtime.mjs';
-import { projectCase, receiptsFromResults } from './case-projection.mjs';
-import { admitProposal, newReservationId } from './case-admission.mjs';
-import { bindWorktree, readBinding, unbindWorktree } from './case-bindings.mjs';
+import { drainCaseInbox } from './case-runtime.mjs';
+import { projectCase } from './case-projection.mjs';
 import { openCaseOnLedger, resolveFrame } from './case-start.mjs';
 import {
   createWorkflowWorktree,
@@ -41,6 +39,8 @@ import {
   unitPatternOf,
 } from './unit-handoff.mjs';
 import { runUnit, snapshotRunnerConfig, detectHerdrPresent } from '../runner/execution/run.mjs';
+import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
+import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
@@ -64,11 +64,6 @@ const detachedChildLog = process.env[ADVANCE_DETACHED_ENV] === '1' ? (line) => p
 /** A refusal that means "the approval this step stands on is not valid for what is there now". */
 const APPROVAL_REFUSALS = new Set(['consent-stale', 'consent-missing', 'consent-subject-unknown', 'entry-milestone-stale']);
 
-const worktreeFacts = (worktree) => ({
-  commonDir: gitOut(worktree, ['rev-parse', '--git-common-dir'])?.trim() ?? null,
-  ref: gitOut(worktree, ['rev-parse', '--abbrev-ref', 'HEAD'])?.trim() ?? null,
-});
-
 /**
  * Run loop of the Playbook proposer: advance the ready steps of a Workflow run until it completes,
  * fails, or parks, under the `advance` hold the caller took.
@@ -82,6 +77,10 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
     if (line && onLog) onLog(line);
     return stored;
   };
+
+  // The one port every Unit of this run is admitted and settled through: it never acquires `advance`,
+  // because this proposer already holds it.
+  const port = createCaseAdmissionPort({ repoRoot: mainRoot, caseId: workflowRunId, heldAdvance: hold });
 
   // A run recorded before cases existed is opened on its first advance, with its guide's defaults.
   {
@@ -304,83 +303,15 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
               }
             }
 
-            // Admission: may this Unit run now? Asked with the case as it is after every earlier Unit
-            // settled. A Unit whose earlier attempt left a live reservation (its controller died) is the
-            // same dispatch and keeps it.
-            let reservation = null;
-            let bound = null;
-            const writing = unitData.writes.length > 0;
-            const bindWritingWorktree = () => bindWorktree({ mainRoot, hold, caseId: workflowRunId, worktree: unitWorktree, ...worktreeFacts(unitWorktree) });
-            if (!prepError) {
-              const current = reread().projection;
-              const live = current.liveReservations.find((r) => r.activity === step.id && r.unitId === u.id);
-              if (live) {
-                reservation = live;
-                if (writing) {
-                  const made = bindWritingWorktree();
-                  if (made.ok) bound = made;
-                  else prepError = `worktree ${unitWorktree} cannot be bound to the case: ${made.answer}`;
-                }
-                if (!prepError) writeReservationFile({ mainRoot, caseId: workflowRunId, reservation: { ...live, worktree: writing ? unitWorktree : null } });
-              } else {
-                const verdict = admitProposal({
-                  projection: current,
-                  proposal: {
-                    activity: step.id,
-                    unitId: u.id,
-                    writes: unitData.writes,
-                    worktree: writing ? unitWorktree : undefined,
-                    blind: u.template.blind === true,
-                    handoffRefs: handoff.inputs,
-                    rigor: u.template.rigor,
-                    seatLaunchCeiling: null,
-                    proposer: 'playbook',
-                  },
-                  bindingAnswers: writing ? { [unitWorktree]: readBinding({ mainRoot, worktree: unitWorktree, caseId: workflowRunId }) } : {},
-                  reservationId: newReservationId(),
-                });
-                if (verdict.refused) {
-                  if (ownsWorktree) cleanupWorkflowWorktree({ repoRoot: mainRoot, worktreePath: unitWorktree, branch: uBranch, deleteBranch: true });
-                  const approval = verdict.refused.violations.find((v) => APPROVAL_REFUSALS.has(v.code) && v.milestone);
-                  const gated = approval && workflow.steps.find((s) => s.gate && current.guide.activities.find((a) => a.id === s.id)?.produces.includes(approval.milestone));
-                  if (gated) {
-                    // What was approved is not what is there now: the gate asks again, for the current version.
-                    recordEvent({
-                      repoRoot: mainRoot,
-                      workflowRunId,
-                      event: {
-                        type: 'gate.park',
-                        payload: {
-                          stepId: gated.id,
-                          question: `${gated.gate.question || `Approve step "${gated.id}"?`}\n\n(Asked again: ${approval.condition})`,
-                          header: gated.gate.header,
-                          parkedAt: new Date().toISOString(),
-                          reason: approval.code,
-                        },
-                      },
-                    });
-                    reparked = true;
-                  } else {
-                    failedUnit = { unitId: u.id, outcome: 'refused', results: [], error: `admission refused ${verdict.refused.code}: ${verdict.refused.condition}`, outOfScope: [] };
-                  }
-                  stateChanged = true;
-                  break;
-                }
-                if (writing) {
-                  const made = bindWritingWorktree();
-                  if (made.ok) bound = made;
-                  else prepError = `worktree ${unitWorktree} cannot be bound to the case: ${made.answer}`;
-                }
-                if (!prepError) {
-                  for (const event of verdict.events) recordEvent({ repoRoot: mainRoot, workflowRunId, event });
-                  reservation = verdict.reservation;
-                  writeReservationFile({ mainRoot, caseId: workflowRunId, reservation });
-                }
-              }
-            }
-
-            // Recording it again would reset the unit and lose the run id it already carries.
-            if (!resumeUnitRunId) {
+            // Admission happens inside runUnit, through the port this proposer injects with its own
+            // `advance` hold: the Execution Core asks before it creates anything, and a refusal arrives
+            // as CaseAdmissionRefusedError. `unit.scheduled` is recorded the moment the Unit is
+            // admitted (or, for a Unit that could not be prepared or resumed, when it runs).
+            let scheduledRecorded = Boolean(resumeUnitRunId);
+            const recordScheduled = (reservationId = null) => {
+              // Recording it again would reset the unit and lose the run id it already carries.
+              if (scheduledRecorded) return;
+              scheduledRecorded = true;
               recordEvent({
                 repoRoot: mainRoot,
                 workflowRunId,
@@ -389,19 +320,22 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                   payload: {
                     stepId: step.id,
                     unitId: u.id,
-                    ...(reservation ? { reservationId: reservation.reservationId } : {}),
+                    ...(reservationId ? { reservationId } : {}),
                     ...(ownsWorktree ? { worktreePath: unitWorktree, branch: uBranch, baseRef, baseSha } : {}),
                   },
                 },
               });
-            }
+            };
 
             // Run Unit via P1 execution door. A throw (an unresolvable hand-off ref, a refused
             // config) is a failed unit like any other: left uncaught it would end the advance with
             // the run still `running` and no event saying why.
             let unitRunResult;
             try {
-              if (prepError) throw new RunnerConfigError(prepError);
+              if (prepError) {
+                recordScheduled();
+                throw new RunnerConfigError(prepError);
+              }
               const runOptions = {
                 unitData,
                 repoRoot: mainRoot,
@@ -439,7 +373,9 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                     account: unitAccount,
                   });
                 })(),
-                workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
+                caseAdmission: port,
+                caseRef: { caseId: workflowRunId, activity: step.id, unitId: u.id },
+                onCaseAdmitted: ({ reservationId }) => recordScheduled(reservationId),
                 ...(resumeUnitRunId ? { resumeUnitRunId } : {
                   onUnitRunCreated: (unitRunId) => {
                     startedUnitRunId = unitRunId;
@@ -467,10 +403,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 ownsWorktree = true;
                 resumeUnitRunId = null;
                 startedUnitRunId = null;
-                // The recovery checkout is the case's worktree from here on.
-                const rebound = bindWritingWorktree();
-                if (!rebound.ok) throw new RunnerConfigError(`recovery worktree ${unitWorktree} cannot be bound to the case: ${rebound.answer}`);
-                bound = rebound;
+                // The recovery checkout is admitted and bound by the run that starts in it.
                 recordEvent({ repoRoot: mainRoot, workflowRunId, event: {
                   type: 'unit.scheduled', payload: { stepId: step.id, unitId: u.id,
                     worktreePath: unitWorktree, branch: uBranch, baseRef, baseSha,
@@ -478,6 +411,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 } });
                 unitRunResult = await runUnit({ ...runOptions, cwd: unitWorktree, worktree: unitWorktree,
                   resumeUnitRunId: undefined,
+                  onCaseAdmitted: undefined,
                   onUnitRunCreated: (unitRunId) => {
                     startedUnitRunId = unitRunId;
                     recordEvent({ repoRoot: mainRoot, workflowRunId, event: {
@@ -487,6 +421,38 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 });
               }
             } catch (err) {
+              if (err instanceof CaseAdmissionRefusedError) {
+                // Refused before anything existed: the worktree made for the Unit goes, the step ends by name,
+                // or, when the approval it stands on went stale, the gate asks again.
+                if (ownsWorktree) cleanupWorkflowWorktree({ repoRoot: mainRoot, worktreePath: unitWorktree, branch: uBranch, deleteBranch: true });
+                const refused = err.refusal;
+                const approval = (refused.violations ?? []).find((v) => APPROVAL_REFUSALS.has(v.code) && v.milestone);
+                const guide = projectCase(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId })).guide;
+                const gated = approval && workflow.steps.find((s) => s.gate && guide.activities.find((a) => a.id === s.id)?.produces.includes(approval.milestone));
+                if (gated) {
+                  // What was approved is not what is there now: the gate asks again, for the current version.
+                  recordEvent({
+                    repoRoot: mainRoot,
+                    workflowRunId,
+                    event: {
+                      type: 'gate.park',
+                      payload: {
+                        stepId: gated.id,
+                        question: `${gated.gate.question || `Approve step "${gated.id}"?`}\n\n(Asked again: ${approval.condition})`,
+                        header: gated.gate.header,
+                        parkedAt: new Date().toISOString(),
+                        reason: approval.code,
+                      },
+                    },
+                  });
+                  reparked = true;
+                } else {
+                  failedUnit = { unitId: u.id, outcome: 'refused', results: [], error: `admission refused ${refused.code}: ${refused.condition}`, outOfScope: [] };
+                }
+                stateChanged = true;
+                break;
+              }
+              recordScheduled();
               unitRunResult = {
                 unitRunId: resumeUnitRunId ?? startedUnitRunId,
                 outcome: 'execution-failure',
@@ -524,35 +490,8 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
               },
             });
 
-            // Settle: the receipts the harness itself produced, the launches the run recorded, and the
-            // reservation released. The attempt is over, so its worktree binding goes too (generation
-            // checked; a lease still held keeps it for the doctor to report).
-            if (reservation) {
-              recordEvent({
-                repoRoot: mainRoot,
-                workflowRunId,
-                event: {
-                  type: 'settle',
-                  payload: {
-                    reservationId: reservation.reservationId,
-                    activity: step.id,
-                    unitId: u.id,
-                    unitRunId: unitRunResult.unitRunId ?? null,
-                    outcome: unitRunResult.outcome,
-                    receipts: receiptsFromResults({ unitRunId: unitRunResult.unitRunId, results: unitRunResult.results ?? [] }),
-                    achieved: [],
-                    seatLaunchesUsed: (unitRunResult.results ?? []).filter((r) => r?.role && !/^verif/.test(r.role)).length,
-                    blind: u.template.blind === true,
-                    settledAt: new Date().toISOString(),
-                  },
-                },
-              });
-              removeReservationFile({ mainRoot, caseId: workflowRunId, reservationId: reservation.reservationId });
-              if (bound?.ok) {
-                unbindWorktree({ mainRoot, hold, caseId: workflowRunId, generation: bound.generation, key: bound.key, worktree: unitWorktree });
-              }
-              reread();
-            }
+            // The reservation was settled by the run itself, through the port; fold in anything that arrived meanwhile.
+            reread();
 
             stateChanged = true;
             // Only explicitly accepted semantic outcomes proceed; execution failures never do.

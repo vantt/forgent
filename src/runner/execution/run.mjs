@@ -7,6 +7,10 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
+import {
+  assertCaseAdmissionPort, CaseAdmissionRefusedError, normalizeCaseRef, seatLaunchesOf, seatLaunchesUsed,
+  PORT_MISSING, SEAT_LAUNCH_CEILING,
+} from './case-admission-port.mjs';
 import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
 import { bind, nextCandidate, retrySameCandidate, getProviderFamily } from './bind.mjs';
 import { credentialFaultFamilies, inspectAccountRotation, mayRotateAccount } from './account-rotation.mjs';
@@ -334,6 +338,30 @@ function preflightRefusal(role, round, { foreignMerge, foreignStaged }) {
 }
 
 /**
+ * The pattern a fresh run uses: an object form a caller passes wins over the unit's own, then the
+ * caller's name, else solo. One computation for the declared-operation check, the pin check, the
+ * admission ceiling and the run itself; a resume reads the one its unit.json recorded instead.
+ */
+function chosenPattern(options, unit) {
+  const callerPattern = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
+  return callerPattern || unit.pattern || options.pattern || 'solo';
+}
+
+const portMissing = () => new RunnerConfigError(
+  'runUnit: a Unit that writes (or names a case) needs the case admission port in options.caseAdmission; none was given',
+  { code: PORT_MISSING },
+);
+
+/** A standalone writing run needs the affirmative `unbound`; every other answer, a missing view included, refuses. */
+function requireFreeWorktree(port, worktree) {
+  const binding = port.resolveBinding({ worktree });
+  if (binding?.answer === 'unbound') return;
+  const answer = binding?.answer ?? 'binding-view-unavailable';
+  const owner = binding?.record?.caseId ? ` (case ${binding.record.caseId})` : '';
+  throw new CaseAdmissionRefusedError({ code: answer, condition: `worktree ${worktree} is not free for a run that names no case: ${answer}${owner}` });
+}
+
+/**
  * Refuse a pinned account before a unit run exists: each seat an `account` override applies to
  * (bound the way the run would bind it) must take that account, at least one seat must, and the
  * account must not be quarantined now.
@@ -341,9 +369,8 @@ function preflightRefusal(role, round, { foreignMerge, foreignStaged }) {
 async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
   const overrides = options.overrides ?? [];
   if (!overrides.some((o) => o && typeof o === 'object' && o.account !== undefined)) return;
-  const callerPattern = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
   const { roles } = await simulateUnitBindings(
-    { ...unit, pattern: callerPattern || unit.pattern || options.pattern || 'solo' },
+    { ...unit, pattern: chosenPattern(options, unit) },
     runnerConfig,
     { session: { herdrPresent: options.session?.herdrPresent ?? detectHerdrPresent(), ...(options.session ?? {}) }, overrides },
   );
@@ -380,21 +407,53 @@ async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
  */
 export async function runUnit(options = {}) {
   assertNotCancelled();
-  const scope = { control: null, custody: null, handedOff: false };
+  // `admission` is what the case admission port answered for this run; `settled` says it was handed back.
+  const scope = { control: null, custody: null, handedOff: false, admission: null, unitRecord: null };
   const uninstall = holdCancelOnSignal(options);
   let result;
+  let failure = null;
   try {
     result = await runUnitBody(options, scope);
     scope.handedOff = true;
     return result;
+  } catch (error) {
+    failure = error;
+    throw error;
   } finally {
     try {
       try { if (scope.handedOff) recordCustodyHandoff(scope.custody, result); }
       finally { scope.custody?.release(); }
     } finally {
       try { scope.control?.release(); } catch { /* a seat that cannot be released is taken over as a dead holder */ }
+      // After custody is released: the worktree is quiet, so the port may release the binding it took for this run.
+      settleAdmission(scope, result, failure);
       uninstall();
     }
+  }
+}
+
+/**
+ * Hand the reservation back, once: after the pattern settled, or when the run failed. A cancelled run
+ * is not settled: it stays live as a dead controller leaves it, and the resume carries on. A run that
+ * never got a unit directory settles as `not-started`. The core writes nothing to the ledger before this.
+ */
+function settleAdmission(scope, result, failure) {
+  const admission = scope.admission;
+  if (!admission || admission.settled) return;
+  if (failure instanceof RunCancelledError) return;
+  admission.settled = true;
+  const outcome = failure ? (admission.started ? 'execution-failure' : 'not-started') : result.outcome;
+  try {
+    admission.port.settle(admission.reservationId, {
+      caseId: admission.caseId,
+      outcome,
+      unitRunId: admission.started ? admission.unitRunId : null,
+      results: result?.results ?? [],
+      seatLaunchesUsed: scope.unitRecord ? seatLaunchesUsed(scope.unitRecord) : 0,
+      frameExhausted: scope.ceilingHit === true,
+    });
+  } catch (error) {
+    console.warn(`fgos: could not settle reservation "${admission.reservationId}" of case "${admission.caseId}": ${error.message}`);
   }
 }
 
@@ -435,12 +494,15 @@ async function runUnitBody(options, scope) {
   } catch { /* best effort */ }
   if (rootsFailure) throw rootsFailure;
   const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
-  const workflowLink = normalizeWorkflowLink(options.workflow);
+  const caseRef = normalizeCaseRef(options.caseRef);
+  const port = options.caseAdmission === undefined ? null : assertCaseAdmissionPort(options.caseAdmission);
 
   let unit;
   let unitRunId;
   let unitRecord;
   let declaredOp = null;
+  // The seat launches the admission handed this run (kept in unit.json, so a resume keeps the same bound).
+  let admittedCeiling = null;
   const assignmentsDir = path.join(mainRoot, '.fgos', 'assignments');
 
   if (options.resumeUnitRunId) {
@@ -460,6 +522,16 @@ async function runUnitBody(options, scope) {
     scope.control = control;
     unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
     unit = validateUnit(unitRecord.unit);
+    // A writing run is never resumed without the port, and a standalone one only into a free worktree.
+    const resumeLink = normalizeWorkflowLink(unitRecord.workflow);
+    if (unit.writes.length > 0 || unitRecord.sync) {
+      if (!port) throw portMissing();
+      if (!resumeLink) requireFreeWorktree(port, worktreePath);
+    }
+    // The reservation the first run recorded is the one this resume settles; it is never admitted again.
+    if (port && resumeLink?.reservationId) {
+      scope.admission = { port, caseId: resumeLink.caseId, reservationId: resumeLink.reservationId, unitRunId, started: true, settled: false };
+    }
     if (!Array.isArray(unitRecord.resolvedInputs)) {
       throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json has no resolvedInputs`);
     }
@@ -511,8 +583,7 @@ async function runUnitBody(options, scope) {
     // Checked before the unit directory exists: an operation the step does not allow leaves nothing
     // behind. The pattern checked is the one the run will use (see patternName below).
     if (options.declared !== undefined) {
-      const callerPatternObject = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
-      declaredOp = declaredOperationOf(options.declared, unit, callerPatternObject || unit.pattern || options.pattern || 'solo', { taskSpecRoot: mainRoot });
+      declaredOp = declaredOperationOf(options.declared, unit, chosenPattern(options, unit), { taskSpecRoot: mainRoot });
     }
     const pinInputs = options.declared !== undefined ? checkedPinInputs(options.pinInputs) : [];
     // A run timeout in an override is checked before the unit run exists (bind() checks it again).
@@ -525,12 +596,38 @@ async function runUnitBody(options, scope) {
     await assertAccountPinsBeforeRun(unit, configSnapshot.runner, options);
     // A sync ref is resolved to its commit once, before the run exists; a resume merges that commit.
     const sync = seedSync(unit, { worktree: worktreePath, mainRoot });
-    if (unit.writes.length > 0 || sync) {
-      if (options.forceSharedCwd === true) throw Object.assign(new RunnerConfigError('--force-shared-cwd cannot be used with writes', { code: 'custody-required' }), { cwd: worktreePath, executorId: null, capability: unit.capability });
+    const writing = unit.writes.length > 0 || Boolean(sync);
+    if (writing && options.forceSharedCwd === true) throw Object.assign(new RunnerConfigError('--force-shared-cwd cannot be used with writes', { code: 'custody-required' }), { cwd: worktreePath, executorId: null, capability: unit.capability });
+    // Admission comes first, then custody, then the unit directory: a refusal leaves nothing behind.
+    // A writing Unit with no port is refused here; a standalone one runs only into a free worktree.
+    if ((writing || caseRef) && !port) throw portMissing();
+    const unitRunIdAtAdmission = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+    if (writing && !caseRef) requireFreeWorktree(port, worktreePath);
+    if (caseRef) {
+      const pattern = chosenPattern(options, unit);
+      const admitted = port.admit({
+        unitRunId: unitRunIdAtAdmission,
+        caseRef,
+        activity: caseRef.activity,
+        writes: unit.writes,
+        worktree: fs.realpathSync(worktreePath),
+        readOnly: !writing,
+        pattern: resolvePattern(pattern).patternName,
+        seatLaunches: seatLaunchesOf({ pattern, unit, runnerConfig: configSnapshot.runner }),
+        blind: unit.blind === true,
+        handoffRefs: unit.inputs,
+        rigor: unit.rigor,
+      });
+      if (admitted.refused) throw new CaseAdmissionRefusedError(admitted.refused);
+      scope.admission = { port, caseId: admitted.caseId, reservationId: admitted.reservationId, unitRunId: unitRunIdAtAdmission, started: false, settled: false };
+      admittedCeiling = admitted.seatLaunchCeiling ?? null;
+      options.onCaseAdmitted?.({ caseId: admitted.caseId, reservationId: admitted.reservationId });
+    }
+    if (writing) {
       scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), worktreePath);
     }
     // Resolved before the unit directory exists, so a ref that points nowhere leaves nothing behind.
-    unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+    unitRunId = unitRunIdAtAdmission;
     const unitDir = path.join(assignmentsDir, unitRunId);
     // A persona file that cannot be parsed or has the wrong shape refuses the run here, before the unit
     // directory exists, instead of seating a silently different persona.
@@ -553,7 +650,8 @@ async function runUnitBody(options, scope) {
 
     unitRecord = {
       unit,
-      workflow: workflowLink,
+      workflow: scope.admission ? normalizeWorkflowLink({ caseId: scope.admission.caseId, activity: caseRef.activity, reservationId: scope.admission.reservationId }) : null,
+      ...(admittedCeiling !== null ? { seatLaunchCeiling: admittedCeiling } : {}),
       pattern: options.pattern ?? unit.pattern ?? 'solo',
       overrides: options.overrides || [],
       configSnapshot,
@@ -585,6 +683,7 @@ async function runUnitBody(options, scope) {
     };
 
     fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(unitRecord, null, 2));
+    if (scope.admission) scope.admission.started = true;
     const fresh = acquireUnitControl(unitDir, unitRunId);
     if (fresh.status !== 'acquired') throw new RunnerConfigError(`unit run "${unitRunId}" is already driven by another controller`, { code: 'resume-in-progress' });
     scope.control = fresh;
@@ -598,6 +697,8 @@ async function runUnitBody(options, scope) {
     scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), unitRecord.worktree);
   }
 
+  scope.unitRecord = unitRecord;
+  const seatLaunchCeiling = unitRecord.seatLaunchCeiling ?? null;
   const unitDir = path.join(assignmentsDir, unitRunId);
   if (options.resumeUnitRunId) {
     const summaryFile = path.join(unitDir, 'unit-summary.json');
@@ -835,6 +936,15 @@ async function runUnitBody(options, scope) {
       return commit;
     };
 
+    // The consent the admission stood on is checked again just before a writing round is committed,
+    // through the same port object the run was given; a refusal commits nothing.
+    const writeGate = (changedFiles) => {
+      const admission = scope.admission;
+      if (!admission) return null;
+      const verdict = admission.port.recheckEffect(admission.reservationId, { caseId: admission.caseId, paths: changedFiles ?? [] });
+      return verdict?.refused ? { reason: verdict.refused.code, detail: verdict.refused.condition } : null;
+    };
+
     // The agent already did this round's work and only the runner commit failed: commit again,
     // never spawn the agent a second time.
     const lastRecorded = recorded[recorded.length - 1];
@@ -843,6 +953,8 @@ async function runUnitBody(options, scope) {
       if (refusal) return refusal;
       assertNotCancelled();
       const prior = readUnitRunHistory(unitDir).find((h) => h.role === role && (h.round ?? 1) === round);
+      const gate = writeGate(prior?.runResult?.evidence?.changedFiles);
+      if (gate) return { outcome: 'policy-refusal', role, round, refused: gate };
       const excludePaths = lastRecorded.preExistingInScope ?? [];
       let commit = commitWork(rUnit || unit, prior?.runResult, excludePaths);
       if (commit.status === 'no-changes') {
@@ -901,11 +1013,28 @@ async function runUnitBody(options, scope) {
     // provider, then the next candidate of the capability's prefer pool runs; each attempt gets a
     // fresh pane/process and the failed one is left exactly as it was (its pane stays open). With
     // nothing left the outcome stays provider-limit -- no other executor is guessed at.
+    let lastResult = null;
     for (;;) {
       const assignmentId = attemptNo === 0 ? `${unitRunId}/${role}/${round}` : `${unitRunId}/${role}/${round}-fb${attemptNo}`;
       const assignmentDir = path.join(unitDir, role, attemptNo === 0 ? String(round) : `${round}-fb${attemptNo}`);
 
       const attempts = unitRecord.bindings[key] ?? (unitRecord.bindings[key] = []);
+      // The seat-launch ceiling the admission handed this run: a launch that would pass it does not
+      // happen. A seat that already ran keeps what it has (a provider limit stays one, with
+      // `fallbackExhausted`); a seat that never ran is refused by name, never reported as `blocked`.
+      if (attempts[attemptNo]?.dispatchRetryId === undefined && seatLaunchCeiling !== null && seatLaunchesUsed(unitRecord) >= seatLaunchCeiling) {
+        scope.ceilingHit = true;
+        const detail = `the seat-launch ceiling of ${seatLaunchCeiling} for this Unit is spent`;
+        if (attemptNo === 0) return { outcome: 'policy-refusal', role, round, refused: { reason: SEAT_LAUNCH_CEILING, detail } };
+        return {
+          ...(lastResult ?? { outcome: 'provider-limit', role, round }),
+          fallbackExhausted: {
+            from: { executor: bound.executor, invocation: bound.invocation, transport: bound.transport },
+            reason: SEAT_LAUNCH_CEILING,
+            detail,
+          },
+        };
+      }
       if (attempts.length <= attemptNo) {
         attempts.push({
           role,
@@ -948,6 +1077,7 @@ async function runUnitBody(options, scope) {
       persistUnitRecord();
       assertNotCancelled();
       const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs, objective, admission });
+      lastResult = result;
 
       // The worker only writes files; this trusted code, outside the confinement, commits the
       // ones inside the write scope. No change is recorded as such, and a commit that cannot be
@@ -955,10 +1085,16 @@ async function runUnitBody(options, scope) {
       if (!readOnly && result.outcome === 'pass') {
         // A pass whose commit never started is picked up by the resume: the work is on disk, the commit is pending.
         assertNotCancelled();
-        const commit = commitWork(rUnit || unit, result.runResult, attempts[attemptNo].preExistingInScope ?? preExistingInScope);
-        result.commit = commit;
-        attempts[attemptNo].commit = commit;
-        if (commit.status === 'failed') result.outcome = 'execution-failure';
+        const gate = writeGate(result.runResult?.evidence?.changedFiles);
+        if (gate) {
+          result.outcome = 'policy-refusal';
+          result.refused = gate;
+        } else {
+          const commit = commitWork(rUnit || unit, result.runResult, attempts[attemptNo].preExistingInScope ?? preExistingInScope);
+          result.commit = commit;
+          attempts[attemptNo].commit = commit;
+          if (commit.status === 'failed') result.outcome = 'execution-failure';
+        }
       }
 
       attempts[attemptNo].outcome = result.outcome;
@@ -1071,10 +1207,9 @@ async function runUnitBody(options, scope) {
   // A caller that passes `{ pattern, params }` is choosing the pattern's params as well as its
   // name, so that object form wins over the unit's own pattern string.
   // A resume runs the pattern its unit.json recorded, never one its caller names now.
-  const callerPattern = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
   const patternName = options.resumeUnitRunId && unitRecord.pattern
     ? unitRecord.pattern
-    : callerPattern || unit.pattern || options.pattern || 'solo';
+    : chosenPattern(options, unit);
   unitRecord.pattern = patternName;
   persistUnitRecord();
 
@@ -1094,6 +1229,12 @@ async function runUnitBody(options, scope) {
     runRole,
     verify,
     history,
+    // A pattern that would start another round asks whether `seats` more launches fit under the ceiling.
+    hasLaunchRoom: (seats = 1) => {
+      const room = seatLaunchCeiling === null || seatLaunchesUsed(unitRecord) + seats <= seatLaunchCeiling;
+      if (!room) scope.ceilingHit = true;
+      return room;
+    },
   });
   executionSettled = true;
   if (fs.existsSync(path.join(unitDir, 'pending-inline.json'))) {

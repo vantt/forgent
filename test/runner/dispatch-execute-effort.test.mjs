@@ -17,7 +17,7 @@ import { renderReasoningEffortArgs, checkLaunchedModel, collectModelWarnings } f
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { bind } from '../../src/runner/execution/bind.mjs';
-import { runUnit } from '../../src/runner/execution/run.mjs';
+import { runUnitWithPort as runUnit } from '../helpers/run-unit-with-port.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 

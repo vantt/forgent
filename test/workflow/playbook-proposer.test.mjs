@@ -266,3 +266,22 @@ test('an answer kept as a file by the detached door is folded in by the next pro
   const state = await resumeWorkflow(id, opts(tmp));
   assert.equal(state.status, 'completed', JSON.stringify(state.steps));
 });
+
+test('a panel Unit is admitted under a ceiling of its planned seats times the fallback allowance, and settles the launches it used', async () => {
+  const tmp = setupRepo();
+  const workflow = validateWorkflow({
+    id: 'proposer-ceiling',
+    frameDefaults: { dispatches: 1, mutatingDispatches: 0, seatLaunchesPerDispatch: 4, fallbackPerSeat: 2, deviationsBeforeAsk: 0, rigorFloor: 'standard' },
+    steps: [{ id: 'think', units: [unit('u-panel', 'Think', { pattern: 'panel', params: { members: 3 } })] }],
+  });
+  const state = await startWorkflow({ workflow, ...opts(tmp) });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  const events = eventsOf(tmp, state.workflowRunId);
+  const reservation = events.find((e) => e.type === 'reservation');
+  const settle = events.find((e) => e.type === 'settle');
+  assert.equal(reservation.payload.seatLaunchCeiling, 8, 'four seats, at most two launches each');
+  assert.equal(settle.payload.seatLaunchesUsed, 4, 'three panelists and the synthesizer launched once each');
+  assert.equal(settle.payload.frameExhausted, undefined);
+  const between = events.filter((e) => e.seq > reservation.seq && e.seq < settle.seq).map((e) => e.type);
+  assert.deepEqual(between.filter((t) => !['unit.scheduled', 'unit.started', 'unit.complete', 'step.start'].includes(t)), [], 'the Execution Core wrote nothing to the ledger between admit and settle');
+});
