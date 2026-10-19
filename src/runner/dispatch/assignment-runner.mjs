@@ -47,7 +47,7 @@ export {
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { bind } from '../execution/bind.mjs';
-import { credentialFaultPools, triedBindingsOf } from '../execution/account-rotation.mjs';
+import { walkStateOf } from '../execution/account-rotation.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, withDefaultExecutor } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
@@ -474,10 +474,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
         runnerConfig: unitRecord.configSnapshot?.runner || opts.runnerConfig,
         session: opts.session || {},
       },
-      {
-        tried: triedBindingsOfAssignment(unitRecord, asgn),
-        excludePools: [...credentialFaultPools(unitRecord, { boundBefore: attemptBoundAt(unitRecord, asgn) })],
-      },
+      walkStateOf(unitRecord, { role: seatRoleOf(asgn), round: asgn.round, assignmentId: asgn.assignmentId }),
     );
 
     if (recomputed.refused) {
@@ -1173,25 +1170,6 @@ function attemptProviderCapacityFallback({
 // operation's role on the assignment and keeps the seat's own name in provenance.
 function seatRoleOf(asgn) {
   return asgn.provenance?.kind === 'unit-run' ? (asgn.provenance.role ?? asgn.role) : asgn.role;
-}
-
-/**
- * Where a provider-limit fallback attempt resumes its walk: the seat's earlier bindings, read from
- * the attempt chain the runner persisted in unit.json -- never from the assignment, which a caller
- * could forge, and only from the assignment's own role/round chain. A first attempt or an unknown
- * assignment binds from the primary, exactly as before.
- */
-function triedBindingsOfAssignment(unitRecord, asgn) {
-  const attempts = unitRecord.bindings?.[`${seatRoleOf(asgn)}/${asgn.round}`];
-  if (!Array.isArray(attempts)) return [];
-  return triedBindingsOf(attempts, attempts.findIndex((attempt) => attempt?.assignmentId === asgn.assignmentId));
-}
-
-// When the runner bound this attempt, from its own persisted record; null when it recorded none.
-function attemptBoundAt(unitRecord, asgn) {
-  const attempts = unitRecord.bindings?.[`${seatRoleOf(asgn)}/${asgn.round}`];
-  const bound = Date.parse(attempts?.find((attempt) => attempt?.assignmentId === asgn.assignmentId)?.boundAt);
-  return Number.isFinite(bound) ? bound : -Infinity;
 }
 
 /**

@@ -64,6 +64,27 @@ export function triedBindingsOf(attempts, at) {
 }
 
 /**
+ * The walk state a recomputed binding of one recorded attempt needs, read from the attempt chain the
+ * runner persisted in `unit.json` -- never from the assignment, which a caller could forge, and only
+ * from the attempt's own role/round chain. The write gate and the doctor binding check both bind
+ * through this one door, so a fallback attempt is recomputed with the seat's earlier bindings and the
+ * pools it had walked away from. A first attempt or an unknown assignment binds from the primary.
+ *
+ * @param {object} unitRecord parsed `unit.json`
+ * @param {{ role: string, round: string|number, assignmentId: string }} attempt the seat and the attempt
+ * @returns {{ tried: object[], excludePools: string[] }} the `bind()` walk options
+ */
+export function walkStateOf(unitRecord, { role, round, assignmentId }) {
+  const attempts = unitRecord?.bindings?.[`${role}/${round}`];
+  const at = Array.isArray(attempts) ? attempts.findIndex((attempt) => attempt?.assignmentId === assignmentId) : -1;
+  const boundAt = Date.parse(attempts?.[at]?.boundAt);
+  return {
+    tried: Array.isArray(attempts) ? triedBindingsOf(attempts, at) : [],
+    excludePools: [...credentialFaultPools(unitRecord, { boundBefore: Number.isFinite(boundAt) ? boundAt : -Infinity })],
+  };
+}
+
+/**
  * Pools whose login failed in this unit and that a seat then walked away from, read from the attempts
  * the runner recorded (resume rebuilds from them, and the write gate recomputes the same exclusion
  * from them). `boundBefore` (epoch ms) keeps only walks made no later than that instant, so an

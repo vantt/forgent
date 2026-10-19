@@ -92,6 +92,7 @@ import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { bind, hasUsablePrefer } from '../runner/execution/bind.mjs';
+import { walkStateOf } from '../runner/execution/account-rotation.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
@@ -667,6 +668,9 @@ export function checkMutatingAssignmentBindingSnapshot(cwd) {
               runnerConfig: unitRecord.configSnapshot?.runner,
               session: {},
             },
+            // A fallback attempt lives at `<round>-fb<n>`; its walk state is read from the seat's
+            // `<role>/<round>` chain exactly as the write gate reads it.
+            walkStateOf(unitRecord, { role, round: round.replace(/-fb\d+$/, ''), assignmentId: run.assignmentId }),
           );
           if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
             problems.push(`unit run "${unitId}" role "${role}" round "${round}" attempt "${run.attempt}" binding mismatches unit.json snapshot`);
