@@ -120,7 +120,7 @@ test('a capability gets the same family and model inside herdr and headless; onl
   }
 });
 
-test('every invocation that declares a login store reads the store its command logs in, through the variable its older binding named', () => {
+test('every invocation that declares a login store reads the store its command logs in', () => {
   for (const [executorId, entry] of Object.entries(executors)) {
     for (const inv of entry.invocations ?? []) {
       const store = inv.credentialStore;
@@ -128,8 +128,8 @@ test('every invocation that declares a login store reads the store its command l
       const label = `${executorId}/${inv.id}`;
       assert.equal(inv.confinement?.backend, 'bwrap', `${label}: only a confined invocation reads a store through a private home`);
       assert.equal(store.use, path.basename(inv.command), `${label}: the store key is the command's CLI`);
-      const binding = (inv.resourceBindings ?? []).find((b) => b.resource === 'private-home');
-      if (binding) assert.equal(store.homeEnv, binding.target.name, `${label}: the home variable is the one the older binding named`);
+      assert.equal(inv.resourceBindings, undefined, `${label}: the store replaces the older private-home binding`);
+      assert.equal(inv.env?.[store.homeEnv], undefined, `${label}: the driver sets ${store.homeEnv}; env does not point at the real store`);
     }
   }
 });
@@ -137,8 +137,8 @@ test('every invocation that declares a login store reads the store its command l
 test('every confined invocation with a login account declares its store, and the id of one names no account', () => {
   for (const [executorId, entry] of Object.entries(executors)) {
     for (const inv of entry.invocations ?? []) {
-      if (inv.credentialStore || !(inv.resourceBindings ?? []).some((b) => b.resource === 'private-home')) continue;
-      assert.fail(`${executorId}/${inv.id} binds a private home without declaring the store it reads`);
+      if (inv.resourceBindings === undefined) continue;
+      assert.fail(`${executorId}/${inv.id} keeps the older private-home binding; declare credentialStore instead`);
     }
   }
   const named = /-(fgovn|tetnu|tetcu72|vantt|openrouter|gemini-tetcu72)$/;
