@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos doctor` row `git-worktree-recovery` no longer fails on a worktree whose `git worktree lock` reason names a process that is still running (pid and start time checked, a reused pid does not count); a lock naming a dead or unparseable owner stays a finding.
+
 - Event Store migration refuses published mirror conflicts before changing the local legacy ref, restores pre-commit filesystem failures, and computes dry-run identities through Rust and the read-only Git port.
 
 - Fix dormant Event Store migration retries and recovery ownership, pre-cutover doctor warnings, HEAD-only reads, and restorable nested porting rollback exports.

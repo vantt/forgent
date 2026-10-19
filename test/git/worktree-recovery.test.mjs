@@ -38,3 +38,16 @@ test('doctor reports foreign admin files and preserves ignored provisioned direc
     assert.equal(fs.readFileSync(foreign,'utf8'),'keep');
   } finally {f.cleanup();}
 });
+test('doctor treats a worktree locked by a live process as advisory and a dead owner as a finding', {skip:process.platform!=='linux'},async()=>{
+  const { spawn } = await import('node:child_process');
+  const f=fixture(); const holder=spawn('sleep',['60']);
+  try {
+    const worker=path.join(f.temp,'worker'); f.git('worktree','add','--detach',worker);
+    f.git('worktree','lock','--reason',`locked agent run (pid ${holder.pid})`,worker);
+    const live=checkGit(f.repoPath,'git-worktree-recovery',f.loader);
+    assert.equal(live.passed,true,live.message); assert.match(live.message,/locked-by-live-process/);
+    holder.kill('SIGKILL'); await new Promise(r=>holder.once('exit',r));
+    const dead=checkGit(f.repoPath,'git-worktree-recovery',f.loader);
+    assert.equal(dead.passed,false); assert.match(dead.message,/locked-registration/);
+  } finally { holder.kill('SIGKILL'); f.cleanup(); }
+});

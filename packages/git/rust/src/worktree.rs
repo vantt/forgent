@@ -23,6 +23,57 @@ pub struct WorktreeHandle {
     pub tip: Oid,
     pub creation_identity: String,
 }
+/// The pid a `git worktree lock` reason names: the number after a `pid`
+/// token (`pid 42`, `(pid=42`, `pid:42`). Generic, not tied to any harness.
+fn pid_named_by(reason: &str) -> Option<u32> {
+    let lower = reason.to_ascii_lowercase();
+    let mut from = 0;
+    while let Some(at) = lower[from..].find("pid") {
+        let rest = lower[from + at + 3..].trim_start_matches([' ', ':', '=']);
+        let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
+        if let Ok(pid) = digits.parse() {
+            return Some(pid);
+        }
+        from += at + 3;
+    }
+    None
+}
+/// True when the lock reason names a process that was already running when the
+/// lock file was written and still is (pid plus start time, never a bare pid:
+/// a process started after the lock is a reused pid). Unknown is false, so the
+/// registration stays a finding.
+#[cfg(target_os = "linux")]
+fn lock_names_live_process(lock: &Path) -> bool {
+    use fgos_process::facts::{boot_ticks_now, observe, Observed};
+    use fgos_process::ProcId;
+    let Some(pid) = fs::read_to_string(lock).ok().as_deref().and_then(pid_named_by) else {
+        return false;
+    };
+    let Observed::Live { start_time } = observe(ProcId(pid)) else {
+        return false;
+    };
+    let (Ok(started), Some(now_ticks)) = (start_time.parse::<u64>(), boot_ticks_now()) else {
+        return false;
+    };
+    let Some(age) = fs::metadata(lock)
+        .and_then(|m| m.modified())
+        .ok()
+        .and_then(|t| t.elapsed().ok())
+    else {
+        return false;
+    };
+    // SAFETY: sysconf only reads a limit.
+    let hz = unsafe { libc::sysconf(libc::_SC_CLK_TCK) };
+    if hz <= 0 {
+        return false;
+    }
+    let lock_ticks = now_ticks.saturating_sub(age.as_secs() * hz as u64);
+    started <= lock_ticks + hz as u64
+}
+#[cfg(not(target_os = "linux"))]
+fn lock_names_live_process(_lock: &Path) -> bool {
+    false
+}
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WorktreeIssue {
@@ -1091,7 +1142,11 @@ impl GitDriver {
             } else if missing(&path)? {
                 Some("missing-worktree-preserved")
             } else if !missing(&admin.join("locked"))? {
-                Some("locked-registration")
+                Some(if lock_names_live_process(&admin.join("locked")) {
+                    "locked-by-live-process"
+                } else {
+                    "locked-registration"
+                })
             } else {
                 match self.worktree_handle(repo, &path) {
                     Err(_) => Some("registration-backlink-mismatch"),
