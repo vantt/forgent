@@ -446,7 +446,9 @@ async function run(args) {
 }
 
 async function rollback(root, fgctl, descriptor, index, loader) {
-  const { computeArtifactDigest } = await import('../build-rust-distribution.mjs');
+  const { computeArtifactDigest, classifyReleasePath, nativeAddonComponent } = await import('../build-rust-distribution.mjs');
+  const staged = JSON.parse(fs.readFileSync(descriptor, 'utf8'));
+  const addonSource = path.join(staged.releaseRoot, staged.manifest.components.nativeAddon.path);
   const base = privateDir(path.join(root, 'rollback'));
   const ws = path.join(base, 'ws');
   git(['init', '-q', ws]);
@@ -461,7 +463,14 @@ async function rollback(root, fgctl, descriptor, index, loader) {
     fs.mkdirSync(path.join(dir, 'libexec/legacy-node/bin'), { recursive: true });
     fs.writeFileSync(path.join(dir, 'bin/fgos'), host, { mode: 0o755 });
     fs.writeFileSync(path.join(dir, 'libexec/legacy-node/bin/fgos.mjs'), legacy);
-    const manifest = { schemaVersion: 1, entries: { fgos: 'bin/fgos' }, capabilities: wal ? ['git-wal-v1'] : [], components: { legacyNode: { root: 'libexec/legacy-node', entry: 'bin/fgos.mjs', digest: sha(legacy) } }, requires: {}, stateSchemas: { read: ['1'], write: ['1'], migrations: [] }, target: { os: 'linux', arch: 'x64' }, files: [{ path: 'bin/fgos', kind: 'file', digest: sha(host), mode: '755', class: 'immutable-entry' }, { path: 'libexec/legacy-node/bin/fgos.mjs', kind: 'file', digest: sha(legacy), mode: '644', class: 'immutable-runtime' }] };
+    // Both releases carry the addon exactly as the release producer stages it;
+    // only the release-level git-wal-v1 capability tells them apart.
+    const addonRelative = 'libexec/native/fgos.node';
+    fs.mkdirSync(path.join(dir, path.dirname(addonRelative)), { recursive: true });
+    fs.copyFileSync(addonSource, path.join(dir, addonRelative));
+    fs.chmodSync(path.join(dir, addonRelative), 0o644);
+    const nativeAddon = nativeAddonComponent(path.join(dir, addonRelative), addonRelative, CHECKOUT);
+    const manifest = { schemaVersion: 1, entries: { fgos: 'bin/fgos' }, capabilities: wal ? ['git-wal-v1'] : [], components: { legacyNode: { root: 'libexec/legacy-node', entry: 'bin/fgos.mjs', digest: sha(legacy) }, nativeAddon }, requires: {}, stateSchemas: { read: ['1'], write: ['1'], migrations: [] }, target: { os: 'linux', arch: 'x64' }, files: [{ path: 'bin/fgos', kind: 'file', digest: sha(host), mode: '755', class: 'immutable-entry' }, { path: 'libexec/legacy-node/bin/fgos.mjs', kind: 'file', digest: sha(legacy), mode: '644', class: 'immutable-runtime' }, { path: addonRelative, kind: 'file', digest: `sha256:${nativeAddon.digest}`, mode: '644', class: classifyReleasePath(addonRelative) }] };
     fs.writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify({ ...manifest, artifactDigest: computeArtifactDigest(manifest) }));
     return dir;
   };
