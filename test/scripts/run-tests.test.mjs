@@ -4,10 +4,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue } from '../../scripts/lib/test-file-watchdog.mjs';
-import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES } from '../../scripts/run-tests.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -119,15 +119,17 @@ test('DEFAULT_TEST_ROOT resolves to <repo>/test', () => {
   assert.ok(fs.existsSync(DEFAULT_TEST_ROOT));
 });
 
+const GUARD_ARG = `--import=${pathToFileURL(GIT_CONFIG_GUARD_PATH).href}`;
+
 // --- buildTestArgv: ordering ------------------------------------------------
 
 test('buildTestArgv places forwarded flags before the full file list, both after --test', () => {
   const argv = buildTestArgv(['test/a.test.mjs', 'test/b.test.mjs'], ['--test-reporter=tap', '--test-concurrency=1']);
-  assert.deepEqual(argv, ['--test', '--test-reporter=tap', '--test-concurrency=1', 'test/a.test.mjs', 'test/b.test.mjs']);
+  assert.deepEqual(argv, ['--test', GUARD_ARG, '--test-reporter=tap', '--test-concurrency=1', 'test/a.test.mjs', 'test/b.test.mjs']);
 });
 
 test('buildTestArgv with no forwarded args is just --test plus the files', () => {
-  assert.deepEqual(buildTestArgv(['x.test.mjs']), ['--test', 'x.test.mjs']);
+  assert.deepEqual(buildTestArgv(['x.test.mjs']), ['--test', GUARD_ARG, 'x.test.mjs']);
 });
 
 // --- runTests: env merge, argv shape, zero-file refusal ---------------------
@@ -167,7 +169,7 @@ test('runTests spawns node --test with the discovered files as argv elements and
 
   assert.equal(result.status, 0);
   assert.equal(captured.execPath, '/fake/node');
-  assert.deepEqual(captured.argv, ['--test', path.relative(root, f)]);
+  assert.deepEqual(captured.argv, ['--test', GUARD_ARG, path.relative(root, f)]);
   assert.equal(captured.opts.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
   assert.equal(captured.opts.env.PATH, '/usr/bin');
   assert.equal(captured.opts.env.UNRELATED, 'kept');
@@ -743,3 +745,64 @@ if (process.argv[1] === ${JSON.stringify(watchdogPath)}) {
     }
   });
 }
+
+// --- identity guard: the checkout's own repository must keep its identity -------------------------
+
+function identityRepo() {
+  const base = tempBase();
+  execFileSync('git', ['init', '-q'], { cwd: base });
+  return base;
+}
+
+test('snapshotGitIdentity lists only user, author and committer keys of the repository config', () => {
+  const base = identityRepo();
+  execFileSync('git', ['config', 'user.name', 'Owner Name'], { cwd: base });
+  execFileSync('git', ['config', 'core.editor', 'true'], { cwd: base });
+  assert.deepEqual(snapshotGitIdentity(base), ['local: user.name Owner Name']);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('snapshotGitIdentity is empty outside a repository', () => {
+  const base = tempBase();
+  assert.deepEqual(snapshotGitIdentity(base, () => { throw new Error('not a repository'); }), []);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('diffGitIdentity reports an added, removed and rewritten identity key', () => {
+  const diff = diffGitIdentity(['local: user.name Owner', 'local: user.email a@b'], ['local: user.name Test', 'local: committer.name X']);
+  assert.deepEqual(diff.added, ['local: committer.name X']);
+  assert.deepEqual(diff.removed, ['local: user.email a@b']);
+  assert.deepEqual(diff.changed, ['local: user.name Owner -> local: user.name Test']);
+  assert.equal(diff.leaked, true);
+  assert.equal(diffGitIdentity(['local: user.name Owner'], ['local: user.name Owner']).leaked, false);
+});
+
+test('runSelectedTests fails the run when a test file rewrites the checkout identity, and names the keys', () => {
+  const base = identityRepo();
+  execFileSync('git', ['config', 'user.name', 'Owner Name'], { cwd: base });
+  const logs = [];
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    log: (m) => logs.push(m),
+    spawn: () => {
+      execFileSync('git', ['config', 'user.name', 'Test'], { cwd: base });
+      execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: base });
+      return { status: 0 };
+    },
+  });
+  assert.equal(result.status, 1, 'a suite that rewrote the identity must not pass');
+  assert.equal(result.gitIdentityDiff.leaked, true);
+  assert.match(logs.join('\n'), /changed the git identity/);
+  assert.match(logs.join('\n'), /\+ local: user\.email test@example\.com/);
+  assert.match(logs.join('\n'), /\* local: user\.name Owner Name -> local: user\.name Test/);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests leaves the run green when the identity keys are untouched', () => {
+  const base = identityRepo();
+  execFileSync('git', ['config', 'user.name', 'Owner Name'], { cwd: base });
+  const result = runSelectedTests(['a.test.mjs'], { cwd: base, spawn: () => ({ status: 0 }) });
+  assert.equal(result.status, 0);
+  assert.equal(result.gitIdentityDiff.leaked, false);
+  fs.rmSync(base, { recursive: true, force: true });
+});

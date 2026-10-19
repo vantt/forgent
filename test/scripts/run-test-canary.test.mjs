@@ -317,7 +317,7 @@ test('a failing canary demonstrably returns before a full-suite run would even s
     cwd: root,
     spawn: (execPath, argv) => {
       // A real full-suite invocation would include more than just the canary file.
-      if (argv.length > 2) fullSuiteSpawnHappened = true;
+      if (argv.filter((arg) => arg.endsWith('.test.mjs')).length > 1) fullSuiteSpawnHappened = true;
       return { status: 1 };
     },
   });

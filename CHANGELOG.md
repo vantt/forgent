@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Workflow definitions load into one guide model (milestones, activities, decision points, MUST rows that each name an existing check, unenforced rules, frame defaults). Playbooks keep their steps and gain a short guide head; a MUST naming a check outside the catalog, an expression field, `listedRoutesOnly` outside a decision point, or `rigorCeiling` is a load error. A run's start event records the normalised guide.
 
 - `fgos workflow start --plan` is removed (an unknown flag now): the AgentKit plan is read as an artifact and its phases run as Units through `fgos run` or `fgos workflow start --units <file>`. The coding workflow file drops its dead runner fields (`units`, `dependsOn`, `gate` and the `integrate` and `approval` steps); its lifecycle part is unchanged.
+- End terminal rounds with `terminal:result-unreadable` when an invalid result stays unchanged for 30 seconds and the agent is idle, releasing custody through normal settlement.
+- Preserve committed decision-index rows missing from local state during setup and doctor fixes; exclude git-ignored setup output consistently from release payloads and checkout drift checks.
+- Warn once per unreadable pid per Worktree removal or relocation, and allow clean tracked `.fgos` while preserving reappearing skip-worktree state and dirty bytes.
+- Arm the Linux terminal gate’s parent-death signal so a killed sandbox monitor ends its namespace; read all kernel lock-table pages while retaining shared-probe release confirmation.
 
 - Warn with pid and comm when a same-user process cwd is unreadable during Worktree removal or relocation; readable checkout cwds still refuse.
 

@@ -115,6 +115,18 @@ fn containment_killing_the_gate_stops_a_setsid_grandchild_and_empties_the_domain
     spawned.child.wait().unwrap();
 }
 
+/// A cooperative terminal gate: arm the same primitive as the production gate
+/// before exec, retaining PID 1 and its death signal across the exec.
+#[test]
+fn containment_terminal_gate_helper() {
+    use std::os::unix::process::CommandExt;
+    let Ok(dir) = std::env::var("FGOS_CONTAINMENT_GATE_DIR") else { return };
+    fgos_process::control::arm_parent_death_signal().unwrap();
+    let err = Command::new("sh").arg(fixture("heartbeat-grandchild.sh"))
+        .arg(Path::new(&dir).join("beat")).exec();
+    panic!("gate exec: {err}");
+}
+
 /// Role of the process the next test kills: it starts the gate and sleeps.
 #[test]
 fn containment_supervisor_helper() {
@@ -125,12 +137,24 @@ fn containment_supervisor_helper() {
     let mode = if mode == "terminal" { StartMode::Terminal } else { StartMode::Direct };
     let script = fixture("heartbeat-grandchild.sh");
     let mut domain = driver.create("attempt-supervisor").unwrap();
-    let mut spawned = driver.spawn_in(&mut domain, spec(&["sh", &script, &dir.join("beat").display().to_string()], mode)).unwrap();
+    let mut launch = spec(&["sh", &script, &dir.join("beat").display().to_string()], mode);
+    if mode == StartMode::Terminal {
+        launch.argv = vec![std::env::current_exe().unwrap().display().to_string(),
+            "--exact".into(), "containment_terminal_gate_helper".into(),
+            "--nocapture".into(), "--test-threads=1".into()];
+        launch.env.insert("FGOS_CONTAINMENT_GATE_DIR".into(), dir.display().to_string());
+    }
+    let mut spawned = driver.spawn_in(&mut domain, launch).unwrap();
     fs::write(dir.join("gate-pid"), spawned.root.pid.0.to_string()).unwrap();
     let _ = spawned.child.wait();
 }
 
-fn run_with_killed_supervisor(mode: &str) -> Option<(PathBuf, ProcTuple)> {
+struct GateCleanup(ProcTuple);
+impl Drop for GateCleanup {
+    fn drop(&mut self) { let _ = signal_by_identity(&self.0, Signal::Kill); }
+}
+
+fn run_with_killed_supervisor(mode: &str) -> Option<(PathBuf, GateCleanup)> {
     bwrap_driver(mode)?;
     let dir = scratch(mode);
     let mut helper = Command::new(std::env::current_exe().unwrap())
@@ -141,7 +165,7 @@ fn run_with_killed_supervisor(mode: &str) -> Option<(PathBuf, ProcTuple)> {
         .stderr(Stdio::null())
         .spawn()
         .unwrap();
-    let gate = identity(wait_for(&dir.join("gate-pid")).trim().parse().unwrap());
+    let gate = GateCleanup(identity(wait_for(&dir.join("gate-pid")).trim().parse().unwrap()));
     let beat = dir.join("beat");
     wait_for(&beat);
     helper.kill().unwrap();
@@ -156,7 +180,7 @@ fn containment_direct_gate_outlives_a_killed_supervisor() {
     let before = lines(&beat);
     sleep(Duration::from_millis(300));
     assert!(lines(&beat) > before, "the namespace keeps running after its supervisor was killed");
-    let _ = signal_by_identity(&gate, Signal::Kill);
+    drop(gate);
 }
 
 #[test]
@@ -165,7 +189,7 @@ fn containment_terminal_gate_dies_with_a_killed_supervisor() {
     let before = lines(&beat);
     sleep(Duration::from_millis(300));
     assert_eq!(lines(&beat), before, "a terminal attempt dies with its supervisor");
-    let _ = signal_by_identity(&gate, Signal::Kill);
+    drop(gate);
 }
 
 #[test]

@@ -26,7 +26,7 @@ const {
   activatedHolderLockRelease,
   MAX_KILL_WAIT_MS,
 } = await import('../../src/setup/holder-lock-checks.mjs');
-const { checkStopped, ownPidChain, fenceStatus } = await import('../../src/holder-lock/fences.mjs');
+const { fenceStatus, placeFences } = await import('../../src/holder-lock/fences.mjs');
 const { descriptionHolders } = await import('../../src/holder-lock/driver.mjs');
 const { getBootId, getPidNs, getProcessStartTime } = await import('../../src/runner/dispatch/process-identity.mjs');
 
@@ -252,10 +252,11 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
   const lock = path.join(dir, 'attempt.lock');
   fs.writeFileSync(lock, '');
 
-  // The monitor is a copy of sleep named bwrap: only a process of that name can be a member.
+  // The monitor is a script named bwrap: only a process of that name can be a member. A copied
+  // binary is not portable (a multi-call coreutils sleep picks its tool from argv[0]). Its sleep
+  // child drops the lock descriptor, so the monitor is the only other holder.
   const bwrap = path.join(scratch, 'bwrap');
-  fs.copyFileSync(execFileSync('sh', ['-c', 'command -v sleep'], { encoding: 'utf8' }).trim(), bwrap);
-  fs.chmodSync(bwrap, 0o755);
+  fs.writeFileSync(bwrap, '#!/bin/sh\nsleep "$1" 9>&- &\nwait\n', { mode: 0o755 });
   // The parent plays the supervisor (it carries the lock marker); its child keeps the same description
   // with no marker at all, as the bwrap monitor does.
   const supervisor = spawn('sh', ['-c', 'exec 9>>"$1"; flock -x 9; env -i "$2" 30 & wait', 'sh', lock, bwrap], { env: foreignEnv({ FGOS_LOCK_FD: 'attempt:9' }), stdio: 'ignore' });
@@ -271,6 +272,7 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
     assert.ok(Date.now() < deadline, 'supervisor and monitor did not both hold the lock');
     await new Promise((resolve) => { setTimeout(resolve, 20); });
   }
+  const monitorCmdline = fs.readFileSync(`/proc/${monitorPid}/cmdline`, 'utf8').split('\0').filter(Boolean).join(' ');
   const member = checkLockHolders(root);
   assert.match(member.message, /^1 lock file\(s\) of 18 locks, 1 held, every holder a fgOS process or a borrowed child$/, member.message);
 
@@ -283,7 +285,7 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
       await new Promise((resolve) => { setTimeout(resolve, 20); });
     }
   })();
-  assert.match(named.message, new RegExp(`^warning: attempt .*attempt\\.lock held by pid ${monitorPid} \\(${bwrap.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')} 30\\), not a fgOS process nor a borrowed child`));
+  assert.match(named.message, new RegExp(`^warning: attempt .*attempt\\.lock held by pid ${monitorPid} \\(${monitorCmdline.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}\\), not a fgOS process nor a borrowed child`));
   process.kill(monitorPid, 'SIGKILL');
 });
 
@@ -340,12 +342,22 @@ function activate(root, { withRegistry }) {
   writeConfig(path.join(root, '.fgos', 'installation', 'activation.json'), { schemaVersion: 1, status: 'ready', releasePath: release });
 }
 
-/** fgOS processes of other sessions match every workspace through their argv; name the ones running now (fences-stop-check does the same). */
-function otherSessionPids() {
-  const probe = path.join(scratch, 'foreign-probe');
-  fs.mkdirSync(probe, { recursive: true });
-  const scan = checkStopped({ workspaces: [probe], hostBin: HOST_BIN });
-  return [...ownPidChain(), ...scan.blockers.filter((b) => b.kind === 'process').map((b) => b.pid)];
+/**
+ * The production fence fix scans the whole machine (a stop-everything cutover),
+ * so what other sessions run at this moment would decide these tests. The
+ * fixture gives the fix the host's own workspace-scoped scan (`--workspace-only`,
+ * the mode the Git gate uses): only processes working in the fixture workspace
+ * count, and every other route passes through to the real host untouched.
+ */
+function workspaceScopedHost() {
+  const shim = path.join(scratch, 'workspace-scoped-host.sh');
+  if (!fs.existsSync(shim)) {
+    fs.writeFileSync(shim, `#!/bin/sh
+if [ "$2" = "quiesce-scan" ]; then exec "${HOST_BIN}" "$@" --workspace-only; fi
+exec "${HOST_BIN}" "$@"
+`, { mode: 0o755 });
+  }
+  return shim;
 }
 
 test('lock-fences sees the missing fences, and the fix places them only under an activated holder-lock release', () => {
@@ -366,11 +378,7 @@ test('lock-fences sees the missing fences, and the fix places them only under an
 
   activate(root, { withRegistry: true });
   assert.match(checkLockFences(root, { providerRuntimeDir }).message, / -- stop every fgOS process of this workspace, then run fgos doctor --fix$/);
-  let fixed;
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    fixed = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN, excludePids: otherSessionPids() });
-    if (fixed.changed || !/still running/.test(fixed.message)) break;
-  }
+  const fixed = fixLockFences(root, { providerRuntimeDir, hostBin: workspaceScopedHost() });
   assert.equal(fixed.changed, true, fixed.message);
   assert.match(fixed.message, /^placed 13 fence\(s\)/);
   assert.equal(checkLockFences(root, { providerRuntimeDir }).passed, false);
@@ -381,6 +389,10 @@ test('lock-fences sees the missing fences, and the fix places them only under an
 
 test('a payload registry without the Rust callers\' locks fences only the locks it owns, leaving the paths an older fgctl still uses', () => {
   const root = workspace('fences-owners');
+  // Establish the machine-wide fence independently of earlier tests.
+  const preconditionRoot = workspace('fences-owners-precondition');
+  assert.equal(placeFences({ fgosDir: path.join(preconditionRoot, '.fgos'), workspaceRoot: preconditionRoot,
+    providerRuntimeDir: path.join(scratch, 'fences-owners-precondition'), owners: ['4.4'] }).ok, true);
   const providerRuntimeDir = path.join(scratch, 'fences-owners-provider-capacity');
   activate(root, { withRegistry: true });
   const activation = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'installation', 'activation.json'), 'utf8'));
@@ -390,15 +402,11 @@ test('a payload registry without the Rust callers\' locks fences only the locks 
   writeConfig(registryPath, registry);
   const owners = activatedHolderLockRelease(root).owners;
   assert.ok(owners.includes('4.2') && !owners.includes('4.4'), owners.join(','));
-  let fixed;
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    fixed = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN, excludePids: otherSessionPids() });
-    if (fixed.changed || !/still running/.test(fixed.message)) break;
-  }
+  const fixed = fixLockFences(root, { providerRuntimeDir, hostBin: workspaceScopedHost() });
   assert.equal(fixed.changed, true, fixed.message);
   assert.match(fixed.message, /^placed 10 fence\(s\)/);
   const status = fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir });
-  // The install tombstone is machine-wide and an earlier test already placed it under the shared state root.
+  // The explicit precondition above placed the machine-wide install tombstone.
   assert.deepEqual(status.missing.map((file) => path.relative(path.join(root, '.fgos'), file)).sort(), [path.join('installation', 'activation.lock'), path.join('observe', '.lock')]);
   assert.deepEqual(status.controllerMissing.map((file) => path.relative(path.join(root, '.fgos'), file)), [path.join('locks', 'activation.lock')], 'the controller fence stays with fgctl');
   assert.deepEqual(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }), {
@@ -417,7 +425,7 @@ test('the fence fix refuses while an fgOS payload of the workspace runs, and nam
   children.add(payload);
   await new Promise((resolve) => { payload.once('spawn', resolve); });
   const providerRuntimeDir = path.join(scratch, 'fences-blocked-provider-capacity');
-  const res = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN, excludePids: otherSessionPids().filter((pid) => pid !== payload.pid) });
+  const res = fixLockFences(root, { providerRuntimeDir, hostBin: workspaceScopedHost() });
   assert.equal(res.changed, false);
   assert.match(res.message, new RegExp(`^fences not placed: fgOS processes still running, stop them first: .*pid ${payload.pid} `));
   assert.equal(fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir }).complete, false);

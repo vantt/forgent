@@ -23,7 +23,7 @@ import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
 import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
@@ -151,8 +151,12 @@ export function discoverTestFiles(root = DEFAULT_TEST_ROOT) {
  * caller-supplied file list in place of it (R5: the default `npm test`
  * door must never let a caller narrow the full-suite selection).
  */
+export const GIT_CONFIG_GUARD_PATH = path.join(REPO_ROOT, 'scripts', 'lib', 'test-git-config-guard.mjs');
+
 export function buildTestArgv(files, forwardedArgs = []) {
-  return ['--test', ...forwardedArgs, ...files];
+  // The guard is preloaded into every test file's process: a `git config` write that would land in
+  // this checkout's own repository is refused there, before it can rewrite the owner's identity.
+  return ['--test', `--import=${pathToFileURL(GIT_CONFIG_GUARD_PATH).href}`, ...forwardedArgs, ...files];
 }
 
 /**
@@ -246,6 +250,47 @@ function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, log }) 
     },
   };
 }
+/**
+ * The identity keys (user.*, author.*, committer.*) the checkout's repository config holds, as
+ * `scope: key=value` lines. A fixture that configures an identity in the wrong repository changes
+ * exactly this, and every later commit of the checkout's owner then carries the fixture's name.
+ * Covers the shared config and a linked worktree's own config.worktree; the machine-wide config is
+ * not this checkout's. Empty when `cwd` is not a repository.
+ */
+export const GIT_IDENTITY_KEYS = '^(user|author|committer)\\.';
+export function snapshotGitIdentity(cwd, exec = execFileSync) {
+  const read = (args) => {
+    try {
+      return String(exec('git', ['-C', cwd, 'config', ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })).split('\n').filter(Boolean);
+    } catch {
+      return []; // No such key (git exits 1) or not a repository: nothing held in this scope.
+    }
+  };
+  const scopes = ['--local'];
+  // Without extensions.worktreeConfig, `--worktree` is just `--local` again.
+  if (read(['--local', '--type=bool', '--get', 'extensions.worktreeConfig'])[0] === 'true') scopes.push('--worktree');
+  return scopes.flatMap((scope) => read([scope, '--get-regexp', GIT_IDENTITY_KEYS]).map((line) => `${scope.slice(2)}: ${line}`)).sort();
+}
+
+/** What changed between two `snapshotGitIdentity` results: `{ added, removed, changed }`. */
+export function diffGitIdentity(before, after) {
+  const asMap = (lines) => new Map(lines.map((line) => {
+    const space = line.indexOf(' ', line.indexOf(': ') + 2);
+    return [space < 0 ? line : line.slice(0, space), line];
+  }));
+  const b = asMap(before);
+  const a = asMap(after);
+  const added = [];
+  const removed = [];
+  const changed = [];
+  for (const [key, line] of a) {
+    if (!b.has(key)) added.push(line);
+    else if (b.get(key) !== line) changed.push(`${b.get(key)} -> ${line}`);
+  }
+  for (const [key, line] of b) if (!a.has(key)) removed.push(line);
+  return { added, removed, changed, leaked: added.length + removed.length + changed.length > 0 };
+}
+
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
 // Derived files that any read of the live store may rewrite: the state view is a cache folded
@@ -374,6 +419,7 @@ export function runSelectedTests(files, {
   }
 
   const fgosBefore = snapshotFgos(cwd);
+  const identityBefore = snapshotGitIdentity(cwd);
 
   let result;
   let timedOut = [];
@@ -432,6 +478,17 @@ export function runSelectedTests(files, {
       log(`  Deleted (${fgosDiff.deleted.length}):`);
       for (const f of fgosDiff.deleted) log(`    - .fgos/${f}`);
     }
+    result.status = result.status !== 0 ? result.status : 1;
+  }
+
+  const identityDiff = diffGitIdentity(identityBefore, snapshotGitIdentity(cwd));
+  result.gitIdentityDiff = identityDiff;
+  if (identityDiff.leaked) {
+    log('run-tests: ERROR: test suite changed the git identity held by this checkout\'s own repository config:');
+    for (const line of identityDiff.added) log(`  + ${line}`);
+    for (const line of identityDiff.removed) log(`  - ${line}`);
+    for (const line of identityDiff.changed) log(`  * ${line}`);
+    log('  A fixture ran `git config user.*` outside its own temporary repository; restore the keys above with `git config --local`.');
     result.status = result.status !== 0 ? result.status : 1;
   }
 
