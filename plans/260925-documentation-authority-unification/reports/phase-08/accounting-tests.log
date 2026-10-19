@@ -1,0 +1,159 @@
+✔ ADR<n> form is recognized (1.502542ms)
+✔ bare NNNN form is recognized only when known (0.196488ms)
+✔ a bare id inside an ADR<id> match is not double-counted (0.133598ms)
+✔ multiple distinct ids on one line (0.10821ms)
+✔ a superseded id cited with no acknowledgement reports a dead-framing finding (0.256242ms)
+✔ citing both the superseded id and its superseding id on the same line reports zero (0.115251ms)
+✔ citing a decision that was never superseded reports zero findings (0.105499ms)
+✔ CLI run over a fixture reports the dead-framing finding and exits 1 (31.809113ms)
+✔ CLI run over a fixture with no drift exits 0 (32.083935ms)
+✔ a paren with real prose is a gloss (0.334814ms)
+✔ a paren with only other id tokens is not a gloss (0.181475ms)
+✔ an empty paren is not a gloss (0.081941ms)
+✔ no paren at all is not a gloss (0.113466ms)
+✔ a bare ADR citation with no gloss reports bare-citation (0.548153ms)
+✔ an ADR citation with a real gloss reports nothing (0.147339ms)
+✔ a RUL citation with only the old area-suffix, no real gloss, still reports bare-citation (0.116731ms)
+✔ a D-local id cited outside its own CONTEXT.md reports d-local-outside-home, gloss or not (0.095136ms)
+✔ a D-local id cited inside its OWN CONTEXT.md reports nothing (0.075491ms)
+✔ a comma-list of D-local ids each report their own finding (0.105167ms)
+✔ a slash-separated D-local list reports each id separately (0.076587ms)
+✔ a heading-parenthetical D-local citation still reports (0.051528ms)
+✔ a citation inside a fenced code block is skipped (0.05564ms)
+✔ a baselined finding does not report as new, a genuinely new one does (0.214292ms)
+✔ a shifted line number alone does not make a baselined finding report as new (tsk-3x8 F1: content-keyed, not line-keyed) (0.094109ms)
+✔ two citations of the same id on different lines/text stay distinct (0.069389ms)
+✔ a genuinely new Nth occurrence of an already-duplicated key is not silently absorbed (tsk-6at: count consumption, not membership) (0.102302ms)
+✔ findNewFindings/baselineFromFindings do not throw on a "__proto__" file (tsk-1pf: Object.create(null) hardening) (0.089825ms)
+✔ --write-baseline snapshots current findings, and a bare re-run against the SAME tree exits 0 (67.140205ms)
+✔ a NEW finding appended after --write-baseline still fails (63.207454ms)
+✔ a line inserted BEFORE a baselined finding does not make it report as new (tsk-3x8 F1: the exact hand-verified repro, CLI level) (74.120856ms)
+✔ CLI run against the real repo root, with the checked-in baseline, exits 0 (76.17454ms)
+✔ deterministic generation: generating baseline twice yields byte-for-byte identical content (2.646394ms)
+✔ class/scope: properly classifies markdown authority, retained sources, and non-markdown evidence (0.179439ms)
+✔ new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file (1.408516ms)
+✔ accounted edit: file modified with valid reviewed exception passes (0.77303ms)
+✔ unaccounted edit: file modified without exception or with digest mismatch is refused (0.581456ms)
+✔ unexpected deletion: baselined file missing without exception is refused (0.468488ms)
+✔ malformed baseline: schema validator rejects invalid baseline structures (0.488914ms)
+✔ malformed exception: schema validator rejects invalid exception objects (0.92086ms)
+✔ canonicalizeExceptionPath: canonicalizes posix relative paths and rejects absolute/traversal paths (R2) (0.244576ms)
+✔ dotfiles: unreviewed dotfile under legacy root is detected and refused (0.684125ms)
+✔ non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry (R4) (4.281652ms)
+✔ symlink identity: replacing a symlink with regular file of identical bytes is refused (0.590175ms)
+✔ symlink target: retargeting a symlink to another file of equal bytes is refused (3.797434ms)
+✔ tree escape: symlink pointing outside repository root or directory symlink is refused (0.49926ms)
+✔ classification: includes curated generated projections alongside maintained authority (0.109751ms)
+✔ CLI: exits 0 on clean tree and exits 1 on finding (109.032802ms)
+✔ live self-check: repository baseline and ratchet verify cleanly (93.165256ms)
+✔ policy-aware: permits edited and new generated projections without exception (0.54756ms)
+✔ policy-aware: permits new and edited history-evidence payloads without exception (0.673385ms)
+✔ maintained controls: blocks unreviewed new maintained-authority and retained-source files (0.647737ms)
+✔ maintained controls: blocks unaccounted edits to maintained-authority and retained-source (0.59147ms)
+✔ safety: detects and refuses class spoofing attempts in baseline (0.457287ms)
+✔ messages: ensure messages do not call non-authority payloads maintained authority (0.401723ms)
+✔ expired exceptions: exceptions past expiry date are flagged with expired-exception (0.447162ms)
+✔ unused exceptions: exceptions with no matching on-disk edit or new file are flagged with unused-exception (0.416713ms)
+✔ root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypassing ratchet (F1) (0.414777ms)
+✔ exact generated projection matching: docs/specs/platform-foundations.MD and PLATFORM-FOUNDATIONS.md classify as maintained-authority and are refused as unreviewed new files (F1 residual) (0.457591ms)
+✔ expiry boundary: explicitly tests active vs expired on expiry date (F4) (0.517017ms)
+✔ reproduction rejects missing or repository output ["consistency"] (35.104276ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/unsafe.json"] (32.108108ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","relative.json"] (31.847481ms)
+✔ direct audit rejects a symlink output before reading the corpus (39.556898ms)
+✔ direct audit rejects a dangling-symlink output before reading the corpus (33.6291ms)
+✔ direct audit rejects a hardlink output before reading the corpus (39.125755ms)
+✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (11393.422537ms)
+✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (11403.381432ms)
+ℹ tests 67
+ℹ suites 0
+ℹ pass 65
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 23051.195323
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale-reproduction.test.mjs:23:131
+✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (11393.422537ms)
+  AssertionError [ERR_ASSERTION]: audit-ownership.mjs
+  
+  node:internal/modules/run_main:107
+      triggerUncaughtException(
+      ^
+  
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert(current.noNewDoubleOwnership)
+  
+      at file:///tmp/fgos-work/reviewer-fresh-BTW8Lg/audit-ownership.mjs:8:56 {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+  
+  Node.js v24.18.0
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-reproduction.test.mjs:30:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-rationale-reproduction.test.mjs:23:131
+✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (11403.381432ms)
+  AssertionError [ERR_ASSERTION]: audit-ownership.mjs
+  
+  node:internal/modules/run_main:107
+      triggerUncaughtException(
+      ^
+  
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert(current.noNewDoubleOwnership)
+  
+      at file:///tmp/fgos-work/reviewer-fresh-ytnB31/audit-ownership.mjs:8:56 {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+  
+  Node.js v24.18.0
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-reproduction.test.mjs:30:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

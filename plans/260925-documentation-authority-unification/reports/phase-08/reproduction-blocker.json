@@ -1,0 +1,700 @@
+{
+  "sourceCommit": "49ad04648447439b5c243af6ddd0b604acb5b3e5",
+  "reproductionManifest": "reports/phase-06/step10-round5-reproduction.json",
+  "command": "env -u CLAUDE_CODE_SESSION_ID node /tmp/fgos-work/brief1-reproduction/ownership.mjs --output-dir /tmp/fgos-work/brief1-reproduction",
+  "targetDigestDriftCount": 85,
+  "countsByTarget": {
+    "docs/architecture-manifest.json": 3,
+    "docs/platform/component-boundary.md": 1,
+    "docs/specs/confinement-authority.md": 3,
+    "docs/specs/distribution.md": 3,
+    "docs/platform/packaging-distribution/contracts/release-manifest.md": 14,
+    "docs/platform/packaging-distribution/contracts/activation-binding.md": 50,
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md": 3,
+    "docs/platform/holder-lock/spec.md": 1,
+    "docs/specs/runner.md": 7
+  },
+  "rows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "d380db6aa752cd05a6f136bda5508b907accff8c8e427767be78c4a08c3d9d36"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetUnitDigest": "e693b4becd1403ce2d0e982cbe5c417090a5de42743413cbaf68aa9073edd35f"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_15308eb4847ddd38be79bd87bd69a0b6",
+      "targetOwner": "docs/specs/confinement-authority.md",
+      "targetAnchor": "unheaded-block-141",
+      "targetUnitDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "652c4935e9cd747ffdb08e497333f31a461605453d08d7553283985cf4ead7be"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_f7b23e10496a2460c655bbcd0c765cfb",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-12",
+      "targetUnitDigest": "bac0a2990fcb00aa7b8a014d4397ba8c6cf36cfe401bfc85affe20105adaad07"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_34af5eabebda68848f5a4f158e81702f",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetUnitDigest": "d54d128a83d245d152077055d35030f291cd78b240184690839922bd087e8124"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_c809de74f3631def7b3b3098a6290c9a",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-14",
+      "targetUnitDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_4ece2063c9e19d3693005ab4de9f86a1",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetUnitDigest": "ead8dd03ae57188ef8d39dbaeb54e973410f426f88701f050dbb675f87ac8829"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_ef427cea4a40a9001dcf5f004d5cda64",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetUnitDigest": "04f33e62f1f152294e35b2d568d3efcec43f8efd6629e623ead9e34bc9f860f4"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_5b308c0d698cf4b6e679cefd4b72159e",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetUnitDigest": "2c2c843c119b46a01d8e99728f09aa95a1bd650fe7c85276230a0324ccf40265"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_e53e994efd41de413243c7feb18609f5",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetUnitDigest": "7f7044001655743cdc702ec27b67e4ab6e1801cb4ea72c8b4ff3cc36fc80416f"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_3153b26f053448afc0c13f85a80b2337",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetUnitDigest": "b36d585b2b0651d5b9fd0cb39af3fa2430ab9f91154893fe4a4ba25d8fc10069"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_4486d8c871bc7cace22f5877da298119",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetUnitDigest": "97cd2867dcc936f5efe7950bc065efc46379f62647e62718b515fb4bdde90b03"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_53faf89f35a824288c56245cbe2ad881",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetUnitDigest": "738abf5487f9f299c9278c6d13076bcb9385e942dabc5437420d0741ff129b3f"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_4181e74c1b213526e0047eb5d8a3d2ac",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "089a50e18972a630a340349ad3e33a2917b313ac50cb1a1a344a6b78e6096831"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_2ce83669de6ea1d99233cd5dfee3de09",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "55012af631606c03d5fb4a9a0364f518b2e1e6c8144aef25ec3fd46db54cffdb"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_ab15836d7a655b68626a332fa0667efb",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "3d1ea331b51042a1bdaefa21bcc3b9736a3698b201646581d4c7e2210321b320"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_bb2261debf9bf9f07bb9a0841991d1a2",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "32122ff0553fd6bc31cd9e5f77b680f47feb87399f7c1e0561c50e46730b49af"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_a0843b462d3bf38fde961cbb25ca58a0",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-12",
+      "targetUnitDigest": "885678733f817f280b07d4b33f77ebe14f07d6adac8890f1731eac84a15fe455"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_b1302fab2b069f48ae2cc5e5ae9353f7",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetUnitDigest": "12b89a785769f424521322c24841709e2d53a1fe5a0c7969d85b0e71129abe4b"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_4b867492e168a488b4d812642f2aad61",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-14",
+      "targetUnitDigest": "346ec840057e1f81dffd3b79f9f0c2fa051879aeaa7d1fd1a25b619b02ad9800"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_25d3080e64bc69696f28d89967456930",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetUnitDigest": "dcbbe772314b4b46c605c86a35c1e5e25c64da8d299ef2ee22ee460360ac611d"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_377f8ce648788d30644f3bc51bfe5381",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetUnitDigest": "3e990f9e6b22795ca945fd9b59a65b78b12c3b37fbc2ea88d3fa2bf43e15ce4a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_2d797473f60376ca54f9086ff0856496",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetUnitDigest": "a04d969d83b5e49defe710e91650b6705cca0acec720219e49f163c81aff2d13"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_f44d55f008d91c249201a984ce908b79",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetUnitDigest": "88d26cd1a90388f48bc95e9cba6d19643339a3163f45cea76c829a346156247b"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_5802544189befbf7e8e93082025a321f",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetUnitDigest": "c31de9a6af67d0eb1cd6bcfb97cdd527e5def03d15a0e2314dc09a8a48ea4f72"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_627c2ef29f032273927e9dfb2f6590ee",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetUnitDigest": "dbf8dbfef2ba662c57de06f78ad450a238098cd8069d2f513587dc429ecdddd5"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_d1fbe2ed17042364fd3798e8f1acb938",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "4eb7a14280149d74fa9814bb99ec418b4638bd08c6eac32fcbfb4d68b37a5d13"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_655efd23210f4e37ebb981dab1d3572d",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "f85c2d79598886465957f90d305d2fcfb9c2510697bbac8444d542d9ebbe5e9d"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_ba307bc371864f9cec89f991fef61744",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "9d7e46eac50d16bd95ce331d38192f4a87d9797f99b71edf8ceea4205dd93ff5"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_3673677485dd4449067c9e5074623e1a",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "273e89aa19e81dcc743483fe3e51606dcf949278cadecb37a885aa39014cec2b"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_ba9547c5587487b5a423db3dfbd2a593",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetUnitDigest": "785e4981db56df9627b8591fd383cd6c57cc04d3e8116137b27e1b8aa1bd6849"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_107a23bb29dcf6db15e2471d7e77590b",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-27",
+      "targetUnitDigest": "6fbabae72e49d14c8ea861f42ffc8ee4180d3b83c968871b6ea38ace19b92d9a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_9b88f0158d85f69a82792e4b47f72022",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-28",
+      "targetUnitDigest": "0449999b7a416906c1e39a270e9c21f37d9cc2326d375cf13594e6fe38253d12"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_5d408ebec2a9651d66e1dceb37b133aa",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-29",
+      "targetUnitDigest": "7db0392a7929f28b94d89e713f924622ad7f686b20f8070c87360ecd964b2b22"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_644be2fa35959c10348a048777c5f1b9",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-30",
+      "targetUnitDigest": "e46b094a9d547703457cd1874db926f229c5f840fdc4c04f70ee621f8d25e57a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_6db1dcef195562e8c4244f6ad6d0a032",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-31",
+      "targetUnitDigest": "dc365e00a42eed9599e3c3364e4fdc6934ded461577fc2edbffbbc164163f43c"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_a56575cde3ab1f361ab6e7079699886f",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-32",
+      "targetUnitDigest": "7925f88545b7297188e1883a5707b8dbb1dfee8bd4fd4797783de1e0d8b26267"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_14de31f9e2756afe4d30767125f2f302",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-33",
+      "targetUnitDigest": "e260a8e1fa942a1f5bf1c99a7ba7abd14dac6ee6231576143a44a28bc0d0a05f"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_3ef278de1f3aec5f3020e1aa0b5ce269",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-34",
+      "targetUnitDigest": "2d86b51570e889b3275f8bd88e04ea73bf1b87ef273c55682de94fc09ee5114b"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_566ba6b6f52ab7360edd78e376c925ba",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-35",
+      "targetUnitDigest": "b8fa01639c54fb4ce334dcb069b23472fbc2478e9bad4df8d67c073289e8e2d8"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_902e921806fa75a30ff3879ae1f85761",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-36",
+      "targetUnitDigest": "dbfa56f1bdbb52a5388df77df070e5146275526c1da44bc23fd9162931e9d761"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_13dd8473351e86bde28b379f9fbeb00f",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-37",
+      "targetUnitDigest": "d2e41a70900c9bf7d37465e1a5e7ce95f2dabdc1d8a1a64be8258795da18205b"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_9abe48d0f9a2dc345830741d5ab789c8",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-38",
+      "targetUnitDigest": "a1f9632769f4cbf2465902c1773664342ac276e6a87f3d290cae2d20730110c6"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_9b6a43d8cd95739a1b4b582898073233",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-39",
+      "targetUnitDigest": "fd456a8043fdb4255157f59b82696fe42576b90151877b4cb1232a5ea854b82a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_bee69c9fafc3e15fc38dd82f1b54acc9",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-40",
+      "targetUnitDigest": "ac51cf26ef4e4e0468e570f319c083e5225c25835f20c164d4a047cd888458c1"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_4a2a23337b8495f1940fd9e3226e9d31",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-41",
+      "targetUnitDigest": "da01d2fc952c416ba16325b6f4493f5602a85e68e6445890d86a661ddb563d60"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_181a82457153d16a123d8c3378c30c98",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-42",
+      "targetUnitDigest": "9a365e9b5b43ce380e4ccc724d86d039e5020c11b3875ec94a3e3547cfbbc663"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_c6869299794e7b0b8faebb525521af54",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-43",
+      "targetUnitDigest": "3608b979a603b21c6131d86953fbe07fd47dceb6f9e477d6dbf66064b3d5f4de"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_bbe6d0ce5f2af5471b4b0f830209f3c6",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-44",
+      "targetUnitDigest": "60ba86001f48ba64132862a134ed1e7ede5c4233b11ea818bda2593400a6ee85"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_573f1ab0c14672c3e3d1893b96f5e6ef",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-45",
+      "targetUnitDigest": "1fa15164579b61c19fd19c467f533973c1577e9a1c708158799e0c8994f50419"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_491998778e598a5385e78b541e33bff8",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-46",
+      "targetUnitDigest": "498ce4bd1a2493ee1261ae7e8632c54b2c6abfcb4fff8fbb7554cd93809c17e8"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_bd90f346258ea0333f0e9b09949a2bae",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-47",
+      "targetUnitDigest": "4a5dcd22823a0b2ccd988467b5c6b7df81536ef3fd5372bfd5ce1d5a1ba2eda5"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_5a5a447d501facb835101fcf15cf5f9d",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-48",
+      "targetUnitDigest": "7736cb341115949ee30f3c483b3b4547bd282597586122e1eb7662e64eeb78f0"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_0d7b6c7bb749583718df925f63a8ba7f",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-49",
+      "targetUnitDigest": "de9ca65ddfe8a9180b1cfc6b5075e300c8e3c63d27516f5767707a0657fabd05"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_eb0ec8c42d305f6fc227246824a4e360",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-50",
+      "targetUnitDigest": "70db9bdf36a7ab578e4aced8a540eefcc332495e830b507981eb3605ff53b858"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_30369b94b606096331ba0ac8215dfe6f",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-51",
+      "targetUnitDigest": "be3d98e07c3a376719e09158f719c780c45a05d4a808f4665df1392229e81c99"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_3a0164aced10388208f0c748829bf990",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-52",
+      "targetUnitDigest": "17a2c3fcd7e144c9173cd3ad9f462ba8152f488e4ae493b63123be13014b8995"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_ec133e4ac5ee546b775219835450cb9a",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-53",
+      "targetUnitDigest": "ac7af0538dc243ffd13baf530f76a89686ff9cd2e59016f38c52877e3c3925df"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_6ed197b95e7f9801fa8298694177e5d0",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-54",
+      "targetUnitDigest": "6974a311e550994984d962f6e8e1f71e1afc8c14fbe7f8d5282a4cdda7df0cd8"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_a144f2fd3dd53acd12feeb7e72607de9",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-55",
+      "targetUnitDigest": "b10f8721b7f1f6d51be6d22b21acb9effa78de473c0b6a2fb2f92dd71e67b158"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_2929202af5d9245fafd9c8fe0055e494",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-56",
+      "targetUnitDigest": "1f0eae3e1e42a0694560408217a0581fc8920c356521c76f38c931b04a3e21f0"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_ed503fa8fc58ad877bf8c8faa3f7958b",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-57",
+      "targetUnitDigest": "1350217488d7df5ff2cd08fc752fef846e75b1b20161c0d22dcde1d9f7388837"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_26bc6a190eda16e49745b6bcc7fbc379",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-58",
+      "targetUnitDigest": "0f882749d3e11278fb1a1150c663da4b71885a1d0a9e39574a10225f36a24d65"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_a5d4be2b9bafbb6afe85aa62070351e0",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-59",
+      "targetUnitDigest": "67b295693448086f48b7539c8a2b9b6914b45d721cfe4a7926635054eb41ea81"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_b0de344d5a30b83c57e0ff1b963c4c43",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-60",
+      "targetUnitDigest": "07f8f1512cab1811efe3279788d3b494c699f31d6e5bf623417c53eb1241ea01"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_89796d37e2377576e2e7202f34b08ea8",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-61",
+      "targetUnitDigest": "8ca6f556298555c6b141f6386ec9ea4418f581ecaca73550d2f99de0dda9aa13"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "collection": "claims",
+      "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "collection": "claims",
+      "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "collection": "registryGaps",
+      "claimId": "claim_891db485a75cdb558cf725c3315f3857",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "collection": "registryGaps",
+      "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+      "targetOwner": "docs/specs/confinement-authority.md",
+      "targetAnchor": "unheaded-block-145",
+      "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "collection": "registryGaps",
+      "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "652c4935e9cd747ffdb08e497333f31a461605453d08d7553283985cf4ead7be"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_04703f011b22383992b94545055b9e56",
+      "targetOwner": "docs/specs/confinement-authority.md",
+      "targetAnchor": "unheaded-block-145",
+      "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "652c4935e9cd747ffdb08e497333f31a461605453d08d7553283985cf4ead7be"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "collection": "registryGaps",
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "d380db6aa752cd05a6f136bda5508b907accff8c8e427767be78c4a08c3d9d36"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "collection": "registryGaps",
+      "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "d380db6aa752cd05a6f136bda5508b907accff8c8e427767be78c4a08c3d9d36"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+      "collection": "claims",
+      "claimId": "claim_83a4a91369ae5c2fd8959d7835a2f76e",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetUnitDigest": "06a65a23a4ff32fbdf33181cf55915a10195d91ec9b84c0e6764c356891947fa"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+      "collection": "registryGaps",
+      "claimId": "claim_7cfb055e3f10b99944ffec46ce877653",
+      "targetOwner": "docs/platform/holder-lock/spec.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "0be636c7d1454285a09adfc266d5303cc83795aa4832447dbdeb6d91678cacbd"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "registryGaps",
+      "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-314",
+      "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "registryGaps",
+      "claimId": "claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-315",
+      "targetUnitDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "registryGaps",
+      "claimId": "claim_93d5f2d34cf452029462ea39674fd255",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-320",
+      "targetUnitDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "registryGaps",
+      "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-317",
+      "targetUnitDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "registryGaps",
+      "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-94",
+      "targetUnitDigest": "9d9ecdc5ecd0e2f7cb876584e56f908c6411e950eb56728e99304eb07c41d640"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "registryGaps",
+      "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-94",
+      "targetUnitDigest": "9d9ecdc5ecd0e2f7cb876584e56f908c6411e950eb56728e99304eb07c41d640"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "registryGaps",
+      "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-52",
+      "targetUnitDigest": "252ea6dbb0e5e764ac177a1d694964a20df0735fe0588f2a889e8b7f9205f170"
+    }
+  ],
+  "disposition": "No checker edits, no target rebind and no approval carry. Lead must resolve conflict between all-pass target and A47/no-rebind boundary."
+}

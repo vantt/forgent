@@ -24,6 +24,34 @@ Before source retirement, the Step 10 documentation-navigation owner must comple
 
 Phase 7 cutover note (L11-23/L11-25): refresh the main-authored Holder-lock main-door/worktree-admin status header during the main-import step; retain the correct reading-map transition banner and two compounding→knowledge fixes (+10/-2 versus `eab4d617b`, accepted divergence, PARK-PROTECTED-01 closed).
 
+### First obligation — final changed-candidate accounting (A47/A48, L12-1)
+
+Before promotion, account every changed candidate file per unit. Retain A47's original 35-file set (6 main-touched, 29 plan-only; 2,436 claims, 233 gaps at the recorded pin); do not replace it with only main imports. The final set is recomputed from B0 and includes every subsequent candidate edit. This is deferred accounting, not a waiver of conservation or current-truth review. No carry or rebind occurred in the Phase 8 detailing turn.
+
+Merge `49ad04648` imports main `708ea6608` and adds the following exact incoming `docs/platform/**` changed-file list to that obligation (union/deduplicate with the original set; thirteen paths is not a claim of thirteen additional unique files):
+
+- `docs/platform/agent-protocol/spec.md`
+- `docs/platform/component-boundary.md`
+- `docs/platform/event-store/spec.md`
+- `docs/platform/git/spec.md`
+- `docs/platform/holder-lock/spec.md`
+- `docs/platform/intent-preservation-ledger.md`
+- `docs/platform/packaging-distribution/contracts/activation-binding.md`
+- `docs/platform/packaging-distribution/contracts/release-manifest.md`
+- `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`
+- `docs/platform/process/spec.md`
+- `docs/platform/run-supervisor/spec.md`
+- `docs/platform/session-identity/spec.md`
+- `docs/platform/terminal-control/spec.md`
+
+[Phase 8 merge accounting](reports/phase-08/merge-accounting.json) preserves merge/base/digest/main-commit provenance. Native identity transitions, content/context rebindings, approvals and per-unit review are still owed against final bytes. Also include legacy main edits, architecture-manifest changes and any later full identity-scope drift as their existing obligations require.
+
+At landing, reconcile main's only references to its new PF-I011/PF-I012 rows in `plans/reports/phase-lead-261018-2025-controller-death-p06-doctor-docs-changelog.md` with their candidate PF-I022/PF-I023 identities; do not alter the plan's existing PF-I011/PF-I012. This is an intent-ledger collision account, not contract renumbering authority.
+
+Keep these cutover seams explicit: A45 legacy CTR010 lines in `docs/architecture-map.md` (Gateway retains CTR010, confinement candidate CTR011; no new shipped-contract renumbering); `apps/fgos-gateway/src/gateway.rs:1187` runtime OpenAPI read; P7-DOC-GAP-05 dead-vocabulary pre-landing blocker and P7-DOC-GAP-06 stale citations; L11-23 Holder-lock header and L11-25 accepted reading-map divergence. L12-1 supersedes L11-20 only where main now registers event-seal/event-append and uses `withStateTx` instead of events/claims locks; preserve the distinct Event Store implementation status.
+
+Phase 8's reproduction diagnostics currently enumerate 85 stale target bindings across nine targets. They do not authorize rebinding early or changing ownership-checker logic; the Lead must settle the requested all-pass test target versus A47's deferral before treating that preparation baseline as green.
+
 **Cutover sequence:**
 
 1. acquire a migration-specific exclusive documentation-cutover lease; while it
