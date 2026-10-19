@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Ctrl-C and SIGTERM of `fgos run` now stop the run cleanly: no commit, reviewer, verify or next round starts after the signal, a signal during the hand-over of an attempt cancels it once it binds, and the resume line is always printed. A malformed `dispatch.cancelWaitMs` or `dispatch.gateKillGraceMs` is a named validation error, and `fgos doctor` names an attempt whose release was removed and how to recover it. Library callers of the runner keep their own signal handling.
+
 - Fix custody admission for busy worktrees, preserve settled results on handoff errors, distinguish reused cwd inodes, and restore 64 MiB commit output capture with overflow errors on every platform.
 
 - Writing Unit runs retain cwd custody through runner commits and lend it to git/hooks and to the Unit verify command; successor admission preserves unprovable predecessor worktrees. Mutating producers require a supervised domain, and `--force-shared-cwd` with writes is refused. Workflow redispatches an unknown custody predecessor in a fresh worktree while preserving its old checkout and branch. Custody refusals include cwd, executor and capability context.
