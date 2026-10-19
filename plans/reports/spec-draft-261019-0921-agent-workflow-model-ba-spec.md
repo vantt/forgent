@@ -64,3 +64,11 @@ File spec riêng thay vì nhồi vào runner.md; hàng ranh giới đặt cạnh
    - **F13** chỉ sau khi phần lõi land.
 
 Pilot-trước-engine (bất đồng P2-pilot-first) là câu hỏi trình tự; owner gặp nó lúc duyệt plan.
+
+## Chuẩn bị landing (owner duyệt)
+
+- Owner duyệt spec 2026-10-19 12:32 ("duyệt spec") và chọn ý tưởng tính năng 12:35 ("đồng ý, chọn theo đề xuất"): F1–F7, F9, F11, F12 là lõi; F13 sau khi lõi land; F8, F14, F15, F16 hoãn; F10 không thuộc cutover này.
+- Quyết định **D-ADR0070**: record đầy đủ ở cuối "Lịch sử quyết định" của `docs/specs/runner.md`; 0048 và 0049 không bị sửa, chỉ thêm một dòng trỏ "Superseded một phần bởi D-ADR0070" (theo cách 0061 trỏ tới 0062 trong `platform-foundations.md`).
+- `workflow.md`: trạng thái Settled, bảng mặc định ghi "settled cùng D-ADR0070", mục 15 có cột lựa chọn của owner.
+- `component-boundary.md`: bốn hàng (Workflow, Work Lifecycle, Execution Core, Holder-lock) thành chữ settled; `system-overview.md` có dòng `workflow` trong area map; `reading-map.md` bỏ nhãn bản nháp.
+- Hai mục trên trước đây ghi "câu hỏi owner còn cần trả lời" nay đã được trả lời; không còn câu hỏi mở cho owner.
