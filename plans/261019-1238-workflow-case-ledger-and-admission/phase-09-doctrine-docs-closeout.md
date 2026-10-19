@@ -1,5 +1,7 @@
 # Phase 09 — Doctrine, docs, closeout
 
+Status: done (report: plans/reports/phase-lead-261020-0051-workflow-case-p09-closeout.md)
+
 ## Context
 
 - Spec §12 "Đổi: doctrine driver (`coordination-driver.md`): phán route là của agent, cơ học và cưỡng chế là của harness"; §5.4 / R8 (doctrine must follow Shape C: workers never call a door naming their playbook case); RUL-WF-11.7 (conductor names the case on every dispatch, read-only included — a skill rule, not a guard); RUL-WF-20 (when to ask a person; batched decision questions); §8 row `operations` → `status`.

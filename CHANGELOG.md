@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- The coordination driver doctrine (`core/skills/_shared/coordination-driver.md`, loaded by `fgos-advise` and the other coordination facades) now teaches the case model: observe with `fgos workflow status <caseId>`, choose an activity and route yourself, dispatch with `--case` and `--activity` on every run (read-only included), treat a refusal as an answer, ask a person only for the listed triggers, close with `fgos workflow close`. It no longer tells a driver to run `fgos workflow operations` on a run.
+
 - Git checkout operations revalidate config file stamps before each child and refuse post-hook promisor changes while retaining the reduced preflight exec count.
 
 - Git: reuse config and storage-format checks within each ScopedCommit/Sync call, recheck after hooks, and retain per-child topology and custody validation.

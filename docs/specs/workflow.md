@@ -1,6 +1,6 @@
 ---
 area: workflow
-updated: 2026-10-19
+updated: 2026-10-20
 status: settled — owner duyệt 2026-10-19 12:32 (quyết định ở mục 17)
 sources: [agent-workflow-model-owner-direction, workflow-design-intent-and-current-state, agent-workflow-model-council-settled, agent-workflow-model-council-reopen, agent-workflow-model-focused-round, agent-workflow-model-independent-review]
 decisions: []
@@ -9,7 +9,7 @@ coverage: partial
 
 # Spec: Workflow (guide, case, admission)
 
-> **Trạng thái: Settled — owner duyệt spec 2026-10-19 12:32 ("duyệt spec"), quyết định D-ADR0070 (workflow guide + admission ledger; lane AGENT-WF).** Luật mang id `RUL-WF-n` của khu vực này. Các quyết định owner đã trả lời riêng lẻ trước đó được đánh dấu **owner 2026-10-19** (mục 17). D-ADR0070 (workflow guide + admission ledger) supersede một phần 0048 §2 và 0049 §4 của [runner.md](runner.md); 0048 §3 và 0049 §1–3 giữ nguyên. Spec khoá hành vi; việc cài đặt đi theo plan, và cho tới khi plan land, code hôm nay vẫn chạy như mục 5.1 mô tả. Owner đã chọn ý tưởng tính năng 2026-10-19 12:35 ("đồng ý, chọn theo đề xuất"): F1–F7, F9, F11, F12 là lõi của cutover; F13 sau khi lõi land; F8, F14, F15, F16 hoãn; F10 không thuộc cutover này (mục 15).
+> **Trạng thái: Settled — owner duyệt spec 2026-10-19 12:32 ("duyệt spec"), quyết định D-ADR0070 (workflow guide + admission ledger; lane AGENT-WF).** Luật mang id `RUL-WF-n` của khu vực này. Các quyết định owner đã trả lời riêng lẻ trước đó được đánh dấu **owner 2026-10-19** (mục 17). D-ADR0070 (workflow guide + admission ledger) supersede một phần 0048 §2 và 0049 §4 của [runner.md](runner.md); 0048 §3 và 0049 §1–3 giữ nguyên. Spec khoá hành vi. **Đã cài trên main** bởi plan [workflow-case-ledger-and-admission](../../plans/261019-1238-workflow-case-ledger-and-admission/plan.md) (lane AGENT-WF; các merge `78b0921d2`, `c3f2567ab`, `b2017d58b`, `f5974213d`, 2026-10-19 đến 10-20): lõi F1–F7, F9, F11, F12; F13 và coding cutover (R2) chưa làm, ghi ở backlog. Hai chỗ cài khác chữ spec: `--activity` bắt buộc đi kèm `--case`; phép kiểm chéo writer id → attempt chưa xây, cửa kiểm reservation và case còn sống thay vào (mục 6, giao thức ngữ cảnh authority, bước 4). Mục 5.1 mô tả code trước cutover. Owner đã chọn ý tưởng tính năng 2026-10-19 12:35 ("đồng ý, chọn theo đề xuất"): F1–F7, F9, F11, F12 là lõi của cutover; F13 sau khi lõi land; F8, F14, F15, F16 hoãn; F10 không thuộc cutover này (mục 15).
 
 Nguồn: hướng owner ([brief-261018-2235](../../plans/reports/brief-261018-2235-agent-workflow-model-owner-direction.md)); nghiên cứu bước 1 ([research-261018-2239](../../plans/reports/research-261018-2239-workflow-design-intent-and-current-state.md)); gói hội đồng đã settle (`unit-run-1792368757620-6e4020ea`); gói reopen trả lời Q1–Q6 (`unit-run-1792374387809-85a2ae93`); review độc lập ([review-261019-0930](../../plans/reports/review-261019-0930-agent-workflow-model-ba-spec.md)); vòng hội đồng tập trung vào phần Rust, đặt tên và cách mang ngữ cảnh case (`unit-run-1792383001628-8dbde4b4`, producer/2 cùng reviewer và red-team của nó); các câu trả lời của owner ngày 2026-10-19 lúc 08:46 và 12:20.
 
@@ -153,7 +153,7 @@ Bản ghi mới gọi id **bằng tên**, không có trường `runId` trần: `
 
 ## 5. Ranh giới component và authority
 
-### 5.1 Hôm nay
+### 5.1 Hôm nay (trước cutover; xem dòng "Đã cài" ở đầu spec)
 
 - Hàng **Workflow** ghi "Domain-neutral step & Unit DAG scheduling … Single sequencer for plans, workflows, and multi-unit tasks"; hàng **Work Lifecycle** ghi "Does not own stage or sequencing (owned by Workflow runner)"; hàng **Execution Core**: authority cho ai làm/model/persona/cơ chế, cửa chạy duy nhất, posture confinement, cổng ghi kiểm chứng được.
 - **Authority admission hôm nay không nằm ở đâu cả.** Thứ tự do vòng DAG (playbook) hoặc văn xuôi (mọi thứ khác); item coding do claim + step FSM; hook `dispatch-decide` chỉ quyết *cơ chế*.

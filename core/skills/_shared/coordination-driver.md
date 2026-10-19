@@ -1,6 +1,6 @@
 # Shared Fragment: Coordination Driver Discipline
 
-This shared doctrine defines the domain-neutral operational loop for coordinating multi-agent sessions across the fgOS runtime. It establishes the driver discipline for observing session state, selecting legal control plane actions, verifying evidence, and performing explicit session termination without embedding domain-specific mechanics.
+This shared doctrine defines the domain-neutral operational loop for coordinating multi-agent sessions across the fgOS runtime. It establishes the driver discipline for observing session state, choosing the next activity, verifying evidence, and performing explicit session termination without embedding domain-specific mechanics.
 
 Every coordination facade loads this fragment and supplies concrete values for the hook slots defined below.
 
@@ -12,8 +12,8 @@ A driver executes a deterministic, evidence-grounded control loop over one or mo
 
 ```text
 observe(status)
-  -> choose one legal action
-  -> dispatch
+  -> choose (activity + route)
+  -> dispatch (naming the case)
   -> verify evidence
   -> disposition
   -> adapt (revise / recheck / retry / ask human)
@@ -23,24 +23,33 @@ observe(status)
 
 ### Step 1: Observe (`status`)
 
-Derive active session state strictly from the runtime's authoritative inspection doors:
-- Query status: `fgos workflow status <workflowRunId>` for a Workflow run; for a single `fgos run` Unit, read its record under `.fgos/assignments/<unitRunId>/`.
-- Reconstruct context from the persistent session record and the designated continuity artifact.
-- Never guess state from unrecorded conversational narration, private agent memory, or expired assumptions. A fresh driver process must be able to resume cold with zero prior chat context using only the session status and continuity artifact.
+Derive state only from the runtime's inspection doors:
+- A Workflow case: `fgos workflow status <caseId>`. It is a projection of the case ledger: milestones with the digest of their subject (`achieved`, `stale`, `blocked`, `unreached`), eligible activities, listed routes plus the unlisted path, frame left, open gates, live reservations, bindings, and whether the case can close. For a conductor case, `running` means a reservation is live; there is no process to wait for.
+- A single `fgos run` Unit: read its record under `.fgos/assignments/<unitRunId>/`.
+- Rebuild context from that record and the facade's continuity artifact. Never from chat narration, private memory or an old assumption. A fresh driver must resume cold from the status and the continuity artifact alone.
 
-### Step 2: Choose One Legal Action
+### Step 2: Choose (the agent judges, the harness enforces)
 
-The runtime derives legal options from the Workflow definition and the run's persisted record. For a Workflow run, `fgos workflow operations <workflowRunId>` lists them:
-- The driver selects exactly **one** legal action to perform next based on facade objectives.
-- Never dispatch an action that is not currently legal or whose preconditions are unsatisfied.
+Which activity next, by which route, is the driver's judgment. The guide gives direction: its routes are `should` (the default, deviate with a reason), `may-instead` (an allowed alternative) and `unlisted` (anything else, allowed with a recorded reason unless the guide closes the decision point to listed routes). Mechanical rules (entry milestones, consent bound to the approved artifact, disjoint writes, the approved frame, the seat-launch ceiling) belong to the harness: it admits or refuses by name when the Unit is dispatched.
+- A refusal is an answer, not a question for the owner. Read its code and condition, re-observe, and change the proposal (another activity, a narrower write scope, wait for the live reservation) or stop. Do not retry the same proposal.
+- Never ask a person to choose a route the guide already permits.
 
-### Step 3: Dispatch
+### Step 3: Dispatch (always name the case)
 
-Execute the chosen action through one of the two doors:
-- `fgos run "<prompt>"` or `fgos run --unit <file>` — one Unit.
-- `fgos workflow start <preset>|--units <file>` — planned work, one step per Unit; `fgos workflow resume` and `fgos workflow answer` continue it and attribute a person's answer.
+Dispatch through one of the two doors, and when the work belongs to a case, name it, read-only Units included:
+- `fgos run "<prompt>" --case <caseId> --activity <activityId> [--route should|may-instead|unlisted] [--reason <text>] [--writes <paths> --worktree <path>]` - one Unit. `--activity` is required with `--case`. A read-only run that names no case is standalone and uncounted; a run that writes needs a worktree no case owns, or the case's authority.
+- `fgos workflow start <preset>|--units <file>` - planned work, one step per Unit (a Playbook case); `fgos workflow resume` and `fgos workflow answer` continue it. A child run nested under your conductor case: `fgos workflow start ... --case <parentCaseId>` (its frame is charged to the parent first).
+- Parallel work needs no declaration. Dispatch Units with disjoint write scopes; overlapping reservations are refused and a busy case is retryable.
 
 Run `fgos dispatch decide` before any dispatch out of the current turn.
+
+Case boundaries (what the harness cannot do for you):
+- A Playbook case (a preset such as `council-lite`) is advanced only by its own proposer. Never admit into it with `--case`, and a worker running inside a Playbook Unit never calls a door naming that case. Both are refused.
+- A worker confined to a sandbox never dispatches a writer. If it needs one, it asks the conductor, who dispatches it.
+- Edits you make in your own session (Edit, Write, a subagent) are outside the ledger; the case does not see them. The approve door still guards landing.
+- Close a conductor case with `fgos workflow close <caseId>` when its closure milestones hold and no consent gate is parked. A Playbook case closes itself when it completes with a pass; a failed, blocked or parked case stays open.
+
+Ask a person only when the case cannot go on without them: a consent gate the guide marks human, an ambiguity about the request itself, a frame that must be widened, or repeated refusals across distinct approaches. Put the questions together and use the decision-question template (`decision-question.md`); work that does not depend on the answer keeps going.
 
 ### Step 4: Verify Evidence
 
@@ -64,7 +73,7 @@ Based on dispositions and evidence outcomes:
 - **Revise:** Authorize and dispatch revision operations within the declared adaptation bounds.
 - **Recheck:** Every accepted finding requires an independent recheck operation to confirm remediation. A finding is never discharged by driver disposition alone.
 - **Retry / Reopen:** When transient failures occur or bounded dialogue reopening is permitted, dispatch retry or follow-up turns within protocol limits.
-- **Ask Human:** When an unresolvable requirement ambiguity, conflicting policy constraint, or repeated failure across distinct approaches occurs, ask the human operator in the decision-question template (`decision-question.md`; batching per AGENTS.md priority #2). Never stall unrelated or non-dependent work while awaiting human response.
+- **Ask Human:** Only for the triggers listed in Step 3. A harness refusal is not one of them. Ask in the decision-question template (`decision-question.md`; batching per AGENTS.md priority #2) and never stall work that does not depend on the answer.
 
 ### Step 7: Explicit Close or Continue
 
@@ -99,7 +108,7 @@ Every consuming facade must explicitly define the following hook values:
 ## 3. Core Operating Invariants
 
 1. **Replay and Status Authority:** Session status is derived strictly from the append-only event log and definition snapshot. The driver never maintains private, uncommitted state.
-2. **Deterministic Preconditions:** A stale or illegal action refuses with an explicit error; the driver re-observes instead of retrying blind.
+2. **Deterministic Preconditions:** The harness refuses an inadmissible proposal with a named code; the driver re-observes instead of retrying blind.
 3. **Driver Identity Continuity:** The driver identity established at session creation stays the same on all follow-up actions.
 4. **Independent Proof:** Dispatched workers perform task execution. The driver independently verifies evidence before certifying any result.
 5. **Explicit Close:** Sessions remain active until the driver explicitly closes them after quorum and prerequisite checks pass.
