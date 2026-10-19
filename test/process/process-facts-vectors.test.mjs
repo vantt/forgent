@@ -3,6 +3,7 @@
 // judgement table. Plus the adapter every lock calls (`resolveHolderLiveness`)
 // against real processes: a record without a pid is held, a zombie is dead.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

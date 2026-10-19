@@ -2,6 +2,7 @@
 // `npm test` builds from this checkout): the routes answer one JSON line,
 // a protocol other than 1 fails closed with exit 3 (host-version-mismatch),
 // and `internal` is in neither the route table nor the help manifest.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

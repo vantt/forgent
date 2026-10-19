@@ -3,6 +3,7 @@
 // Self-contained harness (own tmpCwd/run/envelopeData), same style as
 // fgos-faults.test.mjs in this directory.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

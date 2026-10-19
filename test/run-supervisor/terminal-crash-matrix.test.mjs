@@ -1,6 +1,7 @@
 // What survives the death of a terminal attempt's controller or supervisor, on a fake herdr that keeps one
 // real pane and a real host (supervisor, gate, step runner, adopt). The controller is its own process
 // and the test kills it after the binding, the way a crash would; the fake's files stand for the screen.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

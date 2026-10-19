@@ -4,6 +4,7 @@
 // processes and the same files the Rust helper writes, so this runs on every
 // platform. The Rust half (job, keeper, release rule) is covered by the
 // Windows tests (`windows-borrow.test.mjs`, `apps/fgos/tests/windows_borrow.rs`).
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -31,6 +31,7 @@
 // provider-capacity), required-ness and types are not checked; a flag read through a computed key (`flags[name]`), or by code that
 // only receives an object already built from flags, is invisible to this
 // scan; regex literals containing braces would confuse the brace matcher.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

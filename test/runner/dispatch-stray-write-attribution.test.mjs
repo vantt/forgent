@@ -5,6 +5,7 @@
 // Nothing here rejects a round; a rejection needs a write observed and bound
 // to the run, which no dispatch door has yet.
 
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

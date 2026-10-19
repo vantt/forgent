@@ -9,6 +9,7 @@
 // of the same table through run-lock.mjs's thin wrapper + real
 // acquireRunControl.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';

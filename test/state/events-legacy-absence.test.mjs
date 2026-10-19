@@ -16,6 +16,7 @@
 // script. A regression here would mean the retirement quietly grew back
 // (a re-added import, a re-registered doctor check, a restored script).
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

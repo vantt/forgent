@@ -10,6 +10,7 @@
 // exact composed learning content is cheaper directly against moveWork's
 // returned `view` than round-tripping through the CLI's stdout formatting.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

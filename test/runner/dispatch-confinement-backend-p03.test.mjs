@@ -1,6 +1,7 @@
 // dispatch-confinement-backend-p03.test.mjs — tests for Phase 03:
 // Local Bwrap Backend, Resources, Probes, Attestation Store, and Cleanup (R1-R8).
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

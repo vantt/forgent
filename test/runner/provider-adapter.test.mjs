@@ -5,6 +5,7 @@
 // 2. Accurately reports `applied` statuses and extracts `policyShapedFlags` per provider family.
 // 3. Produces equivalent argv to legacy resolveExecutorCommand across the full 12-executor × 3-tier matrix.
 
+import '../helpers/process-tmp-root.mjs';
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

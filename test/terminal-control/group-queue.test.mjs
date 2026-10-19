@@ -3,6 +3,7 @@
 // failed call does not stall the next. First against a recording stand-in for
 // the host binary (timing is the point), then against the real host binary and
 // the fake herdr (nothing splits a pane that is being closed).
+import '../helpers/process-tmp-root.mjs';
 import { test, after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -1,6 +1,7 @@
 // test/workflow/units-runner.test.mjs — Running a units file: unit prefer/persona, --effort,
 // out-of-scope writes, and chaining a writing unit onto the branch of the writing unit it builds on.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

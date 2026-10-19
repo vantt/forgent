@@ -2,6 +2,7 @@
 // whether a failed seat has another account to rotate to, which families a walk must avoid, and how
 // bind() excludes them.
 
+import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

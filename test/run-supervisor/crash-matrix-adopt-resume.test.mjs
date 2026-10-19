@@ -3,6 +3,7 @@
 // home went back once, the pane (terminal) closed once. Processes are real (controller, supervisor, gate, steps,
 // bwrap); the crash is made from outside by stopping processes when a file of the attempt shows up, or by
 // holding a step through the host command the envelope carries (helpers/envelope-fixture.mjs).
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -120,6 +120,14 @@ pub trait Outbox {
     fn newest_complete(&mut self) -> Option<PathBuf>;
 }
 
+/// Stable invalid publication evidence, including edits made between polls.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UnreadableResult {
+    path: PathBuf,
+    bytes: Vec<u8>,
+    modified: std::time::SystemTime,
+}
+
 /// Reads `launch.outboxDir`. A result counts only when it parses as a JSON
 /// object and keeps its size across a short wait: pi creates `result-N.json`
 /// empty and fills it a moment later, and only claude publishes by rename.
@@ -134,6 +142,26 @@ impl FsOutbox {
             dir: dir.into(),
             stable_wait_ms: 20,
         }
+    }
+}
+
+impl FsOutbox {
+    /// A nonempty invalid result, unchanged across the publication settle wait.
+    /// Keep the contents and timestamp so edits between supervisor polls reset the grace.
+    pub fn newest_unreadable(&mut self) -> Option<UnreadableResult> {
+        let names: Vec<String> = std::fs::read_dir(&self.dir).ok()?
+            .filter_map(|entry| entry.ok()?.file_name().into_string().ok()).collect();
+        let path = newest_result(&self.dir, names.iter().map(String::as_str))?;
+        let bytes = std::fs::read(&path).ok()?;
+        if bytes.is_empty() || serde_json::from_slice::<Value>(&bytes).is_ok_and(|v| v.is_object()) {
+            return None;
+        }
+        let modified = std::fs::metadata(&path).ok()?.modified().ok()?;
+        std::thread::sleep(std::time::Duration::from_millis(self.stable_wait_ms));
+        if std::fs::read(&path).ok()? != bytes || std::fs::metadata(&path).ok()?.modified().ok()? != modified {
+            return None;
+        }
+        Some(UnreadableResult { path, bytes, modified })
     }
 }
 

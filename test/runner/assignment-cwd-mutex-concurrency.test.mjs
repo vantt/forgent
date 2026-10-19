@@ -17,6 +17,7 @@
 // time contention: each call opens its own description of the kernel lock
 // file, and two descriptions exclude each other even inside one process.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

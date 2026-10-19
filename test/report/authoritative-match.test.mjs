@@ -6,6 +6,7 @@
 // pure functions below, added because the doctrine in fgos-coding-
 // compounding/SKILL.md had zero real callers without it.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';

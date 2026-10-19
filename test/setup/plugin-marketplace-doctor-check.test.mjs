@@ -11,6 +11,7 @@
 // mkdtemp directory at test time, driven entirely through FGOS_CLAUDE_COMMAND
 // (registrations.mjs's own test-only seam). No real `claude` CLI is ever
 // invoked.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

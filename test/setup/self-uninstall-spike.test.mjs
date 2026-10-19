@@ -9,6 +9,7 @@
 // the real tarball, npm install -g it into a scratch --prefix, then run the
 // INSTALLED binary against itself — never a mock, never the dev checkout's
 // own in-place files.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

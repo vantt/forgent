@@ -3,6 +3,7 @@
 // mark an install degraded on any non-zero exit, and a project that has not
 // been through `fgos setup` yet always has red checks. `--strict` is the opt-in
 // that turns a failing check into exit 1 for scripts and CI.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

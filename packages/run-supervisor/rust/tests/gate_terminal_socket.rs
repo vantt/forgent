@@ -232,3 +232,41 @@ fn a_pane_without_a_controlling_tty_does_not_start_the_agent() {
     assert!(read_frame(&mut stream).is_err(), "no AGENT frame");
     assert_eq!(attempt.gate_exit().unwrap()["exitCode"], 126);
 }
+
+/// Exercise the production gate, not just the containment fixture: with
+/// --as-pid-1 the gate owns its parent-death signal after bwrap's exec.
+#[test]
+fn killing_the_terminal_monitor_ends_the_gate_and_its_agent() {
+    if bwrap_driver("monitor-death").is_none() { return; }
+    let beat = marker("monitor-death");
+    let script = format!("trap '' HUP; while :; do echo beat >> {}; sleep 0.02; done", beat.display());
+    let options = Options::new("/bin/sh", &["-c", &script]);
+    let (attempt, socket) = terminal_attempt("monitor-death", &options, 60_000, false);
+    let lock = locked_file(&attempt.dir.join("attempt.lock"));
+    let listener = listen(&socket);
+    let mut pane = start_in_pane(&attempt, &socket, true, &[]);
+    let mut stream = handshake(&listener, &attempt, &[lock.as_raw_fd()]);
+    struct Cleanup(fgos_process::facts::ProcTuple);
+    impl Drop for Cleanup {
+        fn drop(&mut self) {
+            let _ = fgos_process::control::signal_by_identity(&self.0, fgos_process::control::Signal::Kill);
+        }
+    }
+    // The accepted socket's peer is the gate, expressed in our PID namespace.
+    let mut cred: libc::ucred = unsafe { std::mem::zeroed() };
+    let mut len = std::mem::size_of_val(&cred) as libc::socklen_t;
+    // SAFETY: getsockopt writes a ucred into the correctly sized live buffer.
+    assert_eq!(unsafe { libc::getsockopt(stream.as_raw_fd(), libc::SOL_SOCKET,
+        libc::SO_PEERCRED, (&mut cred as *mut libc::ucred).cast(), &mut len) }, 0);
+    let _cleanup = Cleanup(fgos_process::facts::identity_of(fgos_process::ProcId(cred.pid as u32)).unwrap());
+    assert_eq!(read_frame(&mut stream).expect("AGENT")["type"], "AGENT");
+    support::supervisor::wait_until(LIMIT, "heartbeat", || fs::read(&beat).is_ok_and(|b| !b.is_empty()));
+    pane.child.kill().unwrap();
+    pane.child.wait().unwrap();
+    std::thread::sleep(Duration::from_millis(300));
+    assert_eq!(fgos_process::facts::judge_here(&_cleanup.0.to_record()),
+        fgos_process::facts::Verdict::Dead, "the namespace init must be dead");
+    let settled = fs::read(&beat).unwrap();
+    std::thread::sleep(Duration::from_millis(300));
+    assert_eq!(fs::read(&beat).unwrap(), settled, "namespace survived its monitor");
+}

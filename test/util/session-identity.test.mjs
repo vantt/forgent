@@ -4,6 +4,7 @@
 // starts empty and the answer comes from the one authority. Failure modes use
 // small stand-in executables (unix only); the real-binary cases run on
 // Windows too.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';

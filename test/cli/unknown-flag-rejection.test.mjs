@@ -2,6 +2,7 @@
 // usage-error code) and accepts every declared flag plus the global ones. The
 // registry is the only list: this test is driven by it, so a new verb or flag
 // is covered the moment it is declared.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -4,6 +4,7 @@
 // The baseline was produced from the runner before the case ledger and admission work began; a later
 // change that moves any of it fails here. Regenerating the baseline is a reviewed act of its own.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

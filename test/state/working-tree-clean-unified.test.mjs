@@ -7,6 +7,7 @@
 // adds the 'subtree' scope's own behavior and confirms both scopes still
 // share the same prefix computation and .fgos/ exclusion.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

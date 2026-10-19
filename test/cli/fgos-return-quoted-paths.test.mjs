@@ -1,5 +1,6 @@
 // `return` reads the item's own diff byte for byte: a name git would quote is matched against the
 // declared footprint as written, and stays the item's own path in the clean-tree gate.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import {
   assert,

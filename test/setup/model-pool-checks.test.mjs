@@ -1,6 +1,7 @@
 // Doctor checks for the model / pool / account config, each driven through the doctor registry
 // against a real project directory and a fake home holding the global config.
 
+import '../helpers/process-tmp-root.mjs';
 import { assert, checkById, fs, mkTemp, path, withHome } from './helpers/setup-checks-harness.mjs';
 import { test } from 'node:test';
 

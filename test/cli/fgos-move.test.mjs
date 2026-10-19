@@ -1,6 +1,7 @@
 // fgos-move.test.mjs -- CLI-level coverage for the `move` verb's own
 // behavior (as opposed to fgos-approve.test.mjs's approve-path coverage).
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import {
   addOk,

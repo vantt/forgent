@@ -313,23 +313,14 @@ fn fdinfo_locks(info: &str) -> impl Iterator<Item = LockEntry> + '_ {
     info.lines().filter_map(|line| parse_lock(line.strip_prefix("lock:")?))
 }
 
-/// Read one consistent prefix of the kernel lock table. A short read is
-/// NOT EOF: seq_file can stop at its internal page boundary even into a much
-/// larger userspace buffer. Presence is evidence; absence is not clearance.
-/// Reopen/grow if our own buffer filled, never join inconsistent chunks.
+/// Read the kernel lock table to EOF on one open seq_file. Short reads are
+/// page boundaries, not EOF. This is not atomic: presence is evidence, while
+/// absence still requires the caller's shared-lock probe before clearance.
 pub fn lock_table_entries() -> io::Result<Vec<LockEntry>> {
     use std::io::Read;
-    let mut size = 16384usize;
-    loop {
-        let mut bytes = vec![0; size];
-        let n = File::open("/proc/locks")?.read(&mut bytes)?;
-        if n == size {
-            size = size.checked_mul(2).ok_or_else(|| io::Error::other("lock table too large"))?;
-            continue;
-        }
-        let text = std::str::from_utf8(&bytes[..n]).map_err(io::Error::other)?;
-        return Ok(text.lines().filter_map(parse_lock).collect());
-    }
+    let mut text = String::new();
+    File::open("/proc/locks")?.read_to_string(&mut text)?;
+    Ok(text.lines().filter_map(parse_lock).collect())
 }
 
 /// This process as named by this proc mount. Reject a mount from an ancestor
@@ -500,6 +491,24 @@ mod tests {
         assert!(first < bytes.len(), "kernel read filled userspace buffer");
         assert!(second > 0, "expected more than one seq_file page of real locks");
         eprintln!("proc/locks: {count} real range locks, 1 MiB request, first {first} bytes, next {second} bytes");
+        let ino = {
+            use std::os::unix::fs::MetadataExt;
+            file.metadata().unwrap().ino().to_string()
+        };
+        // Other tests (and host processes) can change the seq_file between
+        // pages. Wait for one complete observation of our stable ranges;
+        // the old single-page reader can never satisfy this assertion.
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        loop {
+            let entries = lock_table_entries().unwrap();
+            let seen = entries.iter().filter(|entry| entry.kind == "POSIX"
+                && entry.pid == i64::from(std::process::id())
+                && entry.token.rsplit(':').next() == Some(ino.as_str())).count();
+            if seen == count { break; }
+            assert!(std::time::Instant::now() < deadline,
+                "expected {count} held ranges across seq_file pages, saw {seen}");
+            std::thread::sleep(std::time::Duration::from_millis(10));
+        }
         drop(file);
         fs::remove_dir_all(dir).unwrap();
     }

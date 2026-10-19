@@ -1,5 +1,6 @@
 // A role of a Unit run is told its own task: the unit's objective is wrapped by what that role is for.
 
+import '../../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

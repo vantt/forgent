@@ -11,6 +11,7 @@
 // is spawned' actually means in plans/260915-executor-policy-dispatch-seams/phase-00-baseline-snapshot.md.
 // No test in this file opens network connections or writes outside a throwaway temp directory.
 
+import '../helpers/process-tmp-root.mjs';
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

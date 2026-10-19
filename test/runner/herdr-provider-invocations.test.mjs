@@ -2,6 +2,7 @@
 // Each runs an interactive agent in a pane under the bwrap posture, so the home the agent writes its own
 // state into has to be a private one, with the account's login provisioned by the provider account inventory.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

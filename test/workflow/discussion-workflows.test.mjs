@@ -1,5 +1,6 @@
 // test/workflow/discussion-workflows.test.mjs — Integration tests for discussion Workflows (P4 Wave B Phase 5)
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

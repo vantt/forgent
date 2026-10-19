@@ -352,7 +352,7 @@ pub(crate) fn settle_release(file: File, kill_wait: Duration) -> crate::port::Re
             _ => None,
         };
         if tagged == Some(false) {
-            // seq_file may return a short prefix, even into a large buffer.
+            // The table is read to EOF but is not an atomic snapshot.
             // Absence is only a reason to probe, never a release proof.
             if let Some(file) = &probe {
                 if matches!(FlockDriver.try_lock(file, Mode::Sh), Ok(TryLock::Locked)) {

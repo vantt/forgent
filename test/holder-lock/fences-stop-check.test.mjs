@@ -2,6 +2,7 @@
 // quiesce-scan`: a node process running a fgOS payload with its cwd inside
 // the workspace is a blocker, nothing running is clean, and a process that
 // starts after the first scan is caught by the scan that follows placement.
+import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

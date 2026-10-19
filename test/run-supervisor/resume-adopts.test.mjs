@@ -2,6 +2,7 @@
 // is taken through the adopt door, the agent does not run again, and a resume never starts a second
 // supervisor for an attempt that is bound. Real processes: the controller, the supervisor, the gate and the
 // bwrap sandbox are real; the agent is fixtures/direct-agent.mjs.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

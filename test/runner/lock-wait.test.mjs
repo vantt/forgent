@@ -1,3 +1,4 @@
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { withLockRetry, DEFAULT_LOCK_WAIT_MS } from '../../src/runner/lock-wait.mjs';

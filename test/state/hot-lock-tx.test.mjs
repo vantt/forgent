@@ -2,6 +2,7 @@
 // and the record the fast path writes. Real files in a temp .fgos; no host
 // binary is needed because nothing here has to clean a dead holder.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

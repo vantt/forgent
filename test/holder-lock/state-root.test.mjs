@@ -2,6 +2,7 @@
 // through the Node facade: a pinned FGOS_STATE_ROOT is answered by Node
 // alone (no host binary needed); without a pin the route
 // `fgos internal state-root` is asked and its answer must match the vector.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

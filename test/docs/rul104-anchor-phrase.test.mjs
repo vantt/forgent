@@ -3,6 +3,7 @@
 // (doctrine layer, loaded every turn) and the locked law text in the
 // platform-foundations Business Rules, both asserted here.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

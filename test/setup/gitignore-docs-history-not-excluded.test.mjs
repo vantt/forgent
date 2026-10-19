@@ -3,6 +3,7 @@
 // never be excluded from git, since `fgos-coding-exploring`'s own hard
 // rule requires committing `CONTEXT.md` to the item's `fgw/<id>` branch,
 // and an ignored path can never be committed there.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';

@@ -1,5 +1,6 @@
 // The approve/merge path reads file names git would quote (a non-ASCII byte, a tab, a quote)
 // and names with edge spaces byte for byte, and a rename as both its halves.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -6,6 +6,21 @@ id: delphi
 title: Delphi Deliberation Workflow
 description: Multi-round Delphi deliberation with anonymous blind proposals, feedback synthesis, revision, and consensus.
 
+# --- Guide head: what the playbook promises, beside the steps below (the steps are unchanged) ---
+kind: playbook
+purpose: Anonymous blind proposals, mediated feedback, a blind revision round, then one consensus.
+must:
+  - id: independent-first-round
+    guard: independence-blind
+    subject: blind-proposals.settled
+    reason: a seat that has read another seat's output is no longer an independent lens
+  - id: independent-second-round
+    guard: independence-blind
+    subject: second-round.settled
+    reason: a seat that has read another seat's output is no longer an independent lens
+frameDefaults: { dispatches: 4, mutatingDispatches: 0, fallbackPerSeat: 2, deviationsBeforeAsk: 0, rigorFloor: standard }
+closure: [final-consensus.settled]
+
 steps:
   - id: blind-proposals
     title: Blind Proposals

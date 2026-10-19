@@ -2288,19 +2288,17 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'start') {
         const { startWorkflow, startWorkflowDetached, preflightWorkflowSeats } = await import('../src/workflow/index.mjs');
         const workflowId = positional[1] ?? flags.id ?? swallowedId;
-        const planPath = flags.plan;
         // --units <file>: a list of Units run as a one-off Workflow, one step per Unit.
         const unitsPath = flags.units === undefined ? undefined : requireField(flags.units, '--units requires a file path (YAML or JSON list of units)');
-        const sources = [workflowId, planPath, unitsPath].filter((value) => value !== undefined);
+        const sources = [workflowId, unitsPath].filter((value) => value !== undefined);
         if (sources.length !== 1) {
-          throw new StoreError('validation', 'workflow start requires exactly one of <workflowId>, --plan <path> or --units <file>');
+          throw new StoreError('validation', 'workflow start requires exactly one of <workflowId> or --units <file>');
         }
         if (unitsPath !== undefined && flags.seats !== undefined) {
           throw new StoreError('validation', '--seats rebuilds a registered panel preset; it cannot be used with --units (give each unit its own persona or prefer instead)');
         }
         const startParams = {
           workflowId,
-          planPath,
           unitsPath,
           // --effort <level>: every unit of the run asks for this reasoning effort (kept for resume).
           effort: flags.effort === undefined ? undefined : requireField(flags.effort, '--effort requires a level (low, medium, high, max)'),

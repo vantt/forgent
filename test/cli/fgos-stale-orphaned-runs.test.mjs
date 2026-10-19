@@ -6,6 +6,7 @@
 // `--reconcile` asks for the write. A run that a plain `stale` silently
 // rewrote would make every other advisory line in this verb suspect.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -8,6 +8,7 @@ use crate::{
 use fgos_holder_lock::{BorrowedHandle, LockScope};
 use serde::Serialize;
 use std::{
+    collections::BTreeSet,
     fs,
     path::{Path, PathBuf},
     time::Duration,
@@ -233,7 +234,21 @@ impl GitDriver {
             _ => return Err(recovery("worktree-registration-missing")),
         };
         if !missing(&path.join(".fgos"))? {
-            return Err(failure("worktree-worker-state-preserved"));
+            let tracked = self.checked(
+                &target,
+                &["ls-files", "-v", "-z", "--", ".fgos"],
+                Policy::Inspect,
+            )?;
+            if tracked.is_empty() {
+                return Err(failure("worktree-worker-state-preserved"));
+            }
+            for entry in tracked.split(|b| *b == 0).filter(|e| !e.is_empty()) {
+                if matches!(entry.first(), Some(b'S' | b's'))
+                    && !missing(&path.join(byte_path(&entry[2..])?))?
+                {
+                    return Err(failure("worktree-worker-state-preserved"));
+                }
+            }
         }
         if !self
             .status(&target, Untracked::All, None, 1)?
@@ -319,7 +334,7 @@ impl GitDriver {
         }
         Ok(())
     }
-    fn worktree_not_live(&self, path: &Path) -> Result<()> {
+    fn worktree_not_live(&self, path: &Path, warned: &mut BTreeSet<u32>) -> Result<()> {
         use fgos_process::facts::{scan, Scan, ScanFilter};
         match scan(&ScanFilter {
             include_self: true,
@@ -337,7 +352,9 @@ impl GitDriver {
                         })
                     {
                         use fgos_process::facts::{observe, Observed};
-                        if !matches!(observe(row.pid), Observed::Absent | Observed::Zombie) {
+                        if !matches!(observe(row.pid), Observed::Absent | Observed::Zombie)
+                            && warned.insert(row.pid.0)
+                        {
                             #[cfg(target_os = "linux")]
                             let comm = std::fs::read_to_string(format!("/proc/{}/comm", row.pid))
                                 .unwrap_or_else(|_| "unknown".into());
@@ -804,7 +821,8 @@ impl GitDriver {
             return Err(failure("worktree-root-refused"));
         }
         let handle = self.worktree_handle(repo, &path)?;
-        self.worktree_not_live(&path)?;
+        let mut warned = BTreeSet::new();
+        self.worktree_not_live(&path, &mut warned)?;
         self.worktree_custody(repo, &scope, &path)?;
         self.worktree_clean(repo, &path)?;
         if proof.evidence_digest.len() != 64
@@ -856,7 +874,7 @@ impl GitDriver {
             Tip::Absent,
         )?;
         self.worktree_custody(repo, &scope, &path)?;
-        self.worktree_not_live(&path)?;
+        self.worktree_not_live(&path, &mut warned)?;
         let attempted = wal
             .append(
                 &chain,
@@ -868,7 +886,7 @@ impl GitDriver {
             )
             .map_err(failure)?;
         self.worktree_custody(repo, &scope, &path)?;
-        self.worktree_not_live(&path)?;
+        self.worktree_not_live(&path, &mut warned)?;
         self.worktree_call(repo, &scope, &["worktree", "remove", "--", text(&path)?])
             .map_err(|e| self.reconcile_worktree_error(repo, &scope, id, e))?;
         if !missing(&path)? || !missing(&handle.git_dir)? {
@@ -960,7 +978,8 @@ impl GitDriver {
             return Err(failure("worktree-destination-exists"));
         }
         let handle = self.worktree_handle(repo, &source)?;
-        self.worktree_not_live(&source)?;
+        let mut warned = BTreeSet::new();
+        self.worktree_not_live(&source, &mut warned)?;
         self.worktree_custody(repo, &scope, &source)?;
         self.worktree_clean(repo, &source)?;
         if &handle.tip != expected {
@@ -989,7 +1008,7 @@ impl GitDriver {
             tip.clone(),
         )?;
         self.worktree_custody(repo, &scope, &source)?;
-        self.worktree_not_live(&source)?;
+        self.worktree_not_live(&source, &mut warned)?;
         let attempted = wal
             .append(
                 &chain,
@@ -1001,7 +1020,7 @@ impl GitDriver {
             )
             .map_err(failure)?;
         self.worktree_custody(repo, &scope, &source)?;
-        self.worktree_not_live(&source)?;
+        self.worktree_not_live(&source, &mut warned)?;
         self.worktree_call(
             repo,
             &scope,

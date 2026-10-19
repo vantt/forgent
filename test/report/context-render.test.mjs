@@ -5,6 +5,7 @@
 // (replaceLockedDecisionsSection, src/intake/plan.mjs), and the CLI verb
 // wiring (`fgos context-render <id>`) that ties them to a real file.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

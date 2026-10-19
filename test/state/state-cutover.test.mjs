@@ -3,6 +3,7 @@
 // delivered gate takes its git evidence before the lock and retries when the
 // branch moves while it waits.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

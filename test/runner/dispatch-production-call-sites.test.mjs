@@ -12,6 +12,7 @@
 // field the config declared was dropped between those two ends with the whole
 // suite green. These tests start where a real dispatch starts -- at the file.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

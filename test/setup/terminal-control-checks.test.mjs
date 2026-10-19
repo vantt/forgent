@@ -1,6 +1,7 @@
 // The terminal-control doctor checks and setup fix against the real host
 // binary (FGOS_HOST_BIN, built from this checkout) and the fake herdr script
 // the Rust driver tests use. Configs are written to temporary workspaces.
+import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

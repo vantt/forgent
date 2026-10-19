@@ -12,6 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { releaseBinaryPath } from '../src/util/release-binary-path.mjs';
 import { releaseTargetForHost, manifestTargetForHost } from '../src/util/release-targets.mjs';
@@ -165,7 +166,18 @@ export function listLegacyNodeSourceFiles(repoRoot) {
     collectSourceFiles(resolvedRepo, declared, sourceFiles);
   }
   collectSourceFiles(resolvedRepo, 'package.json', sourceFiles);
-  return [...new Set(sourceFiles.map((file) => path.relative(resolvedRepo, path.resolve(resolvedRepo, file)).replaceAll('\\', '/')))].sort();
+  // Git's tracked + non-ignored working files define source; unpacked tarballs
+  // retain the filesystem walk. Fail closed if enumeration of a Git tree fails.
+  let allowed;
+  const git = spawnSync('git', ['rev-parse', '--is-inside-work-tree'], { cwd: resolvedRepo, encoding: 'utf8' });
+  if (git.status === 0 && git.stdout.trim() === 'true') {
+    const listed = spawnSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', '.'], {
+      cwd: resolvedRepo, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024,
+    });
+    if (listed.status !== 0) throw new Error(`Cannot enumerate release source: ${listed.stderr || listed.error}`);
+    allowed = new Set(listed.stdout.split('\0').filter(Boolean));
+  }
+  return [...new Set(sourceFiles.map((file) => path.relative(resolvedRepo, path.resolve(resolvedRepo, file)).replaceAll('\\', '/')).filter((file) => !allowed || allowed.has(file)))].sort();
 }
 
 /**

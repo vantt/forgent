@@ -1,6 +1,7 @@
 // The time one run may take: a duration a person types (`fgos run --timeout 90m`), checked against
 // one floor and one ceiling.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

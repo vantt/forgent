@@ -2,6 +2,7 @@
 // tells an account fault from a CLI fault. Everything here runs against fixtures: the Assignment
 // door, the id claim and the pane close are injected.
 
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

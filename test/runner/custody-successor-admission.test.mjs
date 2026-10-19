@@ -1,3 +1,4 @@
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -214,7 +215,12 @@ test('recreating a directory with a reused inode gets a new custody record key',
   const f = fixture(t);
   const directory = path.join(f.cwd, 'recreated');
   const seen = new Map();
-  for (let generation = 0; generation < 1024; generation += 1) {
+  // Birth time is read from the kernel's timestamp clock, which on some kernels and filesystems
+  // only advances every few milliseconds. Two generations created inside one tick are
+  // indistinguishable by any birth-time key, so each generation waits past a tick: the invariant
+  // under test is that a reused inode born at a later time gets a different key.
+  const pause = new Int32Array(new SharedArrayBuffer(4));
+  for (let generation = 0; generation < 128; generation += 1) {
     fs.mkdirSync(directory);
     const stat = fs.statSync(directory, { bigint: true });
     const key = `${stat.dev}-${stat.ino}`;
@@ -226,6 +232,7 @@ test('recreating a directory with a reused inode gets a new custody record key',
     }
     seen.set(key, lockPath);
     fs.rmdirSync(directory);
+    Atomics.wait(pause, 0, 0, 20);
   }
-  t.diagnostic('filesystem did not reuse a directory inode in 1024 creations; deterministic birth-time and legacy-record checks cover the key');
+  t.diagnostic('filesystem did not reuse a directory inode in 128 creations; deterministic birth-time and legacy-record checks cover the key');
 });

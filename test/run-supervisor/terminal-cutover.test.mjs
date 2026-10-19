@@ -1,6 +1,7 @@
 // The controller half of a terminal attempt, through the real door (`executeAssignment`), a real host
 // binary (supervisor, gate, step runner) and a fake herdr that keeps one real pane: what the controller
 // prepares, what the envelope carries, and that a herdr-spawn seat is judged by the supervisor.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

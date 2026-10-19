@@ -3,6 +3,7 @@
 // herdr seat is) but is never executed; the executor config still validates how an interactive agent is
 // described. The controller half of a seat is tested in test/run-supervisor/terminal-*.test.mjs.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -4,6 +4,7 @@
 // planning-awareness fragment, the P2-runtime code:review/code:test/
 // code:debug/code:refactor slots, and that a capability can resolve to a
 // tool/MCP provider, not only an agent-shaped executor.
+import '../helpers/process-tmp-root.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
