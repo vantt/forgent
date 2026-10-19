@@ -223,6 +223,7 @@ pub enum Outcome {
     deny_unknown_fields
 )]
 pub enum Phase {
+    RestoreAcknowledged,
     RestoreApplied { snapshot: String },
     LandVerified { evidence: crate::LandEvidence, #[serde(default, skip_serializing_if = "Option::is_none")] checkout: Option<String> },
     Intent(Intent),
@@ -898,6 +899,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             },
         ) => expected == i.candidate(),
         (Phase::PinReleaseAttempt { .. }, Phase::PinReleased) => true,
+        (Phase::Outcome(_), Phase::RestoreAcknowledged) => matches!(i.kind, OperationKind::Restore(_)),
         _ => false,
     };
     if valid {
@@ -1104,6 +1106,47 @@ impl<F: FileSystem> Wal<F> {
             identity,
         })
     }
+    /// Seven-day orphan retention is housekeeping, never effect attribution.
+    /// Referenced and malformed evidence is never aged out.
+    fn prune_restore_orphans(&self, dir: &Directory) -> WalResult<()> {
+        let retained = self.retained(100_000)?;
+        let mut referenced = std::collections::BTreeSet::new();
+        for chain in &retained {
+            if let OperationKind::Restore(p) = &chain.intent().kind {
+                referenced.insert(p.snapshot.clone());
+            }
+            for record in chain.records() {
+                if let Phase::RestoreApplied { snapshot } = &record.phase {
+                    referenced.insert(snapshot.clone());
+                }
+            }
+        }
+        for entry in fs::read_dir(dir.path())? {
+            let entry = entry?;
+            let name = entry.file_name().to_string_lossy().into_owned();
+            let metadata = fs::symlink_metadata(entry.path())?;
+            if !metadata.is_file()
+                || referenced.contains(&name)
+                || !metadata
+                    .modified()?
+                    .elapsed()
+                    .is_ok_and(|age| age.as_secs() >= 7 * 24 * 60 * 60)
+            {
+                continue;
+            }
+            let removable = if digest_valid(&name) {
+                self.read_restore_snapshot::<serde_json::Value>(&name)
+                    .is_ok()
+            } else {
+                is_durable_temporary(&name)
+            };
+            if removable {
+                fs::remove_file(entry.path())?;
+            }
+        }
+        dir.file.sync_all()?;
+        Ok(())
+    }
     pub(crate) fn store_restore_snapshot<T: Serialize>(&self, value: &T) -> WalResult<String> {
         let bytes = serde_json::to_vec(value).map_err(|_| corrupt("snapshot serialize"))?;
         if bytes.len() > 128 * 1024 * 1024 {
@@ -1115,6 +1158,7 @@ impl<F: FileSystem> Wal<F> {
             .child("fgos", false, &self.fs)?
             .child("git", false, &self.fs)?;
         let dir = git.child("restore-snapshots", true, &self.fs)?;
+        self.prune_restore_orphans(&dir)?;
         install_ordered(
             &dir.path(),
             &digest,
@@ -1128,6 +1172,37 @@ impl<F: FileSystem> Wal<F> {
         self.fs.checkpoint("restore-snapshot-durable")?;
         let _: serde_json::Value = self.read_restore_snapshot(&digest)?;
         Ok(digest)
+    }
+    pub(crate) fn release_restore_snapshots(&self, digests: &[String]) -> WalResult<()> {
+        let retained = self.retained(100_000)?;
+        let dir = self
+            .common
+            .child("fgos", false, &self.fs)?
+            .child("git", false, &self.fs)?
+            .child("restore-snapshots", false, &self.fs)?;
+        for digest in digests {
+            if !digest_valid(digest) {
+                return Err(corrupt("snapshot digest"));
+            }
+            let used = retained.iter().any(|chain| {
+                if matches!(chain.last().phase, Phase::RestoreAcknowledged) {
+                    return false;
+                }
+                matches!(&chain.intent().kind, OperationKind::Restore(p) if &p.snapshot == digest)
+                    || chain.records.iter().any(|r| {
+                        matches!(&r.phase, Phase::RestoreApplied { snapshot } if snapshot == digest)
+                    })
+            });
+            if !used {
+                match fs::remove_file(dir.path().join(digest)) {
+                    Ok(()) => self.fs.checkpoint("restore-snapshot-released")?,
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+                    Err(e) => return Err(e.into()),
+                }
+            }
+        }
+        fs::File::open(dir.path())?.sync_all()?;
+        Ok(())
     }
     pub(crate) fn read_restore_snapshot<T: serde::de::DeserializeOwned>(
         &self,
@@ -1467,6 +1542,7 @@ fn compaction_suffix(dir: &Directory, id: &str) -> WalResult<Vec<Record>> {
         !matches!(
             r.phase,
             Phase::PinReleased
+                | Phase::RestoreAcknowledged
                 | Phase::Outcome(Outcome::Worktree { .. })
                 | Phase::Outcome(Outcome::Transfer { .. })
                 | Phase::Outcome(Outcome::ConfigApproved)
@@ -1994,13 +2070,35 @@ impl<F: FileSystem> Wal<F> {
         reader: &dyn RecoveryReader,
         authority: &dyn PublicationAuthority,
     ) -> WalResult<CompactReceipt> {
+        self.compact_inner(chain, reader, authority, false)
+    }
+    /// Explicit acknowledgement releases Restore evidence through the normal ledger.
+    pub(crate) fn compact_restore_ack(
+        &self,
+        chain: &Chain,
+        reader: &dyn RecoveryReader,
+        authority: &dyn PublicationAuthority,
+    ) -> WalResult<CompactReceipt> {
+        if !matches!(chain.intent().kind, OperationKind::Restore(_))
+            || !matches!(chain.last().phase, Phase::RestoreAcknowledged)
+        {
+            return Err(WalError::RecoveryRequired);
+        }
+        self.compact_inner(chain, reader, authority, true)
+    }
+    fn compact_inner(
+        &self,
+        chain: &Chain,
+        reader: &dyn RecoveryReader,
+        authority: &dyn PublicationAuthority,
+        restore_ack: bool,
+    ) -> WalResult<CompactReceipt> {
         authority.validate_publication_borrow(chain.intent())?;
         let id = &chain.last().operation_id;
         let actual = self.inspect(id)?;
         if actual.last().digest != chain.last().digest
-            // Restore retains its snapshot binding until explicit repair/retention
-            // is implemented; never turn a full receipt into an unusable id.
-            || matches!(actual.intent().kind, OperationKind::Restore(_))
+            // Restore releases its binding only after durable caller acknowledgement.
+            || (matches!(actual.intent().kind, OperationKind::Restore(_)) && !restore_ack)
             || !(matches!(actual.last().phase, Phase::PinReleased)
                 || (actual.intent().kind != OperationKind::PublicationCas
                     && actual.outcome().is_some()))

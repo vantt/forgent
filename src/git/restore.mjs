@@ -6,7 +6,7 @@ export function createGitSafeRestore(options, loaderOptions) {
   outside();
   const native = loadNativeAddon(loaderOptions);
   const port = new native.GitSafeRestore(options.stateRoot, options.repoPath, options.trustedMain, options.writer);
-  return Object.freeze(Object.fromEntries(['preview', 'apply', 'recover'].map(method => [method, (args, held = []) => {
+  return Object.freeze(Object.fromEntries(['preview', 'apply', 'recover', 'listSnapshot', 'extractPath', 'acknowledge'].map(method => [method, (args, held = []) => {
     outside(); return withNativeLocks(native, held, loans => port.call(method, args, loans));
   }])));
 }

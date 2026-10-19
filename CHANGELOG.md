@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- SafeRestore refuses untracked/ignored collisions unless exact replacement paths are authorized, captures only local bytes, preserves incoming executable modes and intent-to-add, and exposes snapshot extraction and acknowledgement-gated cleanup. Unreadable snapshots no longer permanently block a checkout.
+
 - Git Land recovery blocks unreconciled predecessor effects, tolerates index stat refresh, preserves ignored store collisions and permits acknowledged cleanup of abandoned/lost candidates.
 
 - Add dormant SafeRestore preview/apply/recover ports with durable binary/index/untracked/mode snapshots, verified checkout custody, local delta reapplication and observe-only crash recovery.

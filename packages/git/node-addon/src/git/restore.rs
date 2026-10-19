@@ -69,6 +69,34 @@ impl GitSafeRestore {
                 .driver
                 .recover_restore(&self.repo, held, &self.writer, text(&args, "operationId")?)
                 .map_err(operation)?)),
+            "listSnapshot" => Ok(json!(self
+                .driver
+                .list_restore_snapshot(&self.repo, held, &self.writer, text(&args, "operationId")?)
+                .map_err(operation)?)),
+            "extractPath" => {
+                self.driver
+                    .extract_restore_path(
+                        &self.repo,
+                        held,
+                        &self.writer,
+                        text(&args, "operationId")?,
+                        text(&args, "path")?,
+                        Path::new(text(&args, "destination")?),
+                    )
+                    .map_err(operation)?;
+                Ok(json!({"extracted": true}))
+            }
+            "acknowledge" => {
+                self.driver
+                    .acknowledge_restore(
+                        &self.repo,
+                        held,
+                        &self.writer,
+                        text(&args, "operationId")?,
+                    )
+                    .map_err(operation)?;
+                Ok(json!({"acknowledged": true}))
+            }
             _ => Err(error("unknown-safe-restore-method")),
         }
     }

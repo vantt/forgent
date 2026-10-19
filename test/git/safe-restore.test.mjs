@@ -38,6 +38,7 @@ for (const linked of [false, true]) test(`SafeRestore preserves binary, staged/u
     assert.equal(fs.readFileSync(path.join(repo, 'a'), 'utf8'), 'incoming\n');
     assert.deepEqual(port.recover({ operationId: 'restore' }, held), out);
     assert.deepEqual(port.apply({ request, operationId: 'restore' }, held), out);
+    assert.throws(() => port.extractPath({ operationId: 'restore', path: 'b', destination: f.repo }, held), /outside-repository/);
     assert.throws(() => port.apply({ request: { ...request, reason: 'different' }, operationId: 'restore' }, held), /operation-id-conflict/);
   } finally { lease?.handle.release(); f.close(); }
 });
@@ -70,9 +71,18 @@ test('SafeRestore snapshots an ignored incoming collision and refuses to guess a
     const request = { expectedHead: f.request.target, target, reason: 'explicit snapshot-backed replacement', reapplyLocalDelta: true };
     assert.throws(() => port.apply({ request, operationId: 'collision-reapply' }), /untracked-target-collision/);
     assert.deepEqual(fs.readFileSync(path.join(f.repo, 'collision')), bytes);
-    const out = port.apply({ request: { ...request, reapplyLocalDelta: false }, operationId: 'collision-snapshot' });
+    assert.throws(() => port.apply({ request: { ...request, reapplyLocalDelta: false }, operationId: 'collision-default' }), /untracked-target-collision/);
+    const out = port.apply({ request: { ...request, reapplyLocalDelta: false, allowedReplacements: ['collision'] }, operationId: 'collision-snapshot' });
     const saved = JSON.parse(fs.readFileSync(path.join(f.repo, '.git/fgos/git/restore-snapshots', out.snapshot)));
     assert.deepEqual(Buffer.from(saved.paths.collision.File[0]), bytes);
     assert.equal(fs.readFileSync(path.join(f.repo, 'collision'), 'utf8'), 'incoming');
+    assert.ok(port.listSnapshot({ operationId: 'collision-snapshot' }).includes('collision'));
+    const destination = path.join(f.temp, 'extract'); fs.mkdirSync(destination);
+    assert.deepEqual(port.extractPath({ operationId: 'collision-snapshot', path: 'collision', destination }), { extracted: true });
+    assert.deepEqual(fs.readFileSync(path.join(destination, 'collision')), bytes);
+    assert.throws(() => port.extractPath({ operationId: 'collision-snapshot', path: 'collision', destination }), /exist/i);
+    assert.deepEqual(port.acknowledge({ operationId: 'collision-snapshot' }), { acknowledged: true });
+    assert.equal(fs.existsSync(path.join(f.repo, '.git/fgos/git/restore-snapshots', out.snapshot)), false);
+    assert.throws(() => port.listSnapshot({ operationId: 'collision-snapshot' }), /already-acknowledged/);
   } finally { f.close(); }
 });

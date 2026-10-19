@@ -52,7 +52,10 @@
     "SafeRestore": [
       "preview",
       "apply",
-      "recover"
+      "recover",
+      "listSnapshot",
+      "extractPath",
+      "acknowledge"
     ],
     "Checkpoint adapter": [
       "checkpointTrackedFiles"
