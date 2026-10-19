@@ -1,0 +1,128 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "reviewMode": "full pilot; all files, no sample waiver",
+  "parts": [
+    {
+      "payload": "step-03-pilot-review-part-01.json",
+      "report": "review-a38-step-03-pilot-01.md",
+      "bytes": 273556,
+      "sha256": "33589aaddfdaf073ab3eabaed5b7e38f8d10e33e59ae9b3e064f2ffbac650df9",
+      "entries": 13,
+      "files": [
+        "README.md",
+        "docs/doc-governance.md",
+        "docs/platform-foundations.md",
+        "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+        "docs/reading-map.md",
+        "docs/routing-handoff-contract.md",
+        "docs/specs/confinement-authority.md"
+      ]
+    },
+    {
+      "payload": "step-03-pilot-review-part-02.json",
+      "report": "review-a38-step-03-pilot-02.md",
+      "bytes": 293428,
+      "sha256": "7426bdbccd1f6c2c6d6e6609d2b81e7f20f782f5e3e1f29f49a7ab63847d824d",
+      "entries": 15,
+      "files": [
+        "docs/specs/confinement-authority.md",
+        "docs/specs/decision-citation-drift.md",
+        "docs/specs/distillery.md",
+        "docs/specs/distribution.md",
+        "docs/specs/enduser-docs-authoring.md",
+        "docs/specs/enduser-docs-index.md",
+        "docs/specs/fgos-plugin.md",
+        "docs/specs/herdr-web-dashboard.md"
+      ]
+    },
+    {
+      "payload": "step-03-pilot-review-part-03.json",
+      "report": "review-a38-step-03-pilot-03.md",
+      "bytes": 270102,
+      "sha256": "edcaf5340d849f36ede256adc6b8d276b40142b31f2d33caea2eee65bf87f16b",
+      "entries": 7,
+      "files": [
+        "docs/specs/herdr-web-dashboard.md",
+        "docs/specs/observe.md",
+        "docs/specs/platform-foundations.md",
+        "docs/specs/reading-map.md"
+      ]
+    },
+    {
+      "payload": "step-03-pilot-review-part-04.json",
+      "report": "review-a38-step-03-pilot-04.md",
+      "bytes": 288523,
+      "sha256": "8aac6bf0486c26503160f4a40efe101c06f7d8b2dad8f0099a10c2b97dabb15c",
+      "entries": 3,
+      "files": [
+        "docs/specs/runner.md"
+      ]
+    },
+    {
+      "payload": "step-03-pilot-review-part-05.json",
+      "report": "review-a38-step-03-pilot-05.md",
+      "bytes": 269184,
+      "sha256": "0a7703a4d3029d5d9803f9e6dbb00ba986f96c35366896a674bb1c919fb470c4",
+      "entries": 3,
+      "files": [
+        "docs/specs/runner.md"
+      ]
+    },
+    {
+      "payload": "step-03-pilot-review-part-06.json",
+      "report": "review-a38-step-03-pilot-06.md",
+      "bytes": 247041,
+      "sha256": "7f0b81d445d31a3a0cc805e9275b71238cbd6627f2248331fed32aa2201ec771",
+      "entries": 6,
+      "files": [
+        "docs/specs/runner.md",
+        "docs/specs/system-overview.md",
+        "docs/specs/work-state.md"
+      ]
+    },
+    {
+      "payload": "step-03-pilot-review-part-07.json",
+      "report": "review-a38-step-03-pilot-07.md",
+      "bytes": 271703,
+      "sha256": "95c1563e7b55d0d4c8bf1d38ccb3800c67c79d8811c3ff35fa2da12391418b62",
+      "entries": 3,
+      "files": [
+        "docs/specs/work-state.md"
+      ]
+    },
+    {
+      "payload": "step-03-pilot-review-part-08.json",
+      "report": "review-a38-step-03-pilot-08.md",
+      "bytes": 169479,
+      "sha256": "c301f8e7cdcebf200a805bb476a81f96ff57a9706bd8a5da5956099d7649e769",
+      "entries": 4,
+      "files": [
+        "docs/specs/work-state.md",
+        "docs/specs/workflow.md"
+      ]
+    }
+  ],
+  "fileVerdictReports": {
+    "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md": "review-a38-step-03-pilot-01.md",
+    "README.md": "review-a38-step-03-pilot-01.md",
+    "docs/doc-governance.md": "review-a38-step-03-pilot-01.md",
+    "docs/platform-foundations.md": "review-a38-step-03-pilot-01.md",
+    "docs/reading-map.md": "review-a38-step-03-pilot-01.md",
+    "docs/routing-handoff-contract.md": "review-a38-step-03-pilot-01.md",
+    "docs/specs/confinement-authority.md": "review-a38-step-03-pilot-02.md",
+    "docs/specs/decision-citation-drift.md": "review-a38-step-03-pilot-02.md",
+    "docs/specs/distillery.md": "review-a38-step-03-pilot-02.md",
+    "docs/specs/distribution.md": "review-a38-step-03-pilot-02.md",
+    "docs/specs/enduser-docs-authoring.md": "review-a38-step-03-pilot-02.md",
+    "docs/specs/enduser-docs-index.md": "review-a38-step-03-pilot-02.md",
+    "docs/specs/fgos-plugin.md": "review-a38-step-03-pilot-02.md",
+    "docs/specs/herdr-web-dashboard.md": "review-a38-step-03-pilot-03.md",
+    "docs/specs/observe.md": "review-a38-step-03-pilot-03.md",
+    "docs/specs/platform-foundations.md": "review-a38-step-03-pilot-03.md",
+    "docs/specs/reading-map.md": "review-a38-step-03-pilot-03.md",
+    "docs/specs/runner.md": "review-a38-step-03-pilot-06.md",
+    "docs/specs/system-overview.md": "review-a38-step-03-pilot-06.md",
+    "docs/specs/work-state.md": "review-a38-step-03-pilot-08.md",
+    "docs/specs/workflow.md": "review-a38-step-03-pilot-08.md"
+  }
+}

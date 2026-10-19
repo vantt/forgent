@@ -1,0 +1,48 @@
+{
+  "startedAt": "2026-10-19T17:00:03.180111+00:00",
+  "measuredAt": "2026-10-19T17:15:18.236319+00:00",
+  "authoringWallSeconds": 915.056,
+  "includes": "brief/policy reading, full-source byte inspection and edge-context authoring, tooling, probes, replay, packaging and author verification; excludes future independent review and accounting",
+  "recordBytes": 529701,
+  "recordFiles": 21,
+  "inventoryEdges": 437,
+  "averageRecordBytesPerEdge": 1212.13,
+  "averageRecordBytesPerFile": 25223.857,
+  "sourceContextBytes": 1528937,
+  "payloadBytes": 2083016,
+  "maxPayloadBytes": 293428,
+  "groups": [
+    {
+      "set": "batch-001",
+      "files": 1,
+      "edges": 2,
+      "recordBytes": 2851,
+      "bytesPerEdge": 1425.5,
+      "bytesPerFile": 2851.0
+    },
+    {
+      "set": "batch-002",
+      "files": 5,
+      "edges": 111,
+      "recordBytes": 148747,
+      "bytesPerEdge": 1340.063,
+      "bytesPerFile": 29749.4
+    },
+    {
+      "set": "batch-040",
+      "files": 11,
+      "edges": 161,
+      "recordBytes": 226693,
+      "bytesPerEdge": 1408.031,
+      "bytesPerFile": 20608.455
+    },
+    {
+      "set": "batch-041",
+      "files": 4,
+      "edges": 163,
+      "recordBytes": 151410,
+      "bytesPerEdge": 928.896,
+      "bytesPerFile": 37852.5
+    }
+  ]
+}
