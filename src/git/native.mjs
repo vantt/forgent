@@ -1,3 +1,4 @@
+import { registerGitHandover } from '../holder-lock/native-handover.mjs';
 // Loading and byte verification only. Git/Event Store policy stays in Rust.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -5,6 +6,11 @@ import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { OWN_PAYLOAD_ROOT, releasePayloadManifest } from '../run-supervisor/payload-root.mjs';
 const require = createRequire(import.meta.url);
+let handover;
+export function withNativeLocks(addon, handles, call) {
+  if (!handover) handover = registerGitHandover(addon);
+  return handover(handles, call);
+}
 const unavailable = (cause) => Object.assign(new Error(`git-addon-unavailable: ${cause}`), { code: 'git-addon-unavailable' });
 export function loadNativeAddon({ hostBin = process.env.FGOS_HOST_BIN, descriptor } = {}) {
   let found = descriptor ?? releasePayloadManifest(hostBin);
@@ -37,6 +43,7 @@ export function loadNativeAddon({ hostBin = process.env.FGOS_HOST_BIN, descripto
     }
     const versions = addon.versions(); // Enforce the process marker before exposing either crate.
     if (versions.napi !== entry.napiVersion || typeof versions.git !== 'string' || typeof versions.eventStore !== 'string') throw unavailable('combined addon ABI mismatch');
+    if (!handover) handover = registerGitHandover(addon);
     return addon;
   } catch (err) {
     if (err.message.includes('git-addon-second-load')) throw Object.assign(err, { code: 'git-addon-second-load' });

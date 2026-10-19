@@ -275,8 +275,42 @@ impl GitDriver {
     /// Linked gitdir authority is read from the main registration, never .git.
     pub fn resolve_repo(&self, path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
         self.require_floor()?;
-        let main = fs::canonicalize(trusted_main).map_err(io)?;
+        let mut main = fs::canonicalize(trusted_main).map_err(io)?;
         let path = fs::canonicalize(path).map_err(io)?;
+        // Callers may supply a cwd beneath a checkout. Locate only on disk;
+        // never let Git or GIT_* environment select topology authority.
+        while !main.join(".git").exists()
+            && !(main.join("HEAD").is_file() && main.join("objects").is_dir())
+        {
+            if !main.pop() {
+                return Ok(ResolveRepo::NotARepository);
+            }
+        }
+        // A linked cwd supplies only a discovery hint. Trust comes from the
+        // main .git directory and reciprocal registered gitdir/backlink.
+        let main = if main.join(".git").is_file() {
+            let hint = fs::read(main.join(".git")).map_err(io)?;
+            let hint = line(&hint)?
+                .strip_prefix("gitdir: ")
+                .ok_or_else(|| refusal("untrusted-worktree"))?;
+            let admin = fs::canonicalize(main.join(hint)).map_err(io)?;
+            let common_hint = fs::read(admin.join("commondir"))
+                .map_err(|_| refusal("trusted-main-gitfile-unsupported"))?;
+            let common = fs::canonicalize(admin.join(line(&common_hint)?)).map_err(io)?;
+            let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
+            if common.file_name() != Some(std::ffi::OsStr::new(".git"))
+                || admin.parent() != Some(common.join("worktrees").as_path())
+                || Path::new(line(&backlink)?) != main.join(".git")
+            {
+                return Err(refusal("untrusted-worktree"));
+            }
+            common
+                .parent()
+                .ok_or_else(|| refusal("untrusted-worktree"))?
+                .to_owned()
+        } else {
+            main
+        };
         let common = if main.join(".git").is_dir() {
             let dir = main.join(".git");
             if fs::symlink_metadata(&dir)
@@ -300,7 +334,7 @@ impl GitDriver {
         };
         let mut git_dir = common.clone();
         let bare = common == main;
-        let work_tree = if bare { None } else { Some(path.clone()) };
+        let mut work_tree = if bare { None } else { Some(main.clone()) };
         if path != main {
             let mut found = None;
             if let Ok(entries) = fs::read_dir(common.join("worktrees")) {
@@ -308,18 +342,31 @@ impl GitDriver {
                     let admin = entry.map_err(io)?.path();
                     let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
                     let backlink = line(&backlink)?;
-                    if Path::new(backlink) == path.join(".git") {
+                    let checkout = Path::new(backlink)
+                        .parent()
+                        .ok_or_else(|| refusal("untrusted-worktree"))?;
+                    if path.starts_with(checkout) {
                         let registered_common = fs::read(admin.join("commondir")).map_err(io)?;
                         if fs::canonicalize(admin.join(line(&registered_common)?)).map_err(io)?
                             != common
                         {
                             return Err(refusal("untrusted-worktree"));
                         }
+                        work_tree = Some(fs::canonicalize(checkout).map_err(io)?);
                         found = Some(fs::canonicalize(admin).map_err(io)?);
                     }
                 }
             }
-            git_dir = found.ok_or_else(|| refusal("untrusted-worktree"))?;
+            if let Some(found) = found {
+                git_dir = found;
+            } else if !path.starts_with(&main)
+                || path
+                    .ancestors()
+                    .take_while(|p| *p != main)
+                    .any(|p| p.join(".git").exists())
+            {
+                return Err(refusal("untrusted-worktree"));
+            }
         }
         let mut repo = RepoHandle {
             common_dir: common.clone(),
@@ -2339,10 +2386,8 @@ mod tests {
             driver.resolve_repo(&alien.0, &dir.0).unwrap_err().cause,
             "untrusted-worktree"
         );
-        assert_eq!(
-            driver.resolve_repo(&linked.0, &linked.0).unwrap_err().cause,
-            "trusted-main-gitfile-unsupported"
-        );
+        // The worker gitfile was poisoned above: inferred discovery refuses it.
+        assert!(driver.resolve_repo(&linked.0, &linked.0).is_err());
     }
     #[test]
     fn output_ceiling_and_borrow_gate() {

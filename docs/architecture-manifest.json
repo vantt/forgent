@@ -22,6 +22,8 @@
   "files": {
     "src/git/index.mjs": "infra",
     "src/git/inspect.mjs": "infra",
+    "src/git/refs.mjs": "infra",
+    "src/git/remote.mjs": "infra",
     "src/git/native.mjs": "infra",
     "bin/fgos.mjs": "entry",
     "bin/fgos-runner.mjs": "entry",
@@ -153,6 +155,7 @@
     "src/report/authoritative-match.mjs": "domain",
     "src/evolve/iron-law.mjs": "domain",
     "src/holder-lock/index.mjs": "infra",
+    "src/holder-lock/native-handover.mjs": "infra",
     "src/holder-lock/registry.mjs": "infra",
     "src/holder-lock/state-root.mjs": "infra",
     "src/holder-lock/driver.mjs": "infra",

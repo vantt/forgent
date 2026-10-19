@@ -94,13 +94,13 @@ test('Publication marshals object writes, reads, ordered walks and receipted CAS
 test('staged release and npm-relative manifests resolve their own addon without PATH or cwd fallback', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-payload-'));
   try {
-    const nodeSource = path.join(root, 'src/git/native.mjs');
     for (const channel of ['release', 'npm']) {
       const releaseRoot = path.join(temp, channel);
       const payload = channel === 'release' ? path.join(releaseRoot, 'libexec/legacy-node') : releaseRoot;
       for (const dir of ['src/git', 'src/run-supervisor', 'native']) fs.mkdirSync(path.join(payload, dir), { recursive: true });
-      fs.copyFileSync(nodeSource, path.join(payload, 'src/git/native.mjs'));
-      fs.copyFileSync(path.join(root, 'src/run-supervisor/payload-root.mjs'), path.join(payload, 'src/run-supervisor/payload-root.mjs'));
+      // Stage the actual source payload, including the loader's holder bridge
+      // and its transitive dependencies, as both packaging channels do.
+      fs.cpSync(path.join(root,'src'),path.join(payload,'src'),{recursive:true});
       const nativePath = path.join(payload, 'native/fgos.node');
       fs.copyFileSync(built.addon, nativePath);
       const host = path.join(releaseRoot, 'bin/fgos');
@@ -173,6 +173,7 @@ test('native lock inspection includes symlink residue in a linked worktree git d
 });
 
 test('Windows lock-taking addon doors refuse by name before resolving paths', { skip: process.platform !== 'win32' }, () => {
+  for (const Port of [addon.GitRefs,addon.GitRemote]) assert.throws(()=>new Port('missing-state','missing-repo','missing-main','test'),/git-lock-handover-unsupported/);
   assert.throws(() => new addon.GitPublication('missing-state', 'missing-repo', 'missing-main', 'refs/fgos/events/test', 'test'), /git-lockscope-unavailable-windows/);
   assert.throws(() => addon.ensureGitFetchMapping('missing-state', 'missing-repo', 'missing-main', 'origin', ['+refs/fgos/events/*:refs/fgos/remotes/origin/events/*'], 'test'), /git-lockscope-unavailable-windows/);
 });

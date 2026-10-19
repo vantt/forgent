@@ -75,6 +75,10 @@ impl<'a> LockScope<'a> {
             acquired: Vec::new(),
         })
     }
+    /// A verified hold remains opaque and borrowed for the scope lifetime.
+    pub fn handle(&self, name: &str) -> Option<&Handle> {
+        self.seeded.iter().map(AsRef::as_ref).chain(self.acquired.iter()).find(|h| h.name() == name)
+    }
     pub fn holding(&self) -> Result<Vec<HeldLock>, ScopeError> {
         self.seeded
             .iter()

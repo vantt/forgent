@@ -155,9 +155,8 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
         assert!(
             matches!(driver.resolve_head(&linked_repo).unwrap(),HeadFact::Detached {commit} if commit==second)
         );
-        assert_eq!(
-            driver.resolve_repo(&linked, &linked).unwrap_err().cause,
-            "trusted-main-gitfile-unsupported"
+        assert!(
+            matches!(driver.resolve_repo(&linked, &linked).unwrap(),ResolveRepo::Repository(r) if r.common_dir()==repo.common_dir())
         );
         // Trust is the main registration, never the worker's .git file bytes.
         fs::write(linked.join(".git"), b"gitdir: /untrusted/nonexistent\n").unwrap();

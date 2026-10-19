@@ -275,6 +275,45 @@ impl<'a> BorrowedHandle<'a> {
     }
 }
 
+/// Admission for an FFI bridge that already proves descriptor provenance.
+///
+/// # Safety
+/// The caller must keep the acquired owner's description alive for the entire
+/// synchronous operation and must never supply an arbitrary opened file. The
+/// kernel borrower test alone cannot distinguish a never-locked description.
+#[cfg(unix)]
+impl BorrowedHandle<'static> {
+    /// Duplicate a description pinned by the FFI caller.
+    ///
+    /// # Safety
+    /// `fd` must come from an acquired holder-lock handle, and that owner must
+    /// remain borrowed until the synchronous operation and all copies end.
+    pub unsafe fn from_acquired_description(
+        fd: std::os::fd::RawFd,
+        resource: Resource,
+        kill_wait_ms: u64,
+    ) -> Result<Self, BorrowError> {
+        use std::os::fd::{BorrowedFd, FromRawFd, IntoRawFd};
+        let file = unsafe { BorrowedFd::borrow_raw(fd) }
+            .try_clone_to_owned()
+            .map_err(BorrowError::Io)?;
+        let file = unsafe { std::fs::File::from_raw_fd(file.into_raw_fd()) };
+        let handle = Handle {
+            file: Some(file),
+            resource,
+            mode: Mode::Ex,
+            kill_wait_ms,
+            since: std::sync::Mutex::new((None, None)),
+        };
+        let loan = Self {
+            handle,
+            _owner: std::marker::PhantomData,
+        };
+        validate(loan.as_ref())?;
+        Ok(loan)
+    }
+}
+
 impl AsRef<Handle> for BorrowedHandle<'_> {
     fn as_ref(&self) -> &Handle { &self.handle }
 }

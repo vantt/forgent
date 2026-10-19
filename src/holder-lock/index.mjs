@@ -58,6 +58,8 @@ const DEFAULT_POLL_MS = 25;
 const MAX_OUTPUT_BYTES = 16 * 1024 * 1024;
 
 const descriptions = new WeakMap();
+const handleAuthority = Symbol();
+let nativeRegistered = false;
 
 function descriptionOf(handle) {
   const entry = descriptions.get(handle);
@@ -69,7 +71,8 @@ function descriptionOf(handle) {
  * (fd transport) or one lock-hold helper (hold transport) until `release()`;
  * releasing twice is a no-op. */
 export class LockHandle {
-  constructor({ name, path: lockPath, rank, kind, scope, projectRoot, killWaitMs, claim }) {
+  constructor({ name, path: lockPath, rank, kind, scope, projectRoot, killWaitMs, claim }, authority) {
+    if (authority !== handleAuthority) throw new HolderLockError('lock-handle-invalid', 'handles are minted by acquire', {});
     this.name = name;
     this.path = lockPath;
     this.rank = rank;
@@ -177,7 +180,7 @@ function routeTimeoutMs(wait, killWaitMs) {
 /** `claim` is what the lock lives in: `{ fd }` or `{ hold }`. */
 function makeHandle(prepared, scope, claim) {
   const { lock, projectRoot, killWaitMs } = prepared;
-  const handle = new LockHandle({ name: lock.name, path: lock.v3Path, rank: lock.rank, kind: lock.kind, scope, projectRoot, killWaitMs, claim });
+  const handle = new LockHandle({ name: lock.name, path: lock.v3Path, rank: lock.rank, kind: lock.kind, scope, projectRoot, killWaitMs, claim }, handleAuthority);
   scope.track(handle);
   return handle;
 }
@@ -646,4 +649,34 @@ function checkBorrowedJob(lockPath, { env, fgosDir }) {
   const bin = hostBin({ fgosDir });
   const line = runLockRouteSync({ bin, args: ['--borrowed-check', path.resolve(lockPath)], timeoutMs: ROUTE_CALL_TIMEOUT_MS, env: routeEnv({ ...process.env, ...env }) });
   return borrowedAnswer(line, name);
+}
+
+/** Private registration seam, imported only by native-handover.mjs. No
+ * description accessor escapes: mint and consume within the same call. */
+export function registerNativeHandover(mint, dispose) {
+  if (nativeRegistered) throw new HolderLockError('lock-handover-already-registered', 'native bridge already registered', {});
+  nativeRegistered = true;
+  return (handles, call) => {
+    if (process.platform === 'win32') throw new HolderLockError('git-lock-handover-unsupported', 'native description handover unavailable', {});
+    const entries = handles.map(handle => {
+      const entry = descriptionOf(handle);
+      if (entry.released) throw new HolderLockError('lock-handle-released', 'cannot hand over a released lock', {});
+      if (entry.fd === null) throw new HolderLockError('git-lock-handover-unsupported', 'description unavailable', {});
+      return entry;
+    });
+    const loans = [];
+    for (const entry of entries) entry.borrows += 1;
+    try {
+      for (let i = 0; i < handles.length; i += 1) {
+        const handle = handles[i];
+        loans.push(mint(entries[i].fd, handle.name, handle.path, handle.killWaitMs));
+      }
+      // Native calls are synchronous; Externals are consumed once and closed
+      // before this guard ends, including marshaling/validation failures.
+      return call(loans);
+    } finally {
+      try { for (const loan of loans) dispose(loan); }
+      finally { for (const entry of entries) entry.borrows -= 1; }
+    }
+  };
 }

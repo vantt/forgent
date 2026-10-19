@@ -36,7 +36,7 @@ Document type: BA-grade area specification
 Audience: reviewer, maintainer, implementation agent
 Purpose: One authority for fgOS repository operations and recovery in every domain
 Design status: Accepted G0, D-ADR0057 (2026-10-18). Owner answered Q1-Q7 and R30 on 2026-10-17; proofs runnable at G0 re-checked 2026-10-18 (§19).
-Implementation status: Linux Rust Publication, the durable WAL and its read-only scan, combined Node addon/release manifest support, controller-owned activation fence/C5 admission, and Rust RepositoryConfig.ensure_fetch_mapping (additive local mirror refspecs with WAL URL provenance) are implemented. The Node ensureFetchMapping binding, six Git doctor rows (including the single combined ABI/floor row), read-only WAL health inspection and registered WAL/mirror-mapping setup fixes are implemented. Other mutation ports and the Node writer migration remain pending; the Rust replacement is not complete.
+Implementation status: Linux Rust Publication, the durable WAL and its read-only scan, combined Node addon/release manifest support, controller-owned activation fence/C5 admission, and Rust RepositoryConfig.ensure_fetch_mapping (additive local mirror refspecs with WAL URL provenance) are implemented. The Node ensureFetchMapping binding, six Git doctor rows (including the single combined ABI/floor row), read-only WAL health inspection and registered WAL/mirror-mapping setup fixes are implemented. Dormant Refs and non-event Remote ports (Rust, combined addon and Node facades), opaque one-shot holder handover, and linked-cwd Inspect discovery with reciprocal registration validation are implemented. Checkout/worktree mutation ports and the Node writer migration remain pending; the Rust replacement is not complete.
 Canonical: Yes (docs/platform/git/spec.md)
 Owner: Git component
 Source (proposed): packages/git/rust, crate fgos-git
@@ -124,6 +124,8 @@ All mutations require operation id, validated repository, writer and **declared 
 | Publication | restricted plumbing; section 4. Event Store is the only production writer of event refs |
 
 Implementation may collapse ports internally; the appendix maps lessons to this surface. Idempotency is required wherever an effect can repeat.
+
+Implementation checkpoint (2026-10-19, dormant): `src/git/refs.mjs` and `remote.mjs` marshal typed requests and explicit held handles, with no subprocess policy in Node. Refs uses worktree-admin 40 through membership revalidation, exact-old no-dereference CAS and read-back, and journals `RefUpdate`/`RefDelete` with a reachability pin and one TargetAttempt. `fastForwardCheckedOut` requires the exact registered worktree's rank-30 lease and a clean fast-forward. Non-event Remote takes literal source/destination pairs (fetch destinations under `refs/remotes/*`, push destinations under `refs/heads/*`), pins the granted remote URL, downloads objects before exact-old local CAS, and records `RemoteTransfer` with per-target old/new values before TargetAttempt. Lost acknowledgements preserve the attempt and never resend that id. These ports have no production callers yet; unresolved operations preserve evidence and refuse replay. Linux files/reftable and local bare-remote proofs live in `packages/git/rust/tests/refs_remote.rs` and `test/git/{refs,remote,lock-handover}.test.mjs`. Separate-git-dir remains unsupported: inferred linked-cwd discovery requires a main `.git` directory and reciprocal registered admin/backlink, rather than trusting a worker gitfile alone.
 
 ## 4. Publication port: refs/fgos/*
 

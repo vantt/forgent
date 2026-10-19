@@ -77,8 +77,19 @@ pub struct ConfigChange {
     pub old_config_digest: String,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct RemoteTransfer {
+    pub direction: String,
+    pub url: String,
+    pub mappings: Vec<(String, String)>,
+    pub targets: Vec<(String, Tip, Tip)>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
     PublicationCas,
+    RefUpdate { worktree: Option<String> },
+    RefDelete,
+    RemoteTransfer(Box<RemoteTransfer>),
     ConfigChange(Box<ConfigChange>),
     RemoteFetch { url: String, refspecs: Vec<String> },
     RemotePush { url: String, refspecs: Vec<String> },
@@ -266,6 +277,76 @@ impl Intent {
             }
             return Ok(());
         }
+        if matches!(
+            self.kind,
+            OperationKind::RefUpdate { .. }
+                | OperationKind::RefDelete
+                | OperationKind::RemoteTransfer(_)
+        ) {
+            for resource in &self.resource_set {
+                RefName::parse(resource).map_err(|_| corrupt("resource ref"))?;
+                if resource.starts_with("refs/fgos/") {
+                    return Err(corrupt("non-event resource"));
+                }
+            }
+            match &self.kind {
+                OperationKind::RefUpdate { .. } | OperationKind::RefDelete => {
+                    if self.resource_set.len() != 1
+                        || !self.resource_set[0].starts_with("refs/heads/")
+                        || (matches!(self.kind, OperationKind::RefDelete)
+                            && (self.next != Tip::Absent || self.expected == Tip::Absent))
+                        || (matches!(self.kind, OperationKind::RefUpdate { .. })
+                            && self.next == Tip::Absent)
+                    {
+                        return Err(corrupt("refs binding"));
+                    }
+                }
+                OperationKind::RemoteTransfer(transfer) => {
+                    let RemoteTransfer {
+                        direction,
+                        url,
+                        mappings,
+                        targets,
+                    } = transfer.as_ref();
+                    if !["fetch", "push"].contains(&direction.as_str())
+                        || url.is_empty()
+                        || mappings.is_empty()
+                        || self.expected != Tip::Absent
+                        || self.next != Tip::Absent
+                    {
+                        return Err(corrupt("remote transfer binding"));
+                    }
+                    if targets.len() != mappings.len() || targets.len() != self.resource_set.len() {
+                        return Err(corrupt("remote targets"));
+                    }
+                    for (name, old, next) in targets {
+                        if !self.resource_set.contains(name) || !mappings.iter().any(|(_, d)| d == name)
+                        {
+                            return Err(corrupt("remote target resource"));
+                        }
+                        validate_tip(old, self.object_format)?;
+                        validate_tip(next, self.object_format)?;
+                        if *next == Tip::Absent {
+                            return Err(corrupt("remote target absent"));
+                        }
+                    }
+                    for (source, dest) in mappings {
+                        RefName::parse(source).map_err(|_| corrupt("remote source"))?;
+                        RefName::parse(dest).map_err(|_| corrupt("remote destination"))?;
+                        if source.starts_with("refs/fgos/")
+                            || dest.starts_with("refs/fgos/")
+                            || (direction == "fetch" && !dest.starts_with("refs/remotes/"))
+                            || (direction == "push" && !dest.starts_with("refs/heads/"))
+                        {
+                            return Err(corrupt("remote event namespace"));
+                        }
+                    }
+                }
+                _ => unreachable!(),
+            }
+            validate_tip(&self.expected, self.object_format)?;
+            return validate_tip(&self.next, self.object_format);
+        }
         for resource in &self.resource_set {
             RefName::parse(resource).map_err(|_| corrupt("resource ref"))?;
             if !resource.starts_with("refs/fgos/")
@@ -380,7 +461,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 observations,
                 details,
             } => {
-                if i.kind == OperationKind::PublicationCas
+                if matches!(i.kind,OperationKind::PublicationCas|OperationKind::RefUpdate {..}|OperationKind::RefDelete)
                     || details.len() > 1024
                     || (*acknowledged && *unknown)
                 {
@@ -399,13 +480,13 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 attribution,
             } => {
                 validate_tip(observed, i.object_format)?;
-                i.kind == OperationKind::PublicationCas
+                matches!(i.kind, OperationKind::PublicationCas | OperationKind::RefUpdate { .. } | OperationKind::RefDelete)
                     && observed == &i.next
                     && *attribution != Attribution::Uncertain
             }
             Outcome::Loss { observed } => {
                 validate_tip(observed, i.object_format)?;
-                i.kind == OperationKind::PublicationCas
+                matches!(i.kind, OperationKind::PublicationCas | OperationKind::RefUpdate { .. } | OperationKind::RefDelete)
             }
             Outcome::Superseded {
                 later_operation_id,

@@ -1283,3 +1283,13 @@ test('YAML bundle signature catches a pasted copy of the parser and ignores code
     assert.equal(hasYamlBundleSignature(source), false, source);
   }
 });
+
+
+test('native description handover has exactly one Git loader importer', () => {
+  const importsOf = target => onDisk.filter(file => extractImports(fs.readFileSync(path.join(root,file),'utf8')).some(specifier => specifier.startsWith('.') && path.relative(root,path.resolve(root,path.dirname(file),specifier)).split(path.sep).join('/') === target));
+  assert.deepEqual(importsOf('src/holder-lock/native-handover.mjs'), ['src/git/native.mjs']);
+  for (const file of onDisk) {
+    if (['src/holder-lock/index.mjs','src/holder-lock/native-handover.mjs'].includes(file)) continue;
+    assert.ok(!/\bregisterNativeHandover\b/.test(lexSource(fs.readFileSync(path.join(root,file),'utf8')).code), file);
+  }
+});

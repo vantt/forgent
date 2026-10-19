@@ -4,6 +4,9 @@
 //! children and a file WAL. There is no public raw-argv escape hatch.
 mod driver;
 mod inspect;
+mod refs;
+mod remote;
+pub use remote::{RefMapping, RemoteRef};
 pub use inspect::*;
 mod publication;
 mod repository_config;

@@ -1,5 +1,9 @@
 //! Opaque repository and seal authority stay in Rust for their entire lifetime.
 mod inspect;
+mod handover;
+pub use handover::{take_git_handover, mint_git_loan, close_git_loan};
+mod refs;
+mod remote;
 use crate::{check, error};
 use fgos_git::{HolderAuthority, *};
 use fgos_holder_lock::{Acquire, Handle, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};

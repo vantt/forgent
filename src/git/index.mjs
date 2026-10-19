@@ -20,3 +20,6 @@ export function createEventStore(commonDir, contracts = [], loaderOptions) {
 export function versions(loaderOptions) { return loadNativeAddon(loaderOptions).versions(); }
 
 export { createGitInspect } from './inspect.mjs';
+
+export { createGitRefs } from './refs.mjs';
+export { createGitRemote } from './remote.mjs';

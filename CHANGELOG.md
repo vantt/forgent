@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Git adds a dormant typed Inspect facade with byte-safe status/diff/object/path/worktree reads, explicit trunk uncertainty and shallow ancestry errors, bounded streamed write snapshots on Unix, and transaction-local Rust lock scopes seeded only by verified holder handles. Diff hardening flags now precede the path delimiter; a gitfile supplied as the trusted main root is refused by name. The Node lock handover and non-event Refs/Remote ports remain pending.
+- Git adds dormant typed Refs and non-event Remote facades: checked-out branches are protected under worktree-admin, fast-forward checkout updates require custody, transfers use explicit mappings and preserve unknown outcomes without resending. Opaque one-shot native lock handover blocks release during calls and rejects forged handles; Windows handover remains unsupported.
+
+- Git adds a dormant typed Inspect facade with byte-safe status/diff/object/path/worktree reads, explicit trunk uncertainty and shallow ancestry errors, bounded streamed write snapshots on Unix, and transaction-local Rust lock scopes seeded only by verified holder handles. Diff hardening flags now precede the path delimiter. Linked-worktree cwd discovery validates reciprocal main registration; separate-git-dir remains unsupported.
 
 - Git rollback WAL scans ignore durable-file temporaries in the compaction ledger using the same rule as other WAL readers; incomplete or corrupt installed entries still refuse.
 - Git Publication now checks changing candidates through the successful connectivity fast path, makes replayed Intent directories durable, preserves full recoverable receipts through compaction, and tolerates scans racing terminal compaction. Recreated loose objects get fresh directory durability; deferred compaction failures are reported.
