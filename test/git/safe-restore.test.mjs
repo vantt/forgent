@@ -49,7 +49,10 @@ test('SafeRestore refuses stale HEAD, backward ancestry, native residue and unsa
     const request = { expectedHead: f.request.target, target: f.request.source, reason: 'restore' };
     assert.throws(() => port.preview({ request: { ...request, expectedHead: f.request.source } }), /head-mismatch/);
     fs.writeFileSync(path.join(f.repo, '.git/index.lock'), 'external');
-    assert.throws(() => port.apply({ request, operationId: 'native' }), /native-state/);
+    assert.throws(() => port.apply({ request, operationId: 'native' }), error => {
+      const refusal = JSON.parse(error.message);
+      return refusal.code === 'recovery-required' && refusal.cause.startsWith('native-index-lock-unowned:');
+    });
     assert.equal(fs.readFileSync(path.join(f.repo, '.git/index.lock'), 'utf8'), 'external');
     fs.unlinkSync(path.join(f.repo, '.git/index.lock'));
     f.git('config', 'filter.unsafe.smudge', 'touch /should-never-execute');
