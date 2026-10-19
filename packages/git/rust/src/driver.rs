@@ -78,7 +78,7 @@ fn read_floor_record(path: &Path, key: &serde_json::Value) -> Option<GitFloorVer
 }
 
 /// Effective config record: origin, normalized key, byte-preserving value.
-type ConfigRecord = (Vec<u8>, String, Vec<u8>);
+pub(crate) type ConfigRecord = (Vec<u8>, String, Vec<u8>);
 type ConfigEnvironment = (Option<std::ffi::OsString>, Option<std::ffi::OsString>);
 #[derive(PartialEq, Eq)]
 struct ConfigStamp {
@@ -316,6 +316,47 @@ impl GitDriver {
     /// Linked gitdir authority is read from the main registration, never .git.
     pub fn resolve_repo(&self, path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
         self.require_floor()?;
+        let mut repo = match self.resolve_topology(path, trusted_main)? {
+            ResolveRepo::Repository(repo) => repo,
+            other => return Ok(other),
+        };
+        self.read_repository_facts(&mut repo)?;
+        Ok(ResolveRepo::Repository(repo))
+    }
+
+    fn read_repository_facts(&self, repo: &mut RepoHandle) -> Result<Vec<ConfigRecord>> {
+        let config = self.config(repo)?;
+        self.check_config(repo, &config)?;
+        // Config trust and format facts are obtained once for this resolution.
+        let format = self.repository_fact(repo, "--show-object-format")?;
+        repo.object_format = match line(&format)? {
+            "sha1" => ObjectFormat::Sha1,
+            "sha256" => ObjectFormat::Sha256,
+            _ => return Err(refusal("unsupported-object-format")),
+        };
+        let refs = self.repository_fact(repo, "--show-ref-format")?;
+        repo.layout.refs = match line(&refs)? {
+            "files" => RefStorage::Files,
+            "reftable" => RefStorage::Reftable,
+            _ => return Err(refusal("unsupported-ref-storage")),
+        };
+        repo.layout.promisor = config.iter().any(|(_, k, v)| {
+            (k.ends_with(".promisor") && v != b"false") || k == "extensions.partialclone"
+        });
+        Ok(config)
+    }
+
+    fn repository_fact(&self, repo: &RepoHandle, fact: &str) -> Result<Vec<u8>> {
+        let out = self.invoke(Some(repo), &repo.trusted_main_root,
+            &["rev-parse", fact], Policy::Inspect, None, true,
+            PATH_LIMIT, Duration::from_secs(30))?;
+        if !out.success { return Err(out.error("git-command-failed")); }
+        Ok(out.stdout)
+    }
+
+    /// Disk-only authority check, kept before every checkout child. Git config
+    /// and storage probes belong to the operation, not topology discovery.
+    pub(crate) fn resolve_topology(&self, path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
         let mut main = fs::canonicalize(trusted_main).map_err(io)?;
         let path = fs::canonicalize(path).map_err(io)?;
         // Callers may supply a cwd beneath a checkout. Locate only on disk;
@@ -414,7 +455,8 @@ impl GitDriver {
                 return Err(refusal("untrusted-worktree"));
             }
         }
-        let mut repo = RepoHandle {
+        let repo = RepoHandle {
+            checkout_config: None,
             common_dir: common.clone(),
             trusted_main_root: main,
             object_format: ObjectFormat::Sha1,
@@ -427,27 +469,6 @@ impl GitDriver {
                 promisor: false,
             },
         };
-        self.preflight(&repo)?;
-        let format = self.checked(
-            &repo,
-            &["rev-parse", "--show-object-format"],
-            Policy::Inspect,
-        )?;
-        repo.object_format = match line(&format)? {
-            "sha1" => ObjectFormat::Sha1,
-            "sha256" => ObjectFormat::Sha256,
-            _ => return Err(refusal("unsupported-object-format")),
-        };
-        let refs = self.checked(&repo, &["rev-parse", "--show-ref-format"], Policy::Inspect)?;
-        repo.layout.refs = match line(&refs)? {
-            "files" => RefStorage::Files,
-            "reftable" => RefStorage::Reftable,
-            _ => return Err(refusal("unsupported-ref-storage")),
-        };
-        let config = self.config(&repo)?;
-        repo.layout.promisor = config.iter().any(|(_, k, v)| {
-            (k.ends_with(".promisor") && v != b"false") || k == "extensions.partialclone"
-        });
         Ok(ResolveRepo::Repository(repo))
     }
 
@@ -612,9 +633,13 @@ impl GitDriver {
         Ok(())
     }
 
-    // Deliberately re-read effective config each time. No stale config identity
-    // cache, including includeIf/global/system changes, can authorize a call.
+    // Only an operation-local checkout handle reuses effective config. Ordinary
+    // handles read again, including includeIf/global/system changes.
     fn config(&self, repo: &RepoHandle) -> Result<Vec<ConfigRecord>> {
+        if let Some(config) = &repo.checkout_config {
+            return config.lock().map_err(|_| refusal("config-cache-poisoned"))?
+                .clone().ok_or_else(|| refusal("checkout-facts-invalidated"));
+        }
         let out = self.invoke(
             Some(repo),
             &repo.trusted_main_root,
@@ -667,8 +692,18 @@ impl GitDriver {
     }
 
     pub(crate) fn preflight(&self, repo: &RepoHandle) -> Result<()> {
-        for (_, key, _) in self.config(repo)? {
-            if command_config(&key)
+        if let Some(config) = &repo.checkout_config {
+            return if config.lock().map_err(|_| refusal("config-cache-poisoned"))?.is_some() {
+                Ok(())
+            } else {
+                Err(refusal("checkout-facts-invalidated"))
+            };
+        }
+        self.check_config(repo, &self.config(repo)?)
+    }
+    fn check_config(&self, repo: &RepoHandle, config: &[ConfigRecord]) -> Result<()> {
+        for (_, key, _) in config {
+            if command_config(key)
                 && (key != "credential.helper"
                     || self.untrusted_transport_config(repo)?.iter().any(|k| k == "credential.helper"))
             {
@@ -677,6 +712,29 @@ impl GitDriver {
         }
         Ok(())
     }
+    /// An owned handle local to one port call. It never escapes into the
+    /// long-lived port handle; the next call reads all facts afresh.
+    pub(crate) fn checkout_repository(&self, repo: &RepoHandle) -> Result<RepoHandle> {
+        self.require_floor()?;
+        let mut current = match self.resolve_topology(
+            repo.work_tree.as_deref().ok_or_else(|| refusal("checkout-required"))?,
+            &repo.trusted_main_root,
+        )? {
+            ResolveRepo::Repository(r) => r,
+            _ => return Err(refusal("untrusted-worktree")),
+        };
+        if current.git_dir != repo.git_dir || current.common_dir != repo.common_dir
+            || current.work_tree != repo.work_tree {
+            return Err(refusal("untrusted-worktree"));
+        }
+        let config = self.read_repository_facts(&mut current)?;
+        if current.object_format != repo.object_format || current.layout.refs != repo.layout.refs {
+            return Err(refusal("repository-format-changed"));
+        }
+        current.checkout_config = Some(Mutex::new(Some(config)));
+        Ok(current)
+    }
+
     pub(crate) fn checked(&self, repo: &RepoHandle, args: &[&str], policy: Policy) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;

@@ -154,6 +154,58 @@ async function census(args) {
   port.close();
 }
 
+/** Count real driver Git execs without ptrace. The selected executable logs
+ * argv then execs the real Git; no driver switch or containment bypass. Run
+ * this narrow census independently of the host-only E3 timing experiment. */
+async function scopedCensus(args) {
+  const root = privateDir(path.resolve(args.root));
+  const realGit = fs.realpathSync(process.env.PATH.split(path.delimiter)
+    .map(p => path.join(p, 'git')).find(p => fs.existsSync(p)));
+  const bin = privateDir(path.join(root, 'counting-bin'));
+  const log = path.join(root, 'git-execs.log');
+  const quote = value => "'" + value.replaceAll("'", "'\\''") + "'";
+  fs.writeFileSync(path.join(bin, 'git'), `#!/bin/sh
+printf '%s\\n' "$*" >> ${quote(log)}
+exec ${quote(realGit)} "$@"
+`, {mode:0o755});
+  const result = execFileSync(process.execPath, [SELF, 'scoped-census-worker',
+    '--root', root, '--descriptor', args.descriptor, '--log', log], {
+    encoding:'utf8', env:{...process.env, PATH:bin + path.delimiter + process.env.PATH},
+  });
+  process.stdout.write(result);
+}
+async function scopedCensusWorker(args) {
+  const root = args.root, main = path.join(root, 'main'), linked = path.join(root, 'linked');
+  const state = privateDir(path.join(root, 'state'));
+  git(['init', '-q', '--initial-branch=trunk', main]);
+  git(['-C', main, 'config', 'user.name', 'Census']);
+  git(['-C', main, 'config', 'user.email', 'census@fgos.invalid']);
+  fs.writeFileSync(path.join(main, 'payload'), 'base');
+  git(['-C', main, 'add', 'payload']); git(['-C', main, 'commit', '-qm', 'base']);
+  git(['-C', main, 'worktree', 'add', '-qb', 'producer', linked]);
+  prepareRepo(main, path.join(main, '.git'));
+  const {index, loader} = await loaders(args.descriptor);
+  const {acquireSync, createLockScope} = await import('../../src/holder-lock/index.mjs');
+  const claim = acquireSync(createLockScope(), 'dispatch-cwd', {fgosDir:path.join(main, '.fgos'), cwd:linked});
+  if (claim.result !== 'acquired') throw new Error(`census custody: ${claim.result}`);
+  try {
+    const port = index.createGitScopedCommit({stateRoot:state, repoPath:linked, trustedMain:main, writer:WRITER}, loader);
+    const count = fn => {
+      fs.writeFileSync(args.log, '');
+      const result = fn();
+      const calls = fs.readFileSync(args.log, 'utf8').trim().split('\n').filter(Boolean);
+      return {result, calls};
+    };
+    const before = count(() => port.preflight({}, [claim.handle]));
+    fs.writeFileSync(path.join(linked, 'payload'), 'producer');
+    const after = count(() => port.commit({operationId:'census', baseline:before.result,
+      request:{writes:['payload'], message:'census', cutoverGrant:null}}, [claim.handle]));
+    if (after.result.status !== 'committed') throw new Error(JSON.stringify(after.result));
+    process.stdout.write(JSON.stringify({preflight:before.calls, commit:after.calls,
+      total:before.calls.length + after.calls.length}) + '\n');
+  } finally { claim.handle.release(); }
+}
+
 // ---- the experiment ------------------------------------------------------------
 
 function compileArtifacts() {
@@ -538,6 +590,6 @@ async function rollbackOnly(args) {
   const { index, loader } = await loaders(descriptor);
   console.log(JSON.stringify(await rollback(root, fs.realpathSync(args.fgctl), descriptor, index, loader)));
 }
-const modes = { run, rollback: rollbackOnly, 'load-probe': loadProbe, writer, idle, census };
+const modes = { run, rollback: rollbackOnly, 'load-probe': loadProbe, writer, idle, census, 'scoped-census': scopedCensus, 'scoped-census-worker': scopedCensusWorker };
 if (!modes[mode]) { console.error(`usage: e3-bench.mjs ${Object.keys(modes).join('|')} [options]`); process.exit(2); }
 await modes[mode](args);

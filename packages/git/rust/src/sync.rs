@@ -53,6 +53,8 @@ impl GitDriver {
         if message.is_empty() || message.contains('\0') || message.len() > 1024 * 1024 {
             return Err(failure("invalid-commit-message"));
         }
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         let wal = Wal::open(repo).map_err(failure)?;
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
@@ -317,6 +319,8 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<SyncResult> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
         self.continue_sync_scoped(repo, &scope, &wal, writer, id, false)
@@ -328,6 +332,8 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<SyncResult> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
         self.continue_sync_scoped(repo, &scope, &wal, writer, id, true)
@@ -758,6 +764,8 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<SyncResult> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
         let state = self.continue_sync_scoped(repo, &scope, &wal, writer, id, false)?;
