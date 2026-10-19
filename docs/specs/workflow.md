@@ -166,7 +166,8 @@ Bản ghi mới gọi id **bằng tên**, không có trường `runId` trần: `
 **Execution Core** giữ mọi thứ đang có và **sở hữu giao diện AdmissionPort**, không bao giờ sở hữu quyết định admission:
 - port có ba phép hoặc tương đương: phân giải binding của worktree đích, admit một đề xuất, settle một reservation;
 - `runUnit` nhận port qua options (cùng hình với cách nó đã nhận policy và đã từ chối trước `bind()` cho operation không khai);
-- entry tiêm port: `bin/fgos.mjs` cho `fgos run`, Playbook proposer cho `fgos workflow start`, Work driver loop khi cutover coding;
+- **mọi** caller `runUnit` có `writes` tiêm port **ngay khi land**: `bin/fgos.mjs` cho `fgos run`, Playbook proposer cho `fgos workflow start`, và các đường Work đang chạy hôm nay (Work driver loop, chọn operation, fanout, `fgos plan --validate`). Với đường Work, port là cài đặt thật của Workflow: tra binding của worktree claim, trả `unbound` khẳng định khi không case nào ràng — không stub. "Khi cutover coding" chỉ còn nghĩa: Unit của Work bắt đầu gọi tên case và activity;
+- cài đặt port nhận tuỳ chọn **một lần giữ `advance` đang có**: có thì không bao giờ acquire lại (Playbook proposer gọi `runUnit` trong lúc giữ `advance` suốt đời); không có thì mỗi phép acquire `advance` thử một lần;
 - **fail-closed theo cấu trúc:** Unit ghi file (`writes` khác rỗng) tới `runUnit` mà không có port là lỗi; ghi đứng riêng chỉ hợp lệ khi port trả **khẳng định** `unbound`; "thiếu adapter" không bao giờ là `unbound`;
 - port được tiêm ở cửa phải **còn có mặt ở cổng ghi** (nơi kiểm lại consent gắn subject lúc hiệu ứng): spec khoá đường tiêm này, không giả định nó tự trôi qua stack; một port rơi mất trong lúc chạy ghế làm phép kiểm thứ hai thành vô hiệu;
 - admission chạy **sau khi pattern được giải, trước `bind()`**, vì trần seat launch tính từ pattern.
@@ -188,8 +189,9 @@ Hôm nay `advance` giữ suốt `advanceWorkflowRun` và kiêm "lease sống" c�
 
 - **Conductor case:** `advance` giữ cho đúng một lần reserve hoặc một lần release/settle (reserve-then-release).
 - **Playbook case:** Playbook proposer giữ `advance` **suốt đời** vòng lặp của nó; sống/chết của proposer = có người giữ `advance` (như hôm nay, test hiện có giữ nguyên). Đây là **thu hẹp công khai** của reserve-then-release và của song song qua cửa riêng (mục 7.4) cho playbook case.
-- Hệ quả của C, chấp nhận có chủ đích: không ai ngoài proposer admit được vào một playbook case đang sống; case con mở từ bên trong một playbook case phải chờ proposer thoát (chi tiêu lồng rút từ trần seat launch của Unit); không thêm hàng khoá nào trong registry; rank `advance` (80) không đổi.
-- `answer` khi proposer đang sống chỉ ghi câu trả lời gate (gắn digest subject) rồi trả về; proposer đọc lại gate đậu sau mỗi settle; `answer`/`resume` chỉ đẻ proposer **khi không có** proposer sống. Câu trả lời tới ngay trước lúc proposer đậu và thoát không bị bỏ rơi: proposer đọc lại một lần có giới hạn trước khi thoát, hoặc lần resume sau nhặt nó.
+- Hệ quả của C, chấp nhận có chủ đích: không ai ngoài proposer admit được vào một playbook case đang sống. Mọi dispatch **gọi tên một playbook case đang sống từ bên trong Unit của chính case đó** (ghi hay chỉ-đọc, `fgos run` hay `workflow start` mở case con) bị **từ chối theo tên** (`playbook-case-admits-via-proposer-only`), không chờ — chờ sẽ là vô hạn, vì proposer giữ `advance` trong lúc chờ chính Unit ấy. Dispatch chỉ-đọc lồng không gọi tên case là đứng riêng và không tính vào khung (mục 1.3). Không thêm hàng khoá nào; rank `advance` (80) không đổi. Không playbook nào hôm nay lồng cửa, nhưng doctrine `core/skills/_shared/coordination-driver.md` còn dạy worker gọi cửa: bản viết lại doctrine đó phải theo luật này.
+- **`answer` không bao giờ append ledger trực tiếp.** Nó (1) ghi file gate-answer như runtime state (độc quyền theo step, mang digest subject, bất biến sau khi tiêu), rồi (2) thử lấy `advance` một lần: lấy được → append event `gate.answer` và nhả (conductor case; hoặc playbook case không có proposer sống — khi đó đẻ đúng một proposer); bị giữ → trả về, và proposer đang giữ `advance` append event đó ở lần đọc lại kế tiếp (sau mỗi settle và một lần có giới hạn trước khi thoát), **trước** khi hành động theo câu trả lời. Câu trả lời tới ngay lúc proposer thoát được lần `resume` sau nhặt từ file.
+- **`status` và `resume` theo loại case.** Playbook case: `running` = có người giữ `advance` (như hôm nay); `resume` đẻ proposer chỉ khi không ai giữ. Conductor case: `running` = còn reservation sống (attempt còn sống); không báo stale, không gợi ý resume chỉ vì `advance` trống; `resume` trên conductor case không đẻ tiến trình lái nào — nó chỉ nhặt file gate-answer chưa ghi vào ledger.
 - **Proposer chết không phải là reservation được giải phóng.** Agent và supervisor có thể sống lâu hơn tiến trình điều khiển; reservation ghi file chỉ nhả sau khi attempt/miền chứa im lặng hoặc custody đã settle; proposer kế tiếp nhận các unit run còn sống trước khi thay việc của chúng.
 - Bọc proposer thành một attempt dưới Run Supervisor (Shape B) bị bác: attempt lồng attempt, giam lồng giam; giữ làm ý tưởng F14.
 
@@ -274,20 +276,20 @@ Hôm nay `advance` giữ suốt `advanceWorkflowRun` và kiêm "lease sống" c�
 
 - **RUL-WF-23 (Work là vòng đời nghiệp vụ tuỳ chọn; N12).** Khi case ở trên ledger, authority thi hành và tiến độ là Workflow. Step FSM coding là authority cho item coding tới cutover; cutover chuyển mọi consumer và xoá đường cũ trong một thay đổi (L10).
 
-- **RUL-WF-24 (một cửa ghi ledger, ledger làm cứng tại chỗ).** Mọi lần ghi ledger đi qua đúng một cửa giữ `advance`; append fsync trước khi nhả `advance`; bộ đọc fail closed trên dòng hỏng không rỗng (mục 5.5). Ledger không được khai là consumer Event Store ở spec nào cho tới khi F10 được chọn.
+- **RUL-WF-24 (một cửa ghi ledger, ledger làm cứng tại chỗ).** Mọi lần ghi ledger đi qua đúng một cửa giữ `advance`; file gate-answer và bản ghi binding là runtime state cạnh ledger, không phải lời ghi ledger; append fsync trước khi nhả `advance`; bộ đọc fail closed trên dòng hỏng không rỗng (mục 5.5). Ledger không được khai là consumer Event Store ở spec nào cho tới khi F10 được chọn.
 
 - **RUL-WF-25 (không DSL luật).** Guide là schema dữ liệu khai báo; mọi luật là một dòng gọi tên một kiểm tra đã có. Không biểu thức nào do harness diễn giải.
 
 - **RUL-WF-26 (nội dung tối thiểu của guide).** Mục đích; vai và cạnh tham vấn; milestone với subject, loại bằng chứng, authority chấp nhận; activity với milestone vào, output, hiệu ứng được phép; bảng MUST (mỗi dòng một guard) và mục unenforced; route table (lý do SHOULD, MAY instead, "không dùng khi"); chính sách unlisted theo điểm; mặc định khung và ngưỡng hỏi người; bằng chứng đóng. Guide được bắt đầu nhỏ. Tác giả: owner và agent qua hội đồng kiến trúc, hoặc lượt intake phân loại từng cặp theo RUL-WF-3.
 
 - **RUL-WF-27 (bản ghi binding worktree).** Binding là bản ghi **theo danh tính gốc worktree** (realpath → thiết bị + inode của gốc, như lease `dispatch-cwd`; không theo thư mục con hay cwd tuỳ ý), mang `{caseId, generation, worktreeRoot, commonDir, ref, state}`; nhánh được ghi như trường kiểm toán, không có bản ghi nhánh độc quyền riêng (git đã từ chối checkout một nhánh hai nơi).
-  - Vòng đời dưới `advance` của case: bản ghi `pending` tạo độc quyền + fsync → event `binding` trên ledger + fsync → đổi tên thành committed. Tạo độc quyền là mutex liên-case; không cần hàng khoá mới.
-  - Đã có binding của case khác đang mở → `worktree-already-bound` (từ chối, không chờ). Bản ghi thiếu, cũ, hỏng hay `pending` khi chưa chắc case còn sống → từ chối, không bao giờ `unbound`; đối chiếu với ledger trước khi admit.
+  - **Một tên file** theo danh tính worktree. Vòng đời dưới `advance` của case: tạo độc quyền với `state: pending` bên trong + fsync → event `binding` trên ledger + fsync → đổi `state` thành `committed` bằng ghi-tạm-rồi-đổi-tên đè **cùng tên**. Chỉ chủ (khớp `caseId` + `generation`) được ghi đè. Cửa đọc đúng một file. Tạo độc quyền là mutex liên-case; không cần hàng khoá mới.
+  - **Thiếu bản ghi = `unbound`** (đường nóng không quét ledger). Bản ghi của case khác đang mở → `worktree-already-bound` (từ chối, không chờ). `pending` khi chưa chắc case còn sống, bản ghi hỏng, hay `generation` lệch → từ chối, không bao giờ `unbound`. Đối chiếu binding với ledger là **đường sửa chữa** (`doctor`/dựng lại view), không ở đường nóng.
   - Ràng lúc start, ở **mọi reservation ghi file**, và khi harness tạo worktree cho Unit trong lúc chạy. Không còn câu "binding rộng bằng `writes`": điều kiện là *không có worktree nào mà activity của case được ghi lại không bị ràng*.
   - Gỡ ràng chỉ sau khi attempt im lặng và chỉ đúng `generation` khớp, để một lần dọn trễ không xoá chủ mới. `close` khi còn attempt sống giữ nguyên độc quyền.
   - Binding là **view dựng lại được** từ ledger (L3); chỗ đặt do plan chọn.
 
-- **RUL-WF-28 (case lồng).** Trừ khung cha là **một đoạn riêng** dưới `advance` của cha (ghi reservation vào ledger cha, nhả), **rồi** mới mở case con; không bao giờ giữ hai `advance` (cùng rank) trong một scope. Case con không mở được thì hoàn khung cha một cách idempotent. Với playbook cha, đoạn đó chỉ có khi proposer không giữ `advance` (mục 5.4).
+- **RUL-WF-28 (case lồng).** Trừ khung cha là **một đoạn riêng** dưới `advance` của cha (ghi reservation vào ledger cha, nhả), **rồi** mới mở case con; không bao giờ giữ hai `advance` (cùng rank) trong một scope. Case con không mở được thì hoàn khung cha một cách idempotent. Với playbook cha đang sống, case con mở từ bên trong Unit của nó bị từ chối theo tên (mục 5.4); không có đường chờ.
 
 ## 7. Luồng (Behaviors)
 
@@ -311,7 +313,7 @@ Conductor case: hai activity eligible có reservation rời nhau (path, worktree
 
 ### 7.4 Đậu một câu hỏi
 
-Điểm consent, mâu thuẫn MUST, hay giới hạn sắp vượt làm nhánh `blocked(question)`; câu hỏi vào bộ gom. **Conductor case:** các activity eligible khác vẫn được admit qua lời gọi cửa riêng. **Playbook case (Shape C, thu hẹp công khai):** chỉ proposer admit; trong lúc proposer sống, không ai khác admit được; `answer` ghi câu trả lời và trả về, proposer nhặt nó sau settle kế tiếp hoặc lần đọc lại trước khi thoát. Câu trả lời consent gắn digest subject; câu trả lời thông tin không mở cổng consent.
+Điểm consent, mâu thuẫn MUST, hay giới hạn sắp vượt làm nhánh `blocked(question)`; câu hỏi vào bộ gom. **Conductor case:** các activity eligible khác vẫn được admit qua lời gọi cửa riêng; `answer` ghi file gate-answer, lấy `advance` một lần và append `gate.answer`. **Playbook case (Shape C, thu hẹp công khai):** chỉ proposer admit; trong lúc proposer sống, không ai khác admit được; `answer` ghi file gate-answer, thấy `advance` bị giữ thì trả về; proposer append `gate.answer` ở lần đọc lại kế tiếp rồi mới hành động theo nó (mục 5.4). Câu trả lời consent gắn digest subject; câu trả lời thông tin không mở cổng consent.
 
 ### 7.5 Đóng case
 
@@ -319,7 +321,7 @@ Conductor case: hai activity eligible có reservation rời nhau (path, worktree
 
 ### 7.6 Khởi động lại không cần chat
 
-Tiến trình lái mới đọc JSONL + guide được pin + khung còn lại; nhận các unit run còn sống trước khi thay việc của chúng. Playbook case: một proposer duy nhất được bảo đảm bởi việc giữ `advance` suốt đời; resume/answer đồng thời chỉ cho đúng một proposer.
+Tiến trình lái mới đọc JSONL + guide được pin + khung còn lại + file gate-answer chưa ghi vào ledger; nhận các unit run còn sống trước khi thay việc của chúng. Playbook case: một proposer duy nhất được bảo đảm bởi việc giữ `advance` suốt đời; resume/answer đồng thời chỉ cho đúng một proposer. Conductor case: không có tiến trình lái để khởi động lại; conductor đọc `status` và tiếp tục; `resume` chỉ nhặt file gate-answer (mục 5.4).
 
 ### 7.7 Vòng học
 
@@ -338,10 +340,12 @@ Retrospective đọc route/deviation event → agent đề xuất diff guide kè
 | `fgos workflow start <playbook>` đứng riêng | mở playbook case; Playbook proposer giữ `advance` suốt đời, đề xuất SHOULD duy nhất qua admission; thứ tự quan sát được giống hệt; mọi run đã lưu là playbook nên đây là đường **không được hồi quy** |
 | `fgos workflow start --units` | giữ như cam kết chọn-việc kiểm trước. Đứng riêng: case của chính nó. Trong conductor case: wave lồng tiêu khung cha (RUL-WF-28). "Một Unit hỏng → hỏng" chỉ còn nếu wave khai nó |
 | `fgos workflow start --plan` | **thu hồi** (L10); `fgos-cook` đọc ak plan như artifact và mở case trên guide coding |
-| Skill trong phiên lái Work item (RUL94 (a Work driver step runs as a Unit)) | không đổi tới cutover coding |
+| dispatch gọi tên một playbook case đang sống từ bên trong Unit của nó (ghi hay chỉ-đọc, kể cả mở case con) | **từ chối theo tên** `playbook-case-admits-via-proposer-only` (giá của Shape C, R8) |
+| Skill trong phiên lái Work item (RUL94 (a Work driver step runs as a Unit)) và các đường Work khác gọi `runUnit` có `writes` | tiêm port thật ngay khi land; không case nào ràng worktree claim → port trả `unbound`, chạy như trước; tới cutover coding mới gọi tên case và activity |
 | Edit/Write/Agent trong phiên khi case đang mở | **ngoài ledger** (owner 2026-10-19 chấp nhận); hook `dispatch-decide` chỉ quyết cơ chế; approve door giữ landing; hook đọc binding là F15 |
 | Chi tiêu dưới cửa (vòng pattern, ghế, fallback) | trần seat launch giao cho Unit; settle ghi một lần |
-| `fgos workflow answer` khi proposer sống | ghi câu trả lời, trả về; không đẻ proposer thứ hai |
+| `fgos workflow answer` khi proposer sống | ghi file gate-answer, thử `advance` một lần, thấy bị giữ thì trả về; proposer append `gate.answer`; không đẻ proposer thứ hai |
+| `fgos workflow status` / `resume` trên conductor case | `running` khi còn reservation sống; không gợi ý resume; `resume` chỉ nhặt file gate-answer |
 | `fgos workflow operations` / `status` | `operations` thay bằng `status` là projection; thêm `close` (F6) |
 
 **Không đổi tại hai cửa:** vẫn là hai cửa thi hành duy nhất; `bind()` là bên duy nhất chọn ai/model/persona; `writes` + commit do harness; approve door là authority merge; policy confinement phía đọc không đổi; flag không bị spec khoá.
@@ -354,11 +358,12 @@ Retrospective đọc route/deviation event → agent đề xuất diff guide kè
 | store + digest (`store.mjs` 325, `ref-digests.mjs` 49) | đổi vừa: event kind mới; fold milestone; digest phủ gate answer; **làm cứng**: fsync, bộ đọc fail closed, đường khôi phục dòng cuối |
 | vòng `advanceWorkflowRun` (~400 dòng) | **viết lại** thành Playbook proposer đề xuất qua admission; tách `src/workflow/runner.mjs` theo vai trong cùng commit |
 | admission + binding (mới, infra) | predicate, cài AdmissionPort, bản ghi binding có generation |
-| khoá, nguồn start, verb (~600 dòng) | giữ, sửa nhỏ: bỏ `--plan`; start ghi khung + binding; answer chỉ ghi khi proposer sống; close mới. Shape C giữ nguyên cách giữ `advance` của playbook |
+| khoá, nguồn start, verb (~600 dòng) | giữ, sửa nhỏ: bỏ `--plan`; start ghi khung + binding; answer ghi file gate-answer rồi thử `advance` một lần; status/resume phân biệt conductor và playbook case; close mới. Shape C giữ nguyên cách giữ `advance` của playbook |
 | `plan-source.mjs` 134 | **xoá** (L10) cùng test và đoạn dạy trong skill |
 | `src/runner/execution/run.mjs` 1191 | khai AdmissionPort; nhận port qua options; từ chối Unit ghi file khi thiếu port; admission sau giải pattern, trước `bind()`; trần seat launch như bound |
 | confinement/adapters | env case do cửa đặt, biến kế thừa bị lọc; cấu hình tiêm cho executor không truyền env; port còn có mặt ở cổng ghi. Không đổi Rust |
-| `bind`, patterns, commit, merge, Work driver loop, operation-choice | không đổi |
+| các caller `runUnit` của đường Work (Work driver loop, chọn operation, fanout, `fgos plan --validate`) | thêm một việc: tiêm port thật ngay khi land; hành vi không đổi khi không case nào ràng worktree claim |
+| `bind`, patterns, commit, merge | không đổi |
 | 7 YAML playbook (444 dòng) | không đổi ngữ nghĩa; thêm phần đầu nêu MUST và khung |
 | `feature.yaml` (168), `content-publish.yaml` (40) | mục 10.2, 10.3 |
 | test | test A4 và test cô lập kernel giữ xanh; test runner/units nhắm lại; test playbook thảo luận pass nguyên; battery mục 11 thành test mới |
@@ -494,12 +499,12 @@ closure: [approved]
 6. **Route unlisted vi phạm MUST**: đề xuất được; hành động vi phạm bị từ chối.
 7. **Gate đậu một nhánh của conductor case**: activity eligible khác vẫn được admit qua lời gọi riêng.
 8. **Findings không kèm giao hàng**: không case nào hỏng vì một Unit findings.
-9. **Khởi động lại không chat**: sự thật là JSONL + guide + khung; nhận unit run còn sống.
+9. **Khởi động lại không chat**: sự thật là JSONL + guide + khung; nhận unit run còn sống. Playbook case: `status` báo `running` khi có người giữ `advance`. Conductor case: `status` báo `running` khi còn reservation sống dù `advance` trống quá 30 giây, không gợi ý resume; `resume` không đẻ tiến trình lái.
 10. **Guide đổi giữa run**: run giữ snapshot.
 11. **Lột ngữ cảnh**: conductor trong phiên owner, và worker có shell con đã unset mọi biến, mỗi bên `fgos run --writes` nhắm worktree đã ràng mà không gọi tên case: cả hai bị từ chối trước `bind()` chỉ nhờ binding; executor không truyền env nhận id case do cửa đặt qua cấu hình tiêm.
 12. **Không hồi quy playbook**: `council-lite` sinh cùng Unit, ghế blind, thứ tự như tám run đã lưu; bốn ghế launch dưới trần 4 × `fallbackPerSeat`.
 13. **Cạn seat launch**: ghế giữ provider-limit với `fallbackExhausted`; settle ghi `frame-exhausted` một lần; bộ đếm khớp ledger; không ghi ledger giữa chừng.
-14. **Một proposer**: resume/answer đồng thời cho đúng một proposer; `answer` lúc proposer sống chỉ ghi; câu trả lời lúc proposer đậu không bị bỏ rơi.
+14. **Một proposer**: resume/answer đồng thời cho đúng một proposer; `answer` lúc proposer sống không append ledger; event `gate.answer` xuất hiện trên ledger trước khi proposer hành động theo câu trả lời; câu trả lời lúc proposer đậu không bị bỏ rơi.
 15. **`feature.yaml` hai phần**: biên dịch; `domainSteps` trả bốn step; test cô lập kernel pass; test advisory chạy hai template từ activity hoặc fixture.
 16. **Hai case ràng một worktree** (kể cả qua hai cách viết đường dẫn): case thứ hai bị `worktree-already-bound`.
 17. **Crash giữa các bước binding** (sau `pending`, sau event, trước đổi tên): không bao giờ ra `unbound`; dọn trễ không xoá binding thế hệ mới.
@@ -508,10 +513,14 @@ closure: [approved]
 20. **Tín hiệu mâu thuẫn / case đã đóng**: từ chối với `authority-context-conflict` / `authority-context-invalid`.
 21. **Ledger hỏng giữa file**: bộ đọc fail closed với điều kiện có tên; chỉ dòng cuối chưa kết thúc được khôi phục trong đường khôi phục tường minh.
 22. **Proposer bị giết khi worker còn sống**: reservation không được nhả; proposer kế tiếp nhận unit run.
+23. **Gọi tên playbook case từ bên trong Unit của nó**: `fgos run` (ghi hoặc chỉ-đọc) và `workflow start` gọi tên case đó từ một worker của case bị từ chối ngay với `playbook-case-admits-via-proposer-only`, không treo.
+24. **Đường Work có port**: một bước Work driver (RUL94 (a Work driver step runs as a Unit)) có `writes`, worktree claim không bị case nào ràng → port trả `unbound`, bước chạy như trước; cùng bước thiếu port → bị từ chối.
+25. **Proposer gọi `runUnit` khi đang giữ `advance`**: admit và settle dùng lần giữ đó, không tự từ chối.
+26. **Binding một tên file**: hai case tạo binding đồng thời cho một worktree → đúng một thắng; worktree chưa từng ràng (không có file) → `unbound` mà không quét ledger.
 
 ### 11.2 Nghĩa vụ chứng minh cho plan
 
-Test A4 xanh, không import `workflow/` từ execution/dispatch; Unit ghi file thiếu port bị từ chối; ghi đứng riêng chỉ qua với `unbound` khẳng định. Port tiêm ở `fgos run` được quan sát ở cổng ghi trong dispatch lồng. Biến case trong env của controller không bao giờ tới worker mà cửa không admit vào case đó. Thứ tự playbook giữ nguyên trên mọi run đã lưu. Append fsync trước khi nhả `advance`.
+Test A4 xanh, không import `workflow/` từ execution/dispatch; Unit ghi file thiếu port bị từ chối; ghi đứng riêng chỉ qua với `unbound` khẳng định. Port tiêm ở `fgos run` được quan sát ở cổng ghi trong dispatch lồng. Mọi caller `runUnit` có `writes` hôm nay (cửa, proposer, đường Work) tiêm port thật ngay khi land; đường Work-step có test "có port, `unbound`, chạy như trước". Biến case trong env của controller không bao giờ tới worker mà cửa không admit vào case đó. Thứ tự playbook giữ nguyên trên mọi run đã lưu. Append fsync trước khi nhả `advance`.
 
 ## 12. Giữ / đổi / thu hồi
 
@@ -532,7 +541,7 @@ Test A4 xanh, không import `workflow/` từ execution/dispatch; Unit ghi file t
 | R5 | Fold projection phải tất định khi replay | plan |
 | R6 | N13–N17 và R1 đã có ba panelist, một synthesizer, một critique; ghế reviewer của critique chết vì lỗi provider; gói tập trung có một reviewer pass và hai lượt red-team | — |
 | R7 | Hạn mức khung chỉ ở đơn vị cưỡng chế được; tiền chưa bị máy giới hạn | — |
-| R8 | Shape C: không admit ngoài vào playbook case đang sống; case con trong playbook cha phải chờ proposer | chấp nhận có chủ đích (owner) |
+| R8 | Giá của Shape C (quyết định owner 12:20), không phải lỗi spec: (1) không ai ngoài proposer admit được vào playbook case đang sống; (2) mọi dispatch gọi tên playbook case từ bên trong Unit của nó — kể cả chỉ-đọc, kể cả mở case con — bị từ chối theo tên, vì chờ sẽ là vô hạn. Doctrine `coordination-driver.md` (worker gọi cửa) phải theo khi viết lại | chấp nhận có chủ đích (owner); viết lại doctrine: làn COOK |
 | R9 | Ghi lồng từ worker bị giam bị từ chối; worker playbook cần writer con phải đi qua conductor cho tới khi có relay | chấp nhận có chủ đích (owner) |
 | R10 | `visibility.json` báo `unconfined` trong khi launcher là bwrap; consumer tin nó sẽ phán sai. Đóng khi `visibility.json` khớp launcher cho cả ghế bị giam và không bị giam | làn Execution Core |
 | Mở | Header `docs/platform/event-store/spec.md` còn ghi "Not started" trong khi ES 06 đã trên main | làn Event Store |
@@ -553,7 +562,13 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 | N14 — port thay vì nới test A4 | hội đồng (mặc định) | port không truyền được tới cổng ghi mà không làm nặng mọi chữ ký giữa đường | nới test A4 cho đúng một leaf admission (đã bị bác, ghi làm phương án hai) |
 | N15/F10 — ledger giữ JSONL, không Event Store trong cutover này | owner 2026-10-19 | một sự cố cho thấy JSONL đã làm cứng dưới `advance` mất hay đảo lịch sử case, **hoặc** owner chọn F10 | lịch sử bền của case vào Event Store, append sau đoạn `advance` ngắn, không re-rank; reservation và binding không bao giờ thành event |
 | F10 shape — append sau đoạn, không re-rank | owner 2026-10-19 | append sau đoạn chứng minh để lại khoảng hở lịch sử mà không đóng được bằng đối chiếu | append trong đoạn với re-rank `advance` (làn holder-lock, còn vướng rank seal) — bất đồng N15-substrate |
-| N17 — Shape C | owner 2026-10-19 | một bên thứ ba cần admit vào playbook case đang sống, **hoặc** case con trong playbook cha không được phép chờ proposer, đo bằng việc chờ/từ chối thật | Shape A: hàng lease proposer đăng ký trong scope riêng, `advance` ngắn cho mọi case; làn holder-lock đặt tên và rank; Shape A mất hiệu lực nếu làn đó không nhận hàng |
+| N17 — Shape C | owner 2026-10-19 | một bên thứ ba cần admit vào playbook case đang sống, **hoặc** các dispatch gọi tên playbook case từ bên trong Unit của nó phải được admit, đo bằng số lần từ chối `playbook-case-admits-via-proposer-only` hay việc chờ/từ chối thật | Shape A: hàng lease proposer đăng ký trong scope riêng, `advance` ngắn cho mọi case; làn holder-lock đặt tên và rank; Shape A mất hiệu lực nếu làn đó không nhận hàng |
+| N17 hệ quả — dispatch gọi tên playbook case từ bên trong Unit của nó bị từ chối | theo owner 2026-10-19 (Shape C) | như dòng N17 | hết hiệu lực cùng Shape C; dưới Shape A các dispatch đó được admit qua đoạn `advance` ngắn |
+| Luật `answer` — không append trực tiếp; file gate-answer + thử `advance` một lần | hội đồng (mặc định, theo RUL-WF-24 và Shape C) | nếu N17 chuyển sang Shape A, hoặc một sự cố câu trả lời nằm trong file mà không bao giờ lên ledger | dưới Shape A: `answer` append dưới `advance` ngắn như mọi lời ghi khác |
+| Port nhận lần giữ `advance` đang có | hội đồng (mặc định) | nếu N17 chuyển sang Shape A (proposer không còn giữ suốt đời) | bỏ tuỳ chọn; mỗi phép acquire một lần |
+| RUL-WF-27 — tạo độc quyền một tên file là mutex liên-case, không hàng khoá | làn holder-lock (authority "ai giữ tài nguyên nào") | làn holder-lock đòi binding là hàng trong registry, **hoặc** filesystem đích không có tạo độc quyền nguyên tử | hàng lease theo worktree trong registry holder-lock |
+| RUL-WF-27 — thiếu bản ghi = `unbound`; đối chiếu ledger chỉ ở đường sửa chữa | hội đồng (mặc định) | một sự cố binding bị mất mà case vẫn mở, khiến một ghi đứng riêng lọt vào worktree của case | đối chiếu ledger trên đường nóng cho các worktree có case mở (cần chỉ mục ngược riêng) |
+| RUL-WF-28 — trừ khung cha trong đoạn riêng, rồi mới mở case con | luật rank của holder-lock (không thể giữ hai khoá cùng rank trong một scope) | không có | — |
 | N17 — bác custody attempt cho proposer (Shape B) | hội đồng (mặc định) | proposer cần adopt/probe như một attempt và chi phí giam lồng được chấp nhận | F14 |
 | S6 — trần seat launch giao cho Unit, settle một lần | hội đồng (mặc định) | trần giao trước không giữ được khung qua crash hay fallback dài (bộ đếm lệch ledger) | rút từng seat launch qua port (Execution Core ghi ledger giữa chừng) |
 | N10 — catalog MUST đóng, sáu primitive | hội đồng (mặc định) | nhiều hơn vài domain mỗi bên cần một primitive riêng | dạng mở; trước đó mỗi primitive mới là một dòng ý tưởng tính năng |
@@ -564,6 +579,8 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 | N4 — độc lập trên ledger, đóng gói bắt buộc | hội đồng (mặc định) | có cách mã hoá máy khác cho độc lập ngoài một pattern/wave | bỏ ép đóng gói cho MUST đó |
 | N6 — reserve-then-release cho conductor case | hội đồng (mặc định), thu hẹp cho playbook bởi N17 | nếu N17 chuyển sang Shape A | áp đều cho mọi case |
 | N7 — `rigorFloor`, không `rigorCeiling` | hội đồng (mặc định) | không có (theo luật rigor chỉ tăng) | — |
+| N8 — case không có Work là một Workflow run, dùng `advance`; không khoá thứ ba | hội đồng (mặc định) | không có | — |
+| N11 — projection không loại đường đề xuất unlisted | hội đồng (mặc định) | không có (luật unlisted của owner) | — |
 | N12/N16 — Work tuỳ chọn; `feature.yaml` giữ phần lifecycle tới cutover | hội đồng (mặc định) | cutover coding land | xoá phần lifecycle trong cùng thay đổi (L10) |
 | Không pilot trước engine | hội đồng (mặc định) | owner muốn giao hàng bắt đầu bằng các đối tượng nhỏ trước khi nối admission (bất đồng P2-pilot-first) | đổi trình tự giao hàng, không đổi mô hình |
 | Bác CMMN đầy đủ | hội đồng (mặc định) | nhu cầu trao đổi hay công cụ với bên ngoài được chứng minh | engine CMMN |
