@@ -103,9 +103,14 @@ impl GitDriver {
                 self.repair_worktree_registration(repo, held, id)?;
                 self.inspect_operation(repo, id)
             }
-            OperationKind::ConfigChange(_) => Err(failure(
-                "recovery-config-lock-order-unavailable: repo-config and recovery both rank 80",
-            )),
+            OperationKind::ConfigChange(change) => {
+                // repo-config is already rank 80 and is the resource authority
+                // for both writers and recoverers. Do not acquire a peer leaf.
+                match self.recover_config_change(repo, id, change) {
+                    Ok(()) => self.inspect_operation(repo, id),
+                    Err(e) => Err(e),
+                }
+            },
             OperationKind::RefUpdate { .. } | OperationKind::RefDelete => {
                 value(self.recover_ref_operation(repo, held, writer, id)?)
             }

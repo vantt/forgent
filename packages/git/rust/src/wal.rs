@@ -77,6 +77,10 @@ pub struct HooksChange {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct ConfigChange {
+    /// RepositoryConfig assigns this under repo-config authority. Historical
+    /// chains omit it, preserving their canonical digests.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub config_sequence: Option<u64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub staging: Option<crate::NativeLockArtifact>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -556,7 +560,8 @@ impl Intent {
                 old_config_digest,
                 ..
             } = change.as_ref();
-            if (change.hooks.is_none() && (remote.is_empty() || url.is_empty() || refspecs.is_empty()))
+            if change.config_sequence == Some(0)
+                || (change.hooks.is_none() && (remote.is_empty() || url.is_empty() || refspecs.is_empty()))
                 || change.hooks.as_ref().is_some_and(|h| !Path::new(&h.owner_path).is_absolute() || h.next.as_ref().is_some_and(|n| n != &h.owner_path) || (h.next.is_none() && h.old.as_ref() != Some(&h.owner_path)))
                 || change.staging.as_ref().is_some_and(|a| !a.valid() || Path::new(&a.path).file_name().and_then(|s| s.to_str()) != Some("config.lock"))
                 || !digest_valid(old_config_digest)
@@ -707,6 +712,12 @@ impl Chain {
                 None
             }
         })
+    }
+    pub(crate) fn config_sequence(&self) -> Option<u64> {
+        match &self.intent().kind {
+            OperationKind::ConfigChange(c) => c.config_sequence,
+            _ => None,
+        }
     }
     pub fn last_state(&self) -> &Phase {
         &self.records.iter().rev()
@@ -1213,7 +1224,7 @@ impl<F: FileSystem> Wal<F> {
                 return Err(corrupt("snapshot digest"));
             }
             let used = retained.iter().any(|chain| {
-                if matches!(chain.last().phase, Phase::RestoreAcknowledged) {
+                if matches!(chain.last_state(), Phase::RestoreAcknowledged) {
                     return false;
                 }
                 matches!(&chain.intent().kind, OperationKind::Restore(p) if &p.snapshot == digest)
@@ -1477,7 +1488,7 @@ impl<F: FileSystem> Wal<F> {
         later_id: &str,
         admission: &dyn AuthorityAdmission,
     ) -> WalResult<Chain> {
-        if !matches!(old.last().phase, Phase::TargetAttempt { .. })
+        if !matches!(old.last_state(), Phase::TargetAttempt { .. })
             || old.last().operation_id == later_id
         {
             return Err(WalError::RecoveryRequired);
@@ -2108,7 +2119,7 @@ impl<F: FileSystem> Wal<F> {
         authority: &dyn PublicationAuthority,
     ) -> WalResult<CompactReceipt> {
         if !matches!(chain.intent().kind, OperationKind::Restore(_))
-            || !matches!(chain.last().phase, Phase::RestoreAcknowledged)
+            || !matches!(chain.last_state(), Phase::RestoreAcknowledged)
         {
             return Err(WalError::RecoveryRequired);
         }
@@ -2127,7 +2138,7 @@ impl<F: FileSystem> Wal<F> {
         if actual.last().digest != chain.last().digest
             // Restore releases its binding only after durable caller acknowledgement.
             || (matches!(actual.intent().kind, OperationKind::Restore(_)) && !restore_ack)
-            || !(matches!(actual.last().phase, Phase::PinReleased)
+            || !(matches!(actual.last_state(), Phase::PinReleased)
                 || (actual.intent().kind != OperationKind::PublicationCas
                     && actual.outcome().is_some()))
             || reader.read_ref(&format!("refs/fgos/git-operations/{id}/candidate"))?
@@ -2275,6 +2286,12 @@ impl<F: FileSystem> Wal<F> {
             }
         }
         Ok(false)
+    }
+    /// Call only under repo-config authority. ConfigChange provenance chains
+    /// remain retained, so sequence allocation and provenance share WAL truth.
+    pub(crate) fn next_config_sequence(&self) -> WalResult<u64> {
+        self.retained(100_000)?.iter().filter_map(Chain::config_sequence)
+            .max().unwrap_or(0).checked_add(1).ok_or(WalError::RecoveryRequired)
     }
     /// Admission never traverses historical ledger entries. A directory without
     /// record zero is not an Intent and cannot block an unrelated operation.
@@ -2877,7 +2894,7 @@ mod tests {
                 state,
                 Recovery::FirstAttemptEligible | Recovery::RecoveryRequired
             ));
-            if matches!(c.last().phase, Phase::TargetAttempt { .. }) {
+            if matches!(c.last_state(), Phase::TargetAttempt { .. }) {
                 assert_eq!(state, Recovery::RecoveryRequired);
             }
         }

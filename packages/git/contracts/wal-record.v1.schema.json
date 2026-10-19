@@ -347,6 +347,10 @@
                             },
                             "staging": {
                               "$ref": "#/$defs/nativeLockArtifact"
+                            },
+                            "configSequence": {
+                              "type": "integer",
+                              "minimum": 1
                             }
                           },
                           "required": [

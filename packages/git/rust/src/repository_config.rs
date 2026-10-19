@@ -279,14 +279,10 @@ impl GitDriver {
             self.publication_call(repo, handle, args, &[], false, Duration::from_secs(30))
         };
         let hooks = if let Some((path, remove)) = hooks_request {
-            let values = crate::driver::config_facts(self, repo, "core.hookspath")?;
-            if values.len() > 1 {
-                return Err(error("hooks-config-ambiguous"));
+            let old = self.local_hooks_value(repo)?;
+            if !remove && old.is_none() && self.hooks_value(repo)?.is_some() {
+                return Err(error("hooks-skipped-existing: enforcement-missing"));
             }
-            let old = values
-                .first()
-                .map(|v| String::from_utf8(v.value.clone()).map_err(error))
-                .transpose()?;
             if remove {
                 if old.as_deref() != Some(path) || !self.hooks_owned(repo, path)? {
                     return Err(error("hooks-config-not-owned"));
@@ -345,6 +341,7 @@ impl GitDriver {
         let cleanup = StagingFile::new(staging.clone(), file.metadata().map_err(error)?);
         let intent = Intent {
             kind: OperationKind::ConfigChange(Box::new(wal::ConfigChange {
+                config_sequence: Some(wal.next_config_sequence().map_err(error)?),
                 staging: Some(crate::NativeLockArtifact::capture(
                     &staging,
                     &fgos_process::facts::self_identity()
@@ -464,7 +461,7 @@ impl GitDriver {
             if fs::read(&config).map_err(error)? != old_bytes
                 || hooks
                     .as_ref()
-                    .is_some_and(|h| self.hooks_value(repo).ok().as_ref() != Some(&h.old))
+                    .is_some_and(|h| self.local_hooks_value(repo).ok().as_ref() != Some(&h.old))
             {
                 return Err(error("config-change-stale"));
             }
@@ -487,7 +484,7 @@ impl GitDriver {
             if fs::read(&config).map_err(error)? != old_bytes
                 || hooks
                     .as_ref()
-                    .is_some_and(|h| self.hooks_value(repo).ok().as_ref() != Some(&h.old))
+                    .is_some_and(|h| self.local_hooks_value(repo).ok().as_ref() != Some(&h.old))
             {
                 return Err(error("config-change-stale"));
             }
@@ -606,15 +603,21 @@ pub struct HooksReport {
 }
 impl GitDriver {
     fn hooks_value(&self, repo: &RepoHandle) -> Result<Option<String>> {
-        let values = crate::driver::config_facts(self, repo, "core.hookspath")?;
+        // Git emits config in precedence order. A lower-scope setting must
+        // keep the installation slot occupied even without a local setting.
+        crate::driver::config_facts(self, repo, "core.hookspath")?
+            .into_iter().last()
+            .map(|v| String::from_utf8(v.value).map_err(error)).transpose()
+    }
+    fn local_hooks_value(&self, repo: &RepoHandle) -> Result<Option<String>> {
+        let config = repo.common_dir().join("config");
+        let values: Vec<_> = crate::driver::config_facts(self, repo, "core.hookspath")?
+            .into_iter().filter(|v| v.origin == config).collect();
         if values.len() > 1 {
             return Err(error("hooks-config-ambiguous"));
         }
-        values
-            .into_iter()
-            .next()
-            .map(|v| String::from_utf8(v.value).map_err(error))
-            .transpose()
+        values.into_iter().next()
+            .map(|v| String::from_utf8(v.value).map_err(error)).transpose()
     }
     fn config_change_installed(
         &self,
@@ -622,7 +625,7 @@ impl GitDriver {
         change: &wal::ConfigChange,
     ) -> Result<bool> {
         if let Some(h) = &change.hooks {
-            return Ok(self.hooks_value(repo)? == h.next);
+            return Ok(self.local_hooks_value(repo)? == h.next);
         }
         Ok(mapping_installed(
             &change.remote,
@@ -646,6 +649,7 @@ impl GitDriver {
             return Err(error("git-wal-unreadable"));
         }
         let mut latest = None;
+        let mut ambiguous = false;
         for entry in scan.entries {
             let chain = wal.inspect(&entry.operation_id).map_err(error)?;
             if matches!(
@@ -660,14 +664,14 @@ impl GitDriver {
                 if let OperationKind::ConfigChange(c) = &chain.intent().kind {
                     if let Some(h) = &c.hooks {
                         if h.owner_path == path {
-                            let stamp = fs::metadata(
-                                repo.common_dir()
-                                    .join("fgos/git/operations")
-                                    .join(&entry.operation_id),
-                            )
-                            .and_then(|m| m.modified())
-                            .map_err(error)?;
+                            let stamp = chain.config_sequence();
+                            // Multiple historical records have no durable relative
+                            // order. Refuse ownership rather than guess from mtimes.
+                            if latest.as_ref().is_some_and(|(old, _)| *old == stamp) {
+                                ambiguous = true;
+                            }
                             if latest.as_ref().is_none_or(|(old, _)| stamp > *old) {
+                                ambiguous = false;
                                 latest = Some((
                                     stamp,
                                     h.next.as_ref().map(|_| entry.operation_id.clone()),
@@ -677,6 +681,9 @@ impl GitDriver {
                     }
                 }
             }
+        }
+        if ambiguous {
+            return Err(error("hooks-provenance-order-unknown"));
         }
         Ok(latest.and_then(|(_, id)| id))
     }
@@ -692,7 +699,7 @@ impl GitDriver {
             .to_str()
             .ok_or_else(|| error("invalid-hooks-path"))?;
         let configured = self.hooks_value(repo)?;
-        let provenance = if configured.as_deref() == Some(path) {
+        let provenance = if self.local_hooks_value(repo)?.as_deref() == Some(path) {
             self.hooks_provenance(repo, path)?
         } else {
             None
@@ -768,6 +775,19 @@ impl GitDriver {
 }
 
 impl GitDriver {
+    pub(crate) fn recover_config_change(
+        &self,
+        repo: &RepoHandle,
+        id: &str,
+        change: &wal::ConfigChange,
+    ) -> Result<()> {
+        let hooks = change.hooks.as_ref().map(|h| (h.owner_path.as_str(), h.next.is_none()));
+        match self.change_config(repo, &change.remote, &change.refspecs, id, hooks, &wal::OsFileSystem) {
+            Ok(_) => Ok(()),
+            Err(e) if e.cause == "config-change-resolved-without-success" => Ok(()),
+            Err(e) => Err(e),
+        }
+    }
     /// Settle an interrupted hooks change by observation, never replay its effect.
     pub fn recover_hooks_config(&self, repo: &RepoHandle, id: &str) -> Result<HooksReport> {
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(error)?;

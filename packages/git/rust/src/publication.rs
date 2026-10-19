@@ -287,7 +287,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                 terminal.push((wal.last_change(blocking), blocking.clone()));
                 continue;
             }
-            if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
+            if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
                 let terminal = wal
                     .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                     .map_err(werr)?;
@@ -899,14 +899,14 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         self.authority
             .validate_publication_borrow(chain.intent())
             .map_err(werr)?;
-        if matches!(chain.last().phase, Phase::Intent(_)) {
+        if matches!(chain.last_state(), Phase::Intent(_)) {
             let terminal = wal
                 .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                 .map_err(werr)?;
             return self.finish(repo, &terminal);
         }
         if chain.intent().kind != wal::OperationKind::PublicationCas
-            && matches!(chain.last().phase, Phase::TargetAttempt { .. })
+            && matches!(chain.last_state(), Phase::TargetAttempt { .. })
         {
             let mut observations = Vec::new();
             self.sync_all_objects(repo)?;
@@ -948,7 +948,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             {
                 let i = chain.intent();
                 if !matches!(
-                    chain.last().phase,
+                    chain.last_state(),
                     Phase::Prepared | Phase::TargetAttempt { .. }
                 ) {
                     return Err(werr(WalError::RecoveryRequired));
@@ -980,7 +980,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                     .map_err(werr)?;
                 self.finish(repo, &c)
             }
-            Recovery::EffectObservedOnly if !matches!(chain.last().phase, Phase::Intent(_)) => {
+            Recovery::EffectObservedOnly if !matches!(chain.last_state(), Phase::Intent(_)) => {
                 self.sync_refs(repo, &chain.intent().resource_set[0])?;
                 let c = wal
                     .append(
@@ -1872,7 +1872,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                 .map_err(werr);
         }
         let pin = format!("refs/fgos/git-operations/{id}/candidate");
-        if matches!(chain.last().phase, Phase::Outcome(_)) {
+        if matches!(chain.last_state(), Phase::Outcome(_)) {
             chain = wal
                 .append(
                     &chain,
@@ -1891,7 +1891,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         }
         // A resumed release never retries its irreversible deletion. Absence
         // is a terminal observation, any other value preserves the evidence.
-        if matches!(chain.last().phase, Phase::PinReleaseAttempt { .. }) {
+        if matches!(chain.last_state(), Phase::PinReleaseAttempt { .. }) {
             if self.absent_tip(repo, &pin)? != ExpectedTip::Absent {
                 return Err(werr(WalError::RecoveryRequired));
             }

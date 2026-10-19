@@ -26,6 +26,11 @@ fn hooks_fill_empty_preserve_custom_diagnose_and_remove_only_owned() {
             .status,
         "empty"
     );
+    // Restoring/touching an older operation directory cannot revive ownership.
+    fs::File::open(f.main.join(".git/fgos/git/operations/hooks")).unwrap()
+        .set_times(fs::FileTimes::new().set_modified(
+            std::time::SystemTime::now() + std::time::Duration::from_secs(3600),
+        )).unwrap();
     // Reinstall the exact same text externally: a removed ownership record does not authorize it.
     git(
         &f.main,
@@ -170,6 +175,15 @@ fn dead_config_writer_recovers_wal_before_and_after_effect_without_replay() {
             "child did not crash: {}",
             String::from_utf8_lossy(&out.stderr)
         );
+        let pending = f.driver.list_pending(&f.repo, 100).unwrap();
+        assert!(pending["operations"].as_array().unwrap().iter()
+            .any(|op| op["operationId"] == "crash"));
+        let inspected = f.driver.inspect_operation(&f.repo, "crash").unwrap();
+        assert_eq!(inspected["kind"], "ConfigChange");
+        assert_eq!(inspected["terminal"], false);
+        let result = f.driver.reconcile_operation(&f.repo, vec![], "fixture", "crash", None).unwrap();
+        assert_eq!(result["terminal"], true);
+        assert_eq!(result["requestDigest"], inspected["requestDigest"]);
         let report = f.driver.recover_hooks_config(&f.repo, "crash").unwrap();
         assert_eq!(report.status == "owned", installed, "{at}/{record}");
         assert!(!f.main.join(".git/config.lock").exists());
@@ -230,14 +244,48 @@ fn exact_old_guard_rechecks_after_target_attempt_before_the_effect() {
 }
 
 #[test]
-fn unified_recovery_refuses_conflicting_rank_eighty_contract_without_dropping_authority() {
+fn unified_recovery_uses_config_authority_without_peer_rank_eighty_leaf() {
     let f = Fixture::new();
     let path = f.main.join(".githooks");
     f.driver.ensure_hooks(&f.repo, &path, "config-ranks").unwrap();
     assert_eq!(f.driver.inspect_operation(&f.repo,"config-ranks").unwrap()["kind"], "ConfigChange");
     let before = fs::read(f.main.join(".git/config")).unwrap();
-    let error = f.driver.reconcile_operation(&f.repo,vec![],"fixture","config-ranks",None).unwrap_err();
-    assert!(error.cause.contains("recovery-config-lock-order-unavailable"));
+    let result = f.driver.reconcile_operation(&f.repo,vec![],"fixture","config-ranks",None).unwrap();
+    assert_eq!(result["terminal"], true);
     assert_eq!(fs::read(f.main.join(".git/config")).unwrap(),before);
     assert_eq!(f.driver.recover_hooks_config(&f.repo,"config-ranks").unwrap().status,"owned");
+}
+
+#[test]
+#[ignore = "isolated HOME child invoked by global hooks test"]
+fn global_hooks_child() {
+    let f = Fixture::new();
+    let global = PathBuf::from(std::env::var_os("HOME").unwrap()).join(".gitconfig");
+    let path = f.main.join(".githooks");
+    fs::write(&global, "[core]\n hooksPath = /global/hooks\n").unwrap();
+    let report = f.driver.ensure_hooks(&f.repo, &path, "global-preserved").unwrap();
+    assert_eq!(report.status, "skippedExisting");
+    assert_eq!(report.configured_path.as_deref(), Some("/global/hooks"));
+    assert!(report.enforcement_missing);
+    assert!(!fs::read_to_string(f.main.join(".git/config")).unwrap().contains("hooksPath"));
+    fs::remove_file(&global).unwrap();
+    f.driver.ensure_hooks(&f.repo, &path, "local-owned").unwrap();
+    fs::write(&global, "[core]\n hooksPath = /global/hooks\n").unwrap();
+    assert_eq!(f.driver.inspect_hooks(&f.repo, &path).unwrap().status, "owned");
+    let report = f.driver.remove_owned_hooks_config(&f.repo, &path, "local-remove").unwrap();
+    assert_eq!(report.status, "skippedExisting");
+    assert_eq!(report.configured_path.as_deref(), Some("/global/hooks"));
+    assert_eq!(fs::read_to_string(&global).unwrap(), "[core]\n hooksPath = /global/hooks\n");
+    let _ = evidence as fn(&LandSession) -> LandEvidence;
+}
+#[test]
+fn inherited_global_hooks_preserved_and_owned_local_removal_reveals_global() {
+    let f = Fixture::new();
+    let home = f.temp.join("isolated-home");
+    fs::create_dir(&home).unwrap();
+    let out = Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "global_hooks_child", "--ignored", "--nocapture"])
+        .env("HOME", &home).env("XDG_CONFIG_HOME", home.join("xdg"))
+        .output().unwrap();
+    assert!(out.status.success(), "{}\n{}", String::from_utf8_lossy(&out.stdout), String::from_utf8_lossy(&out.stderr));
 }

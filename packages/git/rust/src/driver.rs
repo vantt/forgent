@@ -2385,14 +2385,7 @@ impl Inspect for GitDriver {
                         } = change.as_ref();
                         if remote == _remote {
                             facts.push((
-                                std::fs::metadata(
-                                    _repo
-                                        .common_dir()
-                                        .join("fgos/git/operations")
-                                        .join(&entry.operation_id),
-                                )
-                                .and_then(|m| m.modified())
-                                .map_err(io)?,
+                                chain.config_sequence(),
                                 FetchMappingProvenance {
                                     operation_id: entry.operation_id,
                                     remote_url: url.clone(),
@@ -2404,7 +2397,10 @@ impl Inspect for GitDriver {
                 }
             }
         }
-        facts.sort_by_key(|(time, _)| *time);
+        facts.sort_by_key(|(sequence, _)| *sequence);
+        if facts.len() > 1 && facts[facts.len() - 1].0 == facts[facts.len() - 2].0 {
+            return Err(refusal("fetch-provenance-order-unknown"));
+        }
         Ok(facts.pop().map(|(_, fact)| fact))
     }
 

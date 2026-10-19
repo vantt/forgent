@@ -335,7 +335,7 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
     wal: &Wal<F>,
     terminal: &wal::Chain,
 ) -> Result<()> {
-    if matches!(terminal.last().phase, Phase::PinReleased) {
+    if matches!(terminal.last_state(), Phase::PinReleased) {
         return Ok(());
     }
     let candidate = match terminal.intent().candidate() {
@@ -347,7 +347,7 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
         terminal.last().operation_id
     ))
     .map_err(failure)?;
-    let release = if matches!(terminal.last().phase, Phase::PinReleaseAttempt { .. }) {
+    let release = if matches!(terminal.last_state(), Phase::PinReleaseAttempt { .. }) {
         terminal.clone()
     } else {
         wal.append(
