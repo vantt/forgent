@@ -874,13 +874,23 @@ pub(crate) fn acquire_worktree_admin<'a>(
     Ok(scope)
 }
 #[cfg(unix)]
+/// The `dispatch-cwd` lease file of a checkout, keyed exactly as the lock registry's
+/// `<cwdDevIno>` (`src/holder-lock/registry.mjs`): `<dev>-<ino>-<birthtimeNs>` of the
+/// directory after realpath. A different key would probe a lease nobody holds.
 pub(crate) fn custody_lock_path(repo: &RepoHandle, root: &Path) -> Result<PathBuf> {
     use std::os::unix::fs::MetadataExt;
-    let m = fs::metadata(root).map_err(failure)?;
+    let m = fs::metadata(fs::canonicalize(root).map_err(failure)?).map_err(failure)?;
+    let birth = m
+        .created()
+        .map_err(failure)?
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(failure)?
+        .as_nanos();
     Ok(repo.trusted_main_root().join(format!(
-        ".fgos/locks/dispatch-cwd--{}-{}.lock",
+        ".fgos/locks/dispatch-cwd--{}-{}-{}.lock",
         m.dev(),
-        m.ino()
+        m.ino(),
+        birth
     )))
 }
 pub(crate) fn branch_in_use(
