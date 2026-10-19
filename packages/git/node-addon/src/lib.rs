@@ -1,5 +1,6 @@
 //! One Node-API load for both foundations. No protocol decisions live here.
 mod event_store;
+pub use event_store::{open_store, resolve_event_store};
 mod git;
 pub use git::{ensure_git_fetch_mapping, initialize_git_wal, inspect_git};
 mod single_load;

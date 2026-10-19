@@ -10,7 +10,8 @@ import crypto from 'node:crypto';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
-import { withStateTx, hotLockDepth } from './hot-lock.mjs';
+import { withStateTx } from './hot-lock.mjs';
+import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 
 const mainFgosDirCache = new Map();
 

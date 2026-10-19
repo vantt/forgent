@@ -307,6 +307,10 @@
     "src/state/step-fsm.mjs": "domain",
     "src/verbs/state/step.mjs": "use-case",
     "src/runner/operation-choice.mjs": "use-case",
-    "src/runner/work-dispatch.mjs": "use-case"
+    "src/runner/work-dispatch.mjs": "use-case",
+    "src/event-store/consumers.mjs": "infra",
+    "src/holder-lock/hot-guard.mjs": "kernel",
+    "src/event-store/index.mjs": "infra",
+    "src/event-store/native.mjs": "infra"
   }
 }
