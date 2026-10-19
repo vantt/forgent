@@ -20,6 +20,8 @@
     },
     "optional": [
       { "flag": "--kill-wait-ms N", "applies": ["--try", "--wait-ms", "--drain-child"], "default": 2000, "meaning": "predecessor kill wait; source lock.predecessorKillWaitMs" },
+      { "flag": "--protected-roots <comma-separated-pids|->", "applies": ["--drain-child"], "meaning": "Live sibling borrow roots from the owning Node handle: their groups and descendants are waited on, never killed. New borrows refuse during a drain snapshot." },
+      { "flag": "--reach-floor-ticks <decimal>", "applies": ["--drain-child"], "meaning": "Required actual guarantee observation retained before opening this description; missing or future floors refuse, never a full per-spawn scan." },
       { "flag": "--predecessor <path>", "applies": ["--try", "--wait-ms"], "meaning": "predecessor record path; default <lock file>.predecessor.json derived from fd 3" }
     ],
     "unknownFlag": "usage error, exit 2"

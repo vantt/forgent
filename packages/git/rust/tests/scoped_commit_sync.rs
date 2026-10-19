@@ -270,49 +270,311 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
 #[test]
 fn baseline_only_cutover_commits_the_event_fence() {
     use sha2::{Digest, Sha256};
-    let f = Fixture::new();
-    let deleted = vec![".fgos/events.jsonl".to_string(), ".fgos/state.json".into()];
-    for p in &deleted {
-        fs::write(f.main.join(p), "legacy\n").unwrap();
+    for tracked_fence in [false, true] {
+        let f = Fixture::new();
+        let deleted = vec![".fgos/events.jsonl".to_string(), ".fgos/state.json".into()];
+        for p in &deleted {
+            fs::write(f.main.join(p), "legacy\n").unwrap();
+        }
+        fs::write(f.main.join("seal.json"), "sealed\n").unwrap();
+        let mut add = vec!["add", "--", "seal.json"];
+        add.extend(deleted.iter().map(String::as_str));
+        if tracked_fence {
+            fs::write(f.main.join(".fgos/events"), "legacy fence\n").unwrap();
+            add.push(".fgos/events");
+        }
+        git(&f.main, &add);
+        git(&f.main, &["commit", "-qm", "legacy"]);
+        let legacy = git(&f.main, &["rev-parse", "HEAD"]);
+        git(&f.main, &["update-ref", "refs/fgos/legacy", &legacy]);
+        let main = match f.driver.resolve_repo(&f.main, &f.main).unwrap() {
+            ResolveRepo::Repository(r) => r,
+            _ => panic!(),
+        };
+        let baseline = f.driver.preflight_commit(&main, vec![]).unwrap();
+        for p in &deleted {
+            fs::remove_file(f.main.join(p)).unwrap();
+        }
+        assert_eq!(f.main.join(".fgos/events").exists(), tracked_fence);
+        fs::write(f.main.join(".fgos/events"), "legacy fence\n").unwrap();
+        let request = CommitRequest {
+            writes: vec!["logs".into()],
+            message: "cutover".into(),
+            cutover_grant: Some(CutoverGrant {
+                exact_paths: deleted.clone(),
+                legacy_ref_oid: legacy,
+                seal_digest: format!("{:x}", Sha256::digest(b"sealed\n")),
+            }),
+        };
+        let result = f
+            .driver
+            .scoped_commit(&main, vec![], &baseline, &request, "fixture", "cutover")
+            .unwrap();
+        assert_eq!(result.status, ResultCode::Committed);
+        assert_eq!(
+            result.files,
+            if tracked_fence {
+                vec![".fgos/events.jsonl", ".fgos/state.json"]
+            } else {
+                vec![".fgos/events", ".fgos/events.jsonl", ".fgos/state.json"]
+            }
+        );
+        assert_eq!(git(&f.main, &["show", "HEAD:.fgos/events"]), "legacy fence");
+        assert_eq!(
+            git(&f.main, &["ls-tree", "--name-only", "HEAD", ".fgos/"]),
+            ".fgos/events"
+        );
     }
-    fs::write(f.main.join("seal.json"), "sealed\n").unwrap();
-    let mut add = vec!["add", "--", "seal.json"];
-    add.extend(deleted.iter().map(String::as_str));
-    git(&f.main, &add);
-    git(&f.main, &["commit", "-qm", "legacy"]);
-    let legacy = git(&f.main, &["rev-parse", "HEAD"]);
-    git(&f.main, &["update-ref", "refs/fgos/legacy", &legacy]);
-    let main = match f.driver.resolve_repo(&f.main, &f.main).unwrap() {
-        ResolveRepo::Repository(r) => r,
-        _ => panic!(),
-    };
-    let baseline = f.driver.preflight_commit(&main, vec![]).unwrap();
-    for p in &deleted {
-        fs::remove_file(f.main.join(p)).unwrap();
+}
+
+/// Construct real durable interruption states under the fixture's held custody.
+fn interrupted(f: &Fixture, id: &str, phase: u8, sync: bool) -> wal::Chain {
+    use wal::*;
+    struct Held<'a>(&'a Handle);
+    impl PublicationAuthority for Held<'_> {
+        fn validate_publication_borrow(&self, i: &Intent) -> WalResult<()> {
+            fgos_holder_lock::validate(self.0)
+                .map_err(|_| WalError::PublicationBorrowUnavailable)?;
+            use std::os::unix::fs::MetadataExt;
+            let m = fs::metadata(self.0.path())?;
+            if i.authority_binding != format!("{}:{}", m.dev(), m.ino()) {
+                return Err(WalError::PublicationBorrowUnavailable);
+            }
+            Ok(())
+        }
     }
-    assert!(!f.main.join(".fgos/events").exists());
-    fs::write(f.main.join(".fgos/events"), "legacy fence\n").unwrap();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
     let request = CommitRequest {
-        writes: vec!["logs".into()],
-        message: "cutover".into(),
-        cutover_grant: Some(CutoverGrant {
-            exact_paths: deleted.clone(),
-            legacy_ref_oid: legacy,
-            seal_digest: format!("{:x}", Sha256::digest(b"sealed\n")),
-        }),
+        writes: vec!["a".into()],
+        message: "interrupted".into(),
+        cutover_grant: None,
     };
-    let result = f
+    fs::write(f.tree.join("a"), "interrupted producer").unwrap();
+    git(&f.tree, &["add", "a"]);
+    let tree = git(&f.tree, &["write-tree"]);
+    let wal = Wal::open(&f.repo).unwrap();
+    let kind = if sync {
+        OperationKind::Sync(Box::new(SyncIntent {
+            worktree: baseline.worktree.clone(),
+            head: baseline.head.clone(),
+            target: baseline.head.clone(),
+            message: "interrupted".into(),
+        }))
+    } else {
+        OperationKind::ScopedCommit(Box::new(ScopedCommitIntent {
+            worktree: baseline.worktree.clone(),
+            baseline: serde_json::to_string(&baseline).unwrap(),
+            request: serde_json::to_string(&request).unwrap(),
+            paths: vec!["a".into()],
+            tree,
+            cutover_grant: None,
+        }))
+    };
+    let intent = Intent {
+        request_digest: canonical_digest(&(&kind, "fixture")).unwrap(),
+        kind,
+        repo_identity: wal.repository_identity().into(),
+        resource_set: vec![format!("worktree:{}", baseline.worktree)],
+        authority_binding: baseline.authority,
+        writer_identity: "fixture".into(),
+        object_format: f.repo.object_format(),
+        expected: Tip::Oid(baseline.head.clone()),
+        next: Tip::Oid(baseline.head),
+    };
+    let Begin::Created(mut chain) = wal
+        .begin(id, intent, &Held(f.lease.as_ref().unwrap()))
+        .unwrap()
+    else {
+        panic!()
+    };
+    if phase >= 1 {
+        chain = wal.append(&chain, Phase::Prepared).unwrap();
+    }
+    if phase >= 2 {
+        chain = wal
+            .append(
+                &chain,
+                Phase::TargetAttempt {
+                    prior_target_attempt: None,
+                    expected: chain.intent().expected.clone(),
+                    next: chain.intent().next.clone(),
+                },
+            )
+            .unwrap();
+    }
+    if sync {
+        git(&f.tree, &["reset", "-q", "HEAD"]);
+    }
+    chain
+}
+fn fresh_commit(f: &Fixture, id: &str) {
+    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    fs::write(f.tree.join("fresh"), id).unwrap();
+    let request = CommitRequest {
+        writes: vec!["fresh".into()],
+        message: "fresh".into(),
+        cutover_grant: None,
+    };
+    assert_eq!(
+        f.driver
+            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", id)
+            .unwrap()
+            .status,
+        ResultCode::Committed
+    );
+}
+#[test]
+fn admission_abandons_pre_attempt_commit_and_sync_without_blocking_fresh_ids() {
+    for sync in [false, true] {
+        for phase in [0, 1] {
+            let f = Fixture::new();
+            interrupted(&f, "interrupted", phase, sync);
+            // Admission runs before the foreign-index check and unstages only the
+            // exact paths of a pre-attempt scoped commit, preserving producer bytes.
+            let baseline = CommitBaseline {
+                head: git(&f.tree, &["rev-parse", "HEAD"]),
+                reference: "refs/heads/producer".into(),
+                worktree: f.tree.to_string_lossy().into(),
+                authority: {
+                    use std::os::unix::fs::MetadataExt;
+                    let m = fs::metadata(f.lease.as_ref().unwrap().path()).unwrap();
+                    format!("{}:{}", m.dev(), m.ino())
+                },
+                dirty: vec![],
+            };
+            fs::write(f.tree.join("fresh"), "fresh").unwrap();
+            let request = CommitRequest {
+                writes: vec!["fresh".into()],
+                message: "fresh".into(),
+                cutover_grant: None,
+            };
+            assert_eq!(
+                f.driver
+                    .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "fresh")
+                    .unwrap()
+                    .status,
+                ResultCode::Committed
+            );
+            assert_eq!(
+                wal::Wal::open(&f.repo)
+                    .unwrap()
+                    .compacted("interrupted")
+                    .unwrap()
+                    .unwrap()
+                    .outcome()
+                    .unwrap(),
+                wal::Outcome::AbandonedBeforeAttempt
+            );
+            assert_eq!(
+                fs::read_to_string(f.tree.join("a")).unwrap(),
+                "interrupted producer"
+            );
+        }
+    }
+}
+#[test]
+fn explicit_recovery_observes_commit_or_closes_unknown_without_replaying() {
+    for committed in [false, true] {
+        let f = Fixture::new();
+        interrupted(&f, "interrupted", 2, false);
+        if committed {
+            git(&f.tree, &["commit", "-qm", "interrupted"]);
+        }
+        let head = git(&f.tree, &["rev-parse", "HEAD"]);
+        let outcome = f
+            .driver
+            .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
+            .unwrap();
+        assert!(if committed {
+            matches!(outcome, wal::Outcome::Commit { .. })
+        } else {
+            matches!(outcome, wal::Outcome::CommitRejected { .. })
+        });
+        assert_eq!(head, git(&f.tree, &["rev-parse", "HEAD"]));
+        fresh_commit(&f, "fresh");
+    }
+}
+#[test]
+fn recovery_preserves_attempt_while_native_index_lock_exists() {
+    let f = Fixture::new();
+    interrupted(&f, "interrupted", 2, false);
+    let gitdir = git(&f.tree, &["rev-parse", "--absolute-git-dir"]);
+    fs::write(Path::new(&gitdir).join("index.lock"), "native residue").unwrap();
+    assert!(f
         .driver
-        .scoped_commit(&main, vec![], &baseline, &request, "fixture", "cutover")
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
+        .is_err());
+    assert!(wal::Wal::open(&f.repo)
+        .unwrap()
+        .inspect("interrupted")
+        .unwrap()
+        .outcome()
+        .is_none());
+    fs::remove_file(Path::new(&gitdir).join("index.lock")).unwrap();
+    git(&f.tree, &["reset", "-q", "HEAD"]);
+    f.driver
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
         .unwrap();
-    assert_eq!(result.status, ResultCode::Committed);
+    fresh_commit(&f, "fresh");
+}
+#[test]
+fn terminal_commit_history_is_bounded_and_compacted_receipts_replay() {
+    let f = Fixture::new();
+    let mut first = None;
+    for n in 0..9 {
+        let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+        fs::write(f.tree.join("a"), format!("version {n}")).unwrap();
+        let request = CommitRequest {
+            writes: vec!["a".into()],
+            message: "bounded".into(),
+            cutover_grant: None,
+        };
+        let id = format!("bounded-{n}");
+        let result = f
+            .driver
+            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", &id)
+            .unwrap();
+        if n == 0 {
+            first = Some((baseline, request, result.oid));
+        }
+    }
+    let wal = wal::Wal::open(&f.repo).unwrap();
+    assert!(wal.retained(100).unwrap().is_empty());
+    assert!(wal.compacted("bounded-0").unwrap().is_some());
+    let (baseline, request, oid) = first.unwrap();
     assert_eq!(
-        result.files,
-        vec![".fgos/events", ".fgos/events.jsonl", ".fgos/state.json"]
+        f.driver
+            .scoped_commit(
+                &f.repo,
+                f.held(),
+                &baseline,
+                &request,
+                "fixture",
+                "bounded-0"
+            )
+            .unwrap()
+            .oid,
+        oid
     );
-    assert_eq!(git(&f.main, &["show", "HEAD:.fgos/events"]), "legacy fence");
-    assert_eq!(
-        git(&f.main, &["ls-tree", "--name-only", "HEAD", ".fgos/"]),
-        ".fgos/events"
-    );
+}
+
+#[test]
+fn sync_inspection_closes_interruption_before_merge_and_allows_fresh_commit() {
+    for phase in [0, 1, 2] {
+        let f = Fixture::new();
+        interrupted(&f, "interrupted", phase, true);
+        assert_eq!(
+            f.driver
+                .inspect_sync(&f.repo, f.held(), "fixture", "interrupted")
+                .unwrap()
+                .state,
+            "not-started"
+        );
+        fresh_commit(&f, "fresh");
+        assert!(wal::Wal::open(&f.repo)
+            .unwrap()
+            .active(100)
+            .unwrap()
+            .is_empty());
+    }
 }

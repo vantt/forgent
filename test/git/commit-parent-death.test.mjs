@@ -16,8 +16,8 @@ async function until(check, label) {
   const deadline = Date.now() + 15000;
   while (!check()) { assert.ok(Date.now() < deadline, label); await pause(); }
 }
-for (const mode of ['commit', 'sync']) {
-  test(`${mode}: controller death retains child custody and refuses an uncertain attempt retry`, { skip: process.platform !== 'linux', timeout: 30000 }, async () => {
+for (const mode of ['commit', 'sync']) for (const rejected of [false,true]) {
+  test(`${mode}: controller death retains custody and recovers ${rejected ? 'unknown rejection' : 'immutable commit'} without replay`, { skip: process.platform !== 'linux', timeout: 30000 }, async () => {
     const temp = fs.mkdtempSync(path.join(os.tmpdir(), `fgos-${mode}-death-`));
     const repo = path.join(temp, 'repo'), linked = path.join(temp, 'linked');
     const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8' }).trim();
@@ -28,7 +28,7 @@ for (const mode of ['commit', 'sync']) {
     const fence = path.join(repo, '.fgos/locks/activation.lock');fs.mkdirSync(fence, { recursive: true });fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
     const hooks = path.join(repo, 'hooks');fs.mkdirSync(hooks);git(repo, 'config', 'core.hooksPath', 'hooks');
     const ready = path.join(temp, 'ready'), go = path.join(temp, 'go');
-    fs.writeFileSync(path.join(hooks, 'pre-commit'), `#!/bin/sh\necho $$ > '${ready}'\nwhile test ! -f '${go}'; do sleep 0.01; done\n`, { mode: 0o755 });
+    fs.writeFileSync(path.join(hooks, 'pre-commit'), `#!/bin/sh\necho $$ > '${ready}'\nwhile test ! -f '${go}'; do sleep 0.01; done\nexit ${rejected?1:0}\n`, { mode: 0o755 });
     const params = { fgosDir: path.join(repo, '.fgos'), cwd: linked };
     const config = { stateRoot: temp, repoPath: linked, trustedMain: repo, writer: 'fixture' };
     const request = { writes: ['a'], message: 'crash commit', cutoverGrant: null };
@@ -60,17 +60,25 @@ for (const mode of ['commit', 'sync']) {
         if (answer.result !== 'acquired') return false;
         holder = answer.handle;return true;
       }, 'Git did not release custody');
-      const observed = git(linked, 'rev-parse', 'HEAD');assert.notEqual(observed, head);
+      const observed = git(linked, 'rev-parse', 'HEAD');if(rejected)assert.equal(observed,head);else assert.notEqual(observed, head);
       if (mode === 'commit') {
         const baseline = JSON.parse(fs.readFileSync(path.join(temp, 'baseline.json')));
         const port = createGitScopedCommit(config, loader);
         assert.throws(() => port.commit({ operationId: 'death', baseline, request }, [holder]), /commit-attempt-recovery-required/);
+        const outcome=port.recover({operationId:'death'},[holder]);
+        if(rejected)assert.equal(outcome.cause,'commit-effect-unknown');
+        else {assert.equal(outcome.observed, observed);assert.equal(port.commit({operationId:'death',baseline,request},[holder]).oid,observed);}
       } else {
         const port = createGitSync(config, loader);
-        assert.throws(() => port.continue({ operationId: 'death' }, [holder]), /sync-commit-attempt-recovery-required/);
-        assert.throws(() => port.start({ operationId: 'death', target, message: 'crash sync' }, [holder]), /sync-commit-attempt-recovery-required/);
+        const result=port.continue({operationId:'death'},[holder]);
+        if(rejected){assert.equal(result.state,'rejected-open');port.abort({operationId:'death'},[holder]);}
+        else assert.equal(result.commit.oid, observed);
       }
       assert.equal(git(linked, 'rev-parse', 'HEAD'), observed);
+      git(repo,'config','core.hooksPath','/dev/null');
+      const fresh=createGitScopedCommit(config,loader);
+      const baseline=fresh.preflight({},[holder]);fs.writeFileSync(path.join(linked,'fresh'),'fresh after crash');
+      assert.equal(fresh.commit({operationId:'fresh',baseline,request:{...request,writes:['fresh']}},[holder]).status,'committed');
     } finally {
       fs.writeFileSync(go, 'continue');
       if (worker.exitCode === null && worker.signalCode === null) worker.kill('SIGKILL');

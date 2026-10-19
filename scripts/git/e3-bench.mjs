@@ -6,7 +6,7 @@
 // publications, a 10,000-record backlog) and times the controller's Rust scan.
 //
 //   node scripts/git/e3-bench.mjs run [--root <fresh dir>] [--out <json>]
-//        [--addon <.node>] [--fixture <e3_fixture>] [--fgctl <fgctl>] [--samples N]
+//        [--addon <.node>] [--fixture <e3_fixture>] [--fgctl <fgctl>] [--host <fgos>] [--samples N]
 //
 // Without --addon/--fixture/--fgctl it compiles them in release mode with cargo,
 // using CARGO_TARGET_DIR from the environment (default <checkout>/target).
@@ -159,9 +159,9 @@ async function census(args) {
 function compileArtifacts() {
   const env = { ...process.env, CARGO_TARGET_DIR: path.resolve(CHECKOUT, process.env.CARGO_TARGET_DIR || 'target') };
   execFileSync('cargo', ['build', '--release', '--locked', '-p', 'fgos-node-addon', '--lib', '--example', 'e3_fixture'], { cwd: CHECKOUT, env, stdio: 'inherit' });
-  execFileSync('cargo', ['build', '--release', '--locked', '-p', 'fgctl'], { cwd: CHECKOUT, env, stdio: 'inherit' });
+  execFileSync('cargo', ['build', '--release', '--locked', '-p', 'fgctl', '-p', 'fgos'], { cwd: CHECKOUT, env, stdio: 'inherit' });
   const release = path.join(env.CARGO_TARGET_DIR, 'release');
-  return { addon: path.join(release, 'libfgos_node_addon.so'), fixture: path.join(release, 'examples/e3_fixture'), fgctl: path.join(release, 'fgctl') };
+  return { addon: path.join(release, 'libfgos_node_addon.so'), fixture: path.join(release, 'examples/e3_fixture'), fgctl: path.join(release, 'fgctl'), host: path.join(release, 'fgos') };
 }
 
 /** Stage the addon as a release-shaped payload and write its loader descriptor. */
@@ -197,7 +197,9 @@ async function run(args) {
   privateDir(root);
   const fstype = execFileSync('findmnt', ['-T', root, '-n', '-o', 'FSTYPE'], { encoding: 'utf8' }).trim();
   if (fstype !== 'ext4') throw new Error(`E3 runs on ext4, not ${fstype}`);
-  const artifacts = args.addon && args.fixture && args.fgctl ? { addon: args.addon, fixture: args.fixture, fgctl: args.fgctl } : compileArtifacts();
+  const artifacts = args.addon && args.fixture && args.fgctl ? { addon: args.addon, fixture: args.fixture, fgctl: args.fgctl, host: args.host ?? process.env.FGOS_HOST_BIN } : compileArtifacts();
+  if (!artifacts.host) throw new Error('E3 Node loans require --host <built fgos> or FGOS_HOST_BIN');
+  process.env.FGOS_HOST_BIN = fs.realpathSync(artifacts.host);
   for (const k of Object.keys(artifacts)) artifacts[k] = fs.realpathSync(artifacts[k]);
   const descriptor = await stageAddon(root, artifacts.addon);
   const results = { environment: environment(root), artifacts, rows: {} };
@@ -216,6 +218,34 @@ async function run(args) {
 
   const { index, loader } = await loaders(descriptor);
   const open = (repo, reference) => index.createGitPublication({ stateRoot: state, repoPath: repo, trustedMain: repo, reference, writer: WRITER }, loader);
+
+  // The Publication rows own Rust handles. This row deliberately acquires a
+  // Node handle and lends it through the opaque addon path on every Git call.
+  {
+    const { acquireSync, createLockScope } = await import('../../src/holder-lock/index.mjs');
+    const main = path.join(root, 'node-loan'), linked = path.join(root, 'node-loan-linked');
+    git(['init', '-q', '--initial-branch=trunk', main]);
+    git(['-C', main, 'config', 'user.name', IDENTITY.name]);
+    git(['-C', main, 'config', 'user.email', IDENTITY.email]);
+    fs.writeFileSync(path.join(main, 'payload'), 'base');
+    git(['-C', main, 'add', 'payload']);git(['-C', main, 'commit', '-qm', 'base']);
+    git(['-C', main, 'worktree', 'add', '-qb', 'producer', linked]);
+    prepareRepo(main, path.join(main, '.git'));
+    const claim = acquireSync(createLockScope(), 'dispatch-cwd', { fgosDir: path.join(main, '.fgos'), cwd: linked });
+    if (claim.result !== 'acquired') throw new Error(`Node loan custody: ${claim.result}`);
+    try {
+      const port = index.createGitScopedCommit({stateRoot:state,repoPath:linked,trustedMain:main,writer:WRITER},loader);
+      const changing=[], preflight=[];
+      for (let n=0;n<samples+20;n++) {
+        const [beforeMs, baseline]=time(()=>port.preflight({},[claim.handle]));
+        fs.writeFileSync(path.join(linked,'payload'),`producer ${n}`);
+        const [commitMs,result]=time(()=>port.commit({operationId:`node-loan-${n}`,baseline,request:{writes:['payload'],message:'E3 Node loan',cutoverGrant:null}},[claim.handle]));
+        if(result.status!=='committed') throw new Error(`Node loan commit: ${JSON.stringify(result)}`);
+        if(n>=20){changing.push(commitMs);preflight.push(beforeMs);}
+      }
+      say('nodeLoanScopedCommit',{authority:'Node dispatch-cwd -> opaque addon loan',changing:stats(changing),preflight:stats(preflight)});
+    } finally { claim.handle.release(); }
+  }
 
   // Today's Node writer shape (one execFileSync git per step) on the same disk:
   // the "current Node writers" comparison and context for the DC tmpfs baseline.

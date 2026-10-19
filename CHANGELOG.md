@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git: recover interrupted scoped commits without replay, unblock pre-attempt/rejected Sync transactions, bound terminal WAL history, preserve concurrent sibling borrows, and restore clean merge paths on abort. E3 now measures Node-loaned checkout custody.
+
 - Restore declared producer bytes, modes and move paths after rejecting ScopedCommit hooks; drain adopted setsid lock borrowers without harming unrelated pre-exec children.
 
 - Preserve acquisition reach provenance in native holder-lock handover and emit Git WAL addon capabilities from the shared release/dev/test producer. Prevent uncertain Sync commit retries after a controller crash and preserve actual hook-modified file sets on receipt replay. Phase 05 remains unreleased pending its remaining acceptance proofs.

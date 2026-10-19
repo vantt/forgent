@@ -80,7 +80,7 @@ export class LockHandle {
     this.scope = scope;
     this.projectRoot = projectRoot;
     this.killWaitMs = killWaitMs;
-    descriptions.set(this, { fd: claim.fd ?? null, hold: claim.hold ?? null, borrows: 0, released: false, reachFloorTicks: claim.reachFloorTicks ?? null });
+    descriptions.set(this, { fd: claim.fd ?? null, hold: claim.hold ?? null, borrows: 0, borrowRoots: new Set(), sweeps: 0, released: false, reachFloorTicks: claim.reachFloorTicks ?? null });
     Object.freeze(this);
   }
 
@@ -431,7 +431,7 @@ function sweepAnswer(handle, answer) {
 function sweepRequest(handle, childPid) {
   return {
     bin: hostBin({ fgosDir: handle.projectRoot && path.join(handle.projectRoot, '.fgos') }),
-    args: ['--drain-child', String(childPid), '--kill-wait-ms', String(handle.killWaitMs)],
+    args: ['--drain-child', String(childPid), '--kill-wait-ms', String(handle.killWaitMs), '--protected-roots', [...descriptionOf(handle).borrowRoots].filter(pid => pid !== childPid).join(',') || '-', '--reach-floor-ticks', String(descriptionOf(handle).reachFloorTicks ?? '-')],
     fd: descriptionOf(handle).fd,
     timeoutMs: handle.killWaitMs + ROUTE_SLACK_MS,
   };
@@ -442,7 +442,10 @@ function sweepLeftoversSync(handle, childPid) {
 }
 async function sweepLeftovers(handle, childPid) {
   if (leftoverSweep() !== 'holders') return sweepProcessGroup(childPid);
-  return sweepAnswer(handle, await runLockRoute(sweepRequest(handle, childPid)));
+  const entry = descriptionOf(handle);
+  entry.sweeps += 1;
+  try { return sweepAnswer(handle, await runLockRoute(sweepRequest(handle, childPid))); }
+  finally { entry.sweeps -= 1; }
 }
 
 function sweepProcessGroup(childPid) {
@@ -538,6 +541,8 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
   const stdio = [spec.stdin ?? 'ignore', 'pipe', 'pipe', entry.fd];
   // The group sweep needs the child to lead a process group; a caller that
   // signals the child's group itself asks for one everywhere.
+  // A drain's protected-root snapshot must not miss a newly spawned sibling.
+  if (entry.sweeps > 0) throw new HolderLockError('borrow-leftover-not-killed', `${handle.name}: borrow drain in progress`, { lock: handle.name });
   const detached = borrowLeadsGroup(spec);
 
   if (sync) {
@@ -564,10 +569,12 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
 
   const child = spawn(spec.command, argv, { cwd: spec.cwd, env: childEnv, stdio, detached, windowsHide: true });
   entry.borrows += 1;
+  if (child.pid) entry.borrowRoots.add(child.pid);
   let settled = false;
   const finish = () => {
     if (settled) return false;
     settled = true;
+    entry.borrowRoots.delete(child.pid);
     entry.borrows -= 1;
     return true;
   };
@@ -577,6 +584,7 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
       reject(new HolderLockError('borrow-spawn-failed', `${handle.name}: cannot run ${spec.command}: ${err.message}`, { lock: handle.name, cause: err.code ?? null }));
     });
     child.once('exit', (exit, signal) => {
+      entry.borrowRoots.delete(child.pid);
       sweepLeftovers(handle, child.pid).then((sweep) => {
         if (!finish()) return;
         if (sweep.remaining.length > 0) reject(leftoverError(handle, sweep.remaining, { exit, signal }));

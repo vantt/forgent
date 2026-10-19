@@ -400,6 +400,6 @@ test('a rejecting hook is invoked once and its original evidence survives sync c
     fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\nprintf x >> '${count.replaceAll("'", "'\\''")}'\necho original-refusal >&2\nexit 1\n`,{mode:0o755});
     git(repoRoot,'config','core.hooksPath',hooks);
     const result=startSyncMerge({worktree:linked,repoRoot,ref:'main',sha:target});
-    assert.equal(result.reason,'hook-refused');assert.match(result.error,/original-refusal/);assert.equal(fs.readFileSync(count,'utf8'),'x');
+    assert.equal(result.reason,'git-error');assert.match(result.error,/original-refusal/);assert.equal(fs.readFileSync(count,'utf8'),'x');
   });
 });

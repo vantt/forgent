@@ -232,3 +232,27 @@ test('Rust drain waits for a direct pre-exec child through both Node borrow path
     }
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
+
+test('concurrent async sibling borrows are waited on and never killed by another drain', { skip: SKIP, timeout: 15000 }, async () => {
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'holder-lock-sibling-'));
+  const taken=acquireSync(createLockScope(),LOCK,{fgosDir:path.join(dir,'.fgos')});
+  assert.equal(taken.result,'acquired');
+  const {handle}=taken;
+  const children=[];
+  const ready=child=>new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);});
+  try {
+    const args=['-e',"process.stdout.write('ready');process.stdin.once('data',()=>process.exit(0));"];
+    const a=runBorrowed(handle,{command:process.execPath,args,stdin:'pipe'},{sync:false});children.push(a);await ready(a);
+    const b=runBorrowed(handle,{command:process.execPath,args,stdin:'pipe'},{sync:false});children.push(b);await ready(b);
+    a.stdin.end('go');
+    await assert.rejects(a.borrowed,err=>err.code==='borrow-leftover-not-killed');
+    assert.equal(b.exitCode,null);assert.equal(b.signalCode,null);
+    process.kill(b.pid,0);
+    b.stdin.end('go');
+    const result=await b.borrowed;assert.equal(result.exit,0);assert.equal(result.signal,null);
+  } finally {
+    for(const child of children) if(child.exitCode===null&&child.signalCode===null) child.kill('SIGKILL');
+    await Promise.allSettled(children.map(child=>child.borrowed));
+    handle.release();fs.rmSync(dir,{recursive:true,force:true});
+  }
+});

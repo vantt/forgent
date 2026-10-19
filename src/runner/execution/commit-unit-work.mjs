@@ -428,7 +428,7 @@ function commitStaged(ctx, subject) {
     git(ctx, ['commit', '-q', '--no-edit', '-m', subject], { env: commitIdentity(ctx) });
     return null;
   } catch (err) {
-    return { reason: err.status === 1 ? 'hook-refused' : 'git-error', error: String(err.stderr || err.message).trim() };
+    return { reason: 'git-error', error: String(err.stderr || err.message).trim() };
   }
 }
 

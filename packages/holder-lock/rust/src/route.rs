@@ -165,7 +165,7 @@ fn take_slot3() -> std::io::Result<File> {
 }
 
 fn lock_fd(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--kill-wait-ms", "--predecessor", "--drain-child", "--clear-domain", "--predecessor-kinds"], &["--try", "--shared-try"]) {
+    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--kill-wait-ms", "--predecessor", "--drain-child", "--clear-domain", "--predecessor-kinds", "--protected-roots", "--reach-floor-ticks"], &["--try", "--shared-try"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
@@ -176,6 +176,9 @@ fn lock_fd(args: &[String]) -> i32 {
     let mode = modes[0];
     if flags.has("--predecessor-kinds") && mode != "--try" && mode != "--wait-ms" {
         return usage("--predecessor-kinds applies only to acquisition");
+    }
+    if mode != "--drain-child" && (flags.has("--protected-roots") || flags.has("--reach-floor-ticks")) {
+        return usage("--protected-roots and --reach-floor-ticks apply only to --drain-child");
     }
     let kinds = match flags.one("--predecessor-kinds") {
         Ok(Some(raw)) if raw.split(',').all(|kind| !kind.is_empty()) => raw.split(',').map(str::to_string).collect::<Vec<_>>(),
@@ -264,6 +267,23 @@ fn lock_fd(args: &[String]) -> i32 {
             Ok(pid) if pid > 1 => pid,
             _ => return usage("--drain-child requires a child pid"),
         };
+        let protected = match flags.one("--protected-roots") {
+            Ok(Some("-")) | Ok(None) => vec![],
+            Ok(Some(raw)) => match raw.split(',').map(str::parse::<u32>).collect::<Result<Vec<_>, _>>() {
+                Ok(pids) if pids.iter().all(|pid| *pid > 1) => pids,
+                _ => return usage("--protected-roots needs child pids"),
+            },
+            Err(e) => return usage(&e),
+        };
+        let now = fgos_process::facts::creation_mark();
+        let reach = match (flags.one("--reach-floor-ticks"), now) {
+            (Ok(Some(raw)), Some(now)) => match raw.parse::<u64>() {
+                Ok(ticks) if ticks <= now.ticks => driver::flock::Reach::Since(fgos_process::facts::CreationMark { ticks, last_pid: None, at: now.at }),
+                _ => return emit(Some("not-drained"), json!({"leftoversKilled":0,"remaining":[]}), EXIT_NEGATIVE),
+            },
+            // Compatibility callers lack a proven floor; refuse rather than scan everyone.
+            _ => return emit(Some("not-drained"), json!({"leftoversKilled":0,"remaining":[]}), EXIT_NEGATIVE),
+        };
         // This helper's parent owns the explicitly inherited description.
         let owner = unsafe { libc::getppid() } as u32;
         return match driver::flock::drain_description(
@@ -271,8 +291,8 @@ fn lock_fd(args: &[String]) -> i32 {
             Some(child),
             owner,
             std::time::Duration::from_millis(kill_wait_ms),
-            // Nothing is known about the inherited description's history.
-            driver::flock::Reach::Everyone,
+            reach,
+            &protected,
         ) {
             Ok(killed) => emit(
                 Some("drained"),

@@ -6,7 +6,7 @@ export function createGitScopedCommit(options, loaderOptions) {
   outside();
   const native = loadNativeAddon(loaderOptions);
   const port = new native.GitScopedCommit(options.stateRoot, options.repoPath, options.trustedMain, options.writer);
-  return Object.freeze(Object.fromEntries(['preflight', 'commit', 'checkpointTrackedFiles'].map(method => [method, (args = {}, held = []) => {
+  return Object.freeze(Object.fromEntries(['preflight', 'commit', 'recover', 'checkpointTrackedFiles'].map(method => [method, (args = {}, held = []) => {
     outside();
     return withNativeLocks(native, held, loans => port.call(method, args, loans));
   }])));

@@ -228,22 +228,18 @@ impl LockDriver for FlockDriver {
 /// Linux: only the borrow group and descendants may be killed. Foreign
 /// direct pre-exec children of the owner are waited; escaped holders are killed.
 fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>) -> Result<u32, Leftovers> {
-    drain_description(file, Some(child_pid), std::process::id(), kill_wait, Reach::of(since)?)
+    drain_description(file, Some(child_pid), std::process::id(), kill_wait, Reach::of(since)?, &[])
 }
 
 /// Non-spawning admission: no borrowing domain means nobody may be killed.
 #[cfg(target_os = "linux")]
 pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration, since: Option<CreationMark>) -> Result<(), Leftovers> {
-    drain_description(file, None, std::process::id(), kill_wait, Reach::of(since)?).map(|_| ())
+    drain_description(file, None, std::process::id(), kill_wait, Reach::of(since)?, &[]).map(|_| ())
 }
 
 /// Which processes a drain reads descriptor tables of.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Reach {
-    /// Every process on the host: nothing is known about when the
-    /// description could first have been copied (a helper handed someone
-    /// else's description).
-    Everyone,
     /// Lagged per-spawn floor, assuming fork inheritance and ordinary PID
     /// allocation. Descriptor transfer to existing processes is covered by
     /// the release-time kernel lock-table settle. Reads processes
@@ -417,6 +413,7 @@ pub(crate) fn drain_description(
     owner: u32,
     kill_wait: Duration,
     reach: Reach,
+    protected_roots: &[u32],
 ) -> Result<u32, Leftovers> {
     use fgos_process::facts::{file_key, lock_holders, lock_holders_among, Holders};
     use fgos_process::ProcId;
@@ -432,7 +429,6 @@ pub(crate) fn drain_description(
         // The processes that may hold a copy, with their parent and group:
         // all of them, or only those created since the reach's mark.
         let (tree, candidates) = match reach {
-            Reach::Everyone => (Tree::read(), None),
             Reach::Since(mark) => match fgos_process::facts::created_since(&mark) {
                 Some(created) => {
                     let tree = Tree::of(created);
@@ -498,7 +494,9 @@ pub(crate) fn drain_description(
         }
         for tuple in holders {
             let pid = tuple.pid.0;
-            if child_pid.is_some_and(|root| in_borrow_domain(pid, root))
+            if protected_roots.iter().any(|root| in_borrow_domain(pid, *root)) {
+                foreign.push(pid);
+            } else if child_pid.is_some_and(|root| in_borrow_domain(pid, root))
                 || (child_pid.is_some()
                     && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner || has_borrowed_copy(dev, ino, pid)))
             {
@@ -515,7 +513,7 @@ pub(crate) fn drain_description(
         let mut live = Vec::new();
         for pid in domain.into_iter().filter(|pid| Some(*pid) != child_pid) {
             // Re-check membership immediately before pinning and signalling.
-            if (child_pid.is_some_and(|root| in_borrow_domain(pid, root))
+            if !protected_roots.iter().any(|root| in_borrow_domain(pid, *root)) && (child_pid.is_some_and(|root| in_borrow_domain(pid, root))
                 || (child_pid.is_some() && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner || has_borrowed_copy(dev, ino, pid))))
                 && cleanup.signal(pid)
             { live.push(pid); }

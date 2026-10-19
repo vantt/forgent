@@ -53,6 +53,18 @@ impl GitDriver {
         }
         let scope = scope(repo, held)?;
         let wal = Wal::open(repo).map_err(failure)?;
+        if let Some(compact) = wal.compacted(id).map_err(failure)? {
+            let kind = OperationKind::Sync(Box::new(wal::SyncIntent {
+                worktree: root(repo)?.to_string_lossy().into(),
+                head: compact.expected.clone(),
+                target: target.as_str().into(),
+                message: message.into(),
+            }));
+            if compact.request != wal::canonical_digest(&(&kind, writer)).map_err(failure)? {
+                return Err(failure("operation-id-reused"));
+            }
+            return self.continue_sync_scoped(repo, &scope, &wal, writer, id, false);
+        }
         if wal.known_id(id).map_err(failure)? {
             let previous = wal.inspect(id).map_err(failure)?;
             match &previous.intent().kind {
@@ -62,6 +74,7 @@ impl GitDriver {
             }
             return self.continue_sync_scoped(repo, &scope, &wal, writer, id, false);
         }
+        self.admit_checkout(repo, &scope, &wal, id)?;
         if self.merge_head(repo, &scope)?.is_some() {
             return Err(failure("foreign-merge-head"));
         }
@@ -113,8 +126,23 @@ impl GitDriver {
             Begin::Created(c) => c,
             _ => return Err(recovery("sync-recovery-required")),
         };
-        crate::refs::install_pin(self, repo, handle(&scope, repo)?, id, target)?;
-        let chain = wal.append(&chain, Phase::Prepared).map_err(failure)?;
+        let preparation = (|| {
+            crate::refs::install_pin(self, repo, handle(&scope, repo)?, id, target)?;
+            wal.append(&chain, Phase::Prepared).map_err(failure)
+        })();
+        let chain = match preparation {
+            Ok(chain) => chain,
+            Err(error) => {
+                let pending = wal.inspect(id).map_err(failure)?;
+                if matches!(pending.last().phase, Phase::Intent(_) | Phase::Prepared) {
+                    let terminal = wal
+                        .append(&pending, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
+                        .map_err(failure)?;
+                    self.compact_checkout(repo, &scope, &wal, &terminal)?;
+                }
+                return Err(error);
+            }
+        };
         let chain = wal
             .append(
                 &chain,
@@ -151,7 +179,7 @@ impl GitDriver {
                     }),
                 )
                 .map_err(failure)?;
-            crate::refs::release_pin(self, repo, handle(&scope, repo)?, &wal, &terminal)?;
+            self.compact_checkout(repo, &scope, &wal, &terminal)?;
             return Err(out.error("merge-refused"));
         }
         // Store paths stay on the producer's HEAD, never in a resolver grant.
@@ -271,6 +299,67 @@ impl GitDriver {
         id: &str,
         finish: bool,
     ) -> Result<SyncResult> {
+        if let Some(compact) = wal.compacted(id).map_err(failure)? {
+            let intent = Intent {
+                kind: OperationKind::Sync(Box::new(wal::SyncIntent {
+                    worktree: root(repo)?.to_string_lossy().into(),
+                    head: compact.expected.clone(),
+                    target: compact.next.clone(),
+                    message: String::new(),
+                })),
+                request_digest: compact.request.clone(),
+                repo_identity: wal.repository_identity().into(),
+                resource_set: vec![format!("worktree:{}", root(repo)?.display())],
+                authority_binding: binding(handle(scope, repo)?)?,
+                writer_identity: writer.into(),
+                object_format: repo.object_format(),
+                expected: Tip::Oid(compact.expected.clone()),
+                next: Tip::Oid(compact.next.clone()),
+            };
+            if !compact.matches(&intent).map_err(failure)? {
+                return Err(failure("sync-authority-mismatch"));
+            }
+            let commit = match compact.outcome().map_err(failure)? {
+                Outcome::Commit {
+                    observed,
+                    contract_violation,
+                } => Some(CommitResult {
+                    status: if contract_violation {
+                        ResultCode::CommittedButContractViolation
+                    } else {
+                        ResultCode::Committed
+                    },
+                    files: paths(&self.checkout_bytes(
+                        repo,
+                        scope,
+                        &[
+                            "diff",
+                            "--name-only",
+                            "--no-renames",
+                            "-z",
+                            &compact.expected,
+                            &observed,
+                        ],
+                    )?)?,
+                    oid: Some(Oid::parse(&observed, repo.object_format()).map_err(failure)?),
+                    operation_id: id.into(),
+                    pre_existing_in_scope: vec![],
+                }),
+                _ => None,
+            };
+            return Ok(info(
+                id,
+                &compact.expected,
+                &compact.next,
+                if commit.is_some() {
+                    "done"
+                } else {
+                    "not-started"
+                },
+                vec![],
+                commit,
+            ));
+        }
         let chain = wal.inspect(id).map_err(failure)?;
         let OperationKind::Sync(payload) = &chain.intent().kind else {
             return Err(failure("not-sync-operation"));
@@ -307,10 +396,13 @@ impl GitDriver {
                         ResultCode::Committed
                     },
                     oid: Some(Oid::parse(observed, repo.object_format()).map_err(failure)?),
-                    files: paths(&self.checkout_bytes(repo, scope, &[
-                        "diff", "--name-only", "--no-renames", "-z", head, observed,
-                    ])?)?,
+                    files: paths(&self.checkout_bytes(
+                        repo,
+                        scope,
+                        &["diff", "--name-only", "--no-renames", "-z", head, observed],
+                    )?)?,
                     operation_id: id.into(),
+                    pre_existing_in_scope: vec![],
                 }),
             ));
         }
@@ -318,16 +410,95 @@ impl GitDriver {
             if merge.is_some() {
                 // A rejected commit can leave our merge open. A terminal
                 // refusal is not evidence that no checkout effect remains.
+                if let Some(Outcome::CommitRejected { cause }) = chain.outcome() {
+                    if (cause == "hook-rejected" || cause == "sync-commit-effect-unknown")
+                        && merge.as_ref() == Some(target)
+                        && &now == head
+                    {
+                        let conflicts = chain
+                            .records()
+                            .iter()
+                            .find_map(|r| match &r.phase {
+                                Phase::SyncState { conflicts, .. } => Some(conflicts.clone()),
+                                _ => None,
+                            })
+                            .unwrap_or_default();
+                        return Ok(info(id, head, target, "rejected-open", conflicts, None));
+                    }
+                }
                 return Err(recovery("sync-rejected-merge-recovery-required"));
             }
             return Ok(info(id, head, target, "not-started", vec![], None));
         }
         // A commit may have moved HEAD and then died before its receipt.
         // Never infer a safe retry from HEAD equality (including ABA).
-        if matches!(chain.last().phase, Phase::SyncCommitAttempt { .. }) {
-            return Err(recovery("sync-commit-attempt-recovery-required"));
+        if let Phase::SyncCommitAttempt { tree } = &chain.last().phase {
+            fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
+            match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+                _ => return Err(recovery("sync-index-lock-present")),
+            }
+            let outcome = if &now == head {
+                Outcome::CommitRejected {
+                    cause: "sync-commit-effect-unknown".into(),
+                }
+            } else {
+                let parents =
+                    self.checkout_text(repo, scope, &["rev-list", "--parents", "-n", "1", &now])?;
+                if parents.split_whitespace().skip(1).collect::<Vec<_>>()
+                    != vec![head.as_str(), target.as_str()]
+                    || self.checkout_text(
+                        repo,
+                        scope,
+                        &["rev-parse", &format!("{now}^{{tree}}")],
+                    )? != *tree
+                {
+                    return Err(recovery("sync-commit-attempt-recovery-required"));
+                }
+                let reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
+                crate::refs::sync_refs(repo, &RefName::parse(&reference).map_err(failure)?)?;
+                Outcome::Commit {
+                    observed: now.clone(),
+                    contract_violation: false,
+                }
+            };
+            let terminal = wal
+                .append(&chain, Phase::Outcome(outcome))
+                .map_err(failure)?;
+            if merge.is_none() {
+                self.compact_checkout(repo, scope, wal, &terminal)?;
+            }
+            return self.continue_sync_scoped(repo, scope, wal, writer, id, false);
         }
         if merge.is_none() {
+            fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
+            if matches!(chain.last().phase, Phase::TargetAttempt { .. })
+                && &now == head
+                && self.staged(repo, scope)?.is_empty()
+                && self.unmerged(repo, scope)?.is_empty()
+            {
+                match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+                    _ => return Err(recovery("sync-index-lock-present")),
+                }
+                let terminal = wal
+                    .append(
+                        &chain,
+                        Phase::Outcome(Outcome::CommitRejected {
+                            cause: "merge-effect-unknown".into(),
+                        }),
+                    )
+                    .map_err(failure)?;
+                self.compact_checkout(repo, scope, wal, &terminal)?;
+                return Ok(info(id, head, target, "not-started", vec![], None));
+            }
+            if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
+                let terminal = wal
+                    .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
+                    .map_err(failure)?;
+                self.compact_checkout(repo, scope, wal, &terminal)?;
+                return Ok(info(id, head, target, "not-started", vec![], None));
+            }
             if self.ancestry(
                 repo,
                 &Oid::parse(target, repo.object_format()).map_err(failure)?,
@@ -349,6 +520,16 @@ impl GitDriver {
         }
         let conflicts = match &chain.last().phase {
             Phase::SyncState { conflicts, .. } => conflicts.clone(),
+            Phase::TargetAttempt { .. } if !finish => {
+                return Ok(info(
+                    id,
+                    head,
+                    target,
+                    "in-progress",
+                    self.unmerged(repo, scope)?,
+                    None,
+                ))
+            }
             _ => return Err(recovery("sync-state-recovery-required")),
         };
         if finish {
@@ -418,7 +599,9 @@ impl GitDriver {
             return Err(failure("staged-set-mismatch"));
         }
         let tree = self.checkout_text(repo, scope, &["write-tree"])?;
-        let attempted = wal.append(chain, Phase::SyncCommitAttempt { tree: tree.clone() }).map_err(failure)?;
+        let attempted = wal
+            .append(chain, Phase::SyncCommitAttempt { tree: tree.clone() })
+            .map_err(failure)?;
         let out = self.checkout_call(
             repo,
             scope,
@@ -437,8 +620,13 @@ impl GitDriver {
         let observed = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
         if &observed == head {
             if !out.success {
-                // Keep the attempted chain and target pin while the merge is
-                // open; a hook refusal does not erase its checkout effects.
+                wal.append(
+                    &attempted,
+                    Phase::Outcome(Outcome::CommitRejected {
+                        cause: "hook-rejected".into(),
+                    }),
+                )
+                .map_err(failure)?;
                 return Err(out.error("hook-rejected"));
             }
             return Err(recovery("sync-commit-effect-unknown"));
@@ -466,7 +654,7 @@ impl GitDriver {
                 }),
             )
             .map_err(failure)?;
-        crate::refs::release_pin(self, repo, handle(scope, repo)?, wal, &terminal)?;
+        self.compact_checkout(repo, scope, wal, &terminal)?;
         Ok(info(
             &chain.last().operation_id,
             head,
@@ -482,6 +670,7 @@ impl GitDriver {
                 oid: Some(Oid::parse(&observed, repo.object_format()).map_err(failure)?),
                 files,
                 operation_id: chain.last().operation_id.clone(),
+                pre_existing_in_scope: vec![],
             }),
         ))
     }
@@ -498,7 +687,7 @@ impl GitDriver {
         if state.state == "done" || state.state == "not-started" {
             return Ok(state);
         }
-        if state.state != "in-progress" {
+        if state.state != "in-progress" && state.state != "rejected-open" {
             return Err(failure("sync-merge-lost"));
         }
         let chain = wal.inspect(id).map_err(failure)?;
@@ -532,10 +721,13 @@ impl GitDriver {
         owned.extend(self.unmerged(repo, scope)?);
         owned.sort();
         owned.dedup();
-        if let Phase::SyncState {
-            conflicts, staged, ..
-        } = &chain.last().phase
-        {
+        let recorded = chain.records().iter().find_map(|r| match &r.phase {
+            Phase::SyncState {
+                conflicts, staged, ..
+            } => Some((conflicts, staged)),
+            _ => None,
+        });
+        if let Some((conflicts, staged)) = recorded {
             if owned
                 .iter()
                 .any(|p| !conflicts.contains(p) && !staged.contains(p))
@@ -543,18 +735,34 @@ impl GitDriver {
                 return Err(failure("foreign-staged-index"));
             }
         }
-        // Reset only index entries. Worktree bytes, including resolver edits, survive.
-        self.stage_paths(repo, scope, &["reset", "-q"], &owned)?;
+        // Preserve resolver bytes only on recorded conflict paths. All clean
+        // merge paths came from the target; Git refused to overwrite local dirt.
+        let conflicts = recorded.map(|(c, _)| c.clone()).unwrap_or_default();
+        let clean: Vec<_> = owned
+            .iter()
+            .filter(|p| !conflicts.contains(p))
+            .cloned()
+            .collect();
+        self.stage_paths(
+            repo,
+            scope,
+            &["restore", "--source=HEAD", "--staged", "--worktree"],
+            &clean,
+        )?;
+        self.stage_paths(repo, scope, &["reset", "-q", "HEAD"], &conflicts)?;
         self.checkout_bytes(repo, scope, &["merge", "--quit"])?;
-        let terminal = wal
-            .append(
+        let terminal = if chain.outcome().is_some() {
+            chain.clone()
+        } else {
+            wal.append(
                 chain,
                 Phase::Outcome(Outcome::CommitRejected {
                     cause: "conflict-aborted".into(),
                 }),
             )
-            .map_err(failure)?;
-        crate::refs::release_pin(self, repo, handle(scope, repo)?, wal, &terminal)
+            .map_err(failure)?
+        };
+        self.compact_checkout(repo, scope, wal, &terminal)
     }
 }
 pub fn has_conflict_markers(bytes: &[u8]) -> bool {

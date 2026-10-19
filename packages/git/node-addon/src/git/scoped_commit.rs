@@ -48,6 +48,10 @@ impl GitScopedCommit {
                 .driver
                 .preflight_commit(&self.repo, held)
                 .map_err(operation)?)),
+            "recover" => Ok(json!(self
+                .driver
+                .recover_scoped_commit(&self.repo, held, &self.writer, text(&args, "operationId")?)
+                .map_err(operation)?)),
             "commit" => {
                 let baseline: CommitBaseline =
                     serde_json::from_value(args["baseline"].clone()).map_err(error)?;

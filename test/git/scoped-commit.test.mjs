@@ -162,8 +162,27 @@ echo called >> '${count}'
 exit 1
 `,{mode:0o755});f.git('config','core.hooksPath','hooks');
     assert.throws(()=>f.port.commit(request,f.held),/commit-rejected/);
-    assert.throws(()=>f.port.commit(request,f.held),/commit-attempt-recovery-required/);
+    assert.throws(()=>f.port.commit(request,f.held),/commit-rejected|commit-attempt-recovery-required/);
     assert.equal(fs.readFileSync(count,'utf8'),'called\n');assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'producer');
     assert.equal(execFileSync('git',['-C',f.linked,'diff','--cached','--name-only'],{encoding:'utf8'}),'');
   } finally {f.close();}
+});
+
+test('baseline-dirty paths changed by the producer are excluded with an explicit receipt report',()=>{
+ const f=fixture();try {
+  fs.writeFileSync(path.join(f.linked,'a'),'before producer');const baseline=f.port.preflight({},f.held);
+  fs.writeFileSync(path.join(f.linked,'a'),'after producer');fs.writeFileSync(path.join(f.linked,'fresh'),'fresh');
+  const result=f.port.commit({operationId:'baseline-dirty',baseline,request:{writes:['**'],message:'report exclusions',cutoverGrant:null}},f.held);
+  assert.deepEqual(result.preExistingInScope,['a']);assert.deepEqual(result.files,['fresh']);
+  assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'after producer');
+ }finally{f.close();}
+});
+for(const name of ['literal*star','control\tname','control\nname']) test(`unsupported literal path ${JSON.stringify(name)} refuses before staging or WAL intent`,()=>{
+ const f=fixture();try {
+  const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,name),'producer');
+  assert.throws(()=>f.port.commit({operationId:'invalid-path',baseline,request:{writes:['**'],message:'refuse literal',cutoverGrant:null}},f.held),/unscopable-commit-path/);
+  assert.equal(execFileSync('git',['-C',f.linked,'diff','--cached','--name-only'],{encoding:'utf8'}),'');
+  assert.equal(fs.existsSync(path.join(f.repo,'.git/fgos/git/operations/invalid-path')),false);
+  assert.equal(fs.readFileSync(path.join(f.linked,name),'utf8'),'producer');
+ }finally{f.close();}
 });

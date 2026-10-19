@@ -14,11 +14,8 @@ impl GitDriver {
     ) -> Result<()> {
         #[cfg(unix)]
         {
-            use std::os::{
-                fd::{AsFd, BorrowedFd},
-                unix::fs::MetadataExt,
-            };
-            // Duplicate, then seal the inherited description before any subprocess.
+            use std::os::{fd::BorrowedFd, unix::fs::MetadataExt};
+            // The host route seals slot 3 before entering this check; duplicate it for validation.
             let inherited = unsafe { BorrowedFd::borrow_raw(3) };
             let owned = inherited.try_clone_to_owned().map_err(failure)?;
             let file = fs::File::from(owned);
@@ -31,15 +28,15 @@ impl GitDriver {
             {
                 return Err(failure("cutover-main-borrow-required"));
             }
-            // The original slot is not owned here and must remain available to the hook.
-            let _ = file.as_fd();
             if repo.work_tree.as_deref() != Some(repo.trusted_main_root()) {
                 return Err(failure("cutover-main-required"));
             }
-            let chain = wal::Wal::open_existing(repo.common_dir(), wal::OsFileSystem)
-                .map_err(failure)?
-                .inspect(operation_id)
-                .map_err(failure)?;
+            let journal =
+                wal::Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
+            if journal.compacted(operation_id).map_err(failure)?.is_some() {
+                return Err(failure("cutover-grant-spent-or-unprepared"));
+            }
+            let chain = journal.inspect(operation_id).map_err(failure)?;
             let OperationKind::ScopedCommit(payload) = &chain.intent().kind else {
                 return Err(failure("cutover-grant-missing"));
             };
@@ -68,7 +65,7 @@ impl GitDriver {
                         .ok_or_else(|| failure("hook-index-untrusted"))?,
                 )
                 .map_err(failure)?
-                    != repo.git_dir
+                    != fs::canonicalize(&repo.git_dir).map_err(failure)?
             {
                 return Err(failure("hook-index-untrusted"));
             }
