@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Restore declared producer bytes, modes and move paths after rejecting ScopedCommit hooks; drain adopted setsid lock borrowers without harming unrelated pre-exec children.
+
 - Preserve acquisition reach provenance in native holder-lock handover and emit Git WAL addon capabilities from the shared release/dev/test producer. Prevent uncertain Sync commit retries after a controller crash and preserve actual hook-modified file sets on receipt replay. Phase 05 remains unreleased pending its remaining acceptance proofs.
 
 - Add dormant native ScopedCommit, Sync and non-event Checkpoint ports, a Rust write-scope leaf, and an activated-host cutover grant check. Linux-x64 activation refuses a missing addon or missing `git-wal-v1` addon capability. Production adapter migration remains phase 07.

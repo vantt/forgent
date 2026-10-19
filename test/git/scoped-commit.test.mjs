@@ -76,14 +76,14 @@ test('ScopedCommit refuses a changed baseline and a foreign merge without stagin
     assert.equal(execFileSync('git',['-C',f.linked,'diff','--cached','--name-only'],{encoding:'utf8'}),'');
   } finally {f.close();}
 });
-for (const main of [false,true]) test(`ScopedCommit ${main?'main 50':'custody 30'} refuses executable filter config and drains hook background children with gc enabled`,{skip:process.platform!=='linux'},()=>{
+for (const escaped of [false,true]) for (const main of [false,true]) test(`ScopedCommit ${escaped?'setsid ':''}${main?'main 50':'custody 30'} refuses executable filter config and drains hook background children with gc enabled`,{skip:process.platform!=='linux'},()=>{
   const f=fixture();const pids=[];
   try {
     const repoPath=main?f.repo:f.linked;
     const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);
     const hookPid=path.join(f.temp,'hook.pid'),filterPid=path.join(f.temp,'filter.pid');
     const hookEvidence=path.join(f.temp,'hook-context');
-    const escape=file=>`sleep 30 </dev/null >/dev/null 2>&1 &\necho $! >> '${file}'\n`;
+    const escape=file=>`${escaped?'setsid ':''}sleep 30 </dev/null >/dev/null 2>&1 &\necho $! >> '${file}'\n`;
     fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\n${escape(hookPid)}printf '%s\\n' "$FGOS_LOCK_FD" > '${hookEvidence}'\ngit config --get gc.auto >> '${hookEvidence}'\ngit rev-parse --absolute-git-dir >> '${hookEvidence}'\n`,{mode:0o755});
     f.git('config','core.hooksPath','hooks');f.git('config','gc.auto','1');
     const filter=path.join(f.temp,'clean');fs.writeFileSync(filter,`#!/bin/sh\n${escape(filterPid)}cat\n`,{mode:0o755});
@@ -111,4 +111,59 @@ for (const main of [false,true]) test(`ScopedCommit ${main?'main 50':'custody 30
     for(const file of ['hook.pid','filter.pid'])try{for(const pid of fs.readFileSync(path.join(f.temp,file),'utf8').trim().split('\n').map(Number))try{process.kill(pid,'SIGKILL');}catch{}}catch{}
     f.close();
   }
+});
+
+test('rejecting hook restores a producer move, binary bytes, modes, symlinks and the index',()=>{
+  const f=fixture();try {
+    const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);
+    fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh
+printf resurrected > a
+printf overwritten > moved
+chmod 600 moved
+rm -f link
+printf replaced > link
+printf damaged > clean
+printf hook > extra
+printf damaged > old-dirt
+printf damaged > ignored/base
+printf created > ignored/new
+mkdir -p scope
+printf created > scope/new
+git add a moved link clean extra old-dirt scope
+exit 1
+`,{mode:0o755});f.git('config','core.hooksPath','hooks');
+    fs.writeFileSync(path.join(f.linked,'clean'),'clean');execFileSync('git',['-C',f.linked,'-c','core.hooksPath=/dev/null','add','clean']);execFileSync('git',['-C',f.linked,'-c','core.hooksPath=/dev/null','commit','-qm','clean']);
+    fs.writeFileSync(path.join(f.linked,'old-dirt'),'keep baseline dirt');
+    fs.appendFileSync(path.join(f.repo,'.git/info/exclude'),'\nignored/\n');fs.mkdirSync(path.join(f.linked,'ignored'));fs.writeFileSync(path.join(f.linked,'ignored/base'),'keep ignored bytes');
+    const baseline=f.port.preflight({},f.held),head=execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'});
+    fs.renameSync(path.join(f.linked,'a'),path.join(f.linked,'moved'));
+    const bytes=Buffer.from([0,255,1,10]);fs.writeFileSync(path.join(f.linked,'moved'),bytes);fs.chmodSync(path.join(f.linked,'moved'),0o751);
+    fs.symlinkSync('moved',path.join(f.linked,'link'));
+    assert.throws(()=>f.port.commit({operationId:'move-reject',baseline,request:{writes:['a','moved','link','clean','extra','old-dirt','scope','ignored'],message:'move',cutoverGrant:null}},f.held),/commit-rejected/);
+    assert.equal(fs.existsSync(path.join(f.linked,'a')),false);
+    assert.deepEqual(fs.readFileSync(path.join(f.linked,'moved')),bytes);assert.equal(fs.statSync(path.join(f.linked,'moved')).mode&0o777,0o751);
+    assert.equal(fs.readlinkSync(path.join(f.linked,'link')),'moved');assert.equal(fs.readFileSync(path.join(f.linked,'clean'),'utf8'),'clean');assert.equal(fs.existsSync(path.join(f.linked,'extra')),false);assert.equal(fs.readFileSync(path.join(f.linked,'old-dirt'),'utf8'),'keep baseline dirt');assert.equal(fs.existsSync(path.join(f.linked,'scope')),false);assert.equal(fs.readFileSync(path.join(f.linked,'ignored/base'),'utf8'),'keep ignored bytes');assert.equal(fs.existsSync(path.join(f.linked,'ignored/new')),false);
+    assert.equal(execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}),head);assert.equal(execFileSync('git',['-C',f.linked,'diff','--cached','--name-only'],{encoding:'utf8'}),'');
+  } finally {f.close();}
+});
+
+test('ScopedCommit refuses invalid requests, post-preflight staging and replay of a rejected attempt',()=>{
+  const f=fixture();try {
+    const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
+    const request={operationId:'refusal-cases',baseline,request:{writes:['a'],message:'valid',cutoverGrant:null}};
+    assert.throws(()=>f.port.commit({...request,request:{...request.request,message:''}},f.held),/invalid-commit-message/);
+    execFileSync('git',['-C',f.linked,'add','a']);
+    assert.throws(()=>f.port.commit(request,f.held),/foreign-staged-index/);
+    assert.equal(execFileSync('git',['-C',f.linked,'show',':a'],{encoding:'utf8'}),'producer');
+    execFileSync('git',['-C',f.linked,'reset','-q','HEAD']);
+    const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);
+    const count=path.join(f.temp,'calls');fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh
+echo called >> '${count}'
+exit 1
+`,{mode:0o755});f.git('config','core.hooksPath','hooks');
+    assert.throws(()=>f.port.commit(request,f.held),/commit-rejected/);
+    assert.throws(()=>f.port.commit(request,f.held),/commit-attempt-recovery-required/);
+    assert.equal(fs.readFileSync(count,'utf8'),'called\n');assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'producer');
+    assert.equal(execFileSync('git',['-C',f.linked,'diff','--cached','--name-only'],{encoding:'utf8'}),'');
+  } finally {f.close();}
 });

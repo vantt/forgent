@@ -391,9 +391,18 @@ impl GitDriver {
                             ResultCode::Committed
                         },
                         oid: Some(Oid::parse(observed, repo.object_format()).map_err(failure)?),
-                        files: paths(&self.checkout_bytes(repo, scope, &[
-                            "diff", "--name-only", "--no-renames", "-z", &baseline.head, observed,
-                        ])?)?,
+                        files: paths(&self.checkout_bytes(
+                            repo,
+                            scope,
+                            &[
+                                "diff",
+                                "--name-only",
+                                "--no-renames",
+                                "-z",
+                                &baseline.head,
+                                observed,
+                            ],
+                        )?)?,
                         operation_id: id.into(),
                     });
                 }
@@ -488,12 +497,50 @@ impl GitDriver {
                 operation_id: id.into(),
             });
         }
-        if let Err(error) = self.stage_paths(repo, scope, &["add", "-A"], &selected) {
-            self.stage_paths(repo, scope, &["reset", "-q"], &selected)
-                .map_err(|_| recovery("commit-unstage-recovery-required"))?;
-            return Err(error);
+        // Snapshot the producer state immediately before staging, including clean
+        // declared files and baseline dirt. A rejecting hook must not own bytes.
+        let checkout = root(repo)?;
+        let mut saved_paths = BTreeSet::new();
+        for p in self
+            .dirty_paths(repo, scope)?
+            .into_iter()
+            .chain(paths(&self.checkout_bytes(
+                repo,
+                scope,
+                &["ls-files", "-z"],
+            )?)?)
+            .chain(paths(&self.checkout_bytes(
+                repo,
+                scope,
+                &[
+                    "ls-files",
+                    "--others",
+                    "--ignored",
+                    "--exclude-standard",
+                    "-z",
+                ],
+            )?)?)
+        {
+            if fgos_write_scope::matches(p.as_bytes(), &writes).map_err(failure)? {
+                saved_paths.insert(p);
+            }
         }
+        saved_paths.extend(selected.iter().cloned());
+        saved_paths.extend(
+            writes
+                .iter()
+                .filter(|p| !p.contains('*') && !checkout.join(p).is_dir())
+                .cloned(),
+        );
+        let snapshot = saved_paths
+            .into_iter()
+            .map(|p| {
+                let saved = SavedPath::capture(&root(repo)?.join(&p))?;
+                Ok((p, saved))
+            })
+            .collect::<Result<BTreeMap<_, _>>>()?;
         let prepared = (|| {
+            self.stage_paths(repo, scope, &["add", "-A"], &selected)?;
             if self.staged(repo, scope)? != selected {
                 return Err(failure("staged-set-mismatch"));
             }
@@ -624,8 +671,35 @@ impl GitDriver {
                 .checkout_text(repo, scope, &["rev-parse", "HEAD"])
                 .is_ok_and(|h| h == baseline.head)
         {
-            self.stage_paths(repo, scope, &["reset", "-q"], &selected)
+            self.checkout_bytes(repo, scope, &["reset", "-q", "HEAD"])
                 .map_err(|_| recovery("commit-unstage-recovery-required"))?;
+            // A hook may create another declared file that was absent from the
+            // pre-commit inventory. Restore absence as well as content/mode.
+            let mut restore = snapshot;
+            for p in
+                self.dirty_paths(repo, scope)?
+                    .into_iter()
+                    .chain(paths(&self.checkout_bytes(
+                        repo,
+                        scope,
+                        &[
+                            "ls-files",
+                            "--others",
+                            "--ignored",
+                            "--exclude-standard",
+                            "-z",
+                        ],
+                    )?)?)
+            {
+                if fgos_write_scope::matches(p.as_bytes(), &writes).map_err(failure)? {
+                    restore.entry(p).or_insert(SavedPath::Absent);
+                }
+            }
+            for (p, saved) in &restore {
+                saved
+                    .restore(&root(repo)?.join(p))
+                    .map_err(|_| recovery("commit-worktree-restore-required"))?;
+            }
         }
         prepared
     }
@@ -715,5 +789,82 @@ fn content_digest(root: &Path, path: &str) -> Result<String> {
         Ok(_) => Ok("non-regular".into()),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok("absent".into()),
         Err(e) => Err(failure(e)),
+    }
+}
+
+// Transaction-local snapshot: uncertain/crashed attempts retain their WAL and
+// refuse replay; only an observed rejection with unchanged HEAD restores bytes.
+enum SavedPath {
+    Absent,
+    File(Vec<u8>, fs::Permissions),
+    Link(std::path::PathBuf),
+}
+impl SavedPath {
+    fn capture(path: &Path) -> Result<Self> {
+        match fs::symlink_metadata(path) {
+            Ok(m) if m.file_type().is_symlink() => {
+                Ok(Self::Link(fs::read_link(path).map_err(failure)?))
+            }
+            Ok(m) if m.is_file() => Ok(Self::File(
+                fs::read(path).map_err(failure)?,
+                m.permissions(),
+            )),
+            Ok(_) => Err(failure("commit-snapshot-non-file")),
+            Err(e)
+                if matches!(
+                    e.kind(),
+                    std::io::ErrorKind::NotFound | std::io::ErrorKind::NotADirectory
+                ) =>
+            {
+                Ok(Self::Absent)
+            }
+            Err(e) => Err(failure(e)),
+        }
+    }
+    fn restore(&self, path: &Path) -> std::io::Result<()> {
+        // Do not follow a hook-created parent symlink outside the checkout.
+        for parent in path.ancestors().skip(1) {
+            if fs::symlink_metadata(parent).is_ok_and(|m| m.file_type().is_symlink()) {
+                return Err(std::io::Error::other("snapshot parent became a symlink"));
+            }
+        }
+        match fs::remove_file(path) {
+            Ok(()) => (),
+            Err(e)
+                if matches!(
+                    e.kind(),
+                    std::io::ErrorKind::NotFound | std::io::ErrorKind::NotADirectory
+                ) => {}
+            // This path was absent or a file/link in the snapshot, so a
+            // directory here was introduced by the hook, never producer data.
+            Err(_) if fs::symlink_metadata(path).is_ok_and(|m| m.is_dir()) => {
+                fs::remove_dir_all(path)?;
+            }
+            Err(e) => return Err(e),
+        }
+        match self {
+            Self::Absent => Ok(()),
+            Self::File(bytes, mode) => {
+                if let Some(parent) = path.parent() {
+                    fs::create_dir_all(parent)?;
+                }
+                fs::write(path, bytes)?;
+                fs::set_permissions(path, mode.clone())
+            }
+            Self::Link(target) => {
+                if let Some(parent) = path.parent() {
+                    fs::create_dir_all(parent)?;
+                }
+                #[cfg(unix)]
+                {
+                    std::os::unix::fs::symlink(target, path)
+                }
+                #[cfg(not(unix))]
+                {
+                    let _ = target;
+                    Err(std::io::Error::other("snapshot symlink unsupported"))
+                }
+            }
+        }
     }
 }
