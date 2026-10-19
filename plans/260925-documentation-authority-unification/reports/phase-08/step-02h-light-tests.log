@@ -1,0 +1,28 @@
+✔ never repoints a source relationship or a link to its own file (2.554594ms)
+✔ source column header protects subsequent table rows (0.267642ms)
+✔ chooses a restored same-named candidate before a portal (0.298365ms)
+✔ chooses the unique per-anchor target when no same-named candidate exists (0.146536ms)
+✔ restores and classifies a portal alias with no specific target (0.163764ms)
+✔ wrapped labels are repointed and labels preserved (0.158956ms)
+✔ fences and historical referents are retained (0.143498ms)
+✔ anchored destinations preserve the explicit alias anchor (0.129257ms)
+✔ ambiguous specific targets fail closed (0.106557ms)
+✔ uses the source heading alias for a split document without guessing among sections (0.176017ms)
+✔ a canonical data cell does not protect unrelated following table rows (0.337937ms)
+✔ restored same-named document takes precedence over an archived heading alias (0.168006ms)
+✔ all source relationship row labels retain legacy destinations and verbatim labels (0.245585ms)
+✔ Source and Legacy source columns protect only their own cells (1.120373ms)
+✔ canonical in narrative text is not a source relationship label (0.132733ms)
+✔ a labelled source relationship inside any cell protects that cell alone (0.2066ms)
+✔ a source relationship link label inside any cell stays verbatim (0.087273ms)
+✔ a source-column link label does not turn preservation targets into source relationships (0.123327ms)
+✔ prose destinations and bare legacy names do not protect candidate links (0.118741ms)
+✔ relationship labels protect their own link, not other links in the same cell (0.112038ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 60.742013

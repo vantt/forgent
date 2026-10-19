@@ -1,3 +1,74 @@
+# Step 2h author checkpoint — final parser fixes and full A50 review packet
+
+State: **L12-24 author regeneration complete; full A50 independent review pending;
+class 3 / Step 2 OPEN.** Input commit `f5033e20ad6d6be137217f0a8c17c35b3dd7e8f1`. L12-24 already accepts
+the third pilot (3/360, 0.8%); this author result is not independent acceptance.
+
+**Supersession:** the entire **99-part step-02g request is SUPERSEDED** by the ONE
+[step-02h mapping request](step-02h-mapping-review-request.md), now **105 logical parts**.
+Earlier scripts/tables/requests and all independent pilot reviews stay unchanged as
+evidence. The older narrative below is preserved verbatim and is historical.
+
+- **Class 3:** 5,436 → **5,434 edges / 1,036 committed-tree files**;
+  1,322 → **1,322 distinct mappings**. The two removed hits are configuration `../static`
+  and inline code example `./x`; both retain pinned exclusion controls. All original
+  02c row dispositions, 59 external URLs and 197 chronological overlay controls remain.
+  Actions: **1,588 cutover-patch-only / 3,150 preserve / 454 pending-target /
+  163 pending-behavioral-proof / 79 whole-row flips**. These are specifications only.
+- **L12-24 before → after:** line-locator loss **17→0** (four uniquely anchored,
+  thirteen parked); bare legacy-tree substitution **15→0**; implicit History-body
+  boundary **13→0**; code/config/inline false positives **2→0**; retained UI-spec
+  identity/action **40→0**; exact same-path file owner **49→0** (includes the pilot's
+  28 executable portal substitutions); missing read-word-boundary mutation coverage
+  **1→0**. The complete [per-defect diff](step-02h-defect-diff.md) includes every
+  L12-21/22/23 class against 02g and the older baselines; all after counts are zero.
+  The 13 History flags end at the next heading, and ordinary fences cannot restart
+  them; explicit declared snapshot regions retain their boundaries. Line locators
+  use the unchanged anchor API over committed source/target text, never a bare-path
+  fallback. Block writers, migration precedence, slash/placeholder topology, brace
+  lists, code-import exclusions, history/provenance, retired checkpoints and exact
+  Observe spec are retained and probed.
+- **A50 full review:** **105 parts / 5,628 entries**, maximum **397,442 bytes**;
+  every part ≤60 entries/400,000 bytes including resolved metadata/rows.
+  **816 seeded semantic edges**, every distinct mapping and every exception/variant
+  are mandatory. Unique reports `review-a38-step-02h-map-part-NN.md`; none authored
+  here. Lead dispatches full review in waves of two parts per reviewer, with one
+  independent all-edge replay. Started/accepted/independent elapsed: **0/0/0**;
+  budgets remain Lead-owned. >3% expansion and sample-breach rules remain.
+- **Mandatory continuity:** former pilot **03 → parts 96–98**, **26 → part 99**;
+  former second-pilot **30/47/65 → 100/101/102**. All **74 changed-action rows →
+  parts 104–105**; both excluded 02g hits → **part 103**. Crosswalks rebuild physical
+  joins and mapping parts; no former source edge disappears when reclassified.
+- **Phase 9 baseline:** **163 missing literal link destinations** are explicitly
+  listed with source digests/spans and per-link carriage/external/inherited-failure
+  disposition in review-data and a mandatory deep-read set. **Verbatim carriage is
+  excluded from the Phase 9 link check**, preserving links without aliases; the
+  inherited 21 broken carriage links remain named evidence. No checker was changed.
+- **Author proof:** full default-HEAD read-only replay **PASS**, failure count zero;
+  **113 differential probes (44 added)** reject old behavior and pass the successor,
+  plus separate invariant guards, nine syntax probes and eight rejected mutation
+  probes including downstream stale overlay/corrected-row hashes. Link tests **20/20**,
+  zero failures/skips; ratchet **995 clean / 26 accounted edits / one accounted new**.
+  The final verification receipt records the external-cwd replay and output comparison,
+  hashes, exact commands and scope checks. Runner-committed-byte acceptance is pending.
+
+**Boundary / blockers:** class 4 **NOT STARTED**; this batch stops at the class-3
+boundary. Full independent review, exact semantic targets, native/current-coordinate
+non-joins, dynamic/adoption traces, Step 5 generator/IO parity and installed-package
+reachability remain open. All 104 earlier target-failure dispositions, 21 anchor
+failures and nine native dynamic controls remain mandatory. No additional write scope
+is needed. No source/consumer/code/docs/gate/test/baseline/skill/switchboard edit,
+Git write, fgOS CLI, state/secret/global read or service startup occurred. Scratch is
+only `/tmp/fgos-work/`; both Phase 6 reproduction manifests remain unchanged. No
+full-suite, independent approval, authority flip, Phase 9 readiness or gate waiver is
+claimed. MDView is unavailable in the tool surface; open the request from disk.
+
+**Next:** runner commits; Lead separately accounts real commit/path pairs under
+L12-11, runs clean committed-byte checks, then starts the full A50 review under
+L12-24. No guessed commit or Doer-started reviewer.
+
+## Earlier author checkpoints (preserved verbatim)
+
 # Step 2g author checkpoint — committed-tree parser and third A50 packet
 
 State: **L12-23 author regeneration complete; third independent pilot pending; class 3 / Step 2 OPEN.** Input commit `bcbef05c15c0cedd6612cc178808b5b2efedc06f`. Runner owns the commit; author proof is not A38 independent acceptance.
