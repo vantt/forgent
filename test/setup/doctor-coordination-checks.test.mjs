@@ -1,3 +1,4 @@
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert';
 import path from 'node:path';

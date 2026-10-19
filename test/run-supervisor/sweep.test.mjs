@@ -1,6 +1,7 @@
 // The sweep door: adopt is the only judge of an attempt directory, and only its finalize-home step removes a
 // private home, while the attempt's lock is free and its process domain is empty. Real directories and a real
 // host binary (FGOS_HOST_BIN built from this checkout).
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

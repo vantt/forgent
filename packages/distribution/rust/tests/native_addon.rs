@@ -17,6 +17,7 @@ fn fixture() -> (std::path::PathBuf, ReleaseManifest) {
         serde_json::from_str(include_str!("goldens/release-manifest-minimal.json")).unwrap();
     let digest = format!("{:x}", Sha256::digest(b"addon bytes"));
     manifest.components.native_addon = Some(NativeAddonComponent {
+        capabilities: vec!["git-wal-v1".into()],
         path: "native/fgos.node".into(),
         digest: digest.clone(),
         target: "linux-x64".into(),

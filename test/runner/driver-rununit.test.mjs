@@ -1,6 +1,7 @@
 // test/runner/driver-rununit.test.mjs — A Work driver step runs as a Unit through runUnit, and the
 // next driver pass finds its verdict on disk by itself (no lastRunResult handed over).
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

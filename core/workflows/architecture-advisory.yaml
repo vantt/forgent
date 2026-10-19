@@ -5,6 +5,17 @@ id: architecture-advisory
 title: Architecture Advisory Panel Workflow
 description: Multi-perspective architecture advisory workflow with framing, 3-panelist shaping, critique, synthesis, and explanation.
 
+# --- Guide head: what the playbook promises, beside the steps below (the steps are unchanged) ---
+kind: playbook
+purpose: Frame the question, collect blind competing proposals, critique them, then recommend and explain, closed by the owner.
+must:
+  - id: independent-proposals
+    guard: independence-blind
+    subject: shaping.settled
+    reason: a seat that has read another seat's output is no longer an independent lens
+frameDefaults: { dispatches: 5, mutatingDispatches: 0, fallbackPerSeat: 2, deviationsBeforeAsk: 0, rigorFloor: standard }
+closure: [close.settled]
+
 steps:
   - id: framing
     title: Intake and Framing

@@ -4,6 +4,7 @@
 // feeds it: the attempt settles as `provider-limit`, the next candidate runs as its own attempt in its own
 // pane, and the mutating gate still commits the fallback's work. A real host, the real door, and a fake
 // herdr whose pane screens are scripted per started command.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

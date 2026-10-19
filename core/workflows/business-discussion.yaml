@@ -2,6 +2,21 @@
 
 id: business-discussion
 title: Business strategic deliberation and analysis workflow
+# --- Guide head: what the playbook promises, beside the steps below (the steps are unchanged) ---
+kind: playbook
+purpose: Frame a business problem, explore blind perspectives, challenge assumptions, synthesize a strategy, and plan only after the owner approves.
+must:
+  - id: independent-perspectives
+    guard: independence-blind
+    subject: perspectives.settled
+    reason: a seat that has read another seat's output is no longer an independent lens
+  - id: owner-approves-strategy
+    guard: human-consent
+    subject: approval.settled
+    reason: the roadmap is built on the strategy the owner approved, not on a draft
+frameDefaults: { dispatches: 5, mutatingDispatches: 0, fallbackPerSeat: 2, deviationsBeforeAsk: 0, rigorFloor: standard }
+closure: [action-plan.settled]
+
 steps:
   - id: framing
     title: Problem Framing & Context

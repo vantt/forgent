@@ -3,6 +3,7 @@
 // the next process within the five second wait, and a live holder never is.
 // The judge reads the holder's creation time through the host's process facts.
 // Needs win32.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';

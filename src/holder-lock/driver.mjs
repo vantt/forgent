@@ -216,6 +216,9 @@ export function guaranteeFor(lockPath, { fgosDir } = {}) {
   if (line.result !== 'guarantee' || !line.guarantee || typeof line.guarantee !== 'object') {
     throw new HolderLockError('lock-route-bad-output', `${bin} --guarantee answered ${JSON.stringify(line.result)}`, { lockDir: dir });
   }
+  // This actual Rust observation precedes every acquired open using the cache.
+  // Keep the older floor: caching must never advance a live handle's reach.
+  Object.defineProperty(line.guarantee, 'reachFloorTicks', { value: line.reachFloorTicks ?? null });
   guarantees.set(dir, line.guarantee);
   return line.guarantee;
 }

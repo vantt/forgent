@@ -1,5 +1,6 @@
 // test/runner/execution/partial-writes.test.mjs -- what changed in a worktree since a snapshot.
 
+import '../../helpers/process-tmp-root.mjs';
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

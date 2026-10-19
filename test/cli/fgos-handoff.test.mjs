@@ -3,6 +3,7 @@
 // convention for a new bin/fgos.mjs subcommand's own coverage, though it
 // also exercises store.mjs's recordCall end to end (add -> handoff ->
 // replay -> holder) since the CLI is a thin wrapper over it.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

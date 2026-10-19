@@ -423,3 +423,22 @@ mod terminal_matchers {
         ));
     }
 }
+
+#[test]
+fn unreadable_results_exclude_empty_and_completed_publications_and_track_edits() {
+    let dir = scratch_dir("unreadable");
+    let path = dir.join("result-1.json");
+    let mut outbox = FsOutbox::new(&dir);
+    assert!(outbox.newest_unreadable().is_none());
+    fs::write(&path, "").unwrap();
+    assert!(outbox.newest_unreadable().is_none());
+    fs::write(&path, "{\"summary\":\"raw\nnewline\"}").unwrap();
+    let first = outbox.newest_unreadable().unwrap();
+    assert_eq!(outbox.newest_unreadable(), Some(first.clone()));
+    fs::write(&path, "[1]").unwrap();
+    assert_ne!(outbox.newest_unreadable(), Some(first));
+    fs::write(&path, "{}").unwrap();
+    assert!(outbox.newest_unreadable().is_none());
+    assert_eq!(outbox.newest_complete(), Some(path));
+    fs::remove_dir_all(dir).unwrap();
+}

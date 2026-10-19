@@ -1,5 +1,6 @@
 // Machine-readable verb manifest tests (entry-standardization P37 deliverable
 // b) — mirrors the run()/spawnSync harness of test/cli/fgos.test.mjs.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

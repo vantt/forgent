@@ -2,6 +2,7 @@
 // on proof that every recorded process is dead and no version-1 home is left; anything else is kept with its
 // reason. Fixture layout follows the runs of the controller-crash spike (herdr pane and cli supervisor).
 // The settle goes through the real recover door, so it needs a host built from this checkout (FGOS_HOST_BIN).
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

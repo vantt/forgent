@@ -1,6 +1,7 @@
 // The full-suite queue on the real `full-suite` kernel lock, with real
 // processes and the real host route. Every case passes its own lockRoot:
 // the suite running these tests holds the machine's queue itself.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

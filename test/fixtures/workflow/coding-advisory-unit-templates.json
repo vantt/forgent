@@ -1,0 +1,10 @@
+{
+  "planning/validate-plan": {
+    "id": "validate-plan",
+    "template": { "capability": "coding:validate", "pattern": "reviewed", "taskSpec": "validate-plan" }
+  },
+  "executing/implement-item": {
+    "id": "implement-item",
+    "template": { "capability": "coding:implement", "pattern": "reviewed", "taskSpec": "implement-item" }
+  }
+}

@@ -4,6 +4,7 @@
 // external user. `readme-install-tag-exists` (src/setup/registrations.mjs)
 // is the doctor check that surfaces this instead of letting it regress
 // silently.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

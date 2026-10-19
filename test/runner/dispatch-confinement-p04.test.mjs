@@ -2,6 +2,7 @@
 // Comprehensive test suite for Phase 04: Required Enforcement And Executor Migration (R1-R8)
 // Spec: docs/specs/confinement-authority.md, plans/.../phase-04-required-enforcement-and-executor-migration.md
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";

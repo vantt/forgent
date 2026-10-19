@@ -24,7 +24,7 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use fgos_agent_protocol::port::{AgentIo, Inspection, IoError, SendInput};
-use fgos_agent_protocol::terminal::{adapter_for, ExitCommand, FsOutbox, Terminal, TerminalOutcome};
+use fgos_agent_protocol::terminal::{adapter_for, ExitCommand, FsOutbox, Terminal, TerminalOutcome, UnreadableResult};
 use fgos_process::facts::{self, ProcTuple};
 use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
 use fgos_terminal_control::core::{Core, Want};
@@ -616,6 +616,26 @@ pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch:
     super::finish(envelope, run_dir, watch, locks, false, &end)
 }
 
+/// The file and idle observations must both persist; unknown activity breaks the evidence.
+#[derive(Default)]
+struct UnreadableWait {
+    file: Option<(UnreadableResult, u64)>,
+    idle_before: bool,
+}
+
+impl UnreadableWait {
+    fn expired(&mut self, file: Option<UnreadableResult>, idle: bool, now_ms: u64) -> bool {
+        let same = self.file.as_ref().map(|(file, _)| file) == file.as_ref();
+        if !same {
+            self.file = file.map(|file| (file, now_ms));
+        }
+        let expired = same && idle && self.idle_before
+            && self.file.as_ref().is_some_and(|(_, since)| now_ms.saturating_sub(*since) >= 30_000);
+        self.idle_before = idle;
+        expired
+    }
+}
+
 /// The agent protocol, step by step, until the agent is done, something ends the run early or the
 /// gate leaves on its own.
 fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
@@ -654,6 +674,8 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
         io.sup.channel_open = false;
     }
 
+    let started = Instant::now();
+    let mut unreadable = UnreadableWait::default();
     loop {
         if io.sup.finished() {
             return;
@@ -663,6 +685,16 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
                 TerminalOutcome::Completed { .. } => return ask_to_leave(plan, &adapter, &mut io),
                 other => return end_early(&mut io, &other),
             }
+        }
+        let file = outbox.newest_unreadable();
+        let idle = io.inspect().is_ok_and(|seen| seen.state.as_deref() == Some("idle")
+            && !seen.visible_working && !seen.visible_blocker);
+        if unreadable.expired(file, idle, started.elapsed().as_millis() as u64) {
+            io.sup.carrier_check(io.core, io.key);
+            if !io.sup.finished() {
+                io.sup.begin_stop("cancel", Some("terminal:result-unreadable"));
+            }
+            return;
         }
         io.pause(WORK_POLL_MS);
     }
@@ -701,6 +733,29 @@ fn ask_to_leave(plan: &Plan, adapter: &Terminal, io: &mut TermIo) {
 mod tests {
     use super::*;
     use fgos_agent_protocol::terminal::TerminalBlock;
+
+    #[test]
+    fn unreadable_wait_requires_unchanged_bytes_and_consecutive_idle_polls() {
+        let dir = std::env::temp_dir().join(format!("unreadable-wait-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("result-1.json");
+        fs::write(&path, "bad").unwrap();
+        let mut outbox = FsOutbox::new(&dir);
+        let mut wait = UnreadableWait::default();
+        assert!(!wait.expired(outbox.newest_unreadable(), true, 0));
+        assert!(!wait.expired(outbox.newest_unreadable(), true, 29_999));
+        assert!(!wait.expired(outbox.newest_unreadable(), false, 30_000));
+        assert!(!wait.expired(outbox.newest_unreadable(), true, 30_700));
+        assert!(wait.expired(outbox.newest_unreadable(), true, 31_400));
+        fs::write(&path, "new bad").unwrap();
+        assert!(!wait.expired(outbox.newest_unreadable(), true, 32_000));
+        assert!(!wait.expired(outbox.newest_unreadable(), true, 61_999));
+        fs::write(&path, "").unwrap();
+        assert!(!wait.expired(outbox.newest_unreadable(), true, 70_000));
+        fs::write(&path, "{}").unwrap();
+        assert!(!wait.expired(outbox.newest_unreadable(), true, 100_000));
+        fs::remove_dir_all(dir).unwrap();
+    }
 
     #[test]
     fn an_early_end_names_why_in_the_receipt_and_a_good_step_names_nothing() {

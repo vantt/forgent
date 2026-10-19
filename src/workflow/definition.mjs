@@ -6,6 +6,7 @@
 import path from 'node:path';
 import { canonicalizeWrites } from '../runner/dispatch/write-scope.mjs';
 import { runTimeoutProblem } from '../runner/dispatch/run-timeout.mjs';
+import { GuideSchemaError, normalizeGuide } from './guide-schema.mjs';
 
 /** Thrown for a malformed Workflow definition. Kept free of runner imports (bar the import-free
  * write-scope and run-timeout leaves) so the Work-lifecycle kernel can read step data without depending on dispatch. */
@@ -125,7 +126,7 @@ const UNITS_FILE_SOURCE = 'units-file';
  * @param {unknown} raw Raw workflow object from YAML or parser
  * @param {object} [options]
  * @param {string} [options.source] Who loaded the definition; 'units-file' lets unit templates carry `prefer`
- * @returns {Readonly<object>} Frozen, normalized Workflow object
+ * @returns {Readonly<object>} Frozen, normalized Workflow object, with its `guide` model (see guide-schema.mjs)
  */
 export function validateWorkflow(raw, { source } = {}) {
   const templateAllowsPrefer = source === UNITS_FILE_SOURCE;
@@ -487,6 +488,14 @@ export function validateWorkflow(raw, { source } = {}) {
     }
   }
 
+  let guide;
+  try {
+    guide = normalizeGuide(raw, { id, steps: normalizedSteps });
+  } catch (err) {
+    if (err instanceof GuideSchemaError) throw new WorkflowDefinitionError(`Workflow "${id}" guide: ${err.message}`);
+    throw err;
+  }
+
   return Object.freeze({
     id,
     title,
@@ -495,5 +504,6 @@ export function validateWorkflow(raw, { source } = {}) {
     transitions: Object.freeze(transitions),
     aliases: Object.freeze(aliases),
     statusSkills: Object.freeze(statusSkills),
+    guide,
   });
 }

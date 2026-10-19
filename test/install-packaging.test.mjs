@@ -6,6 +6,7 @@
 // "Claim hành-vi cần enforcement THẬT". Mirrors the real-process assertion shape
 // already used by test/e2e/coexistence-canary.test.mjs
 // (spawnSync(process.execPath, [FGOS, 'init'], { cwd: fx, encoding: 'utf8' })).
+import './helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

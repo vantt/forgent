@@ -4,6 +4,7 @@
 // slot fail by name instead of taking a lock next to the new kernel lock. The
 // state store's old locks (`events.lock`, `runtime/claims.lock`,
 // `porting/events.lock`) are fenced the same way.
+import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -13,6 +13,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add dormant Event Store migration/import and rollback parity support, HEAD-only legacy reads, migration-required write refusals, and legacy-layout diagnostics; CLI registration follows at cutover.
 
+- Git: defer foreign-checkout cleanup failures after durable closure, preserve Sync receipt replay across branch changes, name detached-HEAD refusal, and document reflog-only recovery.
+
+- Restore WAL exclusion between checkout and worktree lifecycle operations; refuse reflog-only commit attribution, bind Sync recovery to its recorded branch, close foreign attempted chains honestly, and retain sync warnings in runner results.
+
+- Bind checkout WAL to directory identity, recover hook-modified and reflog-visible commits, preserve terminal causes and landed receipts across compaction failures, protect async siblings during native Git loans, and retain clean-file permissions during rollback. Add an aged-floor Node-loan E3 row for host acceptance.
+
+- Git: recover interrupted scoped commits without replay, unblock pre-attempt/rejected Sync transactions, bound terminal WAL history, preserve concurrent sibling borrows, and restore clean merge paths on abort. E3 now measures Node-loaned checkout custody.
+
+- Restore declared producer bytes, modes and move paths after rejecting ScopedCommit hooks; drain adopted setsid lock borrowers without harming unrelated pre-exec children.
+
+- Preserve acquisition reach provenance in native holder-lock handover and emit Git WAL addon capabilities from the shared release/dev/test producer. Prevent uncertain Sync commit retries after a controller crash and preserve actual hook-modified file sets on receipt replay. Phase 05 remains unreleased pending its remaining acceptance proofs.
+
+- Add dormant native ScopedCommit, Sync and non-event Checkpoint ports, a Rust write-scope leaf, and an activated-host cutover grant check. Linux-x64 activation refuses a missing addon or missing `git-wal-v1` addon capability. Production adapter migration remains phase 07.
+
+- Workflow definitions load into one guide model (milestones, activities, decision points, MUST rows that each name an existing check, unenforced rules, frame defaults). Playbooks keep their steps and gain a short guide head; a MUST naming a check outside the catalog, an expression field, `listedRoutesOnly` outside a decision point, or `rigorCeiling` is a load error. A run's start event records the normalised guide.
+
+- `fgos workflow start --plan` is removed (an unknown flag now): the AgentKit plan is read as an artifact and its phases run as Units through `fgos run` or `fgos workflow start --units <file>`. The coding workflow file drops its dead runner fields (`units`, `dependsOn`, `gate` and the `integrate` and `approval` steps); its lifecycle part is unchanged.
+- End terminal rounds with `terminal:result-unreadable` when an invalid result stays unchanged for 30 seconds and the agent is idle, releasing custody through normal settlement.
+- Preserve committed decision-index rows missing from local state during setup and doctor fixes; exclude git-ignored setup output consistently from release payloads and checkout drift checks.
+- Warn once per unreadable pid per Worktree removal or relocation, and allow clean tracked `.fgos` while preserving reappearing skip-worktree state and dirty bytes.
+- Arm the Linux terminal gate’s parent-death signal so a killed sandbox monitor ends its namespace; read all kernel lock-table pages while retaining shared-probe release confirmation.
+
 - Warn with pid and comm when a same-user process cwd is unreadable during Worktree removal or relocation; readable checkout cwds still refuse.
 
 - Fix Worktree allocation under `.claude/worktrees`, multi-user cwd checks and terminal recovery of clean Git refusals; require reachable delivery before removal and report preserved dirty checkouts as advisory diagnostics.

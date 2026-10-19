@@ -1,5 +1,6 @@
 // An earlier role's work reaches a later role as the absolute path of its report.
 
+import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

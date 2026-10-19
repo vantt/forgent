@@ -1,13 +1,14 @@
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue } from '../../scripts/lib/test-file-watchdog.mjs';
-import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes } from '../../scripts/run-tests.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -119,15 +120,17 @@ test('DEFAULT_TEST_ROOT resolves to <repo>/test', () => {
   assert.ok(fs.existsSync(DEFAULT_TEST_ROOT));
 });
 
+const GUARD_ARG = `--import=${pathToFileURL(GIT_CONFIG_GUARD_PATH).href}`;
+
 // --- buildTestArgv: ordering ------------------------------------------------
 
 test('buildTestArgv places forwarded flags before the full file list, both after --test', () => {
   const argv = buildTestArgv(['test/a.test.mjs', 'test/b.test.mjs'], ['--test-reporter=tap', '--test-concurrency=1']);
-  assert.deepEqual(argv, ['--test', '--test-reporter=tap', '--test-concurrency=1', 'test/a.test.mjs', 'test/b.test.mjs']);
+  assert.deepEqual(argv, ['--test', GUARD_ARG, '--test-reporter=tap', '--test-concurrency=1', 'test/a.test.mjs', 'test/b.test.mjs']);
 });
 
 test('buildTestArgv with no forwarded args is just --test plus the files', () => {
-  assert.deepEqual(buildTestArgv(['x.test.mjs']), ['--test', 'x.test.mjs']);
+  assert.deepEqual(buildTestArgv(['x.test.mjs']), ['--test', GUARD_ARG, 'x.test.mjs']);
 });
 
 // --- runTests: env merge, argv shape, zero-file refusal ---------------------
@@ -167,7 +170,7 @@ test('runTests spawns node --test with the discovered files as argv elements and
 
   assert.equal(result.status, 0);
   assert.equal(captured.execPath, '/fake/node');
-  assert.deepEqual(captured.argv, ['--test', path.relative(root, f)]);
+  assert.deepEqual(captured.argv, ['--test', GUARD_ARG, path.relative(root, f)]);
   assert.equal(captured.opts.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
   assert.equal(captured.opts.env.PATH, '/usr/bin');
   assert.equal(captured.opts.env.UNRELATED, 'kept');
@@ -367,6 +370,70 @@ test('runSelectedTests keeps the per-run temp dir when FGOS_TEST_KEEP_TMP=1, and
   });
   assert.equal(fs.existsSync(result.runTemp), true);
   assert.match(logs.join('\n'), new RegExp(result.runTemp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests fails a run that leaves fgos-* temp dirs behind and names their prefixes', () => {
+  const base = tempBase();
+  const logs = [];
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base },
+    spawn: (_exec, _argv, opts) => {
+      for (const name of ['fgos-leaky-test-Ab12Cd', 'fgos-leaky-test-Zy98Xw', 'fgos-other-q1w2e3', 'unrelated-dir']) fs.mkdirSync(path.join(opts.env.TMPDIR, name));
+      return { status: 0 };
+    },
+    log: (msg) => logs.push(msg),
+  });
+  assert.equal(result.status, 1);
+  assert.deepEqual(result.tempLeftovers, { 'fgos-leaky-test-': 2, 'fgos-other-': 1 });
+  assert.match(logs.join('\n'), /fgos-leaky-test-\*: 2/);
+  assert.equal(fs.existsSync(result.runTemp), false, 'the run dir is still removed');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests passes a run whose temp root holds no fgos-* leftovers', () => {
+  const base = tempBase();
+  const result = runSelectedTests(['a.test.mjs'], { cwd: base, env: { TMPDIR: base }, spawn: () => ({ status: 0 }) });
+  assert.equal(result.status, 0);
+  assert.deepEqual(result.tempLeftovers, {});
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('leftoverTempPrefixes groups by prefix without the random suffix and tolerates a missing root', () => {
+  assert.deepEqual(leftoverTempPrefixes('/nope', () => ['fgos-cli-AAAAAA', 'fgos-cli-BBBBBB', 'x']), { 'fgos-cli-': 2 });
+  assert.deepEqual(leftoverTempPrefixes('/nope', () => { throw new Error('ENOENT'); }), {});
+});
+
+test('a test process that imports process-tmp-root.mjs keeps its temp files in a private dir and removes it at exit', () => {
+  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));
+  const script = `import { PROCESS_TEMP_ROOT } from ${JSON.stringify(helper)};
+import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';
+fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));
+console.log(JSON.stringify({ root: PROCESS_TEMP_ROOT, tmpdir: os.tmpdir() }));`;
+  const base = tempBase();
+  const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' } });
+  assert.equal(run.status, 0, run.stderr);
+  const { root, tmpdir } = JSON.parse(run.stdout);
+  assert.equal(tmpdir, root);
+  assert.equal(path.dirname(root), fs.realpathSync(base));
+  assert.deepEqual(fs.readdirSync(base), [], 'nothing survives the process, including the dir the script never removed');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('a test process ended by SIGTERM still removes its private temp dir', async () => {
+  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));
+  const script = `import ${JSON.stringify(helper)};
+import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';
+fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));
+console.log('ready'); setInterval(() => {}, 1000);`;
+  const base = tempBase();
+  const child = spawn(process.execPath, ['--input-type=module', '-e', script], { env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' }, stdio: ['ignore', 'pipe', 'inherit'] });
+  await new Promise((resolve) => child.stdout.once('data', resolve));
+  const closed = new Promise((resolve) => child.once('close', resolve));
+  child.kill('SIGTERM');
+  await closed;
+  assert.deepEqual(fs.readdirSync(base), []);
   fs.rmSync(base, { recursive: true, force: true });
 });
 
@@ -743,3 +810,64 @@ if (process.argv[1] === ${JSON.stringify(watchdogPath)}) {
     }
   });
 }
+
+// --- identity guard: the checkout's own repository must keep its identity -------------------------
+
+function identityRepo() {
+  const base = tempBase();
+  execFileSync('git', ['init', '-q'], { cwd: base });
+  return base;
+}
+
+test('snapshotGitIdentity lists only user, author and committer keys of the repository config', () => {
+  const base = identityRepo();
+  execFileSync('git', ['config', 'user.name', 'Owner Name'], { cwd: base });
+  execFileSync('git', ['config', 'core.editor', 'true'], { cwd: base });
+  assert.deepEqual(snapshotGitIdentity(base), ['local: user.name Owner Name']);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('snapshotGitIdentity is empty outside a repository', () => {
+  const base = tempBase();
+  assert.deepEqual(snapshotGitIdentity(base, () => { throw new Error('not a repository'); }), []);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('diffGitIdentity reports an added, removed and rewritten identity key', () => {
+  const diff = diffGitIdentity(['local: user.name Owner', 'local: user.email a@b'], ['local: user.name Test', 'local: committer.name X']);
+  assert.deepEqual(diff.added, ['local: committer.name X']);
+  assert.deepEqual(diff.removed, ['local: user.email a@b']);
+  assert.deepEqual(diff.changed, ['local: user.name Owner -> local: user.name Test']);
+  assert.equal(diff.leaked, true);
+  assert.equal(diffGitIdentity(['local: user.name Owner'], ['local: user.name Owner']).leaked, false);
+});
+
+test('runSelectedTests fails the run when a test file rewrites the checkout identity, and names the keys', () => {
+  const base = identityRepo();
+  execFileSync('git', ['config', 'user.name', 'Owner Name'], { cwd: base });
+  const logs = [];
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    log: (m) => logs.push(m),
+    spawn: () => {
+      execFileSync('git', ['config', 'user.name', 'Test'], { cwd: base });
+      execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: base });
+      return { status: 0 };
+    },
+  });
+  assert.equal(result.status, 1, 'a suite that rewrote the identity must not pass');
+  assert.equal(result.gitIdentityDiff.leaked, true);
+  assert.match(logs.join('\n'), /changed the git identity/);
+  assert.match(logs.join('\n'), /\+ local: user\.email test@example\.com/);
+  assert.match(logs.join('\n'), /\* local: user\.name Owner Name -> local: user\.name Test/);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests leaves the run green when the identity keys are untouched', () => {
+  const base = identityRepo();
+  execFileSync('git', ['config', 'user.name', 'Owner Name'], { cwd: base });
+  const result = runSelectedTests(['a.test.mjs'], { cwd: base, spawn: () => ({ status: 0 }) });
+  assert.equal(result.status, 0);
+  assert.equal(result.gitIdentityDiff.leaked, false);
+  fs.rmSync(base, { recursive: true, force: true });
+});

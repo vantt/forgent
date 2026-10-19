@@ -2,6 +2,7 @@
 // unit whose controller is gone reads `awaiting-resume`, and `dispatch recover` finishes an orphaned attempt
 // through the adopt door instead of parking on its outbox. Real host binary (FGOS_HOST_BIN), synthetic
 // attempt directories the way a dead supervisor leaves them.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

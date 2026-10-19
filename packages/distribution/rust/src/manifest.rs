@@ -305,6 +305,8 @@ pub fn read_manifest_from_dir(release_dir: &Path) -> Result<ReleaseManifest, Man
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct NativeAddonComponent {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub capabilities: Vec<String>,
     pub path: String,
     pub digest: String,
     pub target: String,

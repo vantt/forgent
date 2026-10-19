@@ -122,6 +122,7 @@ pub(crate) fn admit(
     manifest: &ReleaseManifest,
     lock: &ActivationLockGuard,
 ) -> Result<(), InitError> {
+    crate::verify::require_git_addon(manifest).map_err(|e| refusal("git-addon-missing", e))?;
     if has_wal(manifest) && !cfg!(target_os = "linux") {
         return Err(refusal(
             "git-wal-unsupported-platform",
@@ -198,10 +199,13 @@ mod tests {
         let root =
             std::env::temp_dir().join(format!("fgos-nongit-admission-{}", std::process::id()));
         std::fs::create_dir_all(&root).unwrap();
-        let manifest: ReleaseManifest = serde_json::from_str(include_str!(
+        let mut manifest: ReleaseManifest = serde_json::from_str(include_str!(
             "../tests/goldens/release-manifest-minimal.json"
         ))
         .unwrap();
+        // M10 requires an addon only on linux-x64; this test proves the
+        // non-WAL Windows admission remains independent of Git/state roots.
+        manifest.target.os = "windows".into();
         let lock = ActivationLockGuard::acquire(&root).unwrap();
         admit(&root, &root.join("missing-state-root"), &manifest, &lock).unwrap();
         std::fs::create_dir(root.join(".git")).unwrap();

@@ -1,4 +1,5 @@
 // The project launcher: one `fgos` on PATH that runs each project's own activated fgos.
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

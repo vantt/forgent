@@ -2,6 +2,7 @@
 // The reader reports what is wrong instead of throwing, and can be set against the old
 // runner.providers.<provider>.accounts inventory the lease still reads.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';

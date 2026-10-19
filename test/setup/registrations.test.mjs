@@ -3,6 +3,7 @@
 // a module registers a new entry via src/setup/registrations.mjs and it is
 // picked up through checks.mjs's own re-exported DOCTOR_CHECKS without this
 // test (or any other new module) touching checks.mjs itself.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

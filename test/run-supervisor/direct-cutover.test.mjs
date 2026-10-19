@@ -1,6 +1,7 @@
 // The controller half of a direct attempt, piece by piece: what the envelope and side file carry, how the
 // locks travel to the supervisor, what the controller does when the supervisor never binds, and that no
 // trace of the removed Node supervisor is left in src/.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

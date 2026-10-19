@@ -8,6 +8,7 @@
 // to a real `cargo build --release`, too slow for this file's fast-CLI
 // contract) -- covered instead by test/runner/gateway-control.test.mjs's
 // unit tests and a real manual end-to-end run (tsk-31v's own plan.md).
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

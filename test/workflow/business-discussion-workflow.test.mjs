@@ -1,5 +1,6 @@
 // test/workflow/business-discussion-workflow.test.mjs — Acceptance tests for business-discussion workflow (P4 Phase 4)
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

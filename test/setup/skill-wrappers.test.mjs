@@ -2,6 +2,7 @@
 // build:skills` and `fgos setup`'s external-project materialize path
 // (tsk-1qi, D5/D7 of docs/history/install-setup-external-project-
 // reliability/CONTEXT.md).
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -12,6 +12,7 @@
 // dispatch-reconciliation-concurrency.test.mjs's own 2-process CAS proof
 // already holds for a different mechanism (the per-cwd dispatch lock).
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

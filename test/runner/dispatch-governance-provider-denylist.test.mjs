@@ -1,6 +1,7 @@
 // test/runner/dispatch-governance-provider-denylist.test.mjs
 // Verifies canonical provider family governance across the direct resolution and execution-door gates.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -14,6 +14,7 @@
 // test/cli/fgos.test.mjs's own "setup inside a .fgos/-less linked worktree"
 // test already gives — every CLI call below runs against a throwaway HOME,
 // never the real one.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

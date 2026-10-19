@@ -2,6 +2,7 @@
 // Observe store lock) against a host built from this checkout: their old paths get tombstones once
 // per workspace (install: once per machine), an old lock file still there stops the placement, the
 // new fgctl and the Observe CLI run fine behind the fences, and the doctor checks name the three.
+import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

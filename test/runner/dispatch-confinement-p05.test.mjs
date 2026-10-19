@@ -2,6 +2,7 @@
 // Comprehensive test suite for Phase 05: Herdr and Legacy Confinement Convergence (R1-R6)
 // Spec: docs/specs/confinement-authority.md, plans/.../phase-05-herdr-and-legacy-convergence.md
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";

@@ -3,6 +3,7 @@
 // itself -- the pane, the brief, the supervisor, the crash cases, the confined `fgos run` -- is tested in
 // test/run-supervisor/terminal-*.test.mjs against a fake herdr that keeps a real pane.
 
+import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

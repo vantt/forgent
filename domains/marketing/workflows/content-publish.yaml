@@ -2,6 +2,34 @@
 
 id: marketing/content-publish
 title: Marketing content publication workflow
+# --- Guide head: what the playbook promises, beside the steps below (the steps are unchanged) ---
+kind: playbook
+purpose: Brief, draft and review marketing copy, get it approved by a person, then publish exactly the approved copy.
+milestones:
+  - { id: brief-ready, subject: the content brief, evidence: unit report, acceptedBy: runner, settledBy: brief }
+  - { id: draft-reviewed, subject: the draft copy, evidence: reviewer verdict, acceptedBy: runner, settledBy: draft }
+  - { id: copy-approved, subject: the digest of the approved copy, evidence: gate answer, acceptedBy: owner, settledBy: approval }
+  - { id: publish-recorded, subject: content/published/**, evidence: unit report, acceptedBy: runner, settledBy: publish }
+decisions:
+  - at: brief-ready
+    should: draft
+    reason: researching the audience first reduces rework of the copy
+    mayInstead: [draft straight away for a small update]
+    listedRoutesOnly: true
+must:
+  - id: consent-before-publish
+    guard: human-consent
+    subject: copy-approved
+    reason: publishing approves nothing by itself; the person approves this exact copy, and an edit after approval needs a new approval
+  - id: publish-writes-isolated
+    guard: write-scope-isolation
+    reason: the publish Unit writes only content/published/**, apart from any other writer of the same case
+unenforced:
+  - id: published-on-the-channel
+    note: the content is live on the external channel; the workflow records its own publish, not what the channel shows
+frameDefaults: { dispatches: 3, mutatingDispatches: 1, fallbackPerSeat: 2, deviationsBeforeAsk: 0, rigorFloor: standard }
+closure: [publish-recorded]
+
 steps:
   - id: brief
     title: Research & Brief

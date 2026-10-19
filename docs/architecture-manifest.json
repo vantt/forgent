@@ -297,11 +297,11 @@
     "src/runner/execution/patterns/role-tasks.mjs": "domain",
     "src/runner/execution/patterns/solo.mjs": "domain",
     "src/workflow/definition.mjs": "kernel",
+    "src/workflow/guide-schema.mjs": "kernel",
     "src/workflow/dir-guard.mjs": "infra",
     "src/workflow/loader.mjs": "infra",
     "src/workflow/store.mjs": "infra",
     "src/workflow/integrate.mjs": "infra",
-    "src/workflow/plan-source.mjs": "infra",
     "src/workflow/units-source.mjs": "infra",
     "src/workflow/runner.mjs": "use-case",
     "src/workflow/index.mjs": "use-case",
@@ -328,6 +328,8 @@
     "src/verbs/events/parity.mjs": "use-case",
     "src/setup/event-store-checks.mjs": "use-case",
     "src/setup/event-store-fixes.mjs": "use-case",
-    "src/event-store/config.mjs": "infra"
+    "src/event-store/config.mjs": "infra",
+    "src/git/scoped-commit.mjs": "infra",
+    "src/git/sync.mjs": "infra"
   }
 }

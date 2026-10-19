@@ -7,6 +7,7 @@
 // sets, flag/positional rendering, dispatcher parity); these guards cover the
 // prose instead, derived from live sources so they keep working after the
 // next rename rather than encoding today's retired names by hand.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

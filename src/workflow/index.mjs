@@ -16,7 +16,6 @@ export {
   resolveIntegrationTarget,
   cleanupWorkflowWorktree,
 } from './integrate.mjs';
-export { translatePlanToWorkflow } from './plan-source.mjs';
 export { translateUnitsToWorkflow } from './units-source.mjs';
 export {
   startWorkflow,
