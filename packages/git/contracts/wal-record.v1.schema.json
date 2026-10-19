@@ -318,6 +318,35 @@
                               "items": {
                                 "type": "string"
                               }
+                            },
+                            "hooks": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "old": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
+                                },
+                                "next": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
+                                },
+                                "ownerPath": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "old",
+                                "next",
+                                "ownerPath"
+                              ]
+                            },
+                            "staging": {
+                              "$ref": "#/$defs/nativeLockArtifact"
                             }
                           },
                           "required": [
@@ -629,7 +658,10 @@
                                 },
                                 "allowedReplacements": {
                                   "type": "array",
-                                  "items": { "type": "string", "minLength": 1 }
+                                  "items": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
                                 }
                               },
                               "required": [
@@ -1454,8 +1486,14 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "properties": { "phase": { "const": "restore-acknowledged" } },
-          "required": ["phase"]
+          "properties": {
+            "phase": {
+              "const": "restore-acknowledged"
+            }
+          },
+          "required": [
+            "phase"
+          ]
         },
         {
           "type": "object",
@@ -1476,6 +1514,22 @@
               "required": [
                 "snapshot"
               ]
+            }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "native-lock-owned"
+            },
+            "data": {
+              "$ref": "#/$defs/nativeLockArtifact"
             }
           },
           "required": [
@@ -1649,6 +1703,56 @@
         "candidate",
         "treeDigest",
         "evidenceDigest"
+      ]
+    },
+    "nativeLockArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "bootId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pidNs": {
+          "type": "string"
+        },
+        "pid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "startTime": {
+          "type": "string"
+        },
+        "device": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "inode": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "state": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "host",
+        "bootId",
+        "pidNs",
+        "pid",
+        "startTime",
+        "device",
+        "inode",
+        "state"
       ]
     }
   }

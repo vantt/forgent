@@ -69,7 +69,18 @@ impl FileSystem for OsFileSystem {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct HooksChange {
+    pub old: Option<String>,
+    pub next: Option<String>,
+    pub owner_path: String,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct ConfigChange {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub staging: Option<crate::NativeLockArtifact>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hooks: Option<HooksChange>,
     pub remote: String,
     pub url: String,
     pub refspecs: Vec<String>,
@@ -223,6 +234,7 @@ pub enum Outcome {
     deny_unknown_fields
 )]
 pub enum Phase {
+    NativeLockOwned(crate::NativeLockArtifact),
     RestoreAcknowledged,
     RestoreApplied { snapshot: String },
     LandVerified { evidence: crate::LandEvidence, #[serde(default, skip_serializing_if = "Option::is_none")] checkout: Option<String> },
@@ -544,9 +556,9 @@ impl Intent {
                 old_config_digest,
                 ..
             } = change.as_ref();
-            if remote.is_empty()
-                || url.is_empty()
-                || refspecs.is_empty()
+            if (change.hooks.is_none() && (remote.is_empty() || url.is_empty() || refspecs.is_empty()))
+                || change.hooks.as_ref().is_some_and(|h| !Path::new(&h.owner_path).is_absolute() || h.next.as_ref().is_some_and(|n| n != &h.owner_path) || (h.next.is_none() && h.old.as_ref() != Some(&h.owner_path)))
+                || change.staging.as_ref().is_some_and(|a| !a.valid() || Path::new(&a.path).file_name().and_then(|s| s.to_str()) != Some("config.lock"))
                 || !digest_valid(old_config_digest)
                 || self.resource_set != ["config:local"]
                 || self.expected != Tip::Absent
@@ -696,6 +708,11 @@ impl Chain {
             }
         })
     }
+    pub fn last_state(&self) -> &Phase {
+        &self.records.iter().rev()
+            .find(|r| !matches!(r.phase, Phase::NativeLockOwned(_)))
+            .expect("intent").phase
+    }
     pub fn last(&self) -> &Record {
         self.records.last().expect("validated nonempty chain")
     }
@@ -733,11 +750,22 @@ fn checkout_resource_valid(resources: &[String], worktree: &str) -> bool {
                 .is_some_and(|p| Path::new(p).is_absolute())
 }
 fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
+    let already_owned = records.iter().any(|r| matches!(r.phase, Phase::NativeLockOwned(_)));
+    // Ownership evidence is durable metadata, not an operation-state transition.
+    let states: Vec<_> = records.iter().filter(|r| !matches!(r.phase, Phase::NativeLockOwned(_))).cloned().collect();
+    let records = states.as_slice();
     let i = match &records[0].phase {
         Phase::Intent(i) => i,
         _ => return Err(corrupt("intent")),
     };
     let prev = &records.last().ok_or_else(|| corrupt("empty"))?.phase;
+    if let Phase::NativeLockOwned(artifact) = phase {
+        let filename = match i.kind { OperationKind::ConfigChange(_) => "config.lock", OperationKind::Land(_) | OperationKind::ScopedCommit(_) | OperationKind::Sync(_) | OperationKind::Restore(_) => "index.lock", _ => return Err(corrupt("native lock operation kind")) };
+        if already_owned || Path::new(&artifact.path).file_name().and_then(|s| s.to_str()) != Some(filename) || records.iter().any(|r| matches!(r.phase, Phase::Outcome(_))) || !artifact.valid() {
+            return Err(corrupt("native lock ownership binding"));
+        }
+        return Ok(());
+    }
     let valid = match (prev, phase) {
         (Phase::TargetAttempt { .. }, Phase::RestoreApplied { snapshot }) => matches!(i.kind, OperationKind::Restore(_)) && digest_valid(snapshot),
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::ConfigApproved)) => {
@@ -1664,7 +1692,7 @@ impl<F: FileSystem> Wal<F> {
         }
         let target = reader.read_ref(&i.resource_set[0])?;
         let pin = reader.read_ref(&format!("refs/fgos/git-operations/{id}/candidate"))?;
-        if matches!(c.last().phase, Phase::Intent(_)) {
+        if matches!(c.last_state(), Phase::Intent(_)) {
             return Ok(Recovery::Unprepared);
         }
         if !reader.candidate_intact(i)? {
@@ -1681,7 +1709,7 @@ impl<F: FileSystem> Wal<F> {
         }
         if target == ObservedRef::Direct(i.expected.clone())
             && pin == ObservedRef::Direct(i.candidate().clone())
-            && matches!(c.last().phase, Phase::Prepared)
+            && matches!(c.last_state(), Phase::Prepared)
         {
             return Ok(Recovery::FirstAttemptEligible);
         }
@@ -3237,7 +3265,7 @@ mod tests {
             );
             assert_eq!(reopened.active(100).unwrap().len(), usize::from(installed));
             match reopened.inspect("one") {
-                Ok(c) => assert!(matches!(c.last().phase, Phase::Intent(_))),
+                Ok(c) => assert!(matches!(c.last_state(), Phase::Intent(_))),
                 Err(WalError::Corrupt(_)) => (),
                 other => panic!("unexpected recovery: {other:?}"),
             }

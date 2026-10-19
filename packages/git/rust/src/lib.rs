@@ -424,6 +424,8 @@ pub trait Inspect {
     fn resolve_repo(&self, path: &std::path::Path) -> Result<ResolveRepo>;
 }
 pub trait RepositoryConfig {
+    fn ensure_hooks(&self, repo: &RepoHandle, owned_path: &std::path::Path, operation_id: &str) -> Result<HooksReport>;
+    fn remove_owned_hooks_config(&self, repo: &RepoHandle, owned_path: &std::path::Path, operation_id: &str) -> Result<HooksReport>;
     fn ensure_fetch_mapping(
         &self,
         repo: &RepoHandle,
@@ -556,3 +558,7 @@ mod sync;
 pub use sync::{has_conflict_markers, SyncResult};
 
 mod grant;
+
+mod native_lock;
+pub use native_lock::{NativeLockArtifact, NativeLockReport};
+pub use repository_config::HooksReport;

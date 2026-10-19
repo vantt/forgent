@@ -198,7 +198,7 @@ impl GitDriver {
                             &chain,
                             Phase::Outcome(Outcome::CommitRejected {
                                 cause: if matches!(
-                                    chain.last().phase,
+                                    *chain.last_state(),
                                     Phase::Intent(_) | Phase::Prepared
                                 ) {
                                     "foreign-checkout-abandoned"
@@ -242,7 +242,7 @@ impl GitDriver {
             )
             .map_err(failure)?;
             if chain.outcome().is_none()
-                && matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared)
+                && matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared)
             {
                 fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
                 if let OperationKind::ScopedCommit(payload) = &chain.intent().kind {
@@ -337,7 +337,7 @@ impl GitDriver {
                 )
             }
             OperationKind::Sync(payload) => {
-                let Phase::SyncCommitAttempt { tree } = &chain.last().phase else {
+                let Phase::SyncCommitAttempt { tree } = chain.last_state() else {
                     return Err(recovery("sync-state-recovery-required"));
                 };
                 (
@@ -521,7 +521,7 @@ impl GitDriver {
             return Ok(outcome.clone());
         }
         fgos_holder_lock::validate_quiescent(handle(&scope, repo)?).map_err(failure)?;
-        let outcome = if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
+        let outcome = if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
             let baseline: CommitBaseline =
                 serde_json::from_str(&payload.baseline).map_err(failure)?;
             if self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])? == baseline.head
@@ -533,7 +533,7 @@ impl GitDriver {
         } else {
             match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                _ => return Err(recovery("commit-index-lock-present")),
+                _ => return Err(recovery("commit-index-lock-present: repairNativeIndexLock")),
             }
             let baseline: CommitBaseline =
                 serde_json::from_str(&payload.baseline).map_err(failure)?;
@@ -1279,7 +1279,7 @@ impl GitDriver {
         }
         if prepared.is_err() && wal.known_id(id).map_err(failure)? {
             let chain = wal.inspect(id).map_err(failure)?;
-            if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
+            if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
                 wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                     .map_err(failure)?;
             }

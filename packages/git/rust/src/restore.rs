@@ -267,7 +267,7 @@ impl GitDriver {
             "sequencer",
         ] {
             match fs::symlink_metadata(repo.git_dir.join(name)) {
-                Ok(_) => return Err(recovery(format!("restore-native-state: {name}"))),
+                Ok(_) => return Err(recovery(format!("restore-native-state: {name}{}", if name == "index.lock" { "; repairNativeIndexLock" } else { "" }))),
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
                 Err(e) => return Err(failure(e)),
             }
@@ -778,7 +778,7 @@ impl GitDriver {
         if chain.outcome().is_none() {
             return Err(failure("restore-acknowledgement-requires-terminal-outcome"));
         }
-        let chain = if matches!(chain.last().phase, Phase::RestoreAcknowledged) {
+        let chain = if matches!(chain.last_state(), Phase::RestoreAcknowledged) {
             chain
         } else {
             wal.append(&chain, Phase::RestoreAcknowledged)
@@ -835,7 +835,7 @@ impl GitDriver {
         let snapshot_error = wal.read_restore_snapshot::<Snapshot>(&p.snapshot).err();
         if let Some(error) = snapshot_error {
             let outcome = chain.outcome().cloned().unwrap_or_else(|| {
-                if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
+                if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
                     Outcome::AbandonedBeforeAttempt
                 } else {
                     Outcome::Restore {
@@ -859,7 +859,7 @@ impl GitDriver {
         let mut warnings = vec![];
         let outcome = if let Some(o) = chain.outcome() {
             o.clone()
-        } else if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
+        } else if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
             self.restore_native_gate(repo, scope)?;
             wal.append(chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                 .map_err(failure)?
@@ -872,7 +872,7 @@ impl GitDriver {
             let head = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
             let reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
             let mut state = "recoveryRequired";
-            if let Phase::RestoreApplied { snapshot } = &chain.last().phase {
+            if let Phase::RestoreApplied { snapshot } = chain.last_state() {
                 match wal.read_restore_snapshot::<Snapshot>(snapshot) {
                     Ok(_) if head == p.request.target && reference == p.reference => {
                         let request = RestoreRequest {

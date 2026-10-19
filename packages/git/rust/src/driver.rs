@@ -2411,11 +2411,16 @@ impl Inspect for GitDriver {
         GitDriver::resolve_repo(self, path, path)
     }
 }
-fn config_facts(driver: &GitDriver, repo: &RepoHandle, key: &str) -> Result<Vec<ConfigFact>> {
+pub(crate) fn config_facts(driver: &GitDriver, repo: &RepoHandle, key: &str) -> Result<Vec<ConfigFact>> {
     driver
         .config(repo)?
         .into_iter()
-        .filter(|(_, k, _)| k == &key.to_ascii_lowercase())
+        // The driver's trusted -c hooksPath suppresses hooks for safe plumbing;
+        // it is not a configured user value or an installation slot.
+        .filter(|(origin, k, _)| {
+            k == &key.to_ascii_lowercase()
+                && (key != "core.hookspath" || origin.starts_with(b"file:"))
+        })
         .map(|(origin, _, value)| {
             Ok(ConfigFact {
                 value,

@@ -165,6 +165,7 @@ impl GitDriver {
             "index.lock",
         ] {
             match std::fs::symlink_metadata(repo.git_dir().join(name)) {
+                Ok(_) if name == "index.lock" => return Err(recovery("land-index-lock-present: repairNativeIndexLock")),
                 Ok(_) => return Err(failure("foreign-main-checkout-state")),
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
                 Err(e) => return Err(failure(e)),
@@ -393,7 +394,7 @@ impl GitDriver {
                 && prior.intent().authority_binding == land_binding
                 && matches!(&prior.intent().kind, OperationKind::Land(p) if p.request.destination == req.destination)
                 && matches!(
-                    prior.last().phase,
+                    *prior.last_state(),
                     Phase::Intent(_) | Phase::Prepared | Phase::LandVerified { .. }
                 )
             {
@@ -649,7 +650,7 @@ impl GitDriver {
         let repo = &operation_repo;
         let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
         let chain = wal.inspect(&session.id).map_err(failure)?;
-        if !matches!(chain.last().phase, Phase::Prepared) {
+        if !matches!(chain.last_state(), Phase::Prepared) {
             return Err(recovery("land-recovery-required"));
         }
         let c = session
@@ -1213,7 +1214,7 @@ impl GitDriver {
         .and_then(|_| self.land_native_state(repo, &scope))
         .map_err(|e| {
             if e.cause == "foreign-main-checkout-state" {
-                recovery("land-native-state-preserved")
+                recovery("land-native-state-preserved: repairNativeIndexLock for index.lock")
             } else {
                 e
             }
@@ -1337,7 +1338,7 @@ impl GitDriver {
             .land_target_checkout(repo, &scope, &destination)
             .map_err(|e| {
                 if e.cause == "foreign-main-checkout-state" {
-                    recovery("land-native-state-preserved")
+                    recovery("land-native-state-preserved: repairNativeIndexLock for index.lock")
                 } else {
                     e
                 }
