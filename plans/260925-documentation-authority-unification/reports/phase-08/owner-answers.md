@@ -452,3 +452,12 @@ All seven new findings have text dispositions; implementation, actual accounting
   3. Note for batch-122: candidate `docs/platform/work-state/spec.md` repeats the dead `docs/history/store-atomic-rmw/` path; give it the 08351 disposition if the inventory holds it.
   4. **Elided decision filenames** (`docs/decisions/0032-iron-law-...md`) resolve against the deleted file's full name in git history (prefix match on number + visible slug fragment), and the successor note's title match uses that resolved name — never a sibling filename in the same paragraph. Checker predicate corrected accordingly, with a probe. 04444 (an illustrative collision example) preserves with the note to `docs/platform/runner/decisions/h-36d872fbb0e5.md` heading 0032 "Cổng Iron Law".
 - **Author throughput:** `6eb2a4be6` authored batches 073–074 (50 files / 164 edges); full checker 552 files / 3,992 edges, 0 failures, 182 probes.
+
+## L12-42 — Batch 073–074 review (Lead, A42/A51, 2026-10-20)
+
+- **Result** (`6eb2a4be6` records, reviewed at `bb4b304e9`): [wave4d-p01](review-a38-step-03-wave4d-p01.md) 6/6 ok (27 edges); [wave4d-p02](review-a38-step-03-wave4d-p02.md) batch-074 file ok, batch-073 `resolve-a-decision-id-collision-merge-conflict-on-approve.md` rework on 04449.
+- **Rulings:**
+  1. **04449 patches** (Phase 9, whole-file) to its registry holder `docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md`: its gloss ("the same blocked -> proposed recovery edge used in step 5") is true for the target's step 5, as for the five sibling patches to that target.
+  2. **Expansion:** batch-073 expands to review of every file after correction (the defect file was a lead-ruling supplement, not a seeded sample; the Lead applies the stricter reading).
+  3. Quoted old text and past-event sentences naming `docs/specs/distribution.md` preserve (04420/04421, 04551/04552); verbatim commit messages are captured evidence (L12-40) and get the successor note (04553).
+- **Carried note (Phase 9 step-10 semantic search):** knowledge recipes that `grep docs/decisions/` for decision files are stale (the directory holds only `index.md`).
