@@ -36,7 +36,7 @@ export { trustRoots };
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 import { normalizeLegacyConfinement } from './confinement/policies.mjs';
 import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
-import { expandCredentialHome } from './provider-credential-probe.mjs';
+import { expandCredentialHome } from './provider-capacity.mjs';
 import { publishMutableProjection } from './proof-helpers.mjs';
 import { TRUST_CONTEXT_FILE, cleanupTrust } from '../../run-supervisor/steps/cleanup-trust.mjs';
 
