@@ -242,9 +242,10 @@ fn killing_the_terminal_monitor_ends_the_gate_and_its_agent() {
     let script = format!("trap '' HUP; while :; do echo beat >> {}; sleep 0.02; done", beat.display());
     let options = Options::new("/bin/sh", &["-c", &script]);
     let (attempt, socket) = terminal_attempt("monitor-death", &options, 60_000, false);
+    let lock = locked_file(&attempt.dir.join("attempt.lock"));
     let listener = listen(&socket);
     let mut pane = start_in_pane(&attempt, &socket, true, &[]);
-    let mut stream = handshake(&listener, &attempt, &[]);
+    let mut stream = handshake(&listener, &attempt, &[lock.as_raw_fd()]);
     struct Cleanup(fgos_process::facts::ProcTuple);
     impl Drop for Cleanup {
         fn drop(&mut self) {
