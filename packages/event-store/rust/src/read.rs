@@ -135,80 +135,41 @@ fn legacy_files(
     repo: &RepoHandle,
     oid: &Oid,
     streams: &[StreamId],
-    at_head: bool,
 ) -> Result<Vec<LegacyEvent>, Error> {
-    let mut cursor = None;
     let mut events = Vec::new();
-    let roots: &[&[u8]] = if at_head {
-        &[b".fgos/", b"docs/distillery/state/porting/"]
-    } else {
-        &[b"events", b"porting/"]
-    };
-    for root in roots {
-        loop {
-            let page = port
-                .list_tree(repo, oid, root, cursor, 1024)
-                .map_err(git_error)?;
-            let paths: Vec<_> = page
-                .entries
-                .into_iter()
-                .filter(|e| {
-                    let work = streams.iter().any(|s| s.as_str() == "project");
-                    let porting = streams.iter().any(|s| s.as_str() == "project:porting");
-                    let baseline: &[u8] = if at_head {
-                        b".fgos/events.jsonl"
-                    } else {
-                        b"events.jsonl"
-                    };
-                    let shards: &[u8] = if at_head {
-                        b".fgos/events/"
-                    } else {
-                        b"events/"
-                    };
-                    let porting_path: &[u8] = if at_head {
-                        b"docs/distillery/state/porting/events.jsonl"
-                    } else {
-                        b"porting/events.jsonl"
-                    };
-                    e.kind == ObjectType::Blob
-                        && (work
-                            && (e.path == baseline
-                                || e.path
-                                    .strip_prefix(shards)
-                                    .is_some_and(|p| !p.contains(&b'/') && p.ends_with(b".jsonl")))
-                            || porting && e.path == porting_path)
-                })
-                .map(|e| e.path)
-                .collect();
-            for path in paths {
-                let bytes = blob(port, repo, oid, &path)?
-                    .ok_or_else(|| invalid("listed legacy path missing"))?;
-                let file = std::str::from_utf8(&path)
-                    .map_err(|_| invalid("non-UTF8 legacy provenance"))?;
-                let raw =
-                    std::str::from_utf8(&bytes).map_err(|_| invalid("non-UTF8 legacy events"))?;
-                let tag = if file == "events.jsonl" || file == ".fgos/events.jsonl" {
-                    ""
-                } else if file.starts_with("events/") || file.starts_with(".fgos/events/") {
-                    file.rsplit('/').next().unwrap()
-                } else {
-                    file
-                };
-                let mut parsed = legacy::parse_file(tag, raw)?;
-                for event in &mut parsed {
-                    event.provenance.file = file.into();
-                }
-                events.extend(parsed);
-            }
-            if page.complete {
-                break;
-            }
-            cursor = Some(
-                page.next_cursor
-                    .ok_or_else(|| invalid("tree continuation missing"))?,
-            );
+    for entry in crate::legacy_import::all_entries(port, repo, oid)? {
+        let file =
+            std::str::from_utf8(&entry.path).map_err(|_| invalid("legacy provenance UTF8"))?;
+        let work = file == "events.jsonl"
+            || file
+                .strip_prefix("events/")
+                .is_some_and(|p| !p.contains('/') && p.ends_with(".jsonl"));
+        let porting = file.starts_with("porting/") && file.ends_with("/events.jsonl");
+        if !(work && streams.iter().any(|s| s.as_str() == "project")
+            || porting && streams.iter().any(|s| s.as_str() == "project:porting"))
+        {
+            continue;
         }
-        cursor = None;
+        if entry.kind != ObjectType::Blob || entry.mode != 0o100644 {
+            return Err(invalid("unsafe legacy event entry"));
+        }
+        let bytes = blob(port, repo, oid, &entry.path)?
+            .ok_or_else(|| invalid("listed legacy path missing"))?;
+        let tag = if file == "events.jsonl" {
+            ""
+        } else if work {
+            file.rsplit('/').next().unwrap()
+        } else {
+            file
+        };
+        let mut parsed = legacy::parse_file(
+            tag,
+            std::str::from_utf8(&bytes).map_err(|_| invalid("legacy UTF8"))?,
+        )?;
+        for event in &mut parsed {
+            event.provenance.file = file.into();
+        }
+        events.extend(parsed);
     }
     Ok(events)
 }
@@ -237,14 +198,27 @@ fn read_legacy(
             ));
         }
         crate::fence::validate_refs(Some(&oid), refs.values())?;
-        legacy_files(port, repo, &oid, streams, false)
+        legacy_files(port, repo, &oid, streams)
     } else {
-        crate::fence::validate_refs(None, refs.values())?;
         let head = match port.resolve_head(&authority).map_err(git_error)? {
             HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => commit,
             HeadFact::Unborn { .. } => return Ok(Vec::new()),
         };
-        legacy_files(port, repo, &head, streams, true)
+        for oid in refs.values() {
+            if !matches!(walk::header(port, repo, oid)?, crate::envelope::Seal::Legacy { ref from_commit, .. } if from_commit == head.as_str())
+            {
+                return Err(Error::new(
+                    ErrorCode::EventStoreLegacyMismatch,
+                    "unfenced import does not match HEAD",
+                ));
+            }
+            crate::legacy_import::verify_legacy_tree(port, repo, oid)?;
+        }
+        if let Some(oid) = refs.values().next() {
+            legacy_files(port, repo, oid, streams)
+        } else {
+            crate::legacy_import::read_legacy_from_head(port, repo, streams)
+        }
     }
 }
 /// Must be called outside state rank 60. Local reads precede ref observations.
@@ -393,7 +367,12 @@ pub fn read(
         .iter()
         .map(|(n, o)| (n.clone(), o.as_str().into()))
         .collect();
-    let legacy = legacy::order(read_legacy(port, repo, &legacy_refs, req.streams)?);
+    let raw_legacy = read_legacy(port, repo, &legacy_refs, req.streams)?;
+    let (work, porting): (Vec<_>, Vec<_>) = raw_legacy
+        .into_iter()
+        .partition(|e| !e.provenance.file.starts_with("porting/"));
+    let mut legacy = legacy::order(work);
+    legacy.extend(porting);
     cursor.legacy_digest = if legacy.is_empty() {
         None
     } else {
@@ -621,17 +600,26 @@ mod tests {
             super::mirror_suffix("origin/branch-events/test-aa/feature").unwrap(),
             Some("branch-events/test-aa/feature")
         );
-        assert_eq!(super::mirror_suffix("origin/legacy").unwrap(), Some("legacy"));
+        assert_eq!(
+            super::mirror_suffix("origin/legacy").unwrap(),
+            Some("legacy")
+        );
         assert_eq!(super::mirror_suffix("origin/unknown").unwrap(), None);
     }
     #[test]
     fn mirror_namespace_strips_only_the_remote_segment() {
-        assert_eq!(super::mirror_suffix("origin/legacy/events/m").unwrap(), None);
+        assert_eq!(
+            super::mirror_suffix("origin/legacy/events/m").unwrap(),
+            None
+        );
         assert_eq!(
             super::mirror_suffix("origin/events/m/events/other").unwrap(),
             Some("events/m/events/other")
         );
-        assert_eq!(super::mirror_suffix("origin/legacy").unwrap(), Some("legacy"));
+        assert_eq!(
+            super::mirror_suffix("origin/legacy").unwrap(),
+            Some("legacy")
+        );
         assert!(super::mirror_suffix("origin").is_err());
         assert!(super::mirror_suffix("/events/m").is_err());
     }

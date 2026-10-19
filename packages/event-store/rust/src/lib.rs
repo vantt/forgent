@@ -33,3 +33,5 @@ mod fence;
 
 pub mod export;
 pub mod diagnostics;
+
+pub mod legacy_import;

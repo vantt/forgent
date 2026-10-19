@@ -938,3 +938,65 @@ second rebuild verb or new consumer registration mechanism.
 
 Evidence and reproduction commands:
 `plans/reports/phase-lead-261019-0929-es-p07-verbs-setup-doctor.md`.
+
+
+## Phase 08 dormant migration contracts
+
+`legacy_import::{inventory, read_legacy_from_head, import_legacy}` in the Rust
+crate use Git Inspect and Publication. The combined addon exposes
+`readLegacyFromHead({check}, heldRanks)`, `importLegacy({expectedHead}, heldRanks)`
+and `legacyLayout(heldRanks)` through the existing facade. Migration remains
+unregistered until phase 09. The approved plan's Q5(a) applies: the reviewed
+code commit lands first, then migration uses Git 05 ScopedCommit for data.
+There is no source-commit materialization route (A2/M9 is not required).
+
+Inventory reads only the main checkout's HEAD tree, discovers one tracked
+`**/porting/events.jsonl` and its tracked sibling view, and refuses multiple
+porting directories. Work names lose only the `.fgos/` prefix in the import;
+porting bytes live at `porting/<original tracked path>`. Work keeps the frozen
+`(ts, file, seq)` sort and identity dedupe. The Node facade reparses authenticated raw legacy lines to preserve property
+insertion order and the previous release's serialized view/revision. Historical
+porting keeps its physical log order, including clock rollback, and is folded by the production porting
+reader independently of Work. Rollback includes nested historical logs and new
+root porting records when producing the porting parity report.
+
+`--check` computes the inventory, reader order, parity and commit plan without
+writing objects or refs; its three setup repairs can create local identity/lock
+state and Git mapping provenance. Publication validates the expected HEAD,
+regular-file paths, event records and clean inputs again under `event-seal`.
+It writes a deterministic parentless legacy commit and CASes an absent ref;
+an identical existing commit is reused, a different ref refuses. The canonical
+legacy seal retains the existing header contract; `treeOfFgosEvents` identifies
+the complete imported data tree **without** `seal.json`. Doctor compares every
+path, mode and object id of that tree with the legacy commit sans seal.
+
+The dormant `migrateUseCase` requires the real holder-lock quiesce result to be
+clean, runs the three existing setup-fix bodies, and compares production Work
+and porting folds in a temporary directory. An explicit baseline is checked;
+a previous cache is checked only when its snapshot equals the tracked input
+anchor. Parity failures carry entity differences. Before deleting anything,
+non-check migration also reads the published import through the store reader
+and repeats parity. Git 05 is called via `createGitScopedCommit`, `preflight`,
+and `commit` with the documented exact deletion grant and seal digest; no Git
+subprocess or replacement writer exists in the adapter.
+
+Preparation records write admission before any hot gate: tracked legacy data
+without a fence refuses `event-store-migration-required`; a pinned clone without
+the matching legacy ref or configured publication-remote mapping refuses
+`event-store-refspec-missing`. Prepared admission is valid for that process
+lifetime: stop-everything migration requires ending old writer processes.
+
+A normal cutover failure restores the tracked input bytes only after verifying
+HEAD is unchanged; a committed/unknown result remains Git-owned recovery.
+Interrupted dirty inputs name the deterministic Git operation
+`event-store-cutover-<fromCommit>` for inspection. The real-hook cutover,
+grant-refusal and TargetAttempt crash proof require Git 05 merged and activated;
+phase 08's fixture fence tests do not substitute for that proof. No migrated
+workspace may resume writers until that gate and the host quiesce check pass.
+
+Git 05's in-flight implementation currently selects the fence only when the
+grant deletes a shard under `.fgos/events/`. Until that Git-owned selection is
+fixed, baseline-only projects can run check/import/parity, but non-check
+migration refuses `event-store-cutover-fence-unavailable` before Publication or
+worktree edits. Remove this restriction together with the Git fix and prove it
+using a baseline-only real-hook cutover; never commit a fence-less migration.

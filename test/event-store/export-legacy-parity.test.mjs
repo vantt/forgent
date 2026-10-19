@@ -120,7 +120,7 @@ test('legacy export excludes private streams by default and rejects explicit pri
   }
 });
 
-test('porting parity reports a historical log-order difference using its own reducer', t => {
+test('porting legacy import and rollback retain physical log order across clock rollback', t => {
   const f = fixture(t);
   const lines = [
     { seq: 1, ts: '2020-01-02T00:00:00.000Z', type: 'porting.add', payload: { id: 'p', status: 'candidate' } },
@@ -130,6 +130,6 @@ test('porting parity reports a historical log-order difference using its own red
   const out = path.join(f.temp, 'porting-difference');
   const result = exportUseCase(f.ctx, { out, format: 'legacy-layout' });
   assert.equal(listPorting(out).porting.p.status, 'accepted');
-  assert.equal(result.parity.equal, false);
-  assert.ok(result.parity.differences.some(d => d.collection === 'porting' && d.id === 'p' && d.v4.status === 'candidate'));
+  assert.equal(result.parity.equal, true);
+  assert.deepEqual(result.parity.differences, []);
 });

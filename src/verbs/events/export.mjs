@@ -4,6 +4,7 @@ import os from 'node:os';
 import { listPorting } from '../../state/porting-store.mjs';
 import { isDeepStrictEqual } from 'node:util';
 import { foldEvents } from '../../state/replay.mjs';
+import { entityDifferences } from './parity.mjs';
 import { eventsContext } from './context.mjs';
 
 export function exportUseCase(ctx, options = {}) {
@@ -20,25 +21,18 @@ export function exportUseCase(ctx, options = {}) {
   const { legacyOrder, v4Order, v4PortingOrder, ...result } = store.exportLegacyLayout(request, heldRanks);
   const legacyView = foldEvents(legacyOrder);
   const v4View = foldEvents(v4Order);
-  const differences = [];
-  for (const collection of new Set([...Object.keys(legacyView), ...Object.keys(v4View)])) {
-    const left = legacyView[collection], right = v4View[collection];
-    if (isDeepStrictEqual(left, right)) continue;
-    if (left && right && !Array.isArray(left) && !Array.isArray(right) && typeof left === 'object' && typeof right === 'object') {
-      for (const id of new Set([...Object.keys(left), ...Object.keys(right)])) if (!isDeepStrictEqual(left[id], right[id])) differences.push({ collection, id, legacy: left[id] ?? null, v4: right[id] ?? null });
-    } else if (Array.isArray(left) && Array.isArray(right)) {
-      for (let index = 0; index < Math.max(left.length, right.length); index++) {
-        if (!isDeepStrictEqual(left[index], right[index])) differences.push({ collection, index, id: left[index]?.id ?? right[index]?.id ?? null, legacy: left[index] ?? null, v4: right[index] ?? null });
-      }
-    } else differences.push({ collection, legacy: left ?? null, v4: right ?? null });
-  }
+  const differences = entityDifferences(legacyView, v4View);
   // Use the production porting reader/reducer. It deliberately reads log order,
   // unlike Work's multi-shard (ts, file, seq) ordering.
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-porting-parity-'));
   try {
     fs.mkdirSync(path.join(scratch, 'porting'));
     fs.writeFileSync(path.join(scratch, 'porting/events.jsonl'), v4PortingOrder.map(e => JSON.stringify(e) + '\n').join(''));
-    const left = listPorting(out).porting;
+    const logs = result.files.filter(p => p.startsWith('porting/') && p.endsWith('/events.jsonl'));
+    const legacyScratch = path.join(scratch, 'legacy');
+    fs.mkdirSync(path.join(legacyScratch, 'porting'), { recursive: true });
+    fs.writeFileSync(path.join(legacyScratch, 'porting/events.jsonl'), logs.filter(p => p !== 'porting/events.jsonl').concat(logs.includes('porting/events.jsonl') ? ['porting/events.jsonl'] : []).map(p => fs.readFileSync(path.join(out, p), 'utf8').replace(/\n?$/, '\n')).join(''));
+    const left = listPorting(legacyScratch).porting;
     const right = listPorting(scratch).porting;
     for (const id of new Set([...Object.keys(left), ...Object.keys(right)])) {
       if (!isDeepStrictEqual(left[id], right[id])) differences.push({ collection: 'porting', id, legacy: left[id] ?? null, v4: right[id] ?? null });

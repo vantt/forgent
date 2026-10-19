@@ -127,14 +127,10 @@ pub fn export_jsonl(
     write(req.out, "events.jsonl", &bytes)?;
     Ok(json!({"out":req.out,"cursor":got.cursor,"deferred":got.deferred,"missing":got.missing}))
 }
-fn allowed(path: &str) -> bool {
+pub(crate) fn allowed(path: &str) -> bool {
     let p: Vec<_> = path.split('/').collect();
     let safe = |s: &str| {
-        !s.is_empty()
-            && s != "."
-            && s != ".."
-            && s.bytes()
-                .all(|b| b.is_ascii_alphanumeric() || b"._-".contains(&b))
+        !s.is_empty() && s != "." && s != ".." && !s.chars().any(|c| c.is_control() || c == '\\')
     };
     p.iter().all(|s| safe(s))
         && (path == "events.jsonl"
@@ -266,7 +262,7 @@ pub fn export_legacy_layout(
     let modern_porting: Vec<Value> = got
         .legacy
         .iter()
-        .filter(|e| e.provenance.file == "porting/events.jsonl")
+        .filter(|e| e.provenance.file.starts_with("porting/"))
         .map(|e| e.event.clone())
         .chain(
             got.sequence
