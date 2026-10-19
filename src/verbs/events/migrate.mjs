@@ -140,9 +140,12 @@ export function importPlan({ dataTree, legacyRefOid, existingLegacyOid, legacyMi
 
 // Decode Git's typed envelope; recovery and unknown classes never authorize
 // Event Store restoration, even when HEAD happens to remain at the baseline.
+// Restore only on refusals Git raises before its attempt, or on commit-rejected
+// after Git restored the producer bytes. untrusted-worktree is excluded: Git
+// re-checks topology before every child, including after the commit attempt.
 export function cutoverFailure(error) {
   let code = error.code, cause;
   try { const native = JSON.parse(error.message); code = native.code ?? code; cause = native.cause; } catch {}
-  const ordinary = new Set(['commit-rejected', 'checkout-required', 'lock-order-violation', 'git-dual-borrow-unavailable', 'main-checkout-authority-mismatch', 'checkout-custody-required', 'checkout-custody-stale', 'checkout-authority-required', 'git-lockscope-unavailable-windows', 'untrusted-worktree', 'invalid-commit-message', 'foreign-merge-head', 'foreign-staged-index', 'source-baseline-stale', 'cutover-main-required', 'cutover-exact-deletions-required', 'cutover-legacy-ref-mismatch', 'cutover-seal-digest-mismatch', 'staged-set-mismatch', 'literal-path-staging-failed', 'commit-snapshot-non-file']);
+  const ordinary = new Set(['commit-rejected', 'checkout-required', 'lock-order-violation', 'git-dual-borrow-unavailable', 'main-checkout-authority-mismatch', 'checkout-custody-required', 'checkout-custody-stale', 'checkout-authority-required', 'git-lockscope-unavailable-windows', 'invalid-commit-message', 'foreign-merge-head', 'foreign-staged-index', 'source-baseline-stale', 'cutover-main-required', 'cutover-exact-deletions-required', 'cutover-legacy-ref-mismatch', 'cutover-seal-digest-mismatch', 'staged-set-mismatch', 'literal-path-staging-failed', 'commit-snapshot-non-file']);
   return { code, cause, restore: (code === 'refused' && ordinary.has(cause)) || ordinary.has(code) };
 }

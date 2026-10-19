@@ -1,3 +1,4 @@
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -114,12 +115,15 @@ test('fresh project doctor passes and unfenced reads ignore stale local/mirror i
 });
 
 test('cutover restoration respects typed recovery and unknown outcomes', () => {
-  for (const cause of ['commit-effect-unknown', 'commit-unstage-recovery-required', 'commit-attempt-recovery-required', 'commit-worktree-restore-required', 'commit-prepared-state-changed']) {
+  for (const cause of ['commit-effect-unknown', 'commit-unstage-recovery-required', 'commit-attempt-recovery-required', 'commit-worktree-restore-required', 'commit-prepared-state-changed', 'foreign-checkout-effect-unknown', 'commit-effect-unknown: reflog-only-candidate:0123']) {
     assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'recovery-required', cause }))).restore, false, cause);
   }
   assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'commit-rejected' }))).restore, true);
   assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'source-baseline-stale' }))).restore, true);
   assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'checkout-command-failed' }))).restore, false);
+  // Topology is re-checked before every Git child, so this refusal can follow the attempt.
+  assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'untrusted-worktree' }))).restore, false);
+  assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'foreign-checkout-abandoned' }))).restore, false);
   assert.equal(cutoverFailure(new Error('unknown failure')).restore, false);
   assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'future-error', cause: 'commit-rejected' }))).restore, false);
 });

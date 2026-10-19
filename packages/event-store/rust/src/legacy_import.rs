@@ -753,11 +753,14 @@ fn cutover_operation_id(repo: &RepoHandle, head: &str) -> Result<String, Error> 
                 Err(e) => return Err(invalid(e.to_string())),
             }
         };
-        // The combined addon can land before Git 05 introduces CommitRejected.
-        // Inspect its serialized protocol tag rather than duplicate its enum.
-        let value = serde_json::to_value(outcome).map_err(|e| invalid(e.to_string()))?;
-        if value["kind"] != "commitRejected" && value["kind"] != "abandonedBeforeAttempt" {
-            return Ok(id);
+        // Only a settled no-effect attempt frees its id. An open chain, a commit
+        // (even one whose HEAD was later reset by hand) and an effect-unknown
+        // rejection keep the id, so Git's recovery refusal stays binding.
+        match outcome {
+            Some(fgos_git::wal::Outcome::AbandonedBeforeAttempt) => {}
+            Some(fgos_git::wal::Outcome::CommitRejected { cause })
+                if !cause.ends_with("effect-unknown") => {}
+            _ => return Ok(id),
         }
     }
     Err(invalid("cutover attempt history exceeds inspection bound"))
