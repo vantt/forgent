@@ -635,3 +635,16 @@ separate item, so they do not block the waves above.
   family only after that. Should the order be configurable per capability or per
   tier (for example "change family first, rotate accounts later"), and who
   declares it?
+
+## Owner answers (2026-10-19 23:07)
+
+MP-B1:
+- **Q4 (fallback order scope):** declared per tier; a capability may only narrow it, never widen it.
+- **Q5 (cross-family fallback):** on. The families a tier falls back to are the equivalent ones for that tier: doer tiers (nano, standard, advanced) fall back to cheap equivalent families (gemini, deepseek, glm); flagship and frontier fall back only to premium equivalent families. So the family fallback order is declared per tier.
+- **Q6 (account rotation):** by the declared order: accounts of the same family first, in declared order, then the next family. Replaces least-lease / least-recently-used ranking as the order (one pool's accounts are no longer load-balanced).
+- Reversal trigger: Q6 changes back to least-lease ranking if one account keeps hitting its quota window while the others sit idle; Q5's tier groups change when a family's model at a tier stops being equivalent (price or quality).
+
+MP-COST:
+- **Q1 (ceilings):** code runs on gemini flash, deepseek flash, glm flash, sonnet (big lead derives the tier cells). Councils depend on the kind: software-architecture councils run at rigor critical, and some seats must be frontier.
+- **Q2 (spend signal):** not decided; there is no spend tracking yet. Open.
+- **Q3 (leads):** owner keeps leads on Sonnet to save cost; the "orchestrate" capability proposal is withdrawn (in-process lead model stays a working rule, not config).
