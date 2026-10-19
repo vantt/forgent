@@ -30,7 +30,13 @@ test('CLI adapter creates the checkout and emits the public JSON envelope', {ski
   const { ensureHostBin, REPO_ROOT }=await import('../../scripts/run-tests.mjs');
   const f=fixture('files',true);
   try {
-    const host=ensureHostBin({...process.env,FGOS_HOST_BIN:''},REPO_ROOT);
+    // The payload manifest resolves its host inside the checkout; a host built under an
+    // external CARGO_TARGET_DIR is materialized under .fgos/runtime like the dev host door does.
+    const built=ensureHostBin({...process.env,FGOS_HOST_BIN:''},REPO_ROOT);
+    fs.mkdirSync(path.join(REPO_ROOT,'.fgos','runtime'),{recursive:true});
+    const hostDir=fs.mkdtempSync(path.join(REPO_ROOT,'.fgos','runtime','tmp-worktree-cli-'));
+    const host=path.join(hostDir,'fgos'); fs.copyFileSync(built,host); fs.chmodSync(host,0o755);
+    f.cleanup=(cleanup=>()=>{fs.rmSync(hostDir,{recursive:true,force:true});cleanup();})(f.cleanup);
     const manifest=structuredClone(f.loader.descriptor.manifest);
     manifest.entries.fgos=path.relative(REPO_ROOT,host);
     manifest.components.legacyNode={root:'.',entry:'bin/fgos.mjs'};
