@@ -36,9 +36,9 @@ test('glm is headless pi through OpenRouter, its key read from its login store, 
   for (const inv of glm.invocations) {
     assert.equal(inv.credentialStore.use, 'pi');
     assert.ok(inv.credentialStore.files.includes('auth.json'), 'the OpenRouter key is in the auth.json of the store');
-    assert.equal(inv.env.OPENROUTER_API_KEY, undefined, 'no key variable: the store carries it');
-    assert.equal(inv.env.ANTHROPIC_BASE_URL, undefined);
-    assert.equal(inv.env.ANTHROPIC_AUTH_TOKEN, undefined);
+    assert.equal(inv.env?.OPENROUTER_API_KEY, undefined, 'no key variable: the store carries it');
+    assert.equal(inv.env?.ANTHROPIC_BASE_URL, undefined);
+    assert.equal(inv.env?.ANTHROPIC_AUTH_TOKEN, undefined);
   }
 });
 
