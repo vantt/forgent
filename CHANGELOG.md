@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos workflow start --plan` is removed (an unknown flag now): the AgentKit plan is read as an artifact and its phases run as Units through `fgos run` or `fgos workflow start --units <file>`. The coding workflow file drops its dead runner fields (`units`, `dependsOn`, `gate` and the `integrate` and `approval` steps); its lifecycle part is unchanged.
+
 - Ctrl-C and SIGTERM of `fgos run` now stop the run cleanly: no commit, reviewer, verify or next round starts after the signal, a signal during the hand-over of an attempt cancels it once it binds, and the resume line is always printed. A malformed `dispatch.cancelWaitMs` or `dispatch.gateKillGraceMs` is a named validation error, and `fgos doctor` names an attempt whose release was removed and how to recover it. Library callers of the runner keep their own signal handling.
 
 - Fix custody admission for busy worktrees, preserve settled results on handoff errors, distinguish reused cwd inodes, and restore 64 MiB commit output capture with overflow errors on every platform.

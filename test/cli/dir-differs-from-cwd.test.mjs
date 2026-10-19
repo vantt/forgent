@@ -11,6 +11,7 @@ import { dirDiffersFromCwdWarning } from '../../src/workflow/dir-guard.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 import { FIXTURE_ROOT, makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { writeTrivialWorkflow } from '../helpers/trivial-workflow.mjs';
 
 const made = [];
 after(() => {
@@ -27,14 +28,6 @@ function makeRepo(prefix) {
   execFileSync('git', ['add', 'README.md'], { cwd: dir, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'initial commit'], { cwd: dir, stdio: 'ignore' });
   return dir;
-}
-
-function makePlan(root) {
-  const planDir = path.join(root, 'plan');
-  fs.mkdirSync(planDir);
-  fs.writeFileSync(path.join(planDir, 'plan.md'), '---\ntitle: "Dir Plan"\n---\n');
-  fs.writeFileSync(path.join(planDir, 'phase-01-start.md'), '---\nphase: 1\ntitle: "Start Phase"\ndependencies: []\n---\n');
-  return planDir;
 }
 
 function fgos(args, cwd) {
@@ -86,10 +79,10 @@ test('no warning without --dir, with an explicit --worktree, outside a repositor
 test('workflow start from another project warns on stderr and in the output, and still runs', () => {
   const here = makeRepo('fgos-dir-start-here-');
   const there = makeRepo('fgos-dir-start-there-');
-  const planDir = makePlan(there);
+  const workflowId = writeTrivialWorkflow(there);
 
-  const result = fgos(['workflow', 'start', '--plan', planDir, '--dir', there, '--foreground'], here);
-  assert.equal(result.status, 4, result.stderr);
+  const result = fgos(['workflow', 'start', workflowId, '--dir', there, '--foreground'], here);
+  assert.equal(result.status, 0, result.stderr);
   const warningLines = result.stderr.split('\n').filter((line) => line.includes('dir-differs-from-cwd'));
   assert.equal(warningLines.length, 1, result.stderr);
   assert.ok(warningLines[0].includes(`cd ${there}`), warningLines[0]);
@@ -104,10 +97,10 @@ test('workflow start from another project warns on stderr and in the output, and
 
 test('workflow start from inside the project says nothing about --dir', () => {
   const there = makeRepo('fgos-dir-inside-');
-  const planDir = makePlan(there);
+  const workflowId = writeTrivialWorkflow(there);
 
-  const result = fgos(['workflow', 'start', '--plan', planDir, '--dir', there, '--foreground'], there);
-  assert.equal(result.status, 4, result.stderr);
+  const result = fgos(['workflow', 'start', workflowId, '--dir', there, '--foreground'], there);
+  assert.equal(result.status, 0, result.stderr);
   assert.ok(!result.stderr.includes('dir-differs-from-cwd'), result.stderr);
   assert.equal(JSON.parse(result.stdout).data.warnings, undefined);
 });
@@ -115,9 +108,9 @@ test('workflow start from inside the project says nothing about --dir', () => {
 test('a detached start warns once and its resume child does not warn again', async () => {
   const here = makeRepo('fgos-dir-detach-here-');
   const there = makeRepo('fgos-dir-detach-there-');
-  const planDir = makePlan(there);
+  const workflowId = writeTrivialWorkflow(there);
 
-  const started = fgos(['workflow', 'start', '--plan', planDir, '--dir', there], here);
+  const started = fgos(['workflow', 'start', workflowId, '--dir', there], here);
   assert.equal(started.status, 0, started.stderr);
   assert.equal(started.stderr.split('\n').filter((line) => line.includes('dir-differs-from-cwd')).length, 1, started.stderr);
   const { data } = JSON.parse(started.stdout);

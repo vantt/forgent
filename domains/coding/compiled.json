@@ -156,16 +156,6 @@
                 "fgos-researching"
               ]
             }
-          ],
-          "units": [
-            {
-              "id": "judge-ambiguity",
-              "template": {
-                "capability": "coding:discover",
-                "pattern": "solo",
-                "taskSpec": "judge-ambiguity"
-              }
-            }
           ]
         },
         {
@@ -173,9 +163,6 @@
           "title": "Exploring",
           "phase": "discover",
           "skill": "fgos-coding-exploring",
-          "dependsOn": [
-            "discovery"
-          ],
           "operations": [
             {
               "id": "lock-decisions",
@@ -205,30 +192,13 @@
                 "fgos-researching"
               ]
             }
-          ],
-          "units": [
-            {
-              "id": "lock-decisions",
-              "template": {
-                "capability": "coding:explore",
-                "pattern": "solo",
-                "taskSpec": "lock-decisions"
-              }
-            }
-          ],
-          "gate": {
-            "kind": "human",
-            "question": "Lock decisions for this item?"
-          }
+          ]
         },
         {
           "id": "planning",
           "title": "Planning",
           "phase": "plan",
           "skill": "fgos-coding-planning",
-          "dependsOn": [
-            "exploring"
-          ],
           "operations": [
             {
               "id": "shape-plan",
@@ -269,24 +239,6 @@
                 "fgos-researching"
               ]
             }
-          ],
-          "units": [
-            {
-              "id": "shape-plan",
-              "template": {
-                "capability": "coding:plan",
-                "pattern": "solo",
-                "taskSpec": "shape-plan"
-              }
-            },
-            {
-              "id": "validate-plan",
-              "template": {
-                "capability": "coding:validate",
-                "pattern": "reviewed",
-                "taskSpec": "validate-plan"
-              }
-            }
           ]
         },
         {
@@ -294,9 +246,6 @@
           "title": "Executing",
           "phase": "execute",
           "skill": "fgos-coding-implement",
-          "dependsOn": [
-            "planning"
-          ],
           "operations": [
             {
               "id": "implement-item",
@@ -351,34 +300,7 @@
                 "fgos-researching"
               ]
             }
-          ],
-          "units": [
-            {
-              "id": "implement-item",
-              "template": {
-                "capability": "coding:implement",
-                "pattern": "reviewed",
-                "taskSpec": "implement-item"
-              }
-            }
           ]
-        },
-        {
-          "id": "integrate",
-          "kind": "integrate",
-          "dependsOn": [
-            "executing"
-          ]
-        },
-        {
-          "id": "approval",
-          "dependsOn": [
-            "integrate"
-          ],
-          "gate": {
-            "kind": "human",
-            "question": "Approve delivery of this item?"
-          }
         }
       ],
       "transitions": [

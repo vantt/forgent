@@ -24,7 +24,6 @@ import {
   resolveIntegrationTarget,
   cleanupWorkflowWorktree,
 } from './integrate.mjs';
-import { translatePlanToWorkflow } from './plan-source.mjs';
 import { translateUnitsToWorkflow } from './units-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
@@ -991,9 +990,6 @@ function resolveStart(params) {
   if (params.workflow) {
     workflow = validateWorkflow(params.workflow);
     workflowId = workflow.id;
-  } else if (params.planPath) {
-    workflow = translatePlanToWorkflow(params.planPath);
-    workflowId = workflow.id;
   } else if (params.unitsPath) {
     workflow = translateUnitsToWorkflow(params.unitsPath);
     workflowId = workflow.id;
@@ -1001,7 +997,7 @@ function resolveStart(params) {
     workflow = loadWorkflow(params.workflowId, { packageRoot: mainRoot, cwd });
     workflowId = workflow.id;
   } else {
-    throw new RunnerConfigError('startWorkflow requires workflowId, workflow, planPath, or unitsPath');
+    throw new RunnerConfigError('startWorkflow requires workflowId, workflow, or unitsPath');
   }
   if (params.unitsPath) {
     if (params.seats !== undefined) throw new RunnerConfigError('--seats rebuilds a registered panel preset; it cannot be used with a units file');
@@ -1139,7 +1135,6 @@ export function startWorkflowDetached(params = {}) {
  * @param {object} params
  * @param {string} [params.workflowId] Id of registered workflow
  * @param {object} [params.workflow] In-memory workflow object
- * @param {string} [params.planPath] Path to AgentKit plan.md or plan directory
  * @param {string} [params.unitsPath] Path to a units file (YAML/JSON list of Units), one step per Unit
  * @param {string} [params.effort] Reasoning effort every unit asks for (low, medium, high, max)
  * @param {string} [params.request] The owner's request this run serves; given to every unit

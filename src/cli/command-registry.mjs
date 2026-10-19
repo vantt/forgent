@@ -2189,16 +2189,15 @@ export const COMMAND_REGISTRY = [
   withSubcommands({
     name: 'workflow',
     invoke: 'fgos workflow <start|status|answer|resume|operations> [id]',
-    description: 'Door for planned work: a registered Workflow preset, an AgentKit plan, or a file of several Units run as steps (DAG ordering, human review gates, pure git integration). One task with no planning takes the other door, `fgos run "<prompt>"`. start/answer/resume advance in a detached process by default; read progress with "status".',
+    description: 'Door for planned work: a registered Workflow preset or a file of several Units run as steps (DAG ordering, human review gates, pure git integration). One task with no planning takes the other door, `fgos run "<prompt>"`. start/answer/resume advance in a detached process by default; read progress with "status".',
     subcommands: {
       start: {
-        description: 'Start a run from exactly one of: a registered Workflow id (a preset such as delphi or group-cognition), --plan <AgentKit plan>, or --units <file> (one step per Unit). Returns the run id at once and advances it in a detached process unless --foreground.',
+        description: 'Start a run from exactly one of: a registered Workflow id (a preset such as delphi or group-cognition) or --units <file> (one step per Unit). Returns the run id at once and advances it in a detached process unless --foreground.',
         parameters: {
           type: 'object',
           properties: {
             'workflow-id': { type: 'string', description: 'Positional (or --id): a registered Workflow id / preset.' },
             id: { type: 'string', description: 'Same as the positional workflow id.' },
-            plan: { type: 'string', description: 'Path to an AgentKit plan.md or plan directory.' },
             units: { type: 'string', description: 'A YAML or JSON units file, { id?, title?, units: [Unit...] } or a list of Units, run as a one-off Workflow with one step per Unit; a Unit\'s dependsOn orders the steps and hands it the earlier reports. A Unit may carry a soft "prefer" executor list and a "persona". A writing Unit that builds on exactly one writing Unit starts from that Unit\'s branch; building on two or more is refused (merge them into one unit, or make one depend on the other). Nothing is merged for you: the result lists every writing Unit\'s branch and worktree (writeBranches). Not combinable with --seats.' },
             effort: { type: 'string', description: 'Reasoning effort every unit of the run asks for (low, medium, high, max), checked against each chosen executor; kept for resume.' },
             timeout: {
@@ -2222,7 +2221,6 @@ export const COMMAND_REGISTRY = [
         examples: [
           'fgos workflow start delphi --request "Should we split the billing service?"',
           'fgos workflow start --units units.yaml --effort high --foreground',
-          'fgos workflow start --plan plans/my-plan',
           'fgos workflow start group-cognition --request "Why does month-end close slip?" --seats "reconciliation bottlenecks|handoff timing|automation failure modes" --context-ref docs/finance/close-policy.md',
         ],
       },
