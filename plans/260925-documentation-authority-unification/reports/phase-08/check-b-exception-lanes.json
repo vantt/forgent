@@ -1,23 +1,8 @@
 {
-  "authority": "L12-12",
-  "status": "planned-not-executed-not-accepted",
-  "inputHead": "7af1b1e6a4aa2c391e95643c11f94ad964e6d9da",
-  "baselinePolicy": "No frozen baseline, start-checks or embedded checker edits. Phase 8 effective B uses every frozen pin except the one exact lane below; raw historical B and test exits remain recorded.",
-  "lanes": [
-    {
-      "path": "scripts/generate-shipped-path-inventory.mjs",
-      "lane": "authorized core/workflows classifier repair under plan.md section 7.4 item 3",
-      "hashAlgorithm": "git-blob",
-      "beforeHash": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
-      "frozenExpectedHash": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
-      "beforeSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
-      "afterHash": null,
-      "implementationCommit": null,
-      "testsFirstFailReceipt": null,
-      "testsPassReceipt": null,
-      "inventoryRegenerationReceipt": null,
-      "independentReviewReceipt": null,
-      "acceptance": "pending; null after hash or missing proof/review never passes. Fill from actual committed implementation; no wildcard or second path permitted."
-    }
-  ]
+  "authority": "L12-14 supersedes L12-12",
+  "status": "withdrawn-no-exception-authorized",
+  "inputHead": "cf28815f6122b98986784385a31330a36d28bb71",
+  "baselinePolicy": "Every frozen B pin must match. No external effective-B lane; classifier and inventory regeneration deferred outside Phase 8. Both raw checks and reproduction test must pass after pair accounting.",
+  "lanes": [],
+  "withdrawalReason": "Both embedded checks compute B directly from step10-start-checks.json.B. exceptions applies only to A commit/path pairs; no approved B exception-data mechanism exists. RUL104 forbids checker edits to make room."
 }

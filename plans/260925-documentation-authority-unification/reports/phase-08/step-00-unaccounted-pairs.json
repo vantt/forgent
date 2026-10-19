@@ -1,13 +1,48 @@
 {
   "status": "input-list-awaiting-Step-0-accounting",
-  "inputHead": "7af1b1e6a4aa2c391e95643c11f94ad964e6d9da",
-  "authority": "L12-11",
+  "inputHead": "cf28815f6122b98986784385a31330a36d28bb71",
+  "authority": "L12-11 / L12-14 / L-4",
   "reporter": "reports/phase-08/audit-report.py",
-  "reporterExit": 1,
-  "count": 21,
+  "count": 30,
   "atDf6eab953": 20,
-  "laterPairs": 1,
+  "laterPairs": 10,
   "pairs": [
+    {
+      "commit": "cf28815f6122b98986784385a31330a36d28bb71",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan-recheck-02.md"
+    },
+    {
+      "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+      "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+    },
+    {
+      "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+      "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+    },
+    {
+      "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/check-b-exception-lanes.json"
+    },
+    {
+      "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json"
+    },
+    {
+      "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+    },
+    {
+      "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+    },
+    {
+      "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/recheck-revision-verification.json"
+    },
+    {
+      "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-unaccounted-pairs.json"
+    },
     {
       "commit": "7af1b1e6a4aa2c391e95643c11f94ad964e6d9da",
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan-recheck.md"
@@ -98,5 +133,6 @@
     "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
     "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json"
   ],
-  "futureCommitPolicy": "Re-run at Step 0. Include this author/runner commit and every later unaccounted pair only after its actual id is known. Append exact data to both manifests in a separate accounting-only commit; no accounting done in this revision."
+  "futureCommitPolicy": "Re-run at Step 0. Include this author/runner commit and every later unaccounted pair only after its actual id is known. Append exact data to both manifests in a separate accounting-only commit; no accounting done in this revision.",
+  "method": "Read-only replay of check A: first-parent non-merge commits B0..inputHead; diff-tree paths; exact allowlist prefixes; each manifest exceptions literal independently. No ownership/checker execution; no pairs appended."
 }

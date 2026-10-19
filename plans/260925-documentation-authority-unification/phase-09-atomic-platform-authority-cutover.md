@@ -50,20 +50,24 @@ At landing, reconcile main's only references to its new PF-I011/PF-I012 rows in 
 
 Keep these cutover seams explicit: A45 legacy CTR010 lines in `docs/architecture-map.md` (Gateway retains CTR010, confinement candidate CTR011; no new shipped-contract renumbering); `apps/fgos-gateway/src/gateway.rs:1187` runtime OpenAPI read; P7-DOC-GAP-05 dead-vocabulary pre-landing blocker and P7-DOC-GAP-06 stale citations; L11-23 Holder-lock header and L11-25 accepted reading-map divergence. L12-1 supersedes L11-20 only where main now registers event-seal/event-append and uses `withStateTx` instead of events/claims locks; preserve the distinct Event Store implementation status.
 
-L12-3 supersedes L12-2: the 85 imported stale target bindings across all nine files are Phase 8 Step 0 package work, not a pending Phase 9 rebind decision. Require its reviewed committed-byte receipts and both manifests' ownership audits/checks.mjs against final committed bytes after the separate L12-11 accounting commit; apply only the independently reviewed exact L12-12 classifier B lane, keeping raw historical B/test exits separate from effective acceptance; any cutover edit to a target carries/rebinds changed units in its own package. Include every Phase 8-edited docs/platform path in A47's final union. No checker weakening, blanket expected-red allowance or frozen-baseline edit.
+L12-3 supersedes L12-2: the 85 imported stale target bindings across all nine files are Phase 8 Step 0 package work, not a pending Phase 9 rebind decision. Require its reviewed committed-byte receipts and both manifests' ownership audits/checks.mjs against final committed bytes after the separate L12-11 accounting commit; L12-14 withdraws L12-12, so require every frozen B pin and the unchanged reproduction test green; classifier/inventory work is outside Phase 8; any cutover edit to a target carries/rebinds changed units in its own package. Include every Phase 8-edited docs/platform path in A47's final union. No checker weakening, blanket expected-red allowance or frozen-baseline edit.
 
-L12-4 reserves the literal repository-wide reader/writer legacy-authority search for post-flip step 10; Phase 8 supplies switchboard routing or exact cutover patches for every row. L12-7's docs/specs/** and docs/architect/** consumer edits are exact packet patches here, never early Phase 8 target edits. The AGENTS.md packet must pin Plan A/B phase 06 landing status. L12-13 supersedes L12-6: Phase 8 builds and independently proves the owner-accepted cutover lease as a thin wrapper on current Holder-lock `withMainCheckout` and typed Git doors after a pinned read-only reuse check. No Git 04 landing wait. Require its delivered/rehearsed refusal and rollback receipts; real design/port conflicts go to the owner’s five-part decision packet. The Lead updates the program-board DOC row outside this scoped turn. Decision F revisit (L12-9): the legacy-root ratchet remains deferred from main and retires with those roots; no --record mode.
+L12-4 reserves the literal repository-wide reader/writer legacy-authority search for post-flip step 10; Phase 8 supplies switchboard routing or exact cutover patches for every row. L12-7's docs/specs/** and docs/architect/** consumer edits are exact packet patches here, never early Phase 8 target edits. The AGENTS.md packet must pin Plan A/B phase 06 landing status. L12-13 supersedes L12-6: Phase 8 builds and independently proves the owner-accepted cutover lease as a thin wrapper on Holder-lock `acquire` under its own registered lease lock name and typed Git doors, with the committed held sidecar carrying the freeze across processes (L12-15) after a pinned read-only reuse check. No Git 04 landing wait. Require its delivered/rehearsed refusal and rollback receipts; real design/port conflicts go to the owner’s five-part decision packet. The Lead updates the program-board DOC row outside this scoped turn. Decision F revisit (L12-9): the legacy-root ratchet remains deferred from main and retires with those roots; no --record mode.
 
 **Cutover sequence:**
 
 1. acquire the Phase 8-delivered exclusive documentation-cutover lease, the
    owner-accepted no-TTL/fail-closed thin wrapper on current Holder-lock and typed
-   Git doors (L12-13; lease design §6). Require independent rehearsal/refusal/
+   Git doors (L12-13/L12-15; lease design §6), using `src/holder-lock/index.mjs` `acquire` under the lease-owned lock-registry name coordinated with the Holder-lock owner before build. The shared callback-scoped `withMainCheckout` mutex is used only for brief cutover ref/commit operations, never as the multi-process lease. Require independent rehearsal/refusal/
    rollback proof first; no second lock/ref guard and no Git 04 landing dependency.
-   While held, refuse non-holder dispatch and in-scope writes/commits/merges/ref
-   movement through the reviewed doors, including reference-transaction protection;
+   While held, refuse non-holder dispatch at `fgos run`, `fgos workflow start` and
+   `bind()` (the old dispatch-execute door is removed), and in-scope writes/commits/
+   ref movement through the reviewed doors, including reference-transaction protection;
+   refuse only scope-intersecting merges, allowing code-only merges;
    Publication remains the only door to refs/fgos/*. Require explicit abandon,
-   holder token outside the environment and held-sidecar missing-lock refusal.
+   holder token outside the environment and committed held-sidecar missing-lock refusal.
+   That sidecar persists the freeze across Units/processes and holder death until
+   explicit release or owner abandon; losing the kernel lock never reopens writes.
    Enumerate worktrees and require clean/digest-matched sources before acquire
    and immediately before ref movement; release only after green verification
    or verified rollback under the lease;

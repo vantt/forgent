@@ -14,6 +14,16 @@ Related:
 
 Related files: [plan.md](plan.md), [phase 9](phase-09-atomic-platform-authority-cutover.md), [phase 4](phase-04-freeze-the-minimum-constitution-and-migration-method.md), [minimum-constitution.json](minimum-constitution.json), [evidence payload relocation policy](evidence-payload-relocation-policy.md), [main checkout lock](../../src/runner/main-checkout-lock.mjs), [pre-commit hook](../../.githooks/pre-commit), [dispatch binder](../../src/runner/execution/bind.mjs), [dispatch decide hook](../../scripts/dispatch-decide-hook.mjs), [merge runner](../../src/runner/merge.mjs), [lock retry wrapper](../../src/runner/lock-wait.mjs), [doctor registry](../../src/setup/registrations.mjs), [distribution spec](../../docs/specs/distribution.md), [switchboard](../../docs/transitional-switchboard.md).
 
+## Current-door refinement (Lead L12-15, 2026-10-19)
+
+This is the executable interpretation of the owner’s ten §6 decisions on current foundations; §2’s 2026-10-06 survey and its removed symbols are historical evidence, not build instructions. It refines the accepted design, without reversing it. Remaining real conflicts go to the owner.
+
+Reuse `src/holder-lock/index.mjs` `acquire` under a lease-owned lock name with a new `lock-registry.v1.json` row, coordinated with the Holder-lock owner through the program board before build. The shared `withMainCheckout` rank-50 merge mutex is callback-scoped and released on holder death: it cannot hold the lease and would block code-only merges. Use it only for brief cutover ref-movement/commit operations. Do not restore the old `acquireMainCheckoutLock`/TTL mechanism.
+
+The kernel handle serializes lease transitions; the committed “held” sidecar is the persistent freeze authority across Units/processes and kernel-holder death. Every admission gate consults it. Held plus absent lock remains refused, never automatically reopened, and doctor reports it; release or explicit owner abandon is required. Keep the random holder token outside the environment and all scope/digest/rehearsal/ref-guard obligations. Merge refusal depends on changed-path intersection with lease scope; code-only merges proceed. Current dispatch admission doors are `fgos run`, `fgos workflow start` and `bind()`; there is no dispatch-execute door. Publication owns production `refs/fgos/*`; its hook-disabled internals need typed-port proof, not assumed repository-hook coverage.
+
+Before any Step 6b build, read/pin the program board from current main, re-pin foundation doors, declare exact shared writes, intersect with all in-flight lanes (especially Git 04 custody and COOK), and record Holder-lock registry coordination. A collision stops the build and goes to the big lead for sequencing. This is not a blanket wait for Git 04. No implementation or coordination receipt is claimed here.
+
 ## 1. Problem and scope
 
 Cutover step 1 says: acquire a migration-specific exclusive lease; while it is held, registered doc writers, dispatch admission and merge gates refuse mutations to in-scope roots. Today nothing does that. The drift checks (inventory rerun, ratchet) detect a change after the fact; they do not stop one.
@@ -45,11 +55,11 @@ Prior art does **not** cover: a path-scoped refusal (the main checkout lock guar
 
 ### 3.1. Lock object
 
-A lock file `documentation-cutover.lock` in the main checkout's `.fgos/` directory, created and read only through the existing primitive with `lockFile: 'documentation-cutover.lock'`. Resolved from any worktree by the git common directory (the same main-checkout resolution `registrations.mjs` already exports as `resolveMainCheckout`); UNPROVEN until built: the hook runs with the worktree as its cwd, so the resolution must be tested from a linked worktree.
+A lease-owned registered Holder-lock name, resolved through the current facade/registry from any worktree. The exact registry row, rank and root must be agreed with the Holder-lock owner through the board before build; do not hardcode an unregistered file or revive the removed lock API. A thin wrapper calls `acquire` and owns the handle/transition lifecycle; no TTL or parallel liveness mechanism.
 
-- **Identity**: the registered writer's session identity string from `resolveWriterIdentity`. The registered writer is exactly one session, running in the dedicated cutover worktree. Self-recognition lets it re-acquire and renew freely. The identity is a convention, not proof of possession; decision 9 replaces it with a holder token that is not taken from the environment.
-- **No TTL at acquire.** With no `ttlMs`, the existing primitive answers `AMBIGUOUS` to every foreign identity, and every gate treats `AMBIGUOUS` as refuse. That is the fail-closed behavior this lease wants, and it is existing, tested behavior (decision D5 recorded in the module). But the behavior belongs to the caller, not to the record: a call that passes any `ttlMs` treats an old record as stale and unlinks it. The lease record therefore stores `ttl: null` and the scope, and every acquire, inspect and doctor path for this lock file refuses to pass a `ttlMs` (a wrapper owns the lock file name and does not expose the parameter), with a test that a three-minute-old lease is still held.
-- **Evidence sidecar**, committed on the cutover branch, never under `.fgos/` (workers must not commit under `.fgos/`): `plans/260925-documentation-authority-unification/reports/cutover-lease-<timestamp>.json`, written at acquire and appended at release or abandon.
+- **Holder:** decision 9’s random token outside the environment, passed explicitly to holder workers; session id alone is not possession proof.
+- **Persistence:** a committed evidence sidecar under the plan reports directory records `held`, holder/worktree/scope/digests and transitions. Its path comes from the convention door in the authorized build environment. The sidecar, not a callback or kernel-handle lifetime, carries the freeze across processes. A vanished kernel lock with held sidecar stays fail-closed until verified release or explicit owner abandon.
+- **Proof:** test linked-worktree resolution, process death, missing-lock held-sidecar refusal, multi-Unit continuity, live-holder abandon refusal and scope-only merge refusal before acceptance.
 
 ### 3.2. Registered writers
 
@@ -62,7 +72,7 @@ Candidates found by scanning `src`, `scripts`, `bin`, `.githooks` for files that
 | Gate | Seam | Behavior while the lease is held |
 |---|---|---|
 | Commit (all actors, all worktrees) | `.githooks/pre-commit`, new guard next to the staged-`.fgos/` guards, not gated by the home-checkout test | refuse when staged paths intersect scope and the committer identity is not the holder; message names holder, age and the clear door |
-| Dispatch admission | the out-of-process seams only: `fgos dispatch execute`, the assignment runner and `bind()` callers refuse with a `documentation-cutover-lease` reason (a new `bind()` refusal alone is not enough, see the prior-art table); `decide` reports `unavailable` with that reason so the answer is visible | refuse every non-holder out-of-process dispatch. Dispatch cannot know the footprint of free-form work, so the rule is "all non-holder dispatch" for the duration (a short window). Inline work by an agent that is told `unavailable` is not stopped here; the commit and ref gates stop its result. Workers the holder itself dispatches get their own session ids, so the holder passes an explicit holder token (section 3.2) to its workers or does the cutover writes itself |
+| Dispatch admission | current admission seams: `fgos run`, `fgos workflow start`, the assignment runner and `bind()` callers refuse with a `documentation-cutover-lease` reason (a new `bind()` refusal alone is not enough, see the prior-art table); `decide` reports `unavailable` with that reason so the answer is visible | refuse every non-holder out-of-process dispatch. Dispatch cannot know the footprint of free-form work, so the rule is "all non-holder dispatch" for the duration (a short window). Inline work by an agent that is told `unavailable` is not stopped here; the commit and ref gates stop its result. Workers the holder itself dispatches get their own session ids, so the holder passes an explicit holder token (section 3.2) to its workers or does the cutover writes itself |
 | Merge | `mergeRunnerItem` / `mergeRunnerItemLocked` and the merge readiness listing | refuse an item whose `changedFiles` intersect scope; items that touch only code merge as usual |
 | Registered doc writers | the shared helper in 3.2 | refuse writes to scope for non-holders |
 | Claim (`fgos take` / `pick`) | `claim-port.mjs` | not gated (a claim only creates a worktree and records state); the claimed item's later commit and merge are refused if they touch scope |
@@ -116,23 +126,23 @@ stateDiagram-v2
 
 ### 3.7. Failure and abandon path
 
-A crashed or lost holder leaves the lock in place. This is deliberate: with no TTL a stale lease cannot silently reopen the freeze window. Clearing follows `fgos unlock`: a dedicated door (name to be chosen when built, not a hand edit of `.fgos`) that
+A crashed or lost holder leaves the committed sidecar held even if the kernel lock releases. This is deliberate: with no TTL a stale lease cannot silently reopen the freeze window. Clearing follows `fgos unlock`: a dedicated door (name to be chosen when built, not a hand edit of `.fgos`) that
 
 - refuses while the recorded holder session is demonstrably alive (liveness is only decidable for numeric identities, as the `unlock` comments note for string identities; for a string identity the door refuses without an owner confirmation flag and a written reason);
 - writes the abandon record (who cleared, reason, timestamp, holder identity, age) to the evidence sidecar;
-- removes the lock with `releaseMainCheckoutLock` behind that owner confirmation (not with `forceReclaimAmbiguousLock`, which refuses a valid record); the next acquire must pass every precondition again, including a new digest comparison, so work done under the abandoned lease is re-verified rather than trusted.
+- clears the persistent held state only behind that owner confirmation and releases the current Holder-lock handle through its facade; no removed clear/reclaim API is restored; the next acquire must pass every precondition again, including a new digest comparison, so work done under the abandoned lease is re-verified rather than trusted.
 
 `fgos doctor` reports a held lease with its age as a failing check, so a forgotten lease surfaces at the next health check.
 
 ## 4. What the lease records
 
-In the committed sidecar: holder identity, worktree, branch, base commit; scope list; per-root tree or blob ids at acquire, before ref movement and at release; the worktree and branch enumeration with clean flags; refusals counted by gate and path (from the gates' stderr messages, recorded by the holder, not a new log); abandon records. The lock file itself carries only identity and timestamp (its existing format). Nothing is appended to the event log: plan section 11 requires the cutover append no registry or event-log events.
+In the committed sidecar: holder identity, worktree, branch, base commit; scope list; per-root tree or blob ids at acquire, before ref movement and at release; the worktree and branch enumeration with clean flags; refusals counted by gate and path (from the gates' stderr messages, recorded by the holder, not a new log); abandon records. The runtime lock follows the current Holder-lock format; it is not persistent freeze authority. Nothing is appended to the event log: plan section 11 requires the cutover append no registry or event-log events.
 
 ## 5. Persistent dependencies and registration
 
 **Yes, the design adds infrastructure.** Honest list:
 
-1. A runtime lock file `.fgos/documentation-cutover.lock`, present only during the cutover (already git-ignored by `.fgos/*.lock`).
+1. A lease-owned lock-registry row and its runtime Holder-lock resource, coordinated through the board and resolved through the facade; the committed sidecar carries persistent state.
 2. A new `fgos` door to acquire, inspect, release and abandon, wired in `bin/fgos.mjs` and `src/cli/command-registry.mjs`.
 3. Consultation code in `.githooks/pre-commit`, `bind()`, the merge runner and the registered doc writers.
 4. A committed evidence sidecar under the plan reports directory (no new config).
@@ -167,7 +177,7 @@ The owner accepted every recommendation below as the design direction. Decision 
 
 - Main-checkout resolution of the lock directory from inside the hook running in a linked worktree (the existing hook has an "away from home" path; the new guard must be shown to find the main `.fgos`).
 - The complete list of in-scope doc writers (the node scan found 25 candidates; confirmation file by file is part of building).
-- That every dispatch route passes `bind()`: the live hook covers Agent/Task calls and `fgos dispatch execute`; other executors started by hand outside `fgos` are only caught at commit time.
+- That every relevant admission route enforces the held sidecar: current doors are `fgos run`, `fgos workflow start` and `bind()`; other executors started by hand outside `fgos` are only caught at commit time.
 - Behavior of in-flight dispatches already running when the lease is acquired: this design refuses new work only; the clean-worktree precondition catches their uncommitted in-scope edits, but a run that edits and commits after acquire is refused at commit.
 - Whether a `reference-transaction` hook sees every ref movement of the cutover (decision 8) and how it finds the main checkout's lease from a linked worktree.
-- Whether a lease-aware `fgos dispatch execute` can reach every out-of-process executor path; the plan compiler and `bind()` are separate seams (section 2), and only the ones listed there were read.
+- Whether lease-aware `fgos run`, `fgos workflow start` and `bind()` cover every out-of-process executor path; the plan compiler and `bind()` are separate seams (section 2), and only the ones listed there were read.
