@@ -72,7 +72,7 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "omp-gemini-tetcu72"
+            "invocation": "omp-herdr"
           },
           "claude"
         ]
@@ -82,7 +82,7 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "omp-gemini-tetcu72"
+            "invocation": "omp-herdr"
           },
           "claude"
         ],
@@ -162,7 +162,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -183,7 +183,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -204,7 +204,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -330,7 +330,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -351,7 +351,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -372,7 +372,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -393,7 +393,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -414,7 +414,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -435,7 +435,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -456,7 +456,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -477,7 +477,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -498,7 +498,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -519,7 +519,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -540,7 +540,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -561,7 +561,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -582,7 +582,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -603,7 +603,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -623,7 +623,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ],
         "description": "Workflow unit capability \"coding:discover\" -- declare a \"prefer\" pool to choose which executors serve it."
@@ -644,7 +644,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ],
         "description": "Workflow unit capability \"coding:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
@@ -666,7 +666,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ]
       },
@@ -686,7 +686,7 @@
           },
           {
             "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "invocation": "pi-cli-bwrap"
           }
         ],
         "description": "Workflow unit capability \"coding:validate\" -- declare a \"prefer\" pool to choose which executors serve it."
@@ -695,11 +695,19 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "omp-gemini-tetcu72"
+            "invocation": "omp-herdr"
           },
           "claude"
         ],
         "description": "Workflow unit capability \"coding:implement\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "docs:write": {
+        "description": "Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a \"prefer\" pool to choose which executors serve it.",
+        "serves": {
+          "outputKind": "change",
+          "domain": "docs",
+          "mutates": true
+        }
       }
     },
     "executors": {
@@ -783,30 +791,7 @@
         "allowCrossProvider": true,
         "invocations": [
           {
-            "id": "pi-cli-openrouter",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "pi",
-            "args": [
-              "--model",
-              "{model}",
-              "--thinking",
-              "medium",
-              "--tools",
-              "read,write,edit,bash,grep,find,ls",
-              "--mode",
-              "json",
-              "--approve",
-              "-p",
-              "{prompt}"
-            ],
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
-              "OPENROUTER_API_KEY": "${GLM_OPENROUTER_API_KEY}"
-            }
-          },
-          {
-            "id": "pi-cli-bwrap-openrouter",
+            "id": "pi-cli-bwrap",
             "via": "cli",
             "adapter": "cli-spawn",
             "command": "pi",
@@ -826,19 +811,17 @@
             "confinement": {
               "backend": "bwrap"
             },
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
-              "OPENROUTER_API_KEY": "${GLM_OPENROUTER_API_KEY}"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "auth.json",
+                "models-store.json",
+                "settings.json",
+                "trust.json",
+                "bin/fd"
+              ]
+            }
           }
         ],
         "providerModel": "z-ai"
@@ -883,22 +866,6 @@
         "allowCrossProvider": true,
         "invocations": [
           {
-            "id": "codex-cli-bypass-fgovn",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "codex",
-            "args": [
-              "exec",
-              "--dangerously-bypass-approvals-and-sandbox",
-              "--model",
-              "{model}",
-              "{prompt}"
-            ],
-            "env": {
-              "CODEX_HOME": "${HOME}/.codex-fgovn"
-            }
-          },
-          {
             "id": "codex-cli-bwrap",
             "via": "cli",
             "adapter": "cli-spawn",
@@ -915,18 +882,13 @@
             "confinement": {
               "backend": "bwrap"
             },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "CODEX_HOME"
-                }
-              }
-            ]
+            "credentialStore": {
+              "use": "codex",
+              "homeEnv": "CODEX_HOME"
+            }
           },
           {
-            "id": "codex-herdr-fgovn",
+            "id": "codex-herdr",
             "via": "cli",
             "adapter": "herdr-spawn",
             "confinement": {
@@ -949,87 +911,13 @@
                 "kind": "codex-toml"
               }
             },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "CODEX_HOME"
-                }
-              }
-            ],
-            "env": {
-              "CODEX_HOME": "${HOME}/.codex-fgovn"
+            "credentialStore": {
+              "use": "codex",
+              "homeEnv": "CODEX_HOME"
             }
           },
           {
-            "id": "pi-cli-tetnu",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "pi",
-            "args": [
-              "--model",
-              "{model}",
-              "--thinking",
-              "medium",
-              "--tools",
-              "read,write,edit,bash,grep,find,ls",
-              "--mode",
-              "json",
-              "--approve",
-              "-p",
-              "{prompt}"
-            ],
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetnu"
-            }
-          },
-          {
-            "id": "pi-cli-fgovn",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "pi",
-            "args": [
-              "--model",
-              "{model}",
-              "--thinking",
-              "medium",
-              "--tools",
-              "read,write,edit,bash,grep,find,ls",
-              "--mode",
-              "json",
-              "--approve",
-              "-p",
-              "{prompt}"
-            ],
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-fgovn"
-            }
-          },
-          {
-            "id": "pi-cli-tetcu72",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "pi",
-            "args": [
-              "--model",
-              "{model}",
-              "--thinking",
-              "medium",
-              "--tools",
-              "read,write,edit,bash,grep,find,ls",
-              "--mode",
-              "json",
-              "--approve",
-              "-p",
-              "{prompt}"
-            ],
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetcu72"
-            }
-          },
-          {
-            "id": "pi-cli-bwrap-tetnu",
+            "id": "pi-cli-bwrap",
             "via": "cli",
             "adapter": "cli-spawn",
             "command": "pi",
@@ -1049,86 +937,17 @@
             "confinement": {
               "backend": "bwrap"
             },
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetnu"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
-          },
-          {
-            "id": "pi-cli-bwrap-fgovn",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "pi",
-            "args": [
-              "--model",
-              "{model}",
-              "--thinking",
-              "medium",
-              "--tools",
-              "read,write,edit,bash,grep,find,ls",
-              "--mode",
-              "json",
-              "--approve",
-              "-p",
-              "{prompt}"
-            ],
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-fgovn"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
-          },
-          {
-            "id": "pi-cli-bwrap-tetcu72",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "pi",
-            "args": [
-              "--model",
-              "{model}",
-              "--thinking",
-              "medium",
-              "--tools",
-              "read,write,edit,bash,grep,find,ls",
-              "--mode",
-              "json",
-              "--approve",
-              "-p",
-              "{prompt}"
-            ],
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetcu72"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "auth.json",
+                "models-store.json",
+                "settings.json",
+                "trust.json",
+                "bin/fd"
+              ]
+            }
           }
         ]
       },
@@ -1139,7 +958,7 @@
         "providerModel": "gemini",
         "invocations": [
           {
-            "id": "omp-gemini-tetcu72",
+            "id": "omp-herdr",
             "via": "cli",
             "adapter": "herdr-spawn",
             "confinement": {
@@ -1160,21 +979,19 @@
               "kind": "omp"
             },
             "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/gemini-tetcu72/agent",
               "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
             },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
+            "credentialStore": {
+              "use": "omp",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "agent.db",
+                "config.yml"
+              ]
+            }
           },
           {
-            "id": "omp-cli-bwrap-gemini-tetcu72",
+            "id": "omp-cli-bwrap",
             "via": "cli",
             "adapter": "cli-spawn",
             "command": "omp",
@@ -1195,18 +1012,16 @@
               "backend": "bwrap"
             },
             "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/gemini-tetcu72/agent",
               "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
             },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
+            "credentialStore": {
+              "use": "omp",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "agent.db",
+                "config.yml"
+              ]
+            }
           }
         ]
       },
@@ -1217,30 +1032,7 @@
         "providerModel": "xai",
         "invocations": [
           {
-            "id": "omp-cli-vantt",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "omp",
-            "args": [
-              "--model",
-              "{model}",
-              "--thinking",
-              "medium",
-              "--tools",
-              "read,write,edit,bash,grep,glob",
-              "--mode",
-              "json",
-              "--auto-approve",
-              "-p",
-              "{prompt}"
-            ],
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/xai-vantt/agent",
-              "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
-            }
-          },
-          {
-            "id": "omp-cli-bwrap-vantt",
+            "id": "omp-cli-bwrap",
             "via": "cli",
             "adapter": "cli-spawn",
             "command": "omp",
@@ -1261,21 +1053,20 @@
               "backend": "bwrap"
             },
             "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/xai-vantt/agent",
               "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
             },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
+            "credentialStore": {
+              "use": "omp",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "agent.db",
+                "config.yml",
+                "models.db"
+              ]
+            }
           },
           {
-            "id": "omp-herdr-vantt",
+            "id": "omp-herdr",
             "via": "cli",
             "adapter": "herdr-spawn",
             "confinement": {
@@ -1296,18 +1087,17 @@
               "kind": "omp"
             },
             "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/xai-vantt/agent",
               "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
             },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
+            "credentialStore": {
+              "use": "omp",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "agent.db",
+                "config.yml",
+                "models.db"
+              ]
+            }
           }
         ]
       },
@@ -1318,30 +1108,7 @@
         "providerModel": "deepseek",
         "invocations": [
           {
-            "id": "pi-cli-openrouter",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "pi",
-            "args": [
-              "--model",
-              "{model}",
-              "--thinking",
-              "medium",
-              "--tools",
-              "read,write,edit,bash,grep,find,ls",
-              "--mode",
-              "json",
-              "--approve",
-              "-p",
-              "{prompt}"
-            ],
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
-              "OPENROUTER_API_KEY": "${GLM_OPENROUTER_API_KEY}"
-            }
-          },
-          {
-            "id": "pi-cli-bwrap-openrouter",
+            "id": "pi-cli-bwrap",
             "via": "cli",
             "adapter": "cli-spawn",
             "command": "pi",
@@ -1361,22 +1128,20 @@
             "confinement": {
               "backend": "bwrap"
             },
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
-              "OPENROUTER_API_KEY": "${GLM_OPENROUTER_API_KEY}"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "auth.json",
+                "models-store.json",
+                "settings.json",
+                "trust.json",
+                "bin/fd"
+              ]
+            }
           },
           {
-            "id": "pi-herdr-openrouter",
+            "id": "pi-herdr",
             "via": "cli",
             "adapter": "herdr-spawn",
             "confinement": {
@@ -1396,19 +1161,17 @@
               "exitCommand": "/quit",
               "kind": "pi"
             },
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
-              "OPENROUTER_API_KEY": "${GLM_OPENROUTER_API_KEY}"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "auth.json",
+                "models-store.json",
+                "settings.json",
+                "trust.json",
+                "bin/fd"
+              ]
+            }
           }
         ]
       }
@@ -1561,5 +1324,8 @@
       "minRows": 20,
       "maxPanesPerTab": 8
     }
+  },
+  "eventStore": {
+    "remote": "origin"
   }
 }

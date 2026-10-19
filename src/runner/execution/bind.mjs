@@ -164,6 +164,10 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
   // Level 4: Overrides matching role/unit
   const matchingOverride = findMatchingOverride(overrides, unit, role);
 
+  // Skills the work needs. Only roles that do the unit's work are asked for them; a checker or panel
+  // seat reads the result and is chosen on independence, not on what the producer's task needs.
+  const requiredSkills = !isCheckerOrPanelRole(role) && Array.isArray(unit?.skills) ? unit.skills : [];
+
   // Level 2 & 1: Capability prefer candidates (project / global)
   const { entry: capConfig, key: capKey } = lookupCapabilityConfig(runnerConfig, unit?.capability);
 
@@ -242,6 +246,17 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
         continue;
       }
 
+      // Filter: the executor must declare every skill the unit needs (`supports.skills`).
+      if (requiredSkills.length > 0) {
+        const declared = executorEntry?.supports?.skills ?? [];
+        const missing = requiredSkills.filter((skill) => !declared.includes(skill));
+        if (missing.length > 0) {
+          refusalReason = 'skills-unavailable';
+          refusalDetail = `Candidate "${executorId}" does not declare skill${missing.length > 1 ? 's' : ''} [${missing.join(', ')}] in supports.skills`;
+          continue;
+        }
+      }
+
       // Filter: a family excluded by the caller (a dead credential seen earlier in this unit).
       if (excludedFamilies.has(providerFamily.toLowerCase())) {
         refusalReason = 'family-excluded';
@@ -313,7 +328,8 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
   // Fallback: If no candidate chosen yet
   if (!chosenCandidate) {
     // If role === 'producer' and session has Lead (not headless) -> inline
-    if (role === 'producer' && isLeadPresent && !blind) {
+    // The session lead declares no skills, so a unit that needs some never falls back to it.
+    if (role === 'producer' && isLeadPresent && !blind && requiredSkills.length === 0) {
       chosenCandidate = {
         executor: session.provider ?? 'lead',
         invocation: null,
@@ -324,14 +340,14 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
       if (isHeadless) {
         return {
           refused: {
-            reason: refusalReason || 'headless-no-executor',
+            reason: refusalReason || (requiredSkills.length > 0 ? 'skills-unavailable' : 'headless-no-executor'),
             detail: refusalDetail || `No candidate executor available in headless session for capability "${unit?.capability}"`,
           },
         };
       }
       return {
         refused: {
-          reason: refusalReason || 'no-candidate',
+          reason: refusalReason || (requiredSkills.length > 0 ? 'skills-unavailable' : 'no-candidate'),
           detail: refusalDetail || `No candidate executor found for role "${role}" and capability "${unit?.capability}"`,
         },
       };

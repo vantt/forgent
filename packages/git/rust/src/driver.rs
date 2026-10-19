@@ -17,6 +17,65 @@ static SERIAL: AtomicU64 = AtomicU64::new(0);
 static GIT: OnceLock<Option<PathBuf>> = OnceLock::new();
 // One selected executable and one floor result, including failures, per process.
 static FLOOR: OnceLock<Result<GitFloorVerdict>> = OnceLock::new();
+/// The recorded floor verdict, in the driver's trusted state root.
+const FLOOR_RECORD: &str = "git-floor-verdict.json";
+
+fn floor_record(key: &serde_json::Value, v: &GitFloorVerdict) -> serde_json::Value {
+    serde_json::json!({
+        "key": key,
+        "version": v.version,
+        "minimum": v.minimum,
+        "supported": v.supported,
+        "probes": v.probes.iter().map(|p| serde_json::json!({"name": p.name, "passed": p.passed, "evidence": p.evidence})).collect::<Vec<_>>(),
+    })
+}
+
+/// The recorded verdict when its key equals `key` exactly; anything
+/// unreadable, foreign or different is no record.
+fn read_floor_record(path: &Path, key: &serde_json::Value) -> Option<GitFloorVerdict> {
+    use std::io::Read;
+    #[cfg(unix)]
+    let file = {
+        use std::os::unix::fs::OpenOptionsExt;
+        fs::OpenOptions::new().read(true).custom_flags(libc::O_NOFOLLOW).open(path).ok()?
+    };
+    #[cfg(not(unix))]
+    let file = fs::File::open(path).ok()?;
+    let mut bytes = Vec::new();
+    file.take(64 * 1024).read_to_end(&mut bytes).ok()?;
+    let record: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
+    if record.get("key")? != key {
+        return None;
+    }
+    let text = |v: &serde_json::Value| v.as_str().map(str::to_owned);
+    let probes = record
+        .get("probes")?
+        .as_array()?
+        .iter()
+        .map(|p| {
+            Some(FloorProbe {
+                name: text(p.get("name")?)?,
+                passed: p.get("passed")?.as_bool()?,
+                evidence: text(p.get("evidence")?)?,
+            })
+        })
+        .collect::<Option<Vec<_>>>()?;
+    let supported = record.get("supported")?.as_bool()?;
+    let contract: serde_json::Value = serde_json::from_str(include_str!("../../contracts/git-floor.v1.json")).ok()?;
+    let required: BTreeSet<_> = contract["requiredProbes"].as_array()?.iter().map(|v| v.as_str()).collect();
+    let actual: BTreeSet<_> = probes.iter().map(|p| Some(p.name.as_str())).collect();
+    if actual != required || probes.len() != required.len() { return None; }
+    // A record never claims more than its own probes show.
+    if supported != (!probes.is_empty() && probes.iter().all(|p| p.passed)) {
+        return None;
+    }
+    Some(GitFloorVerdict {
+        version: text(record.get("version")?)?,
+        minimum: text(record.get("minimum")?)?,
+        supported,
+        probes,
+    })
+}
 
 /// Effective config record: origin, normalized key, byte-preserving value.
 type ConfigRecord = (Vec<u8>, String, Vec<u8>);
@@ -81,6 +140,7 @@ fn io(error: std::io::Error) -> OperationError {
 pub(crate) enum Policy {
     Inspect,
     Publication,
+    LocalMutation,
     Remote,
     HookContext,
 }
@@ -153,12 +213,42 @@ pub struct GitDriver {
     config_sources: Mutex<BTreeMap<ConfigEnvironment, Vec<PathBuf>>>,
 }
 impl GitDriver {
+    /// Setup-only repair. Canonicalizes the root; hooks use a no-follow descriptor.
+    /// Existing unrelated roots and foreign owners are never chmodded.
+    pub fn prepare_directories(state_root: &Path) -> Result<bool> {
+        let existed = state_root.exists();
+        let root = if existed {
+            fs::canonicalize(state_root).map_err(io)?
+        } else {
+            state_root.to_path_buf()
+        };
+        if existed && root.file_name().is_none_or(|n| n != "fgos") {
+            // The driver's own floor record is an existing ownership marker.
+            let marker = root.join(FLOOR_RECORD);
+            let owned_marker = fs::symlink_metadata(&marker)
+                .is_ok_and(|m| m.is_file() && !m.file_type().is_symlink())
+                && fs::read(&marker)
+                    .ok()
+                    .and_then(|bytes| serde_json::from_slice::<serde_json::Value>(&bytes).ok())
+                    .is_some_and(|v| {
+                        v.get("key").is_some_and(|k| k.get("binary").is_some())
+                            && v.get("probes").is_some_and(|p| p.is_array())
+                    });
+            if !owned_marker {
+                // Safe roots need no permission change, but must still be checked.
+                trusted_directory(&root).map_err(|_| refusal(format!("untrusted-driver-directory: {}; refusing to chmod an unrelated root; point FGOS_STATE_ROOT/FGOS_STATE_HOME at an fgOS directory named fgos or repair its permissions manually", root.display())))?;
+            }
+        }
+        let mut changed = secure_driver_directory(&root, 0o700, true)?;
+        changed |= secure_driver_directory(&root.join("git-empty-hooks"), 0o500, false)?;
+        Ok(changed)
+    }
     /// state_root is a caller-owned trusted directory, not a repository path.
     pub fn new(state_root: &Path) -> Result<Self> {
         let state_root = fs::canonicalize(state_root).map_err(io)?;
         trusted_directory(&state_root)?;
         let hooks = state_root.join("git-empty-hooks");
-        match fs::create_dir(&hooks) {
+        match driver_directory_builder(0o500).create(&hooks) {
             Ok(()) => {
                 #[cfg(unix)]
                 {
@@ -197,7 +287,7 @@ impl GitDriver {
     }
 
     pub fn git_floor_verdict(&self) -> Result<&GitFloorVerdict> {
-        match FLOOR.get_or_init(|| self.probe_floor()) {
+        match FLOOR.get_or_init(|| self.recorded_floor()) {
             Ok(verdict) => Ok(verdict),
             Err(error) => {
                 // Floor probes cannot publish or carry an operation receipt.
@@ -210,7 +300,7 @@ impl GitDriver {
         }
     }
 
-    fn require_floor(&self) -> Result<()> {
+    pub(crate) fn require_floor(&self) -> Result<()> {
         if self.git_floor_verdict()?.supported {
             Ok(())
         } else {
@@ -222,8 +312,42 @@ impl GitDriver {
     /// Linked gitdir authority is read from the main registration, never .git.
     pub fn resolve_repo(&self, path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
         self.require_floor()?;
-        let main = fs::canonicalize(trusted_main).map_err(io)?;
+        let mut main = fs::canonicalize(trusted_main).map_err(io)?;
         let path = fs::canonicalize(path).map_err(io)?;
+        // Callers may supply a cwd beneath a checkout. Locate only on disk;
+        // never let Git or GIT_* environment select topology authority.
+        while !main.join(".git").exists()
+            && !(main.join("HEAD").is_file() && main.join("objects").is_dir())
+        {
+            if !main.pop() {
+                return Ok(ResolveRepo::NotARepository);
+            }
+        }
+        // A linked cwd supplies only a discovery hint. Trust comes from the
+        // main .git directory and reciprocal registered gitdir/backlink.
+        let main = if main.join(".git").is_file() {
+            let hint = fs::read(main.join(".git")).map_err(io)?;
+            let hint = line(&hint)?
+                .strip_prefix("gitdir: ")
+                .ok_or_else(|| refusal("untrusted-worktree"))?;
+            let admin = fs::canonicalize(main.join(hint)).map_err(io)?;
+            let common_hint = fs::read(admin.join("commondir"))
+                .map_err(|_| refusal("trusted-main-gitfile-unsupported"))?;
+            let common = fs::canonicalize(admin.join(line(&common_hint)?)).map_err(io)?;
+            let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
+            if common.file_name() != Some(std::ffi::OsStr::new(".git"))
+                || admin.parent() != Some(common.join("worktrees").as_path())
+                || Path::new(line(&backlink)?) != main.join(".git")
+            {
+                return Err(refusal("untrusted-worktree"));
+            }
+            common
+                .parent()
+                .ok_or_else(|| refusal("untrusted-worktree"))?
+                .to_owned()
+        } else {
+            main
+        };
         let common = if main.join(".git").is_dir() {
             let dir = main.join(".git");
             if fs::symlink_metadata(&dir)
@@ -237,11 +361,17 @@ impl GitDriver {
         } else if main.join("HEAD").is_file() && main.join("objects").is_dir() {
             main.clone()
         } else {
+            if main.join(".git").is_file() {
+                // A worker-controlled gitfile is never topology authority. The
+                // caller must supply the trusted main checkout; separate-git-dir
+                // needs an explicit trusted common-dir contract before support.
+                return Err(refusal("trusted-main-gitfile-unsupported"));
+            }
             return Ok(ResolveRepo::NotARepository);
         };
         let mut git_dir = common.clone();
         let bare = common == main;
-        let work_tree = if bare { None } else { Some(path.clone()) };
+        let mut work_tree = if bare { None } else { Some(main.clone()) };
         if path != main {
             let mut found = None;
             if let Ok(entries) = fs::read_dir(common.join("worktrees")) {
@@ -249,18 +379,36 @@ impl GitDriver {
                     let admin = entry.map_err(io)?.path();
                     let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
                     let backlink = line(&backlink)?;
-                    if Path::new(backlink) == path.join(".git") {
+                    let checkout = Path::new(backlink)
+                        .parent()
+                        .ok_or_else(|| refusal("untrusted-worktree"))?;
+                    if path.starts_with(checkout)
+                        && (found.is_none()
+                            || work_tree.as_ref().is_none_or(|prior| {
+                                checkout.components().count() > prior.components().count()
+                            }))
+                    {
                         let registered_common = fs::read(admin.join("commondir")).map_err(io)?;
                         if fs::canonicalize(admin.join(line(&registered_common)?)).map_err(io)?
                             != common
                         {
                             return Err(refusal("untrusted-worktree"));
                         }
+                        work_tree = Some(fs::canonicalize(checkout).map_err(io)?);
                         found = Some(fs::canonicalize(admin).map_err(io)?);
                     }
                 }
             }
-            git_dir = found.ok_or_else(|| refusal("untrusted-worktree"))?;
+            if let Some(found) = found {
+                git_dir = found;
+            } else if !path.starts_with(&main)
+                || path
+                    .ancestors()
+                    .take_while(|p| *p != main)
+                    .any(|p| p.join(".git").exists())
+            {
+                return Err(refusal("untrusted-worktree"));
+            }
         }
         let mut repo = RepoHandle {
             common_dir: common.clone(),
@@ -334,11 +482,13 @@ impl GitDriver {
         )
     }
 
-    fn publication_preflight(
+    fn config_paths(
         &self,
-        repo: &RepoHandle,
-        handle: &fgos_holder_lock::Handle,
-    ) -> Result<()> {
+        repo: Option<&RepoHandle>,
+        cwd: &Path,
+        policy: Policy,
+        loan: Option<&dyn BorrowedSpawn>,
+    ) -> Result<Vec<PathBuf>> {
         let environment = (
             std::env::var_os("HOME"),
             std::env::var_os("XDG_CONFIG_HOME"),
@@ -356,11 +506,11 @@ impl GitDriver {
             // appears later, and a custom Git prefix must never be guessed.
             for variable in ["GIT_CONFIG_SYSTEM", "GIT_CONFIG_GLOBAL"] {
                 let out = self.invoke_input(
-                    Some(repo),
-                    &repo.trusted_main_root,
+                    repo,
+                    cwd,
                     &["var", variable],
-                    Policy::Publication,
-                    Some(handle),
+                    policy,
+                    loan,
                     true,
                     PATH_LIMIT,
                     Duration::from_secs(30),
@@ -384,6 +534,20 @@ impl GitDriver {
             paths
         };
         drop(sources);
+        Ok(globals)
+    }
+
+    fn publication_preflight(
+        &self,
+        repo: &RepoHandle,
+        handle: &fgos_holder_lock::Handle,
+    ) -> Result<()> {
+        let globals = self.config_paths(
+            Some(repo),
+            &repo.trusted_main_root,
+            Policy::Publication,
+            Some(handle),
+        )?;
         let mut paths = globals;
         paths.extend([
             repo.common_dir.join("config"),
@@ -417,7 +581,10 @@ impl GitDriver {
             return Err(config.error("git-config-failed"));
         }
         for (origin, key, _) in parse_config(&config.stdout)? {
-            if command_config(&key) {
+            if command_config(&key)
+                && (key != "credential.helper"
+                    || self.untrusted_transport_config(repo)?.iter().any(|k| k == "credential.helper"))
+            {
                 return Err(refusal(format!("repository-config-untrusted: {key}")));
             }
             if let Some(path) = origin.strip_prefix(b"file:") {
@@ -459,15 +626,54 @@ impl GitDriver {
         }
         parse_config(&out.stdout)
     }
-    fn preflight(&self, repo: &RepoHandle) -> Result<()> {
+    /// Read-only diagnostic shared with Remote admission. Scope, rather than
+    /// origin spelling, determines trust even for linked worktrees and symlinks.
+    pub fn untrusted_transport_config(&self, repo: &RepoHandle) -> Result<Vec<String>> {
+        let mut keys = Vec::new();
+        // Transfers are rooted in the trusted main checkout; a linked handle
+        // also contributes its worktree-scoped policy. Refuse either source.
+        for context in [None, Some(repo)] {
+            if context.is_some() && repo.git_dir == repo.common_dir {
+                continue;
+            }
+            let out = self.invoke(
+                context,
+                &repo.trusted_main_root,
+                &["config", "--null", "--show-scope", "--list"],
+                Policy::Inspect,
+                None,
+                false,
+                PATH_LIMIT,
+                Duration::from_secs(30),
+            )?;
+            if !out.success {
+                return Err(out.error("git-config-failed"));
+            }
+            for (scope, key, _) in parse_config(&out.stdout)? {
+                if ![b"global".as_slice(), b"system", b"command"].contains(&scope.as_slice())
+                    && repository_transport_config(&key)
+                {
+                    keys.push(key);
+                }
+            }
+        }
+        keys.sort();
+        keys.dedup();
+        Ok(keys)
+    }
+
+    pub(crate) fn preflight(&self, repo: &RepoHandle) -> Result<()> {
         for (_, key, _) in self.config(repo)? {
-            if command_config(&key) {
+            if command_config(&key)
+                && (key != "credential.helper"
+                    || self.untrusted_transport_config(repo)?.iter().any(|k| k == "credential.helper"))
+            {
                 return Err(refusal(format!("repository-config-untrusted: {key}")));
             }
         }
         Ok(())
     }
-    fn checked(&self, repo: &RepoHandle, args: &[&str], policy: Policy) -> Result<Vec<u8>> {
+    pub(crate) fn checked(&self, repo: &RepoHandle, args: &[&str], policy: Policy) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;
         let out = self.invoke(
@@ -500,7 +706,7 @@ impl GitDriver {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn invoke(
+    pub(crate) fn invoke(
         &self,
         repo: Option<&RepoHandle>,
         cwd: &Path,
@@ -566,10 +772,28 @@ impl GitDriver {
                 argv.push(format!("--work-tree={}", text_path(w)?));
             }
         }
+        if policy == Policy::Remote {
+            argv.extend(
+                [
+                    "-c",
+                    "http.proxy=",
+                    "-c",
+                    "http.sslVerify=true",
+                    "-c",
+                    "http.extraHeader=",
+                    "-c",
+                    "http.followRedirects=false",
+                ]
+                .map(str::to_owned),
+            );
+        }
         for (i, arg) in args.iter().enumerate() {
             argv.push((*arg).to_owned());
             if i == 0 && *arg == "update-ref" {
                 argv.push("--no-deref".into());
+            }
+            if i == 0 && *arg == "diff" {
+                argv.extend(["--no-ext-diff", "--no-textconv", "--no-relative"].map(str::to_owned));
             }
         }
         if policy == Policy::Remote && args.contains(&"protocol.file.allow=always") {
@@ -600,8 +824,16 @@ impl GitDriver {
                 argv.insert(at, format!("{option}={command}"));
             }
         }
-        if args.first() == Some(&"diff") {
-            argv.extend(["--no-ext-diff", "--no-textconv", "--no-relative"].map(str::to_owned));
+        if policy == Policy::Remote {
+            if let Some(repo) = repo {
+                // Repository transport policy is untrusted, including URL-scoped
+                // values which outrank generic -c values. Refuse the whole family.
+                if let Some(key) = self.untrusted_transport_config(repo)?.first() {
+                    return Err(refusal(format!(
+                        "repository-transport-config-untrusted: {key}"
+                    )));
+                }
+            }
         }
         let mut env = Scrubbed::new();
         env.0.insert("LC_ALL".into(), "C".into());
@@ -722,6 +954,76 @@ impl GitDriver {
             code: status.code(),
         })
     }
+    /// The floor verdict for the selected Git. Probing runs about fourteen
+    /// contained Git invocations; its verdict is kept in the state root,
+    /// keyed by everything the probes depend on (the Git binary's identity,
+    /// the floor contract, and the identity of every config file the
+    /// probes' Git could read), and reused by a later process only when
+    /// the whole key is unchanged. Anything else probes again.
+    fn recorded_floor(&self) -> Result<GitFloorVerdict> {
+        let record = self.state_root.join(FLOOR_RECORD);
+        let key = self.floor_key();
+        if let Some(verdict) = key.as_ref().and_then(|key| read_floor_record(&record, key)) {
+            return Ok(verdict);
+        }
+        let verdict = self.probe_floor()?;
+        if let Some(key) = key {
+            // A record that cannot be written only costs the next process a probe.
+            let _ = fgos_durable_file::replace_durably(
+                &self.state_root,
+                FLOOR_RECORD,
+                floor_record(&key, &verdict).to_string().as_bytes(),
+            );
+        }
+        Ok(verdict)
+    }
+    fn floor_key(&self) -> Option<serde_json::Value> {
+        let home = std::env::var_os("HOME").map(PathBuf::from);
+        let xdg = std::env::var_os("XDG_CONFIG_HOME").map(PathBuf::from);
+        let mut configs = self.config_paths(None, &self.state_root, Policy::Inspect, None).ok()?;
+        let before = ConfigStamp::read(configs.clone()).ok()?;
+        // Includes may depend on gitdir/onbranch/hasconfig as well as files.
+        // Conservatively do not persist a verdict for any include directive,
+        // including missing or currently inactive includeIf targets.
+        let config = self
+            .invoke(
+                None,
+                &self.state_root,
+                &["config", "--null", "--show-origin", "--list"],
+                Policy::Inspect,
+                None,
+                false,
+                PATH_LIMIT,
+                Duration::from_secs(10),
+            )
+            .ok()?;
+        if !config.success {
+            return None;
+        }
+        for (origin, key, _) in parse_config(&config.stdout).ok()? {
+            if key == "include.path" || key.starts_with("includeif.") { return None; }
+            if let Some(path) = origin.strip_prefix(b"file:") {
+                let path = PathBuf::from(std::str::from_utf8(path).ok()?);
+                let path = self.state_root.join(path);
+                if !configs.contains(&path) { configs.push(path); }
+            }
+        }
+        if before != ConfigStamp::read(before.paths.clone()).ok()? { return None; }
+        let binary = ConfigStamp::read(vec![self.git.clone()]).ok()?;
+        let configs = ConfigStamp::read(configs).ok()?;
+        Some(serde_json::json!({
+            "v": 2,
+            "hostVersion": env!("CARGO_PKG_VERSION"),
+            "probeCode": crate::wal::canonical_digest(&include_str!("driver.rs")).ok()?,
+            "path": std::env::var_os("PATH").map(|p| p.to_string_lossy().into_owned()),
+            "git": self.git,
+            "binary": binary.files,
+            "contract": crate::wal::canonical_digest(&include_str!("../../contracts/git-floor.v1.json")).ok()?,
+            "home": home,
+            "xdgConfigHome": xdg,
+            "configs": configs.paths.iter().zip(&configs.files).collect::<Vec<_>>(),
+        }))
+    }
     fn probe_floor(&self) -> Result<GitFloorVerdict> {
         let out = self.invoke(
             None,
@@ -765,7 +1067,7 @@ impl GitDriver {
             std::process::id(),
             SERIAL.fetch_add(1, Ordering::Relaxed)
         ));
-        fs::create_dir(&dir).map_err(io)?;
+        driver_directory_builder(0o700).create(&dir).map_err(io)?;
         let result = self.probe_features(&dir, &mut verdict);
         // Probe evidence is diagnostic, not operation evidence; no WAL is here.
         let cleanup = fs::remove_dir_all(&dir).map_err(io);
@@ -926,17 +1228,108 @@ fn line(bytes: &[u8]) -> Result<&str> {
     let bytes = bytes.strip_suffix(b"\n").unwrap_or(bytes);
     std::str::from_utf8(bytes).map_err(|_| refusal("git-protocol-invalid-utf8"))
 }
+fn driver_directory_builder(mode: u32) -> fs::DirBuilder {
+    let builder = fs::DirBuilder::new();
+    #[cfg(unix)]
+    let mut builder = builder;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        builder.mode(mode);
+    }
+    #[cfg(not(unix))]
+    let _ = mode;
+    builder
+}
+fn secure_driver_directory(path: &Path, mode: u32, recursive: bool) -> Result<bool> {
+    let existed = fs::symlink_metadata(path).is_ok();
+    let mut builder = driver_directory_builder(mode);
+    builder.recursive(recursive);
+    let created = match builder.create(path) {
+        Ok(()) => true,
+        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => false,
+        Err(e) => return Err(io(e)),
+    };
+    // recursive create returns Ok for an existing directory; compare mode below
+    // rather than reporting that as a change.
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::{MetadataExt, OpenOptionsExt, PermissionsExt};
+        let file = fs::OpenOptions::new()
+            .read(true)
+            .custom_flags(libc::O_NOFOLLOW | libc::O_DIRECTORY)
+            .open(path)
+            .map_err(|e| refusal(format!("untrusted-driver-directory: {}: {e}; inspect the directory, restore owner read/search access if needed, remove foreign hooks files, then rerun fgos doctor --fix (git-driver-directories)", path.display())))?;
+        let meta = file.metadata().map_err(io)?;
+        if meta.uid() != current_uid() {
+            return Err(refusal("untrusted-driver-directory: not owned by current user; no permission repair allowed"));
+        }
+        if mode == 0o500 {
+            use std::os::fd::IntoRawFd;
+            // fdopendir owns a duplicate, leaving the checked chmod fd alive.
+            let fd = file.try_clone().map_err(io)?.into_raw_fd();
+            // SAFETY: fd is an open directory descriptor, transferred on success.
+            let directory = unsafe { libc::fdopendir(fd) };
+            if directory.is_null() {
+                // SAFETY: failed fdopendir did not take ownership.
+                unsafe { libc::close(fd) };
+                return Err(io(std::io::Error::last_os_error()));
+            }
+            let mut populated = false;
+            let mut read_error = None;
+            loop {
+                // readdir_r reports read errors explicitly and reads this descriptor.
+                let mut entry = std::mem::MaybeUninit::<libc::dirent>::uninit();
+                let mut result = std::ptr::null_mut();
+                #[allow(deprecated)]
+                // SAFETY: directory is live, entry/result are valid output storage.
+                let code = unsafe { libc::readdir_r(directory, entry.as_mut_ptr(), &mut result) };
+                if code != 0 {
+                    read_error = Some(std::io::Error::from_raw_os_error(code));
+                    break;
+                }
+                if result.is_null() {
+                    break;
+                }
+                // SAFETY: successful readdir_r returned an initialized dirent.
+                let name = unsafe { std::ffi::CStr::from_ptr((*result).d_name.as_ptr()) };
+                if name.to_bytes() != b"." && name.to_bytes() != b".." {
+                    populated = true;
+                    break;
+                }
+            }
+            // SAFETY: close the directory and its duplicate fd exactly once.
+            unsafe { libc::closedir(directory) };
+            if populated || read_error.is_some() {
+                return Err(refusal(format!("trusted-hooks-not-empty-or-unreadable: {}{}; inspect it, remove foreign files or restore owner read/search access, then rerun fgos doctor --fix (git-driver-directories)", path.display(), read_error.map(|e| format!(": {e}")).unwrap_or_default())));
+            }
+        }
+        let wanted = if mode == 0o500 {
+            mode
+        } else {
+            meta.mode() & 0o777 & !0o022
+        };
+        if meta.mode() & 0o777 != wanted {
+            file.set_permissions(fs::Permissions::from_mode(wanted))
+                .map_err(io)?;
+            return Ok(true);
+        }
+    }
+    #[cfg(not(unix))]
+    if mode == 0o500 { check_hooks(path)?; } else { trusted_directory(path)?; }
+    Ok(created && !existed)
+}
 fn trusted_directory(path: &Path) -> Result<()> {
     let meta = fs::symlink_metadata(path).map_err(io)?;
     if !meta.is_dir() || meta.file_type().is_symlink() {
-        return Err(refusal("untrusted-driver-directory"));
+        return Err(refusal(format!("untrusted-driver-directory: {} must be a real directory; run fgos doctor --fix (git-driver-directories)", path.display())));
     }
     #[cfg(unix)]
     {
         use std::os::unix::fs::MetadataExt;
         // The state root must belong to this process's user, not a repository.
         if meta.mode() & 0o022 != 0 || meta.uid() != current_uid() {
-            return Err(refusal("untrusted-driver-directory"));
+            return Err(refusal(format!("untrusted-driver-directory: {} mode {:04o}, uid {} (current {}); group/world writable or wrong owner; run fgos doctor --fix (git-driver-directories); only current-user-owned fgOS directories can be repaired", path.display(), meta.mode() & 0o777, meta.uid(), current_uid())));
         }
     }
     Ok(())
@@ -948,14 +1341,14 @@ fn current_uid() -> u32 {
 }
 fn check_hooks(path: &Path) -> Result<()> {
     trusted_directory(path)?;
-    if fs::read_dir(path).map_err(io)?.next().is_some() {
-        return Err(refusal("trusted-hooks-not-empty"));
+    if fs::read_dir(path).map_err(|e| refusal(format!("trusted-hooks-unreadable: {}: {e}; inspect it and restore owner read/search access, then rerun fgos doctor --fix (git-driver-directories)", path.display())))?.next().is_some() {
+        return Err(refusal(format!("trusted-hooks-not-empty: {}; inspect it, remove foreign files, then rerun fgos doctor --fix (git-driver-directories)", path.display())));
     }
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
         if fs::metadata(path).map_err(io)?.permissions().mode() & 0o777 != 0o500 {
-            return Err(refusal("trusted-hooks-permissions"));
+            return Err(refusal(format!("trusted-hooks-permissions: {} must have mode 0500; run fgos doctor --fix (git-driver-directories)", path.display())));
         }
     }
     Ok(())
@@ -1044,13 +1437,34 @@ fn command_config(key: &str) -> bool {
                 .any(|s| key.ends_with(s)))
         || (key.starts_with("diff.") && key.ends_with(".textconv"))
         || (key.starts_with("merge.") && key.ends_with(".driver"))
-        || (key.starts_with("url.") && key.ends_with(".insteadof"))
+        || key.starts_with("url.")
         || (key.starts_with("remote.")
             && [".uploadpack", ".receivepack"]
                 .iter()
                 .any(|s| key.ends_with(s)))
 }
-/// Config --null --show-origin emits alternating origin NUL key LF value NUL.
+// Generic HTTP settings below are forcibly overridden by Remote's -c policy.
+fn repository_transport_config(key: &str) -> bool {
+    ![
+        "http.proxy",
+        "http.sslverify",
+        "http.extraheader",
+        "http.followredirects",
+    ]
+    .contains(&key)
+        && (key.starts_with("http.")
+            || key.starts_with("https.")
+            || key.starts_with("ssh.")
+            || key.starts_with("protocol.")
+            || key.starts_with("credential.")
+            || key == "core.gitproxy"
+            || key == "remote.pushdefault"
+            || (key.starts_with("remote.")
+                && [".proxy", ".proxyauthmethod", ".vcs"]
+                    .iter()
+                    .any(|s| key.ends_with(s))))
+}
+/// Config --null with --show-origin or --show-scope emits metadata NUL key LF value NUL.
 fn parse_config(bytes: &[u8]) -> Result<Vec<ConfigRecord>> {
     let fields = nul_records(bytes)?;
     if fields.len() % 2 != 0 {
@@ -1877,6 +2291,66 @@ mod tests {
             let _ = fs::remove_dir_all(&self.0);
         }
     }
+    #[test]
+    fn floor_record_is_reused_only_for_the_same_key_and_consistent_verdict() {
+        let t = Temp::new();
+        let driver = GitDriver::new(&t.0).unwrap();
+        let key = driver.floor_key().expect("floor key");
+        let verdict = GitFloorVerdict {
+            version: "2.53.0".into(),
+            minimum: "2.53.0".into(),
+            supported: true,
+            probes: ["hook-suppression", "no-lazy-fetch", "update-ref-no-deref", "hook-run"].into_iter().map(|name| FloorProbe { name: name.into(), passed: true, evidence: "e".into() }).collect(),
+        };
+        let path = t.0.join(FLOOR_RECORD);
+        fs::write(&path, floor_record(&key, &verdict).to_string()).unwrap();
+        let read = read_floor_record(&path, &key).expect("same key reuses the record");
+        assert!(read.supported && read.probes.len() == 4 && read.version == "2.53.0");
+        // Any change in what the probes depend on is a different key.
+        let mut other = key.clone();
+        other["binary"] = serde_json::json!(["changed"]);
+        assert!(read_floor_record(&path, &other).is_none());
+        // A record whose verdict disagrees with its own probes is ignored.
+        let mut lying = floor_record(&key, &verdict);
+        lying["probes"][0]["passed"] = serde_json::json!(false);
+        fs::write(&path, lying.to_string()).unwrap();
+        assert!(read_floor_record(&path, &key).is_none());
+        // Passing an incomplete or different probe set cannot certify the floor.
+        for name in ["different-probe", "hook-suppression"] {
+            let mut incomplete = floor_record(&key, &verdict);
+            incomplete["probes"] = serde_json::json!([{"name": name, "passed": true, "evidence": "e"}]);
+            fs::write(&path, incomplete.to_string()).unwrap();
+            assert!(read_floor_record(&path, &key).is_none());
+        }
+        // A symlink is never followed.
+        fs::remove_file(&path).unwrap();
+        fs::write(t.0.join("elsewhere"), floor_record(&key, &verdict).to_string()).unwrap();
+        #[cfg(unix)]
+        {
+            std::os::unix::fs::symlink(t.0.join("elsewhere"), &path).unwrap();
+            assert!(read_floor_record(&path, &key).is_none());
+        }
+    }
+    #[test]
+    fn floor_key_names_the_git_binary_and_config_identities() {
+        let t = Temp::new();
+        let driver = GitDriver::new(&t.0).unwrap();
+        let key = driver.floor_key().expect("floor key");
+        assert_eq!(key["git"], serde_json::json!(driver.git));
+        assert_eq!(key["hostVersion"], env!("CARGO_PKG_VERSION"));
+        assert!(key["probeCode"].as_str().is_some_and(|s| s.len() == 64));
+        assert_eq!(key["path"], std::env::var("PATH").unwrap());
+        assert!(key["binary"][0].is_string(), "the binary identity is recorded");
+        assert!(key["configs"].as_array().unwrap().iter().any(|c| c[0] == serde_json::json!("/etc/gitconfig")));
+    }
+    #[test]
+    fn include_directives_disable_persistent_floor_reuse_even_when_inactive() {
+        let t = Temp::new();
+        git(&t.0, &["init", "--quiet"]);
+        git(&t.0, &["config", "includeIf.gitdir:/never-a-probe/.path", "missing-include"]);
+        let driver = GitDriver::new(&t.0).unwrap();
+        assert!(driver.floor_key().is_none());
+    }
     fn git(dir: &Path, args: &[&str]) -> Vec<u8> {
         let out = Command::new("git")
             .current_dir(dir)
@@ -1983,7 +2457,7 @@ mod tests {
             !control.status.success(),
             "the installed hook must reject the control"
         );
-        release(handle);
+        assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
     }
     #[test]
     fn floor_and_all_repository_backends() {
@@ -2053,6 +2527,7 @@ mod tests {
             "includeIf.gitdir:x.path",
             "credential.helper",
             "url.x.insteadOf",
+            "url.x.pushInsteadOf",
             "remote.x.uploadpack",
             "remote.x.receivepack",
             "core.sshCommand",
@@ -2158,10 +2633,8 @@ mod tests {
             driver.resolve_repo(&alien.0, &dir.0).unwrap_err().cause,
             "untrusted-worktree"
         );
-        assert!(matches!(
-            driver.resolve_repo(&linked.0, &linked.0).unwrap(),
-            ResolveRepo::NotARepository
-        ));
+        // The worker gitfile was poisoned above: inferred discovery refuses it.
+        assert!(driver.resolve_repo(&linked.0, &linked.0).is_err());
     }
     #[test]
     fn output_ceiling_and_borrow_gate() {
@@ -2221,13 +2694,11 @@ mod tests {
             fs::set_permissions(&driver.hooks, fs::Permissions::from_mode(0o700)).unwrap();
         }
         fs::write(driver.hooks.join("injected"), b"x").unwrap();
-        assert_eq!(
-            driver
-                .checked(&repo, &["status", "-z"], Policy::Inspect)
-                .unwrap_err()
-                .cause,
-            "trusted-hooks-not-empty"
-        );
+        let cause = driver.checked(&repo, &["status", "-z"], Policy::Inspect).unwrap_err().cause;
+        assert!(cause.starts_with("trusted-hooks-not-empty"));
+        assert!(cause.contains(&driver.hooks.display().to_string()));
+        assert!(cause.contains("remove foreign files"));
+        assert!(cause.contains("fgos doctor --fix"));
     }
     #[test]
     fn scrubbed_environment_cannot_supply_git_authority() {
@@ -2349,7 +2820,7 @@ struct CommitCursor {
 }
 
 impl GitDriver {
-    fn inspect_input(&self, repo: &RepoHandle, args: &[&str], input: &[u8]) -> Result<Vec<u8>> {
+    pub(crate) fn inspect_input(&self, repo: &RepoHandle, args: &[&str], input: &[u8]) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;
         let out = self.invoke_input(

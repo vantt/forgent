@@ -655,3 +655,36 @@ test('workflow resume preserves an unknown custody predecessor and redispatches 
   const recovery = readWorkflowEvents({ repoRoot: tmp, workflowRunId: first.workflowRunId }).find((e) => e.payload.recovery);
   assert.equal(recovery.payload.recovery.preservedWorktree, old.worktreePath);
 });
+
+test('a unit\'s verify in a units file reaches the Unit and runs in its worktree', async () => {
+  const tmp = setupRepo();
+  useTwoFamilies(tmp);
+  const file = unitsFile(tmp, [{
+    id: 'checked',
+    objective: 'Read the readme',
+    capability: 'docs:write',
+    pattern: 'reviewed',
+    verify: `node -e "require('fs').writeFileSync('verify-ran.txt', 'yes')"`,
+  }]);
+  const state = await startWorkflow({ unitsPath: file, ...opts(tmp) });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  const record = unitRecordOf(tmp, state.steps.checked.units.checked.unitRunId);
+  assert.equal(record.unit.verify, `node -e "require('fs').writeFileSync('verify-ran.txt', 'yes')"`);
+  assert.equal(fs.readFileSync(path.join(tmp, 'verify-ran.txt'), 'utf8'), 'yes');
+});
+
+test('a unit\'s skills in a units file reach bind(), and a pool that cannot provide them refuses the unit', async () => {
+  const tmp = setupRepo();
+  const file = unitsFile(tmp, [{ id: 'needs-skill', objective: 'Read the readme', capability: 'docs:write', skills: ['docs-seeker'] }]);
+  const state = await startWorkflow({ unitsPath: file, ...opts(tmp) });
+  assert.notEqual(state.status, 'completed');
+  assert.match(JSON.stringify(state.steps), /skills-unavailable/);
+
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  cfg.runner.executors['test-node'].supports = { skills: ['docs-seeker'] };
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  const served = await startWorkflow({ unitsPath: file, ...opts(tmp) });
+  assert.equal(served.status, 'completed', JSON.stringify(served.steps));
+  assert.deepEqual(unitRecordOf(tmp, served.steps['needs-skill'].units['needs-skill'].unitRunId).unit.skills, ['docs-seeker']);
+});

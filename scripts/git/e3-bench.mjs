@@ -340,21 +340,24 @@ async function run(args) {
     const remote = fs.realpathSync((git(['init', '-q', '--bare', path.join(root, 'census-remote.git')]), path.join(root, 'census-remote.git')));
     git(['--git-dir', local, 'remote', 'add', 'origin', remote]);
     const log = path.join(root, 'census.strace');
-    execFileSync('strace', ['-f', '-qq', '-e', 'trace=execve,access,faccessat,faccessat2', '-o', log, process.execPath, SELF, 'census', '--descriptor', descriptor, '--state', state, '--repo', local, '--remote', remote], { stdio: 'inherit' });
+    execFileSync('strace', ['-f', '-qq', '-e', 'trace=execve,access,faccessat,faccessat2,fsync,fdatasync', '-o', log, process.execPath, SELF, 'census', '--descriptor', descriptor, '--state', state, '--repo', local, '--remote', remote], { stdio: 'inherit' });
     const counts = {};
     let open = null;
     for (const line of fs.readFileSync(log, 'utf8').split('\n')) {
       const marker = line.match(/nonexistent-e3-marker\/([A-Za-z-]+)-(\d+)-(begin|end)/);
-      if (marker) { open = marker[3] === 'begin' ? { op: marker[1], execs: [] } : (counts[marker[1]] ??= [], counts[marker[1]].push(open.execs), null); continue; }
+      if (marker) { open = marker[3] === 'begin' ? { op: marker[1], execs: [], fsyncs: 0 } : (counts[marker[1]] ??= [], counts[marker[1]].push(open), null); continue; }
       const exec = line.match(/execve\("([^"]+)"/);
       if (open && exec && !/= -1 E/.test(line)) open.execs.push(path.basename(exec[1]));
+      // Count each fsync once: its start line (strace splits a call that
+      // another thread interrupts into "<unfinished ...>" and "resumed").
+      if (open && /\bf(data)?sync\(/.test(line) && !/resumed/.test(line)) open.fsyncs++;
     }
     const census = {};
     for (const [op, runs] of Object.entries(counts)) {
-      const totals = runs.map(r => r.length);
+      const totals = runs.map(r => r.execs.length);
       const byBinary = {};
-      for (const name of runs[runs.length - 1]) byBinary[name] = (byBinary[name] ?? 0) + 1;
-      census[op] = { execvePerRun: totals, gitTopLevel: runs.map(r => r.filter(n => n === 'git').length), lastRunByBinary: byBinary, nodeToAddonCalls: 1 };
+      for (const name of runs[runs.length - 1].execs) byBinary[name] = (byBinary[name] ?? 0) + 1;
+      census[op] = { execvePerRun: totals, gitTopLevel: runs.map(r => r.execs.filter(n => n === 'git').length), fsyncPerRun: runs.map(r => r.fsyncs), lastRunByBinary: byBinary, nodeToAddonCalls: 1 };
     }
     say('subprocessCensus', census);
   }
@@ -460,8 +463,9 @@ async function rollback(root, fgctl, descriptor, index, loader) {
   const receipts = fs.readFileSync(log, 'utf8').trim().split('\n').map(l => JSON.parse(l));
   const port = index.createGitPublication({ stateRoot: privateDir(path.join(base, 'verify-state')), repoPath: fs.realpathSync(ws), trustedMain: fs.realpathSync(ws), reference, writer: WRITER }, loader);
   let lost = 0;
+  // Recover observes the durable receipt without replaying a publication.
   for (const r of receipts) {
-    try { const again = port.recover({ operationId: r.id }); if (again.attribution !== 'thisInvocationWonCas' || again.localEffect.publishedOid !== r.next) lost++; } catch { lost++; }
+    try { const again = port.recover({ operationId: r.id }); if (again.operationId !== r.id || again.attribution !== 'thisInvocationWonCas' || again.localEffect.publishedOid !== r.next) lost++; } catch { lost++; }
   }
   const tipMatches = port.readRef({ name: reference }).oid === receipts[receipts.length - 1].next;
   port.close();

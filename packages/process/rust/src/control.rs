@@ -225,7 +225,7 @@ pub(crate) fn unix_spawn_with_fds(mut cmd: Command, fd_map: &[(FdSlot, &File)]) 
 /// calling process's descriptors there); when that cannot be read, every
 /// number up to the open-file limit is probed instead.
 #[cfg(unix)]
-fn inheritable_fds() -> Vec<libc::c_int> {
+pub(crate) fn inheritable_fds() -> Vec<libc::c_int> {
     let listed: Vec<libc::c_int> = match std::fs::read_dir("/dev/fd") {
         Ok(entries) => entries
             .filter_map(|entry| entry.ok())

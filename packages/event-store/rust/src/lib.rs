@@ -30,3 +30,6 @@ pub mod refspec;
 pub mod sync;
 
 mod fence;
+
+pub mod export;
+pub mod diagnostics;

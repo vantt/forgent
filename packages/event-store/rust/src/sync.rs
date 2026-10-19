@@ -32,6 +32,10 @@ pub struct SyncRequest<'a> {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct SyncRecord {
+    #[serde(default)]
+    pub last_fetch: Option<TransferRecord>,
+    #[serde(default)]
+    pub last_push: Option<TransferRecord>,
     #[serde(default = "record_version")]
     pub v: u8,
     pub time: u64,
@@ -44,12 +48,35 @@ pub struct SyncRecord {
     pub warnings: Vec<String>,
     pub unpublished_since: Option<u64>,
 }
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct TransferRecord {
+    pub time: u64,
+    pub remote: String,
+    pub error: Option<String>,
+}
+fn transfer<T>(
+    record: &mut Option<TransferRecord>,
+    remote: &str,
+    run: impl FnOnce() -> Result<T, Error>,
+) -> Result<T, Error> {
+    let time = now()?;
+    let result = run();
+    *record = Some(TransferRecord {
+        time,
+        remote: remote.into(),
+        error: result.as_ref().err().map(ToString::to_string),
+    });
+    result
+}
 fn record_version() -> u8 {
     1
 }
 impl Default for SyncRecord {
     fn default() -> Self {
         Self {
+            last_fetch: None,
+            last_push: None,
             v: 1,
             time: 0,
             remote: String::new(),
@@ -317,8 +344,10 @@ pub fn sync_with_fs(
             )
             .with_remote(grant.clone());
             port.recover_publications(repo).map_err(git_error)?;
-            port.fetch_refs(repo, req.remote, &refspec::mappings(req.remote)?)
-                .map_err(git_error)?;
+            transfer(&mut state.last_fetch, req.remote, || {
+                port.fetch_refs(repo, req.remote, &refspec::mappings(req.remote)?)
+                    .map_err(git_error)
+            })?;
             fetched = mirrors(&port, repo, req.remote)?;
             verify_mirrors(
                 &port,
@@ -394,7 +423,9 @@ pub fn sync_with_fs(
             }
             if !req.no_push && identity.is_some() && tip(&port, repo, reference.as_str())?.is_some()
             {
-                push(&port, repo, req.remote, reference.clone())?;
+                transfer(&mut state.last_push, req.remote, || {
+                    push(&port, repo, req.remote, reference.clone())
+                })?;
             }
             if req.no_push {
                 if let Some(own) = tip(&port, repo, reference.as_str())? {
@@ -425,16 +456,20 @@ pub fn sync_with_fs(
                 &format!("refs/fgos/remotes/{}/legacy", req.remote),
             )?;
             if local.is_some() && mirror.is_none() {
-                push(
-                    &port,
-                    repo,
-                    req.remote,
-                    RefName::parse("refs/fgos/legacy").unwrap(),
-                )?;
+                transfer(&mut state.last_push, req.remote, || {
+                    push(
+                        &port,
+                        repo,
+                        req.remote,
+                        RefName::parse("refs/fgos/legacy").unwrap(),
+                    )
+                })?;
             }
             // Confirm publication in mirrors for retirement/status and consumer notification.
-            port.fetch_refs(repo, req.remote, &refspec::mappings(req.remote)?)
-                .map_err(git_error)?;
+            transfer(&mut state.last_fetch, req.remote, || {
+                port.fetch_refs(repo, req.remote, &refspec::mappings(req.remote)?)
+                    .map_err(git_error)
+            })?;
             let fetched = mirrors(&port, repo, req.remote)?;
             verify_mirrors(
                 &port,
@@ -533,4 +568,32 @@ pub fn unpublished_summary(
         });
     }
     Ok(out)
+}
+
+/// Outside-gate facade entry. Publication authority stays inside the crate.
+pub fn guarded_unpublished_summary(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    req: SyncRequest<'_>,
+) -> Result<Vec<Unpublished>, Error> {
+    if repo.common_dir() != req.layout.common_dir {
+        return Err(invalid("repository/layout mismatch"));
+    }
+    let mut guard = acquire_seal(req.layout, req.held_ranks, req.hot_lock_depth, false)?
+        .ok_or_else(|| invalid("explicit seal acquisition returned busy"))?;
+    let reference = own_ref(req.machine, &StreamId::parse("project")?)?;
+    let identity = match fs::symlink_metadata(req.layout.store()) {
+        Ok(_) => Some(StoreIdentity::open(req.layout, req.machine)?),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
+        Err(error) => return Err(io(error)),
+    };
+    let writer = identity
+        .as_ref()
+        .map(|i| i.store_id.as_str())
+        .unwrap_or("unpublished-summary");
+    let path = req.layout.seal_lock();
+    let authority = HolderAuthority::new(repo, &mut guard.handle, &path, reference, writer)
+        .map_err(git_error)?;
+    let port = PublicationPort::new(driver, authority);
+    unpublished_summary(&port, repo, req.layout, req.machine, req.remote)
 }

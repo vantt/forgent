@@ -189,3 +189,66 @@ fn replacement_errors_report_effect_at_real_boundaries() {
         assert_eq!(err.temporary.is_some(), !after_rename);
     }
 }
+
+/// `install_ordered` runs `alongside` while the bytes are synced and its
+/// barrier after that, before the name exists; a failure of either leaves
+/// no record, only the temporary.
+/// Extra directories are synced with the record's directory.
+#[test]
+fn ordered_install_waits_for_its_barrier_before_the_name_exists() {
+    use fgos_durable_file::{install_ordered, sync_directories, FileSystem};
+    struct Steps(std::sync::Mutex<Vec<&'static str>>);
+    impl FileSystem for Steps {
+        fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+            self.0.lock().unwrap().push(step);
+            Ok(())
+        }
+    }
+    let dir = Dir::new();
+    let other = Dir::new();
+    let steps = Steps(Default::default());
+    let mut seen_at_barrier = None;
+    let target = dir.0.join("record");
+    let alongside_ran = std::sync::atomic::AtomicBool::new(false);
+    let installed = install_ordered(
+        &dir.0,
+        "record",
+        b"bytes",
+        &steps,
+        Some(&|| {
+            alongside_ran.store(true, std::sync::atomic::Ordering::SeqCst);
+            Ok(())
+        }),
+        &mut || {
+            seen_at_barrier = Some((target.exists(), steps.0.lock().unwrap().clone()));
+            Ok(())
+        },
+        &[&other.0],
+    )
+    .unwrap();
+    assert_eq!(installed, Installed::Created);
+    assert!(alongside_ran.load(std::sync::atomic::Ordering::SeqCst));
+    let (existed, before) = seen_at_barrier.unwrap();
+    assert!(!existed, "the name is installed only after the barrier");
+    assert!(before.ends_with(&["file-fsync"]), "{before:?}");
+    assert!(steps.0.lock().unwrap().ends_with(&["parent-fsync"]));
+
+    for (name, alongside_fails) in [("second", false), ("third", true)] {
+        let refused = install_ordered(
+            &dir.0,
+            name,
+            b"bytes",
+            &steps,
+            Some(&|| if alongside_fails { Err(std::io::Error::other("alongside refused")) } else { Ok(()) }),
+            &mut || if alongside_fails { Ok(()) } else { Err(std::io::Error::other("barrier refused")) },
+            &[],
+        )
+        .unwrap_err();
+        assert_eq!(refused.installed, None);
+        assert!(!dir.0.join(name).exists());
+        assert!(refused.temporary.is_some_and(|t| t.exists()));
+    }
+
+    sync_directories(&[&dir.0, &other.0]).unwrap();
+    assert!(sync_directories(&[&dir.0, &dir.0.join("missing")]).is_err());
+}

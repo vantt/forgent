@@ -170,10 +170,8 @@ ran.
 Invoke `skill`. It runs its own gate — Socratic questions, a shaping
 pass, an implementation pass, whatever that stage's own job is — and,
 once satisfied, calls the engine verb that actually advances stage/status
-(`fgos discover`/`fgos plan`/`fgos return`), except at stage `discovery`:
-there, this loop applies the discovery skill's own returned verdict via
-`fgos discover` on the skill's behalf rather than the skill calling it
-directly.
+(`fgos discover`/`fgos plan`/`fgos return`) — the discovery skill included,
+which calls `fgos discover` itself.
 
 The invoked skill is trusted to do its own job completely, including its
 own gate question when one is needed, before returning control here. This

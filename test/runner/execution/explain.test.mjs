@@ -25,7 +25,7 @@ function deepseekConfig() {
         kind: 'agent',
         providerModel: 'deepseek',
         command: 'pi',
-        invocations: [{ id: 'pi-cli-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'pi', args: ['--model', '{model}', '-p', '{prompt}'], confinement: { backend: 'bwrap' } }],
+        invocations: [{ id: 'pi-cli-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'pi', args: ['--model', '{model}', '-p', '{prompt}'], confinement: { backend: 'bwrap' }, credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: ['auth.json'] } }],
       },
     },
     providers: { deepseek: { accounts: { openrouter: { credentialSource: { kind: 'home-files', home: '/srv/pi-openrouter', files: ['auth.json'] } } } } },
@@ -42,12 +42,23 @@ test('explain reports the entry of the family pool as used and an entry of anoth
   assert.equal(result.executor.id, 'deepseek');
   assert.equal(result.executor.source, 'capability:research');
   assert.equal(result.invocation, 'pi-cli-bwrap');
+  assert.deepEqual(result.credentialStore, { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: ['auth.json'], source: 'declared' });
   assert.deepEqual(result.tier, { value: 'standard', source: 'rigor:standard', ceiling: null });
   assert.equal(result.model.value, 'deepseek/deepseek-v4-flash');
   assert.deepEqual(result.cell.entries, [
     { model: 'deepseek-v4-flash', pool: 'deepseek-api', status: 'pending-pool-routing' },
     { model: 'deepseek/deepseek-v4-flash', pool: 'deepseek', status: 'used' },
   ]);
+});
+
+test('explain names the store an older config implies, and none for an invocation that reads no store', () => {
+  const cfg = deepseekConfig();
+  const [inv] = cfg.executors.deepseek.invocations;
+  delete inv.credentialStore;
+  inv.resourceBindings = [{ resource: 'private-home', target: { kind: 'env', name: 'PI_CODING_AGENT_DIR' } }];
+  assert.deepEqual(explainCapability(cfg, { capability: 'research', session: headless }).credentialStore, { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', source: 'inferred' });
+  delete inv.resourceBindings;
+  assert.equal(explainCapability(cfg, { capability: 'research', session: headless }).credentialStore, null);
 });
 
 test('explain lists the pool accounts of both inventories and which old ones the new one declares', () => {

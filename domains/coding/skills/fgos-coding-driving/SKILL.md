@@ -5,7 +5,7 @@ description: >-
   Drive one coding-domain work item through its own lifecycle, one stage at
   a time, until it hits a ceiling, a question only a person can answer, or
   the ceiling stage/status is reached. This is the mechanical loop every
-  coding-domain caller (`/fgOS:cook`, `/fgOS:pick`, a discovery/planning/
+  coding-domain caller (`/fgOS:deliver`, `/fgOS:pick`, a discovery/planning/
   execution sweep) is built on top of, never a second routing judgment of
   its own. Use when a session already knows which item and how far to carry
   it (the ceiling), and just needs the loop that gets it there. Examples:
@@ -26,7 +26,7 @@ the stage-to-skill judgment still lives in exactly one place.
 This skill's name states its scope on purpose: its own body is a purely
 mechanical loop with no coding-specific content leaking into it, but it is
 proven correct only for the `coding` domain — reused across every loop of
-that one domain's work (`cook`/`pick`/a discovery sweep/a planning
+that one domain's work (`deliver`/`pick`/a discovery sweep/a planning
 sweep/an execution sweep), never assumed to generalize automatically to a
 domain that does not exist yet.
 
@@ -212,9 +212,8 @@ domain's default role.
 ### Step 5: Invoke the skill
 Invoke `skill`. It runs its own gate and, once satisfied, calls the engine
 verb that actually advances stage/status (`fgos discover`/`fgos plan`/
-`fgos return`) — except at stage `discovery`, where this loop applies the
-discovery skill's own returned verdict via `fgos discover` on its behalf.
-The invoked skill is trusted to do its own job completely, including its
+`fgos return`), the discovery skill included — it calls `fgos discover`
+itself, this loop never applies a verdict on its behalf. The invoked skill is trusted to do its own job completely, including its
 own gate question when one is needed, before returning control here — this
 skill never second-guesses or repeats a stage-skill's own gate.
 
@@ -235,7 +234,7 @@ thing to the caller — see `references/reclaim-and-role-graph.md`.
 - Secondary operation (e.g. `planning.validate-plan`) creates an Assignment only when the stage skill or deterministic rule selects it.
 - Assignment result is evidence input for driver decision, not lifecycle movement by itself.
 - Only engine verbs (`fgos plan`, `fgos discover`, `fgos return`) move Work lifecycle state.
-- **Workflow Run Integration**: When an item carries `workflowRunId`, driving the item advances its Workflow run via `fgos workflow resume <workflowRunId>` or `fgos workflow answer <workflowRunId>`, executing units through `fgos run`. Work items do not have `stage`; step progression belongs to Workflow runs.
+- **Workflow Run Integration**: When an item carries `workflowRunId`, driving the item advances its Workflow run via `fgos workflow resume <workflowRunId>` or `fgos workflow answer <workflowRunId>`, executing units through `fgos run`. A Work item records its place as `workflowStep` (the older name for it is `stage`, which this document still uses for that same value); the Workflow run owns step progression.
 
 ## Caller contract
 

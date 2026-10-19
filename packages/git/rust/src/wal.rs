@@ -2,7 +2,7 @@
 //! hold the stream's event-seal and borrow it into every effecting Git child.
 //! No method here executes, retries, rolls back or deletes a Git ref.
 use crate::{ObjectFormat, Oid, RefName, RepoHandle};
-use fgos_durable_file::{install_with, sync_directory, Installed};
+use fgos_durable_file::{install_ordered, Installed};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fs::{self, File, OpenOptions};
@@ -79,9 +79,21 @@ pub struct ConfigChange {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
     PublicationCas,
+    RefUpdate { worktree: Option<String> },
+    RefDelete,
     ConfigChange(Box<ConfigChange>),
-    RemoteFetch { url: String, refspecs: Vec<String> },
-    RemotePush { url: String, refspecs: Vec<String> },
+    RemoteFetch {
+        url: String,
+        refspecs: Vec<String>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")] // Preserve historical digests.
+        targets: Vec<(String, Tip, Tip)>,
+    },
+    RemotePush {
+        url: String,
+        refspecs: Vec<String>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")] // Preserve historical digests.
+        targets: Vec<(String, Tip, Tip)>,
+    },
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
@@ -266,6 +278,90 @@ impl Intent {
             }
             return Ok(());
         }
+        if let OperationKind::RemoteFetch {
+            url,
+            refspecs,
+            targets,
+        }
+        | OperationKind::RemotePush {
+            url,
+            refspecs,
+            targets,
+        } = &self.kind
+        {
+            if url.is_empty() || refspecs.is_empty() {
+                return Err(corrupt("remote binding"));
+            }
+            let publication = self.resource_set[0].starts_with("refs/fgos/");
+            let fetch = matches!(self.kind, OperationKind::RemoteFetch { .. });
+            let mut seen = std::collections::BTreeSet::new();
+            for (name, old, next) in targets {
+                RefName::parse(name).map_err(|_| corrupt("remote target"))?;
+                validate_tip(old, self.object_format)?;
+                validate_tip(next, self.object_format)?;
+                if !self.resource_set.contains(name)
+                    || !seen.insert(name)
+                    || *next == Tip::Absent
+                    || (publication && fetch && !name.starts_with("refs/fgos/remotes/"))
+                    || (publication && !fetch && name != &self.resource_set[0])
+                    || (!publication && fetch && !name.starts_with("refs/remotes/"))
+                    || (!publication && !fetch && !name.starts_with("refs/heads/"))
+                {
+                    return Err(corrupt("remote target resource"));
+                }
+            }
+            if !publication {
+                if targets.len() != self.resource_set.len()
+                    || targets.len() != refspecs.len()
+                    || self.expected != Tip::Absent
+                    || self.next != Tip::Absent
+                {
+                    return Err(corrupt("remote targets"));
+                }
+                for spec in refspecs {
+                    let (source, destination) = spec.split_once(':').ok_or_else(|| corrupt("remote mapping"))?;
+                    RefName::parse(source).map_err(|_| corrupt("remote source"))?;
+                    RefName::parse(destination).map_err(|_| corrupt("remote destination"))?;
+                    if source.starts_with("refs/fgos/") || !seen.contains(&destination.to_owned()) {
+                        return Err(corrupt("remote mapping resource"));
+                    }
+                }
+                for resource in &self.resource_set {
+                    RefName::parse(resource).map_err(|_| corrupt("resource ref"))?;
+                }
+                if self.resource_set.iter().collect::<std::collections::BTreeSet<_>>().len() != self.resource_set.len() {
+                    return Err(corrupt("duplicate remote resource"));
+                }
+                return Ok(());
+            }
+        }
+        if matches!(
+            self.kind,
+            OperationKind::RefUpdate { .. } | OperationKind::RefDelete
+        ) {
+            for resource in &self.resource_set {
+                RefName::parse(resource).map_err(|_| corrupt("resource ref"))?;
+                if resource.starts_with("refs/fgos/") {
+                    return Err(corrupt("non-event resource"));
+                }
+            }
+            match &self.kind {
+                OperationKind::RefUpdate { .. } | OperationKind::RefDelete => {
+                    if self.resource_set.len() != 1
+                        || !self.resource_set[0].starts_with("refs/heads/")
+                        || (matches!(self.kind, OperationKind::RefDelete)
+                            && (self.next != Tip::Absent || self.expected == Tip::Absent))
+                        || (matches!(self.kind, OperationKind::RefUpdate { .. })
+                            && self.next == Tip::Absent)
+                    {
+                        return Err(corrupt("refs binding"));
+                    }
+                }
+                _ => unreachable!(),
+            }
+            validate_tip(&self.expected, self.object_format)?;
+            return validate_tip(&self.next, self.object_format);
+        }
         for resource in &self.resource_set {
             RefName::parse(resource).map_err(|_| corrupt("resource ref"))?;
             if !resource.starts_with("refs/fgos/")
@@ -278,8 +374,8 @@ impl Intent {
             OperationKind::PublicationCas if self.resource_set.len() != 1 => {
                 return Err(corrupt("CAS resource set"))
             }
-            OperationKind::RemoteFetch { url, refspecs }
-            | OperationKind::RemotePush { url, refspecs }
+            OperationKind::RemoteFetch { url, refspecs, .. }
+            | OperationKind::RemotePush { url, refspecs, .. }
                 if url.is_empty() || refspecs.is_empty() =>
             {
                 return Err(corrupt("remote binding"))
@@ -380,7 +476,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 observations,
                 details,
             } => {
-                if i.kind == OperationKind::PublicationCas
+                if matches!(i.kind,OperationKind::PublicationCas|OperationKind::RefUpdate {..}|OperationKind::RefDelete)
                     || details.len() > 1024
                     || (*acknowledged && *unknown)
                 {
@@ -399,13 +495,13 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 attribution,
             } => {
                 validate_tip(observed, i.object_format)?;
-                i.kind == OperationKind::PublicationCas
+                matches!(i.kind, OperationKind::PublicationCas | OperationKind::RefUpdate { .. } | OperationKind::RefDelete)
                     && observed == &i.next
                     && *attribution != Attribution::Uncertain
             }
             Outcome::Loss { observed } => {
                 validate_tip(observed, i.object_format)?;
-                i.kind == OperationKind::PublicationCas
+                matches!(i.kind, OperationKind::PublicationCas | OperationKind::RefUpdate { .. } | OperationKind::RefDelete)
             }
             Outcome::Superseded {
                 later_operation_id,
@@ -479,6 +575,18 @@ impl Directory {
         }
     }
     fn child(&self, name: &str, create: bool, fsys: &dyn FileSystem) -> WalResult<Self> {
+        self.child_synced(name, create, create, fsys)
+    }
+    /// `sync`: make the child and its name durable now. An operation
+    /// directory is created without it: its first record's install fsyncs
+    /// the directory and its parent before that record is acknowledged.
+    fn child_synced(
+        &self,
+        name: &str,
+        create: bool,
+        sync: bool,
+        fsys: &dyn FileSystem,
+    ) -> WalResult<Self> {
         let path = self.path().join(name);
         if create {
             #[cfg(unix)]
@@ -495,14 +603,50 @@ impl Directory {
         }
         let child = Self::open(&path)?;
         // Also sync pre-existing dirs: a preceding failed creator may have
-        // installed the name without ever syncing it.
-        if create {
-            child.file.sync_all()?;
-            fsys.checkpoint("directory-fsync")?;
-            self.file.sync_all()?;
-            fsys.checkpoint("parent-fsync")?;
+        // installed the name without ever syncing it. Once this process has
+        // synced a directory and its name, both stay durable until that
+        // directory is removed, so a later open of the same directory (same
+        // device, inode and birth time) needs no second fsync.
+        if sync {
+            let key = durable_key(&child.file);
+            if key.is_none() || !DURABLE_DIRECTORIES.lock().is_ok_and(|seen| seen.contains(&key)) {
+                child.file.sync_all()?;
+                fsys.checkpoint("directory-fsync")?;
+                self.file.sync_all()?;
+                fsys.checkpoint("parent-fsync")?;
+                if key.is_some() {
+                    if let Ok(mut seen) = DURABLE_DIRECTORIES.lock() {
+                        seen.insert(key);
+                    }
+                }
+            }
         }
         Ok(child)
+    }
+}
+
+/// Directories this process has made durable, with their names, by
+/// `(device, inode, birth time)`.
+static DURABLE_DIRECTORIES: std::sync::Mutex<std::collections::BTreeSet<Option<(u64, u64, u128)>>> =
+    std::sync::Mutex::new(std::collections::BTreeSet::new());
+
+/// Identity of a directory that a removal and re-creation cannot reuse;
+/// `None` when the filesystem reports no birth time.
+fn durable_key(dir: &File) -> Option<(u64, u64, u128)> {
+    durable_identity(&dir.metadata().ok()?)
+}
+
+pub(crate) fn durable_identity(m: &fs::Metadata) -> Option<(u64, u64, u128)> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        let born = m.created().ok()?.duration_since(std::time::UNIX_EPOCH).ok()?.as_nanos();
+        Some((m.dev(), m.ino(), born))
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = m;
+        None
     }
 }
 
@@ -583,7 +727,8 @@ impl<F: FileSystem> Wal<F> {
         if !valid_id(id) {
             return Err(corrupt("operation id"));
         }
-        self.root.child(id, create, &self.fs)
+        // Record zero's install makes a created operation directory durable.
+        self.root.child_synced(id, create, false, &self.fs)
     }
     pub fn begin(
         &self,
@@ -609,8 +754,25 @@ impl<F: FileSystem> Wal<F> {
             }
             return Ok(Begin::Compacted(c));
         }
+        // An installed record zero already binds this id: the no-overwrite
+        // install below could only lose to it, so answer as that loser
+        // would, without writing (and syncing) a doomed temporary.
+        if dir.path().join(record_name(0)).try_exists()? {
+            fgos_durable_file::sync_directories(&[&dir.path(), &self.root.path()])?;
+            self.fs.checkpoint("existing-intent-parent-fsync")?;
+            return match self.existing(id, &intent) {
+                // A compactor may have removed the chain since: its ledger
+                // entry is then the binding, as after a lost install.
+                Err(e) => match self.compacted(id)? {
+                    Some(c) if c.matches(&intent)? => Ok(Begin::Compacted(c)),
+                    Some(_) => Err(WalError::OperationIdConflict),
+                    None => Err(e),
+                },
+                found => found,
+            };
+        }
         let r = make_record(id, 0, None, Phase::Intent(intent.clone()))?;
-        let installed = self.install(&dir, &record_name(0), &r)?;
+        let installed = self.install(&dir, &record_name(0), &r, true)?;
         // A concurrent compactor may have removed record zero after our first
         // ledger read. Its durable binding wins even if we installed a name
         // through a still-open operation directory descriptor.
@@ -622,34 +784,62 @@ impl<F: FileSystem> Wal<F> {
         }
         match installed {
             Installed::Created => Ok(Begin::Created(Chain { records: vec![r] })),
-            Installed::AlreadyExists => {
-                let c = self.inspect(id)?;
-                if c.intent().request_digest != intent.request_digest
-                    || binding_digest(c.intent())? != binding_digest(&intent)?
-                {
-                    return Err(WalError::OperationIdConflict);
-                }
-                Ok(Begin::Existing(c))
-            }
+            Installed::AlreadyExists => self.existing(id, &intent),
         }
     }
+    /// The established chain of `id`, when it binds the same request.
+    fn existing(&self, id: &str, intent: &Intent) -> WalResult<Begin> {
+        let c = self.inspect(id)?;
+        if c.intent().request_digest != intent.request_digest
+            || binding_digest(c.intent())? != binding_digest(intent)?
+        {
+            return Err(WalError::OperationIdConflict);
+        }
+        Ok(Begin::Existing(c))
+    }
+    /// Install one record: durable-file writes and fsyncs the file, installs
+    /// the name without overwrite and fsyncs `dir`. `new_directory`: `dir`
+    /// was created for this record (record zero), so its parent is fsynced
+    /// too before the record is acknowledged; a later record's directory
+    /// name is already durable.
     fn install<T: Serialize>(
         &self,
         dir: &Directory,
         name: &str,
         value: &T,
+        new_directory: bool,
+    ) -> WalResult<Installed> {
+        self.install_ordered(dir, name, value, new_directory, None, &mut || Ok(()))
+    }
+    /// `alongside` runs while the record bytes are synced, `before_install`
+    /// after both and before its name exists (see
+    /// `fgos_durable_file::install_ordered`).
+    fn install_ordered<T: Serialize>(
+        &self,
+        dir: &Directory,
+        name: &str,
+        value: &T,
+        new_directory: bool,
+        alongside: Option<&(dyn Fn() -> io::Result<()> + Sync)>,
+        before_install: &mut dyn FnMut() -> io::Result<()>,
     ) -> WalResult<Installed> {
         let bytes = serde_json::to_vec(value).map_err(|_| corrupt("serialize"))?;
         if bytes.len() as u64 > MAX_RECORD {
             return Err(corrupt("record byte bound"));
         }
-        let result = install_with(&dir.path(), name, &bytes, &FaultAdapter(&self.fs))
-            .map_err(|e| WalError::Io(e.source))?;
+        let root = self.root.path();
+        let parents: &[&Path] = if new_directory { &[&root] } else { &[] };
+        let result = install_ordered(
+            &dir.path(),
+            name,
+            &bytes,
+            &FaultAdapter(&self.fs),
+            alongside,
+            before_install,
+            parents,
+        )
+        .map_err(|e| WalError::Io(e.source))?;
         self.fs.checkpoint("record-install")?;
-        sync_directory(&dir.path())?;
-        self.fs.checkpoint("record-directory-fsync")?;
-        self.root.file.sync_all()?;
-        self.fs.checkpoint("record-parent-fsync")?;
         Ok(result)
     }
     pub fn inspect(&self, id: &str) -> WalResult<Chain> {
@@ -664,7 +854,7 @@ impl<F: FileSystem> Wal<F> {
                 .file_name()
                 .into_string()
                 .map_err(|_| corrupt("non UTF-8 record name"))?;
-            if name.starts_with(".durable-file-") && name.ends_with(".tmp") {
+            if is_durable_temporary(&name) {
                 continue;
             }
             if names.len() >= MAX_RECORDS {
@@ -691,15 +881,35 @@ impl<F: FileSystem> Wal<F> {
     /// the next numbered name; the loser gets Busy and no effect permit.
     /// Supersession has a separate checked entry point.
     pub fn append(&self, chain: &Chain, phase: Phase) -> WalResult<Chain> {
+        self.append_ordered(chain, phase, None, &mut || Ok(()))
+    }
+    /// [`Wal::append`] whose record is installed only after `alongside` (run
+    /// on another thread while the record's bytes are synced) and then
+    /// `before_install` returned `Ok`. A caller uses it to make another
+    /// durable effect that must precede this record durable together with
+    /// the record's own write.
+    pub fn append_ordered(
+        &self,
+        chain: &Chain,
+        phase: Phase,
+        alongside: Option<&(dyn Fn() -> io::Result<()> + Sync)>,
+        before_install: &mut dyn FnMut() -> io::Result<()>,
+    ) -> WalResult<Chain> {
         if matches!(
             phase,
             Phase::Intent(_) | Phase::Outcome(Outcome::Superseded { .. })
         ) {
             return Err(WalError::RecoveryRequired);
         }
-        self.append_checked(chain, phase)
+        self.append_checked(chain, phase, alongside, before_install)
     }
-    fn append_checked(&self, chain: &Chain, phase: Phase) -> WalResult<Chain> {
+    fn append_checked(
+        &self,
+        chain: &Chain,
+        phase: Phase,
+        alongside: Option<&(dyn Fn() -> io::Result<()> + Sync)>,
+        before_install: &mut dyn FnMut() -> io::Result<()>,
+    ) -> WalResult<Chain> {
         let id = &chain.last().operation_id;
         chain.validate(id)?;
         let actual = self.inspect(id)?;
@@ -714,7 +924,9 @@ impl<F: FileSystem> Wal<F> {
             phase,
         )?;
         let dir = self.operation(id, false)?;
-        if self.install(&dir, &record_name(r.sequence), &r)? != Installed::Created {
+        if self.install_ordered(&dir, &record_name(r.sequence), &r, false, alongside, before_install)?
+            != Installed::Created
+        {
             return Err(WalError::Busy);
         }
         let mut records = chain.records.clone();
@@ -772,6 +984,8 @@ impl<F: FileSystem> Wal<F> {
                 later_receipt_digest: receipt.digest.clone(),
                 attribution,
             }),
+            None,
+            &mut || Ok(()),
         )
     }
     pub(crate) fn native_lock_present(&self, intent: &Intent) -> WalResult<bool> {
@@ -973,12 +1187,75 @@ pub struct CompactReceipt {
     pub v: u8,
     pub id: String,
     #[serde(rename = "q")]
+    #[serde(with = "ledger_hex")]
     pub request: String,
     #[serde(rename = "b")]
+    #[serde(with = "ledger_hex")]
     pub binding: String,
     #[serde(rename = "r")]
+    #[serde(with = "ledger_hex_vec")]
     pub receipt: Vec<String>,
+    #[serde(default, rename = "e", with = "ledger_hex")]
+    pub expected: String,
+    #[serde(default, rename = "n", with = "ledger_hex")]
+    pub next: String,
+    #[serde(with = "ledger_hex")]
     pub digest: String,
+}
+// Lossless base64url representation of hex hashes keeps full SHA-256 receipts
+// below the signed 512-byte ledger bound, including maximum-length ids.
+mod ledger_hex {
+    use serde::{Deserialize, Deserializer, Serializer};
+    const ALPHABET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    pub(super) fn encode(s: &str) -> String {
+        if !matches!(s.len(), 40 | 64) || !s.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)) {
+            return s.into();
+        }
+        let mut out = String::from("~");
+        let mut bits = 0u32;
+        let mut n = 0;
+        for byte in s.as_bytes().as_chunks::<2>().0 {
+            let hex = |b: u8| if b <= b'9' { b - b'0' } else { b - b'a' + 10 };
+            bits = (bits << 8) | u32::from(hex(byte[0]) * 16 + hex(byte[1]));
+            n += 8;
+            while n >= 6 {
+                n -= 6;
+                out.push(ALPHABET[((bits >> n) & 63) as usize] as char);
+            }
+        }
+        if n > 0 { out.push(ALPHABET[((bits << (6 - n)) & 63) as usize] as char); }
+        out
+    }
+    pub(super) fn decode(s: String) -> Result<String, String> {
+        let Some(encoded) = s.strip_prefix('~') else { return Ok(s) };
+        let mut out = String::new();
+        let mut bits = 0u32;
+        let mut n = 0;
+        for c in encoded.bytes() {
+            let v = ALPHABET.iter().position(|b| *b == c).ok_or("invalid ledger hash")?;
+            bits = (bits << 6) | v as u32;
+            n += 6;
+            if n >= 8 {
+                n -= 8;
+                let b = ((bits >> n) & 255) as u8;
+                use std::fmt::Write;
+                write!(out, "{b:02x}").unwrap();
+            }
+        }
+        if encode(&out) != s { return Err("noncanonical ledger hash".into()); }
+        Ok(out)
+    }
+    pub fn serialize<S: Serializer>(s: &str, serializer: S) -> Result<S::Ok, S::Error> { serializer.serialize_str(&encode(s)) }
+    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<String, D::Error> { decode(String::deserialize(d)?).map_err(serde::de::Error::custom) }
+}
+mod ledger_hex_vec {
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+    pub fn serialize<S: Serializer>(values: &[String], serializer: S) -> Result<S::Ok, S::Error> {
+        values.iter().map(|s| super::ledger_hex::encode(s)).collect::<Vec<_>>().serialize(serializer)
+    }
+    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<Vec<String>, D::Error> {
+        Vec::<String>::deserialize(d)?.into_iter().map(|s| super::ledger_hex::decode(s).map_err(serde::de::Error::custom)).collect()
+    }
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
@@ -1103,7 +1380,7 @@ impl CompactReceipt {
             },
         })
     }
-    fn matches(&self, i: &Intent) -> WalResult<bool> {
+    pub(crate) fn matches(&self, i: &Intent) -> WalResult<bool> {
         Ok(self.request == i.request_digest && self.binding == binding_digest(i)?)
     }
 }
@@ -1169,12 +1446,24 @@ impl<F: FileSystem> Wal<F> {
             Err(WalError::Io(e)) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
             Err(e) => return Err(e),
         };
-        let d = canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt))?;
-        if c.v != 1
+        // Version 1 omitted expected/next. Keep its immutable binding and
+        // exact-request replay readable; missing facts must never be guessed.
+        let d = if c.v == 1 {
+            canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt))?
+        } else {
+            canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt, &c.expected, &c.next))?
+        };
+        let tips_valid = if c.v == 1 {
+            c.expected.is_empty() && c.next.is_empty()
+        } else {
+            [&c.expected, &c.next].iter().all(|s| *s == "-" || matches!(s.len(), 40 | 64) && s.bytes().all(|b| b.is_ascii_hexdigit()))
+        };
+        if !matches!(c.v, 1 | 2)
             || c.id != id
             || c.digest != d
             || !digest_valid(&c.request)
             || !digest_valid(&c.binding)
+            || !tips_valid
             || !valid_compact_outcome(&c.receipt)
         {
             return Err(corrupt("ledger hash/version/id"));
@@ -1218,14 +1507,16 @@ impl<F: FileSystem> Wal<F> {
         }
         let i = actual.intent();
         let mut c = CompactReceipt {
-            v: 1,
+            v: 2,
             id: id.clone(),
             request: i.request_digest.clone(),
             binding: binding_digest(i)?,
+            expected: compact_tip(&i.expected),
+            next: compact_tip(&i.next),
             receipt: compact_outcome(actual.outcome().ok_or(WalError::RecoveryRequired)?),
             digest: String::new(),
         };
-        c.digest = canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt))?;
+        c.digest = canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt, &c.expected, &c.next))?;
         if serde_json::to_vec(&c)
             .map_err(|_| corrupt("ledger serialize"))?
             .len()
@@ -1234,7 +1525,7 @@ impl<F: FileSystem> Wal<F> {
         {
             return Err(corrupt("ledger entry exceeds 512 bytes"));
         }
-        if self.install(&self.ledger, id, &c)? == Installed::AlreadyExists {
+        if self.install(&self.ledger, id, &c, false)? == Installed::AlreadyExists {
             let existing = self
                 .compacted(id)?
                 .ok_or_else(|| corrupt("missing ledger"))?;
@@ -1242,8 +1533,7 @@ impl<F: FileSystem> Wal<F> {
                 return Err(WalError::OperationIdConflict);
             }
         }
-        self.ledger.file.sync_all()?;
-        self.fs.checkpoint("ledger-fsync")?;
+        // The install fsynced the ledger directory after the name.
         let dir = self.operation(id, false)?;
         // No recursive remove: unexpected files (including failed-write temps)
         // are evidence. Leave them attributable by the durable ledger.
@@ -1280,6 +1570,11 @@ pub struct Backlog {
     pub oldest_unresolved: Option<(String, std::time::SystemTime)>,
 }
 impl<F: FileSystem> Wal<F> {
+    /// When the operation's directory last changed (its last record was
+    /// installed). Scheduling only: it never decides a protocol outcome.
+    pub(crate) fn last_change(&self, id: &str) -> Option<std::time::SystemTime> {
+        fs::metadata(self.root.path().join(id)).ok()?.modified().ok()
+    }
     pub(crate) fn known_id(&self, id: &str) -> WalResult<bool> {
         if self.compacted(id)?.is_some() {
             return Ok(true);
@@ -1299,7 +1594,7 @@ impl<F: FileSystem> Wal<F> {
                 return Err(corrupt("pre-intent scan bound"));
             }
             let name = entry?.file_name().to_string_lossy().into_owned();
-            if !(name.starts_with(".durable-file-") && name.ends_with(".tmp")) {
+            if !is_durable_temporary(&name) {
                 return Err(corrupt("unknown pre-intent artifact"));
             }
         }
@@ -1351,65 +1646,56 @@ impl<F: FileSystem> Wal<F> {
         let mut seen = 0;
         for (dir, ledger) in [(&self.root, false), (&self.ledger, true)] {
             for entry in fs::read_dir(dir.path())? {
+                let entry = entry?;
+                let id = entry.file_name().to_string_lossy().into_owned();
+                if is_durable_temporary(&id) { continue; }
                 if seen == bound {
                     result.complete = false;
                     return Ok(result);
                 }
                 seen += 1;
-                let entry = entry?;
-                let id = entry.file_name().to_string_lossy().into_owned();
-                let metadata = entry.metadata()?;
+                // The ledger is installed durably before any chain deletion.
+                // Re-read it after every failed observation of a root entry.
+                let inspect_entry = || -> WalResult<(bool, u64, Option<std::time::SystemTime>, bool)> {
+                    let metadata = entry.metadata()?;
+                    if ledger {
+                        self.compacted(&id)?.ok_or_else(|| corrupt("missing ledger"))?;
+                        return Ok((true, metadata.len(), metadata.modified().ok(), false));
+                    }
+                    if self.compacted(&id)?.is_some() {
+                        return Ok((true, 0, None, false));
+                    }
+                    let operation = self.operation(&id, false)?;
+                    let terminal = !self.has_intent(&operation)? || self.inspect(&id)?.outcome().is_some();
+                    let mut bytes = metadata.len();
+                    let mut incomplete = false;
+                    for (n, file) in fs::read_dir(operation.path())?.enumerate() {
+                        if n >= MAX_RECORDS * 2 { incomplete = true; break; }
+                        bytes += file?.metadata()?.len();
+                    }
+                    Ok((terminal, bytes, metadata.modified().ok(), incomplete))
+                };
+                let (terminal, bytes, modified, incomplete, error) = match inspect_entry() {
+                    Ok((t, bytes, modified, incomplete)) => (t, bytes, modified, incomplete, None),
+                    Err(e) if !ledger => match self.compacted(&id) {
+                        Ok(Some(_)) => (true, 0, None, false, None),
+                        _ => (false, 0, None, false, Some(e.to_string())),
+                    },
+                    Err(e) => (false, entry.metadata().map(|m| m.len()).unwrap_or(0), None, false, Some(e.to_string())),
+                };
                 if ledger {
-                    result.ledger_bytes += metadata.len();
+                    result.ledger_bytes += bytes;
                     result.ledger_entries += 1;
-                    result.ledger_capacity_warning =
-                        result.ledger_entries >= 100_000 || result.ledger_bytes >= 64 * 1024 * 1024;
+                    result.ledger_capacity_warning = result.ledger_entries >= 100_000 || result.ledger_bytes >= 64 * 1024 * 1024;
                 } else {
-                    result.retained_bytes += metadata.len();
+                    result.retained_bytes += bytes;
                 }
-                let check = if ledger {
-                    self.compacted(&id).map(|_| true)
-                } else {
-                    self.compacted(&id).and_then(|c| {
-                        if c.is_some() {
-                            self.operation(&id, false)
-                                .and_then(|dir| compaction_suffix(&dir, &id))
-                                .map(|_| true)
-                        } else {
-                            self.operation(&id, false).and_then(|dir| {
-                                if !self.has_intent(&dir)? {
-                                    return Ok(true);
-                                }
-                                self.inspect(&id).map(|c| c.outcome().is_some())
-                            })
-                        }
-                    })
-                };
-                let (terminal, error) = match check {
-                    Ok(t) => (t, None),
-                    Err(e) => (false, Some(e.to_string())),
-                };
+                result.complete &= !incomplete;
                 if !terminal {
                     result.unresolved += 1;
-                    if let Ok(time) = metadata.modified() {
-                        if result
-                            .oldest_unresolved
-                            .as_ref()
-                            .is_none_or(|(_, old)| time < *old)
-                        {
+                    if let Some(time) = modified {
+                        if result.oldest_unresolved.as_ref().is_none_or(|(_, old)| time < *old) {
                             result.oldest_unresolved = Some((id.clone(), time));
-                        }
-                    }
-                }
-                if !ledger && metadata.is_dir() {
-                    let operation = self.operation(&id, false);
-                    if let Ok(operation) = operation {
-                        for (n, file) in fs::read_dir(operation.path())?.enumerate() {
-                            if n >= MAX_RECORDS * 2 {
-                                result.complete = false;
-                                break;
-                            }
-                            result.retained_bytes += file?.metadata()?.len();
                         }
                     }
                 }
@@ -1422,6 +1708,11 @@ impl<F: FileSystem> Wal<F> {
         }
         Ok(result)
     }
+}
+
+// Same temporary-name rule for every WAL directory reader.
+fn is_durable_temporary(name: &str) -> bool {
+    name.starts_with(".durable-file-") && name.ends_with(".tmp")
 }
 
 #[cfg(all(test, target_os = "linux"))]
@@ -1718,6 +2009,116 @@ mod tests {
             }
         }
     }
+    /// Records every checkpoint name it sees.
+    struct Steps(std::sync::Mutex<Vec<&'static str>>);
+    impl FileSystem for Steps {
+        fn checkpoint(&self, step: &'static str) -> io::Result<()> {
+            self.0.lock().unwrap().push(step);
+            Ok(())
+        }
+    }
+    #[test]
+    fn begin_replay_syncs_both_directories_after_creator_stopped_before_parent_fsync() {
+        struct StopBeforeSync;
+        impl FileSystem for StopBeforeSync {
+            fn checkpoint(&self, step: &'static str) -> io::Result<()> {
+                if step == "temp-removed" { Err(io::Error::other("creator stopped before directory sync")) } else { Ok(()) }
+            }
+        }
+        let t = Temp::new();
+        let creator = Wal::with_filesystem(&t.0, StopBeforeSync).unwrap();
+        assert!(creator.begin("replay", intent(&creator), &Authority).is_err());
+        assert!(creator.inspect("replay").is_ok(), "record zero exists despite failed begin");
+        let replay = Wal::with_filesystem(&t.0, Steps(Default::default())).unwrap();
+        replay.fs.0.lock().unwrap().clear();
+        assert!(matches!(replay.begin("replay", intent(&replay), &Authority).unwrap(), Begin::Existing(_)));
+        assert_eq!(&*replay.fs.0.lock().unwrap(), &["existing-intent-parent-fsync"]);
+        let mut different = intent(&replay);
+        different.request_digest = "f".repeat(64);
+        assert!(matches!(replay.begin("replay", different, &Authority), Err(WalError::OperationIdConflict)));
+    }
+
+    #[test]
+    fn scan_ignores_compaction_temporaries_before_counting_the_bound() {
+        let t = Temp::new();
+        let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        fs::write(wal.ledger.path().join(".durable-file-123-0.tmp"), b"partial ledger").unwrap();
+        let scan = wal.scan(0).unwrap();
+        assert!(scan.complete);
+        assert_eq!(scan.unresolved, 0);
+        assert_eq!(scan.ledger_entries, 0);
+        assert!(scan.entries.is_empty());
+        fs::write(wal.ledger.path().join("unexpected"), b"bad").unwrap();
+        let scan = wal.scan(10).unwrap();
+        assert_eq!(scan.unresolved, 1);
+        assert!(scan.entries[0].error.is_some());
+    }
+
+    #[test]
+    fn scan_remains_terminal_while_compaction_removes_records_and_directories() {
+        struct SlowRemoval;
+        impl FileSystem for SlowRemoval {
+            fn checkpoint(&self, step: &'static str) -> io::Result<()> {
+                if step == "remove-record" { std::thread::sleep(std::time::Duration::from_millis(1)); }
+                Ok(())
+            }
+        }
+        let t = Temp::new();
+        let wal = Wal::with_filesystem(&t.0, SlowRemoval).unwrap();
+        let mut terminal = Vec::new();
+        for n in 0..16 {
+            let c = success(&wal, &attempted(&wal, &format!("race-{n}")));
+            let c = wal.append(&c, Phase::PinReleaseAttempt { prior_target_attempt: None, expected: c.intent().next.clone(), next: Tip::Absent }).unwrap();
+            terminal.push(wal.append(&c, Phase::PinReleased).unwrap());
+        }
+        let done = std::sync::atomic::AtomicBool::new(false);
+        std::thread::scope(|scope| {
+            let worker = scope.spawn(|| {
+                for chain in &terminal {
+                    let mut r = reader(chain.intent());
+                    r.pin = ObservedRef::Direct(Tip::Absent);
+                    wal.compact(chain, &r, &Authority).unwrap();
+                }
+                done.store(true, Ordering::SeqCst);
+            });
+            let mut scans = 0;
+            while !done.load(Ordering::SeqCst) && scans < 1000 {
+                let backlog = wal.scan(100).unwrap();
+                assert!(backlog.complete);
+                assert_eq!(backlog.unresolved, 0, "{:?}", backlog.entries);
+                assert!(backlog.entries.iter().all(|e| e.error.is_none()));
+                scans += 1;
+            }
+            worker.join().unwrap();
+            assert!(scans > 0);
+        });
+        assert_eq!(wal.scan(100).unwrap().ledger_entries, 16);
+    }
+
+    #[test]
+    fn durable_directories_are_synced_once_per_process_and_records_keep_their_syncs() {
+        let t = Temp::new();
+        let first = Wal::with_filesystem(&t.0, Steps(Default::default())).unwrap();
+        assert!(first.fs.0.lock().unwrap().contains(&"directory-fsync"));
+        // Same directories, already durable: no second fsync of them.
+        let again = Wal::with_filesystem(&t.0, Steps(Default::default())).unwrap();
+        assert!(!again.fs.0.lock().unwrap().contains(&"directory-fsync"));
+        // A record still fsyncs its file and directory; record zero also
+        // the parent of its new operation directory.
+        let c = begun(&again, "one");
+        let steps = std::mem::take(&mut *again.fs.0.lock().unwrap());
+        assert_eq!(steps.iter().filter(|s| **s == "file-fsync").count(), 1);
+        assert_eq!(steps.iter().filter(|s| **s == "parent-fsync").count(), 1);
+        again.append(&c, Phase::Prepared).unwrap();
+        let steps = std::mem::take(&mut *again.fs.0.lock().unwrap());
+        assert_eq!(steps.iter().filter(|s| **s == "file-fsync").count(), 1);
+        assert_eq!(steps.iter().filter(|s| **s == "parent-fsync").count(), 1);
+        // A directory removed and made again is a new directory: synced again.
+        drop((first, again));
+        fs::remove_dir_all(t.0.join("fgos")).unwrap();
+        let fresh = Wal::with_filesystem(&t.0, Steps(Default::default())).unwrap();
+        assert!(fresh.fs.0.lock().unwrap().contains(&"directory-fsync"));
+    }
     #[test]
     fn crash_at_each_record_install_boundary_is_conservative() {
         for point in 1..=16 {
@@ -1766,6 +2167,23 @@ mod tests {
         assert!(scan.entries[0].error.is_some());
         assert!(path.exists());
     }
+    #[test]
+    fn legacy_compact_entries_keep_their_binding_and_exact_request_replay() {
+        let t = Temp::new();
+        let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        let i = intent(&wal);
+        let receipt = compact_outcome(&Outcome::Success { observed: i.next.clone(), attribution: Attribution::ThisInvocationWonCas });
+        let binding = binding_digest(&i).unwrap();
+        let digest = canonical_digest(&(1u8, "legacy", &i.request_digest, &binding, &receipt)).unwrap();
+        let old = serde_json::json!({"v": 1, "id": "legacy", "q": i.request_digest, "b": binding, "r": receipt, "digest": digest});
+        fgos_durable_file::install_once(&wal.ledger.path(), "legacy", old.to_string().as_bytes()).unwrap();
+        assert!(matches!(wal.begin("legacy", i.clone(), &Authority).unwrap(), Begin::Compacted(_)));
+        let mut other = i;
+        other.expected = Tip::Oid("c".repeat(40));
+        assert!(matches!(wal.begin("legacy", other, &Authority), Err(WalError::OperationIdConflict)));
+        assert_eq!(wal.scan(10).unwrap().unresolved, 0);
+    }
+
     #[test]
     fn compact_retains_binding_and_receipt_before_deletion() {
         let t = Temp::new();
@@ -2008,14 +2426,21 @@ mod tests {
             attribution: Attribution::Uncertain,
         };
         let c = CompactReceipt {
-            v: 1,
+            v: 2,
             id: "x".repeat(80),
             request: "b".repeat(64),
             binding: "c".repeat(64),
+            expected: "e".repeat(64),
+            next: "f".repeat(64),
             receipt: compact_outcome(&o),
             digest: "d".repeat(64),
         };
-        assert!(serde_json::to_vec(&c).unwrap().len() < 512);
+        let bytes = serde_json::to_vec(&c).unwrap();
+        assert!(bytes.len() < 512, "{} bytes", bytes.len());
+        let restored: CompactReceipt = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(restored.expected, c.expected);
+        assert_eq!(restored.next, c.next);
+        assert_eq!(restored.receipt, c.receipt);
     }
     #[test]
     fn ten_thousand_terminal_operations_have_no_record_directories() {

@@ -147,7 +147,7 @@ fn validate_directory(
     Ok(guarantee)
 }
 
-pub(crate) fn validate_seal_context(held_ranks: &[u32], hot_lock_depth: u32) -> Result<(), Error> {
+pub fn validate_seal_context(held_ranks: &[u32], hot_lock_depth: u32) -> Result<(), Error> {
     if hot_lock_depth > 0 || held_ranks.contains(&60) {
         return Err(Error::new(
             ErrorCode::EventStoreSealUnderState,

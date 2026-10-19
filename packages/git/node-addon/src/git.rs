@@ -1,4 +1,9 @@
 //! Opaque repository and seal authority stay in Rust for their entire lifetime.
+mod inspect;
+mod handover;
+pub use handover::{take_git_handover, mint_git_loan, close_git_loan};
+mod refs;
+mod remote;
 use crate::{check, error};
 use fgos_git::{HolderAuthority, *};
 use fgos_holder_lock::{Acquire, Handle, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
@@ -79,10 +84,17 @@ impl GitPublication {
         })
     }
     #[napi]
-    pub fn close(&mut self) -> Result<()> {
+    pub fn close(&mut self) -> Result<Value> {
         check()?;
-        self.handle.take();
-        Ok(())
+        match self.handle.take().map(fgos_holder_lock::release) {
+            Some(fgos_holder_lock::Release::Stuck { killed, pids }) => Err(error(
+                json!({"cause":"lock-release-stuck", "leftoversKilled":killed, "pids":pids}),
+            )),
+            Some(fgos_holder_lock::Release::Released { killed }) => {
+                Ok(json!({"released":true, "leftoversKilled":killed}))
+            }
+            None => Ok(json!({"released":true, "leftoversKilled":0})),
+        }
     }
     /// One mechanical dispatcher; typed validation and all policy remain in the port.
     #[napi]
@@ -167,7 +179,12 @@ impl GitPublication {
 
 /// Inspection never acquires event-seal or initializes a repository WAL.
 #[napi]
-pub fn inspect_git(state_root: String, repo_path: String, trusted_main: String) -> Result<Value> {
+pub fn inspect_git(
+    state_root: String,
+    repo_path: String,
+    trusted_main: String,
+    remote: Option<String>,
+) -> Result<Value> {
     check()?;
     let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
     let floor = driver.git_floor_verdict().map_err(operation)?;
@@ -191,9 +208,38 @@ pub fn inspect_git(state_root: String, repo_path: String, trusted_main: String) 
     } else {
         json!({"initialized":false,"complete":true,"pendingCount":0,"retainedBytes":0,"oldestUnresolved":null,"errors":[]})
     };
+    let remote = remote.as_deref().unwrap_or("origin");
+    let obsolete = obsolete_legacy_fetch_mapping(remote).map_err(operation)?;
     let mappings = driver
-        .configured_fetch_refspecs(&repo, "origin")
+        .configured_fetch_refspecs(&repo, remote)
         .map_err(operation)?;
+    let mut reserved_legacy_refs = Vec::new();
+    let mut cursor = None;
+    loop {
+        let page = driver
+            .list_refs(
+                &repo,
+                &[RefPrefix::parse("refs/fgos/remotes/").map_err(error)?],
+                cursor,
+                1000,
+            )
+            .map_err(operation)?;
+        for entry in page.entries {
+            let name = entry.name.as_str();
+            if let Some((_, suffix)) = name
+                .strip_prefix("refs/fgos/remotes/")
+                .and_then(|r| r.split_once('/'))
+            {
+                if suffix.starts_with("legacy") && suffix != "legacy" {
+                    reserved_legacy_refs.push(name.to_owned());
+                }
+            }
+        }
+        if page.complete {
+            break;
+        }
+        cursor = page.next_cursor;
+    }
     let mut native_locks = ["config.lock", "packed-refs.lock", "shallow.lock"]
         .iter()
         .filter(|name| std::fs::symlink_metadata(repo.common_dir().join(name)).is_ok())
@@ -202,7 +248,7 @@ pub fn inspect_git(state_root: String, repo_path: String, trusted_main: String) 
         native_locks.push(&"index.lock");
     }
     Ok(
-        json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"nativeLocks":native_locks,"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
+        json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"nativeLocks":native_locks,"untrustedTransportConfig":driver.untrusted_transport_config(&repo).map_err(operation)?,"reservedLegacyRefs":reserved_legacy_refs,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
     )
 }
 #[napi]
@@ -247,4 +293,17 @@ pub fn ensure_git_fetch_mapping(
             .map_err(operation)?)),
         ResolveRepo::NotARepository => Err(error("not-a-repository")),
     }
+}
+
+/// Read the RepositoryConfig policy without creating a driver or changing config.
+#[napi]
+pub fn git_fetch_mappings(remote: String) -> Result<Vec<String>> {
+    check()?;
+    publication_fetch_mappings(&remote).map_err(operation)
+}
+
+#[napi]
+pub fn prepare_git_driver_directories(state_root: String) -> Result<bool> {
+    check()?;
+    GitDriver::prepare_directories(Path::new(&state_root)).map_err(operation)
 }

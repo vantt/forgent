@@ -9,7 +9,7 @@
 
 - Spec §4 (facade refusal `event-store-seal-under-state`), §8 (resolution once per process, `GIT_*` scrubbed), §13 (no walk, git call or spawn inside the gate), §17 (one combined addon, no per-call host facade, part (a) of the budget), §22 (platforms).
 - Git D2-D4: one addon crate owned by Git; Event Store adds one module and one dependency line; one ABI row (`git-component-compatible`); the addon resolver is `payload-root.mjs`; no new env variable.
-- Exec guard: any `child_process` call inside a hot critical section throws `exec-under-hot-lock` (`src/state/hot-lock.mjs`, `hotLockDepth` at `:58`); a Rust spawn is invisible to it, so the facade must never reach a spawning Rust path inside the gate.
+- Exec guard: any `child_process` call inside a hot critical section throws `exec-under-hot-lock` (`src/holder-lock/hot-guard.mjs` since 2026-10-19, re-exported by `src/state/hot-lock.mjs`, `hotLockDepth`); a Rust spawn is invisible to it, so the facade must never reach a spawning Rust path inside the gate.
 
 ## Requirements
 

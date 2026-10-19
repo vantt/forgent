@@ -275,6 +275,24 @@ test('validateUnit: the G2 message names the mechanics a unit still may not pin'
   );
 });
 
+test('validateUnit: verify is a non-empty command string and survives validation', () => {
+  const base = { id: 'u-verify', objective: 'Fix it', capability: 'code:implement' };
+  assert.equal(validateUnit({ ...base, verify: ' npm test ' }).verify, 'npm test');
+  assert.equal('verify' in validateUnit(base), false);
+  for (const verify of ['', '  ', 3, {}, ['npm test'], null]) {
+    assert.throws(() => validateUnit({ ...base, verify }), (err) => err instanceof RunnerConfigError && /unit\.verify/.test(err.message), `verify=${JSON.stringify(verify)}`);
+  }
+});
+
+test('validateUnit: skills are a non-empty list of names, trimmed and de-duplicated', () => {
+  const base = { id: 'u-skills', objective: 'Write docs', capability: 'docs:write' };
+  assert.deepEqual(validateUnit({ ...base, skills: [' docs-seeker ', 'docs-seeker', 'mermaid'] }).skills, ['docs-seeker', 'mermaid']);
+  assert.equal('skills' in validateUnit(base), false);
+  for (const skills of [[], ['  '], [3], 'docs-seeker', {}, null]) {
+    assert.throws(() => validateUnit({ ...base, skills }), (err) => err instanceof RunnerConfigError && /unit\.skills/.test(err.message), `skills=${JSON.stringify(skills)}`);
+  }
+});
+
 test('validateUnit: a unit may ask for its own run timeout, inside the ceiling', async () => {
   const { RUN_TIMEOUT_MAX_MS, RUN_TIMEOUT_MIN_MS } = await import('../../../src/runner/dispatch/config.mjs');
   const base = { id: 'u-heavy', objective: 'Port the parser', capability: 'code:implement' };

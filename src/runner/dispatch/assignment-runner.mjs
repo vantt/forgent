@@ -124,6 +124,7 @@ import {
   classifyProviderCapacityFault,
   commandCli,
   credentialSourceForCli,
+  credentialStoreOf,
   defaultProviderCapacityRuntimeDir,
   hasProviderAccounts,
   probeQuarantinedAccounts,
@@ -176,20 +177,23 @@ function resolveExecutorCommandFallback(entry, executorId) {
 }
 
 /**
- * The CLIs a launch of `executorId` may run, before the invocation is settled: the pinned invocation's CLI
- * when the caller pinned one, else the CLIs of the executor's `cli` invocations in declaration order (the
- * first is the one an unpinned launch takes). Used to pick an account's per-CLI login store for the lazy
- * probe and for refresh-ahead; the launch itself takes the store of the command it really runs.
+ * The login stores a launch of `executorId` may read, before the invocation is settled: the store key of the
+ * pinned invocation when the caller pinned one, else of the executor's `cli` invocations in declaration
+ * order (the first is the one an unpinned launch takes). An invocation that declares no store is keyed by
+ * its command's CLI. Used to pick an account's per-CLI login store for the lazy probe and for
+ * refresh-ahead; the launch itself takes the store its invocation reads.
  */
+const storeKeyOf = (invocation) => credentialStoreOf(invocation)?.use ?? commandCli(invocation?.command);
+
 function launchCandidateClis(cfg, executorId, pinnedInvocationId) {
   const entry = cfg?.executors?.[executorId] ?? cfg?.executor;
   const invocations = Array.isArray(entry?.invocations) ? entry.invocations.filter((inv) => inv?.via === 'cli') : [];
   if (pinnedInvocationId) {
     const pinned = invocations.find((inv) => inv.id === pinnedInvocationId);
-    if (pinned?.command) return [commandCli(pinned.command)];
+    if (pinned?.command) return [storeKeyOf(pinned)];
   }
-  const commands = invocations.length > 0 ? invocations.map((inv) => inv.command) : [entry?.command];
-  return [...new Set(commands.map(commandCli).filter(Boolean))];
+  const keys = invocations.length > 0 ? invocations.map(storeKeyOf) : [storeKeyOf(entry)];
+  return [...new Set(keys.filter(Boolean))];
 }
 
 function resolveProviderFamilyForExecutor(entry, executorId) {
@@ -2299,7 +2303,7 @@ export async function executeAssignment(assignment, opts = {}) {
             url: resolvedCmd.url,
             headers: resolvedCmd.headers,
             body: resolvedCmd.body,
-            resourceBindings: resolvedCmd.resourceBindings,
+            credentialStore: resolvedCmd.credentialStore,
           },
           providerCapacity: providerCapacityForLaunch,
           ...(opts.blind === true ? { blind: true } : {}),
@@ -2392,7 +2396,7 @@ export async function executeAssignment(assignment, opts = {}) {
           delivery: opts.promptDelivery ?? process.env.FGOS_HERDR_PROMPT_DELIVERY?.trim() ?? resolvedCmd.promptDelivery ?? 'inline',
           trustStore: interactive.trustStore,
           trustAccountSource: providerCapacityForLaunch?.status === 'selected'
-            ? credentialSourceForCli(providerCapacityForLaunch, commandCli(prepResult.attempt.command)) ?? null
+            ? (resolvedCmd.credentialStore ? credentialSourceForCli(providerCapacityForLaunch, resolvedCmd.credentialStore.use) : null) ?? null
             : null,
           dispatchBatchKey: opts.dispatchBatchKey
             ?? effectiveAssignment.unitRunId

@@ -177,3 +177,32 @@ impl StoreIdentity {
         Self::open(layout, machine)
     }
 }
+
+/// Setup-only atomic mint. Readers can never observe a partially written id.
+pub fn mint_machine_id(state_root: &Path, hostname: &str) -> Result<(bool, String), Error> {
+    let mut slug = crate::layout::branch_key(hostname)?;
+    slug.truncate(56);
+    let slug = slug.trim_end_matches('-');
+    let random = random_id()?;
+    let mut suffix = String::new();
+    for offset in (0..12).step_by(2) {
+        let byte = u8::from_str_radix(&random[offset..offset + 2], 16)
+            .map_err(|e| invalid(e.to_string()))?;
+        suffix.push(b"abcdefghijklmnopqrstuvwxyz234567"[(byte & 31) as usize] as char);
+    }
+    let value = format!("{slug}-{suffix}\n");
+    let result = fgos_durable_file::install_once_with_mode(
+        state_root,
+        "machine-id",
+        value.as_bytes(),
+        0o600,
+    )
+    .map_err(Error::from_install_error)?;
+    let meta = fs::symlink_metadata(state_root.join("machine-id")).map_err(io)?;
+    if !meta.is_file() || meta.file_type().is_symlink() {
+        return Err(invalid("existing identity is invalid"));
+    }
+    let id = machine_id(None, state_root)
+        .map_err(|e| invalid(format!("existing identity is invalid: {e}")))?;
+    Ok((result == fgos_durable_file::Installed::Created, id))
+}

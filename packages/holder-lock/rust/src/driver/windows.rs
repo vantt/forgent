@@ -3,8 +3,8 @@
 //! The kernel drops the lock when the owning process dies (measured: released
 //! 0.1 ms after `TerminateProcess`). A lock is owned by the process and the
 //! handle that took it, so it is never shared through an inherited or
-//! duplicated handle: borrowing runs through a job instead (`prepare_borrow`
-//! and `end_leftovers` land with the job driver). Win32 has no API that lists
+//! duplicated handle: borrowing runs through a job instead (`end_leftovers`
+//! lands with the job driver). Win32 has no API that lists
 //! byte-range lock holders, so `holders` is unlistable.
 
 use std::fs::File;
@@ -12,7 +12,6 @@ use std::io;
 use std::os::windows::ffi::OsStringExt;
 use std::os::windows::io::AsRawHandle;
 use std::path::{Path, PathBuf};
-use std::process::Command;
 use std::time::Duration;
 
 use windows_sys::Win32::Foundation::{CloseHandle, ERROR_LOCK_VIOLATION, HANDLE, INVALID_HANDLE_VALUE};
@@ -214,9 +213,8 @@ impl LockDriver for LockFileExDriver {
         HoldersList::Unlistable("Windows has no API that lists byte-range lock holders".to_string())
     }
 
-    fn prepare_borrow(&self, _cmd: &mut Command) {}
 
-    fn end_leftovers(&self, _file: &File, _child_pid: u32, _kill_wait: Duration) -> Result<u32, Leftovers> {
+    fn end_leftovers(&self, _file: &File, _child_pid: u32, _kill_wait: Duration, _since: Option<fgos_process::facts::CreationMark>) -> Result<u32, Leftovers> {
         Err(Leftovers { killed: 0, pids: Vec::new(), foreign: false })
     }
 

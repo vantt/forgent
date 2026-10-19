@@ -744,6 +744,7 @@ test("the leased account's credential source reaches the herdr-spawn adapter so 
         adapter: "herdr-spawn",
         interactiveMode: { kind: "codex", trustStore: { kind: "codex-toml" } },
         prompt: "do the work",
+        credentialStore: { use: "codex", homeEnv: "CODEX_HOME" },
       },
       providerCapacity: { provider: "openai-codex", accountId: "leased", credentialSource },
       requirement: { mode: "unconfined" },

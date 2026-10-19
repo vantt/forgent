@@ -161,6 +161,10 @@ pub struct Profile {
     /// Gap between typing the brief and pressing Enter. A CLI that reads a
     /// quick text-then-Enter as one paste turns the Enter into a newline.
     pub enter_gap_ms: u64,
+    /// The brief goes in one prompt-door send (text plus submit) instead of
+    /// typed text, a gap and a separate Enter. For a CLI whose composer
+    /// swallows Enter after a long typed paste.
+    pub submit_by_prompt_door: bool,
     /// Lowercase wordings of this CLI's folder-trust dialog.
     pub trust_markers: &'static [&'static str],
 }
@@ -325,21 +329,20 @@ impl Terminal {
         })
     }
 
+    fn submit_brief(&self, io: &mut dyn AgentIo, message: &str) -> Result<(), IoError> {
+        io.send(&SendInput {
+            text: Some(message.to_string()),
+            keys: None,
+            submit: true,
+        })
+    }
+
     fn press_enter(&self, io: &mut dyn AgentIo) -> Result<(), IoError> {
         io.send(&SendInput {
             text: None,
             keys: Some(vec!["Enter".to_string()]),
             submit: false,
         })
-    }
-
-    /// Type the brief (inline text or a file-pointer line), leave this CLI's
-    /// gap, press Enter. Either failure is returned; it does not say whether
-    /// the CLI took the brief.
-    pub fn deliver(&self, io: &mut dyn AgentIo, message: &str) -> Result<(), IoError> {
-        self.type_brief(io, message)?;
-        io.pause(self.profile.enter_gap_ms);
-        self.press_enter(io)
     }
 
     /// Deliver the brief and confirm it, re-typing only when sure it was not
@@ -356,11 +359,18 @@ impl Terminal {
         let before = io.screen().unwrap_or_default();
         let mut resends = 0;
         loop {
-            match self.type_brief(io, message) {
+            let sent = if self.profile.submit_by_prompt_door {
+                self.submit_brief(io, message)
+            } else {
+                self.type_brief(io, message)
+            };
+            match sent {
                 Ok(()) => {
-                    io.pause(self.profile.enter_gap_ms);
-                    // A lost Enter leaves the draft in the composer; the confirm loop presses it again.
-                    let _ = self.press_enter(io);
+                    if !self.profile.submit_by_prompt_door {
+                        io.pause(self.profile.enter_gap_ms);
+                        // A lost Enter leaves the draft in the composer; the confirm loop presses it again.
+                        let _ = self.press_enter(io);
+                    }
                     return self.confirm_submitted(io, message, outbox);
                 }
                 Err(_) => {

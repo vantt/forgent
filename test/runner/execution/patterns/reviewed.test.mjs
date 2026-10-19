@@ -5,6 +5,8 @@ import {
   resolveCheckers,
   reviewedHistoryOutcome,
   DEFAULT_CHECKERS_BY_RIGOR,
+  verifyCommandOf,
+  requiresDistinctFamilies,
 } from '../../../../src/runner/execution/patterns/reviewed.mjs';
 
 test('resolveCheckers derives checker set from rigor, capability, and params', () => {
@@ -421,4 +423,60 @@ test('resume keeps a complete round final but retries every unpassed seat of an 
   assert.deepEqual(dispatched.sort(), ['red-team/1', 'reviewer/1']);
   assert.equal(resumed.outcome, 'pass');
   assert.equal(resumed.rounds, 1);
+});
+
+test('verifyCommandOf reads the unit, then its capability, and nothing else', () => {
+  assert.equal(verifyCommandOf({ capability: 'docs:write', verify: 'make check' }, {}), 'make check');
+  assert.equal(verifyCommandOf({ capability: 'docs:write' }, { capabilities: { 'docs:write': { verify: 'lint docs' } } }), 'lint docs');
+  assert.equal(verifyCommandOf({ capability: 'docs:write', verify: 'unit wins' }, { capabilities: { 'docs:write': { verify: 'cap loses' } } }), 'unit wins');
+  assert.equal(verifyCommandOf({ capability: 'docs:write' }, {}), undefined);
+  assert.equal(verifyCommandOf({ capability: 'docs:write', verify: '   ' }, {}), undefined);
+});
+
+test('a verify command in pattern params is not a verify: the runner never ran one from there', async () => {
+  const unit = { id: 'u-params-verify', objective: 'Do it', capability: 'docs:write' };
+  const res = await runReviewed(
+    unit,
+    {},
+    {
+      runRole: async (opts) => ({ role: opts.role, outcome: 'pass' }),
+      verify: () => assert.fail('no unit or capability verify exists, so no verify role runs'),
+    },
+    { verify: 'npm test' },
+  );
+  assert.equal(res.outcome, 'pass');
+  assert.equal(res.results.some((r) => r.role === 'verify'), false);
+});
+
+test('requiresDistinctFamilies is true at rigor high or critical, from the unit or its capability floor', () => {
+  assert.equal(requiresDistinctFamilies({ capability: 'docs:write' }, {}), false);
+  assert.equal(requiresDistinctFamilies({ capability: 'docs:write', rigor: 'low' }, {}), false);
+  assert.equal(requiresDistinctFamilies({ capability: 'docs:write', rigor: 'standard' }, {}), false);
+  assert.equal(requiresDistinctFamilies({ capability: 'docs:write', rigor: 'high' }, {}), true);
+  assert.equal(requiresDistinctFamilies({ capability: 'docs:write', rigor: 'critical' }, {}), true);
+  assert.equal(requiresDistinctFamilies({ capability: 'docs:write', rigor: 'low' }, { capabilities: { 'docs:write': { rigor: 'high' } } }), true);
+  assert.equal(requiresDistinctFamilies({ capability: 'docs:write', rigor: 'critical' }, { capabilities: { 'docs:write': { rigor: 'low' } } }), true);
+});
+
+test('reviewed at high or critical rigor makes every checker independent of the producer and of each other', async () => {
+  for (const rigor of ['high', 'critical']) {
+    const seen = [];
+    const unit = { id: `u-${rigor}`, objective: 'Do it', capability: 'docs:write', rigor };
+    await runReviewed(unit, {}, { runRole: async (opts) => { seen.push(opts); return { role: opts.role, outcome: 'pass' }; } });
+    const byRole = Object.fromEntries(seen.map((opts) => [opts.role, opts.independentOf]));
+    assert.deepEqual(byRole.reviewer, ['producer', 'red-team'], rigor);
+    assert.deepEqual(byRole['red-team'], ['producer', 'reviewer'], rigor);
+  }
+});
+
+test('reviewed at standard or low rigor keeps checkers independent of the producer only', async () => {
+  for (const rigor of ['low', 'standard', undefined]) {
+    const seen = [];
+    const unit = { id: 'u-standard', objective: 'Do it', capability: 'docs:write', ...(rigor ? { rigor } : {}) };
+    const params = { minCheckers: ['reviewer', 'red-team'] };
+    await runReviewed(unit, {}, { runRole: async (opts) => { seen.push(opts); return { role: opts.role, outcome: 'pass' }; } }, params);
+    for (const opts of seen.filter((o) => o.role !== 'producer')) {
+      assert.deepEqual(opts.independentOf, ['producer'], `${rigor} ${opts.role}`);
+    }
+  }
 });

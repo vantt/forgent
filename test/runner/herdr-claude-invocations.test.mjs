@@ -29,14 +29,16 @@ test('glm has no pane invocation: in a herdr pane GLM loops on one tool call, so
   assert.equal(runner.modelPolicies['z-ai'].standard, 'z-ai/glm-5.3');
 });
 
-test('glm is headless pi through OpenRouter with the same key variable and no claude gateway variables', () => {
+test('glm is headless pi through OpenRouter, its key read from its login store, with no claude gateway variables', () => {
   const glm = runner.executors.glm;
   assert.equal(glm.providerModel, 'z-ai');
   assert.ok(glm.invocations.length > 0 && glm.invocations.every((inv) => inv.command === 'pi'));
   for (const inv of glm.invocations) {
-    assert.equal(inv.env.OPENROUTER_API_KEY, '${GLM_OPENROUTER_API_KEY}');
-    assert.equal(inv.env.ANTHROPIC_BASE_URL, undefined);
-    assert.equal(inv.env.ANTHROPIC_AUTH_TOKEN, undefined);
+    assert.equal(inv.credentialStore.use, 'pi');
+    assert.ok(inv.credentialStore.files.includes('auth.json'), 'the OpenRouter key is in the auth.json of the store');
+    assert.equal(inv.env?.OPENROUTER_API_KEY, undefined, 'no key variable: the store carries it');
+    assert.equal(inv.env?.ANTHROPIC_BASE_URL, undefined);
+    assert.equal(inv.env?.ANTHROPIC_AUTH_TOKEN, undefined);
   }
 });
 

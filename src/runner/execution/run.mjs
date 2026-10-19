@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execFileSync, execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
 import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
@@ -16,6 +16,8 @@ import { worktreeSnapshot, writesSince } from './partial-writes.mjs';
 import { createRoleExecutorLedger } from './role-ledger.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
+import { verifyCommandOf } from './patterns/reviewed.mjs';
+import { runCommand } from '../goal-check.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
@@ -1008,8 +1010,13 @@ async function runUnitBody(options, scope) {
       }
 
       if (credentialFault) credentialFaultFamilySet.add(getProviderFamily(runnerConfig, bound.executor).toLowerCase());
-      // The spread is read again now: sibling seats may have changed executors since this seat first bound.
-      const walkAsk = preferIndependentOf.length > 0 ? { ...ask, preferIndependentOf: roleLedger.seats(preferIndependentOf) } : ask;
+      // The independence and the spread are read again now: sibling seats may have changed executors
+      // since this seat first bound, and a hard `independentOf` must hold for the executor it falls back to.
+      const walkAsk = {
+        ...ask,
+        independentOf: resolveIndependence(independentOf),
+        ...(preferIndependentOf.length > 0 ? { preferIndependentOf: roleLedger.seats(preferIndependentOf) } : {}),
+      };
       const next = nextCandidate(bound, walkAsk, bindCtx, 'provider-limit', { excludeFamilies: [...credentialFaultFamilySet] });
       if (next.refused || next.mechanism === 'inline') {
         return {
@@ -1029,28 +1036,24 @@ async function runUnitBody(options, scope) {
     }
   };
 
-  // Helper for verify command
+  // The deterministic check a round ends with: the unit's own `verify`, else its capability's. It
+  // runs through the one bounded command runner (goal-check.mjs), for at most `runner.timeoutMs`;
+  // running past that is a failed verify that says so, never a hang.
   const verify = async (targetUnit) => {
     const runnerConfig = unitRecord.configSnapshot.runner;
-    const verifyCmd = targetUnit.verify || runnerConfig.capabilities?.[targetUnit.capability]?.verify;
-    if (!verifyCmd || typeof verifyCmd !== 'string') {
-      return { pass: true };
-    }
+    const verifyCmd = verifyCommandOf(targetUnit, runnerConfig);
+    if (!verifyCmd) return { pass: true };
 
-    try {
-      execSync(verifyCmd, {
-        cwd: unitRecord.worktree,
-        stdio: ['ignore', 'pipe', 'pipe'],
-        encoding: 'utf8',
-        timeout: 60000,
-      });
-      return { pass: true };
-    } catch (err) {
-      return {
-        pass: false,
-        findings: [`Verification command failed: ${verifyCmd} (${err.message})`],
-      };
-    }
+    const outcome = await runCommand(verifyCmd, unitRecord.worktree, runnerConfig.timeoutMs);
+    if (outcome.passed) return { pass: true };
+    const how = outcome.timedOut
+      ? `timed out after ${runnerConfig.timeoutMs}ms`
+      : outcome.status === null ? 'could not run' : `exited ${outcome.status}`;
+    const tail = outcome.output.trim().split('\n').slice(-20).join('\n');
+    return {
+      pass: false,
+      findings: [`Verification command ${how}: ${verifyCmd}${tail ? `\n${tail}` : ''}`],
+    };
   };
 
   // A caller that passes `{ pattern, params }` is choosing the pattern's params as well as its
@@ -1087,6 +1090,8 @@ async function runUnitBody(options, scope) {
     settle(patternResult.outcome);
   }
 
+  // A reviewed run with nothing to verify says so: a pass without a verify is not a verified pass.
+  const unverified = resolvePattern(patternName).patternName === 'reviewed' && !verifyCommandOf(unit, unitRecord.configSnapshot.runner);
   return {
     unitRunId,
     outcome: patternResult.outcome,
@@ -1094,6 +1099,7 @@ async function runUnitBody(options, scope) {
     results: patternResult.results,
     findings: patternResult.findings || [],
     ...(unitRecord.sync ? { sync: syncSummary(unitRecord.sync) } : {}),
+    ...(unverified ? { verify: { ran: false, reason: 'no verify command: set unit.verify, pass --verify, or declare capabilities.<capability>.verify' } } : {}),
   };
   } catch (error) {
     if (!executionSettled) {

@@ -61,6 +61,86 @@
                               "items": {
                                 "type": "string"
                               }
+                            },
+                            "targets": {
+                              "type": "array",
+                              "items": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "oneOf": [
+                                      {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "const": "absent"
+                                          }
+                                        },
+                                        "required": [
+                                          "kind"
+                                        ]
+                                      },
+                                      {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "const": "oid"
+                                          },
+                                          "oid": {
+                                            "type": "string",
+                                            "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                                          }
+                                        },
+                                        "required": [
+                                          "kind",
+                                          "oid"
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "oneOf": [
+                                      {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "const": "absent"
+                                          }
+                                        },
+                                        "required": [
+                                          "kind"
+                                        ]
+                                      },
+                                      {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "const": "oid"
+                                          },
+                                          "oid": {
+                                            "type": "string",
+                                            "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                                          }
+                                        },
+                                        "required": [
+                                          "kind",
+                                          "oid"
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "minItems": 3,
+                                "maxItems": 3
+                              },
+                              "description": "All new writers emit explicit per-target old/new tips. Omission is accepted only for historical Publication records; Rust enforces namespace and authority recovery rules."
                             }
                           },
                           "required": [
@@ -91,6 +171,86 @@
                               "items": {
                                 "type": "string"
                               }
+                            },
+                            "targets": {
+                              "type": "array",
+                              "items": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "oneOf": [
+                                      {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "const": "absent"
+                                          }
+                                        },
+                                        "required": [
+                                          "kind"
+                                        ]
+                                      },
+                                      {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "const": "oid"
+                                          },
+                                          "oid": {
+                                            "type": "string",
+                                            "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                                          }
+                                        },
+                                        "required": [
+                                          "kind",
+                                          "oid"
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "oneOf": [
+                                      {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "const": "absent"
+                                          }
+                                        },
+                                        "required": [
+                                          "kind"
+                                        ]
+                                      },
+                                      {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "const": "oid"
+                                          },
+                                          "oid": {
+                                            "type": "string",
+                                            "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                                          }
+                                        },
+                                        "required": [
+                                          "kind",
+                                          "oid"
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "minItems": 3,
+                                "maxItems": 3
+                              },
+                              "description": "All new writers emit explicit per-target old/new tips. Omission is accepted only for historical Publication records; Rust enforces namespace and authority recovery rules."
                             }
                           },
                           "required": [
@@ -101,6 +261,76 @@
                       },
                       "required": [
                         "RemotePush"
+                      ]
+                    },
+                    {
+                      "const": "RefDelete"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "RefUpdate": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "worktree": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "worktree"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "RefUpdate"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "ConfigChange": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "remote": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string"
+                            },
+                            "oldConfigDigest": {
+                              "type": "string"
+                            },
+                            "refspecs": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "oldValues": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "required": [
+                            "remote",
+                            "url",
+                            "refspecs",
+                            "oldValues",
+                            "oldConfigDigest"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "ConfigChange"
                       ]
                     }
                   ]
@@ -118,7 +348,7 @@
                   "minItems": 1,
                   "items": {
                     "type": "string",
-                    "pattern": "^refs/fgos/"
+                    "pattern": "^(?:refs/|config:local$)"
                   }
                 },
                 "authorityBinding": {
@@ -482,7 +712,7 @@
                         "prefixItems": [
                           {
                             "type": "string",
-                            "pattern": "^refs/fgos/"
+                            "pattern": "^refs/"
                           },
                           {
                             "oneOf": [
@@ -693,6 +923,6 @@
   ],
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:fgos:git:wal-record:v1",
-  "title": "Publication WAL immutable envelope v1",
-  "description": "Concrete PublicationCas graph. Other operation families remain unimplemented and are refused. SHA-256 covers recursively key-sorted UTF-8 JSON with digest omitted. Intent at sequence zero has null predecessor; every subsequent record hashes its predecessor. Semantic transitions, object-format validation, resource and live authority checks are Rust obligations. This file is evidence, never effect authority. An Intent/Prepared with no TargetAttempt may close record-only as abandonedBeforeAttempt under the same publication authority. An operation directory without installed record zero is no Intent; temporary files remain evidence but do not block admission."
+  "title": "Git WAL immutable envelope v1",
+  "description": "Immutable Git WAL envelope for Publication, Refs, RepositoryConfig and Remote. RemoteFetch/RemotePush share explicit per-target old/new tips across Publication and non-event transfers. SHA-256 covers recursively key-sorted UTF-8 JSON with digest omitted. Semantic transitions, namespace grants, object-format checks and live authority remain Rust obligations; evidence never grants effect authority."
 }

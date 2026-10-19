@@ -406,7 +406,7 @@ function isGeneratedClaudeSkillWrapper(skillDirName, targetPath, projectRoot) {
  * files are byte-identical copies of the full skill, so they never carry
  * `GENERATED_WRAPPER_MARKER` -- provenance is the only proof available here.
  * A hand-authored `fgos-custom/` (right prefix, no source) or a hand-authored
- * user command (`pick/`, `submit/`, `cook/`) is never this function's to claim. */
+ * user command (`pick/`, `submit/`, `deliver/`) is never this function's to claim. */
 function isMirroredPluginSkill(sub, root) {
   if (sub === '_shared' || sub.startsWith('_shared/')) {
     return hasSharedFragmentSource(root, sub);
@@ -424,7 +424,7 @@ function isMirroredPluginSkill(sub, root) {
  * - `.gemini/extensions/fgos/*`: generated extension package
  * - `plugins/fgOS/skills/*`: only what the plugin mirror writes -- `_shared/` fragments and
  *   `fgos-*` dev-skills that have a canonical/assembled source (`isMirroredPluginSkill`);
- *   hand-authored plugin skills (`pick`, `submit`, `cook`, or a custom `fgos-*` with no
+ *   hand-authored plugin skills (`pick`, `submit`, `deliver`, or a custom `fgos-*` with no
  *   source) are NOT generated targets.
  * - `.claude/skills/*`: only generated thin-wrapper stubs containing `GENERATED_WRAPPER_MARKER`
  *   or canonical provenance; hand-authored or third-party skills (e.g. `ui-spec`, `gitnexus`)

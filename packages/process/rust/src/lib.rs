@@ -12,6 +12,8 @@
 pub mod containment;
 pub mod control;
 pub mod facts;
+#[cfg(unix)]
+pub mod mapped;
 pub mod platform;
 
 pub use platform::ProcessPlatform;

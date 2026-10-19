@@ -38,8 +38,8 @@ function assertRunnable(binding, label) {
   assert.equal(inv.confinement?.backend, 'bwrap', `${label}: the run is confined`);
   if (NEEDS_PRIVATE_HOME.has(binding.executor)) {
     assert.ok(
-      (inv.resourceBindings ?? []).some((b) => b.resource === 'private-home'),
-      `${label}: ${binding.executor}/${binding.invocation} needs a private home`,
+      inv.credentialStore !== undefined,
+      `${label}: ${binding.executor}/${binding.invocation} needs a private home for the login store it reads`,
     );
   }
 }
@@ -116,6 +116,35 @@ test('a capability gets the same family and model inside herdr and headless; onl
       assert.equal(cli.model, pane.model, `${capability}/${rigor}`);
       assert.equal(pane.invocation, 'claude-herdr-bwrap', `${capability}/${rigor}`);
       assertRunnable(cli, `${capability}/${rigor} headless`);
+    }
+  }
+});
+
+test('every invocation that declares a login store reads the store its command logs in', () => {
+  for (const [executorId, entry] of Object.entries(executors)) {
+    for (const inv of entry.invocations ?? []) {
+      const store = inv.credentialStore;
+      if (!store) continue;
+      const label = `${executorId}/${inv.id}`;
+      assert.equal(inv.confinement?.backend, 'bwrap', `${label}: only a confined invocation reads a store through a private home`);
+      assert.equal(store.use, path.basename(inv.command), `${label}: the store key is the command's CLI`);
+      assert.equal(inv.resourceBindings, undefined, `${label}: the store replaces the older private-home binding`);
+      assert.equal(inv.env?.[store.homeEnv], undefined, `${label}: the driver sets ${store.homeEnv}; env does not point at the real store`);
+    }
+  }
+});
+
+test('every confined invocation with a login account declares its store, and the id of one names no account', () => {
+  for (const [executorId, entry] of Object.entries(executors)) {
+    for (const inv of entry.invocations ?? []) {
+      if (inv.resourceBindings === undefined) continue;
+      assert.fail(`${executorId}/${inv.id} keeps the older private-home binding; declare credentialStore instead`);
+    }
+  }
+  const named = /-(fgovn|tetnu|tetcu72|vantt|openrouter|gemini-tetcu72)$/;
+  for (const [executorId, entry] of Object.entries(executors)) {
+    for (const inv of entry.invocations ?? []) {
+      if (inv.credentialStore) assert.doesNotMatch(inv.id, named, `${executorId}/${inv.id}: an account is leased at launch, so the id does not carry its name`);
     }
   }
 });

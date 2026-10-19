@@ -17,13 +17,16 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 > "Please run /login · API Error: 401 Missing Authentication header" every
 > time, so `glm` now runs the `pi` CLI against OpenRouter
 > (`z-ai/glm-5.3` from the `z-ai` model policy, raised from 5.2 on 2026-10-05), the same shape as `deepseek`
-> (headless) and `xai` (herdr pane). The key is still only a `${VAR}`
-> reference: `OPENROUTER_API_KEY` is set from `${GLM_OPENROUTER_API_KEY}`.
-> The per-executor `env` mechanism described below is unchanged and is what
-> carries that reference. Everything below that names the claude CLI or
+> (headless) and `xai` (herdr pane). The key was then only a `${VAR}`
+> reference: `OPENROUTER_API_KEY` was set from `${GLM_OPENROUTER_API_KEY}`.
+> Since 2026-10-19 the committed invocation carries no key variable: it
+> declares `credentialStore` (the `pi` login store), and pi reads the key from
+> the `auth.json` the sandbox is handed (docs/specs/runner.md RUL105). The
+> per-executor `env` mechanism described below is unchanged for any
+> invocation that still names a variable. Everything below that names the claude CLI or
 > `ANTHROPIC_*` variables describes the superseded route.
 >
-> **Which invocation to use.** Run headless (`glm` with `pi-cli-bwrap-openrouter`),
+> **Which invocation to use.** Run headless (`glm` with `pi-cli-bwrap`),
 > `z-ai/glm-5.2` answered, calls `bash` and writes its report correctly (checked
 > 2026-10-05, a read-only Unit that read a file under `.fgos` and quoted its first
 > line). The model sometimes degenerates, in a herdr pane
@@ -35,7 +38,7 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 > pane this looks like one call repeated forever. The Unit then runs until the
 > output buffer (10 MiB) or the ceiling kills it and fails as an execution failure
 > with no fallback to the next executor. The capability preference pools name
-> `glm` with `pi-cli-bwrap-openrouter`. The pane executor `glm-herdr` was removed on
+> `glm` with `pi-cli-bwrap`. The pane executor `glm-herdr` was removed on
 > 2026-10-17 when each family got exactly one executor: a pane invocation on `glm`
 > would be chosen inside herdr whenever a pool fell back to glm, so glm runs headless only. The model was raised to `z-ai/glm-5.3` on 2026-10-05 in the hope that it
 > does not degenerate: 16 of 16 headless runs passed (medium and high), but 5.2 also passed

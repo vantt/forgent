@@ -6,7 +6,7 @@ use std::io;
 use std::process::{Child, Command};
 
 use crate::control::{Signal, SignalOutcome};
-use crate::facts::{Holders, Observed, Observer, PidNs, ProcTuple, Scan, ScanFilter};
+use crate::facts::{CreationMark, Holders, Observed, Observer, PidNs, ProcTuple, Relation, Scan, ScanFilter};
 use crate::{FdSlot, ProcId};
 
 #[cfg(target_os = "linux")]
@@ -32,6 +32,25 @@ pub trait ProcessPlatform: Send + Sync {
     fn observe(&self, pid: ProcId) -> Observed;
     /// Every process holding a kernel lock on the file `(dev, ino)`.
     fn lock_holders(&self, dev: u64, ino: u64) -> Holders;
+    /// The holders of a kernel lock on `(dev, ino)` among `pids` only, read
+    /// the same way as [`ProcessPlatform::lock_holders`]. `Unlistable` where
+    /// the OS cannot list holders.
+    fn lock_holders_among(&self, _dev: u64, _ino: u64, _pids: &[ProcId]) -> Holders {
+        Holders::Unlistable
+    }
+    /// Parent, process group and start time of every visible process, from
+    /// one pass over the process table; `None` where the OS has no such pass.
+    fn relations(&self) -> Option<Vec<Relation>> {
+        None
+    }
+    /// The last pid allocated in this process's pid namespace.
+    fn last_pid(&self) -> Option<u32> {
+        None
+    }
+    /// See [`crate::facts::created_since`].
+    fn created_since(&self, _mark: &CreationMark) -> Option<Vec<Relation>> {
+        None
+    }
     /// Every live process with the facts `filter` asks for.
     fn scan(&self, filter: &ScanFilter) -> Scan;
     /// Spawn with an explicit descriptor map; see [`crate::control::spawn_with_fds`].

@@ -511,7 +511,7 @@ export function probePeerRunHidden({ bwrapBin = '/usr/bin/bwrap', scratchDir, br
     const request = {
       dispatchId: 'probe-peer-run-hidden',
       override: { controls: { hostRead: 'blind' } },
-      invocation: { command: 'node', args: ['-e', script], env: {}, resourceBindings: [] },
+      invocation: { command: 'node', args: ['-e', script], env: {} },
       context: { cwd: project, repoRoot: project, runDir, fgosDir },
     };
     const prepared = prepareBwrapSync({ resources }, request, { id: 'bwrap', config: { executable: bwrapBin } });

@@ -1,7 +1,7 @@
 ---
 title: "Hai cửa, một runUnit: đường Doer xanh, xoá cửa thô, tách Work khỏi dispatch"
 description: "R0-R3 theo hội đồng mở lại r4 + quyết định Lead 2026-10-14: fgos run và fgos workflow start là hai cửa trên một ranh giới runUnit; dispatch là tầng thấp; Work chỉ là bên dùng. Mốc M1 = N1+N2 dùng được thật; M2 = xoá cửa cũ + cắt Work."
-status: pending
+status: completed
 priority: P1
 effort: "~17d tổng công; M1 ~4.5 ngày lịch, M2 ~6 ngày lịch sau M1 (~10.5 ngày lịch tổng)"
 branch: main

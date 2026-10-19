@@ -8,7 +8,6 @@ export const PRESETS = Object.freeze({
     pattern: 'reviewed',
     params: Object.freeze({
       minCheckers: Object.freeze(['reviewer', 'red-team']),
-      verify: 'npm test',
     }),
   }),
   'consult': Object.freeze({

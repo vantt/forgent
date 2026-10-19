@@ -11,7 +11,7 @@ import {
   credentialStoreDir,
   providerAccountDir,
   providerAccountInventory,
-  providerCapacityForCommand,
+  providerCapacityForInvocation,
   tryAcquireAccountLock,
   ProviderCapacityConfigError,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
@@ -133,7 +133,7 @@ async function provisionFor(w, command, selection, dispatchId) {
   const request = buildConfinementRequest({
     capability: 'code:review',
     executorId: 'openai',
-    invocation: { command, args: [], env: {}, resourceBindings: [] },
+    invocation: { command, args: [], env: {}, credentialStore: { use: path.basename(command), homeEnv: 'AGENT_HOME' } },
     context: { cwd: w.tmp, runDir: path.join(w.tmp, 'run') },
     providerCapacity: selection,
   });
@@ -170,9 +170,24 @@ test('a launch whose CLI the account declares no store for is refused before the
   } finally { w.cleanup(); }
 });
 
-test('a single-source selection reaches every command unchanged', () => {
+test('a single-source selection serves every store key; an invocation that reads no store gets no login', () => {
   const selection = { status: 'selected', accountId: 'a', credentialSource: { kind: 'codex-home', home: '/x' } };
-  assert.equal(providerCapacityForCommand(selection, 'pi'), selection);
+  const served = providerCapacityForInvocation(selection, { command: 'pi', credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' } });
+  assert.deepEqual(served.credentialSource, selection.credentialSource);
+  const none = providerCapacityForInvocation(selection, { command: 'claude' });
+  assert.equal(none.credentialSource, null);
+  assert.equal(none.accountId, 'a');
+});
+
+test('the store key the invocation declares picks the login store, not the basename of its command', () => {
+  const w = workspace();
+  try {
+    const selection = acquireProviderAccountLease({ runnerConfig: runnerConfig({ acct: perCliAccount(w) }), provider: 'openai-codex', runId: 'run-use', runtimeDir: w.runtimeDir });
+    const wrapped = providerCapacityForInvocation(selection, { command: '/opt/bin/agent-wrapper', credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' } });
+    assert.equal(wrapped.credentialSource.home, w.piHome);
+    const inferred = providerCapacityForInvocation(selection, { command: '/usr/local/bin/codex', resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] });
+    assert.equal(inferred.credentialSource.home, w.codexHome, 'an older config is read through the same door');
+  } finally { w.cleanup(); }
 });
 
 test('renewal of a per-CLI store keeps its copies in that store directory; the write-back marker names it', async () => {

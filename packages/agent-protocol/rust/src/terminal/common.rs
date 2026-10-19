@@ -79,17 +79,29 @@ fn bracket_chip(c: &[char], i: usize, label: &str) -> bool {
 /// Collapsed paste markers, modal paste menus and attachment chips (omp's
 /// `📄 #N`) rendered in agent TUI composers.
 ///
-/// Original, case-insensitive: `(\[paste #\d+(?: [^\]]+)?\]|\[Pasted text #\d+(?: [^\]]+)?\]|\[Paste\]|#\d+\s*(?:…|\.\.\.)\s*\+\d+\s*lines|Pasted \d+ lines|📄\s*#\d+)`
+/// Original, case-insensitive: `(\[paste #\d+(?: [^\]]+)?\]|\[Pasted text #\d+(?: [^\]]+)?\]|\[Pasted Content \d+ chars\]|\[Paste\]|#\d+\s*(?:…|\.\.\.)\s*\+\d+\s*lines|Pasted \d+ lines|📄\s*#\d+)`
 pub fn has_paste_chip(text: &str) -> bool {
     let c: Vec<char> = text.to_lowercase().chars().collect();
     (0..c.len()).any(|i| {
         bracket_chip(&c, i, "[paste #")
             || bracket_chip(&c, i, "[pasted text #")
+            || pasted_content_chip(&c, i)
             || starts_with(&c, i, "[paste]").is_some()
             || hash_ellipsis_lines(&c, i)
             || pasted_n_lines(&c, i)
             || attachment_chip(&c, i)
     })
+}
+
+/// codex's `[Pasted Content N chars]`.
+fn pasted_content_chip(c: &[char], i: usize) -> bool {
+    let Some(i) = starts_with(c, i, "[pasted content ") else {
+        return false;
+    };
+    let Some(i) = digits_end(c, i) else {
+        return false;
+    };
+    starts_with(c, i, " chars]").is_some()
 }
 
 fn hash_ellipsis_lines(c: &[char], i: usize) -> bool {

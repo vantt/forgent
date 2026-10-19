@@ -673,7 +673,7 @@ test('isGeneratedAdapterTarget and isCanonicalSkillSource enforce executable ski
   // Precise classification: hand-authored plugin and claude skills are NOT generated adapter targets
   assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/pick/SKILL.md'), false);
   assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/submit/SKILL.md'), false);
-  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/cook/SKILL.md'), false);
+  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/deliver/SKILL.md'), false);
   assert.equal(isGeneratedAdapterTarget('.claude/skills/ui-spec/SKILL.md'), false);
   assert.equal(isGeneratedAdapterTarget('.claude/skills/gitnexus/gitnexus-cli/SKILL.md'), false);
 

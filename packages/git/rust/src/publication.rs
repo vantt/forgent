@@ -198,6 +198,9 @@ pub struct RemoteGrant {
     pub pinned_url: String,
 }
 
+/// Terminal chains of a ref kept whole by admission before compaction.
+const RECENT_TERMINAL: usize = 4;
+
 pub struct PublicationPort<'a, F = wal::OsFileSystem> {
     driver: &'a GitDriver,
     authority: HolderAuthority<'a>,
@@ -249,8 +252,17 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         wal::require_activation_fence(repo).map_err(werr)?;
         Wal::with_filesystem(repo.common_dir(), &self.filesystem).map_err(werr)
     }
+    /// Admission of `id` on the bound ref. Unresolved chains of the same ref
+    /// are closed or block as before. Terminal chains of the same ref, left
+    /// by earlier calls, are compacted here (pin released, id binding and
+    /// receipt kept in the ledger) except the most recently changed few,
+    /// which stay whole so `recover` of a just-finished id still returns its
+    /// full receipt. Retained chains stay bounded, so admission never
+    /// re-reads a growing history. A compaction that cannot finish keeps its
+    /// evidence and is retried by a later call.
     fn admit_pending(&self, repo: &RepoHandle, wal: &Wal<&F>, id: &str) -> Result<()> {
-        for chain in wal.active(100_000).map_err(|e| {
+        let mut terminal = Vec::new();
+        for chain in wal.retained(100_000).map_err(|e| {
             let mut error = werr(e);
             error.cause = format!("publication-backlog-unreadable: {}", error.cause);
             error
@@ -271,17 +283,26 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                 e.cause = format!("blocking operation {blocking}: {}", e.cause);
                 return Err(e);
             }
+            if chain.outcome().is_some() {
+                terminal.push((wal.last_change(blocking), blocking.clone()));
+                continue;
+            }
             if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
                 let terminal = wal
                     .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                     .map_err(werr)?;
-                let _ = self.release_pin_and_compact(repo, &terminal.last().operation_id);
+                if let Err(e) = self.release_pin_and_compact(repo, &terminal.last().operation_id) { eprintln!("git compaction deferred: {}: {}", terminal.last().operation_id, e.cause); }
             } else if chain.intent().kind != wal::OperationKind::PublicationCas {
                 let mut e = werr(WalError::RecoveryRequired);
                 e.operation_id = Some(blocking.clone());
                 e.cause = format!("blocking operation {blocking}: {}", e.cause);
                 return Err(e);
             }
+        }
+        // Newest first; an unreadable change time sorts oldest.
+        terminal.sort_by_key(|t| std::cmp::Reverse(t.0));
+        for (_, old) in terminal.into_iter().skip(RECENT_TERMINAL) {
+            if let Err(e) = self.release_pin_and_compact(repo, &old) { eprintln!("git compaction deferred: {old}: {}", e.cause); }
         }
         Ok(())
     }
@@ -329,16 +350,49 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             .map_err(|e| err(format!("directory-fsync: {e}")))?;
         self.point("publication-directory-fsync")
     }
-    fn sync_object(&self, repo: &RepoHandle, oid: &Oid) -> Result<()> {
+    /// Fsync `dirs` together (one fsync each, issued concurrently so the
+    /// filesystem can serve them with one journal commit). Each must be a
+    /// real directory, never a symlink.
+    fn sync_dirs(&self, dirs: &[PathBuf]) -> Result<()> {
+        for path in dirs {
+            let meta = fs::symlink_metadata(path).map_err(|e| err(e.to_string()))?;
+            if !meta.is_dir() || meta.file_type().is_symlink() {
+                return Err(err("untrusted-publication-directory"));
+            }
+        }
+        let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();
+        fgos_durable_file::sync_directories(&paths)
+            .map_err(|e| err(format!("directory-fsync: {e}")))?;
+        for _ in dirs {
+            self.point("publication-directory-fsync")?;
+        }
+        Ok(())
+    }
+    /// The loose-object fan-out directory (when present) and `objects/`.
+    fn object_dirs(repo: &RepoHandle, oid: &Oid) -> Vec<PathBuf> {
         let objects = repo.common_dir().join("objects");
         let fanout = objects.join(&oid.as_str()[..2]);
+        let mut dirs = Vec::new();
         if fanout.exists() {
-            self.sync_dir(&fanout)?;
+            dirs.push(fanout);
         }
-        self.sync_dir(&objects)?;
+        dirs.push(objects);
+        dirs
+    }
+    /// Make the object's directory entries durable, unless this process
+    /// already did for the same loose file (no write of ours intervened).
+    fn sync_object(&self, repo: &RepoHandle, oid: &Oid) -> Result<()> {
+        if !durable_objects::durable(repo, oid) {
+            self.sync_dirs(&Self::object_dirs(repo, oid))?;
+            durable_objects::remember(repo, oid);
+        }
         self.point("object-durable")
     }
-    fn sync_refs(&self, repo: &RepoHandle, reference: &str) -> Result<()> {
+    /// Every existing directory from the ref's parent up to the common dir
+    /// (and `reftable/` for that backend): the directory chain of a ref
+    /// created, changed or deleted.
+    fn ref_dirs(&self, repo: &RepoHandle, reference: &str) -> Result<Vec<PathBuf>> {
+        let mut dirs = Vec::new();
         let mut path = repo
             .common_dir()
             .join(reference)
@@ -347,7 +401,8 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             .to_path_buf();
         loop {
             match fs::symlink_metadata(&path) {
-                Ok(_) => self.sync_dir(&path)?,
+                Ok(meta) if meta.is_dir() && !meta.file_type().is_symlink() => dirs.push(path.clone()),
+                Ok(_) => return Err(err("untrusted-publication-directory")),
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
                 Err(e) => return Err(err(e.to_string())),
             }
@@ -360,9 +415,68 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                 .into();
         }
         if repo.layout.refs == RefStorage::Reftable {
-            self.sync_dir(&repo.common_dir().join("reftable"))?;
+            dirs.push(repo.common_dir().join("reftable"));
+        }
+        Ok(dirs)
+    }
+    /// One existence probe first (`show-ref --exists` reads the ref itself,
+    /// so a dangling symbolic ref exists): a missing ref costs one Git child
+    /// instead of the listing plus the symbolic probe of `read_ref`. Any ref
+    /// that exists is read in full by `read_ref`.
+    fn read_ref_absent_first(&self, repo: &RepoHandle, name: &RefName) -> Result<RefValue> {
+        let exists = self.raw(
+            repo,
+            &["show-ref", "--exists", "--", name.as_str()],
+            &[],
+            false,
+        )?;
+        match exists.code {
+            Some(2) => Ok(RefValue::Absent),
+            Some(0) => self.read_ref(repo, name),
+            _ => Err(exists.error("read-ref-failed")),
+        }
+    }
+    fn sync_refs(&self, repo: &RepoHandle, reference: &str) -> Result<()> {
+        let dirs = self.ref_dirs(repo, reference)?;
+        sync_ref_chain(&dirs).map_err(|e| err(e.to_string()))?;
+        for _ in &dirs {
+            self.point("publication-directory-fsync")?;
         }
         self.point("ref-durable")
+    }
+    /// Append `phase` to `chain` once `reference`'s directory chain is
+    /// durable. The chain's directories are synced while the record's own
+    /// bytes are synced, so both can share one journal commit; the record's
+    /// name is installed only after both finished, so the record never
+    /// exists before the ref is durable.
+    fn append_after_ref_durable(
+        &self,
+        repo: &RepoHandle,
+        wal: &Wal<&F>,
+        chain: &wal::Chain,
+        phase: Phase,
+        reference: &str,
+    ) -> Result<wal::Chain> {
+        let dirs = self.ref_dirs(repo, reference)?;
+        let sync = || sync_ref_chain(&dirs);
+        let mut refused: Option<OperationError> = None;
+        let mut points = || -> std::io::Result<()> {
+            let mut done = Ok(());
+            for _ in &dirs {
+                done = done.and_then(|()| self.point("publication-directory-fsync"));
+            }
+            done.and_then(|()| self.point("ref-durable")).map_err(|e| {
+                let io = std::io::Error::other(e.cause.clone());
+                refused = Some(e);
+                io
+            })
+        };
+        match wal.append_ordered(chain, phase, Some(&sync), &mut points) {
+            Ok(chain) => Ok(chain),
+            Err(_) if refused.is_some() => Err(refused.take().expect("checked")),
+            Err(WalError::Io(e)) if e.to_string().starts_with("directory-fsync") => Err(err(e.to_string())),
+            Err(e) => Err(werr(e)),
+        }
     }
     fn object_write(&self, repo: &RepoHandle, kind: &str, bytes: &[u8]) -> Result<Oid> {
         let out = self.call(
@@ -383,10 +497,21 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         Ok(oid)
     }
     fn ref_tip(&self, repo: &RepoHandle, reference: &str) -> Result<ExpectedTip> {
-        match self.read_ref(
+        Self::tip_of(self.read_ref(
             repo,
             &RefName::parse(reference).map_err(|_| err("invalid-ref"))?,
-        )? {
+        )?)
+    }
+    /// [`Self::ref_tip`] for a ref that is usually absent at this point (an
+    /// operation pin before it is created or after it is deleted).
+    fn absent_tip(&self, repo: &RepoHandle, reference: &str) -> Result<ExpectedTip> {
+        Self::tip_of(self.read_ref_absent_first(
+            repo,
+            &RefName::parse(reference).map_err(|_| err("invalid-ref"))?,
+        )?)
+    }
+    fn tip_of(value: RefValue) -> Result<ExpectedTip> {
+        match value {
             RefValue::Absent => Ok(ExpectedTip::Absent),
             RefValue::Direct(o) => Ok(ExpectedTip::Oid(o)),
             RefValue::Symbolic(_) => Err(err("symbolic-publication-ref")),
@@ -399,7 +524,22 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         old: &ExpectedTip,
         next: &ExpectedTip,
     ) -> Result<Output> {
-        self.ref_tip(repo, name)?; // best-effort symbolic preflight
+        // Best-effort symbolic preflight; a create expects nothing there.
+        match old {
+            ExpectedTip::Absent => self.absent_tip(repo, name)?,
+            ExpectedTip::Oid(_) => self.ref_tip(repo, name)?,
+        };
+        self.cas_preflighted(repo, name, old, next)
+    }
+    /// The exact-old no-deref update alone, for a caller whose own read of
+    /// the ref (a symbolic-or-direct fact) immediately precedes it.
+    fn cas_preflighted(
+        &self,
+        repo: &RepoHandle,
+        name: &str,
+        old: &ExpectedTip,
+        next: &ExpectedTip,
+    ) -> Result<Output> {
         let zero = "0".repeat(match repo.object_format() {
             ObjectFormat::Sha1 => 40,
             ObjectFormat::Sha256 => 64,
@@ -446,7 +586,17 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         i: &Intent,
         outcome: &Outcome,
     ) -> Result<Receipt> {
-        let current = tip(&self.ref_tip(repo, &i.resource_set[0])?);
+        // Only outcomes without an observed tip of their own report the
+        // current one; the others never read the ref again.
+        let current = match outcome {
+            Outcome::ConfigApproved
+            | Outcome::AbandonedBeforeAttempt
+            | Outcome::Transfer { .. }
+            | Outcome::Superseded { .. } => {
+                tip(&self.ref_tip(repo, &i.resource_set[0])?)
+            }
+            Outcome::Success { .. } | Outcome::Loss { .. } => Tip::Absent,
+        };
         let (observed, state, attribution) = match outcome {
             Outcome::ConfigApproved
             | Outcome::AbandonedBeforeAttempt
@@ -510,28 +660,22 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         })
     }
     fn finish(&self, repo: &RepoHandle, chain: &wal::Chain) -> Result<Receipt> {
-        let receipt = self.materialize(
-            repo,
-            &chain.last().operation_id,
-            chain.intent(),
-            chain
-                .outcome()
-                .ok_or_else(|| err("missing-terminal-outcome"))?,
-        )?;
+        self.finish_outcome(repo, &chain.last().operation_id, chain.intent(), chain.outcome().ok_or_else(|| err("missing-terminal-outcome"))?)
+    }
+    fn finish_outcome(&self, repo: &RepoHandle, id: &str, intent: &Intent, outcome: &Outcome) -> Result<Receipt> {
+        let receipt = self.materialize(repo, id, intent, outcome)?;
         if matches!(
-            chain.outcome(),
-            Some(
-                Outcome::Loss { .. } | Outcome::Superseded { .. } | Outcome::AbandonedBeforeAttempt
-            )
+            outcome,
+            Outcome::Loss { .. } | Outcome::Superseded { .. } | Outcome::AbandonedBeforeAttempt
         ) {
-            let mut e = err(match chain.outcome() {
-                Some(Outcome::Superseded { .. }) => "operation-superseded",
-                Some(Outcome::AbandonedBeforeAttempt) => "abandoned-before-attempt",
+            let mut e = err(match outcome {
+                Outcome::Superseded { .. } => "operation-superseded",
+                Outcome::AbandonedBeforeAttempt => "abandoned-before-attempt",
                 _ => "compare-and-swap-stale",
             });
-            e.code = match chain.outcome() {
-                Some(Outcome::Superseded { .. }) => ResultCode::Superseded,
-                Some(Outcome::AbandonedBeforeAttempt) => ResultCode::Refused,
+            e.code = match outcome {
+                Outcome::Superseded { .. } => ResultCode::Superseded,
+                Outcome::AbandonedBeforeAttempt => ResultCode::Refused,
                 _ => ResultCode::Stale,
             };
             e.operation_id = Some(receipt.operation_id.clone());
@@ -539,11 +683,11 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             return Err(e);
         }
         let mut receipt = receipt;
-        if let Some(Outcome::Transfer {
+        if let Outcome::Transfer {
             acknowledged,
             unknown,
             ..
-        }) = chain.outcome()
+        } = outcome
         {
             receipt.remote = if *acknowledged {
                 Remote::Acknowledged
@@ -636,7 +780,8 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         }
         self.point("before-target-cas")
             .map_err(|e| self.pending_error(repo, id, i, e))?;
-        let effect = self.cas_raw(
+        // `before` is the symbolic preflight of this update.
+        let effect = self.cas_preflighted(
             repo,
             &i.resource_set[0],
             &expected(&i.expected, repo.object_format())?,
@@ -648,8 +793,6 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             .ref_tip(repo, &i.resource_set[0])
             .map_err(|e| self.pending_error(repo, id, i, e))?;
         self.point("target-read-back")
-            .map_err(|e| self.pending_error(repo, id, i, e))?;
-        self.sync_refs(repo, &i.resource_set[0])
             .map_err(|e| self.pending_error(repo, id, i, e))?;
         let outcome = match effect {
             Ok(out) if out.success && tip(&observed) == i.next => Outcome::Success {
@@ -669,15 +812,23 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             }
 
             _ => {
+                self.sync_refs(repo, &i.resource_set[0])
+                    .map_err(|e| self.pending_error(repo, id, i, e))?;
                 let mut e = err("publication-outcome-unknown");
                 e.code = ResultCode::RecoveryRequired;
                 e.operation_id = Some(id.clone());
                 return Err(e);
             }
         };
-        let terminal = wal
-            .append(&attempted, Phase::Outcome(outcome))
-            .map_err(|e| self.pending_error(repo, id, i, werr(e)))?;
+        let terminal = self
+            .append_after_ref_durable(
+                repo,
+                wal,
+                &attempted,
+                Phase::Outcome(outcome),
+                &i.resource_set[0],
+            )
+            .map_err(|e| self.pending_error(repo, id, i, e))?;
         self.finish(repo, &terminal)
     }
     /// Recover retained PublicationCas records for this bound ref. Unknown
@@ -719,6 +870,29 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     /// Observe/recover this id; an attempted CAS is never reissued.
     pub fn recover(&self, repo: &RepoHandle, id: &str) -> Result<Receipt> {
         let wal = self.wal(repo)?;
+        if let Some(c) = wal.compacted(id).map_err(werr)? {
+            if c.v == 1 {
+                let mut e = werr(WalError::RecoveryRequired);
+                e.cause = "legacy-compact-receipt-incomplete: expected and next were not recorded; exact-request replay remains available".into();
+                e.operation_id = Some(id.into());
+                return Err(e);
+            }
+            let decode_tip = |s: &str| if s == "-" { Tip::Absent } else { Tip::Oid(s.into()) };
+            let intent = Intent {
+                kind: wal::OperationKind::PublicationCas,
+                request_digest: c.request.clone(),
+                repo_identity: self.authority.repo_identity.clone(),
+                resource_set: vec![self.authority.reference.as_str().into()],
+                authority_binding: self.authority.binding.clone(),
+                writer_identity: self.authority.writer.clone(),
+                object_format: repo.object_format(),
+                expected: decode_tip(&c.expected),
+                next: decode_tip(&c.next),
+            };
+            if !c.matches(&intent).map_err(werr)? { return Err(err("publication-borrow-unavailable")); }
+            self.authority.validate_publication_borrow(&intent).map_err(werr)?;
+            return self.finish_outcome(repo, id, &intent, &c.outcome().map_err(werr)?);
+        }
         let chain = wal.inspect(id).map_err(werr)?;
         self.authority
             .validate_publication_borrow(chain.intent())
@@ -840,14 +1014,14 @@ struct BoundReader<'a, 'b, F> {
 }
 impl<F: FileSystem> RecoveryReader for BoundReader<'_, '_, F> {
     fn read_ref(&self, reference: &str) -> wal::WalResult<ObservedRef> {
-        match self
-            .port
-            .read_ref(
-                self.repo,
-                &RefName::parse(reference).map_err(|_| WalError::RecoveryRequired)?,
-            )
-            .map_err(|_| WalError::RecoveryRequired)?
-        {
+        let name = RefName::parse(reference).map_err(|_| WalError::RecoveryRequired)?;
+        // Operation pins are usually gone when recovery or compaction reads them.
+        let value = if reference.starts_with("refs/fgos/git-operations/") {
+            self.port.read_ref_absent_first(self.repo, &name)
+        } else {
+            self.port.read_ref(self.repo, &name)
+        };
+        match value.map_err(|_| WalError::RecoveryRequired)? {
             RefValue::Absent => Ok(ObservedRef::Direct(Tip::Absent)),
             RefValue::Direct(o) => Ok(ObservedRef::Direct(Tip::Oid(o.as_str().into()))),
             RefValue::Symbolic(_) => Ok(ObservedRef::Symbolic),
@@ -862,6 +1036,35 @@ impl<F: FileSystem> RecoveryReader for BoundReader<'_, '_, F> {
             Tip::Oid(o) => {
                 let oid = Oid::parse(o, self.repo.object_format())
                     .map_err(|_| WalError::RecoveryRequired)?;
+                // One walk proves both facts when the candidate is intact:
+                // `<oid>^{commit}` resolves to the oid itself only for a
+                // commit (a tag peels to another oid, a tree or blob fails),
+                // and the walk fails on any missing object. Anything else is
+                // decided by the separate type read and walk below, so every
+                // refusal keeps its own answer. History already published at
+                // the expected tip passed this check when it was published and
+                // is held by that ref: the walk stops at it (as Git's own
+                // connectivity check does), so its cost follows the new
+                // objects, not the length of the stream.
+                let peeled = format!("{o}^{{commit}}");
+                let mut args = vec![
+                    "rev-list",
+                    "--objects",
+                    "--missing=error",
+                    "--end-of-options",
+                    &peeled,
+                ];
+                let excluded;
+                if let Tip::Oid(expected) = &i.expected {
+                    excluded = format!("^{expected}");
+                    args.push(&excluded);
+                }
+                if let Ok(out) = self.port.call(self.repo, &args, &[]) {
+                    if out.split(|b| *b == b'\n').next() == Some(o.as_bytes()) {
+                        self.port.point("candidate-fast-path").map_err(|e| WalError::Io(std::io::Error::other(e.cause)))?;
+                        return Ok(true);
+                    }
+                }
                 let obj = self
                     .port
                     .read_object(self.repo, &oid, ObjectType::Commit)
@@ -885,6 +1088,74 @@ impl<F: FileSystem> RecoveryReader for BoundReader<'_, '_, F> {
                     .is_ok())
             }
         }
+    }
+}
+
+/// Fsync a ref's directory chain (see `ref_dirs`), concurrently. A
+/// directory that a concurrent ref deletion pruned in the meantime has no
+/// entry left to make durable, and its removal is made durable by its parent,
+/// which is in the chain: it is skipped, never an error.
+fn sync_ref_chain(dirs: &[PathBuf]) -> std::io::Result<()> {
+    let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();
+    let synced = match fgos_durable_file::sync_directories(&paths) {
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => paths.iter().try_for_each(|dir| {
+            match fgos_durable_file::sync_directory(dir) {
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+                other => other,
+            }
+        }),
+        other => other,
+    };
+    synced.map_err(|e| std::io::Error::new(e.kind(), format!("directory-fsync: {e}")))
+}
+
+/// Loose objects this process made durable (file fsynced by Git under
+/// `core.fsync`, fan-out and `objects/` directories fsynced by the port), by
+/// common dir, oid and the loose file's inode. While the same file is still
+/// at its name, that name is durable: no fsync of ours is needed again.
+/// Bounded in size and age.
+mod durable_objects {
+    use crate::{Oid, RepoHandle};
+    use std::collections::HashMap;
+    use std::path::PathBuf;
+    use std::sync::Mutex;
+    use std::time::{Duration, Instant};
+    const KEEP: Duration = Duration::from_secs(600);
+    const BOUND: usize = 4096;
+    type Key = (PathBuf, String);
+    /// Device, inode and birth time of the loose file, and durability time.
+    type Seen = HashMap<Key, ((u64, u64, u128), Instant)>;
+    static SEEN: Mutex<Option<Seen>> = Mutex::new(None);
+    #[cfg(unix)]
+    fn loose(repo: &RepoHandle, oid: &Oid) -> Option<(u64, u64, u128)> {
+        let s = oid.as_str();
+        let m = std::fs::symlink_metadata(repo.common_dir().join("objects").join(&s[..2]).join(&s[2..])).ok()?;
+        m.is_file().then(|| crate::wal::durable_identity(&m)).flatten()
+    }
+    #[cfg(not(unix))]
+    fn loose(_: &RepoHandle, _: &Oid) -> Option<(u64, u64, u128)> {
+        None
+    }
+    pub(super) fn remember(repo: &RepoHandle, oid: &Oid) {
+        let Some(file) = loose(repo, oid) else { return };
+        if let Ok(mut seen) = SEEN.lock() {
+            let seen = seen.get_or_insert_with(HashMap::new);
+            if seen.len() >= BOUND {
+                seen.retain(|_, (_, at)| at.elapsed() < KEEP);
+                if seen.len() >= BOUND {
+                    seen.clear();
+                }
+            }
+            seen.insert((repo.common_dir().to_path_buf(), oid.as_str().to_owned()), (file, Instant::now()));
+        }
+    }
+    /// The loose file this process made durable is still the one at its name.
+    pub(super) fn durable(repo: &RepoHandle, oid: &Oid) -> bool {
+        let known = SEEN.lock().ok().and_then(|seen| {
+            seen.as_ref()
+                .and_then(|seen| seen.get(&(repo.common_dir().to_path_buf(), oid.as_str().to_owned())).copied())
+        });
+        matches!(known, Some((file, at)) if at.elapsed() < KEEP && loose(repo, oid) == Some(file))
     }
 }
 
@@ -984,21 +1255,9 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
         self.object_write(repo, "commit", &bytes)
     }
     fn read_ref(&self, repo: &RepoHandle, name: &RefName) -> Result<RefValue> {
-        let symbolic = self.raw(
-            repo,
-            &["symbolic-ref", "--quiet", "--", name.as_str()],
-            &[],
-            false,
-        )?;
-        if symbolic.success {
-            return Ok(RefValue::Symbolic(
-                RefName::parse(text(&symbolic.stdout)?.trim_end_matches('\n'))
-                    .map_err(|_| err("invalid-symbolic-target"))?,
-            ));
-        }
-        if symbolic.code != Some(1) {
-            return Err(symbolic.error("read-ref-failed"));
-        }
+        // One listing answers for a direct ref and for a symbolic ref whose
+        // target exists. Only an unlisted name needs the symbolic probe: a
+        // dangling symbolic ref is never listed, and it must not read as absent.
         let out = self.call(
             repo,
             &[
@@ -1024,6 +1283,21 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
                     RefName::parse(text(fields[2])?).map_err(|_| err("invalid-symbolic-target"))?,
                 ))
             };
+        }
+        let symbolic = self.raw(
+            repo,
+            &["symbolic-ref", "--quiet", "--", name.as_str()],
+            &[],
+            false,
+        )?;
+        if symbolic.success {
+            return Ok(RefValue::Symbolic(
+                RefName::parse(text(&symbolic.stdout)?.trim_end_matches('\n'))
+                    .map_err(|_| err("invalid-symbolic-target"))?,
+            ));
+        }
+        if symbolic.code != Some(1) {
+            return Err(symbolic.error("read-ref-failed"));
         }
         Ok(RefValue::Absent)
     }
@@ -1113,10 +1387,8 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
                 return Err(err("publication-candidate-incomplete"));
             }
             if let Tip::Oid(o) = i.candidate() {
-                self.sync_object(
-                    repo,
-                    &Oid::parse(o, repo.object_format()).map_err(|_| err("invalid-oid"))?,
-                )?;
+                let oid = Oid::parse(o, repo.object_format()).map_err(|_| err("invalid-oid"))?;
+                self.sync_object(repo, &oid)?;
             }
         }
         self.authority
@@ -1125,31 +1397,7 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
         let chain = match wal.begin(id, i.clone(), &self.authority).map_err(werr)? {
             Begin::Created(c) => c,
             Begin::Existing(_) => return self.recover(repo, id),
-            Begin::Compacted(c) => {
-                let outcome = c.outcome().map_err(werr)?;
-                let receipt = self.materialize(repo, id, &i, &outcome)?;
-                if matches!(
-                    outcome,
-                    Outcome::Loss { .. }
-                        | Outcome::Superseded { .. }
-                        | Outcome::AbandonedBeforeAttempt
-                ) {
-                    let mut e = err(match outcome {
-                        Outcome::Superseded { .. } => "operation-superseded",
-                        Outcome::AbandonedBeforeAttempt => "abandoned-before-attempt",
-                        _ => "compare-and-swap-stale",
-                    });
-                    e.code = match outcome {
-                        Outcome::Superseded { .. } => ResultCode::Superseded,
-                        Outcome::AbandonedBeforeAttempt => ResultCode::Refused,
-                        _ => ResultCode::Stale,
-                    };
-                    e.operation_id = Some(id.into());
-                    e.receipt = Some(Box::new(receipt));
-                    return Err(e);
-                }
-                return Ok(receipt);
-            }
+            Begin::Compacted(c) => return self.finish_outcome(repo, id, &i, &c.outcome().map_err(werr)?),
         };
         let i = chain.intent();
         let pin = format!("refs/fgos/git-operations/{id}/candidate");
@@ -1168,8 +1416,7 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
             return Err(err("publication-pin-read-back-mismatch"));
         }
         self.point("pin-read-back")?;
-        self.sync_refs(repo, &pin)?;
-        let prepared = wal.append(&chain, Phase::Prepared).map_err(werr)?;
+        let prepared = self.append_after_ref_durable(repo, &wal, &chain, Phase::Prepared, &pin)?;
         let receipt = self.attempt(repo, &wal, &prepared)?;
         if matches!(receipt.attribution, Attribution::ThisInvocationWonCas) {
             for pending in wal.active(100_000).unwrap_or_default() {
@@ -1217,8 +1464,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         let bytes = self.call(repo, &["remote", "get-url", "--", remote], &[])?;
         let url = text(&bytes)?.trim_end_matches('\n');
         if url != grant.pinned_url
-            || url.contains(['\n', '\r', '\0'])
-            || url.contains('@')
+            || crate::remote::url_has_credentials_or_controls(url)
             || url.starts_with('-')
         {
             return Err(err("remote-url-not-pinned-or-credentials-present"));
@@ -1244,8 +1490,6 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             "core.sshCommand=ssh -oBatchMode=yes".into(),
             "-c".into(),
             "core.askPass=".into(),
-            "-c".into(),
-            "credential.helper=".into(),
         ];
         argv.extend_from_slice(args);
         self.raw(
@@ -1272,6 +1516,8 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         );
         let request_digest =
             wal::canonical_digest(&(&kind, &resources, &self.authority.binding)).map_err(werr)?;
+        // One read: a transfer records the bound ref's tip as both values.
+        let current = tip(&self.ref_tip(repo, &resources[0])?);
         Ok((
             id,
             Intent {
@@ -1282,8 +1528,8 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                 authority_binding: self.authority.binding.clone(),
                 writer_identity: self.authority.writer.clone(),
                 object_format: repo.object_format(),
-                expected: tip(&self.ref_tip(repo, &resources[0])?),
-                next: tip(&self.ref_tip(repo, &resources[0])?),
+                expected: current.clone(),
+                next: current,
             },
         ))
     }
@@ -1351,9 +1597,8 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         if refspecs.is_empty() || refspecs.len() > 2 {
             return Err(err("invalid-publication-fetch-mapping"));
         }
-        let events = format!("+refs/fgos/events/*:refs/fgos/remotes/{remote}/events/*");
-        let legacy = format!("+refs/fgos/legacy:refs/fgos/remotes/{remote}/legacy");
-        if refspecs.iter().any(|r| r != &events && r != &legacy) {
+        let allowed = crate::publication_fetch_mappings(remote)?;
+        if refspecs.iter().any(|r| !allowed.contains(r)) {
             return Err(err("fetch-destination-not-granted"));
         }
         let advertised = self.remote_call(
@@ -1379,12 +1624,12 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             let oid = Oid::parse(oid, repo.object_format())
                 .map_err(|_| err("remote-object-format-mismatch"))?;
             RefName::parse(source).map_err(|_| err("invalid-remote-ref"))?;
-            let target = if source.starts_with("refs/fgos/events/") && refspecs.contains(&events) {
+            let target = if source.starts_with("refs/fgos/events/") && refspecs.iter().any(|r| r.starts_with("+refs/fgos/events/")) {
                 format!(
                     "refs/fgos/remotes/{remote}/events/{}",
                     &source["refs/fgos/events/".len()..]
                 )
-            } else if source == "refs/fgos/legacy" && refspecs.contains(&legacy) {
+            } else if source == "refs/fgos/legacy" && refspecs.iter().any(|r| r.starts_with("+refs/fgos/legacy*:")) {
                 format!("refs/fgos/remotes/{remote}/legacy")
             } else {
                 continue;
@@ -1401,6 +1646,12 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             wal::OperationKind::RemoteFetch {
                 url: url.clone(),
                 refspecs: refspecs.to_vec(),
+                targets: mappings
+                    .iter()
+                    .map(|(name, next, old)| {
+                        (name.clone(), tip(old), wal::Tip::Oid(next.as_str().into()))
+                    })
+                    .collect(),
             },
             resources,
         )?;
@@ -1476,13 +1727,45 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             return Err(err("push-ref-not-granted"));
         }
         let local = &refs[0].0;
-        self.ref_tip(repo, local.as_str())?;
+        // transfer_intent reads the local ref (refusing a symbolic one).
         let spec = format!("{}:{}", local.as_str(), refs[0].1.as_str());
+        let advertised = self.remote_call(
+            repo,
+            &scheme,
+            &[
+                "ls-remote".into(),
+                "--refs".into(),
+                "--".into(),
+                url.clone(),
+                refs[0].1.as_str().into(),
+            ],
+        )?;
+        if !advertised.success {
+            return Err(advertised.error("remote-advertisement-failed"));
+        }
+        let mut remote_old = ExpectedTip::Absent;
+        for line in text(&advertised.stdout)?.lines() {
+            let (oid, name) = line
+                .split_once('\t')
+                .ok_or_else(|| err("invalid-remote-advertisement"))?;
+            if name != refs[0].1.as_str() {
+                return Err(err("unexpected-remote-ref"));
+            }
+            remote_old = ExpectedTip::Oid(
+                Oid::parse(oid, repo.object_format()).map_err(|_| err("invalid-remote-oid"))?,
+            );
+        }
+
         let (id, intent) = self.transfer_intent(
             repo,
             wal::OperationKind::RemotePush {
                 url: url.clone(),
                 refspecs: vec![spec.clone()],
+                targets: vec![(
+                    local.as_str().into(),
+                    tip(&remote_old),
+                    tip(&self.ref_tip(repo, local.as_str())?),
+                )],
             },
             vec![local.as_str().into()],
         )?;
@@ -1495,6 +1778,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                 &scheme,
                 &[
                     "push".into(),
+                    "--atomic".into(),
                     "--porcelain".into(),
                     "--no-verify".into(),
                     "--recurse-submodules=no".into(),
@@ -1565,7 +1849,15 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         id: &str,
     ) -> Result<wal::CompactReceipt> {
         let wal = self.wal(repo)?;
-        let mut chain = wal.inspect(id).map_err(werr)?;
+        let mut chain = match wal.inspect(id) {
+            Ok(chain) => chain,
+            // Already compacted (for example by a later publication's
+            // admission): the ledger entry is the result.
+            Err(WalError::Io(e)) if e.kind() == std::io::ErrorKind::NotFound => {
+                return wal.compacted(id).map_err(werr)?.ok_or_else(|| werr(WalError::Io(e)));
+            }
+            Err(e) => return Err(werr(e)),
+        };
         self.authority
             .validate_publication_borrow(chain.intent())
             .map_err(werr)?;
@@ -1598,11 +1890,10 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         // A resumed release never retries its irreversible deletion. Absence
         // is a terminal observation, any other value preserves the evidence.
         if matches!(chain.last().phase, Phase::PinReleaseAttempt { .. }) {
-            if self.ref_tip(repo, &pin)? != ExpectedTip::Absent {
+            if self.absent_tip(repo, &pin)? != ExpectedTip::Absent {
                 return Err(werr(WalError::RecoveryRequired));
             }
-            self.sync_refs(repo, &pin)?;
-            chain = wal.append(&chain, Phase::PinReleased).map_err(werr)?;
+            chain = self.append_after_ref_durable(repo, &wal, &chain, Phase::PinReleased, &pin)?;
         }
         wal.compact(&chain, &BoundReader { port: self, repo }, &self.authority)
             .map_err(werr)

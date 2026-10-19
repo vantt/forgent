@@ -168,7 +168,7 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
             providerModel: id,
             invocations: [
               { id: `${id}-cli`, via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: executor.command, args: ['{prompt}'] },
-              { id: `${id}-herdr`, via: 'cli', adapter: 'herdr-spawn', confinement: herdrConfinement, command: executor.command, args: ['{prompt}'], env: executor.env, interactiveMode: executor.interactiveMode, resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'HOME' } }] },
+              { id: `${id}-herdr`, via: 'cli', adapter: 'herdr-spawn', confinement: herdrConfinement, command: executor.command, args: ['{prompt}'], env: executor.env, interactiveMode: executor.interactiveMode, credentialStore: { use: 'agent', homeEnv: 'HOME' } },
             ],
           }])),
           modelPolicies: Object.fromEntries(executorIds.map((id) => [id, { standard: 'sonnet' }])),
@@ -236,9 +236,10 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       return found.sort();
     },
     attemptDir() { return project.attemptDirs()[0] ?? null; },
-    /** Wait until the supervisor has typed the brief (the text and the submit key) at the pane. */
+    /** Wait until the supervisor has delivered the brief at the pane: one prompt-door send (codex), or the
+     * typed text and the submit key (the other CLIs). */
     async waitBriefTyped() {
-      await waitUntil(() => project.sent().length >= 2, { what: 'the brief typed at the pane' });
+      await waitUntil(() => project.sent()[0]?.kind === 'prompt' || project.sent().length >= 2, { what: 'the brief typed at the pane' });
       return project.sent()[0].text;
     },
     /** The agent shows the brief taken: the protocol reads `working`, so the supervisor confirms delivery. */

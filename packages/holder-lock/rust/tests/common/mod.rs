@@ -189,7 +189,7 @@ pub fn child_entry() {
                 fs::write(&marker, std::process::id().to_string()).unwrap();
                 std::thread::sleep(Duration::from_micros(500 + u64::from(std::process::id() % 7) * 300));
                 fs::remove_file(&marker).unwrap();
-                release(handle);
+                assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
             }
             std::process::exit(0);
         }

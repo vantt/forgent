@@ -930,3 +930,50 @@ test('bind: a capability rigor below the global cap leaves the global cap in for
   assert.equal(result.tier, 'advanced');
   assert.deepEqual(result.provenance.tier.ceiling, { value: 'advanced', source: 'global' });
 });
+
+function skillsConfig() {
+  const config = createMockRunnerConfig();
+  config.executors.claude.supports = { skills: ['docs-seeker', 'mermaid'] };
+  config.executors.codex.supports = { skills: ['docs-seeker'] };
+  return config;
+}
+
+test('bind skills: only executors declaring every required skill bind, in pool order', () => {
+  const unit = { id: 'u-skills', capability: 'docs:write', writes: ['README.md'], skills: ['docs-seeker', 'mermaid'] };
+  const result = bind({ unit, role: 'producer', independentOf: [] }, { runnerConfig: skillsConfig(), session: { headless: true } });
+  // docs:write lists codex first; it lacks "mermaid", so claude binds.
+  assert.equal(result.executor, 'claude');
+
+  const oneSkill = bind({ unit: { ...unit, skills: ['docs-seeker'] }, role: 'producer', independentOf: [] }, { runnerConfig: skillsConfig(), session: { headless: true } });
+  assert.equal(oneSkill.executor, 'codex');
+});
+
+test('bind skills: refuses with skills-unavailable, naming the missing skills, when no executor declares them', () => {
+  const unit = { id: 'u-skills', capability: 'docs:write', writes: ['README.md'], skills: ['kubectl'] };
+  const result = bind({ unit, role: 'producer', independentOf: [] }, { runnerConfig: skillsConfig(), session: { headless: true } });
+  assert.equal(result.refused.reason, 'skills-unavailable');
+  assert.match(result.refused.detail, /\[kubectl\]/);
+});
+
+test('bind skills: an executor with no supports.skills declares none, and a unit without skills binds as before', () => {
+  const config = createMockRunnerConfig();
+  const unit = { id: 'u-skills', capability: 'docs:write', writes: ['README.md'], skills: ['docs-seeker'] };
+  assert.equal(bind({ unit, role: 'producer', independentOf: [] }, { runnerConfig: config, session: { headless: true } }).refused.reason, 'skills-unavailable');
+  const plain = bind({ unit: { ...unit, skills: undefined }, role: 'producer', independentOf: [] }, { runnerConfig: config, session: { headless: true } });
+  assert.equal(plain.executor, 'codex');
+});
+
+test('bind skills: a live session lead never takes over a unit that needs skills', () => {
+  const unit = { id: 'u-skills', capability: 'docs:write', writes: ['README.md'], skills: ['kubectl'] };
+  const ctx = { runnerConfig: skillsConfig(), session: { headless: false, provider: 'claude', hasNativeAgent: true } };
+  assert.equal(bind({ unit, role: 'producer', independentOf: [] }, ctx).refused.reason, 'skills-unavailable');
+  // without the requirement the lead still takes the inline fallback when no candidate fits
+  const noPool = { ...ctx, runnerConfig: { ...skillsConfig(), capabilities: {} } };
+  assert.equal(bind({ unit: { ...unit, skills: undefined }, role: 'producer', independentOf: [] }, noPool).mechanism, 'inline');
+});
+
+test('bind skills: checker and panel seats are chosen on independence, not on the producer skills', () => {
+  const unit = { id: 'u-skills', capability: 'docs:write', writes: [], skills: ['mermaid'] };
+  const reviewer = bind({ unit, role: 'reviewer', readOnly: true, independentOf: ['claude'] }, { runnerConfig: skillsConfig(), session: { headless: true } });
+  assert.equal(reviewer.executor, 'codex');
+});

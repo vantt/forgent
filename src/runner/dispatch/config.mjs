@@ -35,6 +35,7 @@ import {
 // can validate adapter names without importing transport.mjs (cutting the
 // prior config.mjs <-> transport.mjs import cycle).
 import { EXECUTOR_ADAPTERS } from './adapters.mjs';
+import { credentialStoreProblem } from './provider-capacity.mjs';
 import {
   BUILTIN_POLICIES,
   BUILTIN_POLICY_IDS,
@@ -740,7 +741,7 @@ export function normalizePreferCandidates(prefer, label) {
   throw new RunnerConfigError(`runner config (${label}) must be a non-empty string (a executor id) or a non-empty array of candidates when present.`);
 }
 
-function validateInvocationShape(invocation, label, capabilityNames) {
+function validateInvocationShape(invocation, label, capabilityNames, executorConfinement) {
   if (!invocation || typeof invocation !== 'object' || Array.isArray(invocation)) {
     throw new RunnerConfigError(`runner config (${label}) must be an object.`);
   }
@@ -800,6 +801,15 @@ function validateInvocationShape(invocation, label, capabilityNames) {
   }
   if (invocation.interactiveMode !== undefined) {
     validateInteractiveModeShape(invocation.interactiveMode, `${label} "interactiveMode"`);
+  }
+  // The login store a confined invocation reads. Only a confined launch has a private home to hand it;
+  // an unconfined one reads its store in place through "env".
+  if (invocation.credentialStore !== undefined) {
+    const problem = credentialStoreProblem(invocation.credentialStore);
+    if (problem) throw new RunnerConfigError(`runner config (${label}) "credentialStore" ${problem}.`);
+    if (invocation.via !== 'cli' || !(invocation.confinement ?? executorConfinement)?.backend) {
+      throw new RunnerConfigError(`runner config (${label}) declares "credentialStore" without a confinement backend. A store is handed to the launch through its private home, so only a confined "cli" invocation can read one; an unconfined invocation reads its store through "env".`);
+    }
   }
   // Same vocabulary as the executor-level declaration: an invocation may
   // override how the prompt reaches its worker, and both spellings are
@@ -1125,7 +1135,7 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
       throw new RunnerConfigError(`runner config (${label}) "invocations" must be a non-empty array when present.`);
     }
     executor.invocations.forEach((invocation, index) => {
-      validateInvocationShape(invocation, `${label} invocations[${index}]`, capabilityNames);
+      validateInvocationShape(invocation, `${label} invocations[${index}]`, capabilityNames, executor.confinement);
     });
     const seenInvocationIds = new Set();
     for (const invocation of executor.invocations) {
@@ -1207,6 +1217,11 @@ function validateExecutorSupportsShape(supports, label) {
   if (supports.reasoningEffort !== undefined) {
     if (!Array.isArray(supports.reasoningEffort) || supports.reasoningEffort.length === 0 || !supports.reasoningEffort.every((e) => REASONING_EFFORT_VALUES.includes(e))) {
       throw new RunnerConfigError(`runner config (${label}) "reasoningEffort" must be a non-empty array whose entries are each one of ${REASONING_EFFORT_VALUES.join('/')} when present.`);
+    }
+  }
+  if (supports.skills !== undefined) {
+    if (!Array.isArray(supports.skills) || supports.skills.length === 0 || !supports.skills.every((skill) => typeof skill === 'string' && skill.trim())) {
+      throw new RunnerConfigError(`runner config (${label}) "skills" must be a non-empty array of non-empty skill names when present.`);
     }
   }
   if (supports.systemPrompt !== undefined && typeof supports.systemPrompt !== 'boolean') {

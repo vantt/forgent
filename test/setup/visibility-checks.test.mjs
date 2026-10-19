@@ -177,7 +177,8 @@ function paneExecutors(providerModel = 'openai') {
       openai: {
         providerModel,
         invocations: [
-          { id: 'codex-herdr', adapter: 'herdr-spawn', resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] },
+          { id: 'codex-herdr', adapter: 'herdr-spawn', command: 'codex', credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
+          { id: 'codex-bwrap', adapter: 'cli-spawn', command: 'codex', resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] },
           { id: 'codex-cli', adapter: 'cli-spawn' },
         ],
       },
@@ -185,23 +186,27 @@ function paneExecutors(providerModel = 'openai') {
   };
 }
 
-test('checkConfinedPaneAccounts fails by name when a private-home pane has no account inventory', () => {
+test('checkConfinedPaneAccounts fails by name when an invocation that reads a store has no account inventory', () => {
   const r = checkConfinedPaneAccounts(paneExecutors());
   assert.equal(r.passed, false);
   assert.match(r.message, /executor "openai" invocation "codex-herdr": no runner\.providers\.openai-codex\.accounts/);
-  assert.doesNotMatch(r.message, /codex-cli/, 'only invocations that bind a private home are checked');
+  assert.doesNotMatch(r.message, /codex-cli/, 'only invocations that read a login store are checked');
+  assert.match(r.message, /invocation "codex-bwrap": no runner\.providers/, 'a cli invocation is covered as well as a pane, and an older binding counts');
 });
 
-test('checkConfinedPaneAccounts passes when every listed credential file exists, and names a missing one', () => {
+test('checkConfinedPaneAccounts passes while some credential file of the store exists, and names the absent ones', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-accounts-'));
   try {
     fs.writeFileSync(path.join(home, 'auth.json'), '{}');
     const withInventory = (source) => ({ ...paneExecutors(), providers: { openai: { accounts: { acct: { credentialSource: source } } } } });
     assert.equal(checkConfinedPaneAccounts(withInventory({ kind: 'codex-home', home })).passed, true);
     assert.equal(checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['auth.json'] })).passed, true);
-    const missing = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['auth.json', 'models.json'] }));
-    assert.equal(missing.passed, false);
-    assert.match(missing.message, /account "acct" is missing models\.json/);
+    const partial = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['auth.json', 'models.json'] }));
+    assert.equal(partial.passed, true, 'a store with some of its files present still logs in');
+    assert.match(partial.message, /account "acct" has 1 of 2 credential file\(s\); absent: models\.json/);
+    const none = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['models.json', 'settings.json'] }));
+    assert.equal(none.passed, false);
+    assert.match(none.message, /account "acct" has none of models\.json, settings\.json under .*nothing is copied/);
     const invalid = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home }));
     assert.equal(invalid.passed, false);
     assert.match(invalid.message, /provider account inventory is invalid/);
@@ -227,10 +232,24 @@ test('checkConfinedPaneAccounts expands ~, $HOME and ${HOME} the way dispatch do
   }
 });
 
-test('checkConfinedPaneAccounts has nothing to say when no herdr invocation binds a private home', () => {
+test('checkConfinedPaneAccounts takes the files the invocation declares over the account list', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-declared-'));
+  try {
+    fs.writeFileSync(path.join(home, 'agent.db'), '');
+    const cfg = {
+      executors: { openai: { providerModel: 'openai', invocations: [{ id: 'omp-bwrap', command: 'omp', credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR', files: ['agent.db'] } }] } },
+      providers: { openai: { accounts: { acct: { credentialSource: { kind: 'home-files', home, files: ['auth.json'] } } } } },
+    };
+    const r = checkConfinedPaneAccounts(cfg);
+    assert.equal(r.passed, true, r.message);
+    assert.match(r.message, /has its 1 credential file/);
+  } finally { fs.rmSync(home, { recursive: true, force: true }); }
+});
+
+test('checkConfinedPaneAccounts has nothing to say when no invocation reads a login store', () => {
   const r = checkConfinedPaneAccounts({ executors: { a: { invocations: [{ id: 'x', adapter: 'herdr-spawn' }] } } });
   assert.equal(r.passed, true);
-  assert.match(r.message, /no confined herdr invocation binds a private home/);
+  assert.match(r.message, /no confined invocation reads a login store/);
 });
 
 // The registered check judges the machine-global inventory whatever directory doctor runs in. Every test here
@@ -258,7 +277,7 @@ test('the registered confined-pane-accounts check reads the global inventory fro
     writeGlobalConfig(home, { runner: runner({ acct: { credentialSource: { kind: 'codex-home', home: creds } } }) });
     const missing = withHome(home, () => entry.check(home));
     assert.equal(missing.passed, false, missing.message);
-    assert.match(missing.message, /account "acct" is missing auth\.json/);
+    assert.match(missing.message, /account "acct" has none of auth\.json/);
     fs.writeFileSync(path.join(creds, 'auth.json'), '{}');
     const ok = withHome(home, () => entry.check(home));
     assert.equal(ok.passed, true, ok.message);

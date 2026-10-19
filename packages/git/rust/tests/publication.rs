@@ -1068,6 +1068,8 @@ fn historical_ledger_over_admission_bound_does_not_block_new_publication() {
             &receipt.request,
             &receipt.binding,
             &receipt.receipt,
+            &receipt.expected,
+            &receipt.next,
         ))
         .unwrap();
         fs::write(
@@ -1291,8 +1293,36 @@ fn linear_history_walk_batches_commit_reads() {
     assert_eq!(page.commits.len(), 1024);
 }
 
+fn write_historical_chain(repo: &RepoHandle, chain: &wal::Chain) {
+    let mut previous = serde_json::Value::Null;
+    for (n, record) in chain.records().iter().enumerate() {
+        let mut value = serde_json::to_value(record).unwrap();
+        if n == 0 {
+            for kind in ["RemoteFetch", "RemotePush"] {
+                if let Some(fields) = value["phase"]["data"]["kind"]
+                    .get_mut(kind)
+                    .and_then(serde_json::Value::as_object_mut)
+                {
+                    fields.remove("targets");
+                }
+            }
+        }
+        value["previousDigest"] = previous;
+        value.as_object_mut().unwrap().remove("digest");
+        let digest = wal::canonical_digest(&value).unwrap();
+        value["digest"] = digest.clone().into();
+        previous = digest.into();
+        let file = repo
+            .common_dir()
+            .join("fgos/git/operations")
+            .join(&record.operation_id)
+            .join(format!("{n:08}.json"));
+        fs::write(file, serde_json::to_vec(&value).unwrap()).unwrap();
+    }
+}
+
 #[test]
-fn prepared_cas_and_pre_attempt_transfers_are_abandoned_under_the_same_authority() {
+fn historical_transfer_wal_digests_and_pre_attempt_recovery_remain_compatible() {
     struct RecordFixture;
     impl wal::PublicationAuthority for RecordFixture {
         fn validate_publication_borrow(&self, _: &wal::Intent) -> wal::WalResult<()> {
@@ -1322,10 +1352,12 @@ fn prepared_cas_and_pre_attempt_transfers_are_abandoned_under_the_same_authority
         wal::OperationKind::RemoteFetch {
             url: "/unused".into(),
             refspecs: vec!["refs/fgos/events/*".into()],
+            targets: vec![],
         },
         wal::OperationKind::RemotePush {
             url: "/unused".into(),
             refspecs: vec![reference().as_str().into()],
+            targets: vec![],
         },
     ]
     .into_iter()
@@ -1341,10 +1373,75 @@ fn prepared_cas_and_pre_attempt_transfers_are_abandoned_under_the_same_authority
                 wal::Begin::Created(c) => c,
                 _ => panic!(),
             };
-            if prepared {
-                wal.append(&chain, Phase::Prepared).unwrap();
-            }
+            let chain = if prepared {
+                wal.append(&chain, Phase::Prepared).unwrap()
+            } else {
+                chain
+            };
+            // Write historical bytes, hashing the old JSON shape directly rather
+            // than reserializing a new Record. Also rebind the second record.
+            write_historical_chain(&repo, &chain);
+            assert_eq!(
+                wal.inspect(&id).unwrap().records().len(),
+                if prepared { 2 } else { 1 }
+            );
+            let scan = wal.scan(100).unwrap();
+            assert!(scan.complete && scan.entries.iter().all(|e| e.error.is_none()));
         }
+    }
+    // Rule 4: an attempted historical transfer is observed, never resent.
+    // Rules 4a/4b/4c must not turn it into a superseded CAS, abandoned CAS,
+    // or configuration approval. The unreachable URL makes replay observable.
+    for (n, kind) in [
+        wal::OperationKind::RemoteFetch {
+            url: "/never-contact".into(),
+            refspecs: vec!["refs/fgos/events/*".into()],
+            targets: vec![],
+        },
+        wal::OperationKind::RemotePush {
+            url: "/never-contact".into(),
+            refspecs: vec![reference().as_str().into()],
+            targets: vec![],
+        },
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let id = format!("historical-attempt-{n}");
+        let mut intent = seed.clone();
+        intent.kind = kind;
+        intent.request_digest = wal::canonical_digest(&id).unwrap();
+        let chain = match wal.begin(&id, intent, &RecordFixture).unwrap() {
+            wal::Begin::Created(c) => c,
+            _ => panic!(),
+        };
+        let chain = wal.append(&chain, Phase::Prepared).unwrap();
+        let chain = wal
+            .append(
+                &chain,
+                Phase::TargetAttempt {
+                    prior_target_attempt: None,
+                    expected: chain.intent().expected.clone(),
+                    next: chain.intent().next.clone(),
+                },
+            )
+            .unwrap();
+        write_historical_chain(&repo, &chain);
+        assert_eq!(wal.inspect(&id).unwrap().records().len(), 3);
+        assert!(wal
+            .scan(100)
+            .unwrap()
+            .entries
+            .iter()
+            .all(|e| e.error.is_none()));
+        assert!(matches!(
+            port.recover(&repo, &id).unwrap().remote,
+            Remote::Unknown
+        ));
+        assert!(matches!(
+            port.recover(&repo, &id).unwrap().remote,
+            Remote::Unknown
+        ));
     }
     port.compare_and_swap(
         &repo,
@@ -1355,7 +1452,16 @@ fn prepared_cas_and_pre_attempt_transfers_are_abandoned_under_the_same_authority
     )
     .unwrap();
     assert!(wal.active(100).unwrap().is_empty());
-    assert_eq!(wal.scan(100).unwrap().unresolved, 0);
+    let scan = wal.scan(100).unwrap();
+    assert!(scan.complete && scan.entries.iter().all(|e| e.error.is_none()));
+    assert_eq!(scan.unresolved, 0);
+    for n in 0..3 {
+        for prepared in [false, true] {
+            let id = format!("pre-attempt-{n}-{prepared}");
+            let error = port.recover(&repo, &id).unwrap_err();
+            assert!(error.cause.contains("abandoned-before-attempt"), "{error:?}");
+        }
+    }
 }
 
 #[test]
@@ -1702,10 +1808,7 @@ fn fetch_mapping_is_additive_idempotent_and_records_remote_url() {
     git(&root, &["config", "unrelated.keep", "value"]);
     let driver = GitDriver::new(&t.0).unwrap();
     let repo = resolve(&driver, &root);
-    let maps = vec![
-        "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".into(),
-        "+refs/fgos/legacy:refs/fgos/remotes/origin/legacy".into(),
-    ];
+    let maps = publication_fetch_mappings("origin").unwrap();
     driver
         .ensure_fetch_mapping(&repo, "origin", &maps, "mapping-first")
         .unwrap();
@@ -1937,4 +2040,216 @@ fn config_recovery_observes_attempted_changes_and_never_replays_old_ids() {
                 .is_err());
         }
     }
+}
+
+/// Each publication compacts the ref's older terminal chains: their pins
+/// are released and their id bindings and receipts move to the ledger, so
+/// retained operation directories stay bounded however long the stream
+/// runs. A recent id keeps its whole chain for `recover`; a compacted id
+/// replayed with the same request still returns its receipt, and with a
+/// different request is refused.
+#[test]
+fn publication_keeps_retained_chains_bounded_and_compacted_ids_bound() {
+    for (format, backend) in [("sha1", "files"), ("sha256", "files"), ("sha1", "reftable"), ("sha256", "reftable")] {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, format, backend);
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let mut tip = ExpectedTip::Absent;
+    let mut done = Vec::new();
+    for n in 0..12 {
+        let parents = match &tip {
+            ExpectedTip::Oid(o) => vec![o.clone()],
+            ExpectedTip::Absent => vec![],
+        };
+        let next = commit(&port, &repo, parents, &format!("seal {n}"));
+        let id = format!("seal-{n:02}");
+        let receipt = port
+            .compare_and_swap(&repo, &reference(), &tip, &ExpectedTip::Oid(next.clone()), &id)
+            .unwrap();
+        assert!(matches!(receipt.attribution, Attribution::ThisInvocationWonCas));
+        done.push((id, tip.clone(), next.clone()));
+        tip = ExpectedTip::Oid(next);
+        // Keep the change times of successive chains apart.
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    let operations = repo.common_dir().join("fgos/git/operations");
+    let retained = fs::read_dir(&operations).unwrap().count();
+    assert!(retained <= 5, "retained operation directories: {retained}");
+    let pins = fs::read_dir(repo.common_dir().join("refs/fgos/git-operations"))
+        .map(|d| d.count())
+        .unwrap_or(0);
+    assert!(pins <= 5, "retained pins: {pins}");
+    let ledger = fs::read_dir(repo.common_dir().join("fgos/git/compacted")).unwrap().count();
+    assert!(ledger >= 7, "compacted ids: {ledger}");
+    // The first id is compacted: same request returns its receipt.
+    let (id, old, next) = &done[1];
+    assert!(!operations.join(id).exists());
+    // Compaction preserves the full durable terminal receipt for recovery.
+    assert_eq!(&port.release_pin_and_compact(&repo, id).unwrap().id, id);
+    let compacted = port.recover(&repo, id).unwrap();
+    assert_eq!(&compacted.local_effect.expected, old);
+    assert_eq!(compacted.local_effect.published_oid.as_ref(), Some(next));
+    assert!(matches!(compacted.attribution, Attribution::ThisInvocationWonCas));
+    let receipt = port
+        .compare_and_swap(&repo, &reference(), old, &ExpectedTip::Oid(next.clone()), id)
+        .unwrap();
+    assert_eq!(receipt.local_effect.published_oid.as_ref(), Some(next));
+    assert!(matches!(receipt.attribution, Attribution::ThisInvocationWonCas));
+    // A different request under the same id is refused.
+    assert!(port
+        .compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(done[1].2.clone()), id)
+        .is_err());
+    // Old experimental entries lack expected/next. Preserve their bindings
+    // and exact replay; read-only recovery must report the missing evidence.
+    let journal = wal::Wal::open(&repo).unwrap();
+    let compacted = journal.compacted(id).unwrap().unwrap();
+    let legacy_digest = wal::canonical_digest(&(1u8, "legacy-receipt", &compacted.request, &compacted.binding, &compacted.receipt)).unwrap();
+    let legacy = serde_json::json!({"v": 1, "id": "legacy-receipt", "q": compacted.request, "b": compacted.binding, "r": compacted.receipt, "digest": legacy_digest});
+    fgos_durable_file::install_once(&repo.common_dir().join("fgos/git/compacted"), "legacy-receipt", legacy.to_string().as_bytes()).unwrap();
+    let incomplete = port.recover(&repo, "legacy-receipt").unwrap_err();
+    assert_eq!(incomplete.code, ResultCode::RecoveryRequired);
+    assert!(incomplete.cause.starts_with("legacy-compact-receipt-incomplete"));
+    assert_eq!(port.compare_and_swap(&repo, &reference(), old, &ExpectedTip::Oid(next.clone()), "legacy-receipt").unwrap().local_effect.published_oid.as_ref(), Some(next));
+    // The latest id keeps its whole chain for recover.
+    let (last, _, last_next) = done.last().unwrap();
+    let recovered = port.recover(&repo, last).unwrap();
+    assert_eq!(recovered.local_effect.published_oid.as_ref(), Some(last_next));
+    }
+}
+
+#[test]
+fn changing_cas_uses_the_intact_candidate_fast_path() {
+    struct FastPath(std::sync::atomic::AtomicUsize);
+    impl FileSystem for FastPath {
+        fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+            if step == "candidate-fast-path" { self.0.fetch_add(1, Ordering::SeqCst); }
+            Ok(())
+        }
+    }
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha256", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let fast = FastPath(Default::default());
+    let port = PublicationPort::with_filesystem(&driver, authority(&repo, &mut h), &fast);
+    let a = commit(&port, &repo, vec![], "a");
+    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(a.clone()), "fast-a").unwrap();
+    fast.0.store(0, Ordering::SeqCst);
+    let b = commit(&port, &repo, vec![a.clone()], "b");
+    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Oid(a), &ExpectedTip::Oid(b), "fast-b").unwrap();
+    assert_eq!(fast.0.load(Ordering::SeqCst), 1, "the changing CAS was decided by one successful rev-list");
+}
+
+#[test]
+fn recreated_loose_object_gets_directory_durability_again() {
+    struct Syncs(AtomicU64);
+    impl FileSystem for Syncs {
+        fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+            if step == "publication-directory-fsync" { self.0.fetch_add(1, Ordering::SeqCst); }
+            Ok(())
+        }
+    }
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let syncs = Syncs(AtomicU64::new(0));
+    let port = PublicationPort::with_filesystem(&driver, authority(&repo, &mut h), &syncs);
+    let oid = port.write_blob(&repo, b"recreated").unwrap();
+    syncs.0.store(0, Ordering::SeqCst);
+    assert_eq!(port.write_blob(&repo, b"recreated").unwrap(), oid);
+    assert_eq!(syncs.0.load(Ordering::SeqCst), 0);
+    let hex = oid.as_str();
+    fs::remove_file(repo.common_dir().join("objects").join(&hex[..2]).join(&hex[2..])).unwrap();
+    assert_eq!(port.write_blob(&repo, b"recreated").unwrap(), oid);
+    assert!(syncs.0.load(Ordering::SeqCst) >= 2);
+}
+
+#[test]
+fn ordinary_fetch_and_pull_survive_absent_legacy_and_repair_exact_mapping() {
+    let t = Temp::new();
+    let remote = t.0.join("remote.git");
+    init(&remote, "sha1", "files");
+    let root = t.0.join("checkout");
+    git(
+        &t.0,
+        &["clone", remote.to_str().unwrap(), root.to_str().unwrap()],
+    );
+    git(
+        &root,
+        &[
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.invalid",
+            "commit",
+            "--allow-empty",
+            "-m",
+            "initial",
+        ],
+    );
+    git(&root, &["push", "-u", "origin", "HEAD"]);
+    git(&root, &["remote", "rename", "origin", "upstream"]);
+    git(&root, &["config", "unrelated.keep", "preserved"]);
+    let old = "+refs/fgos/legacy:refs/fgos/remotes/upstream/legacy";
+    git(&root, &["config", "--add", "remote.upstream.fetch", old]);
+    let failed = Command::new("git")
+        .arg("-C")
+        .arg(&root)
+        .arg("fetch")
+        .output()
+        .unwrap();
+    assert!(!failed.status.success());
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let maps = publication_fetch_mappings("upstream").unwrap();
+    driver
+        .ensure_fetch_mapping(&repo, "upstream", &maps, "repair-exact")
+        .unwrap();
+    let config = git(&root, &["config", "--get-all", "remote.upstream.fetch"]);
+    assert!(!String::from_utf8_lossy(&config).lines().any(|r| r == old));
+    assert_eq!(git(&root, &["config", "unrelated.keep"]), b"preserved\n");
+    git(&root, &["fetch"]);
+    git(&root, &["pull", "--ff-only"]);
+    let head = String::from_utf8(git(&root, &["rev-parse", "HEAD"])).unwrap();
+    git(&remote, &["update-ref", "refs/fgos/legacy", head.trim()]);
+    git(&root, &["fetch"]);
+    git(&root, &["pull", "--ff-only"]);
+    assert_eq!(
+        git(&root, &["rev-parse", "refs/fgos/remotes/upstream/legacy"]),
+        head.as_bytes()
+    );
+    assert_eq!(
+        driver
+            .fetch_mapping_provenance(&repo, "upstream")
+            .unwrap()
+            .unwrap()
+            .refspecs,
+        maps
+    );
+    // Both forms installed is still a broken configuration: remove the exact
+    // form even when the desired wildcard was already present.
+    git(&root, &["config", "--add", "remote.upstream.fetch", old]);
+    driver
+        .ensure_fetch_mapping(&repo, "upstream", &maps, "repair-both")
+        .unwrap();
+    assert!(!String::from_utf8_lossy(&git(
+        &root,
+        &["config", "--get-all", "remote.upstream.fetch"]
+    ))
+    .lines()
+    .any(|r| r == old));
+    let bytes = fs::read(repo.common_dir().join("config")).unwrap();
+    driver
+        .ensure_fetch_mapping(&repo, "upstream", &maps, "repair-idempotent")
+        .unwrap();
+    assert_eq!(fs::read(repo.common_dir().join("config")).unwrap(), bytes);
 }

@@ -1,4 +1,4 @@
-import { checkGit, fixGitWal, fixGitFetchMapping } from './git-checks.mjs';
+import { checkGit, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
 // declares a doctor check and/or a config-default shape. `checks.mjs` never
@@ -105,7 +105,7 @@ import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '..
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
-import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, commandCli, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
@@ -2419,6 +2419,13 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
     confinement: { mode: 'unconfined' },
     serves: { outputKind: 'finding', mutates: false },
   },
+  // The documentation counterpart of code:implement: the capability `fgos run --capability docs:write`
+  // and the fgos-run skill name for writing docs. Same curated-default-never-pins reasoning.
+  'docs:write': {
+    description:
+      'Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a "prefer" pool to choose which executors serve it.',
+    serves: { outputKind: 'change', domain: 'docs', mutates: true },
+  },
   'code:implement': {
     description:
       'Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)',
@@ -3358,11 +3365,11 @@ registerFix({
 
 // tsk-32b: `plugin-skill-cli-reachable` above only confirms the `fgos` CLI
 // binary is reachable -- it says nothing about whether the coding-domain
-// dev-skills the plugin's own slash-command skills (cook/discover/plan/
+// dev-skills the plugin's own slash-command skills (deliver/discover/plan/
 // pick) dispatch into via the Skill tool are actually shipped in
 // plugins/fgOS/skills/ (they were not, before tsk-32b's own fix -- a
 // plugin-only consumer got "Unknown skill: fgos-coding-driving" the first
-// time cook/discover/plan/pick tried to dispatch into one, with the CLI
+// time deliver/discover/plan/pick tried to dispatch into one, with the CLI
 // itself fully reachable the whole time). This check only ever fires
 // against THIS repo's own source tree -- it derives the expected dev-skill
 // set from `.claude/skills/fgos-*` and confirms each one also exists under
@@ -4430,10 +4437,11 @@ export function checkTrustStoresReadable(cwd, runnerCfg = {}) {
 }
 
 /**
- * A confined herdr pane that binds `private-home` starts in an empty home: the account's login only gets
- * there when the machine-global provider account inventory names it. Without that entry the agent starts
- * logged out, and the first symptom is a pane sitting at a sign-in screen until the idle limit. This is the
- * doctor line that names it, per invocation, before a run does.
+ * A confined invocation that reads a login store starts in an empty private home: the account's login only
+ * gets there when the machine-global provider account inventory names it. Without that entry the agent
+ * starts logged out, and the first symptom is a pane sitting at a sign-in screen until the idle limit. This
+ * is the doctor line that names it, per invocation, before a run does. Files of the store that are absent
+ * are noted; a store with none of its files present fails, since nothing would be copied.
  */
 export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = undefined) {
   let inventory;
@@ -4453,7 +4461,8 @@ export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = un
   const notes = [];
   for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
     for (const inv of executor?.invocations ?? []) {
-      if (inv?.adapter !== 'herdr-spawn' || !(inv.resourceBindings ?? []).some((b) => b?.resource === 'private-home')) continue;
+      const store = credentialStoreOf(inv && { ...inv, command: inv.command ?? executor.command });
+      if (!store) continue;
       const label = `executor "${id}" invocation "${inv.id ?? '?'}"`;
       const provider = normalizeProviderFamily(executor.providerModel ?? executor.provider);
       const providerEntry = Object.hasOwn(inventory, provider) ? inventory[provider] : undefined;
@@ -4463,24 +4472,24 @@ export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = un
         problems.push(`${label}: no runner.providers.${provider}.accounts in the global config, so its pane starts in an empty private home, logged out`);
         continue;
       }
-      // An account that keeps one login per CLI reaches this pane only through the store of the pane's CLI.
-      const cli = commandCli(inv.command ?? executor.command);
+      // An account that keeps one login per CLI reaches this invocation only through the store it names.
       for (const account of accounts) {
-        const source = credentialSourceForCli(account, cli);
+        const source = credentialSourceForCli(account, store.use);
         if (!source) {
-          problems.push(`${label}: account "${account.id}" declares no credential source for CLI "${cli}", so a pane leased to it starts logged out`);
+          problems.push(`${label}: account "${account.id}" declares no credential source for store "${store.use}", so an agent leased to it starts logged out`);
           continue;
         }
         const home = expandHome(source.home);
-        const files = source.kind === 'home-files' ? source.files : ['auth.json'];
+        const files = store.files ?? (source.kind === 'home-files' ? source.files : ['auth.json']);
         const missing = files.filter((rel) => !fs.existsSync(path.join(home, rel)));
-        if (missing.length > 0) problems.push(`${label}: account "${account.id}" is missing ${missing.join(', ')} under ${home}`);
+        if (missing.length === files.length) problems.push(`${label}: account "${account.id}" has none of ${files.join(', ')} under ${home}, so nothing is copied and its agent starts logged out`);
+        else if (missing.length > 0) notes.push(`${label}: account "${account.id}" has ${files.length - missing.length} of ${files.length} credential file(s); absent: ${missing.join(', ')}`);
         else notes.push(`${label}: account "${account.id}" has its ${files.length} credential file(s)`);
       }
     }
   }
   if (problems.length > 0) return { passed: false, message: problems.join('; ') };
-  return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no confined herdr invocation binds a private home' };
+  return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no confined invocation reads a login store' };
 }
 
 /** Second reading of the config door's own C5 invariant. Names the executor and
@@ -4698,7 +4707,7 @@ registerCheck({
 
 registerCheck({
   id: 'confined-pane-accounts',
-  description: 'every confined herdr invocation that binds a private home has an account in the global provider inventory whose credential files exist, so its pane starts logged in',
+  description: 'every confined invocation that reads a login store has an account in the global provider inventory with at least one of that store\'s credential files, so its agent starts logged in',
   check: (cwd) => {
     // The account inventory lives only in the global config, so it is read from there whatever the cwd.
     // Executors come from the project config merged with the global one; with no usable project config the
@@ -6615,10 +6624,13 @@ registerCheck({
   check: (cwd) => checkObserveRunCoverage(cwd),
 });
 
+registerConfigDefault({ id: 'event-store', key: 'eventStore', shape: { remote: 'origin' } });
+
 // Git and Event Store share one addon ABI admission row.
-for (const id of ['git-component-compatible', 'git-trust-topology', 'git-operation-journal', 'git-native-locks', 'git-publication-refspecs', 'git-durability-capability']) {
+for (const id of ['git-component-compatible', 'git-transport-config', 'git-trust-topology', 'git-operation-journal', 'git-native-locks', 'git-publication-refspecs', 'git-durability-capability']) {
   registerCheck({ id, description: {
     'git-component-compatible': 'Combined addon contracts and Git feature floor',
+    'git-transport-config': 'Repository transport settings refused by Publication/Remote',
     'git-trust-topology': 'Trusted repository layout and common directory',
     'git-operation-journal': 'Readable Git WAL with no unresolved operations',
     'git-native-locks': 'Native Git lock residue (read-only detection)',
@@ -6626,5 +6638,6 @@ for (const id of ['git-component-compatible', 'git-trust-topology', 'git-operati
     'git-durability-capability': 'Measured Git durability guarantees',
   }[id], check: (cwd) => checkGit(cwd, id) });
 }
+registerFix({ id: 'git-driver-directories', fix: fixGitDriverDirectories });
 registerFix({ id: 'git-wal-dir', fix: fixGitWal });
 registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });
