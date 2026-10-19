@@ -1,0 +1,4 @@
+[package]
+name = "fgos-write-scope"
+version.workspace = true
+edition.workspace = true

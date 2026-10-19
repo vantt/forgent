@@ -1,7 +1,12 @@
 //! Opaque repository and seal authority stay in Rust for their entire lifetime.
-mod inspect;
+mod scoped_commit;
+mod sync;
+mod write_scope;
+#[allow(unused_imports)] // N-API registration is used by Node, not Rust unit tests.
+pub use write_scope::write_scope;
 mod handover;
-pub use handover::{take_git_handover, mint_git_loan, close_git_loan};
+mod inspect;
+pub use handover::{close_git_loan, mint_git_loan, take_git_handover};
 mod refs;
 mod worktree;
 pub use worktree::inspect_git_worktree_recovery;

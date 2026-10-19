@@ -83,7 +83,27 @@ pub struct WorktreeDeliveryBinding {
     pub evidence_digest: String,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct ScopedCommitIntent {
+    pub worktree: String,
+    pub baseline: String,
+    pub request: String,
+    pub paths: Vec<String>,
+    pub tree: String,
+    pub cutover_grant: Option<crate::CutoverGrant>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct SyncIntent {
+    pub worktree: String,
+    pub head: String,
+    pub target: String,
+    pub message: String,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
+    ScopedCommit(Box<ScopedCommitIntent>),
+    Sync(Box<SyncIntent>),
     PublicationCas,
     WorktreeCreate {
         path: Box<str>,
@@ -152,6 +172,13 @@ pub enum Attribution {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase", deny_unknown_fields)]
 pub enum Outcome {
+    Commit {
+        observed: String,
+        contract_violation: bool,
+    },
+    CommitRejected {
+        cause: String,
+    },
     /// Effect-free approval; URL and mappings live in the ConfigChange intent.
     ConfigApproved,
     Worktree {
@@ -188,6 +215,11 @@ pub enum Outcome {
 pub enum Phase {
     Intent(Intent),
     Prepared,
+    SyncState {
+        conflicts: Vec<String>,
+        staged: Vec<String>,
+        index_digest: String,
+    },
     TargetAttempt {
         prior_target_attempt: Option<()>,
         expected: Tip,
@@ -315,6 +347,46 @@ impl Intent {
             || self.resource_set.is_empty()
         {
             return Err(corrupt("intent binding"));
+        }
+        if let OperationKind::ScopedCommit(payload) = &self.kind {
+            let ScopedCommitIntent {
+                worktree,
+                paths,
+                tree,
+                ..
+            } = payload.as_ref();
+            if !Path::new(worktree).is_absolute()
+                || self.resource_set != vec![format!("worktree:{worktree}")]
+            {
+                return Err(corrupt("scoped commit binding"));
+            }
+            for path in paths {
+                if crate::fgos_scope_literal(path).is_err() {
+                    return Err(corrupt("scoped commit path"));
+                }
+            }
+            Oid::parse(tree, self.object_format).map_err(|_| corrupt("commit tree"))?;
+            validate_tip(&self.expected, self.object_format)?;
+            return validate_tip(&self.next, self.object_format);
+        }
+        if let OperationKind::Sync(payload) = &self.kind {
+            let SyncIntent {
+                worktree,
+                head,
+                target,
+                message,
+            } = payload.as_ref();
+            if !Path::new(worktree).is_absolute()
+                || self.resource_set != vec![format!("worktree:{worktree}")]
+                || message.is_empty()
+                || message.contains('\0')
+            {
+                return Err(corrupt("sync binding"));
+            }
+            Oid::parse(head, self.object_format).map_err(|_| corrupt("sync head"))?;
+            Oid::parse(target, self.object_format).map_err(|_| corrupt("sync target"))?;
+            validate_tip(&self.expected, self.object_format)?;
+            return validate_tip(&self.next, self.object_format);
         }
         let paths = match &self.kind {
             OperationKind::WorktreeCreate {
@@ -617,7 +689,34 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 next,
             },
         ) => expected == &i.expected && next == &i.next,
-        (Phase::TargetAttempt { .. }, Phase::Outcome(o)) => match o {
+        (
+            Phase::TargetAttempt { .. },
+            Phase::SyncState {
+                conflicts,
+                staged,
+                index_digest,
+            },
+        ) => {
+            matches!(i.kind, OperationKind::Sync(_))
+                && digest_valid(index_digest)
+                && conflicts
+                    .iter()
+                    .chain(staged)
+                    .all(|p| crate::fgos_scope_literal(p).is_ok())
+        }
+        (Phase::TargetAttempt { .. } | Phase::SyncState { .. }, Phase::Outcome(o)) => match o {
+            Outcome::Commit { observed, .. } => {
+                matches!(
+                    i.kind,
+                    OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
+                ) && Oid::parse(observed, i.object_format).is_ok()
+            }
+            Outcome::CommitRejected { cause } => {
+                matches!(
+                    i.kind,
+                    OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
+                ) && !cause.is_empty()
+            }
             Outcome::Worktree { details, .. } => {
                 matches!(
                     i.kind,
@@ -1469,6 +1568,11 @@ mod ledger_hex_vec {
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
+        Outcome::Commit {
+            observed,
+            contract_violation,
+        } => vec!["k".into(), observed.clone(), contract_violation.to_string()],
+        Outcome::CommitRejected { cause } => vec!["r".into(), cause.clone()],
         Outcome::Worktree { completed, .. } => vec!["w".into(), completed.to_string()],
         Outcome::ConfigApproved => vec!["c".into()],
         Outcome::AbandonedBeforeAttempt => vec!["a".into()],
@@ -1526,6 +1630,8 @@ fn valid_compact_outcome(o: &[String]) -> bool {
             || Oid::parse(s, ObjectFormat::Sha256).is_ok()
     };
     match o.first().map(String::as_str) {
+        Some("k") => o.len() == 3 && tip(&o[1]) && matches!(o[2].as_str(), "true" | "false"),
+        Some("r") => o.len() == 2 && !o[1].is_empty(),
         Some("w") => o.len() == 2 && matches!(o[1].as_str(), "true" | "false"),
         Some("a" | "c") => o.len() == 1,
         Some("t") => {
@@ -1562,6 +1668,13 @@ impl CompactReceipt {
             }
         };
         Ok(match r[0].as_str() {
+            "k" => Outcome::Commit {
+                observed: r[1].clone(),
+                contract_violation: r[2] == "true",
+            },
+            "r" => Outcome::CommitRejected {
+                cause: r[1].clone(),
+            },
             "w" => Outcome::Worktree {
                 completed: r[1] == "true",
                 details: vec![],

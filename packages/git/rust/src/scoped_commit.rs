@@ -1,0 +1,720 @@
+//! Exact, custody-backed commit transaction. Hooks run once, via Git.
+use crate::{
+    driver::{Output, Policy},
+    refs::{failure, recovery, Authority},
+    wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
+    *,
+};
+use fgos_holder_lock::{BorrowedHandle, Handle, LockScope, Wait};
+use serde::{Deserialize, Serialize};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fs,
+    path::Path,
+    time::Duration,
+};
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CutoverGrant {
+    pub exact_paths: Vec<String>,
+    pub legacy_ref_oid: String,
+    pub seal_digest: String,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CommitRequest {
+    pub writes: Vec<String>,
+    pub message: String,
+    pub cutover_grant: Option<CutoverGrant>,
+}
+/// Capture before producer launch. Keep this value for commit-only retry.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CommitBaseline {
+    pub head: String,
+    pub reference: String,
+    pub worktree: String,
+    pub authority: String,
+    pub dirty: Vec<(String, String)>,
+}
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CommitResult {
+    pub status: ResultCode,
+    pub oid: Option<Oid>,
+    pub files: Vec<String>,
+    pub operation_id: String,
+}
+pub(crate) fn paths(bytes: &[u8]) -> Result<Vec<String>> {
+    bytes
+        .split(|b| *b == 0)
+        .filter(|p| !p.is_empty())
+        .map(|p| {
+            fgos_write_scope::path_text(p)
+                .map(str::to_owned)
+                .map_err(failure)
+        })
+        .collect()
+}
+pub(crate) fn root(repo: &RepoHandle) -> Result<&Path> {
+    repo.work_tree
+        .as_deref()
+        .ok_or_else(|| failure("checkout-required"))
+}
+pub(crate) fn scope<'a>(repo: &RepoHandle, held: Vec<BorrowedHandle<'a>>) -> Result<LockScope<'a>> {
+    require_lock_scope_platform()?;
+    let mut scope = LockScope::seeded(held).map_err(failure)?;
+    if scope
+        .holding()
+        .map_err(failure)?
+        .iter()
+        .any(|h| h.rank >= 55)
+    {
+        return Err(failure("lock-order-violation"));
+    }
+    if root(repo)? == repo.trusted_main_root() {
+        if scope.handle("dispatch-cwd").is_some() {
+            return Err(failure("git-dual-borrow-unavailable"));
+        }
+        if let Some(h) = scope.handle("main-checkout") {
+            if h.path()
+                != repo
+                    .trusted_main_root()
+                    .join(".fgos/locks/main-checkout.lock")
+            {
+                return Err(failure("main-checkout-authority-mismatch"));
+            }
+        } else {
+            scope
+                .acquire(
+                    "main-checkout",
+                    &BTreeMap::from([(
+                        "fgosDir".into(),
+                        repo.trusted_main_root()
+                            .join(".fgos")
+                            .to_string_lossy()
+                            .into_owned(),
+                    )]),
+                    Wait::Ms(5000),
+                )
+                .map_err(failure)?;
+        }
+    } else {
+        let lease = scope
+            .handle("dispatch-cwd")
+            .ok_or_else(|| failure("checkout-custody-required"))?;
+        #[cfg(unix)]
+        if lease.path() != crate::refs::custody_lock_path(repo, root(repo)?)? {
+            return Err(failure("checkout-custody-stale"));
+        }
+    }
+    Ok(scope)
+}
+pub(crate) fn handle<'a>(scope: &'a LockScope<'_>, repo: &RepoHandle) -> Result<&'a Handle> {
+    scope.validate().map_err(failure)?;
+    scope
+        .handle(if root(repo)? == repo.trusted_main_root() {
+            "main-checkout"
+        } else {
+            "dispatch-cwd"
+        })
+        .ok_or_else(|| failure("checkout-authority-required"))
+}
+pub(crate) fn binding(handle: &Handle) -> Result<String> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        let m = fs::metadata(handle.path()).map_err(failure)?;
+        Ok(format!("{}:{}", m.dev(), m.ino()))
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = handle;
+        Err(failure("git-lockscope-unavailable-windows"))
+    }
+}
+impl GitDriver {
+    pub(crate) fn checkout_call(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        args: &[&str],
+        input: &[u8],
+        hooks: bool,
+    ) -> Result<Output> {
+        self.require_floor()?;
+        self.preflight(repo)?;
+        // Re-resolve topology, including reciprocal registration, before every child.
+        let current = match self.resolve_repo(root(repo)?, repo.trusted_main_root())? {
+            ResolveRepo::Repository(r) => r,
+            _ => return Err(failure("untrusted-worktree")),
+        };
+        if current.git_dir != repo.git_dir || current.work_tree != repo.work_tree {
+            return Err(failure("untrusted-worktree"));
+        }
+        let h = handle(scope, repo)?;
+        #[cfg(unix)]
+        if h.name() == "dispatch-cwd"
+            && h.path() != crate::refs::custody_lock_path(repo, root(repo)?)?
+        {
+            return Err(failure("checkout-custody-stale"));
+        }
+        self.invoke_input(
+            Some(repo),
+            root(repo)?,
+            args,
+            if hooks {
+                Policy::HookContext
+            } else {
+                Policy::Publication
+            },
+            Some(h),
+            true,
+            64 * 1024 * 1024,
+            Duration::from_secs(120),
+            input,
+        )
+    }
+    pub(crate) fn checkout_bytes(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        args: &[&str],
+    ) -> Result<Vec<u8>> {
+        let out = self.checkout_call(repo, scope, args, &[], false)?;
+        if out.success {
+            Ok(out.stdout)
+        } else {
+            Err(out.error("checkout-command-failed"))
+        }
+    }
+    pub(crate) fn checkout_text(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        args: &[&str],
+    ) -> Result<String> {
+        let bytes = self.checkout_bytes(repo, scope, args)?;
+        Ok(std::str::from_utf8(&bytes)
+            .map_err(failure)?
+            .trim_end_matches('\n')
+            .into())
+    }
+    pub(crate) fn stage_paths(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        verb: &[&str],
+        selected: &[String],
+    ) -> Result<()> {
+        if selected.is_empty() {
+            return Ok(());
+        }
+        let input: Vec<u8> = selected
+            .iter()
+            .flat_map(|p| p.as_bytes().iter().copied().chain([0]))
+            .collect();
+        let mut args = vec!["--literal-pathspecs"];
+        args.extend_from_slice(verb);
+        args.extend(["--pathspec-from-file=-", "--pathspec-file-nul"]);
+        let out = self.checkout_call(repo, scope, &args, &input, false)?;
+        if out.success {
+            Ok(())
+        } else {
+            Err(out.error("literal-path-staging-failed"))
+        }
+    }
+    pub(crate) fn staged(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<Vec<String>> {
+        paths(&self.checkout_bytes(
+            repo,
+            scope,
+            &[
+                "diff",
+                "--cached",
+                "--name-only",
+                "--no-renames",
+                "--no-relative",
+                "-z",
+            ],
+        )?)
+    }
+    pub(crate) fn merge_head(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+    ) -> Result<Option<String>> {
+        let out = self.checkout_call(
+            repo,
+            scope,
+            &["rev-parse", "-q", "--verify", "MERGE_HEAD"],
+            &[],
+            false,
+        )?;
+        if out.success {
+            Ok(Some(
+                std::str::from_utf8(&out.stdout)
+                    .map_err(failure)?
+                    .trim_end_matches('\n')
+                    .into(),
+            ))
+        } else if out.code == Some(1) {
+            Ok(None)
+        } else {
+            Err(out.error("merge-head-unreadable"))
+        }
+    }
+    fn dirty_paths(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<Vec<String>> {
+        let mut result = paths(&self.checkout_bytes(
+            repo,
+            scope,
+            &[
+                "diff",
+                "--name-only",
+                "--no-renames",
+                "--no-relative",
+                "--ignore-submodules=dirty",
+                "-z",
+            ],
+        )?)?;
+        result.extend(paths(&self.checkout_bytes(
+            repo,
+            scope,
+            &["ls-files", "--others", "--exclude-standard", "-z"],
+        )?)?);
+        result.sort();
+        result.dedup();
+        Ok(result)
+    }
+    pub fn preflight_commit(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+    ) -> Result<CommitBaseline> {
+        let scope = scope(repo, held)?;
+        if self.merge_head(repo, &scope)?.is_some() {
+            return Err(failure("foreign-merge-head"));
+        }
+        if !self.staged(repo, &scope)?.is_empty() {
+            return Err(failure("foreign-staged-index"));
+        }
+        let head = self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])?;
+        let reference = self.checkout_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"])?;
+        let dirty = self
+            .dirty_paths(repo, &scope)?
+            .into_iter()
+            .map(|p| Ok((p.clone(), content_digest(root(repo)?, &p)?)))
+            .collect::<Result<_>>()?;
+        Ok(CommitBaseline {
+            head,
+            reference,
+            worktree: root(repo)?.to_string_lossy().into_owned(),
+            authority: binding(handle(&scope, repo)?)?,
+            dirty,
+        })
+    }
+    pub fn scoped_commit(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        baseline: &CommitBaseline,
+        request: &CommitRequest,
+        writer: &str,
+        id: &str,
+    ) -> Result<CommitResult> {
+        let scope = scope(repo, held)?;
+        self.commit_scoped(repo, &scope, baseline, request, writer, id)
+    }
+    fn commit_scoped(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        baseline: &CommitBaseline,
+        request: &CommitRequest,
+        writer: &str,
+        id: &str,
+    ) -> Result<CommitResult> {
+        if request.message.is_empty()
+            || request.message.contains('\0')
+            || request.message.len() > 1024 * 1024
+        {
+            return Err(failure("invalid-commit-message"));
+        }
+        let writes = fgos_write_scope::canonicalize_all(&request.writes).map_err(failure)?;
+        if baseline.worktree != root(repo)?.to_string_lossy()
+            || baseline.authority != binding(handle(scope, repo)?)?
+        {
+            return Err(failure("checkout-custody-stale"));
+        }
+        let wal = Wal::open(repo).map_err(failure)?;
+        if wal.known_id(id).map_err(failure)? {
+            let old = wal.inspect(id).map_err(failure)?;
+            if matches!(old.outcome(), Some(Outcome::AbandonedBeforeAttempt)) {
+                if let OperationKind::ScopedCommit(payload) = &old.intent().kind {
+                    if payload.paths.is_empty()
+                        && payload.baseline == serde_json::to_string(baseline).map_err(failure)?
+                        && payload.request == serde_json::to_string(request).map_err(failure)?
+                        && old.intent().writer_identity == writer
+                    {
+                        return Ok(CommitResult {
+                            status: ResultCode::Unchanged,
+                            oid: None,
+                            files: vec![],
+                            operation_id: id.into(),
+                        });
+                    }
+                }
+                return Err(failure("operation-id-reused"));
+            }
+            // A ref-moving attempt is never issued twice, even after ABA.
+            if let Some(Outcome::Commit {
+                observed,
+                contract_violation,
+            }) = old.outcome()
+            {
+                if let OperationKind::ScopedCommit(payload) = &old.intent().kind {
+                    let wal::ScopedCommitIntent {
+                        baseline: b,
+                        request: r,
+                        ..
+                    } = payload.as_ref();
+                    if b != &serde_json::to_string(baseline).map_err(failure)?
+                        || r != &serde_json::to_string(request).map_err(failure)?
+                        || old.intent().writer_identity != writer
+                    {
+                        return Err(failure("operation-id-reused"));
+                    }
+                    return Ok(CommitResult {
+                        status: if *contract_violation {
+                            ResultCode::CommittedButContractViolation
+                        } else {
+                            ResultCode::Committed
+                        },
+                        oid: Some(Oid::parse(observed, repo.object_format()).map_err(failure)?),
+                        files: match &old.intent().kind {
+                            OperationKind::ScopedCommit(payload) => payload.paths.clone(),
+                            _ => unreachable!(),
+                        },
+                        operation_id: id.into(),
+                    });
+                }
+            }
+            return Err(recovery("commit-attempt-recovery-required"));
+        }
+        if self.merge_head(repo, scope)?.is_some() {
+            return Err(failure("foreign-merge-head"));
+        }
+        if !self.staged(repo, scope)?.is_empty() {
+            return Err(failure("foreign-staged-index"));
+        }
+        if self.checkout_text(repo, scope, &["rev-parse", "HEAD"])? != baseline.head
+            || self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?
+                != baseline.reference
+        {
+            return Err(failure("source-baseline-stale"));
+        }
+        let excluded: BTreeSet<_> = baseline.dirty.iter().map(|(p, _)| p).collect();
+        let mut selected = vec![];
+        for path in self.dirty_paths(repo, scope)? {
+            if !excluded.contains(&path)
+                && fgos_write_scope::matches(path.as_bytes(), &writes).map_err(failure)?
+            {
+                selected.push(path);
+            }
+        }
+        if let Some(grant) = &request.cutover_grant {
+            if root(repo)? != repo.trusted_main_root() {
+                return Err(failure("cutover-main-required"));
+            }
+            self.validate_cutover_seal(repo, scope, grant)?;
+            for path in &grant.exact_paths {
+                if !path.starts_with(".fgos/")
+                    || fgos_write_scope::canonicalize(path).map_err(failure)? != *path
+                    || path.contains('*')
+                    || fs::symlink_metadata(root(repo)?.join(path)).is_ok()
+                {
+                    return Err(failure("cutover-exact-deletions-required"));
+                }
+                selected.push(path.clone());
+            }
+        }
+        if let Some(grant) = &request.cutover_grant {
+            let fence = root(repo)?.join(".fgos/events");
+            if grant
+                .exact_paths
+                .iter()
+                .any(|p| p.starts_with(".fgos/events/"))
+                && fs::symlink_metadata(&fence)
+                    .is_ok_and(|m| m.is_file() && !m.file_type().is_symlink())
+            {
+                selected.push(".fgos/events".into());
+            }
+        }
+        selected.sort();
+        selected.dedup();
+        if selected.is_empty() {
+            let kind = OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
+                worktree: baseline.worktree.clone(),
+                baseline: serde_json::to_string(baseline).map_err(failure)?,
+                request: serde_json::to_string(request).map_err(failure)?,
+                paths: vec![],
+                tree: self.checkout_text(repo, scope, &["rev-parse", "HEAD^{tree}"])?,
+                cutover_grant: None,
+            }));
+            let resources = vec![format!("worktree:{}", baseline.worktree)];
+            crate::refs::admission(&wal, id, &resources)?;
+            let binding = binding(handle(scope, repo)?)?;
+            let intent = Intent {
+                request_digest: wal::canonical_digest(&(&kind, writer)).map_err(failure)?,
+                kind,
+                repo_identity: wal.repository_identity().into(),
+                resource_set: resources,
+                authority_binding: binding.clone(),
+                writer_identity: writer.into(),
+                object_format: repo.object_format(),
+                expected: Tip::Oid(baseline.head.clone()),
+                next: Tip::Oid(baseline.head.clone()),
+            };
+            let authority = Authority { scope, binding };
+            let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+                Begin::Created(c) => c,
+                _ => return Err(recovery("commit-attempt-recovery-required")),
+            };
+            wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
+                .map_err(failure)?;
+            return Ok(CommitResult {
+                status: ResultCode::Unchanged,
+                oid: None,
+                files: vec![],
+                operation_id: id.into(),
+            });
+        }
+        if let Err(error) = self.stage_paths(repo, scope, &["add", "-A"], &selected) {
+            self.stage_paths(repo, scope, &["reset", "-q"], &selected)
+                .map_err(|_| recovery("commit-unstage-recovery-required"))?;
+            return Err(error);
+        }
+        let prepared = (|| {
+            if self.staged(repo, scope)? != selected {
+                return Err(failure("staged-set-mismatch"));
+            }
+            let tree = self.checkout_text(repo, scope, &["write-tree"])?;
+            let kind = OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
+                worktree: baseline.worktree.clone(),
+                baseline: serde_json::to_string(baseline).map_err(failure)?,
+                request: serde_json::to_string(request).map_err(failure)?,
+                paths: selected.clone(),
+                tree: tree.clone(),
+                cutover_grant: request.cutover_grant.clone(),
+            }));
+            let resources = vec![format!("worktree:{}", baseline.worktree)];
+            crate::refs::admission(&wal, id, &resources)?;
+            let authority_binding = binding(handle(scope, repo)?)?;
+            let intent = Intent {
+                request_digest: wal::canonical_digest(&(&kind, writer)).map_err(failure)?,
+                kind,
+                repo_identity: wal.repository_identity().into(),
+                resource_set: resources,
+                authority_binding: authority_binding.clone(),
+                writer_identity: writer.into(),
+                object_format: repo.object_format(),
+                expected: Tip::Oid(baseline.head.clone()),
+                next: Tip::Oid(baseline.head.clone()),
+            };
+            let authority = Authority {
+                scope,
+                binding: authority_binding,
+            };
+            let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+                Begin::Created(c) => c,
+                _ => return Err(recovery("commit-attempt-recovery-required")),
+            };
+            let chain = wal.append(&chain, Phase::Prepared).map_err(failure)?;
+            if self.checkout_text(repo, scope, &["rev-parse", "HEAD"])? != baseline.head
+                || self.checkout_text(repo, scope, &["write-tree"])? != tree
+            {
+                return Err(recovery("commit-prepared-state-changed"));
+            }
+            let attempted = wal
+                .append(
+                    &chain,
+                    Phase::TargetAttempt {
+                        prior_target_attempt: None,
+                        expected: chain.intent().expected.clone(),
+                        next: chain.intent().next.clone(),
+                    },
+                )
+                .map_err(failure)?;
+            // Config transports the selector to the Git-supplied hook environment.
+            let context = format!("fgos.operationId={id}");
+            let out = self.checkout_call(
+                repo,
+                scope,
+                &[
+                    "-c",
+                    &context,
+                    "-c",
+                    "core.fsync=all",
+                    "commit",
+                    "-q",
+                    "--cleanup=verbatim",
+                    "-F",
+                    "-",
+                ],
+                request.message.as_bytes(),
+                true,
+            )?;
+            let observed = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
+            if observed == baseline.head {
+                // Keep the attempt durable. Retrying uses a new id after a fresh preflight.
+                if !out.success {
+                    wal.append(
+                        &attempted,
+                        Phase::Outcome(Outcome::CommitRejected {
+                            cause: "commit-rejected".into(),
+                        }),
+                    )
+                    .map_err(failure)?;
+                    return Err(out.error("commit-rejected"));
+                }
+                return Err(recovery("commit-effect-unknown"));
+            }
+            let actual_tree = self.checkout_text(repo, scope, &["rev-parse", "HEAD^{tree}"])?;
+            let actual = paths(&self.checkout_bytes(
+                repo,
+                scope,
+                &[
+                    "diff",
+                    "--name-only",
+                    "--no-renames",
+                    "-z",
+                    &baseline.head,
+                    &observed,
+                ],
+            )?)?;
+            let parents =
+                self.checkout_text(repo, scope, &["rev-list", "--parents", "-n", "1", "HEAD"])?;
+            let violation = !out.success
+                || actual_tree != tree
+                || actual != selected
+                || parents.split_whitespace().skip(1).collect::<Vec<_>>()
+                    != vec![baseline.head.as_str()];
+            let oid = Oid::parse(&observed, repo.object_format()).map_err(failure)?;
+            crate::refs::sync_refs(repo, &RefName::parse(&baseline.reference).map_err(failure)?)?;
+            wal.append(
+                &attempted,
+                Phase::Outcome(Outcome::Commit {
+                    observed,
+                    contract_violation: violation,
+                }),
+            )
+            .map_err(failure)?;
+            Ok(CommitResult {
+                status: if violation {
+                    ResultCode::CommittedButContractViolation
+                } else {
+                    ResultCode::Committed
+                },
+                oid: Some(oid),
+                files: actual,
+                operation_id: id.into(),
+            })
+        })();
+        if prepared.is_err()
+            && self
+                .checkout_text(repo, scope, &["rev-parse", "HEAD"])
+                .is_ok_and(|h| h == baseline.head)
+        {
+            self.stage_paths(repo, scope, &["reset", "-q"], &selected)
+                .map_err(|_| recovery("commit-unstage-recovery-required"))?;
+        }
+        prepared
+    }
+    fn validate_cutover_seal(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        grant: &CutoverGrant,
+    ) -> Result<()> {
+        let current =
+            self.checkout_text(repo, scope, &["rev-parse", "--verify", "refs/fgos/legacy"])?;
+        if current != grant.legacy_ref_oid {
+            return Err(failure("cutover-legacy-ref-mismatch"));
+        }
+        let bytes = self.checkout_bytes(
+            repo,
+            scope,
+            &["show", &format!("{}:seal.json", grant.legacy_ref_oid)],
+        )?;
+        use sha2::{Digest, Sha256};
+        if format!("{:x}", Sha256::digest(bytes)) != grant.seal_digest {
+            return Err(failure("cutover-seal-digest-mismatch"));
+        }
+        Ok(())
+    }
+    /// Main-only non-event tracked payload. Event files never enter this adapter.
+    pub fn checkpoint_tracked_files(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        files: Vec<String>,
+        message: String,
+        writer: &str,
+        id: &str,
+    ) -> Result<CommitResult> {
+        if root(repo)? != repo.trusted_main_root()
+            || files
+                .iter()
+                .any(|p| p == ".fgos" || p.starts_with(".fgos/"))
+        {
+            return Err(failure("checkpoint-non-event-main-required"));
+        }
+        let scope = scope(repo, held)?;
+        let tracked = paths(&self.checkout_bytes(repo, &scope, &["ls-files", "-z"])?)?;
+        if files
+            .iter()
+            .any(|p| p.contains('*') || !tracked.contains(p))
+        {
+            return Err(failure("checkpoint-tracked-literals-required"));
+        }
+        if !self.staged(repo, &scope)?.is_empty() || self.merge_head(repo, &scope)?.is_some() {
+            return Err(failure("checkpoint-foreign-state"));
+        }
+        let baseline = CommitBaseline {
+            head: self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])?,
+            reference: self.checkout_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"])?,
+            worktree: root(repo)?.to_string_lossy().into_owned(),
+            authority: binding(handle(&scope, repo)?)?,
+            dirty: vec![],
+        };
+        self.commit_scoped(
+            repo,
+            &scope,
+            &baseline,
+            &CommitRequest {
+                writes: files,
+                message,
+                cutover_grant: None,
+            },
+            writer,
+            id,
+        )
+    }
+}
+fn content_digest(root: &Path, path: &str) -> Result<String> {
+    use sha2::{Digest, Sha256};
+    match fs::symlink_metadata(root.join(path)) {
+        Ok(m) if m.file_type().is_symlink() => Ok(format!(
+            "symlink:{:?}",
+            fs::read_link(root.join(path)).map_err(failure)?
+        )),
+        Ok(m) if m.is_file() => Ok(format!(
+            "file:{:?}:{:x}",
+            m.permissions(),
+            Sha256::digest(fs::read(root.join(path)).map_err(failure)?)
+        )),
+        Ok(_) => Ok("non-regular".into()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok("absent".into()),
+        Err(e) => Err(failure(e)),
+    }
+}
