@@ -80,6 +80,17 @@ function withSubcommands(entry) {
 }
 
 export const COMMAND_REGISTRY = [
+  withSubcommands({
+    name: 'worktree', invoke: 'fgos worktree create <path> [--branch <name> | --detach] [--base <ref>]',
+    description: 'Create a registered worker checkout under worktree-admin; strip worker .fgos before returning.',
+    subcommands: { create: {
+      description: 'Create a named branch or a detached checkout (the default). Dependency provisioning is a separate consumer step.',
+      parameters: { type: 'object', properties: { path: { type: 'string' }, branch: { type: 'string' }, detach: { type: 'boolean' }, base: { type: 'string' } }, positional: ['path'], required: ['path'] },
+      examples: ['fgos worktree create ../worker --branch task/example', 'fgos worktree create ../scratch --detach'],
+    } },
+    examples: ['fgos worktree create ../worker --branch task/example', 'fgos worktree create ../scratch --detach'],
+    touchesState: false, requiresExistingStore: false, externalEffect: true, paginated: false, deprecated: null,
+  }),
   {
     name: 'version',
     invoke: 'fgos version',

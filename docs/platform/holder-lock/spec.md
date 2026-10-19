@@ -317,7 +317,7 @@ Nothing in the repo-lock core (sections 14, 16) imports the event log, a shard o
 
 `worktree-admin` is a mutex (rank 40, `<fgosDir>/locks/worktree-admin.lock`) with no v1 predecessor and no fence. It wraps every fgOS call of `git worktree add`, `git worktree remove`, `git worktree move` (relocate) and `git worktree prune`. For remove and relocate, the dirty-check of the worktree, the destroy or move, and the registration change run under one hold of the lock, so no other worktree administration can run between the check and the effect (Git lessons G-042, G-155). It stays one lock: there is no second admin lock, and read-only listing takes none. Rank 40 is below main checkout (50), so no wrapped worktree command runs while main is held: a claim creates its worktree after it has released main; a merge creates its temporary worktree under the merge slot (20), before it takes main.
 
-Amended 2026-10-17 by owner decision (Git G0 Q6); implementation lands with the Git component. Before this amendment the lock wrapped `git worktree add` only, and `remove` and `prune` stayed unwrapped because they had no recorded incident. The Git component spec ([docs/platform/git/spec.md](../git/spec.md) §5) states which Git operations take this lock and which locks a caller may already hold.
+Amended 2026-10-17 by owner decision (Git G0 Q6); implemented by the Rust Git Worktree port in phase 03 (2026-10-19), including operation-specific prune/repair under the same rank-40 scope. The public create verb uses this door now; legacy runner/session/integration callers migrate together in Git phase 07. Before this amendment the lock wrapped `git worktree add` only, and `remove` and `prune` stayed unwrapped because they had no recorded incident. The Git component spec ([docs/platform/git/spec.md](../git/spec.md) §5) states which Git operations take this lock and which locks a caller may already hold.
 
 ## 17. `fgos lock fence`
 
@@ -343,6 +343,8 @@ The same stop-everything rule as section 12 applies; each lock moves to its new 
 `worktree-admin` has none. An older release that meets a tombstone fails with a raw `EISDIR` (measured with the real code of the cutover's base commit: `withEventsLock`, `withClaimsLock`, `acquireMainCheckoutLock`, the old hook and the old merge slot all throw it); that is accepted for a single user and noted in the changelog.
 
 ## 19. Known limits
+
+- Git Worktree remove/move cannot acquire rank 30 while holding rank 40. It rechecks custody and live cwd immediately before TargetAttempt and again before the Git call, but a new rank-30 acquirer can still race the final probe. Cross-user unreadable cwd and privileged actors are outside its same-user process guarantee; shared cross-user checkout custody is not certified.
 
 - A live holder that is wedged keeps its lock until it exits: a dispatcher stuck on a cwd blocks that cwd with no time limit (the legacy lock had a 4-hour ttl and a reconcile clear; `dispatch reconcile clear-cwd-lock` now only reports held or free). The worker it started is still killed at its run timeout.
 - A hung live holder is never taken over. A person fences it (section 17); the lock releases when it dies.

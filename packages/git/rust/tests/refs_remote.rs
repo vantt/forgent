@@ -223,7 +223,6 @@ fn late_raw_checkout_switch_is_recovery_required_and_unborn_is_in_use() {
 }
 #[test]
 fn fast_forward_requires_exact_lease_and_clean_tree() {
-    use std::os::unix::fs::MetadataExt;
     for backend in ["files", "reftable"] {
         let f = Fixture::new(backend);
         let linked = f.root.join("linked");
@@ -247,12 +246,7 @@ fn fast_forward_requires_exact_lease_and_clean_tree() {
             .unwrap_err()
             .cause
             .contains("custody"));
-        let m = fs::metadata(&linked).unwrap();
-        let lock = f.path.join(format!(
-            ".fgos/locks/dispatch-cwd--{}-{}.lock",
-            m.dev(),
-            m.ino()
-        ));
+        let lock = f.path.join(dispatch_cwd_lock_name(&linked));
         let lease = match acquire(
             &Resource::new("dispatch-cwd", lock),
             Mode::Ex,
@@ -851,7 +845,6 @@ fn unchanged_ref_lock_failure_is_not_cas_loss() {
 
 #[test]
 fn ignored_checkout_collision_refuses_before_target_attempt() {
-    use std::os::unix::fs::MetadataExt;
     let f = Fixture::new("files");
     fs::write(f.path.join("collision"), b"new tracked data").unwrap();
     git(&f.path, &["add", "collision"]);
@@ -876,16 +869,8 @@ fn ignored_checkout_collision_refuses_before_target_attempt() {
     fs::write(f.path.join(".git/info/exclude"), "collision\n").unwrap();
     fs::create_dir(linked.join("collision")).unwrap();
     fs::write(linked.join("collision/precious"), b"precious ignored data").unwrap();
-    let m = fs::metadata(&linked).unwrap();
     let lease = match acquire(
-        &Resource::new(
-            "dispatch-cwd",
-            f.path.join(format!(
-                ".fgos/locks/dispatch-cwd--{}-{}.lock",
-                m.dev(),
-                m.ino()
-            )),
-        ),
+        &Resource::new("dispatch-cwd", f.path.join(dispatch_cwd_lock_name(&linked))),
         Mode::Ex,
         Wait::Try,
         1000,
@@ -995,4 +980,22 @@ fn wal_schema_records_from_real_refs_and_transfers() {
             println!("WAL_SCHEMA_RECORD {}", String::from_utf8(bytes).unwrap());
         }
     }
+}
+
+/// The registry's `dispatch-cwd--<dev>-<ino>-<birthtimeNs>.lock` for a checkout directory.
+fn dispatch_cwd_lock_name(dir: &std::path::Path) -> String {
+    use std::os::unix::fs::MetadataExt;
+    let m = fs::metadata(fs::canonicalize(dir).unwrap()).unwrap();
+    let birth = m
+        .created()
+        .unwrap()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    format!(
+        ".fgos/locks/dispatch-cwd--{}-{}-{}.lock",
+        m.dev(),
+        m.ino(),
+        birth
+    )
 }

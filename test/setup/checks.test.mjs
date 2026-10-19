@@ -143,6 +143,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       'terminal-control',
       'git-component-compatible',
+      'git-worktree-recovery',
       'git-transport-config',
       'git-trust-topology',
       'git-operation-journal',

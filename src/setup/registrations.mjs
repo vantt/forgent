@@ -6627,8 +6627,9 @@ registerCheck({
 registerConfigDefault({ id: 'event-store', key: 'eventStore', shape: { remote: 'origin' } });
 
 // Git and Event Store share one addon ABI admission row.
-for (const id of ['git-component-compatible', 'git-transport-config', 'git-trust-topology', 'git-operation-journal', 'git-native-locks', 'git-publication-refspecs', 'git-durability-capability']) {
+for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-transport-config', 'git-trust-topology', 'git-operation-journal', 'git-native-locks', 'git-publication-refspecs', 'git-durability-capability']) {
   registerCheck({ id, description: {
+    'git-worktree-recovery': 'Orphan, dirty/stale checkout and pending worktree operations (read-only)',
     'git-component-compatible': 'Combined addon contracts and Git feature floor',
     'git-transport-config': 'Repository transport settings refused by Publication/Remote',
     'git-trust-topology': 'Trusted repository layout and common directory',
