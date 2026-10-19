@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- End terminal rounds with `terminal:result-unreadable` when an invalid result stays unchanged for 30 seconds and the agent is idle, releasing custody through normal settlement.
+
 - Warn with pid and comm when a same-user process cwd is unreadable during Worktree removal or relocation; readable checkout cwds still refuse.
 
 - Fix Worktree allocation under `.claude/worktrees`, multi-user cwd checks and terminal recovery of clean Git refusals; require reachable delivery before removal and report preserved dirty checkouts as advisory diagnostics.
