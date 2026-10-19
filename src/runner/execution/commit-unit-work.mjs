@@ -422,13 +422,42 @@ function keepBranchSideOfStore(ctx) {
   }
 }
 
-/** Commit the validated nonempty index once; retain the original hook/Git stderr. */
+/**
+ * Commit what is staged. A refusal is told apart from a git failure by running the pre-commit hook
+ * git would run (the trusted hooks path) once more as git runs it: when it fails on its own, the
+ * result is `hook-refused` with its words. Returns null when the commit landed.
+ */
 function commitStaged(ctx, subject) {
   try {
     git(ctx, ['commit', '-q', '--no-edit', '-m', subject], { env: commitIdentity(ctx) });
     return null;
   } catch (err) {
+    const words = preCommitRefusal(ctx);
+    if (words !== null) return { reason: 'hook-refused', error: `the pre-commit hook refused the commit: ${words}` };
     return { reason: 'git-error', error: String(err.stderr || err.message).trim() };
+  }
+}
+
+/** What the pre-commit hook prints when it refuses the index as it stands; null when it passes or there is none. */
+function preCommitRefusal(ctx) {
+  let hook;
+  try {
+    hook = path.resolve(ctx.cwd, git(ctx, ['rev-parse', '--git-path', 'hooks/pre-commit']).trim());
+    fs.accessSync(hook, fs.constants.X_OK);
+  } catch {
+    return null;
+  }
+  try {
+    (ctx.custody ? (command, args, options) => borrowed(ctx.custody, command, args, options) : execFileSync)(hook, [], {
+      cwd: ctx.cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: cleanEnv({ GIT_DIR: ctx.gitDir, GIT_WORK_TREE: ctx.cwd, GIT_INDEX_FILE: path.join(ctx.gitDir, 'index') }),
+    });
+    return null;
+  } catch (err) {
+    const words = `${err.stderr ?? ''}${err.stdout ?? ''}`.trim() || err.message;
+    return words.length > 4000 ? `${words.slice(0, 4000)}…` : words;
   }
 }
 
