@@ -654,3 +654,5 @@ MP-COST:
 - deepseek-v4-pro stays in tier `advanced` (code at `advanced` gets pro, not flash).
 - Software-architecture council: rigor critical; synthesizer and one critique seat at `frontier`, the other seats at `flagship` (owner: "tạm đồng ý").
 - GLM: owner named `glm-5.4`. OpenRouter's model list on 2026-10-19 23:15 has no `glm-5.4`; the newest GLM ids are `z-ai/glm-5.3` ($0.08/$1.40 per M in/out), `z-ai/glm-5.3-flash` ($0.05/$0.16), `z-ai/glm-5.3-flashx` ($0.37/$1.25), `z-ai/glm-5.3-prime` ($2.80/$8.80). fgOS reaches GLM only through OpenRouter (`providers.z-ai.accounts.openrouter`, invocations `pi-*-openrouter`). Also listed: `deepseek/deepseek-v4.1-flash` ($0.03/$0.08), cheaper than the configured `deepseek-v4-flash` ($0.09/$0.18).
+
+- 2026-10-19 23:15 owner: switch deepseek `nano`/`standard` to `deepseek/deepseek-v4.1-flash`. Applied the same minute in `~/.fgos/config.json` and project `.fgos/config.json` (value change in existing cells, no new key; backups `.fgos/runtime/config-backup-261019-2315/`); doctor model rows pass. Reversal: back to `deepseek-v4-flash` if v4.1-flash fails tasks v4-flash passed.
