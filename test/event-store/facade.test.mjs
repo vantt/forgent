@@ -146,7 +146,8 @@ test('preparation requires trusted main and validates each loader descriptor bef
   assert.notEqual(first, other);
   assert.throws(() => prepareStore(repo, { stateRoot, trustedMain: repo, loaderOptions: { descriptor: { manifest: {}, releaseRoot: root } } }), { code: 'git-addon-unavailable' });
   const nested = path.join(repo, 'nested'); fs.mkdirSync(nested);
-  assert.throws(() => prepareStore(nested, { stateRoot, trustedMain: repo, loaderOptions }), { code: 'refused', cause: 'untrusted-worktree' });
+  // Git resolves a subdirectory of the trusted main checkout to that same repository.
+  assert.ok(prepareStore(nested, { stateRoot, trustedMain: repo, loaderOptions }));
 });
 
 test('hot-section release is one-shot and nested sections preserve the process guard', async () => {
