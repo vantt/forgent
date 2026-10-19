@@ -433,3 +433,12 @@ All seven new findings have text dispositions; implementation, actual accounting
   5. **`lead-ruling` becomes a valid park category** that commits but blocks set closure: a set closes only with zero `lead-ruling` edges. Checker enum and probe.
   6. **G1 — explicit "Document history" sections are history regions** (compound-learn capture linkage: original `docPath`, `fgos doc-sources` capture identity): 04295–04297 and 04306–04308 preserve; the renamed-alias rule exempts them. Checker recognizes such headings as history regions.
   7. **G2 — deleted decision basenames** (`00NN-*.md` without a directory) in live text are references: the scanner must find them (checker extension, probe); the event-log-evolution L13 citation of `0001-event-log-la-su-that.md` parks as a dead link (removed at `4722361ae`, no narrative holder found) unless the author finds the 0001 holder by title search, in which case it patches with an anchor. Author-added edges join the extended scanner output.
+
+## L12-40 — Captured evidence and self-alias are exempt from the renamed-alias rule (Lead, A42/A51, 2026-10-20)
+
+- **Context:** `c0c64372c` applied L12-39 everywhere and authored batch-072 (25 files / 80 edges); full checker 502 files / 3,828 edges, 0 failures, 174 probes. Three edges remain `lead-ruling`: 04320, 04345, 04353 — exact repro/grep/captured work-description text inside live `docs/knowledge/**` files that names the old `docs/how-to/…` spelling.
+- **Rulings:**
+  1. **Captured evidence is history** wherever it appears: fenced code blocks, quoted command output, verbatim captured work descriptions and grep/repro transcripts record what was true when captured. Edges inside them preserve (with a successor note when a holder exists) and are exempt from the renamed-alias rule (L12-37(2)), like the "Document history" regions of L12-39(6). 04320, 04345, 04353 preserve.
+  2. **Self-alias is never patched:** when the registry/alias holder of a legacy spelling is the consumer file itself, a patch would create a self pointer; the edge preserves (inside evidence) or parks as description-rewrite (in live prose).
+  3. Checker: the renamed-alias rule exempts edges inside fenced code / blockquoted captured output / explicit history regions and edges whose alias holder equals the consumer; a probe each.
+- **Throughput:** each author turn now does only authoring plus at most the rule changes the Lead lists; reviews of finished batches run in parallel against a fixed commit.
