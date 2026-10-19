@@ -43,13 +43,18 @@ struct Tip {
     scope: Scope,
     mirror: bool,
 }
-fn mirror_suffix(rest: &str) -> Result<&str, Error> {
-    ["/events/", "/branch-events/", "/local-events/", "/legacy"]
-        .iter()
-        .filter_map(|separator| rest.rfind(separator))
-        .max()
-        .map(|index| &rest[index + 1..])
-        .ok_or_else(|| invalid("invalid mirror ref"))
+fn mirror_suffix(rest: &str) -> Result<Option<&str>, Error> {
+    let (remote, suffix) = rest
+        .split_once('/')
+        .ok_or_else(|| invalid("invalid mirror ref"))?;
+    if remote.is_empty() {
+        return Err(invalid("invalid mirror remote"));
+    }
+    Ok((suffix == "legacy"
+        || ["events/", "branch-events/", "local-events/"]
+            .iter()
+            .any(|p| suffix.starts_with(p)))
+    .then_some(suffix))
 }
 fn tips(
     port: &dyn Inspect,
@@ -71,7 +76,13 @@ fn tips(
     for e in crate::refs::list(port, repo, &prefixes)? {
         let name = e.name.as_str();
         let (rest, mirror) = if let Some(r) = name.strip_prefix("refs/fgos/remotes/") {
-            (mirror_suffix(r)?, true)
+            (
+                match mirror_suffix(r)? {
+                    Some(suffix) => suffix,
+                    None => continue,
+                },
+                true,
+            )
         } else {
             (name.strip_prefix("refs/fgos/").unwrap(), false)
         };
@@ -601,16 +612,27 @@ pub(crate) fn descends(
 #[cfg(test)]
 mod tests {
     #[test]
-    fn mirror_namespace_follows_the_complete_remote_name() {
+    fn mirror_namespace_accepts_only_recognized_suffixes() {
         assert_eq!(
-            super::mirror_suffix("a/b/events/test-aa").unwrap(),
-            "events/test-aa"
+            super::mirror_suffix("origin/events/test-aa").unwrap(),
+            Some("events/test-aa")
         );
         assert_eq!(
-            super::mirror_suffix("a/events/b/branch-events/test-aa/feature").unwrap(),
-            "branch-events/test-aa/feature"
+            super::mirror_suffix("origin/branch-events/test-aa/feature").unwrap(),
+            Some("branch-events/test-aa/feature")
         );
-        assert_eq!(super::mirror_suffix("a/b/legacy").unwrap(), "legacy");
-        assert!(super::mirror_suffix("a/b/unknown").is_err());
+        assert_eq!(super::mirror_suffix("origin/legacy").unwrap(), Some("legacy"));
+        assert_eq!(super::mirror_suffix("origin/unknown").unwrap(), None);
+    }
+    #[test]
+    fn mirror_namespace_strips_only_the_remote_segment() {
+        assert_eq!(super::mirror_suffix("origin/legacy/events/m").unwrap(), None);
+        assert_eq!(
+            super::mirror_suffix("origin/events/m/events/other").unwrap(),
+            Some("events/m/events/other")
+        );
+        assert_eq!(super::mirror_suffix("origin/legacy").unwrap(), Some("legacy"));
+        assert!(super::mirror_suffix("origin").is_err());
+        assert!(super::mirror_suffix("/events/m").is_err());
     }
 }

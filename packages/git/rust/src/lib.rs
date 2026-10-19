@@ -11,6 +11,7 @@ pub use inspect::*;
 mod publication;
 mod repository_config;
 pub use publication::{HolderAuthority, PublicationPort, RemoteGrant};
+pub use repository_config::{obsolete_legacy_fetch_mapping, publication_fetch_mappings};
 pub mod wal;
 pub use driver::{GitDriver, WalReader};
 use serde::{Deserialize, Serialize};

@@ -52,7 +52,13 @@ fn read_floor_record(path: &Path, key: &serde_json::Value) -> Option<GitFloorVer
         .get("probes")?
         .as_array()?
         .iter()
-        .map(|p| Some(FloorProbe { name: text(p.get("name")?)?, passed: p.get("passed")?.as_bool()?, evidence: text(p.get("evidence")?)? }))
+        .map(|p| {
+            Some(FloorProbe {
+                name: text(p.get("name")?)?,
+                passed: p.get("passed")?.as_bool()?,
+                evidence: text(p.get("evidence")?)?,
+            })
+        })
         .collect::<Option<Vec<_>>>()?;
     let supported = record.get("supported")?.as_bool()?;
     let contract: serde_json::Value = serde_json::from_str(include_str!("../../contracts/git-floor.v1.json")).ok()?;
@@ -206,12 +212,42 @@ pub struct GitDriver {
     config_sources: Mutex<BTreeMap<ConfigEnvironment, Vec<PathBuf>>>,
 }
 impl GitDriver {
+    /// Setup-only repair. Canonicalizes the root; hooks use a no-follow descriptor.
+    /// Existing unrelated roots and foreign owners are never chmodded.
+    pub fn prepare_directories(state_root: &Path) -> Result<bool> {
+        let existed = state_root.exists();
+        let root = if existed {
+            fs::canonicalize(state_root).map_err(io)?
+        } else {
+            state_root.to_path_buf()
+        };
+        if existed && root.file_name().is_none_or(|n| n != "fgos") {
+            // The driver's own floor record is an existing ownership marker.
+            let marker = root.join(FLOOR_RECORD);
+            let owned_marker = fs::symlink_metadata(&marker)
+                .is_ok_and(|m| m.is_file() && !m.file_type().is_symlink())
+                && fs::read(&marker)
+                    .ok()
+                    .and_then(|bytes| serde_json::from_slice::<serde_json::Value>(&bytes).ok())
+                    .is_some_and(|v| {
+                        v.get("key").is_some_and(|k| k.get("binary").is_some())
+                            && v.get("probes").is_some_and(|p| p.is_array())
+                    });
+            if !owned_marker {
+                // Safe roots need no permission change, but must still be checked.
+                trusted_directory(&root).map_err(|_| refusal(format!("untrusted-driver-directory: {}; refusing to chmod an unrelated root; point FGOS_STATE_ROOT/FGOS_STATE_HOME at an fgOS directory named fgos or repair its permissions manually", root.display())))?;
+            }
+        }
+        let mut changed = secure_driver_directory(&root, 0o700, true)?;
+        changed |= secure_driver_directory(&root.join("git-empty-hooks"), 0o500, false)?;
+        Ok(changed)
+    }
     /// state_root is a caller-owned trusted directory, not a repository path.
     pub fn new(state_root: &Path) -> Result<Self> {
         let state_root = fs::canonicalize(state_root).map_err(io)?;
         trusted_directory(&state_root)?;
         let hooks = state_root.join("git-empty-hooks");
-        match fs::create_dir(&hooks) {
+        match driver_directory_builder(0o500).create(&hooks) {
             Ok(()) => {
                 #[cfg(unix)]
                 {
@@ -440,7 +476,13 @@ impl GitDriver {
         )
     }
 
-    fn config_paths(&self, repo: Option<&RepoHandle>, cwd: &Path, policy: Policy, loan: Option<&dyn BorrowedSpawn>) -> Result<Vec<PathBuf>> {
+    fn config_paths(
+        &self,
+        repo: Option<&RepoHandle>,
+        cwd: &Path,
+        policy: Policy,
+        loan: Option<&dyn BorrowedSpawn>,
+    ) -> Result<Vec<PathBuf>> {
         let environment = (
             std::env::var_os("HOME"),
             std::env::var_os("XDG_CONFIG_HOME"),
@@ -494,7 +536,12 @@ impl GitDriver {
         repo: &RepoHandle,
         handle: &fgos_holder_lock::Handle,
     ) -> Result<()> {
-        let globals = self.config_paths(Some(repo), &repo.trusted_main_root, Policy::Publication, Some(handle))?;
+        let globals = self.config_paths(
+            Some(repo),
+            &repo.trusted_main_root,
+            Policy::Publication,
+            Some(handle),
+        )?;
         let mut paths = globals;
         paths.extend([
             repo.common_dir.join("config"),
@@ -864,8 +911,21 @@ impl GitDriver {
         // Includes may depend on gitdir/onbranch/hasconfig as well as files.
         // Conservatively do not persist a verdict for any include directive,
         // including missing or currently inactive includeIf targets.
-        let config = self.invoke(None, &self.state_root, &["config", "--null", "--show-origin", "--list"], Policy::Inspect, None, false, PATH_LIMIT, Duration::from_secs(10)).ok()?;
-        if !config.success { return None; }
+        let config = self
+            .invoke(
+                None,
+                &self.state_root,
+                &["config", "--null", "--show-origin", "--list"],
+                Policy::Inspect,
+                None,
+                false,
+                PATH_LIMIT,
+                Duration::from_secs(10),
+            )
+            .ok()?;
+        if !config.success {
+            return None;
+        }
         for (origin, key, _) in parse_config(&config.stdout).ok()? {
             if key == "include.path" || key.starts_with("includeif.") { return None; }
             if let Some(path) = origin.strip_prefix(b"file:") {
@@ -933,7 +993,7 @@ impl GitDriver {
             std::process::id(),
             SERIAL.fetch_add(1, Ordering::Relaxed)
         ));
-        fs::create_dir(&dir).map_err(io)?;
+        driver_directory_builder(0o700).create(&dir).map_err(io)?;
         let result = self.probe_features(&dir, &mut verdict);
         // Probe evidence is diagnostic, not operation evidence; no WAL is here.
         let cleanup = fs::remove_dir_all(&dir).map_err(io);
@@ -1094,17 +1154,108 @@ fn line(bytes: &[u8]) -> Result<&str> {
     let bytes = bytes.strip_suffix(b"\n").unwrap_or(bytes);
     std::str::from_utf8(bytes).map_err(|_| refusal("git-protocol-invalid-utf8"))
 }
+fn driver_directory_builder(mode: u32) -> fs::DirBuilder {
+    let builder = fs::DirBuilder::new();
+    #[cfg(unix)]
+    let mut builder = builder;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        builder.mode(mode);
+    }
+    #[cfg(not(unix))]
+    let _ = mode;
+    builder
+}
+fn secure_driver_directory(path: &Path, mode: u32, recursive: bool) -> Result<bool> {
+    let existed = fs::symlink_metadata(path).is_ok();
+    let mut builder = driver_directory_builder(mode);
+    builder.recursive(recursive);
+    let created = match builder.create(path) {
+        Ok(()) => true,
+        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => false,
+        Err(e) => return Err(io(e)),
+    };
+    // recursive create returns Ok for an existing directory; compare mode below
+    // rather than reporting that as a change.
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::{MetadataExt, OpenOptionsExt, PermissionsExt};
+        let file = fs::OpenOptions::new()
+            .read(true)
+            .custom_flags(libc::O_NOFOLLOW | libc::O_DIRECTORY)
+            .open(path)
+            .map_err(|e| refusal(format!("untrusted-driver-directory: {}: {e}; inspect the directory, restore owner read/search access if needed, remove foreign hooks files, then rerun fgos doctor --fix (git-driver-directories)", path.display())))?;
+        let meta = file.metadata().map_err(io)?;
+        if meta.uid() != current_uid() {
+            return Err(refusal("untrusted-driver-directory: not owned by current user; no permission repair allowed"));
+        }
+        if mode == 0o500 {
+            use std::os::fd::IntoRawFd;
+            // fdopendir owns a duplicate, leaving the checked chmod fd alive.
+            let fd = file.try_clone().map_err(io)?.into_raw_fd();
+            // SAFETY: fd is an open directory descriptor, transferred on success.
+            let directory = unsafe { libc::fdopendir(fd) };
+            if directory.is_null() {
+                // SAFETY: failed fdopendir did not take ownership.
+                unsafe { libc::close(fd) };
+                return Err(io(std::io::Error::last_os_error()));
+            }
+            let mut populated = false;
+            let mut read_error = None;
+            loop {
+                // readdir_r reports read errors explicitly and reads this descriptor.
+                let mut entry = std::mem::MaybeUninit::<libc::dirent>::uninit();
+                let mut result = std::ptr::null_mut();
+                #[allow(deprecated)]
+                // SAFETY: directory is live, entry/result are valid output storage.
+                let code = unsafe { libc::readdir_r(directory, entry.as_mut_ptr(), &mut result) };
+                if code != 0 {
+                    read_error = Some(std::io::Error::from_raw_os_error(code));
+                    break;
+                }
+                if result.is_null() {
+                    break;
+                }
+                // SAFETY: successful readdir_r returned an initialized dirent.
+                let name = unsafe { std::ffi::CStr::from_ptr((*result).d_name.as_ptr()) };
+                if name.to_bytes() != b"." && name.to_bytes() != b".." {
+                    populated = true;
+                    break;
+                }
+            }
+            // SAFETY: close the directory and its duplicate fd exactly once.
+            unsafe { libc::closedir(directory) };
+            if populated || read_error.is_some() {
+                return Err(refusal(format!("trusted-hooks-not-empty-or-unreadable: {}{}; inspect it, remove foreign files or restore owner read/search access, then rerun fgos doctor --fix (git-driver-directories)", path.display(), read_error.map(|e| format!(": {e}")).unwrap_or_default())));
+            }
+        }
+        let wanted = if mode == 0o500 {
+            mode
+        } else {
+            meta.mode() & 0o777 & !0o022
+        };
+        if meta.mode() & 0o777 != wanted {
+            file.set_permissions(fs::Permissions::from_mode(wanted))
+                .map_err(io)?;
+            return Ok(true);
+        }
+    }
+    #[cfg(not(unix))]
+    if mode == 0o500 { check_hooks(path)?; } else { trusted_directory(path)?; }
+    Ok(created && !existed)
+}
 fn trusted_directory(path: &Path) -> Result<()> {
     let meta = fs::symlink_metadata(path).map_err(io)?;
     if !meta.is_dir() || meta.file_type().is_symlink() {
-        return Err(refusal("untrusted-driver-directory"));
+        return Err(refusal(format!("untrusted-driver-directory: {} must be a real directory; run fgos doctor --fix (git-driver-directories)", path.display())));
     }
     #[cfg(unix)]
     {
         use std::os::unix::fs::MetadataExt;
         // The state root must belong to this process's user, not a repository.
         if meta.mode() & 0o022 != 0 || meta.uid() != current_uid() {
-            return Err(refusal("untrusted-driver-directory"));
+            return Err(refusal(format!("untrusted-driver-directory: {} mode {:04o}, uid {} (current {}); group/world writable or wrong owner; run fgos doctor --fix (git-driver-directories); only current-user-owned fgOS directories can be repaired", path.display(), meta.mode() & 0o777, meta.uid(), current_uid())));
         }
     }
     Ok(())
@@ -1116,14 +1267,14 @@ fn current_uid() -> u32 {
 }
 fn check_hooks(path: &Path) -> Result<()> {
     trusted_directory(path)?;
-    if fs::read_dir(path).map_err(io)?.next().is_some() {
-        return Err(refusal("trusted-hooks-not-empty"));
+    if fs::read_dir(path).map_err(|e| refusal(format!("trusted-hooks-unreadable: {}: {e}; inspect it and restore owner read/search access, then rerun fgos doctor --fix (git-driver-directories)", path.display())))?.next().is_some() {
+        return Err(refusal(format!("trusted-hooks-not-empty: {}; inspect it, remove foreign files, then rerun fgos doctor --fix (git-driver-directories)", path.display())));
     }
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
         if fs::metadata(path).map_err(io)?.permissions().mode() & 0o777 != 0o500 {
-            return Err(refusal("trusted-hooks-permissions"));
+            return Err(refusal(format!("trusted-hooks-permissions: {} must have mode 0500; run fgos doctor --fix (git-driver-directories)", path.display())));
         }
     }
     Ok(())
@@ -2447,13 +2598,11 @@ mod tests {
             fs::set_permissions(&driver.hooks, fs::Permissions::from_mode(0o700)).unwrap();
         }
         fs::write(driver.hooks.join("injected"), b"x").unwrap();
-        assert_eq!(
-            driver
-                .checked(&repo, &["status", "-z"], Policy::Inspect)
-                .unwrap_err()
-                .cause,
-            "trusted-hooks-not-empty"
-        );
+        let cause = driver.checked(&repo, &["status", "-z"], Policy::Inspect).unwrap_err().cause;
+        assert!(cause.starts_with("trusted-hooks-not-empty"));
+        assert!(cause.contains(&driver.hooks.display().to_string()));
+        assert!(cause.contains("remove foreign files"));
+        assert!(cause.contains("fgos doctor --fix"));
     }
     #[test]
     fn scrubbed_environment_cannot_supply_git_authority() {
