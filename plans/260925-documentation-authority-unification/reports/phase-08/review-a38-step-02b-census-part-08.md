@@ -1,0 +1,84 @@
+# Independent census review - step 02b part 08
+
+- Reviewer: reviewer:sonnet-session:a7f9bf67c4e662374@2026-10-19
+- Author commit 8606433d6, accounting commit c801778ac (worktree detached HEAD verified c801778ac48e78dae45b67a58b7484e87bfcd4a5)
+- Part: plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-08.json, sha256 57543b8e4dde4324ad9e2af4469037059ac4f7f12efe0a716acb101cda72ded2, 60 entries
+- Method: scripted mechanical check of every entry (file digest, equality with the author table row, edgeIds equal to table edges for the path, bare-sibling line/text, source digest, generated header source, body equals source after header removal, byte-identical copies, wrapper bytes via generateWrapperContent, no generated header on sources) plus a legacy-token coverage scan of every file against edge/prior-history/bare-sibling lines. Mechanical result: 0 digest, mapping, line or edgeId mismatches.
+- Totals: ok 55, rework 3, needs-Lead-judgment 2
+
+## Deep-read list
+- skills-332 (distill.mjs 560-640, src/state/porting-store.mjs movePorting/listPorting writes under stateDir; role consistent with skills-330/331)
+- AGENTS.md (managed block 315-394 vs core/instructions sources; lines 60-100 span coverage)
+- CLAUDE.md
+- core/instructions/decision-question.md, components/packaging-distribution/instructions/verification.md, domains/coding/instructions/verification-discipline.md, domains/coding/instructions/worktree-safety.md, domains/marketing/AGENTS.md (zero-hit disposition; contents grepped)
+- domains/coding/AGENTS.md, core/instructions/design-principles.md, core/instructions/platform-laws.md (uncovered legacy-token scan)
+- src/setup/instruction-projections.mjs (materialize writers 325-358, defaults 240-250), src/setup/instruction-registry.mjs (99-101 index reader, 590-700 discovery), src/setup/instruction-composition.mjs
+- .agents/skills/_shared/executor-dispatch-fallback.md, .agents/skills/fgos-clarifying/SKILL.md, .agents/skills/_shared/capability-catalog.md, .agents/skills/_shared/planning-capability-awareness.md, .agents/skills/_shared/citation-format.md, .agents/skills/_shared/decision-question.md
+- .agents/skills/fgos-architecture-panel/SKILL.md (docs/platform playbook links, switchboard candidate routes; not a legacy root so noMigrationReference=true accepted)
+- .agents/skills/distill/* (SKILL, CREATION-LOG, three references, two byte-identical scripts), .agents/skills/fgos-advise/references/request-kinds-and-routes.md (consumer-project placeholders in shipped-path inventory)
+- .agents/skills/fgos-coding-discovering/SKILL.md, fgos-coding-exploring/references/scope-and-reclaim.md
+
+## Entries
+
+| Entry | Kind | Verdict | Note |
+|---|---|---|---|
+| `skills-332` | edge skills-332 | ok | ok: matched expression at line 587 col 3-53 and context verified; digest ok; learning-state root passed to movePorting (writer in porting-store); aliasLookup empty; preserve/preserve consistent with L12-10 external project learning contract. Observation: accessRole instruction-or-citation matches sibling skills-330, though this path feeds state writes. |
+| `AGENTS.md` | file | rework | sourcePaths omits core/instructions/decision-question.md although the managed block (AGENTS.md lines 324-330) renders it with source: core/instructions/decision-question.md; also line 70 names the retired corpus directory `docs/decisions/` (DoD item 6, a settled-decision destination) with no edge span (only line 71 docs/specs/<area>.md is covered). Complete sourcePaths and add the line-70 span. |
+| `CLAUDE.md` | file | ok | ok: digest verified; file is only the `@AGENTS.md` import (line 10) plus explanatory prose; edge instructions-057 matches. |
+| `components/packaging-distribution/instructions/verification.md` | file | ok | ok: canonical source/implementation, no generated header; fileDigest ok, edgeIds 0 equal table |
+| `core/instructions/decision-question.md` | file | ok | ok: canonical source/implementation, no generated header; fileDigest ok, edgeIds 0 equal table |
+| `core/instructions/design-principles.md` | file | ok | ok: canonical source/implementation, no generated header; fileDigest ok, edgeIds 1 equal table |
+| `core/instructions/platform-laws.md` | file | ok | ok: canonical source/implementation, no generated header; fileDigest ok, edgeIds 12 equal table |
+| `domains/coding/AGENTS.md` | file | needs-Lead-judgment | Row, digest, edges 051/052/056 verified. Line 22 cites bare decision id ADR0020 (retired docs/decisions corpus) with no path; the census only records path-bearing references, so whether bare retired-ADR ids need a destination row is a policy call. |
+| `domains/coding/instructions/verification-discipline.md` | file | ok | ok: canonical source/implementation, no generated header; fileDigest ok, edgeIds 0 equal table |
+| `domains/coding/instructions/worktree-safety.md` | file | ok | ok: canonical source/implementation, no generated header; fileDigest ok, edgeIds 0 equal table |
+| `domains/marketing/AGENTS.md` | file | ok | ok: canonical source/implementation, no generated header; fileDigest ok, edgeIds 0 equal table |
+| `src/setup/instruction-composition.mjs` | file | ok | ok: canonical source/implementation, no generated header; fileDigest ok, edgeIds 1 equal table |
+| `src/setup/instruction-projections.mjs` | file | ok | ok: canonical source/implementation, no generated header; fileDigest ok, edgeIds 15 equal table |
+| `src/setup/instruction-registry.mjs` | file | ok | ok: canonical source/implementation, no generated header; fileDigest ok, edgeIds 17 equal table |
+| `.agents/skills/_shared/capability-catalog.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/_shared/capability-matching.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/_shared/catchup-self-recovery.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/_shared/citation-format.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 9 equal table, bare-sibling lines/text match |
+| `.agents/skills/_shared/coding-cell-policy.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/_shared/coding-worker-contract.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 5 equal table, bare-sibling lines/text match |
+| `.agents/skills/_shared/coordination-driver.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/_shared/decision-question.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/_shared/executor-dispatch-fallback.md` | file | rework | Wrapped citations of retired `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md` at lines 239-240 and 311-312 have neither an edge nor a bareSiblingMentions record (only the four docs/history spans are indexed). Same span gap exists in the core source and plugin copy (other parts). |
+| `.agents/skills/_shared/fgos-cli-fallback.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/_shared/planning-capability-awareness.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/_shared/private-cell-worktree.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/distill/CREATION-LOG.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/distill/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/distill/references/consult-protocol.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/distill/references/deep-dive-protocol.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/distill/references/extract-rules.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/distill/scripts/distill.mjs` | file | ok | ok: byte-identical to source, digest matches; fileDigest ok, edgeIds 34 equal table, bare-sibling lines/text match |
+| `.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs` | file | ok | ok: byte-identical to source, digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-advise/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-advise/references/request-kinds-and-routes.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-architecture-panel/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-clarifying/SKILL.md` | file | rework | Wrapped citation `docs/decisions/0026-vision-orchestrator-roottask-capacity-` / `native-vs-cli-spawn.md` at lines 99-101 (and the rule-2 citation) has no span; only the docs/specs/runner.md RUL45 span (skills-015) is recorded. Same gap in source/plugin copies (other parts). |
+| `.agents/skills/fgos-coding-discovering/SKILL.md` | file | needs-Lead-judgment | Mapping/digest/edges verified. Line 52 cites bare ADR0020 (retired corpus id) with no span; same bare-id policy question as domains/coding/AGENTS.md. |
+| `.agents/skills/fgos-coding-driving/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-driving/references/caller-contract.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-driving/references/loop-mechanics.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-driving/references/reclaim-and-role-graph.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-exploring/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 3 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-exploring/references/gate-mechanics.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 2 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 2 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-exploring/references/re-entry-from-planning.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-implement/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 2 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-implement/references/implement-and-collaboration.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-implement/references/return-mechanics.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 1 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 1 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-knowledge/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 1 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-planning/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-planning/references/approach-and-shape.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 3 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-planning/references/split-and-child-specs.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-shaping/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 7 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-validating/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |

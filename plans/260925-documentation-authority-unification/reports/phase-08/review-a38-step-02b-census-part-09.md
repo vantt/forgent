@@ -1,0 +1,81 @@
+# Independent census review - step 02b part 09
+
+- Reviewer: reviewer:sonnet-session:a7f9bf67c4e662374@2026-10-19
+- Author commit 8606433d6, accounting commit c801778ac (worktree detached HEAD verified c801778ac48e78dae45b67a58b7484e87bfcd4a5)
+- Part: plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-09.json, sha256 73e8718dd07a084a2a777be17ac8ae32bf49baf6d7c409934a3e912fe7b53842, 60 entries
+- Method: scripted mechanical check of every entry (file digest, equality with the author table row, edgeIds equal to table edges for the path, bare-sibling line/text, source digest, generated header source, body equals source after header removal, byte-identical copies, wrapper bytes via generateWrapperContent, no generated header on sources) plus a legacy-token coverage scan of every file against edge/prior-history/bare-sibling lines. Mechanical result: 0 digest, mapping, line or edgeId mismatches.
+- Totals: ok 59, rework 0, needs-Lead-judgment 1
+
+## Deep-read list
+- 19 thin wrappers: generateWrapperContent over .agents copy equals file bytes (node, pure API); source mapping to canonical owner
+- 2 byte-identical distill scripts (.claude/skills/distill/scripts) vs core source
+- .agents/skills/fgos-indexing/SKILL.md and .claude/skills/fgos-indexing wrapper (edge skills-043, docs/enduser-docs-index.json pointer)
+- .agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md, bootstrap-and-reality-gate.md, gate-tier-a-b-triggers.md
+- .agents/skills/fgos-routing/SKILL.md (domains/coding/AGENTS.md ref line 182), .claude/skills/distill/references/*, .claude/skills/fgos-advise/references/request-kinds-and-routes.md
+- .claude/skills/ui-spec/{CONVENTION,METHODOLOGY,SKILL}.md (no generated header; self-source; docs/ui-spec edges 063-066)
+- all 35 assembly rows: full body==source byte comparison and header source match
+
+## Entries
+
+| Entry | Kind | Verdict | Note |
+|---|---|---|---|
+| `.agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 1 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-fanout/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-fanout/references/wave-dispatch-mechanics.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-group-thinking/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-indexing/SKILL.md` | file | needs-Lead-judgment | Mapping/digest/edges verified. Line 27 cites bare ADR0020 (retired corpus id) with no span; same bare-id policy question. (Maintained-pointer edge skills-043 at line 63 is correct.) |
+| `.agents/skills/fgos-lock-fence/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-researching/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 2 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-routing/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.agents/skills/fgos-run/SKILL.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/distill/CREATION-LOG.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/distill/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/distill/references/consult-protocol.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/distill/references/deep-dive-protocol.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/distill/references/extract-rules.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/distill/scripts/distill.mjs` | file | ok | ok: byte-identical to source, digest matches; fileDigest ok, edgeIds 34 equal table, bare-sibling lines/text match |
+| `.claude/skills/distill/scripts/migrate-porting-state-backfill.mjs` | file | ok | ok: byte-identical to source, digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-advise/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-advise/references/request-kinds-and-routes.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-architecture-panel/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-clarifying/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-discovering/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-driving/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-driving/references/caller-contract.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-driving/references/loop-mechanics.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-driving/references/reclaim-and-role-graph.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-exploring/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-exploring/references/gate-mechanics.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 2 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 2 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-exploring/references/re-entry-from-planning.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-exploring/references/scope-and-reclaim.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-implement/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-implement/references/implement-and-collaboration.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-implement/references/return-mechanics.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 1 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-implement/references/worker-contract-and-orient.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 1 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-knowledge/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-planning/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-planning/references/approach-and-shape.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-planning/references/bootstrap-and-lane.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 3 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-planning/references/split-and-child-specs.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 2 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-shaping/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 1 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-validating/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 1 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 3 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-fanout/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-fanout/references/wave-dispatch-mechanics.md` | file | ok | ok: header names the source, body equals source bytes after header removal, source digest matches; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-group-thinking/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-indexing/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-lock-fence/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-researching/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-routing/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/fgos-run/SKILL.md` | file | ok | ok: exact generateWrapperContent output over the .agents assembly; source mapped to canonical owner; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/ui-spec/CONVENTION.md` | file | ok | ok: hand-authored/canonical source, no generated header, self-mapped; fileDigest ok, edgeIds 1 equal table, bare-sibling lines/text match |
+| `.claude/skills/ui-spec/METHODOLOGY.md` | file | ok | ok: hand-authored/canonical source, no generated header, self-mapped; fileDigest ok, edgeIds 0 equal table, bare-sibling lines/text match |
+| `.claude/skills/ui-spec/SKILL.md` | file | ok | ok: hand-authored/canonical source, no generated header, self-mapped; fileDigest ok, edgeIds 4 equal table, bare-sibling lines/text match |
+| `.claude/skills/ui-spec/references/CONVENTION.md` | file | ok | ok: hand-authored/canonical source, no generated header, self-mapped; fileDigest ok, edgeIds 1 equal table, bare-sibling lines/text match |
