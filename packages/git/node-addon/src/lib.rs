@@ -2,7 +2,7 @@
 mod event_store;
 pub use event_store::{open_store, resolve_event_store};
 mod git;
-pub use git::{ensure_git_fetch_mapping, git_fetch_mappings, initialize_git_wal, inspect_git, prepare_git_driver_directories};
+pub use git::{close_git_loan, ensure_git_fetch_mapping, git_fetch_mappings, initialize_git_wal, inspect_git, mint_git_loan, prepare_git_driver_directories, take_git_handover};
 mod single_load;
 use napi::{Error, Result};
 use napi_derive::napi;

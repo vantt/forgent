@@ -7,6 +7,8 @@ import { loadNativeAddon } from '../git/native.mjs';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 
+const transportRemedy = 'For actions/checkout use persist-credentials: false, remove its repo-local http.<url>.extraheader, and configure a trusted global credential helper or GIT_CONFIG_GLOBAL-level setting. Doctor never moves credentials automatically.';
+
 function context(cwd, loaderOptions) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
   const config = mergeWithGlobalConfig(readSharedConfig(root));
@@ -20,6 +22,11 @@ export function checkGit(cwd, kind, loaderOptions) {
     if (kind === 'git-component-compatible') return { passed: compatibleGitContracts(versions, facts.floor), message: JSON.stringify({ versions, floor: facts.floor }) };
     if (facts.notARepository) return { passed: true, message: 'info: not a Git repository' };
     switch (kind) {
+      case 'git-transport-config': {
+        const keys = facts.untrustedTransportConfig;
+        if (!Array.isArray(keys)) return { passed: false, message: 'Git addon lacks transport diagnostics; upgrade the active release' };
+        return { passed: keys.length === 0, message: keys.length ? `repository-transport-config-untrusted: ${keys.join(', ')}; Publication/Remote transfers refuse these settings. ${transportRemedy}` : 'no repository-local transport settings would refuse Publication/Remote' };
+      }
       case 'git-trust-topology': return { passed: true, message: `${facts.commonDir}: ${facts.layout}` };
       case 'git-operation-journal': return { passed: facts.journal.initialized && facts.journal.complete && facts.journal.errors.length === 0 && facts.journal.pendingCount === 0, message: JSON.stringify(facts.journal) };
       case 'git-native-locks': return { passed: facts.nativeLocks.length === 0, message: facts.nativeLocks.length ? `native locks detected (never removed): ${facts.nativeLocks.join(', ')}` : 'no native Git locks detected' };
@@ -33,7 +40,9 @@ export function checkGit(cwd, kind, loaderOptions) {
       case 'git-durability-capability': return { passed: true, message: `info: ${facts.durability}` };
       default: throw new Error(`unknown Git check: ${kind}`);
     }
-  } catch (err) { return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel until M10' : err.message }; }
+  } catch (err) {
+    if (kind === 'git-transport-config' && /repository-config-untrusted: credential\.helper/.test(err.message)) return { passed: false, message: `${err.message}; ${transportRemedy}` };
+    return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel until M10' : err.message }; }
 }
 function initializeWal(cwd) {
   const { root, remote, stateRoot, native } = context(cwd);
