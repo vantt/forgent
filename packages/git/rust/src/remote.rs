@@ -67,8 +67,6 @@ impl GitDriver {
             "core.sshCommand=ssh -oBatchMode=yes".into(),
             "-c".into(),
             "core.askPass=".into(),
-            "-c".into(),
-            "credential.helper=".into(),
         ];
         argv.extend_from_slice(args);
         let held = scope.holding().map_err(failure)?;
@@ -247,7 +245,7 @@ impl GitDriver {
                 };
             }
             Err(wal::WalError::Io(e)) if e.kind() == std::io::ErrorKind::NotFound => (),
-            Err(e) => return Err(failure(e)),
+            Err(e) => return Err(recovery(format!("git-wal-unreadable: {e}"))),
         }
         // Advertisement is read-only. Bind exact old/new targets in Intent.
         let names: Vec<_> = mappings

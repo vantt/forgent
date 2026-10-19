@@ -248,7 +248,7 @@ pub fn inspect_git(
         native_locks.push(&"index.lock");
     }
     Ok(
-        json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"nativeLocks":native_locks,"reservedLegacyRefs":reserved_legacy_refs,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
+        json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"nativeLocks":native_locks,"untrustedTransportConfig":driver.untrusted_transport_config(&repo).map_err(operation)?,"reservedLegacyRefs":reserved_legacy_refs,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
     )
 }
 #[napi]

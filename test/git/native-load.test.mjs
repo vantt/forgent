@@ -125,7 +125,7 @@ test('staged release and npm-relative manifests resolve their own addon without 
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
-test('inspection leaves WAL absent; setup and mapping use the shared Rust config writer', { skip: process.platform === 'win32' }, () => {
+test('inspection leaves WAL absent; setup and mapping use the shared Rust config writer', { skip: process.platform === 'win32' }, async () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-inspect-'));
   const repo = path.join(temp, 'repo');
   execFileSync('git', ['init', '--bare', repo], { stdio: 'ignore' });
@@ -138,6 +138,11 @@ test('inspection leaves WAL absent; setup and mapping use the shared Rust config
   try {
     const facts = addon.inspectGit(temp, repo, repo);
     assert.equal(facts.journal.initialized, false);
+    assert.deepEqual(facts.untrustedTransportConfig, []);
+    git('config', 'http.https://github.com/.extraheader', 'AUTHORIZATION: secret');
+    assert.deepEqual(addon.inspectGit(temp, repo, repo).untrustedTransportConfig, ['http.https://github.com/.extraheader']);
+    git('config', '--unset', 'http.https://github.com/.extraheader');
+
     assert.equal(fs.existsSync(path.join(repo, 'fgos/git')), false);
     addon.initializeGitWal(temp, repo, repo);
     assert.equal(addon.inspectGit(temp, repo, repo).journal.initialized, true);
@@ -217,6 +222,39 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     execFileSync('git', ['init', '-q', repo]);
     git('remote', 'add', 'upstream', '/fixture/remote');
     git('remote', 'add', 'origin', '/fixture/origin');
+    git('config', 'http.https://github.com/.extraheader', 'AUTHORIZATION: secret');
+    const transport = checkGit(repo, 'git-transport-config', options);
+    assert.equal(transport.passed, false);
+    assert.match(transport.message, /persist-credentials: false/);
+    assert.match(transport.message, /trusted global credential helper or GIT_CONFIG_GLOBAL/);
+    assert.doesNotMatch(transport.message, /AUTHORIZATION: secret/);
+    assert.equal(git('config', '--get', 'http.https://github.com/.extraheader'), 'AUTHORIZATION: secret');
+    git('config', '--unset', 'http.https://github.com/.extraheader');
+    assert.equal(checkGit(repo, 'git-transport-config', options).passed, true);
+    git('config', 'credential.helper', 'untrusted-helper');
+    const localHelper = checkGit(repo, 'git-transport-config', options);
+    assert.equal(localHelper.passed, false);
+    assert.match(localHelper.message, /persist-credentials: false/);
+    git('config', '--unset', 'credential.helper');
+    // A real global helper is permitted; private HOME keeps host config intact.
+    const priorHome = process.env.HOME;
+    const priorXdg = process.env.XDG_CONFIG_HOME;
+    const trustedHome = path.join(root, 'trusted-home');
+    fs.mkdirSync(trustedHome);
+    fs.writeFileSync(path.join(trustedHome, '.gitconfig'), '[credential]\\nhelper = trusted-helper\\n');
+    process.env.HOME = trustedHome;
+    process.env.XDG_CONFIG_HOME = path.join(trustedHome, '.config');
+    assert.equal(checkGit(repo, 'git-transport-config', options).passed, true);
+    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);
+    const {createGitRemote} = await import(new URL('../git/index.mjs', process.argv[3]));
+    const bare = path.join(root, 'bare');
+    execFileSync('git', ['init', '-q', '--bare', bare]);
+    git('remote', 'add', 'helper-proof', bare);
+    const remotePort = createGitRemote({stateRoot:old,repoPath:repo,trustedMain:repo,writer:'fixture'}, options);
+    assert.deepEqual(remotePort.inspectRemote({remoteGrant:{name:'helper-proof',pinnedUrl:bare},refs:['refs/heads/trunk']}), []);
+    if (priorHome === undefined) delete process.env.HOME; else process.env.HOME = priorHome;
+    if (priorXdg === undefined) delete process.env.XDG_CONFIG_HOME; else process.env.XDG_CONFIG_HOME = priorXdg;
+
     const oldOrigin = addon.gitFetchMappings('origin').find(r => r.includes('legacy*')).replaceAll('*', '');
     git('config', '--add', 'remote.origin.fetch', oldOrigin);
     const fence = path.join(repo, '.fgos/locks/activation.lock');

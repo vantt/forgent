@@ -85,13 +85,13 @@ pub enum OperationKind {
     RemoteFetch {
         url: String,
         refspecs: Vec<String>,
-        #[serde(default)] // Historical Publication records predate target detail.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")] // Preserve historical digests.
         targets: Vec<(String, Tip, Tip)>,
     },
     RemotePush {
         url: String,
         refspecs: Vec<String>,
-        #[serde(default)] // Historical Publication records predate target detail.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")] // Preserve historical digests.
         targets: Vec<(String, Tip, Tip)>,
     },
 }

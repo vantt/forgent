@@ -581,7 +581,10 @@ impl GitDriver {
             return Err(config.error("git-config-failed"));
         }
         for (origin, key, _) in parse_config(&config.stdout)? {
-            if command_config(&key) {
+            if command_config(&key)
+                && (key != "credential.helper"
+                    || self.untrusted_transport_config(repo)?.iter().any(|k| k == "credential.helper"))
+            {
                 return Err(refusal(format!("repository-config-untrusted: {key}")));
             }
             if let Some(path) = origin.strip_prefix(b"file:") {
@@ -623,9 +626,48 @@ impl GitDriver {
         }
         parse_config(&out.stdout)
     }
+    /// Read-only diagnostic shared with Remote admission. Scope, rather than
+    /// origin spelling, determines trust even for linked worktrees and symlinks.
+    pub fn untrusted_transport_config(&self, repo: &RepoHandle) -> Result<Vec<String>> {
+        let mut keys = Vec::new();
+        // Transfers are rooted in the trusted main checkout; a linked handle
+        // also contributes its worktree-scoped policy. Refuse either source.
+        for context in [None, Some(repo)] {
+            if context.is_some() && repo.git_dir == repo.common_dir {
+                continue;
+            }
+            let out = self.invoke(
+                context,
+                &repo.trusted_main_root,
+                &["config", "--null", "--show-scope", "--list"],
+                Policy::Inspect,
+                None,
+                false,
+                PATH_LIMIT,
+                Duration::from_secs(30),
+            )?;
+            if !out.success {
+                return Err(out.error("git-config-failed"));
+            }
+            for (scope, key, _) in parse_config(&out.stdout)? {
+                if ![b"global".as_slice(), b"system", b"command"].contains(&scope.as_slice())
+                    && repository_transport_config(&key)
+                {
+                    keys.push(key);
+                }
+            }
+        }
+        keys.sort();
+        keys.dedup();
+        Ok(keys)
+    }
+
     pub(crate) fn preflight(&self, repo: &RepoHandle) -> Result<()> {
         for (_, key, _) in self.config(repo)? {
-            if command_config(&key) {
+            if command_config(&key)
+                && (key != "credential.helper"
+                    || self.untrusted_transport_config(repo)?.iter().any(|k| k == "credential.helper"))
+            {
                 return Err(refusal(format!("repository-config-untrusted: {key}")));
             }
         }
@@ -786,44 +828,10 @@ impl GitDriver {
             if let Some(repo) = repo {
                 // Repository transport policy is untrusted, including URL-scoped
                 // values which outrank generic -c values. Refuse the whole family.
-                for (origin, key, _) in self.config(repo)? {
-                    let local = origin
-                        .strip_prefix(b"file:")
-                        .and_then(|p| std::str::from_utf8(p).ok())
-                        .is_some_and(|p| {
-                            let p = Path::new(p);
-                            let p = if p.is_absolute() {
-                                p.to_owned()
-                            } else {
-                                repo.trusted_main_root.join(p)
-                            };
-                            p == repo.common_dir.join("config")
-                                || p == repo.git_dir.join("config.worktree")
-                        });
-                    if local
-                        && ![
-                            "http.proxy",
-                            "http.sslverify",
-                            "http.extraheader",
-                            "http.followredirects",
-                        ]
-                        .contains(&key.as_str())
-                        && (key.starts_with("http.")
-                            || key.starts_with("https.")
-                            || key.starts_with("ssh.")
-                            || key.starts_with("protocol.")
-                            || key.starts_with("credential.")
-                            || key == "core.gitproxy"
-                            || key == "remote.pushdefault"
-                            || (key.starts_with("remote.")
-                                && [".proxy", ".proxyauthmethod", ".vcs"]
-                                    .iter()
-                                    .any(|s| key.ends_with(s))))
-                    {
-                        return Err(refusal(format!(
-                            "repository-transport-config-untrusted: {key}"
-                        )));
-                    }
+                if let Some(key) = self.untrusted_transport_config(repo)?.first() {
+                    return Err(refusal(format!(
+                        "repository-transport-config-untrusted: {key}"
+                    )));
                 }
             }
         }
@@ -1435,7 +1443,28 @@ fn command_config(key: &str) -> bool {
                 .iter()
                 .any(|s| key.ends_with(s)))
 }
-/// Config --null --show-origin emits alternating origin NUL key LF value NUL.
+// Generic HTTP settings below are forcibly overridden by Remote's -c policy.
+fn repository_transport_config(key: &str) -> bool {
+    ![
+        "http.proxy",
+        "http.sslverify",
+        "http.extraheader",
+        "http.followredirects",
+    ]
+    .contains(&key)
+        && (key.starts_with("http.")
+            || key.starts_with("https.")
+            || key.starts_with("ssh.")
+            || key.starts_with("protocol.")
+            || key.starts_with("credential.")
+            || key == "core.gitproxy"
+            || key == "remote.pushdefault"
+            || (key.starts_with("remote.")
+                && [".proxy", ".proxyauthmethod", ".vcs"]
+                    .iter()
+                    .any(|s| key.ends_with(s))))
+}
+/// Config --null with --show-origin or --show-scope emits metadata NUL key LF value NUL.
 fn parse_config(bytes: &[u8]) -> Result<Vec<ConfigRecord>> {
     let fields = nul_records(bytes)?;
     if fields.len() % 2 != 0 {

@@ -536,6 +536,78 @@ fn pinned_remote_refuses_rewrites_and_repository_transport_config() {
 }
 
 #[test]
+fn transport_trust_uses_scope_for_main_worktree_config_and_symlinked_paths() {
+    use std::os::unix::fs::symlink;
+    let f = Fixture::new("files");
+    let remote = f.remote();
+    let linked = f.root.join("linked");
+    git(
+        &f.path,
+        &["worktree", "add", "-qb", "linked", linked.to_str().unwrap()],
+    );
+    git(&f.path, &["config", "extensions.worktreeConfig", "true"]);
+    let key = "http.https://example.invalid/.extraheader";
+    git(&f.path, &["config", "--worktree", key, "secret"]);
+    let alias = f.root.join("alias");
+    symlink(&f.path, &alias).unwrap();
+    let mappings = [RefMapping {
+        source: RefName::parse("refs/heads/trunk").unwrap(),
+        destination: RefName::parse("refs/heads/shared").unwrap(),
+    }];
+    for (cwd, main) in [(&linked, &f.path), (&alias, &alias)] {
+        let ResolveRepo::Repository(repo) = f.driver.resolve_repo(cwd, main).unwrap() else {
+            panic!()
+        };
+        assert_eq!(
+            f.driver.untrusted_transport_config(&repo).unwrap(),
+            vec![key]
+        );
+        let error = f
+            .driver
+            .push_refs(
+                &repo,
+                vec![],
+                &remote,
+                &mappings,
+                "fixture",
+                "scope-refusal",
+            )
+            .unwrap_err();
+        assert!(
+            error
+                .cause
+                .contains("repository-transport-config-untrusted"),
+            "{error:?}"
+        );
+    }
+    assert!(git(Path::new(&remote.pinned_url), &["for-each-ref"]).is_empty());
+    // The main config file can itself have a different filesystem spelling.
+    git(&f.path, &["config", "--worktree", "--unset", key]);
+    let config = f.path.join(".git/config");
+    let actual = f.root.join("actual-config");
+    fs::rename(&config, &actual).unwrap();
+    symlink(&actual, &config).unwrap();
+    git(&f.path, &["config", "--local", key, "secret"]);
+    assert_eq!(
+        f.driver.untrusted_transport_config(&f.repo).unwrap(),
+        vec![key]
+    );
+    assert!(f
+        .driver
+        .push_refs(
+            &f.repo,
+            vec![],
+            &remote,
+            &mappings,
+            "fixture",
+            "symlink-refusal"
+        )
+        .unwrap_err()
+        .cause
+        .contains("repository-transport-config-untrusted"));
+}
+
+#[test]
 fn atomic_push_rejection_leaves_every_target_unchanged() {
     let f = Fixture::new("files");
     let remote = f.remote();
@@ -867,16 +939,6 @@ fn nested_registered_worktree_resolution_uses_longest_prefix() {
             panic!()
         };
         assert_eq!(repo.git_dir(), f.path.join(".git/worktrees/inner"));
-    }
-}
-
-#[test]
-fn historical_publication_remote_kind_keeps_read_compatibility() {
-    for kind in ["RemoteFetch", "RemotePush"] {
-        let value = serde_json::json!({kind: {"url":"/remote", "refspecs":["refs/fgos/events/a:refs/fgos/events/a"]}});
-        let parsed: wal::OperationKind = serde_json::from_value(value).unwrap();
-        let serialized = serde_json::to_value(parsed).unwrap();
-        assert_eq!(serialized[kind]["targets"], serde_json::json!([]));
     }
 }
 

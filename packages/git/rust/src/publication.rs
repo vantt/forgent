@@ -1490,8 +1490,6 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             "core.sshCommand=ssh -oBatchMode=yes".into(),
             "-c".into(),
             "core.askPass=".into(),
-            "-c".into(),
-            "credential.helper=".into(),
         ];
         argv.extend_from_slice(args);
         self.raw(
