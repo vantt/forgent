@@ -584,3 +584,59 @@ fn successful_registered_create_rollback_settles_as_not_completed() {
         ""
     );
 }
+
+fn lock_issue(f: &Fixture, reason: &str, age: Option<std::time::Duration>) -> String {
+    let worker = f.root.join("worker");
+    git(
+        &f.path,
+        &["worktree", "add", "--detach", worker.to_str().unwrap()],
+    );
+    git(
+        &f.path,
+        &["worktree", "lock", "--reason", reason, worker.to_str().unwrap()],
+    );
+    if let Some(age) = age {
+        let lock = f.path.join(".git/worktrees/worker/locked");
+        fs::File::options()
+            .write(true)
+            .open(lock)
+            .unwrap()
+            .set_modified(std::time::SystemTime::now() - age)
+            .unwrap();
+    }
+    let issues = f.driver.inspect_worktree_orphans(&f.repo).unwrap();
+    assert_eq!(issues.len(), 1, "{issues:?}");
+    issues[0].reason.clone()
+}
+#[test]
+fn lock_naming_a_live_process_is_not_a_recovery_finding() {
+    let f = Fixture::new();
+    let mut holder = Command::new("sleep").arg("60").spawn().unwrap();
+    let reason = format!("locked claude agent x (pid {})", holder.id());
+    let got = lock_issue(&f, &reason, None);
+    holder.kill().unwrap();
+    holder.wait().unwrap();
+    assert_eq!(got, "locked-by-live-process");
+}
+#[test]
+fn lock_naming_a_dead_or_unparseable_or_reused_owner_stays_a_finding() {
+    let mut gone = Command::new("true").spawn().unwrap();
+    gone.wait().unwrap();
+    let dead = format!("locked agent (pid {})", gone.id());
+    assert_eq!(lock_issue(&Fixture::new(), &dead, None), "locked-registration");
+    assert_eq!(
+        lock_issue(&Fixture::new(), "held by the user", None),
+        "locked-registration"
+    );
+    // Lock written long before this process existed: the live pid is a reuse.
+    let mut late = Command::new("sleep").arg("60").spawn().unwrap();
+    let reused = format!("locked agent (pid {})", late.id());
+    let got = lock_issue(
+        &Fixture::new(),
+        &reused,
+        Some(std::time::Duration::from_secs(3600)),
+    );
+    late.kill().unwrap();
+    late.wait().unwrap();
+    assert_eq!(got, "locked-registration");
+}

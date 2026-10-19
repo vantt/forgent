@@ -1,0 +1,275 @@
+// src/workflow/case-start.mjs — how a Workflow case begins: the start sources, the opening events, the detached spawn
+// Architecture guard: MUST NOT import src/state/** or src/runner/coordination/** (A4 boundary)
+
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import path from 'node:path';
+import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
+import { normalizeContextRefs } from './definition.mjs';
+import { loadWorkflow } from './loader.mjs';
+import { createWorkflowRun, appendWorkflowEvent, readWorkflowEvents, projectWorkflowState } from './store.mjs';
+import { translateUnitsToWorkflow } from './units-source.mjs';
+import { snapshotRunnerConfig, resolveGitRoots, detectHerdrPresent } from '../runner/execution/run.mjs';
+import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
+import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } from './seats.mjs';
+import { digestContextRefs, digestText } from './ref-digests.mjs';
+import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
+import { RunnerConfigError, assertReasoningEffort, parseRunTimeout, assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
+import { providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
+import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
+import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
+import { assertWriteChains, gitOut } from './unit-handoff.mjs';
+import { RIGOR_ORDER } from './case-projection.mjs';
+import { bindWorktree } from './case-bindings.mjs';
+
+const FRAME_COUNT_KEYS = Object.freeze(['dispatches', 'mutatingDispatches', 'fallbackPerSeat', 'deviationsBeforeAsk', 'seatLaunchesPerDispatch']);
+
+/**
+ * The frame a case opens with: the guide's defaults, narrowed by the flags given at start and never
+ * widened. A count may only go down, the rigor floor only up; a count the guide leaves to the approver
+ * takes whatever is given. A guide with no frame defaults has nothing to narrow.
+ *
+ * @param {object | null | undefined} guide
+ * @param {Record<string, number | string> | undefined} flags
+ * @returns {object | null}
+ */
+export function resolveFrame(guide, flags) {
+  const asked = flags && Object.keys(flags).length > 0 ? flags : null;
+  const defaults = guide?.frameDefaults ?? null;
+  if (defaults === null) {
+    if (asked) throw new RunnerConfigError(`--frame narrows the frame defaults of a guide, and "${guide?.id ?? 'this workflow'}" states none`);
+    return null;
+  }
+  const frame = { ...defaults };
+  for (const [key, raw] of Object.entries(asked ?? {})) {
+    if (key === 'rigorFloor') {
+      if (!RIGOR_ORDER.includes(raw)) throw new RunnerConfigError(`--frame rigorFloor must be one of [${RIGOR_ORDER.join(', ')}], got "${raw}"`);
+      if (RIGOR_ORDER.includes(frame.rigorFloor) && RIGOR_ORDER.indexOf(raw) < RIGOR_ORDER.indexOf(frame.rigorFloor)) {
+        throw new RunnerConfigError(`--frame rigorFloor=${raw} lowers the guide's floor ${frame.rigorFloor}; a case may only raise it`);
+      }
+      frame.rigorFloor = raw;
+      continue;
+    }
+    if (!FRAME_COUNT_KEYS.includes(key)) throw new RunnerConfigError(`--frame has unknown key "${key}" (allowed: ${[...FRAME_COUNT_KEYS, 'rigorFloor'].join(', ')})`);
+    const value = Number(raw);
+    if (!Number.isInteger(value) || value < 0) throw new RunnerConfigError(`--frame ${key} must be a non-negative integer, got "${raw}"`);
+    if (Number.isInteger(frame[key]) && value > frame[key]) {
+      throw new RunnerConfigError(`--frame ${key}=${value} widens the guide's default ${frame[key]}; a case may only narrow its frame`);
+    }
+    frame[key] = value;
+  }
+  return frame;
+}
+
+/**
+ * Open the case on its ledger, under the run's `advance` hold: `case.opened` with the guide snapshot
+ * reference, the frame and the request digest (which is what makes `request-received` achieved), and a
+ * binding for the worktree a conductor case is going to write in. A playbook case binds its worktrees
+ * when it admits a writing Unit. A ledger that already carries `case.opened` is left alone, so a run
+ * recorded before cases existed is opened on its first resume, with its guide's defaults.
+ *
+ * @returns {{ opened: boolean }}
+ */
+export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = workflow.guide, frame, request, hold, worktreePath, legacy = false }) {
+  const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
+  if (events.some((e) => e.type === 'case.opened')) return { opened: false };
+  const append = (event) => appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId, event, hold });
+  append({
+    type: 'case.opened',
+    payload: {
+      caseId: workflowRunId,
+      kind: guide.kind,
+      guide: { id: guide.id, sha256: crypto.createHash('sha256').update(JSON.stringify(guide)).digest('hex') },
+      frame,
+      requestDigest: digestText(request ?? ''),
+      openedAt: new Date().toISOString(),
+      ...(legacy ? { legacy: true } : {}),
+    },
+  });
+  if (guide.kind === 'guide' && worktreePath && guide.activities.some((a) => a.effects === 'writes')) {
+    const bound = bindWorktree({
+      mainRoot,
+      hold,
+      caseId: workflowRunId,
+      worktree: worktreePath,
+      commonDir: gitOut(worktreePath, ['rev-parse', '--git-common-dir'])?.trim() ?? null,
+      ref: gitOut(worktreePath, ['rev-parse', '--abbrev-ref', 'HEAD'])?.trim() ?? null,
+    });
+    if (!bound.ok) {
+      append({ type: 'case.closed', payload: { closedAt: new Date().toISOString(), reason: bound.answer } });
+      throw new RunnerConfigError(`Workflow case "${workflowRunId}" was not opened: worktree ${worktreePath} cannot be bound (${bound.answer}${bound.record?.caseId ? `, held by case ${bound.record.caseId}` : ''})`, { code: bound.answer });
+    }
+  }
+  return { opened: true };
+}
+
+/**
+ * Spawn `fgos workflow resume <id> --foreground` as a detached process whose output goes to
+ * advance.log beside the event log. `--foreground` is what keeps the child from detaching again.
+ */
+export function spawnDetachedAdvance({ mainRoot, workflowRunId, runDir, worktree, cwd, cliPath }) {
+  const cli = cliPath ?? fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
+  const args = [cli, 'workflow', 'resume', workflowRunId, '--dir', mainRoot];
+  if (worktree) args.push('--worktree', worktree);
+  args.push('--foreground');
+
+  const logPath = path.join(runDir, 'advance.log');
+  const logFd = fs.openSync(logPath, 'a');
+  let child;
+  try {
+    child = spawn(process.execPath, args, {
+      cwd: cwd ?? process.cwd(),
+      detached: true,
+      env: { ...process.env, [ADVANCE_DETACHED_ENV]: '1' },
+      stdio: ['ignore', logFd, logFd],
+    });
+  } finally {
+    fs.closeSync(logFd);
+  }
+  child.on('error', () => {});
+  child.unref();
+  return { pid: child.pid ?? null, logPath, statusCommand: `fgos workflow status ${workflowRunId}` };
+}
+
+export function detachedResult({ mainRoot, workflowRunId, detached }) {
+  const state = projectWorkflowState(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId }));
+  return { ...state, caseId: workflowRunId, detached };
+}
+
+/**
+ * Resolve everything a start needs without touching the store: the roots, the definition to run
+ * (the registered one, or that one rebuilt with `params.seats`), and the shared context refs.
+ * A refused request throws here, so it creates no run.
+ */
+function resolveStart(params) {
+  const cwd = params.cwd ?? process.cwd();
+  const roots = resolveGitRoots(cwd);
+  const mainRoot = params.repoRoot ? path.resolve(params.repoRoot) : roots.mainCheckoutRoot;
+  const worktreePath = params.worktree ? path.resolve(params.worktree) : roots.worktreeRoot;
+
+  let workflow;
+  let workflowId;
+
+  if (params.workflow) {
+    workflow = validateWorkflow(params.workflow);
+    workflowId = workflow.id;
+  } else if (params.unitsPath) {
+    workflow = translateUnitsToWorkflow(params.unitsPath);
+    workflowId = workflow.id;
+  } else if (params.workflowId) {
+    workflow = loadWorkflow(params.workflowId, { packageRoot: mainRoot, cwd });
+    workflowId = workflow.id;
+  } else {
+    throw new RunnerConfigError('startWorkflow requires workflowId, workflow, or unitsPath');
+  }
+  if (params.unitsPath) {
+    if (params.seats !== undefined) throw new RunnerConfigError('--seats rebuilds a registered panel preset; it cannot be used with a units file');
+    assertWriteChains(workflow);
+  }
+  const effort = params.effort === undefined || params.effort === null ? null : assertReasoningEffort(params.effort);
+
+  let timeoutMs = null;
+  if (params.timeout !== undefined && params.timeout !== null) {
+    timeoutMs = typeof params.timeout === 'number'
+      ? assertRunTimeoutMs(params.timeout, '--timeout')
+      : parseRunTimeout(params.timeout);
+  } else if (params.timeoutMs !== undefined && params.timeoutMs !== null) {
+    timeoutMs = assertRunTimeoutMs(params.timeoutMs, '--timeout');
+  }
+
+  let account = null;
+  if (params.account !== undefined && params.account !== null) {
+    if (typeof params.account !== 'string' || !params.account.trim()) {
+      throw new RunnerConfigError('--account requires a non-empty account id');
+    }
+    account = params.account.trim();
+  }
+
+  const contextRefs = normalizeContextRefs(params.contextRefs);
+  let seats;
+  if (params.seats !== undefined) {
+    // Names are resolved (and a missing or duplicated one refused) here, before any run exists; the
+    // text found now is what the run pins, so a later edit of the file never reaches it.
+    const personas = {};
+    for (const entry of normalizeSeats(params.seats)) {
+      const name = personaNameOf(entry);
+      if (name !== null) personas[name] = resolveAgentDefinition(name, { projectRoot: worktreePath });
+    }
+    ({ workflow, provenance: seats } = expandWorkflowSeats(workflow, params.seats, { contextRefs, personas }));
+    seats = { ...seats, refDigests: digestContextRefs(contextRefs, worktreePath) };
+  }
+  const allRefs = [...contextRefs, ...workflow.steps.flatMap((step) => step.units.flatMap((unit) => unit.template.contextRefs || []))];
+  if (allRefs.some((ref) => !/^(unit-run:|gate-answer:)/.test(ref)) && mainRoot !== worktreePath
+      && resolveGitRoots(mainRoot).mainCheckoutRoot !== resolveGitRoots(worktreePath).mainCheckoutRoot) {
+    throw new RunnerConfigError('Workflow contextRefs cannot use plain paths across repositories; use unit-run:<id>/<role> or gate-answer:<workflowRunId>/<stepId>');
+  }
+  return { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account };
+}
+
+/**
+ * Dry-bind a seated definition before anything is spent: every panel unit's seats and synthesizer are
+ * bound against the pool exactly as a run would bind them, nothing is dispatched or written.
+ * Seats that would share a provider family are only reported (a preference, bind() spreads what it
+ * can); a role no candidate can serve refuses the start. Without `params.seats` it does nothing.
+ *
+ * @param {object} params the same params as startWorkflow
+ * @returns {Promise<{ warnings: string[] }>}
+ */
+export async function preflightWorkflowSeats(params = {}) {
+  if (params.seats === undefined) return { warnings: [] };
+  const { mainRoot, workflow } = resolveStart(params);
+  const runnerConfig = snapshotRunnerConfig(mainRoot).runner;
+  const session = { headless: true, herdrPresent: detectHerdrPresent() };
+  const warnings = [];
+  const refused = [];
+  for (const unit of seatedPanelUnits(workflow)) {
+    const { roles } = await simulateUnitBindings(unit, runnerConfig, { session });
+    for (const role of roles) {
+      if (role.refused) refused.push(`${unit.id}/${role.role}: ${role.refused.reason}: ${role.refused.detail}`);
+      else if (role.sharesFamilyWith?.length) warnings.push(`${unit.id}/${role.role}=${role.executor} shares a provider family with ${role.sharesFamilyWith.join(', ')}`);
+    }
+  }
+  if (refused.length > 0) {
+    throw new RunnerConfigError(`--seats cannot be served by the current pools, no run was created: ${refused.join('; ')}`);
+  }
+  return { warnings };
+}
+
+/**
+ * Resolve the Workflow definition and record a new run, without advancing it. The run exists
+ * in the store (status `running`, nothing started) as soon as this returns, so its id can be
+ * handed to a caller before any step executes.
+ */
+export function prepareWorkflowRun(params) {
+  const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account } = resolveStart(params);
+  // A frame flag that widens the guide's defaults refuses here, so it creates no run.
+  const frame = resolveFrame(workflow.guide, params.frame);
+  const configSnapshot = snapshotRunnerConfig(mainRoot);
+  if (account !== null) {
+    const inventory = providerAccountInventory(configSnapshot.runner);
+    const exists = Object.values(inventory).some(
+      (entry) => entry?.accounts && Object.hasOwn(entry.accounts, account),
+    );
+    if (!exists) {
+      throw new RunnerConfigError(`account "${account}" is not configured in runner.providers.*.accounts`);
+    }
+  }
+  const { workflowRunId, runDir } = createWorkflowRun({
+    repoRoot: mainRoot,
+    workflowId,
+    workflow,
+    configSnapshot,
+    request: params.request,
+    stanceOptions: normalizeStanceOptions(params.stanceOptions),
+    contextRefs,
+    seats,
+    effort,
+    timeoutMs,
+    account,
+  });
+
+  return { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request: params.request ?? null };
+}

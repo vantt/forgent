@@ -17,7 +17,7 @@ import {
   statusWorkflow,
   answerWorkflow,
 } from '../../src/workflow/index.mjs';
-import { acquireAdvanceLock } from '../../src/workflow/runner.mjs';
+import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';

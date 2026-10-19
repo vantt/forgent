@@ -236,3 +236,13 @@ test('recreating a directory with a reused inode gets a new custody record key',
   }
   t.diagnostic('filesystem did not reuse a directory inode in 128 creations; deterministic birth-time and legacy-record checks cover the key');
 });
+
+test('a record left after the kernel lock was released is judged by pid and start time, never by pid alone', { skip }, async (t) => {
+  const f = fixture(t);
+  const { localObserver } = await import(identity);
+  // The holder's own pid is live, but the recorded start time is not its: a reused pid, so the domain is dead.
+  fs.writeFileSync(f.record, JSON.stringify({ v: 1, domainKind: 'linux-gate', domainId: { ...localObserver(), pid: process.pid, startTime: '1' } }));
+  const successor = admitSuccessor(createLockScope('successor'), f.fgosDir, f.cwd);
+  try { assert.equal(predecessorState(f.lockPath, { fgosDir: f.fgosDir }).state, 'absent'); }
+  finally { successor.release(); }
+});
