@@ -64,6 +64,7 @@ import {
 } from './workflow-pool-independence.mjs';
 import {
   checkExecutorFamilyUnique,
+  checkTierFallback,
   checkModelPolicyPools,
   checkLlmAccountsShape,
   checkLlmAccountsVsLegacy,
@@ -1467,6 +1468,12 @@ registerCheck({
   id: 'executor-family-unique',
   description: 'each agent family (providerModel) is served by exactly one executor; its transports are invocations of that executor',
   check: (cwd) => checkExecutorFamilyUnique(cwd),
+});
+
+registerCheck({
+  id: 'tier-fallback',
+  description: 'every family runner.tierFallback lists for a tier has a modelPolicies cell at that tier and an agent executor; warns otherwise',
+  check: (cwd) => checkTierFallback(cwd),
 });
 
 registerCheck({

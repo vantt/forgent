@@ -41,6 +41,30 @@ export function checkExecutorFamilyUnique(cwd) {
   return { passed: true, message: `each of ${byFamily.size} agent families has one executor` };
 }
 
+/**
+ * A family a tier's fallback list names but that has no cell at that tier, or no agent executor, is
+ * skipped by the walk and recorded. Warns, never fails: the list still works for the families that serve it.
+ */
+export function checkTierFallback(cwd) {
+  const { runnerConfig, skip } = loadOrExplain(cwd);
+  if (skip) return skip;
+  const declared = Object.entries(runnerConfig.tierFallback ?? {});
+  if (declared.length === 0) return { passed: true, message: 'runner.tierFallback not declared; every tier walks its capability prefer order after a failure' };
+  const served = new Set();
+  for (const entry of Object.values(runnerConfig.executors ?? {})) {
+    if (entry?.kind === 'agent') served.add(deriveProviderFamily(entry));
+  }
+  const problems = [];
+  for (const [tier, families] of declared) {
+    for (const family of families) {
+      if (runnerConfig.modelPolicies?.[family]?.[tier] === undefined) problems.push(`${tier}: ${family} has no modelPolicies cell at ${tier}`);
+      else if (!served.has(family)) problems.push(`${tier}: no agent executor serves ${family}`);
+    }
+  }
+  if (problems.length > 0) return { passed: true, message: `warning: tier fallback entries the walk skips: ${problems.join('; ')}` };
+  return { passed: true, message: `runner.tierFallback declares the walk order of ${declared.length} tier(s): ${declared.map(([tier]) => tier).join(', ')}` };
+}
+
 /** A tier cell entry served by a pool runner.llmAccounts does not declare cannot run once pools route. */
 export function checkModelPolicyPools(cwd) {
   const { runnerConfig, skip } = loadOrExplain(cwd);
