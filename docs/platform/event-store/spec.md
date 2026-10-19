@@ -413,7 +413,9 @@ Refs in each clone:
 A default clone or fetch carries only `refs/heads/*`; its refspec is `+refs/heads/*:refs/remotes/origin/*`. In V-REF-01 a fresh clone had no `refs/fgos/*` (`rev-parse` exit 128) until an explicit refspec fetched it. Setup therefore installs two fetch refspecs on the remote named by `eventStore.remote` (default `origin`), in the repository-local git config:
 
 - `+refs/fgos/events/*:refs/fgos/remotes/<remote>/events/*`
-- `+refs/fgos/legacy:refs/fgos/remotes/<remote>/legacy`
+- `+refs/fgos/legacy*:refs/fgos/remotes/<remote>/legacy*`
+
+2026-10-19: Git RepositoryConfig owns these mappings; Event Store reads its policy rather than maintaining a copy. The legacy wildcard tolerates a remote with no legacy ref before cutover; its empty suffix preserves the exact destination `refs/fgos/remotes/<remote>/legacy`. Setup also replaces the old exact legacy line without changing user settings.
 
 Setup installs them before any reader expects mirrors. Until they exist, `status` and doctor report the refspec as missing (section 21), not as empty history. After that, every plain `git fetch` keeps the mirrors current. Setup never writes a push refspec, because a configured `remote.<name>.push` changes what a person's bare `git push` sends. Fetching into a mirror namespace means that a fetch can never overwrite the own ref; V-REF-01 confirmed that a fetch created no own ref.
 
@@ -448,6 +450,8 @@ Joining and leaving. A new machine needs no registration: setup mints its machin
 Garbage collection: V-REF-01 kept refs and objects that only `refs/fgos/*` reached through `git gc`, `git gc --prune=now`, `git repack -ad` and `git pack-refs --all`. `git worktree add`, `stash`, `clean -fdx` and `checkout` left those refs unchanged. Objects that no ref reaches, such as those of an interrupted seal, are ordinary garbage.
 
 A forge may hide custom refs in its UI; reading them goes through `fgos events export` or `git log -p <ref>`. V-REF-01 tested the behavior of `refs/fgos/*` under push, fetch, packed refs, gc and prune, fresh clones and divergence against a local bare repository used as the remote (section 23.1 item 2), which needed no external push and no owner authorization. Whether the owner's own forge accepts and serves `refs/fgos/*` stays an acceptance gate on the owner's real remote (section 23.2 item 5); a local bare repository cannot answer it.
+
+2026-10-19 landing review: Mirror readers remove exactly one `<remote>/` segment below `refs/fgos/remotes/` and accept only exact `legacy` or the `events/`, `branch-events/`, `local-events/` stream prefixes. A suffix such as `legacy/events/<machine>` is ignored, never reinterpreted as an event tip. All `refs/fgos/legacy?*` names (nonempty suffix after `legacy`) are reserved and must never be created: the optional-source Git wildcard necessarily fetches those names too. `git-publication-refspecs` reports their mirrors for manual inspection and source/mirror cleanup.
 
 ## 15. Views, cursors and verbs
 
@@ -579,6 +583,8 @@ Config defaults merged by `fgos setup` (added only when missing, global then pro
 | `eventStore.sync.intervalSec` | 300 (0 = explicit sync only) |
 | `eventStore.rebuild.maxAttempts` | 5 (rebuild-install attempts before `event-store-rebuild-busy`) |
 | `eventStore.remote` | `origin` |
+
+`eventStore.remote` has the setup config-merge registration `event-store`, defaulting to `origin`; explicit project/global selection keeps precedence. With another configured remote, doctor/setup also migrate any obsolete exact legacy mapping on `origin` through RepositoryConfig's existing journaled `ensure_fetch_mapping` door.
 
 Repository-local git config, never tracked: the fetch refspecs of section 14 (`+refs/fgos/events/*:refs/fgos/remotes/<remote>/events/*` and the legacy one), and the optional `fgos.machineId`.
 
@@ -818,3 +824,31 @@ Amended 2026-10-18 with the phase 05 sharing and sync review; no lock row, rank 
 
 1. **Section 14.** Authenticated reconciliation (exact prior and candidate authorized before the CAS), per-mirror verification (foreign failure is a typed warning, own-id failure refuses), certified sync positions, and the clone-wide tracked-fence authority resolved through the trusted main checkout.
 2. **Git.** The no-op fetch-mapping setup records the effect-free `configApproved` outcome (Git spec section 10 rule 4c).
+
+
+## Phase 06 facade review corrections (phase 07 handoff)
+
+Prepared stores are opened only from opaque `resolveEventStore` authority. Append
+uses the bound machine identity; no raw-directory constructor or caller machine
+parameter remains. `prepareStore(cwd, { trustedMain, stateRoot, loaderOptions })`
+requires an explicit trusted main checkout. Git resolution currently supports a
+linked worktree only with that trusted main path; arbitrary cwd discovery and
+separate-git-dir support remain Git work for the phase 07 handoff. Missing trust
+is `event-store-trusted-main-required`; Git operation failures retain their JSON
+`code` in the Node error. Error codes in ordinary native messages are recognized
+only at the start of `code: detail`.
+
+Preparation caches for the process lifetime by cwd, trusted main, state root and
+loader options. The loader validates the descriptor before cache reuse. Entries
+are not invalidated when a repository is removed; callers must end the process
+before replacing a repository at the same path. Consumer cache paths, contract
+paths and ids must each be unique.
+
+The shared exec guard and `hotLockDepth` now live in
+`src/holder-lock/hot-guard.mjs`; `src/state/hot-lock.mjs` re-exports the depth and
+error for existing consumers. Entering a hot section returns a one-shot release
+that cannot decrement the depth twice. Unpublished summary validates repository
+and layout before taking `event-seal`; this read-only operation waits behind an
+active seal or sync. The strace gate proof covers ordinary append/readInGate and recovery of a lost
+high-water mark plus a torn active tail. Holder reclaim additionally relies on
+the Rust structural no-port boundary and existing crate regression tests.

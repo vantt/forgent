@@ -1,5 +1,5 @@
 // Dormant facade. Never bypass the hot gate merely because Rust can spawn directly.
-import { hotLockDepth } from '../state/hot-lock.mjs';
+import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { loadNativeAddon } from './native.mjs';
 function outsideGate() {
   if (hotLockDepth() > 0) throw Object.assign(new Error('exec-under-hot-lock: Git publication'), { code: 'exec-under-hot-lock' });
@@ -13,8 +13,5 @@ export function createGitPublication(options, loaderOptions) {
     facade[method] = (args = {}) => { outsideGate(); return port.call(method, args); };
   }
   return Object.freeze(facade);
-}
-export function createEventStore(commonDir, contracts = [], loaderOptions) {
-  return new (loadNativeAddon(loaderOptions).EventStore)(commonDir, contracts);
 }
 export function versions(loaderOptions) { return loadNativeAddon(loaderOptions).versions(); }

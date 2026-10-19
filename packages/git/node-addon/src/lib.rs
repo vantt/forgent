@@ -1,7 +1,8 @@
 //! One Node-API load for both foundations. No protocol decisions live here.
 mod event_store;
+pub use event_store::{open_store, resolve_event_store};
 mod git;
-pub use git::{ensure_git_fetch_mapping, initialize_git_wal, inspect_git};
+pub use git::{ensure_git_fetch_mapping, git_fetch_mappings, initialize_git_wal, inspect_git, prepare_git_driver_directories};
 mod single_load;
 use napi::{Error, Result};
 use napi_derive::napi;

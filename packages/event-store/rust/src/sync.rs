@@ -534,3 +534,31 @@ pub fn unpublished_summary(
     }
     Ok(out)
 }
+
+/// Outside-gate facade entry. Publication authority stays inside the crate.
+pub fn guarded_unpublished_summary(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    req: SyncRequest<'_>,
+) -> Result<Vec<Unpublished>, Error> {
+    if repo.common_dir() != req.layout.common_dir {
+        return Err(invalid("repository/layout mismatch"));
+    }
+    let mut guard = acquire_seal(req.layout, req.held_ranks, req.hot_lock_depth, false)?
+        .ok_or_else(|| invalid("explicit seal acquisition returned busy"))?;
+    let reference = own_ref(req.machine, &StreamId::parse("project")?)?;
+    let identity = match fs::symlink_metadata(req.layout.store()) {
+        Ok(_) => Some(StoreIdentity::open(req.layout, req.machine)?),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
+        Err(error) => return Err(io(error)),
+    };
+    let writer = identity
+        .as_ref()
+        .map(|i| i.store_id.as_str())
+        .unwrap_or("unpublished-summary");
+    let path = req.layout.seal_lock();
+    let authority = HolderAuthority::new(repo, &mut guard.handle, &path, reference, writer)
+        .map_err(git_error)?;
+    let port = PublicationPort::new(driver, authority);
+    unpublished_summary(&port, repo, req.layout, req.machine, req.remote)
+}

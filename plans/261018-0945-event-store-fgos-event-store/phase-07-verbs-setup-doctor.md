@@ -7,6 +7,7 @@
 
 ## Context
 
+- Handoff from phase 06 (2026-10-19): `prepareStore(cwd, { trustedMain, stateRoot, loaderOptions })` requires an explicit trusted main checkout (`event-store-trusted-main-required`); Git's facade resolver handles a linked worktree only with that path. Git phase 02 adds linked-cwd discovery to `Inspect.resolveRepo` (separate-git-dir stays unsupported); when it is on main, the verbs may resolve the trusted main through it instead of requiring the caller to pass one. Event Store spec section "Phase 06 facade review corrections".
 - Spec §15 (verbs table, `fgos rebuild` stays the one door), §16 (doctor thresholds), §18 (export legacy-layout for rollback), §21 (four config keys, git config, three setup fixes, ten doctor checks, CHANGELOG), §22 (orphan branch streams).
 - Setup/doctor doors: `registerConfigDefault` (`src/setup/registrations.mjs:193`), `registerCheck` (`:172`), `registerFix`; Git's `git-component-compatible`, `git-publication-refspecs` and Git floor (Git D3, M5).
 - Verb plumbing: `src/cli/command-registry.mjs` (rebuild at `:1405`), `packages/host-runtime/contracts/command-routes.json` (`rebuild` at `:641`), `test/rust-host/vectors/envelope/version.json`.
