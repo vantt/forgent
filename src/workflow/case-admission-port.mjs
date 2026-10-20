@@ -17,7 +17,8 @@ import path from 'node:path';
 import { appendWorkflowEvent, projectWorkflowState, readWorkflowEvents } from './store.mjs';
 import { tryAcquireAdvanceLock } from './case-lock.mjs';
 import { applySettle, drainCaseInbox, writeReservationFile, writeSettlePending } from './case-runtime.mjs';
-import { projectCase, receiptsFromResults } from './case-projection.mjs';
+import { isDeliveryMilestone, projectCase, receiptsFromResults } from './case-projection.mjs';
+import { digestSubject, digestUnitRunReports } from './ref-digests.mjs';
 import { admitProposal, newReservationId, recheckReservation } from './case-admission.mjs';
 import { bindWorktree, ensureBindingsSentinel, readBinding } from './case-bindings.mjs';
 import { gitOut, playbookSubjectDigests } from './unit-handoff.mjs';
@@ -49,6 +50,45 @@ function readCase(mainRoot, caseId) {
   const state = projectWorkflowState(events);
   const currentDigests = base.kind === 'playbook' ? playbookSubjectDigests({ state, workflow: state.workflow, guide: base.guide, mainRoot }) : {};
   return { events, projection: projectCase(events, { currentDigests }) };
+}
+
+/**
+ * What a conductor case's settle proposes as achieved: each milestone the reservation's activity declares
+ * it produces, with the digest of its subject as it is now, and the receipts that back it. A delivery
+ * milestone's subject is the paths the Unit was allowed to write, read in its worktree, and each of its
+ * receipts names that milestone and digest; any other milestone's subject is the reports the Unit run left.
+ * Only a pass or a findings outcome proposes anything, and a digest that cannot be read proposes nothing,
+ * so that milestone stays unreached. Whether a proposal is accepted stays the projection's decision.
+ * A Playbook case achieves its milestones at step completion and proposes none here.
+ */
+function testedPathsDigest(reservation, mainRoot) {
+  // A write scope is a path or `<path>/**`; a pattern in the middle of a path names no single subject.
+  const paths = (reservation.writes ?? []).map((w) => w.replace(/\/\*\*?$/, ''));
+  if (paths.length === 0 || paths.some((w) => /[*?[\]{}]/.test(w))) return null;
+  return digestSubject({ tree: paths }, reservation.worktree ?? mainRoot);
+}
+
+function proposedAchievements({ mainRoot, projection, reservation, result }) {
+  const base = receiptsFromResults({ unitRunId: result.unitRunId ?? null, results: result.results ?? [] });
+  const produces = projection.kind === 'playbook' || !['pass', 'findings'].includes(result.outcome)
+    ? []
+    : (projection.guide?.activities.find((a) => a.id === reservation.activity)?.produces ?? []);
+  if (produces.length === 0) return { achieved: [], receipts: base };
+  const reports = () => {
+    const roles = [...new Set((result.results ?? []).filter((r) => r?.runResult).map((r) => r.role))];
+    return result.unitRunId && roles.length > 0 ? digestUnitRunReports([{ unitRunId: result.unitRunId, roles }], mainRoot) : null;
+  };
+  const achieved = [];
+  const receipts = [];
+  for (const milestone of produces) {
+    const delivery = isDeliveryMilestone(projection.guide, milestone);
+    const subjectDigest = delivery ? testedPathsDigest(reservation, mainRoot) : reports();
+    if (subjectDigest === null) continue;
+    achieved.push({ milestone, subjectDigest });
+    if (delivery) receipts.push(...receiptsFromResults({ unitRunId: result.unitRunId ?? null, results: result.results ?? [], milestone, subjectDigest }));
+  }
+  // A receipt that names its milestone replaces the unnamed one it was made from.
+  return { achieved, receipts: receipts.length > 0 ? receipts : base };
 }
 
 const refusal = (code, condition) => ({ refused: { code, condition } });
@@ -263,16 +303,18 @@ export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance =
 
     settle(reservationId, result) {
       const id = result.caseId;
-      const reservation = readEvents(mainRoot, id).find((e) => e.type === 'reservation' && e.payload?.reservationId === reservationId)?.payload;
+      const events = readEvents(mainRoot, id);
+      const reservation = events.find((e) => e.type === 'reservation' && e.payload?.reservationId === reservationId)?.payload;
       if (!reservation) return;
+      const { achieved, receipts } = proposedAchievements({ mainRoot, projection: projectCase(events), reservation, result });
       const payload = {
         reservationId,
         activity: reservation.activity,
         unitId: reservation.unitId,
         unitRunId: result.unitRunId ?? null,
         outcome: result.outcome,
-        receipts: receiptsFromResults({ unitRunId: result.unitRunId ?? null, results: result.results ?? [] }),
-        achieved: [],
+        receipts,
+        achieved,
         seatLaunchesUsed: result.seatLaunchesUsed ?? 0,
         ...(result.frameExhausted ? { frameExhausted: true } : {}),
         blind: reservation.blind === true,
