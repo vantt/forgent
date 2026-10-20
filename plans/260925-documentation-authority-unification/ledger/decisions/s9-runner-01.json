@@ -8404,7 +8404,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8428,7 +8428,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8452,7 +8452,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8476,7 +8476,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8500,7 +8500,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8524,7 +8524,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8548,7 +8548,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8572,7 +8572,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8598,7 +8598,8 @@
       },
       "reviewEntryId": "gap-claim_004b47fc284721eff96cfa890f85aac0",
       "evidenceDigest": "d732fc0bdf3782bcea8afb2265458765b9b5211d28d351731fe11f8f86912af2",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_f4058f068a378962aaf237ae038db5af",
@@ -8638,7 +8639,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8662,7 +8663,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8686,7 +8687,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8710,7 +8711,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8734,7 +8735,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8758,7 +8759,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8782,7 +8783,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8806,7 +8807,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8832,7 +8833,8 @@
       },
       "reviewEntryId": "gap-claim_69311391fbb9b1cf924197e6063e5cad",
       "evidenceDigest": "b2a41e953647900af3686ad2ada97007ed296e47b7d8c42858e29fb309d001c4",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
@@ -8851,7 +8853,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8875,7 +8877,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8899,7 +8901,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8923,7 +8925,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8947,7 +8949,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8971,7 +8973,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -8995,7 +8997,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9019,7 +9021,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9045,7 +9047,8 @@
       },
       "reviewEntryId": "gap-claim_c1d4ad0697013185af2572dd0a944024",
       "evidenceDigest": "aa72e6361c91bffa68d71c8e92cdf3b59ff922e3eff5e1369dcf645e6e182fab",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
@@ -9064,7 +9067,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9088,7 +9091,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9112,7 +9115,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9136,7 +9139,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9160,7 +9163,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9184,7 +9187,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9208,7 +9211,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9232,7 +9235,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9258,7 +9261,8 @@
       },
       "reviewEntryId": "gap-claim_79fd838ebf7eb7bbaa72efa619535671",
       "evidenceDigest": "39b7d5466dc8fb5a920b711632b9dc7381328a6308fb715874cd8366b1a809e2",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
@@ -9277,7 +9281,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9301,7 +9305,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9325,7 +9329,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9349,7 +9353,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9373,7 +9377,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9397,7 +9401,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9421,7 +9425,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9445,7 +9449,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9471,7 +9475,8 @@
       },
       "reviewEntryId": "gap-claim_99f595d515a3a60d4796192d78e67eae",
       "evidenceDigest": "616a221410f7feadbff95e34aef587bf8bfeaf6c90cffb9722e1a9b2ddf53eb9",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
@@ -9490,7 +9495,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9514,7 +9519,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9538,7 +9543,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9562,7 +9567,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9586,7 +9591,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9610,7 +9615,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9634,7 +9639,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9658,7 +9663,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9684,7 +9689,8 @@
       },
       "reviewEntryId": "gap-claim_0f9aa9f49945a45860e3e3c2d1e880bd",
       "evidenceDigest": "1f341a60bb791ff3efc30a25139dc91c92e9ac8f338bcb220a62e323ed63af5d",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
@@ -9703,7 +9709,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9727,7 +9733,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9751,7 +9757,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9775,7 +9781,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9799,7 +9805,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9823,7 +9829,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9847,7 +9853,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9871,7 +9877,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9897,7 +9903,8 @@
       },
       "reviewEntryId": "gap-claim_b3960a6316827da8f49bc10a9221b4c5",
       "evidenceDigest": "bb82b05f589a0831acca37455ab381885b3d686415f6c522ceb52109bc4c999c",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
@@ -9916,7 +9923,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9940,7 +9947,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9964,7 +9971,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -9988,7 +9995,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10012,7 +10019,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10036,7 +10043,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10060,7 +10067,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10084,7 +10091,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10110,7 +10117,8 @@
       },
       "reviewEntryId": "gap-claim_2afd573c3c2205adb49a698535fbf864",
       "evidenceDigest": "7f01641205834f09f4c44df4cf70d9a4d8057a28cdcd1a668e89def1a209d765",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
@@ -10129,7 +10137,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10153,7 +10161,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10177,7 +10185,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10201,7 +10209,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10225,7 +10233,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10249,7 +10257,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10273,7 +10281,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10297,7 +10305,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10323,7 +10331,8 @@
       },
       "reviewEntryId": "gap-claim_298fc2ef185e234bd4b65f047f70ecec",
       "evidenceDigest": "c0864f5f109e534ed4027ba07aeed5ac985824ab9141a4c89ecc0ea752d97489",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
@@ -10342,7 +10351,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10366,7 +10375,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10390,7 +10399,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10414,7 +10423,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10438,7 +10447,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10462,7 +10471,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10486,7 +10495,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10510,7 +10519,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10536,7 +10545,8 @@
       },
       "reviewEntryId": "gap-claim_09dd63bd1aaf9b4b6078de434144efb0",
       "evidenceDigest": "d8a914511225a33fa4b90d02727a90f4074d354d9fddf49c50abee7b1f2ab0e8",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
@@ -10555,7 +10565,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10579,7 +10589,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10603,7 +10613,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10627,7 +10637,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10651,7 +10661,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10675,7 +10685,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10699,7 +10709,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10723,7 +10733,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10749,7 +10759,8 @@
       },
       "reviewEntryId": "gap-claim_3c1dfb5d442b11bec14ecd32e309c1dd",
       "evidenceDigest": "4ebae848ad3d18e48cbd0c3dcb20fb3aa2df00062f064fbd4d2101f7700323d6",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_cad110bd532badff055f69c0a236644a",
@@ -10768,7 +10779,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10792,7 +10803,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10816,7 +10827,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10840,7 +10851,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10864,7 +10875,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10888,7 +10899,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10912,7 +10923,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10936,7 +10947,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -10962,7 +10973,8 @@
       },
       "reviewEntryId": "gap-claim_cad110bd532badff055f69c0a236644a",
       "evidenceDigest": "16205182945f7492df0d56c48506c4403d6a065bfe6c707c18981e0d626eb7ab",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
@@ -10981,7 +10993,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11005,7 +11017,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11029,7 +11041,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11053,7 +11065,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11077,7 +11089,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11101,7 +11113,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11125,7 +11137,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11149,7 +11161,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11175,7 +11187,8 @@
       },
       "reviewEntryId": "gap-claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
       "evidenceDigest": "fdfcd8b0b28014a97c27e2d0a411b14ac2bff5018b0f0aaeb861d0e3baaca9ec",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
@@ -11194,7 +11207,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11218,7 +11231,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11242,7 +11255,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11266,7 +11279,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11290,7 +11303,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11314,7 +11327,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11338,7 +11351,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11362,7 +11375,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11388,7 +11401,8 @@
       },
       "reviewEntryId": "gap-claim_b2afbadf035b6374ed73289b388f5d20",
       "evidenceDigest": "e6f202ac3cb128d98cddbaa681d55bde29edbd7ddc34b248bab6ee9e76924330",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_33c41de79cf4a52288035a9656c09735",
@@ -11407,7 +11421,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11431,7 +11445,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11455,7 +11469,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11479,7 +11493,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11503,7 +11517,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11527,7 +11541,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11551,7 +11565,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11575,7 +11589,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11601,7 +11615,8 @@
       },
       "reviewEntryId": "gap-claim_33c41de79cf4a52288035a9656c09735",
       "evidenceDigest": "ff4c882c8a98bf3d9548555c5255e218b9ae6c4b5f6d76f418f6e33e9b52fd8c",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
@@ -11620,7 +11635,7 @@
           {
             "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-150",
+            "anchor": "unheaded-block-153",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11644,7 +11659,7 @@
           {
             "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-155",
+            "anchor": "unheaded-block-158",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11668,7 +11683,7 @@
           {
             "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-167",
+            "anchor": "unheaded-block-170",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11692,7 +11707,7 @@
           {
             "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-176",
+            "anchor": "unheaded-block-179",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11716,7 +11731,7 @@
           {
             "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-241",
+            "anchor": "unheaded-block-244",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11740,7 +11755,7 @@
           {
             "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-250",
+            "anchor": "unheaded-block-253",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11764,7 +11779,7 @@
           {
             "claimId": "claim_825b8970950e755e43c8c1740612eac4",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-274",
+            "anchor": "unheaded-block-277",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11788,7 +11803,7 @@
           {
             "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
             "path": "docs/specs/runner.md",
-            "anchor": "unheaded-block-286",
+            "anchor": "unheaded-block-289",
             "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
             "ancestry": [
               "Spec: Runner (vòng tự hành)",
@@ -11814,7 +11829,8 @@
       },
       "reviewEntryId": "gap-claim_fa95d7f496a850ef197d25f18ad6f760",
       "evidenceDigest": "fe0b38b2b00d39e6899398962adef59084343f91e08ca051bf325834f8c6495a",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval.",
+      "reviewNote": "L12-57 proposed contextual group member correction; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
@@ -11958,36 +11974,36 @@
       "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
       "sourcePath": "docs/specs/runner.md",
       "sourceUnitDigest": "eb016bbb57ba643787f71c06f78838c1bf0bd938c028c8536acb66ee7c9a8d75",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-94",
-      "targetUnitDigest": "987a59231f6a2fe306e180b5659be4a7fa93dc6e2bf8baf57510053184b62647",
+      "targetUnitDigest": "421ac6dd9c1b24478b93861886f81f19f1dc3e451994aba85da7c9fb85b60107",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
       ],
-      "rationale": "A34 pending predecessor disposition: All 26 historical lines remain in order in RUL77 onward; later rule additions do not replace old text. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-94 -> unheaded-block-94. The Business Rules block still starts with RUL77 and includes RUL78..103; main revises RUL80 and appends RUL104/105 and supervisor/verify facts. Rule identities and unchanged surrounding entries identify the expanded block. Source identity unchanged; no native identity assignment or approval carry; independent review pending. L12-44 merge 6b3335711454f638780affa907353992dcde82ba: Same named ancestry and unique full passage opening; main patch changes within this passage. Exact before/after passage in step-00-l12-44-merge-rebindings.json; current target unheaded-block-94 SHA256 987a59231f6a2fe306e180b5659be4a7fa93dc6e2bf8baf57510053184b62647; source identity unchanged; no native identity assignment or approval carry.",
-      "reviewNote": "L12-44 imported binding repair; independent review pending; no approval carry."
+      "rationale": "A34 pending predecessor disposition: All 26 historical lines remain in order in RUL77 onward; later rule additions do not replace old text. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-94 -> unheaded-block-94. The Business Rules block still starts with RUL77 and includes RUL78..103; main revises RUL80 and appends RUL104/105 and supervisor/verify facts. Rule identities and unchanged surrounding entries identify the expanded block. Source identity unchanged; no native identity assignment or approval carry; independent review pending. L12-44 merge 6b3335711454f638780affa907353992dcde82ba: Same named ancestry and unique full passage opening; main patch changes within this passage. Exact before/after passage in step-00-l12-44-merge-rebindings.json; current target unheaded-block-94 SHA256 987a59231f6a2fe306e180b5659be4a7fa93dc6e2bf8baf57510053184b62647; source identity unchanged; no native identity assignment or approval carry. L12-57 merge 3732d245d75d7c40b7206ac53707821176c471ec: Unique complete passage opening under identical named ancestry; inspected main delta changes the bound unit. Full historical/current passage retained; no ordinal substitution. Current target unheaded-block-94 SHA256 421ac6dd9c1b24478b93861886f81f19f1dc3e451994aba85da7c9fb85b60107; source identity unchanged; no native identity assignment or approval carry.",
+      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
       "sourcePath": "docs/specs/runner.md",
       "sourceUnitDigest": "77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-94",
-      "targetUnitDigest": "987a59231f6a2fe306e180b5659be4a7fa93dc6e2bf8baf57510053184b62647",
+      "targetUnitDigest": "421ac6dd9c1b24478b93861886f81f19f1dc3e451994aba85da7c9fb85b60107",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
       ],
-      "rationale": "A34 pending predecessor disposition: RUL90 fan-out/caller closure wording changed as RUL95 landed; retain the original complete RUL90 line. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-94 -> unheaded-block-94. The Business Rules block still starts with RUL77 and includes RUL78..103; main revises RUL80 and appends RUL104/105 and supervisor/verify facts. Rule identities and unchanged surrounding entries identify the expanded block. Source identity unchanged; no native identity assignment or approval carry; independent review pending. L12-44 merge 6b3335711454f638780affa907353992dcde82ba: Same named ancestry and unique full passage opening; main patch changes within this passage. Exact before/after passage in step-00-l12-44-merge-rebindings.json; current target unheaded-block-94 SHA256 987a59231f6a2fe306e180b5659be4a7fa93dc6e2bf8baf57510053184b62647; source identity unchanged; no native identity assignment or approval carry.",
+      "rationale": "A34 pending predecessor disposition: RUL90 fan-out/caller closure wording changed as RUL95 landed; retain the original complete RUL90 line. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-94 -> unheaded-block-94. The Business Rules block still starts with RUL77 and includes RUL78..103; main revises RUL80 and appends RUL104/105 and supervisor/verify facts. Rule identities and unchanged surrounding entries identify the expanded block. Source identity unchanged; no native identity assignment or approval carry; independent review pending. L12-44 merge 6b3335711454f638780affa907353992dcde82ba: Same named ancestry and unique full passage opening; main patch changes within this passage. Exact before/after passage in step-00-l12-44-merge-rebindings.json; current target unheaded-block-94 SHA256 987a59231f6a2fe306e180b5659be4a7fa93dc6e2bf8baf57510053184b62647; source identity unchanged; no native identity assignment or approval carry. L12-57 merge 3732d245d75d7c40b7206ac53707821176c471ec: Unique complete passage opening under identical named ancestry; inspected main delta changes the bound unit. Full historical/current passage retained; no ordinal substitution. Current target unheaded-block-94 SHA256 421ac6dd9c1b24478b93861886f81f19f1dc3e451994aba85da7c9fb85b60107; source identity unchanged; no native identity assignment or approval carry.",
       "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 cecd70f251aacaf5bf34abe8b712e309493dbc9165e11c976f02af96118cce0a; source 77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f, primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Independent A34 acceptance pending; blocks cutover.",
-      "reviewNote": "L12-44 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_41571c8f42f542be1f44c9371fad823a",

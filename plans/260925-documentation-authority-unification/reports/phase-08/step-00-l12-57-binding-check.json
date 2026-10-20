@@ -1,0 +1,4639 @@
+{
+  "inputHEAD": "6b9095778e9fc41866215b5b4671b3b854b8faab",
+  "changedTargetFilesChecked": 26,
+  "targetBytesEqualHEAD": true,
+  "extractorsAgree": true,
+  "directBindingsChecked": 129,
+  "groupMembersChecked": 128,
+  "candidateSuccessorsChecked": 128,
+  "remainingDigestDrift": 0,
+  "parked": [],
+  "direct": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-02.json",
+      "keys": [
+        "claims",
+        "23"
+      ],
+      "claimId": "claim_1794a3b9ec470264eb9fdd9c4c3b1cf1",
+      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
+      "targetAnchor": "unheaded-block-9",
+      "expectedDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90",
+      "resolvedDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "58"
+      ],
+      "claimId": "claim_013ee9eb17feddcfd3f52b4ae6fa9cb4",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-3",
+      "expectedDigest": "34c671feb26adf27b415d09120d7aa84916773e8a599be7052a6980dcea71826",
+      "resolvedDigest": "34c671feb26adf27b415d09120d7aa84916773e8a599be7052a6980dcea71826",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "59"
+      ],
+      "claimId": "claim_6f84b826a3c5d2d9ffc498ace5506388",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-4",
+      "expectedDigest": "3b1a68a537f49ee127f03f7803b114ee156f809ba389939101a6d9f414b80076",
+      "resolvedDigest": "3b1a68a537f49ee127f03f7803b114ee156f809ba389939101a6d9f414b80076",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "60"
+      ],
+      "claimId": "claim_91f849b6185af7eea1e86f7b9cda75af",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-6",
+      "expectedDigest": "90beaf55f2254396873779da99c551539e46758d8e17f777a73055ddabf12be5",
+      "resolvedDigest": "90beaf55f2254396873779da99c551539e46758d8e17f777a73055ddabf12be5",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "61"
+      ],
+      "claimId": "claim_93fd0ae30280ecd5658e29b860490a57",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-7",
+      "expectedDigest": "20944c6b083a0ee03b5e320eccb0b51e8519d8df2c3feb3a9825144747b58916",
+      "resolvedDigest": "20944c6b083a0ee03b5e320eccb0b51e8519d8df2c3feb3a9825144747b58916",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "62"
+      ],
+      "claimId": "claim_130d1de8fb8a1c57785d1c58d474b5ab",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-8",
+      "expectedDigest": "f218624f7073efd6e1f79d8c3f0a9ad8f79e483538f5e32335321170ae58c3b4",
+      "resolvedDigest": "f218624f7073efd6e1f79d8c3f0a9ad8f79e483538f5e32335321170ae58c3b4",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "63"
+      ],
+      "claimId": "claim_1078827cfb2f2c94f8d32447ff313a7f",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-9",
+      "expectedDigest": "a0fbbe60d0c28d7b399aa8a80e5d14f35775894ae9f70d5fdcffc793ffbfb000",
+      "resolvedDigest": "a0fbbe60d0c28d7b399aa8a80e5d14f35775894ae9f70d5fdcffc793ffbfb000",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "64"
+      ],
+      "claimId": "claim_5ada0c5c0146c797c82cefffbaa8f64c",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-11",
+      "expectedDigest": "37aa99c57d5982471015e30e11654cc7e314f8f59d2fca5f666c1b8ca179acca",
+      "resolvedDigest": "37aa99c57d5982471015e30e11654cc7e314f8f59d2fca5f666c1b8ca179acca",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "65"
+      ],
+      "claimId": "claim_acb84e4ea31640c11b89efab4b8c10ad",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-12",
+      "expectedDigest": "8773135a7b80dc54e8a18c31733f1b8dcd2cdbbcbafda63430ef3f3d1bccc021",
+      "resolvedDigest": "8773135a7b80dc54e8a18c31733f1b8dcd2cdbbcbafda63430ef3f3d1bccc021",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "66"
+      ],
+      "claimId": "claim_68f6ceac4a26eb225d46225ad2eb8232",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "1-coordination-has-been-too-closely-identified-with-work",
+      "expectedDigest": "ff2913661838966eaf7af5e557ea7b692e772616c4d7dc1c7995ab830340036c",
+      "resolvedDigest": "ff2913661838966eaf7af5e557ea7b692e772616c4d7dc1c7995ab830340036c",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "67"
+      ],
+      "claimId": "claim_a52e34144e7e7a24de78aa9ad0935a06",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-14",
+      "expectedDigest": "8c8107a7de4f3ca25dc55b0e7bc7a07765c3a51094bb29dd44c1e8f40d42462d",
+      "resolvedDigest": "8c8107a7de4f3ca25dc55b0e7bc7a07765c3a51094bb29dd44c1e8f40d42462d",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "68"
+      ],
+      "claimId": "claim_37bc2c099223de0bdc9a6f10b7122ec3",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-15",
+      "expectedDigest": "6ad3d592d9662edb8931035ef7466cb73babf19248ab3a7e993bfe4eb79ce82e",
+      "resolvedDigest": "6ad3d592d9662edb8931035ef7466cb73babf19248ab3a7e993bfe4eb79ce82e",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "69"
+      ],
+      "claimId": "claim_a1f440b5cd3063cfb1dfe642f130a867",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "4-predeclared-structure-has-been-treated-as-universally-mandatory",
+      "expectedDigest": "e05602477e6cdef59df6391e17aa9bf2ea38cf527240134c10c9d1fad9f2526f",
+      "resolvedDigest": "e05602477e6cdef59df6391e17aa9bf2ea38cf527240134c10c9d1fad9f2526f",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "70"
+      ],
+      "claimId": "claim_50199fbba53c7b095aac9c5a5044a725",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-18",
+      "expectedDigest": "ef34a344283572b4708a79b1c54d26865be553046d2b4846c54a8dd4fb3c4012",
+      "resolvedDigest": "ef34a344283572b4708a79b1c54d26865be553046d2b4846c54a8dd4fb3c4012",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "71"
+      ],
+      "claimId": "claim_b0ba3b41ae0dd07934e68271f5600cc8",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-19",
+      "expectedDigest": "b3e36d0973ab994c18f9034202e4a9bc0f771629ffab6524efcbdce52686f9bb",
+      "resolvedDigest": "b3e36d0973ab994c18f9034202e4a9bc0f771629ffab6524efcbdce52686f9bb",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "72"
+      ],
+      "claimId": "claim_5a4d6d1690851cf76fac5e243b45073f",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "5-generic-and-domain-specific-planning-concerns-are-mixed",
+      "expectedDigest": "6eb761577911f6056c9f00c5ed887480f5c9e1dc5fa2e6a4a5427242036d0df5",
+      "resolvedDigest": "6eb761577911f6056c9f00c5ed887480f5c9e1dc5fa2e6a4a5427242036d0df5",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "73"
+      ],
+      "claimId": "claim_3a75670f5f502b715c7272ee293d7a6f",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-20",
+      "expectedDigest": "c21e6f7cc7c414eb23178e14cdb0b9d4808bab11301a03e792bf64afa1b60db8",
+      "resolvedDigest": "c21e6f7cc7c414eb23178e14cdb0b9d4808bab11301a03e792bf64afa1b60db8",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "74"
+      ],
+      "claimId": "claim_4e83750abf77998315deed0a55b0bb70",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-21",
+      "expectedDigest": "1d394e88c999dcf5af1f980cc200a18f2bcb224da0cf6d0f3803dc418be9168c",
+      "resolvedDigest": "1d394e88c999dcf5af1f980cc200a18f2bcb224da0cf6d0f3803dc418be9168c",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "75"
+      ],
+      "claimId": "claim_fd1d192b4c992dd43976f889fce7b853",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-23",
+      "expectedDigest": "e6bfa3210da4ad4e9e7741be2056ee7606f001a6c18aa170a7e451980fd4efa6",
+      "resolvedDigest": "e6bfa3210da4ad4e9e7741be2056ee7606f001a6c18aa170a7e451980fd4efa6",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "76"
+      ],
+      "claimId": "claim_536498983b33c9b20470bae82158b7e9",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "v-001-agent-coordination-is-a-foundation-layer",
+      "expectedDigest": "0e3e3261e9b814f9353c3765a9ccc998c0def733fab03b393a177e2c223d3761",
+      "resolvedDigest": "0e3e3261e9b814f9353c3765a9ccc998c0def733fab03b393a177e2c223d3761",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "77"
+      ],
+      "claimId": "claim_c83d7dcdcd5cff5827b4c55f3a399dec",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-24",
+      "expectedDigest": "84de2dc6e3c4745854fb374bce399c3efd68455d7768ef3aa360027cb8b720fe",
+      "resolvedDigest": "84de2dc6e3c4745854fb374bce399c3efd68455d7768ef3aa360027cb8b720fe",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "78"
+      ],
+      "claimId": "claim_d0ac6470bf510da9a3bb0c3b162d0127",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "v-002-work-is-optional-integration-not-system-identity",
+      "expectedDigest": "2374c1bad52fc16a8a68801a7f7384f5d80db9af9f847cc61201b9edacfccae8",
+      "resolvedDigest": "2374c1bad52fc16a8a68801a7f7384f5d80db9af9f847cc61201b9edacfccae8",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "79"
+      ],
+      "claimId": "claim_1cdd77a5d6581e70a9c4acc51ab13245",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-25",
+      "expectedDigest": "96151e79bc022c8a0ebec5b372543866492b7edb61ca20bd277895f187ae1f5b",
+      "resolvedDigest": "96151e79bc022c8a0ebec5b372543866492b7edb61ca20bd277895f187ae1f5b",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "84"
+      ],
+      "claimId": "claim_5342c8ef0f0b234c4b9a57a8aead329d",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-26",
+      "expectedDigest": "5bd7da0e7f550d61d22aedc4998b12dc9133a67db0771d936175f219cbe4d889",
+      "resolvedDigest": "5bd7da0e7f550d61d22aedc4998b12dc9133a67db0771d936175f219cbe4d889",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "85"
+      ],
+      "claimId": "claim_b6fcedfc2bf597e1d0b79e04eafc8ecb",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-27",
+      "expectedDigest": "d29e71aafef9dab1b66753428865107c2f18c47e73170fe8e5584d0aac210433",
+      "resolvedDigest": "d29e71aafef9dab1b66753428865107c2f18c47e73170fe8e5584d0aac210433",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "86"
+      ],
+      "claimId": "claim_21d0792cd728cd874b9aaad308fed0e3",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "v-005-agents-own-adaptive-reasoning-the-foundation-owns-authority",
+      "expectedDigest": "885a26c684899c2f74a812fb552656579db0474707b6d414e3b3f96ddbe5a3ec",
+      "resolvedDigest": "885a26c684899c2f74a812fb552656579db0474707b6d414e3b3f96ddbe5a3ec",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "87"
+      ],
+      "claimId": "claim_e14a865f7edd1a7e8c4ab707aea0c4c4",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-29",
+      "expectedDigest": "5ccb8eac01f0039e6d1a0eca7daaec05e45e2e1ecb0249b5fc651b9e382b4513",
+      "resolvedDigest": "5ccb8eac01f0039e6d1a0eca7daaec05e45e2e1ecb0249b5fc651b9e382b4513",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "88"
+      ],
+      "claimId": "claim_5e34af6c8d8c30a7f8fca418a021638f",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-30",
+      "expectedDigest": "956ad7b232951e9e55062a43fcb313bf181e91a7eeaaecab384510aaf8ef1058",
+      "resolvedDigest": "956ad7b232951e9e55062a43fcb313bf181e91a7eeaaecab384510aaf8ef1058",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "92"
+      ],
+      "claimId": "claim_05020154cd83da9598526a30ac5db55f",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "v-007-dispatch-is-a-primary-foundation-capability",
+      "expectedDigest": "a198520d19f7e0f902b10f6c1ccd32fbf1408bbe05ff7634cca4de9d1048447e",
+      "resolvedDigest": "a198520d19f7e0f902b10f6c1ccd32fbf1408bbe05ff7634cca4de9d1048447e",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "93"
+      ],
+      "claimId": "claim_e330c0cb89c45df58143417cda0b4ca4",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-32",
+      "expectedDigest": "651431594ca1ae7167c73fbce4739a78d5a019fb42238b862a0e6c130b6a866a",
+      "resolvedDigest": "651431594ca1ae7167c73fbce4739a78d5a019fb42238b862a0e6c130b6a866a",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "94"
+      ],
+      "claimId": "claim_ffe4af41e03f693efc410d211768419c",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-33",
+      "expectedDigest": "6e117fe9907937d07ab7c4ee2ddbc24ed13edea021b3c2794f3070190993ea8f",
+      "resolvedDigest": "6e117fe9907937d07ab7c4ee2ddbc24ed13edea021b3c2794f3070190993ea8f",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "95"
+      ],
+      "claimId": "claim_26710ef749f503ba538c9202bf7c25f4",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "v-008-domain-and-organization-augmentation-creates-differentiation",
+      "expectedDigest": "96a9b70fbe30d8cad5d3108560f2daeb17dc4fc66c1132dff97c5f488e478ca8",
+      "resolvedDigest": "96a9b70fbe30d8cad5d3108560f2daeb17dc4fc66c1132dff97c5f488e478ca8",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "96"
+      ],
+      "claimId": "claim_65055dfb819b31275834ec643b471c7a",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-34",
+      "expectedDigest": "122917f6368ba9f5ea691f9eb295d6b5386848f6b84d24dcf08c78a4a171eb69",
+      "resolvedDigest": "122917f6368ba9f5ea691f9eb295d6b5386848f6b84d24dcf08c78a4a171eb69",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "97"
+      ],
+      "claimId": "claim_6cae2b2ef41500ef17ff90ecbb845483",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-35",
+      "expectedDigest": "bc8df8a4b0827bf4fde20eb6703a4c7f2cf97d25abe9e8390e67ceeed6dca2ec",
+      "resolvedDigest": "bc8df8a4b0827bf4fde20eb6703a4c7f2cf97d25abe9e8390e67ceeed6dca2ec",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "98"
+      ],
+      "claimId": "claim_f350009afaa5af58496a10f4ad14be6f",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-36",
+      "expectedDigest": "146ba8bb06ccbbdef5e19540b1a44c8af7d2cd1a42937c4c561bc50fc12bfc71",
+      "resolvedDigest": "146ba8bb06ccbbdef5e19540b1a44c8af7d2cd1a42937c4c561bc50fc12bfc71",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "102"
+      ],
+      "claimId": "claim_2956fb9f215e0d0336571eef8fc0540e",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "v-010-evidence-and-provenance-survive-every-profile",
+      "expectedDigest": "efe350b50c3e0feffa6c5259b31c01cf766756ef6cb749ed8d706d9eed21e512",
+      "resolvedDigest": "efe350b50c3e0feffa6c5259b31c01cf766756ef6cb749ed8d706d9eed21e512",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "103"
+      ],
+      "claimId": "claim_fca80dcd75dc5a638f50e505e69db994",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-37",
+      "expectedDigest": "67514790e13c3193da5c2334df26defab2b815af709d2d319eccd63dfac9bb15",
+      "resolvedDigest": "67514790e13c3193da5c2334df26defab2b815af709d2d319eccd63dfac9bb15",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "104"
+      ],
+      "claimId": "claim_ff80e1c1295b1217af77deb9f9eefc65",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "v-011-the-foundation-core-stays-small",
+      "expectedDigest": "f81de0d4072cee26312ba37724f2154e96416c89eebd4fbb40e5145db0256d0a",
+      "resolvedDigest": "f81de0d4072cee26312ba37724f2154e96416c89eebd4fbb40e5145db0256d0a",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "105"
+      ],
+      "claimId": "claim_554d9d7713990e04649d04f529e2cacc",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-38",
+      "expectedDigest": "55e7bdd0fdb3a20569839e379fc05e8317871f41a29929cdc802bb1e8897000d",
+      "resolvedDigest": "55e7bdd0fdb3a20569839e379fc05e8317871f41a29929cdc802bb1e8897000d",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "106"
+      ],
+      "claimId": "claim_ca6424eafddd9617e206f7827cc1ce8a",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-39",
+      "expectedDigest": "09a8633496eeda7cc92520816e755e9eaf79291a5662fed17bdf5e44385b2d56",
+      "resolvedDigest": "09a8633496eeda7cc92520816e755e9eaf79291a5662fed17bdf5e44385b2d56",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "107"
+      ],
+      "claimId": "claim_ba408c3cc9004a27be1c9fecab09c9ab",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "v-012-generalization-requires-two-unlike-consumers",
+      "expectedDigest": "bbff98997536ff04894616b9bda560386e436ca47bcfaf2ca52a8694ec0fb67a",
+      "resolvedDigest": "bbff98997536ff04894616b9bda560386e436ca47bcfaf2ca52a8694ec0fb67a",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "108"
+      ],
+      "claimId": "claim_6f98fffcbe00439503f88286d4efb52b",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-40",
+      "expectedDigest": "fdc48ae4357045735bdcf617f8027b4ddacddb7aec04212ca24942cf74ab08d0",
+      "resolvedDigest": "fdc48ae4357045735bdcf617f8027b4ddacddb7aec04212ca24942cf74ab08d0",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "109"
+      ],
+      "claimId": "claim_c74f0b415d97ca8efdc169d47eba4131",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-41",
+      "expectedDigest": "1346b60f533cae2b0c95f7983e8599767c381c82acbbfe48e0e967dffe0180a5",
+      "resolvedDigest": "1346b60f533cae2b0c95f7983e8599767c381c82acbbfe48e0e967dffe0180a5",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "110"
+      ],
+      "claimId": "claim_19e924286b9815c6a688c86dfd43d5db",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-42",
+      "expectedDigest": "6d93f82a9bc83be198d232ca8efb4e03d1c0a231ada5033e0947ddd3ca5afaba",
+      "resolvedDigest": "6d93f82a9bc83be198d232ca8efb4e03d1c0a231ada5033e0947ddd3ca5afaba",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "111"
+      ],
+      "claimId": "claim_6d48b5e2bda8133502dbddf0a30bccfe",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-49",
+      "expectedDigest": "51ad15b70f434a1d71b1b9d16bacf1bf0ef93318c4e94393c060cb121d83b7fd",
+      "resolvedDigest": "51ad15b70f434a1d71b1b9d16bacf1bf0ef93318c4e94393c060cb121d83b7fd",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "112"
+      ],
+      "claimId": "claim_be6821741a7773e3e6c856dba6ea5efa",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "domain-and-integration-responsibilities",
+      "expectedDigest": "0e4002a9cce0c8d6b1d740bf07f7f2049c4c331dd50009cc24c5ad6d2d8fcef9",
+      "resolvedDigest": "0e4002a9cce0c8d6b1d740bf07f7f2049c4c331dd50009cc24c5ad6d2d8fcef9",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "113"
+      ],
+      "claimId": "claim_4296d0ed22dd9201b6018ac71f024915",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-50",
+      "expectedDigest": "bfbc77b7282bfde79c5fc43f670983c6805c56a121416964a1ce1c1d3ffe4ba1",
+      "resolvedDigest": "bfbc77b7282bfde79c5fc43f670983c6805c56a121416964a1ce1c1d3ffe4ba1",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "114"
+      ],
+      "claimId": "claim_899e837dd759dc01afff5c6dd8a322bd",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-51",
+      "expectedDigest": "c06dc574c821ebb3bfe616ab3f17430dce2c7703f7b2eb016789aa0e8c800340",
+      "resolvedDigest": "c06dc574c821ebb3bfe616ab3f17430dce2c7703f7b2eb016789aa0e8c800340",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "115"
+      ],
+      "claimId": "claim_b394376d1521888e01f83eb33d0d1a8d",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-52",
+      "expectedDigest": "b9f357eef27d1025c25bfbfd43429dbc2502bda02c81af240f7a8dc4e9d6af48",
+      "resolvedDigest": "b9f357eef27d1025c25bfbfd43429dbc2502bda02c81af240f7a8dc4e9d6af48",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "117"
+      ],
+      "claimId": "claim_07c68665d6b19d67c6b26491297ed6ba",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-55",
+      "expectedDigest": "a42735dca2f7773f8f270410c0469b666ddb7fe51e43c6a44ccb1287f8f9b80f",
+      "resolvedDigest": "a42735dca2f7773f8f270410c0469b666ddb7fe51e43c6a44ccb1287f8f9b80f",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "118"
+      ],
+      "claimId": "claim_8578eb3520660abdf596e07df634658f",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-56",
+      "expectedDigest": "b233727aa299288753f61a122ef87c06a19794119daacfe18f5184126aeb662f",
+      "resolvedDigest": "b233727aa299288753f61a122ef87c06a19794119daacfe18f5184126aeb662f",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "122"
+      ],
+      "claimId": "claim_39494662eed59b83a66e63b9a2163226",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-57",
+      "expectedDigest": "b3362130268b60c5f668a73d275d2c6918de7e57d81b77787387f55556c4d393",
+      "resolvedDigest": "b3362130268b60c5f668a73d275d2c6918de7e57d81b77787387f55556c4d393",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "123"
+      ],
+      "claimId": "claim_2dc0bc012109a1c2d1ea7d8659f957cf",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-58",
+      "expectedDigest": "97cc4e381c4d07d4aea2c6b7eac6786320e49ac237dee359bc42a2cf94dd0b64",
+      "resolvedDigest": "97cc4e381c4d07d4aea2c6b7eac6786320e49ac237dee359bc42a2cf94dd0b64",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "126"
+      ],
+      "claimId": "claim_233e60f81a8d1f6720b34de45ba20ebb",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-62",
+      "expectedDigest": "2037530f444b84893e4f4be7fd6c3a9a339a3e26aee0db7f05e6b8e4e5178bdb",
+      "resolvedDigest": "2037530f444b84893e4f4be7fd6c3a9a339a3e26aee0db7f05e6b8e4e5178bdb",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "keys": [
+        "claims",
+        "145"
+      ],
+      "claimId": "claim_bd8a05c3bda253eafa843ee48a78d1ff",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "problems-this-vision-resolves",
+      "expectedDigest": "e5267b72a0f29e9631b6e398d3451a5869f87e95793db6f79a40994002223523",
+      "resolvedDigest": "e5267b72a0f29e9631b6e398d3451a5869f87e95793db6f79a40994002223523",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "keys": [
+        "claims",
+        "146"
+      ],
+      "claimId": "claim_c21536dec23954ed3fc478f666ec43d5",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "6-the-two-unsafe-extremes",
+      "expectedDigest": "53554791b479c742ef58049beaa0cb898b2174dd6d73166e4a7beaf955bfd245",
+      "resolvedDigest": "53554791b479c742ef58049beaa0cb898b2174dd6d73166e4a7beaf955bfd245",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "keys": [
+        "claims",
+        "147"
+      ],
+      "claimId": "claim_832d730918fd7ec72730438c02b0a1ea",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "unheaded-block-22",
+      "expectedDigest": "2d843edd750aedd9ca4e611c8b72e48d2c4dc70c6350037fddd7c2f04f9255ae",
+      "resolvedDigest": "2d843edd750aedd9ca4e611c8b72e48d2c4dc70c6350037fddd7c2f04f9255ae",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "keys": [
+        "claims",
+        "148"
+      ],
+      "claimId": "claim_1e802ee97f49f39adf169e746fc90440",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "accepted-vision-decisions",
+      "expectedDigest": "24fa1aa6236fbd6f222fdffaf7643be06ccf4f518797cf52c291610c0494eff0",
+      "resolvedDigest": "24fa1aa6236fbd6f222fdffaf7643be06ccf4f518797cf52c291610c0494eff0",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "keys": [
+        "claims",
+        "150"
+      ],
+      "claimId": "claim_2c531f09f9410d21fc5d8767b601b9b0",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "foundation-responsibilities",
+      "expectedDigest": "8894387ad35fab05ad8d2f03cb0170f273820a3a5450321bc1ce81b451f3c609",
+      "resolvedDigest": "8894387ad35fab05ad8d2f03cb0170f273820a3a5450321bc1ce81b451f3c609",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "keys": [
+        "claims",
+        "152"
+      ],
+      "claimId": "claim_f4c5bd9dd0a8f97df4596c47519e4f9c",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "consequences-for-downstream-design",
+      "expectedDigest": "220050cf052d9ae3b76681f983db34f0bcc3cc802dca80b3d264d8f4b60df911",
+      "resolvedDigest": "220050cf052d9ae3b76681f983db34f0bcc3cc802dca80b3d264d8f4b60df911",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "keys": [
+        "claims",
+        "153"
+      ],
+      "claimId": "claim_88097d7b3426d6caf4b176315181f9bb",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "protocol-model",
+      "expectedDigest": "a9bed025ca2fa9c69f0ad5967631753b0ddad2807296d475285a54af5dcd5c8a",
+      "resolvedDigest": "a9bed025ca2fa9c69f0ad5967631753b0ddad2807296d475285a54af5dcd5c8a",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "keys": [
+        "claims",
+        "154"
+      ],
+      "claimId": "claim_0287aee81df05441ee9ee652579bb3cb",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "assignment",
+      "expectedDigest": "f936753f7c9ef017fdbfb100c8646229676b238232c3a4229ea47aec1942bdad",
+      "resolvedDigest": "f936753f7c9ef017fdbfb100c8646229676b238232c3a4229ea47aec1942bdad",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "keys": [
+        "claims",
+        "157"
+      ],
+      "claimId": "claim_816824c44b0382cf327e7f8c7052eb2e",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "planning-materialization",
+      "expectedDigest": "a10b03651c24fe6fb9849bc663245c36be6c84e3765ea77c484b7df300c75d73",
+      "resolvedDigest": "a10b03651c24fe6fb9849bc663245c36be6c84e3765ea77c484b7df300c75d73",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "keys": [
+        "claims",
+        "158"
+      ],
+      "claimId": "claim_2a35cd91ef4489b8cba34a05e2905cbf",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "extension-design",
+      "expectedDigest": "96bdd272db28763995fe852aae99517606d5f4daa00debffe3eb252bc7683b90",
+      "resolvedDigest": "96bdd272db28763995fe852aae99517606d5f4daa00debffe3eb252bc7683b90",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "29"
+      ],
+      "claimId": "claim_d35eecbfe4319ad1033c7a373bbc4adb",
+      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
+      "targetAnchor": "accepted-decisions",
+      "expectedDigest": "2747b59526d6d98b9baf4d83a704f0069ba97b4f0822aab57346fdcbccd09602",
+      "resolvedDigest": "2747b59526d6d98b9baf4d83a704f0069ba97b4f0822aab57346fdcbccd09602",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "261"
+      ],
+      "claimId": "claim_f7be1d8a794e7f9c867378b67fbc3158",
+      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
+      "targetAnchor": "accepted-decisions",
+      "expectedDigest": "2747b59526d6d98b9baf4d83a704f0069ba97b4f0822aab57346fdcbccd09602",
+      "resolvedDigest": "2747b59526d6d98b9baf4d83a704f0069ba97b4f0822aab57346fdcbccd09602",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "262"
+      ],
+      "claimId": "claim_128087ed2e98dd5ca8dfdf2adeed72fd",
+      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
+      "targetAnchor": "accepted-decisions",
+      "expectedDigest": "2747b59526d6d98b9baf4d83a704f0069ba97b4f0822aab57346fdcbccd09602",
+      "resolvedDigest": "2747b59526d6d98b9baf4d83a704f0069ba97b4f0822aab57346fdcbccd09602",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "263"
+      ],
+      "claimId": "claim_a8914714b51091a9f0a487f739172da2",
+      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
+      "targetAnchor": "accepted-decisions",
+      "expectedDigest": "2747b59526d6d98b9baf4d83a704f0069ba97b4f0822aab57346fdcbccd09602",
+      "resolvedDigest": "2747b59526d6d98b9baf4d83a704f0069ba97b4f0822aab57346fdcbccd09602",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "380"
+      ],
+      "claimId": "claim_04f1e3992587473eafb0bc73fa04117a",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "authority-and-reading-rule",
+      "expectedDigest": "13f05f8ca9ccdebdb5f866294bd0726070f7b1112c15c5bf72e8dd516ab2e0d3",
+      "resolvedDigest": "13f05f8ca9ccdebdb5f866294bd0726070f7b1112c15c5bf72e8dd516ab2e0d3",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "381"
+      ],
+      "claimId": "claim_52a9700c3921ea5126aa0ab1d6ca3e4b",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "vision",
+      "expectedDigest": "1457aa6090b3482d5cd2926e308587e595a56f761e1ec9bdece1a3d4f6b3b6f1",
+      "resolvedDigest": "1457aa6090b3482d5cd2926e308587e595a56f761e1ec9bdece1a3d4f6b3b6f1",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "382"
+      ],
+      "claimId": "claim_b15db24ee1738cb12ed454378aab1638",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "reading-down-from-the-vision",
+      "expectedDigest": "852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52",
+      "resolvedDigest": "852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "383"
+      ],
+      "claimId": "claim_60a5c12e7c7c78095b2c90db75324462",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "reading-down-from-the-vision",
+      "expectedDigest": "852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52",
+      "resolvedDigest": "852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "394"
+      ],
+      "claimId": "claim_b43407f65064c93d3f3b8cf51a658814",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "authority-and-reading-rule",
+      "expectedDigest": "13f05f8ca9ccdebdb5f866294bd0726070f7b1112c15c5bf72e8dd516ab2e0d3",
+      "resolvedDigest": "13f05f8ca9ccdebdb5f866294bd0726070f7b1112c15c5bf72e8dd516ab2e0d3",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "395"
+      ],
+      "claimId": "claim_2849a6d9d1bcb4814b5823076640d501",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "vision",
+      "expectedDigest": "1457aa6090b3482d5cd2926e308587e595a56f761e1ec9bdece1a3d4f6b3b6f1",
+      "resolvedDigest": "1457aa6090b3482d5cd2926e308587e595a56f761e1ec9bdece1a3d4f6b3b6f1",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "396"
+      ],
+      "claimId": "claim_326219701affbc3692d11c36a1f8b6b7",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "vision",
+      "expectedDigest": "1457aa6090b3482d5cd2926e308587e595a56f761e1ec9bdece1a3d4f6b3b6f1",
+      "resolvedDigest": "1457aa6090b3482d5cd2926e308587e595a56f761e1ec9bdece1a3d4f6b3b6f1",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "397"
+      ],
+      "claimId": "claim_a2274c1467c05ee211e46c6e98d409f2",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "2-planning-currently-over-materializes-work",
+      "expectedDigest": "83466698c93a1809b700add28568b950f5fd71a058b16370033b8cec8ea1cf10",
+      "resolvedDigest": "83466698c93a1809b700add28568b950f5fd71a058b16370033b8cec8ea1cf10",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "398"
+      ],
+      "claimId": "claim_7f7c89a049856d8f7258d20b540fc6d2",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "2-planning-currently-over-materializes-work",
+      "expectedDigest": "83466698c93a1809b700add28568b950f5fd71a058b16370033b8cec8ea1cf10",
+      "resolvedDigest": "83466698c93a1809b700add28568b950f5fd71a058b16370033b8cec8ea1cf10",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "399"
+      ],
+      "claimId": "claim_8e62a5bc9a8337f8a2fa275fc43e2a0f",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "2-planning-currently-over-materializes-work",
+      "expectedDigest": "83466698c93a1809b700add28568b950f5fd71a058b16370033b8cec8ea1cf10",
+      "resolvedDigest": "83466698c93a1809b700add28568b950f5fd71a058b16370033b8cec8ea1cf10",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "400"
+      ],
+      "claimId": "claim_069cc66cd7da80d6509a87322c8dd25a",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "3-standalone-coordination-borrows-coding-workflow-structure",
+      "expectedDigest": "349494baa6e44a48ea02ae4afc34b9ab1108acddd4fc15f2cf5875a9b194fa13",
+      "resolvedDigest": "349494baa6e44a48ea02ae4afc34b9ab1108acddd4fc15f2cf5875a9b194fa13",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "401"
+      ],
+      "claimId": "claim_0a39506143741e4d7246472eac3d9fe0",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "3-standalone-coordination-borrows-coding-workflow-structure",
+      "expectedDigest": "349494baa6e44a48ea02ae4afc34b9ab1108acddd4fc15f2cf5875a9b194fa13",
+      "resolvedDigest": "349494baa6e44a48ea02ae4afc34b9ab1108acddd4fc15f2cf5875a9b194fa13",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "402"
+      ],
+      "claimId": "claim_c932fbc11e8de796f03d74a25eef26c1",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "v-004-runtime-execution-contracts-are-mandatory",
+      "expectedDigest": "c6a0fbd8539ba449063c70fe0b60bfeb0128118151593d9b3c45e5f083f18cd0",
+      "resolvedDigest": "c6a0fbd8539ba449063c70fe0b60bfeb0128118151593d9b3c45e5f083f18cd0",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "403"
+      ],
+      "claimId": "claim_132190178ee9da393d626629b0394c7c",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "v-004-runtime-execution-contracts-are-mandatory",
+      "expectedDigest": "c6a0fbd8539ba449063c70fe0b60bfeb0128118151593d9b3c45e5f083f18cd0",
+      "resolvedDigest": "c6a0fbd8539ba449063c70fe0b60bfeb0128118151593d9b3c45e5f083f18cd0",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "404"
+      ],
+      "claimId": "claim_4ff3a12817bb891341b26283460beea0",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "open-design-questions-under-this-vision",
+      "expectedDigest": "b5288b6f94225cb832fcd635d42e51face82e815ebdbb0b6f196bc7d285a7b12",
+      "resolvedDigest": "b5288b6f94225cb832fcd635d42e51face82e815ebdbb0b6f196bc7d285a7b12",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "expectedDigest": "63f023133c0566012f2289959f9e15d7cf2867ad7b14beded8ff52d2846741e0",
+      "resolvedDigest": "63f023133c0566012f2289959f9e15d7cf2867ad7b14beded8ff52d2846741e0",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-14",
+      "expectedDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+      "resolvedDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-5",
+      "expectedDigest": "c4cc704b1d7dbdc9f2b474743111945f5943e33e73999e2bb90a300d083ae2b3",
+      "resolvedDigest": "c4cc704b1d7dbdc9f2b474743111945f5943e33e73999e2bb90a300d083ae2b3",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-153",
+      "expectedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "resolvedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-158",
+      "expectedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "resolvedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-170",
+      "expectedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "resolvedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-179",
+      "expectedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "resolvedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-244",
+      "expectedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "resolvedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-253",
+      "expectedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "resolvedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-277",
+      "expectedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "resolvedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-289",
+      "expectedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "resolvedDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "claimId": "claim_b91c86788522c3516bef2c7bab859093",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-81",
+      "expectedDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
+      "resolvedDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-9",
+      "expectedDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646",
+      "resolvedDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        "10"
+      ],
+      "claimId": "claim_ac8cc5d1152e7a057ffbef1e804079aa",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "contributor-hooks-setup",
+      "expectedDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+      "resolvedDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        "11"
+      ],
+      "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-27",
+      "expectedDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+      "resolvedDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        "12"
+      ],
+      "claimId": "claim_2cca265eea57df2daf94c3b3876393f3",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "setup",
+      "expectedDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+      "resolvedDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        "13"
+      ],
+      "claimId": "claim_40d8d8f06aaedbc16cdcc4f8603e6d09",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "doctor",
+      "expectedDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+      "resolvedDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        "14"
+      ],
+      "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-29",
+      "expectedDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+      "resolvedDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "claimId": "claim_891db485a75cdb558cf725c3315f3857",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-28",
+      "expectedDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+      "resolvedDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "claimId": "claim_acd9a23bb5fe3a5dda7169c04a12b409",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-1",
+      "expectedDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+      "resolvedDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-5",
+      "expectedDigest": "c4cc704b1d7dbdc9f2b474743111945f5943e33e73999e2bb90a300d083ae2b3",
+      "resolvedDigest": "c4cc704b1d7dbdc9f2b474743111945f5943e33e73999e2bb90a300d083ae2b3",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-5",
+      "expectedDigest": "c4cc704b1d7dbdc9f2b474743111945f5943e33e73999e2bb90a300d083ae2b3",
+      "resolvedDigest": "c4cc704b1d7dbdc9f2b474743111945f5943e33e73999e2bb90a300d083ae2b3",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "claimId": "claim_5ad7915f076019507cae1a93c14ad2d7",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "targetAnchor": "unheaded-block-27",
+      "expectedDigest": "e21779e108d69203bc26537f09f82d14f57f45bc2cf5232134320c9dfe08d105",
+      "resolvedDigest": "e21779e108d69203bc26537f09f82d14f57f45bc2cf5232134320c9dfe08d105",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "claimId": "claim_0b03338bd7576f97d0cd046630a49fee",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "targetAnchor": "unheaded-block-28",
+      "expectedDigest": "ab07915018064a880c69774d42994e1da515f12837c2276b64f98be6c00c9f88",
+      "resolvedDigest": "ab07915018064a880c69774d42994e1da515f12837c2276b64f98be6c00c9f88",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "claimId": "claim_d85a5331d5712b2f5c2ecd9cab60e487",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "targetAnchor": "unheaded-block-29",
+      "expectedDigest": "8b845575534e8e9dfe409dc59e73bb7168d3579f320d6b6cd34d709fda7cfdb5",
+      "resolvedDigest": "8b845575534e8e9dfe409dc59e73bb7168d3579f320d6b6cd34d709fda7cfdb5",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "targetAnchor": "unheaded-block-37",
+      "expectedDigest": "4a64d7a65abfee3bd0b3d3956c2a2d533c133fa0363f738fe2d0869ac01a84f0",
+      "resolvedDigest": "4a64d7a65abfee3bd0b3d3956c2a2d533c133fa0363f738fe2d0869ac01a84f0",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        "35"
+      ],
+      "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-102",
+      "expectedDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+      "resolvedDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        "36"
+      ],
+      "claimId": "claim_c2cb6de3e8b1288ed15fcd60f3154bbb",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-9",
+      "expectedDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646",
+      "resolvedDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "expectedDigest": "63f023133c0566012f2289959f9e15d7cf2867ad7b14beded8ff52d2846741e0",
+      "resolvedDigest": "63f023133c0566012f2289959f9e15d7cf2867ad7b14beded8ff52d2846741e0",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        "1"
+      ],
+      "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "expectedDigest": "63f023133c0566012f2289959f9e15d7cf2867ad7b14beded8ff52d2846741e0",
+      "resolvedDigest": "63f023133c0566012f2289959f9e15d7cf2867ad7b14beded8ff52d2846741e0",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-portal-classifications.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+      "targetOwner": "docs/platform/README.md",
+      "targetAnchor": "unheaded-block-7",
+      "expectedDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+      "resolvedDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "claimId": "claim_8f3435494fd3ab6edecb312621fd044d",
+      "targetOwner": "docs/platform/README.md",
+      "targetAnchor": "unheaded-block-4",
+      "expectedDigest": "9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24",
+      "resolvedDigest": "9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-102",
+      "expectedDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+      "resolvedDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "1"
+      ],
+      "claimId": "claim_f64fa4a36030f89feab71dc5943015c0",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-126",
+      "expectedDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+      "resolvedDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "3"
+      ],
+      "claimId": "claim_f4058f068a378962aaf237ae038db5af",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-135",
+      "expectedDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+      "resolvedDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "19"
+      ],
+      "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-318",
+      "expectedDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+      "resolvedDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "20"
+      ],
+      "claimId": "claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-320",
+      "expectedDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
+      "resolvedDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "21"
+      ],
+      "claimId": "claim_93d5f2d34cf452029462ea39674fd255",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-326",
+      "expectedDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
+      "resolvedDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "22"
+      ],
+      "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-323",
+      "expectedDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+      "resolvedDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "23"
+      ],
+      "claimId": "claim_74a47937380f03ed75fa755f0faccffb",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-71",
+      "expectedDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
+      "resolvedDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "24"
+      ],
+      "claimId": "claim_20a5804444535524364c0049e5bc87dd",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-9",
+      "expectedDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646",
+      "resolvedDigest": "ad50d1b4f22683791ffa9f8e122789a54e622c0cd5bc7c44c93f565f1fdaa646",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "25"
+      ],
+      "claimId": "claim_072766aafbaf01714df1aa65347a1d24",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-90",
+      "expectedDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+      "resolvedDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "26"
+      ],
+      "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-94",
+      "expectedDigest": "421ac6dd9c1b24478b93861886f81f19f1dc3e451994aba85da7c9fb85b60107",
+      "resolvedDigest": "421ac6dd9c1b24478b93861886f81f19f1dc3e451994aba85da7c9fb85b60107",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "27"
+      ],
+      "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-94",
+      "expectedDigest": "421ac6dd9c1b24478b93861886f81f19f1dc3e451994aba85da7c9fb85b60107",
+      "resolvedDigest": "421ac6dd9c1b24478b93861886f81f19f1dc3e451994aba85da7c9fb85b60107",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "28"
+      ],
+      "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-52",
+      "expectedDigest": "97ebe38b535ab15b5085bfe68ad09e70f2be7220f7858b3ff3c7217521cc2f52",
+      "resolvedDigest": "97ebe38b535ab15b5085bfe68ad09e70f2be7220f7858b3ff3c7217521cc2f52",
+      "drift": false,
+      "ancestryMatches": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "29"
+      ],
+      "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-102",
+      "expectedDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+      "resolvedDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+      "drift": false,
+      "ancestryMatches": true
+    }
+  ],
+  "groups": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 0,
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-153",
+      "resolvedAnchor": "unheaded-block-153",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 1,
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-158",
+      "resolvedAnchor": "unheaded-block-158",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 2,
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-170",
+      "resolvedAnchor": "unheaded-block-170",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 3,
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-179",
+      "resolvedAnchor": "unheaded-block-179",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 4,
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-244",
+      "resolvedAnchor": "unheaded-block-244",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 5,
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-253",
+      "resolvedAnchor": "unheaded-block-253",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 6,
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-277",
+      "resolvedAnchor": "unheaded-block-277",
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 7,
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "path": "docs/specs/runner.md",
+      "anchor": "unheaded-block-289",
+      "resolvedAnchor": "unheaded-block-289",
+      "drift": false
+    }
+  ],
+  "candidates": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 0,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 1,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 2,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 3,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 4,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 5,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 6,
+      "drift": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "memberIndex": 7,
+      "drift": false
+    }
+  ]
+}

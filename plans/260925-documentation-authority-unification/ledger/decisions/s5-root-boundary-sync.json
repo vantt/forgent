@@ -655,15 +655,15 @@
       "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
       "targetAnchor": "unheaded-block-37",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. L12-44 merge 6b3335711454f638780affa907353992dcde82ba: Same named ancestry and unique full passage opening; main patch changes within this passage. Exact before/after passage in step-00-l12-44-merge-rebindings.json; current target unheaded-block-37 SHA256 3ebadee6f9ae5d80b9106bea8e8df5c9b865d400157dd81428661ba7c68becc2; source identity unchanged; no native identity assignment or approval carry.",
-      "targetUnitDigest": "3ebadee6f9ae5d80b9106bea8e8df5c9b865d400157dd81428661ba7c68becc2",
+      "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. L12-44 merge 6b3335711454f638780affa907353992dcde82ba: Same named ancestry and unique full passage opening; main patch changes within this passage. Exact before/after passage in step-00-l12-44-merge-rebindings.json; current target unheaded-block-37 SHA256 3ebadee6f9ae5d80b9106bea8e8df5c9b865d400157dd81428661ba7c68becc2; source identity unchanged; no native identity assignment or approval carry. L12-57 merge 3732d245d75d7c40b7206ac53707821176c471ec: Unique complete passage opening under identical named ancestry; inspected main delta changes the bound unit. Full historical/current passage retained; no ordinal substitution. Current target unheaded-block-37 SHA256 4a64d7a65abfee3bd0b3d3956c2a2d533c133fa0363f738fe2d0869ac01a84f0; source identity unchanged; no native identity assignment or approval carry.",
+      "targetUnitDigest": "4a64d7a65abfee3bd0b3d3956c2a2d533c133fa0363f738fe2d0869ac01a84f0",
       "targetAncestry": [
         "How to install fgOS in a project and use fgos doctor",
         "4. Every doctor check",
         "4.2. Project config (written by setup or `--fix`)"
       ],
-      "reviewNote": "L12-44 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_4b0be5d6b3c4382616bd5748e7bd6c94",

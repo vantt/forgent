@@ -32,7 +32,7 @@
     "docs/specs/workflow.md",
     "plugins/fgOS/skills/_shared/ak-cook-worker-contract.md"
   ],
-  "procedure": "Both unchanged reproduction manifest unitsOf agree on old/current extraction. Resolve historical anchor AND full digest, then full passage and actual heading ancestry; inspect changed text with main patch. Preserve source identity; reset proposed review and remove approval fields. No ordinal rehash, native identity or approval carry. Ledger writes forbidden by effective scope, so all entries are proposed, never applied.",
+  "procedure": "Both unchanged reproduction manifest unitsOf agree on old/current extraction. Resolve historical anchor AND full digest, then full passage and actual heading ancestry; inspect changed text with main patch. Preserve source identity; reset proposed review and remove approval fields. No ordinal rehash, native identity or approval carry. Second turn: expanded write scope authorizes exactly these eight shards. All 19 direct and 16 group-record proposals applied after both protected manifest unitsOf validated complete historical/current text and actual ancestry; changed bindings remain pending independent review, with source identities unchanged and no approval carry.",
   "checkedBindings": [
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-02.json",
@@ -6828,8 +6828,8 @@
         "reviewMode": "ordinary",
         "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
       },
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
@@ -6923,8 +6923,8 @@
         "reviewMode": "ordinary",
         "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
       },
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
@@ -7018,8 +7018,8 @@
         "reviewMode": "ordinary",
         "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
       },
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
@@ -7113,8 +7113,8 @@
         "reviewMode": "ordinary",
         "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
       },
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
@@ -7212,8 +7212,8 @@
         "reviewMode": "ordinary",
         "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
       },
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
@@ -7311,8 +7311,8 @@
         "reviewMode": "ordinary",
         "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
       },
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
@@ -7410,8 +7410,8 @@
         "reviewMode": "ordinary",
         "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
       },
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
@@ -7509,8 +7509,8 @@
         "reviewMode": "ordinary",
         "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
       },
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
@@ -7604,8 +7604,8 @@
         "reviewMode": "ordinary",
         "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
       },
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
@@ -7703,8 +7703,8 @@
         "reviewMode": "ordinary",
         "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
       },
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
@@ -7765,8 +7765,8 @@
         "d7f9e8bb27fea2f36c43dabb8717a7a5c54ad61e chore(architecture): register the debate pattern in the manifest; add phase report"
       ],
       "removedApprovalFields": {},
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
@@ -7849,8 +7849,8 @@
         "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
       ],
       "removedApprovalFields": {},
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
@@ -7937,8 +7937,8 @@
         "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
       ],
       "removedApprovalFields": {},
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
@@ -8021,8 +8021,8 @@
         "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
       ],
       "removedApprovalFields": {},
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
@@ -8111,8 +8111,8 @@
         "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
       ],
       "removedApprovalFields": {},
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
@@ -8173,8 +8173,8 @@
         "d7f9e8bb27fea2f36c43dabb8717a7a5c54ad61e chore(architecture): register the debate pattern in the manifest; add phase report"
       ],
       "removedApprovalFields": {},
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
@@ -8237,8 +8237,8 @@
         "d7f9e8bb27fea2f36c43dabb8717a7a5c54ad61e chore(architecture): register the debate pattern in the manifest; add phase report"
       ],
       "removedApprovalFields": {},
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -8325,8 +8325,8 @@
         "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
       ],
       "removedApprovalFields": {},
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -8415,8 +8415,8 @@
         "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
       ],
       "removedApprovalFields": {},
-      "applied": false,
-      "blockedReason": "Decision shard is outside effective execution write scope; proposed patch only."
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     }
   ],
   "preexistingGroupRebindings": [
@@ -9392,7 +9392,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -10366,7 +10367,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -11340,7 +11342,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -12314,7 +12317,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -13288,7 +13292,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -14262,7 +14267,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -15236,7 +15242,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -16210,7 +16217,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -17184,7 +17192,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -18158,7 +18167,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -19132,7 +19142,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -20106,7 +20117,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -21080,7 +21092,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -22054,7 +22067,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -23028,7 +23042,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -24002,7 +24017,8 @@
         }
       ],
       "removedApprovalFields": {},
-      "applied": false
+      "applied": true,
+      "appliedBy": "codex-session:fgos-run_unit-run-17924958dcda5e@2026-10-20"
     }
   ],
   "parked": [],
@@ -24012,21 +24028,20 @@
     "contentChanged": 11,
     "positionalOnly": 8,
     "proposedRebindings": 19,
-    "appliedRebindings": 0,
+    "appliedRebindings": 19,
     "preexistingGroupRecordsNeedingCorrection": 16,
     "preexistingGroupMemberCorrections": 128,
-    "decisionShardsNeedingWrites": 8
+    "decisionShardsNeedingWrites": 0,
+    "appliedPreexistingGroupRecords": 16,
+    "appliedPreexistingGroupMemberCorrections": 128,
+    "parked": 0,
+    "remainingDigestDrift": 0,
+    "remainingGroupRecordsNeedingCorrection": 0,
+    "remainingGroupMemberCorrections": 0,
+    "changedDecisionShards": 8,
+    "pendingIndependentReviewRecords": 35
   },
-  "needsWrites": [
-    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json"
-  ],
+  "needsWrites": [],
   "mainPathCommits": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": [
       "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
@@ -24150,5 +24165,191 @@
     "docs/platform/secrets/spec.md",
     "docs/platform/terminal-control/spec.md"
   ],
-  "scopeLimit": "Decision binding acceptance remains blocked until an expanded-scope Unit applies and independently reviews the proposed entries. No reproduction acceptance claimed."
+  "scopeLimit": "Binding repairs applied in second turn; all 35 changed records (19 direct plus 16 contextual group records containing 128 member corrections) await independent review. No content approval or committed-byte reproduction acceptance claimed; Lead owns separate L12-11 accounting.",
+  "applicationHEAD": "6b9095778e9fc41866215b5b4671b3b854b8faab",
+  "appliedRebindings": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "111"
+      ],
+      "claimId": "claim_6d48b5e2bda8133502dbddf0a30bccfe",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "113"
+      ],
+      "claimId": "claim_4296d0ed22dd9201b6018ac71f024915",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "114"
+      ],
+      "claimId": "claim_899e837dd759dc01afff5c6dd8a322bd",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "115"
+      ],
+      "claimId": "claim_b394376d1521888e01f83eb33d0d1a8d",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "117"
+      ],
+      "claimId": "claim_07c68665d6b19d67c6b26491297ed6ba",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "118"
+      ],
+      "claimId": "claim_8578eb3520660abdf596e07df634658f",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "122"
+      ],
+      "claimId": "claim_39494662eed59b83a66e63b9a2163226",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "123"
+      ],
+      "claimId": "claim_2dc0bc012109a1c2d1ea7d8659f957cf",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "126"
+      ],
+      "claimId": "claim_233e60f81a8d1f6720b34de45ba20ebb",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "404"
+      ],
+      "claimId": "claim_4ff3a12817bb891341b26283460beea0",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        "1"
+      ],
+      "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "26"
+      ],
+      "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "27"
+      ],
+      "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+      "reviewStatus": "pending"
+    }
+  ],
+  "postApplicationBindingCheck": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-binding-check.json",
+    "inputHEAD": "6b9095778e9fc41866215b5b4671b3b854b8faab",
+    "changedTargetFilesChecked": 26,
+    "directBindingsChecked": 129,
+    "groupMembersChecked": 128,
+    "candidateSuccessorsChecked": 128,
+    "remainingDigestDrift": 0,
+    "parked": 0,
+    "extractorsAgree": true,
+    "targetBytesEqualHEAD": true
+  }
 }

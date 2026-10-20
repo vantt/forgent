@@ -8900,21 +8900,16 @@
       "sourceUnitDigest": "ee50db7e449d775e1f533342f869a9fd841abf5dcfbf0d9600c4e24f9588fbb7",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/vision.md:363-363#unheaded-block-62 (current lines); unit SHA256 ee50db7e449d775e1f533342f869a9fd841abf5dcfbf0d9600c4e24f9588fbb7.\nTarget: docs/platform/agent-coordination/vision.md:322-322#open-design-questions-under-this-vision (current lines); unit SHA256 4c62eb4370fcbd171a4a904fd0762e9a61c89ec028f52073477b4c66cabff717.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 4c62eb4370fcbd171a4a904fd0762e9a61c89ec028f52073477b4c66cabff717 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 62\" → \"Open Design Questions Under This Vision\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 1 removed and 16 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vision.md#unheaded-block-62 under docs/platform/agent-coordination/vision.md#open-design-questions-under-this-vision; source context \"Agent Coordination Foundation Vision / Open Design Questions Under This Vision\", target context \"Agent Coordination Foundation Vision\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/vision.md:363-363#unheaded-block-62 (current lines); unit SHA256 ee50db7e449d775e1f533342f869a9fd841abf5dcfbf0d9600c4e24f9588fbb7.\nTarget: docs/platform/agent-coordination/vision.md:322-322#open-design-questions-under-this-vision (current lines); unit SHA256 4c62eb4370fcbd171a4a904fd0762e9a61c89ec028f52073477b4c66cabff717.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 4c62eb4370fcbd171a4a904fd0762e9a61c89ec028f52073477b4c66cabff717 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 62\" → \"Open Design Questions Under This Vision\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 1 removed and 16 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vision.md#unheaded-block-62 under docs/platform/agent-coordination/vision.md#open-design-questions-under-this-vision; source context \"Agent Coordination Foundation Vision / Open Design Questions Under This Vision\", target context \"Agent Coordination Foundation Vision\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. L12-57 merge 3732d245d75d7c40b7206ac53707821176c471ec: Unique complete passage opening under identical named ancestry; inspected main delta changes the bound unit. Full historical/current passage retained; no ordinal substitution. Current target open-design-questions-under-this-vision SHA256 b5288b6f94225cb832fcd635d42e51face82e815ebdbb0b6f196bc7d285a7b12; source identity unchanged; no native identity assignment or approval carry.",
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "open-design-questions-under-this-vision",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: supersede vision.md#unheaded-block-62 (unheaded-block, lines 363-363) to agent-coordination/vision.md#open-design-questions-under-this-vision (heading, line 322); full digests, line spans, titles, depths and ancestry recomputed from the unit extractor and equal to the rationale; anchors ok; source block has 1 lines not verbatim in the successor section (first The Vision fixes direction but intentionally doe), so a rewrite under supersede with the count in the rationale matching a plain line diff plus the target heading line; links 0/0 equal",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-07-62751458b.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "4c62eb4370fcbd171a4a904fd0762e9a61c89ec028f52073477b4c66cabff717",
+      "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
+      "reviewStatus": "pending",
+      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry.",
+      "targetUnitDigest": "b5288b6f94225cb832fcd635d42e51face82e815ebdbb0b6f196bc7d285a7b12",
       "targetAncestry": [
         "Agent Coordination Foundation Vision"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_ee6b9f0f588bbebae2e0b21f860de343",

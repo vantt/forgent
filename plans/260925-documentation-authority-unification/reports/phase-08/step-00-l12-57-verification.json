@@ -1,110 +1,555 @@
 {
-  "inputHEAD": "3732d245d75d7c40b7206ac53707821176c471ec",
-  "status": "blocked-binding-application-outside-write-scope",
+  "inputHEAD": "6b9095778e9fc41866215b5b4671b3b854b8faab",
+  "mergeInputHEAD": "3732d245d75d7c40b7206ac53707821176c471ec",
+  "status": "applied-pending-independent-review",
+  "firstTurnVerification": {
+    "inputHEAD": "3732d245d75d7c40b7206ac53707821176c471ec",
+    "status": "blocked-binding-application-outside-write-scope",
+    "commands": [
+      {
+        "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs",
+        "exit": 0,
+        "result": "996 files / 28 accounted edits / two accounted new / zero violations",
+        "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet.log"
+      },
+      {
+        "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/check-legacy-docs-ratchet.test.mjs",
+        "exit": 0,
+        "tests": 28,
+        "pass": 28,
+        "fail": 0,
+        "skip": 0,
+        "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet-tests.log"
+      },
+      {
+        "command": "git diff --check",
+        "exit": 0
+      }
+    ],
+    "structuralProof": {
+      "exceptionChanges": [
+        "docs/specs/distribution.md",
+        "docs/specs/runner.md",
+        "docs/specs/workflow.md",
+        "docs/architect/agent-coordination/decisions/README.md",
+        "docs/architect/agent-coordination/vision.md"
+      ],
+      "previousAccountingRetainedExactly": true,
+      "changedAndNewPopulationSpansAndHashesVerified": true,
+      "changedExistingFiles": 11,
+      "changedExistingSlots": 141,
+      "newStep4Files": 8,
+      "newStep4Slots": 10,
+      "newClass3Files": 2,
+      "newClass3Slots": 8,
+      "step4": {
+        "files": 309,
+        "edges": 833,
+        "sourceOwners": 268,
+        "classes": {
+          "phase9": 105,
+          "preserve": 724,
+          "park": 4
+        }
+      },
+      "step0": {
+        "directBindingsChecked": 129,
+        "groupMembersChecked": 128,
+        "contentChanged": 11,
+        "positionalOnly": 8,
+        "proposedRebindings": 19,
+        "appliedRebindings": 0,
+        "preexistingGroupRecordsNeedingCorrection": 16,
+        "preexistingGroupMemberCorrections": 128,
+        "decisionShardsNeedingWrites": 8
+      },
+      "step3RecordsUnchanged": 17,
+      "step3SourceDigestDrifts": 16,
+      "allDecisionShardsUnchanged": true,
+      "allProposedCorrectionsPendingNoApprovalCarry": true,
+      "sourceIdentitiesPreserved": true,
+      "consumerDiffEmpty": true,
+      "writeScopeVerified": true
+    },
+    "protectedReproductionManifests": [
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "sha256": "728ab223d6df40ab05473c62fd29609a510708523a27858025398bfcff3568fa"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "sha256": "2087ca9dafb4422ae2d0505d4927b163d0ab8d5a91f037d653dd6c1528ace45a"
+      }
+    ],
+    "needsWrites": [
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json"
+    ],
+    "trackedAndNewWritesBeforeThisReceipt": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-merge-rebindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-step3-deferred-rebinds.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-tier2-population-drift.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-verification.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-authoring-request.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-batches.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-population.json",
+      "scripts/check-legacy-docs-ratchet.exceptions.json"
+    ],
+    "limits": [
+      "No decision correction applied: eight shards outside effective scope; proposed rows/journal ready for separately scoped Unit.",
+      "Independent review not launched or accepted; new census slots not accepted by author.",
+      "No full suite or reproduction scripts run; committed-byte acceptance remains separate after actual runner commit and L12-11 accounting.",
+      "No git write, fgOS CLI, consumer/Step3 record edit, .fgos/config/secrets read or write (mandatory external outbox is the brief exception), preview or service startup."
+    ]
+  },
   "commands": [
     {
-      "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs",
+      "label": "round5-ownership.mjs",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work NODE_OPTIONS=--max-old-space-size=3072 node /tmp/fgos-work/l12-57-second/round5/ownership.mjs --output-dir /tmp/fgos-work/l12-57-second/round5",
       "exit": 0,
-      "result": "996 files / 28 accounted edits / two accounted new / zero violations",
-      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet.log"
+      "stdout": "{ all: 269, active: 207, sameSource: 205, drift: 0 }\n",
+      "stderr": ""
     },
     {
-      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "label": "round5-audit-ownership.mjs",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work NODE_OPTIONS=--max-old-space-size=3072 node /tmp/fgos-work/l12-57-second/round5/audit-ownership.mjs --output-dir /tmp/fgos-work/l12-57-second/round5",
       "exit": 0,
-      "tests": 28,
-      "pass": 28,
-      "fail": 0,
-      "skip": 0,
-      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet-tests.log"
+      "stdout": "{\n  collisions: 269,\n  newGapGroups: 24,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+      "stderr": ""
+    },
+    {
+      "label": "sync4d-ownership.mjs",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work NODE_OPTIONS=--max-old-space-size=3072 node /tmp/fgos-work/l12-57-second/sync4d/ownership.mjs --output-dir /tmp/fgos-work/l12-57-second/sync4d",
+      "exit": 0,
+      "stdout": "{ all: 269, active: 207, sameSource: 205, drift: 0 }\n",
+      "stderr": ""
+    },
+    {
+      "label": "sync4d-audit-ownership.mjs",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work NODE_OPTIONS=--max-old-space-size=3072 node /tmp/fgos-work/l12-57-second/sync4d/audit-ownership.mjs --output-dir /tmp/fgos-work/l12-57-second/sync4d",
+      "exit": 0,
+      "stdout": "{\n  collisions: 269,\n  newGapGroups: 24,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+      "stderr": ""
+    },
+    {
+      "label": "tests",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work NODE_OPTIONS=--max-old-space-size=3072 node --test test/scripts/check-legacy-docs-ratchet.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/doc-binding-repair.test.mjs test/scripts/doc-corpus-decisions.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-decision-exact.test.mjs test/scripts/doc-decision-conservation.test.mjs test/scripts/doc-decision-mirrors.test.mjs",
+      "exit": 0,
+      "stdout": "✔ deterministic generation: generating baseline twice yields byte-for-byte identical content (2.959246ms)\n✔ class/scope: properly classifies markdown authority, retained sources, and non-markdown evidence (0.206709ms)\n✔ new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file (1.674524ms)\n✔ accounted edit: file modified with valid reviewed exception passes (0.938234ms)\n✔ unaccounted edit: file modified without exception or with digest mismatch is refused (0.676383ms)\n✔ unexpected deletion: baselined file missing without exception is refused (0.609272ms)\n✔ malformed baseline: schema validator rejects invalid baseline structures (0.598114ms)\n✔ malformed exception: schema validator rejects invalid exception objects (1.069469ms)\n✔ canonicalizeExceptionPath: canonicalizes posix relative paths and rejects absolute/traversal paths (R2) (0.362178ms)\n✔ dotfiles: unreviewed dotfile under legacy root is detected and refused (0.834743ms)\n✔ non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry (R4) (4.99776ms)\n✔ symlink identity: replacing a symlink with regular file of identical bytes is refused (0.734111ms)\n✔ symlink target: retargeting a symlink to another file of equal bytes is refused (0.724986ms)\n✔ tree escape: symlink pointing outside repository root or directory symlink is refused (0.599021ms)\n✔ classification: includes curated generated projections alongside maintained authority (0.118054ms)\n✔ CLI: exits 0 on clean tree and exits 1 on finding (124.681997ms)\n✔ live self-check: repository baseline and ratchet verify cleanly (81.248738ms)\n✔ policy-aware: permits edited and new generated projections without exception (0.974348ms)\n✔ policy-aware: permits new and edited history-evidence payloads without exception (0.752582ms)\n✔ maintained controls: blocks unreviewed new maintained-authority and retained-source files (0.548111ms)\n✔ maintained controls: blocks unaccounted edits to maintained-authority and retained-source (0.552076ms)\n✔ safety: detects and refuses class spoofing attempts in baseline (0.437864ms)\n✔ messages: ensure messages do not call non-authority payloads maintained authority (0.380937ms)\n✔ expired exceptions: exceptions past expiry date are flagged with expired-exception (0.418829ms)\n✔ unused exceptions: exceptions with no matching on-disk edit or new file are flagged with unused-exception (0.399947ms)\n✔ root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypassing ratchet (F1) (0.37838ms)\n✔ exact generated projection matching: docs/specs/platform-foundations.MD and PLATFORM-FOUNDATIONS.md classify as maintained-authority and are refused as unreviewed new files (F1 residual) (0.402101ms)\n✔ expiry boundary: explicitly tests active vs expired on expiry date (F4) (0.476604ms)\n✔ inserted paragraphs move anchors without substituting neighbouring text (0.819644ms)\n✔ identical footers keep their occurrence within the prior content sequence (0.846262ms)\n✔ ambiguous or absent content fails closed instead of retaining old anchor (0.402403ms)\n✔ unchanged bindings never overwrite truthful rationale (0.233071ms)\n✔ ownership check reports two distinct claims at one target (0.224035ms)\n✔ position-exact link replay rejects swapped table cells despite string presence (1.111925ms)\n✔ stale prior anchor uses reviewed ancestry to distinguish repeated footer text (0.167206ms)\n✔ expanding digest prefixes or shifting an unchanged content anchor preserves rationale (0.126369ms)\n✔ repeated content with a stale anchor and no ancestry is rejected rather than taking occurrence one (0.201593ms)\n✔ independently committed corpus rules classify every selected row and file without reviewing legacy authority (34.122207ms)\n✔ a corpus classification drift is rejected rather than silently giving authority rows a rule approval (28.183166ms)\n✔ unsupported corpora and dispositions cannot earn rule review (20.76053ms)\n✔ uncommitted, mismatched and self-session corpus review cannot approve rows (33.287532ms)\n✔ corpus-generated rows cannot be decided again in the same shard (20.136418ms)\n✔ loader rejects a malformed corpus-rule collection (18.897445ms)\n✔ pending corpus policy keeps rows blocking until its independent review is committed (17.208964ms)\n✔ corpus approval preserves generated projections while reviewing every generated claim (19.562036ms)\n✔ coverage honors explicit source paths and prefix maps but not target mentions or neighboring prefixes (3.057434ms)\n✔ rebind preserves review only for one digest match and otherwise returns rows to pending (0.736139ms)\n✔ snapshot uses merged decisions in the ledger schema shape and verifies both content and digest (4.496348ms)\n✔ identical text moved under another heading loses review while same-context anchor shifts retain it (0.363896ms)\n✔ coverage excludes canonical and non-authority items and a heading range covers only its rows (1.090083ms)\n✔ exact proposals carry only unique long units with equal ancestors and a sufficient document share (2.388061ms)\n✔ repeated digests, changed ancestors and low exact share cannot become script-reviewed (0.417091ms)\n✔ the gate re-proves exact entries and binds current anchors by digest rather than position (1.937372ms)\n✔ committed unit lookup retains full text and the ancestor chain for exact proof (30.785702ms)\n✔ summary lists multi-legacy duplicate groups and required reconciliation sources (1.352187ms)\n✔ exact proof cannot script-review canonical self-carries or non-legacy sources (1.062253ms)\n✔ two identical source occurrences cannot both be exact against one target occurrence (0.820158ms)\n✔ a byte-identical evidence mirror carries all source units to the verified copy and decides its file (3.170024ms)\n✔ mirror proof rejects changed blobs, unpinned blobs, non-evidence sources and missing targets (0.769142ms)\n✔ mirror and manual decisions cannot decide the same claim or file twice (0.689459ms)\n✔ mixed-file target anchors and digests are proven from the committed bytes, not the working tree (28.623024ms)\n✔ a canonical duplicate group with two source copies and two platform copies has one owner (4.994968ms)\n✔ review pack contains full source and target units and reverse unmatched candidate blocks (3.931059ms)\n✔ seeded review uses six real text mutations and scores missed defects and false flags (14.778252ms)\n✔ review application binds current digest and keeps rework and hold pending without inventing approval (5.941096ms)\n✔ valid source digest prefixes survive pack and review application with full seen-text bindings (2.792262ms)\n✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (0.869437ms)\n✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (2.730313ms)\n✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (1.302856ms)\n✔ the same reviewer session on another date is still the author session (0.300093ms)\n✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (1.632475ms)\n✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (3.4682ms)\n✔ review application requires a passing sensitivity result for the exact shown pack (3.516719ms)\n✔ approval cannot attach to target text or heading ancestry changed after the pack (3.96208ms)\n✔ approved rows retain the seen unit binding and their own report across review rounds (3.012213ms)\n✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (2.203041ms)\n✔ buildSwitchboardIndex + lookupSwitchboard: exact root document wins (2.501724ms)\n✔ lookupSwitchboard: exact area route (non-glob) matches precisely (0.272352ms)\n✔ lookupSwitchboard: glob route (/**) matches every file under the prefix (0.236693ms)\n✔ lookupSwitchboard: unmatched path returns null (0.235263ms)\n✔ deriveFileClassFromAuthority: role text mentioning generated/projection wins regardless of status (0.193504ms)\n✔ deriveFileClassFromAuthority: non-authority defaults to maintained-authority, not generated (0.101973ms)\n✔ deriveFileClassFromAuthority: historical/vision role text yields retained-source (0.115829ms)\n✔ classifyDocPath: AGENTS.md and CLAUDE.md are always-loaded instruction layer (0.237997ms)\n✔ classifyDocPath: promoted docs/platform/** file classifies as platform-authority, maintained-authority (0.26138ms)\n✔ classifyDocPath: docs/knowledge/** is switchboard-known but corpus is user-knowledge, not platform-authority (0.257052ms)\n✔ classifyDocPath: unmatched docs/architect path falls to the legacy directory heuristic as an explicit gap (0.289588ms)\n✔ classifyDocPath: completely unmapped path (outside docs/architect and docs/specs) is an explicit unclassified gap (0.159472ms)\n✔ classifyByDirectoryHeuristic: distillery is a consumer-project corpus, not platform authority (0.090947ms)\n✔ slugifyHeading: lowercases, strips punctuation, collapses whitespace to GitHub-compatible hyphens (0.707539ms)\n✔ normalizeDocTarget + extractLinks: resolves Markdown relative links against the source path (1.580007ms)\n✔ extractRefs: preserves full tsk ids, avoids ADR inside D-ADR duplicates, and ignores pure date-like hex (0.592593ms)\n✔ extractHeadings: ignores headings inside fenced code blocks and dedupes repeated anchors (2.19369ms)\n✔ extractMarkdownConservationUnits: only closes fences with matching marker and sufficient length (0.248229ms)\n✔ extractHeadings: strips a trailing ATX closing sequence (0.180789ms)\n✔ extractDocumentType: reads the conventional leading ```txt frontmatter block (0.302403ms)\n✔ extractDocumentType: returns null when no frontmatter block is present (0.206767ms)\n✔ deriveClaimKind: maps known document types, falls back to unclassified (0.115208ms)\n✔ proposeDisposition: gap always wins as unknown-blocking regardless of other fields (0.096128ms)\n✔ proposeDisposition: user-knowledge and consumer-project corpora reclassify out of platform scope (0.075292ms)\n✔ proposeDisposition: history-evidence retains as evidence; generated regenerates from source (0.052779ms)\n✔ proposeDisposition: already-promoted docs/platform/** canonical route proposes promote; legacy maintained files merge (0.073301ms)\n✔ proposeRationale: every disposition that requires one gets a non-empty string; others get null (0.095006ms)\n✔ buildInventoryRow: end-to-end row for a promoted portal file requires a target owner and needs no rationale (2.138075ms)\n✔ buildInventoryRow: end-to-end row for an unmapped gap requires a rationale and no target owner (1.156099ms)\n✔ buildInventoryRow: claim ledger rows carry every plan §6.2 field and enum status (0.631722ms)\n✔ buildInventoryRow: source and claim ids come from path-scoped registry entries, not content fallback (1.040093ms)\n✔ generateInventory: exact duplicate files share semantic claim ids with explicit occurrence coverage (72.484265ms)\n✔ buildInventoryRow: identical claim content inside one source never silently collides (0.495582ms)\n✔ extractMarkdownConservationUnits: emits headings and unheaded blocks for conservation (0.273458ms)\n✔ extractMarkdownConservationUnits: preserves short nonblank normative unheaded lines (0.306603ms)\n✔ extractMarkdownConservationUnits: conserves fenced payloads without treating headings inside them as headings (0.173848ms)\n✔ extractMixedFileConservationUnit: non-Markdown payloads get a file-block claim unit (0.143446ms)\n✔ classifyConsumerKind: covers dynamic, glob, fixture, executable proof, and literal consumers without treating Markdown bold as glob (0.101079ms)\n✔ collectConsumers: scans source extensions, resolves relative links, globs, exact AGENTS segments, and immutable refs (33.434551ms)\n✔ buildInventoryRow: current source route is not automatically its own target owner (0.442021ms)\n✔ buildInventoryRow: multi-claim-kind with only one concrete owner demotes instead of pretending split (0.729402ms)\n✔ parseLsTreeLong: parses `git ls-tree -r -l` output and ignores non-blob entries (0.190329ms)\n✔ validateStructure: accepts shared duplicate claim ids only with explicit coverage and rejects silent collisions (0.989718ms)\n✔ validateStructure: accepts explicit unresolvedRoot dynamic consumer gaps without broad target fan-out (0.171613ms)\n✔ validateStructure: rejects missing plan §6.2 fields and invalid claim status (0.192885ms)\n✔ validateCommitBlobIntegrity: verifies sourceDigest and blobSha against commit tree (24.426375ms)\n✔ sharded inventory artifact loader verifies hashes, sizes, order, and extra parts (2.983148ms)\n✔ identity registry reuses unaffected claim ids when unrelated text is inserted and headings reorder (0.566136ms)\n✔ missing or ambiguous identity registry entries become explicit blockers, never derived replacement ids (0.476232ms)\n✔ buildSwitchboardIndex: duplicate exact routes become blocking route-conflict gaps instead of last-write-wins (0.232924ms)\n✔ slugifyHeading: preserves underscores like GitHub anchors (0.053065ms)\n✔ collectConsumers: path.join dynamic prefixes create standalone unresolved dynamic edges (28.015343ms)\n✔ collectConsumers: dynamic parser skips comments, quotes, and Markdown prose but scans fenced code (24.744835ms)\n✔ collectConsumers: the generator ignores its own saved output artifacts and still counts ordinary inputs (24.149889ms)\n✔ listCommitEntries: omits only the generator output artifacts from the commit tree (18.061226ms)\n✔ isGeneratorOutputArtifact: output locations agree with the checker defaults and the sharded writer layout (0.501775ms)\n✔ validateSourceUnitCoverage: detects dropped, duplicate, and digest-mismatched immutable source-unit coverage (36.994148ms)\n✔ deriveValidTargetOwnersFromSwitchboard reads target topology independently of inventory rows (0.257484ms)\n✔ validateAgainstVocabulary: retained claim owner must be a real switchboard-backed target owner (0.721604ms)\n✔ identity registry unit lookup excludes claim kind, status, and classification changes (0.698692ms)\n✔ repeated heading identity follows semantic fingerprint instead of ordinal anchor (1.145264ms)\n✔ indistinguishable repeated carried-forward units become explicit identity gaps (0.529288ms)\n✔ collectConsumers: dynamic parser keeps nested, multiple, multiline calls as docs-rooted unresolved patterns (22.585634ms)\n✔ buildSwitchboardIndex marks tied equal-prefix routes as blocking conflicts (0.58792ms)\n✔ carryForwardIdentityRegistry moves one source without reminting claim ids or unrelated opaque ids (79.937887ms)\n✔ carryForwardIdentityRegistry refuses existing destination registry entries (83.624543ms)\n✔ carryForwardIdentityRegistry updates carried unit status from new classification (99.929388ms)\n✔ carryForwardIdentityRegistry refuses ambiguous duplicate and edited units without guessing positional ids (124.006576ms)\n✔ validateIdentityRegistry detects exact equality and stale units (0.527897ms)\n✔ repo-wide carry-forward keeps ids of unchanged units, binds to the new commit and gives added units fresh opaque ids (67.208923ms)\n✔ repo-wide carry-forward keeps ids of a unit that moved to another path when its digest is unique (69.468282ms)\n✔ repo-wide carry-forward keeps the id of an edited heading with a stable anchor, records lineage and marks it for review (69.603557ms)\n✔ repo-wide carry-forward never matches an edited positional unit: old id becomes a gap row, the new unit gets a fresh id (72.674217ms)\n✔ repo-wide carry-forward does not match a heading whose title slug is duplicated in the file (83.69756ms)\n✔ repo-wide carry-forward pairs identical duplicates 1:1 by anchor when the anchor sets match (103.481839ms)\n✔ repo-wide carry-forward turns duplicates whose anchor sets differ into explicit gap rows instead of guessing (123.757504ms)\n✔ repo-wide carry-forward keeps removed units as retired rows pending disposition, never dropping an old id (76.08602ms)\n✔ repo-wide carry-forward partitions every old unit exactly once and emits deterministic order (58.682871ms)\n✔ repo-wide carry-forward registry is accepted by inventory generation for the new commit (73.775693ms)\n✔ validateDroppedClaims accepts an entry whose claim id is in the ledger or in the registry (including retired rows) (0.376122ms)\n✔ validateDroppedClaims fails when the claim id is absent from registry and ledger or missing from the entry (0.146432ms)\n✔ validateDroppedClaims fails when an entry lacks status, restorationOwner or gate (0.203517ms)\n✔ validateRetiredDispositions reports retired rows without a vocabulary disposition as open rows, not fatal findings (0.302493ms)\n✔ repo-wide carry-forward does not let carry markers survive into a later carry (83.786846ms)\n✔ repo-wide carry-forward reports a fingerprint ambiguity as ambiguous even when the digest finds nothing (88.633213ms)\n✔ repo-wide carry-forward refuses an input registry that holds a claim id twice (90.822462ms)\n✔ validateIdentityRegistry reports a claim id repeated across units, retired rows and gap rows (0.211417ms)\n✔ validateDroppedClaims fails on a register whose entries are missing or not an array (0.128334ms)\n✔ loadDroppedClaimsRegister skips a missing default file with a notice but fails on a missing explicit file (0.373455ms)\n✔ isGeneratorOutputArtifact covers the committed artifact names and keeps the first generation names (0.115161ms)\n✔ gates CLI names the regenerate command when the default manifest has no shards (10.847453ms)\n✔ ledger resolves duplicate-digest units paired by anchor to their carried ids (112.192931ms)\n✔ ledger keeps unpaired duplicate-digest units as ambiguous registry gaps (132.609445ms)\n✔ extractMarkdownConservationUnits: a short block joins the previous block of its section, or the next one, and no non-blank line is left outside every unit (1.822538ms)\n✔ extractMarkdownConservationUnits: consecutive short blocks before the first long block of a section all join that block without overlapping the next one (0.479206ms)\n✔ extractMarkdownConservationUnits: a short label ending in a colon joins the block it introduces, not the fence before it (0.804241ms)\nℹ tests 172\nℹ suites 0\nℹ pass 172\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 2120.867561\n",
+      "stderr": ""
+    },
+    {
+      "label": "ratchet",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work NODE_OPTIONS=--max-old-space-size=3072 node scripts/check-legacy-docs-ratchet.mjs",
+      "exit": 0,
+      "stdout": "check-legacy-docs-ratchet: clean (996 legacy files checked; 28 accounted edit(s), 2 accounted new file(s)).\n",
+      "stderr": ""
     },
     {
       "command": "git diff --check",
-      "exit": 0
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
     }
   ],
-  "structuralProof": {
-    "exceptionChanges": [
-      "docs/specs/distribution.md",
-      "docs/specs/runner.md",
-      "docs/specs/workflow.md",
-      "docs/architect/agent-coordination/decisions/README.md",
-      "docs/architect/agent-coordination/vision.md"
-    ],
-    "previousAccountingRetainedExactly": true,
-    "changedAndNewPopulationSpansAndHashesVerified": true,
-    "changedExistingFiles": 11,
-    "changedExistingSlots": 141,
-    "newStep4Files": 8,
-    "newStep4Slots": 10,
-    "newClass3Files": 2,
-    "newClass3Slots": 8,
-    "step4": {
-      "files": 309,
-      "edges": 833,
-      "sourceOwners": 268,
-      "classes": {
-        "phase9": 105,
-        "preserve": 724,
-        "park": 4
-      }
-    },
-    "step0": {
-      "directBindingsChecked": 129,
-      "groupMembersChecked": 128,
-      "contentChanged": 11,
-      "positionalOnly": 8,
-      "proposedRebindings": 19,
-      "appliedRebindings": 0,
-      "preexistingGroupRecordsNeedingCorrection": 16,
-      "preexistingGroupMemberCorrections": 128,
-      "decisionShardsNeedingWrites": 8
-    },
-    "step3RecordsUnchanged": 17,
-    "step3SourceDigestDrifts": 16,
-    "allDecisionShardsUnchanged": true,
-    "allProposedCorrectionsPendingNoApprovalCarry": true,
-    "sourceIdentitiesPreserved": true,
-    "consumerDiffEmpty": true,
-    "writeScopeVerified": true
+  "bindingProcedure": "Both unchanged reproduction manifest unitsOf agree on old/current extraction. Resolve historical anchor AND full digest, then full passage and actual heading ancestry; inspect changed text with main patch. Preserve source identity; reset proposed review and remove approval fields. No ordinal rehash, native identity or approval carry. Second turn: expanded write scope authorizes exactly these eight shards. All 19 direct and 16 group-record proposals applied after both protected manifest unitsOf validated complete historical/current text and actual ancestry; changed bindings remain pending independent review, with source identities unchanged and no approval carry.",
+  "recipeReproduction": "Extracted .scripts (round5) and .readOnlyScripts (sync4d) verbatim from protected manifests into distinct /tmp/fgos-work/l12-57-second directories. All jobs ran serially, from repo cwd, with CLAUDE_CODE_SESSION_ID unset. No recipe or manifest changed.",
+  "postApplicationBindingCheck": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-binding-check.json",
+    "inputHEAD": "6b9095778e9fc41866215b5b4671b3b854b8faab",
+    "changedTargetFilesChecked": 26,
+    "directBindingsChecked": 129,
+    "groupMembersChecked": 128,
+    "candidateSuccessorsChecked": 128,
+    "remainingDigestDrift": 0,
+    "parked": 0,
+    "extractorsAgree": true,
+    "targetBytesEqualHEAD": true
   },
   "protectedReproductionManifests": [
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
-      "sha256": "728ab223d6df40ab05473c62fd29609a510708523a27858025398bfcff3568fa"
+      "sha256": "728ab223d6df40ab05473c62fd29609a510708523a27858025398bfcff3568fa",
+      "byteIdenticalToInput": true
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
-      "sha256": "2087ca9dafb4422ae2d0505d4927b163d0ab8d5a91f037d653dd6c1528ace45a"
+      "sha256": "2087ca9dafb4422ae2d0505d4927b163d0ab8d5a91f037d653dd6c1528ace45a",
+      "byteIdenticalToInput": true
     }
   ],
-  "needsWrites": [
-    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json"
+  "structuralProof": {
+    "directRebindingsApplied": 19,
+    "contentChanged": 11,
+    "positionalOnly": 8,
+    "groupRecordsCorrected": 16,
+    "groupMemberCorrections": 128,
+    "changedShards": 8,
+    "pendingIndependentReviewRecords": 35,
+    "parked": 0,
+    "remainingDigestDrift": 0,
+    "allOtherShardBytesIdenticalToHEAD": true,
+    "sourceIdentitiesPreserved": true,
+    "groupIdentitiesPreserved": true,
+    "candidateSuccessorMappingsPreserved": true,
+    "noApprovalCarry": true,
+    "allChangedTargetsByteIdenticalToHEAD": true,
+    "consumerDiffEmpty": true
+  },
+  "pendingIndependentReview": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "111"
+      ],
+      "claimId": "claim_6d48b5e2bda8133502dbddf0a30bccfe",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "113"
+      ],
+      "claimId": "claim_4296d0ed22dd9201b6018ac71f024915",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "114"
+      ],
+      "claimId": "claim_899e837dd759dc01afff5c6dd8a322bd",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "115"
+      ],
+      "claimId": "claim_b394376d1521888e01f83eb33d0d1a8d",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "117"
+      ],
+      "claimId": "claim_07c68665d6b19d67c6b26491297ed6ba",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "118"
+      ],
+      "claimId": "claim_8578eb3520660abdf596e07df634658f",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "122"
+      ],
+      "claimId": "claim_39494662eed59b83a66e63b9a2163226",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "123"
+      ],
+      "claimId": "claim_2dc0bc012109a1c2d1ea7d8659f957cf",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "keys": [
+        "claims",
+        "126"
+      ],
+      "claimId": "claim_233e60f81a8d1f6720b34de45ba20ebb",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "keys": [
+        "claims",
+        "404"
+      ],
+      "claimId": "claim_4ff3a12817bb891341b26283460beea0",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        "1"
+      ],
+      "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "26"
+      ],
+      "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "27"
+      ],
+      "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+      "kind": "direct"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "2"
+      ],
+      "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "5"
+      ],
+      "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "6"
+      ],
+      "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "7"
+      ],
+      "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "8"
+      ],
+      "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "9"
+      ],
+      "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "10"
+      ],
+      "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "11"
+      ],
+      "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "12"
+      ],
+      "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "13"
+      ],
+      "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "14"
+      ],
+      "claimId": "claim_cad110bd532badff055f69c0a236644a",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "15"
+      ],
+      "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "16"
+      ],
+      "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "17"
+      ],
+      "claimId": "claim_33c41de79cf4a52288035a9656c09735",
+      "kind": "contextual-group-record"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "18"
+      ],
+      "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
+      "kind": "contextual-group-record"
+    }
   ],
-  "trackedAndNewWritesBeforeThisReceipt": [
-    "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
-    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
-    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-merge-rebindings.json",
-    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet-tests.log",
-    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet.log",
-    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-step3-deferred-rebinds.json",
-    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-tier2-population-drift.json",
-    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-verification.json",
-    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-authoring-request.md",
-    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-batches.json",
-    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-population.json",
-    "scripts/check-legacy-docs-ratchet.exceptions.json"
-  ],
+  "needsWrites": [],
   "limits": [
-    "No decision correction applied: eight shards outside effective scope; proposed rows/journal ready for separately scoped Unit.",
-    "Independent review not launched or accepted; new census slots not accepted by author.",
-    "No full suite or reproduction scripts run; committed-byte acceptance remains separate after actual runner commit and L12-11 accounting.",
-    "No git write, fgOS CLI, consumer/Step3 record edit, .fgos/config/secrets read or write (mandatory external outbox is the brief exception), preview or service startup."
-  ]
+    "Author verification only; independent review of all 35 changed records remains required.",
+    "No full npm suite or checks.mjs/reproduction-test batch-end acceptance claimed. Lead owns separate accounting after the actual runner commit.",
+    "L12-48 verification records ratchet tests only; this turn additionally runs seven ledger/binding/decision test files (172 total tests including ratchet).",
+    "No consumer, checker, code, tests, baseline, vocabulary, extractor, comparator or protected reproduction manifest edits; no fgOS CLI or git write."
+  ],
+  "finalScopeVerification": {
+    "trackedWrites": [
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-merge-rebindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-verification.json"
+    ],
+    "untrackedWrites": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-binding-check.json"
+    ],
+    "writeScopeVerified": true,
+    "diffCheckExit": 0,
+    "consumerDiffEmpty": true
+  }
 }
