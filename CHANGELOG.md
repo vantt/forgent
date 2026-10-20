@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Work replay records concurrent precondition conflicts deterministically; rebuild preserves the previous cache on failure, and dispatch attestation reads the Event Store with failures propagated. The storytelling probe now accepts `--dir <.fgos-directory>` in place of `--log <file>`.
+
 - Work mutations use one acknowledged Event Store batch per state gate, stage claim/file effects until acknowledgement, and cache the folded view with its coverage cursor. Returned `seq` is now per store and stream; event identity includes `origin` and the full hash. Work store access requires Linux and a Git repository.
 
 - Git typed commit and recovery reads ignore user signature/display settings; suite subprocess census no longer requires strace.

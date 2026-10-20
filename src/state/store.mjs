@@ -146,10 +146,10 @@ export function resolveWriterLogPath(dir) {
 }
 
 // Full readers are forbidden under the hot mutex. Gate callbacks use tx.view.
-function readAllEvents(dir) {
+function readAllEvents(dir, options) {
   if (hotLockDepth() > 0) throw new StoreError('event-store-full-read-under-state', 'full Work history read inside state gate');
   const { store } = prepareWorkStore(dir, getMainFgosDir(dir));
-  return readWorkState(store).events;
+  return readWorkState(store, options).events;
 }
 
 function currentView(dir) {
@@ -2030,8 +2030,8 @@ export function computedSchedule(dir, candidateIds) {
  * door is untouched (this accessor never appends, never rebuilds the view).
  * Reads through the Event Store full reader outside the Work mutex.
  */
-export function readRawEvents(dir) {
-  return readAllEvents(dir);
+export function readRawEvents(dir, options) {
+  return readAllEvents(dir, options);
 }
 
 /**

@@ -14,7 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { readEvents } from '../src/state/events.mjs';
+import { readRawEvents } from '../src/state/store.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 // Cùng pattern `git rev-parse --git-common-dir` mà scripts/measure-verify-
@@ -172,12 +172,12 @@ export function formatReport({ logPath, totalEvents, askVista, decisionVista }) 
 
 function main() {
   const args = process.argv.slice(2);
-  const logIdx = args.indexOf('--log');
-  const logPath = logIdx >= 0 ? args[logIdx + 1] : path.join(resolveMainCheckoutRoot(), '.fgos', 'events.jsonl');
+  const logIdx = args.indexOf('--dir');
+  const logPath = logIdx >= 0 ? args[logIdx + 1] : path.join(resolveMainCheckoutRoot(), '.fgos');
   const reportIdx = args.indexOf('--report');
   const reportPath = reportIdx >= 0 ? args[reportIdx + 1] : null;
 
-  const rawEvents = readEvents(logPath);
+  const rawEvents = readRawEvents(logPath);
   const askVista = gatherAskVista(rawEvents);
   const decisionVista = gatherDecisionVista(rawEvents);
   const report = formatReport({ logPath, totalEvents: rawEvents.length, askVista, decisionVista });

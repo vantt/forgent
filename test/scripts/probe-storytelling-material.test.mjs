@@ -2,7 +2,6 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import {
@@ -13,9 +12,10 @@ import {
   BOILERPLATE_RATIONALES,
 } from "../../scripts/probe-storytelling-material.mjs";
 
-function mkTempDir(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
-}
+import { fixture, addon, loaderOptions } from '../event-store/phase07-fixture.mjs';
+import { openStore } from '../../src/event-store/index.mjs';
+import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
+import { root } from '../helpers/git-addon.mjs';
 
 // Fixture mirrors CONTEXT.md D4's five real boilerplate patterns (each
 // repeated, so they are never singletons) plus two genuine single-occurrence
@@ -44,13 +44,6 @@ function fixtureEvents() {
     { seq: 17, ts: "2026-01-01T00:00:16.000Z", type: "decision", payload: { id: "tsk-m13", text: "D1", rationale: "dung thu vien X thay vi Y vi Y khong ho tro streaming" }, v: 2 },
     { seq: 18, ts: "2026-01-01T00:00:17.000Z", type: "decision", payload: { id: "tsk-n14", text: "D1", rationale: "dung thu vien X thay vi Y vi Y khong ho tro streaming" }, v: 2 },
   ];
-}
-
-function writeFixture(dir) {
-  const logPath = path.join(dir, "events.jsonl");
-  const raw = `${fixtureEvents().map((e) => JSON.stringify(e)).join("\n")}\n`;
-  fs.writeFileSync(logPath, raw, "utf8");
-  return logPath;
 }
 
 test("gatherAskVista keeps only work.move events with a non-empty ask", () => {
@@ -111,15 +104,26 @@ test("formatReport is grouped, readable text — not a flat unstructured stream"
   assert.match(report, /After filtering: 2 singleton rationales remain/);
 });
 
-test("CLI reads a real events.jsonl via --log and prints both vistas, optionally writing --report", () => {
-  const dir = mkTempDir("probe-storytelling-material-");
-  const logPath = writeFixture(dir);
-  const reportPath = path.join(dir, "report.md");
+test("CLI reads a real Event Store via --dir and prints both vistas, optionally writing --report", t => {
+  const f = fixture(t);
+  const host = resolveActiveHostBin({ fgosDir: path.join(root, '.fgos') }).bin;
+  const release = path.join(f.temp, 'release');
+  fs.mkdirSync(path.join(release, 'bin'), {recursive:true});
+  const bin = path.join(release, 'bin/fgos');
+  fs.copyFileSync(host, bin); fs.chmodSync(bin, 0o755);
+  fs.symlinkSync(root, path.join(release, 'payload'));
+  const component = loaderOptions.descriptor.manifest.components.nativeAddon;
+  fs.copyFileSync(path.join(root, component.path), path.join(release, 'fgos.node'));
+  fs.writeFileSync(path.join(release, 'manifest.json'), JSON.stringify({entries:{fgos:'bin/fgos'},components:{legacyNode:{root:'payload',entry:'bin/fgos.mjs'},nativeAddon:{...component,path:'fgos.node'}}}));
+  const store = openStore(addon.resolveEventStore(f.repo,f.stateRoot,f.repo),'phase-seven',[path.join(root,'packages/work-state/contracts/event-streams.v1.json')],loaderOptions);
+  store.append('project',fixtureEvents().map(e=>({eventType:e.type,schemaVersion:1,payload:e.payload,ts:e.ts})),{},'fixture',[]);
+  const logPath = path.join(f.repo,'.fgos');
+  const reportPath = path.join(f.temp,'report.md');
 
   const stdout = execFileSync(
     process.execPath,
-    [path.join(process.cwd(), "scripts/probe-storytelling-material.mjs"), "--log", logPath, "--report", reportPath],
-    { encoding: "utf8" },
+    [path.join(process.cwd(), "scripts/probe-storytelling-material.mjs"), "--dir", logPath, "--report", reportPath],
+    { encoding: "utf8", env: {...process.env,FGOS_HOST_BIN:bin,FGOS_STATE_ROOT:f.stateRoot} },
   );
 
   assert.match(stdout, /Vista \(a\): ask\/question events \(2 total\)/);

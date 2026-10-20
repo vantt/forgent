@@ -1,3 +1,4 @@
+import { prepareWorkStore } from '../state/work-event-store.mjs';
 import { checkGit, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
@@ -3903,6 +3904,16 @@ function isFgosSourceCheckout(root) {
   return fs.existsSync(path.join(root, 'apps/fgos/Cargo.toml'));
 }
 
+function workStoreOpen(dir) {
+  try {
+    prepareWorkStore(dir, dir).store.read({ streams: ['project'] }, []);
+    return true;
+  } catch (error) {
+    if (error.code === 'event-store-no-repository') return false;
+    throw error;
+  }
+}
+
 // The doc registry is opt-in per project: doctor --fix only refreshes it.
 function docRegistryAdopted(root) {
   return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));
@@ -3912,7 +3923,7 @@ function checkDocRegistryStale(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   const root = mainCheckout ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {
+  if (!workStoreOpen(fgosDir)) {
     return { passed: true, message: 'knowledge registry check skipped -- no events log' };
   }
   if (!docRegistryAdopted(root)) {
@@ -3935,7 +3946,7 @@ function fixDocRegistryStale(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   const root = mainCheckout ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {
+  if (!workStoreOpen(fgosDir)) {
     return { changed: false, message: 'skipped -- no events log' };
   }
   if (!docRegistryAdopted(root)) {
@@ -3973,7 +3984,7 @@ function fixDocRegistryStale(cwd) {
 function checkDocAliasBroken(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  if (!workStoreOpen(fgosDir)) return { passed: true, message: 'skipped' };
   const view = rebuild(fgosDir);
   const docs = Object.values(view.docs || {}).filter((d) => d.docLifecycle !== 'retired');
   const aliasOwners = new Map();
@@ -3999,7 +4010,7 @@ function checkDocAliasBroken(cwd) {
 function checkDocActiveDuplicate(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  if (!workStoreOpen(fgosDir)) return { passed: true, message: 'skipped' };
   const view = rebuild(fgosDir);
   const counts = {};
   for (const doc of Object.values(view.docs || {})) {
@@ -4046,7 +4057,7 @@ function checkDocNearDuplicate(cwd) {
 function checkDocProvisionalAged(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  if (!workStoreOpen(fgosDir)) return { passed: true, message: 'skipped' };
   const view = rebuild(fgosDir);
   const now = Date.now();
   const maxAgeMs = 7 * 24 * 60 * 60 * 1000;
@@ -4063,7 +4074,7 @@ function checkDocProvisionalAged(cwd) {
 function checkDocTopicOversized(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  if (!workStoreOpen(fgosDir)) return { passed: true, message: 'skipped' };
   const view = rebuild(fgosDir);
   const shared = readSharedConfig(cwd);
   const maxDocs = shared.docRegistry?.topicMaxDocs ?? 10;
@@ -4079,7 +4090,7 @@ function checkDocTopicOversized(cwd) {
 function checkDocRoleUnderused(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  if (!workStoreOpen(fgosDir)) return { passed: true, message: 'skipped' };
   const view = rebuild(fgosDir);
   const roleCounts = {};
   for (const doc of Object.values(view.docs || {})) {
@@ -4098,7 +4109,7 @@ function checkDocRoleUnderused(cwd) {
 function checkDocCurrentPathMissing(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  if (!workStoreOpen(fgosDir)) return { passed: true, message: 'skipped' };
   if (!fs.existsSync(path.join(root, '.git'))) return { passed: true, message: 'skipped (not a git checkout)' };
   const view = rebuild(fgosDir);
   const missing = [];
@@ -4128,7 +4139,7 @@ function looksLikeDocPath(value) {
 function checkDocSourceUnreachable(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  if (!workStoreOpen(fgosDir)) return { passed: true, message: 'skipped' };
   const view = rebuild(fgosDir);
   const unreachable = [];
   for (const doc of Object.values(view.docs || {})) {
@@ -4166,7 +4177,7 @@ function checkDocSourceUnreachable(cwd) {
 function checkDocSourceConservation(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  if (!workStoreOpen(fgosDir)) return { passed: true, message: 'skipped' };
   const view = rebuild(fgosDir);
   const problems = [];
 
@@ -6258,42 +6269,12 @@ export function checkObserveFrictionMigrated(cwd) {
     return { passed: true, message: 'no .fgos directory present' };
   }
 
-  // 1. Scan legacy work.friction records in .fgos/events.jsonl and .fgos/events/*.jsonl
-  const legacyFrictions = [];
-  const filesToScan = [];
-  const baselineEvents = path.join(fgosDir, 'events.jsonl');
-  if (fs.existsSync(baselineEvents)) {
-    filesToScan.push({ src: 'events.jsonl', path: baselineEvents });
-  }
-  const eventsDir = path.join(fgosDir, 'events');
-  if (fs.existsSync(eventsDir) && fs.statSync(eventsDir).isDirectory()) {
-    try {
-      const entries = fs.readdirSync(eventsDir);
-      for (const entry of entries) {
-        if (entry.endsWith('.jsonl')) {
-          filesToScan.push({ src: `events/${entry}`, path: path.join(eventsDir, entry) });
-        }
-      }
-    } catch {}
-  }
-
-  for (const { src, path: filePath } of filesToScan) {
-    try {
-      const content = fs.readFileSync(filePath, 'utf8');
-      const lines = content.split('\n');
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        try {
-          const ev = JSON.parse(trimmed);
-          if (ev.type === 'work.friction') {
-            const seq = typeof ev.seq === 'number' ? ev.seq : 0;
-            legacyFrictions.push({ src, seq });
-          }
-        } catch {}
-      }
-    } catch {}
-  }
+  // Legacy provenance is retained by the facade; current events are never
+  // mistaken for historical Observe migration candidates.
+  const { store } = prepareWorkStore(fgosDir, fgosDir);
+  const legacyFrictions = store.read({ streams: ['project'] }, []).legacy
+    .filter(record => record.event.type === 'work.friction')
+    .map(record => ({ src: record.provenance.file, seq: record.event.seq ?? 0 }));
 
   if (legacyFrictions.length === 0) {
     return { passed: true, message: 'no legacy work.friction records to migrate' };

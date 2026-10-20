@@ -20,21 +20,19 @@ import { applyKnowledgeEvent } from './knowledge-registry.mjs';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
 // tsk-49e: every top-level key applyEvent ever writes to `view` is either an
-export const VIEW_SCHEMA_VERSION = 4;
+export const VIEW_SCHEMA_VERSION = 5;
 
-// array `.push`ed onto in place (only `decisions`) or reassigned via a
-// `{...oldValue, ...patch}` spread (every other container: work, gates,
-// settlements, learnings, decisionsById, outcomes, discovery, tools, and any
-// future one applyEvent adds) — never mutated two levels deep in place. A
-// generic ONE-LEVEL shallow clone of each top-level key is therefore
-// sufficient to protect a seed view's own nested references: `foldEvents`
-// only ever needs to guarantee its OWN `view` object (and each of its direct
-// children) is a fresh reference, never that every nested object is.
+// Containers are copied for incremental replay. Work handlers mutate item
+// fields, so clone those items as well to keep the caller's seed immutable.
 function cloneTopLevel(seedView) {
   const out = {};
   for (const [key, value] of Object.entries(seedView)) {
     if (Array.isArray(value)) out[key] = [...value];
-    else if (value && typeof value === 'object') out[key] = { ...value };
+    else if (value && typeof value === 'object') {
+      out[key] = key === 'work'
+        ? Object.fromEntries(Object.entries(value).map(([id, item]) => [id, { ...item }]))
+        : { ...value };
+    }
     else out[key] = value;
   }
   return out;
@@ -82,7 +80,40 @@ function foldLegacyStage(target, item) {
 export function foldEvents(events, seedView) {
   const view = seedView ? cloneTopLevel(seedView) : { work: {}, decisions: [] };
   for (const event of events) {
+    const condition = event.payload?.precondition;
+    const before = view.work[event.payload?.id];
+    const beforeStatus = before?.status;
+    if (condition && event.origin && event.h) {
+      const id = event.payload.id;
+      const item = view.work[id];
+      let reason;
+      if (condition.exists !== undefined && !!item !== condition.exists) reason = 'existence';
+      else if (condition.expectedStatus !== undefined && item?.status !== condition.expectedStatus) reason = 'expected-status';
+      else if (condition.capacity && Object.values(view.work).filter(w => w.status === condition.capacity.status).length >= condition.capacity.max) reason = 'capacity';
+      if (reason) {
+        const against = reason === 'capacity'
+          ? Object.keys(view.work).sort().filter(key => view.work[key].status === condition.capacity.status)
+            .map(key => view.preconditionHeads?.[key]?.status).find(head => head && head.origin !== event.origin && (event.seen?.[`${head.origin}:${head.stream}`] ?? 0) < head.seq)
+          : view.preconditionHeads?.[id]?.[reason === 'existence' ? 'existence' : 'status'];
+        if (!against || against.origin === event.origin || (event.seen?.[`${against.origin}:${against.stream}`] ?? 0) >= against.seq) {
+          throw Object.assign(new Error('work-replay-precondition: causal precondition failed'), { code: 'work-replay-precondition' });
+        }
+        view.conflicts ??= [];
+        view.conflicts.push({ h: event.h, origin: event.origin, reason, against: against.h });
+        continue;
+      }
+    }
     applyEvent(view, event);
+    if (condition && event.origin && event.h) {
+      const id = event.payload.id;
+      const after = view.work[id];
+      const head = { h: event.h, origin: event.origin, stream: event.stream, seq: event.seq };
+      view.preconditionHeads ??= {};
+      const heads = { ...view.preconditionHeads[id] };
+      if (!!before !== !!after) heads.existence = head;
+      if (beforeStatus !== after?.status) heads.status = head;
+      view.preconditionHeads[id] = heads;
+    }
   }
   return view;
 }
@@ -92,7 +123,7 @@ function applyEvent(view, event) {
     case 'work.add': {
       const item = event.payload;
       if (item && typeof item === 'object' && typeof item.id === 'string') {
-        const normalized = { ...item };
+        const { precondition, ...normalized } = item;
         if (normalized.tier !== undefined) {
           if (normalized.size === undefined) {
             normalized.size = normalized.tier;

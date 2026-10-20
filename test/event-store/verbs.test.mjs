@@ -67,7 +67,7 @@ test('status identifies deferred predecessors explicitly and exports no deferred
   assert.equal(fs.readFileSync(path.join(out, 'events.jsonl'), 'utf8'), '');
 });
 
-test('rebuild resolves shipped consumer contracts, removes both caches and refolds from real events', async t => {
+test('rebuild resolves shipped consumer contracts, preserves caches until consumers replace them and refolds from real events', async t => {
   const { root } = await import('../helpers/git-addon.mjs');
   const { execFileSync } = await import('node:child_process');
   const { pathToFileURL } = await import('node:url');
@@ -84,7 +84,7 @@ test('rebuild resolves shipped consumer contracts, removes both caches and refol
   fs.mkdirSync(path.join(f.repo, '.fgos/cache'));
   for (const entry of entries) {
     fs.writeFileSync(path.join(f.repo, entry.cachePath), 'stale');
-    fs.writeFileSync(path.join(payload, entry.rebuildModule), `import fs from 'node:fs'; export function rebuildFromStore(ctx) { const cache=${JSON.stringify(path.join(f.repo, entry.cachePath))}; if (fs.existsSync(cache)) throw new Error('cache not removed'); const events=ctx.store.read({streams:['project']},ctx.heldRanks).sequence; fs.writeFileSync(cache,JSON.stringify(events)); return {count:events.length,maxAttempts:ctx.maxAttempts}; }`);
+    fs.writeFileSync(path.join(payload, entry.rebuildModule), `import fs from 'node:fs'; export function rebuildFromStore(ctx) { const cache=${JSON.stringify(path.join(f.repo, entry.cachePath))}; if (fs.readFileSync(cache,'utf8') !== 'stale') throw new Error('old cache lost'); const events=ctx.store.read({streams:['project']},ctx.heldRanks).sequence; fs.writeFileSync(cache,JSON.stringify(events)); return {count:events.length,maxAttempts:ctx.maxAttempts}; }`);
   }
   const url = pathToFileURL(path.join(payload, 'src/verbs/events/rebuild.mjs')).href;
   const result = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', `const {rebuildStoreUseCase}=await import(${JSON.stringify(url)}); console.log(JSON.stringify(await rebuildStoreUseCase(${JSON.stringify(f.ctx)})));`], { encoding: 'utf8' }));
@@ -105,4 +105,18 @@ test('ahead and behind count only commits outside the opposite tip ancestry', t 
   assert.deepEqual(statusUseCase(f.ctx).aheadBehind, { ahead: 0, behind: 1 });
   f.git('update-ref', 'refs/fgos/events/phase-seven', second);
   assert.deepEqual(statusUseCase(f.ctx).aheadBehind, { ahead: 0, behind: 0 });
+});
+
+test('failed real Work rebuild preserves the previous cache', async t => {
+  const f = fixture(t);
+  await rebuildStoreUseCase(f.ctx);
+  const cache = path.join(f.repo, '.fgos/cache/state.json');
+  const before = fs.readFileSync(cache);
+  // A malformed durable cache is not the failure source: refuse a real store
+  // read by corrupting the acknowledged open log, then rebuild through CLI.
+  append(f.store, [{}]);
+  const active = path.join(f.repo, '.git/fgos/events/project/active.jsonl');
+  fs.writeFileSync(active, fs.readFileSync(active, 'utf8').replace('one', 'tampered'));
+  await assert.rejects(rebuildStoreUseCase(f.ctx));
+  assert.deepEqual(fs.readFileSync(cache), before);
 });

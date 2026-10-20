@@ -13,7 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { readEvents } from '../src/state/events.mjs';
+import { readRawEvents } from '../src/state/store.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 // Cùng pattern `git rev-parse --git-common-dir` mà verify-fanout-overlap.mjs
@@ -325,11 +325,8 @@ function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify
   return lines.join('\n');
 }
 
-function assertInvariants({ totalEvents, causes, returns, wcLCount }) {
+function assertInvariants({ totalEvents, causes, returns }) {
   if (totalEvents <= 0) throw new Error('measure-verify-cost: totalEvents phải > 0 — log rỗng hay đường dẫn sai?');
-  if (totalEvents !== wcLCount) {
-    throw new Error(`measure-verify-cost: readEvents trả ${totalEvents} sự kiện nhưng file có ${wcLCount} dòng — lệch, dừng lại thay vì báo cáo số sai.`);
-  }
   const sumByErrorClass = Object.values(causes.byErrorClass).reduce((a, b) => a + b, 0);
   if (sumByErrorClass !== causes.totalFriction) {
     throw new Error(`measure-verify-cost: tổng errorClass (${sumByErrorClass}) khác totalFriction (${causes.totalFriction}) — có bản ghi bị rơi khi group-by.`);
@@ -355,9 +352,7 @@ function main() {
   // chung của mọi session khác.
   const mainCheckoutRoot = resolveMainCheckoutRoot();
   const outputRoot = process.argv[2] ?? process.cwd();
-  const logPath = path.join(mainCheckoutRoot, '.fgos', 'events.jsonl');
-  const rawEvents = readEvents(logPath);
-  const wcLCount = fs.readFileSync(logPath, 'utf8').split('\n').filter((l) => l !== '').length;
+  const rawEvents = readRawEvents(path.join(mainCheckoutRoot, '.fgos'));
 
   const { movesById, frictionById } = groupById(rawEvents);
   const picks = measurePicks(movesById);
@@ -366,7 +361,7 @@ function main() {
   const causes = measureFailureCauses(frictionById);
   const fullVerify = measureFullVerifyRuns(returns, approves);
 
-  assertInvariants({ totalEvents: rawEvents.length, causes, returns, wcLCount });
+  assertInvariants({ totalEvents: rawEvents.length, causes, returns });
 
   const report = buildReport({ totalEvents: rawEvents.length, picks, returns, approves, causes, fullVerify });
   const reportPath = path.join(

@@ -30,7 +30,10 @@ test('public Work mutations, same-writer drift and settle use the real facade an
   const source = `
     import assert from 'node:assert/strict';
     import fs from 'node:fs';
+    import { DOCTOR_CHECKS } from ${JSON.stringify(new URL('../../src/setup/checks.mjs', import.meta.url).href)};
+    import { prepareWorkStore } from ${JSON.stringify(new URL('../../src/state/work-event-store.mjs', import.meta.url).href)};
     import * as work from ${JSON.stringify(storeUrl)};
+    import { checkDispatchAttestation } from ${JSON.stringify(new URL('../../src/runner/attestation-guard.mjs', import.meta.url).href)};
     import { acquireClaim, getItemDurableRevision } from ${JSON.stringify(claimsUrl)};
     const dir = process.argv[1] + '/.fgos';
     assert.deepEqual(work.initStore(dir), {work:{}, decisions:[]});
@@ -46,6 +49,12 @@ test('public Work mutations, same-writer drift and settle use the real facade an
     assert.equal(settled.view.work.one.title, 'Edited by claimant');
     assert.equal(settled.view.work.one.description, 'settled patch');
     assert.equal(fs.existsSync(dir + '/runtime/claims/one.json'), false);
+    assert.deepEqual(checkDispatchAttestation(dir, process.argv[1], 'one', 'branch'), {ok:true,skipped:true});
+    const active=process.argv[1]+'/.git/fgos/events/project/active.jsonl';
+    const bytes=fs.readFileSync(active,'utf8');
+    fs.writeFileSync(active,bytes.replace('Edited by claimant','tampered claimant'));
+    assert.throws(() => checkDispatchAttestation(dir, process.argv[1], 'one', 'branch'));
+    fs.writeFileSync(active,bytes);
     const topic = work.registerTopicStore(dir, {topicId:'topic-one',purposeSlug:'test-topic',purposeTitle:'Test topic',entities:[]});
     assert.ok(topic.event.origin && topic.event.seq > settled.event.seq);
     assert.equal(work.readRawEvents(dir).filter(e => e.type === 'work.attempt').length, 1);
@@ -53,6 +62,10 @@ test('public Work mutations, same-writer drift and settle use the real facade an
     const saved=JSON.parse(fs.readFileSync(dir+'/cache/state.json'));
     assert.equal('snapshot' in saved, false);
     assert.equal(Object.values(saved.cursor.cover)[0], topic.event.seq);
+    assert.deepEqual(DOCTOR_CHECKS.find(c=>c.id==='doc-alias-broken').check(process.argv[1]),{passed:true,message:'no broken doc aliases'});
+    const native=prepareWorkStore(dir,dir).store;
+    native.append('project',[{eventType:'executor.dispatch',schemaVersion:1,payload:{id:'one'},ts:new Date().toISOString()}],{'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:project':1},'fixture',[]);
+    assert.throws(() => checkDispatchAttestation(dir, process.argv[1], 'one', 'branch'), {code:'event-store-incomplete-history'});
     console.log(JSON.stringify({seq:topic.event.seq,origin:topic.event.origin}));
   `;
   const output = execFileSync(process.execPath, ['--input-type=module', '-e', source, f.repo], {

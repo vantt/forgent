@@ -24,7 +24,9 @@
     "docs/how-to",
     "docs/explanation",
     "docs/enduser-docs-index.json",
-    "packages/event-store/contracts"
+    "packages/event-store/contracts",
+    "packages/work-state/contracts/event-streams.v1.json",
+    "packages/work-state/contracts/porting-event-streams.v1.json"
   ],
   "scripts": {
     "test": "node scripts/run-tests.mjs",

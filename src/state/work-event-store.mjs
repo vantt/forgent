@@ -18,9 +18,10 @@ export function prepareWorkStore(dir, mainFgosDir) {
 }
 
 /** Full history is read only outside the mutex. Legacy order stays untouched. */
-export function readWorkState(store, { cachePath, heldRanks = [] } = {}) {
+export function readWorkState(store, { cachePath, heldRanks = [], requireComplete = false } = {}) {
   if (hotLockDepth() > 0) throw refusal('event-store-full-read-under-state');
   const read = store.read({ streams: ['project'] }, heldRanks);
+  if (requireComplete && (read.deferred.length || read.missing.length)) throw refusal('event-store-incomplete-history');
   const events = [...read.legacy.map(record => record.event), ...read.sequence];
   // A cache never establishes coverage: first authenticate it against the
   // reader's cursor. Old snapshots and damaged/schema-stale caches refold.
@@ -90,6 +91,17 @@ export function withWorkState(dir, mainFgosDir, writer, fn, { store, config, reb
         mainFgosDir, writer, extraRoots, eventStore: store, stageEffects: true,
         commitEvents(tx, events) {
           if (!events.length) return;
+          // Record the exact durable existence/status checked by the gate.
+          // Advance a local fold for dependent events in the same batch.
+          let decided = structuredClone(tx.view);
+          for (const event of events) {
+            const id = event.payload?.id;
+            if (event.type.startsWith('work.') && id) {
+              const item = decided.work[id];
+              event.payload.precondition = { ...event.payload.precondition, exists: !!item, ...(item ? { expectedStatus: item.status } : {}) };
+            }
+            decided = foldEvents([event], decided);
+          }
           const appended = store.append('project', events.map(event => ({ eventType: event.type, schemaVersion: 1, payload: event.payload, ts: event.ts })), tx.cursor.cover, String(writer), [...heldRanks, 60]);
           for (let i = 0; i < events.length; i += 1) Object.assign(events[i], appended.events[i]);
           tx.view = foldEvents(appended.events, tx.view);
