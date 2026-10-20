@@ -461,3 +461,7 @@ All seven new findings have text dispositions; implementation, actual accounting
   2. **Expansion:** batch-073 expands to review of every file after correction (the defect file was a lead-ruling supplement, not a seeded sample; the Lead applies the stricter reading).
   3. Quoted old text and past-event sentences naming `docs/specs/distribution.md` preserve (04420/04421, 04551/04552); verbatim commit messages are captured evidence (L12-40) and get the successor note (04553).
 - **Carried note (Phase 9 step-10 semantic search):** knowledge recipes that `grep docs/decisions/` for decision files are stale (the directory holds only `index.md`).
+
+## L12-43 — Batch 075 review clean (Lead, A42/A51, 2026-10-20)
+
+- [wave4e-p01](review-a38-step-03-wave4e-p01.md): batch-075 sample 4 files / 8 edges, 0 rework; L12-41 landed (04444 preserve with note to runner decisions 0032 "Cổng Iron Law"; event-log 0001 parks GAP-02). 04628/04629 (completed-sweep narration) preserve. Batch-075 closes. `5065607cd` then applied L12-42 (04449 patch, 04553 note), wrote the batch-073 expansion request and authored batch-076; full checker 602 files / 4,105 edges, 0 failures, no open lead-ruling in sets 001–076.
