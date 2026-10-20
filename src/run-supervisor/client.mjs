@@ -6,8 +6,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { resolveHostBin } from '../util/host-bin.mjs';
+import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from './protocol.mjs';
 
-const PROTOCOL = 1;
 const ROUTE_TIMEOUT_MS = 10 * 60 * 1000;
 const MAX_OUTPUT_BYTES = 64 * 1024 * 1024;
 
