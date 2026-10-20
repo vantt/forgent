@@ -197,8 +197,11 @@ test('event-store product code has no Git spawn site and no classified spawn: it
   const {sites,classes}=scan({root:process.cwd()});
   const owned=entry=>EVENT_OWNED.some(prefix=>entry.path.startsWith(prefix));
   assert.deepEqual(sites.filter(owned),[],'event-store code spawns git');
-  // Rust integration tests build fixture repositories with git; only product code is judged.
-  assert.deepEqual(classes.filter(c=>owned(c)&&c.class!=='rust-test'),[],'event-store code carries a classified git spawn');
+  // Rust integration tests build fixture repositories with git; only product code is judged. A wrapper
+  // no product code calls (`decodeLegacyFiles`, `branchKey`: only tests pass them loader options) is
+  // reported by the scan so a later caller is noticed, but no spawn reaches it: that caller would
+  // turn it into a site or a configured binary, which the two assertions here do judge.
+  assert.deepEqual(classes.filter(c=>owned(c)&&!['rust-test','uncalled-wrapper'].includes(c.class)),[],'event-store code carries a classified git spawn');
 });
 
 // Shrink-only dormant debt: identities are file + call kind + target family,

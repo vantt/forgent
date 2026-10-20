@@ -483,10 +483,9 @@ test("HIGH-2 regression: bin: entries get child-process evidence via the PATH sh
   // node: entries must NOT double-count: the same real git invocation is
   // reachable through both child-process-spy.cjs (in-process monkeypatch)
   // and the PATH shim (OS-exec boundary) unless the spy's own
-  // FGOS_HARNESS_SHIMMED_COMMANDS skip is working. `bin/fgos.mjs version`
-  // is the real fgos invocation known to spawn exactly one `git` call.
-  const nodeEntry = parseEntry("node:bin/fgos.mjs");
-  const nodeResult = await runCaseOnEntry(nodeEntry, { id: "node-no-double-count-regression", args: ["version"] });
+  // FGOS_HARNESS_SHIMMED_COMMANDS skip is working. The fixture starts git once.
+  const nodeEntry = parseEntry(`node:${path.join(FIXTURES_DIR, "node-git-caller.mjs")}`);
+  const nodeResult = await runCaseOnEntry(nodeEntry, { id: "node-no-double-count-regression", args: [] });
   const gitCallsRecorded = nodeResult.spawnedChildren.filter((c) => path.basename(c.cmd) === "git").length;
   assert.equal(
     gitCallsRecorded,
