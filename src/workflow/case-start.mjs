@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { normalizeContextRefs } from './definition.mjs';
-import { loadWorkflow } from './loader.mjs';
+import { loadWorkflow, workflowPersonaScope } from './loader.mjs';
 import { createWorkflowRun, appendWorkflowEvent, readWorkflowEvents, projectWorkflowState } from './store.mjs';
 import { translateUnitsToWorkflow } from './units-source.mjs';
 import { snapshotRunnerConfig, resolveGitRoots, detectHerdrPresent } from '../runner/execution/run.mjs';
@@ -199,9 +199,11 @@ function resolveStart(params) {
     // Names are resolved (and a missing or duplicated one refused) here, before any run exists; the
     // text found now is what the run pins, so a later edit of the file never reaches it.
     const personas = {};
+    // The same scope the run's Units look personas up in: the workflow's own folder and owning domain.
+    const personaScope = workflowPersonaScope(workflow.id, { packageRoot: mainRoot, cwd });
     for (const entry of normalizeSeats(params.seats)) {
       const name = personaNameOf(entry);
-      if (name !== null) personas[name] = resolveAgentDefinition(name, { projectRoot: worktreePath });
+      if (name !== null) personas[name] = resolveAgentDefinition(name, { projectRoot: worktreePath, workflow: personaScope });
     }
     ({ workflow, provenance: seats } = expandWorkflowSeats(workflow, params.seats, { contextRefs, personas }));
     seats = { ...seats, refDigests: digestContextRefs(contextRefs, worktreePath) };

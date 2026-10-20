@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A persona file that names a model `tier` or `prefer` is now refused with `persona-model-taste-not-allowed` (model taste belongs to the seat, at `capabilities.<cap>.personas.<name>`), a packaged workflow (`<name>/wf.<name>.yaml`) can keep its own personas beside it (`agent.<name>.yaml`), and a domain persona is visible only to workflows of that domain.
+
 - New skill `fgos-cook`: delivers a plan written by `ak:plan` by opening a conductor case on the coding guide with an owner-approved frame, then dispatching one slice at a time through `fgos run` and `fgos workflow` naming the case, checking each result itself and handing the branch to the owner (it never merges). Slices run serially in one worktree until the Git land operation exists; the route table waits for Seat Binding.
 - A conductor Workflow case now moves past its entry milestones: when a Unit settles with `pass` (or `findings`), its activity's `produces` milestones are proposed as achieved with the digest of their subject (the Unit's reports, or for a delivery milestone the paths it wrote, backed by a verify receipt for that digest). Before, the settle recorded nothing, so `fgos run --case C --activity implement-item` stayed refused with `entry-milestone-unmet` after `validate-plan` passed.
 - A panel or debate unit must now declare its `seats:` (ids, roles, optional persona), and `workflow start --seats` re-seats generic member seats; a reviewed unit may declare its seats too, if its checker roles match what its rigor requires. Resuming a unit run recorded before seat binding is refused with `record-predates-seat-binding` (it stays readable in summaries, history and metrics).

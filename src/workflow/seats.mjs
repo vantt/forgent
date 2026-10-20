@@ -137,7 +137,7 @@ export function expandWorkflowSeats(base, rawSeats, { contextRefs = [], personas
     if (name === null) return;
     const found = personas[name];
     if (!found) throw new RunnerConfigError(`seat ${index + 1} names persona "${name}" but it was not resolved`);
-    pinned.push({ seat: memberSeat(index + 1), name, tier: found.tier, source: found.source, digest: found.digest, text: found.text });
+    pinned.push({ seat: memberSeat(index + 1), name, tier: found.tier, source: found.source, identity: found.identity, digest: found.digest, text: found.text });
   });
   const panels = panelUnits(base);
   if (panels.length === 0) {

@@ -195,6 +195,25 @@
     {"rule": "seat-id", "value": "inputs", "expectedError": "reserved-identifier"},
     {"rule": "seat-id", "value": "unit-control", "expectedError": "reserved-identifier"},
     {"rule": "seat-id", "value": "sync", "expectedError": "reserved-identifier"},
-    {"rule": "seat-id", "value": "verify", "expectedError": "reserved-identifier"}
+    {"rule": "seat-id", "value": "verify", "expectedError": "reserved-identifier"},
+    {"rule": "workflow-name", "value": "council-lite", "expectedError": null},
+    {"rule": "workflow-name", "value": "Council", "expectedError": "invalid-identifier"},
+    {"rule": "workflow-name", "value": "../x", "expectedError": "invalid-identifier"},
+    {"rule": "agent-name", "value": "panelist", "expectedError": null},
+    {"rule": "agent-name", "value": "a/b", "expectedError": "invalid-identifier"},
+    {"rule": "agent-name", "value": "", "expectedError": "invalid-identifier"}
+  ],
+  "definitionFileCases": [
+    {"rule": "workflow-file", "fileName": "wf.council-lite.yaml", "expectedName": "council-lite"},
+    {"rule": "workflow-file", "fileName": "wf.Council.yaml", "expectedName": null},
+    {"rule": "workflow-file", "fileName": "wf..yaml", "expectedName": null},
+    {"rule": "workflow-file", "fileName": "council-lite.yaml", "expectedName": null},
+    {"rule": "workflow-file", "fileName": "wf.council-lite.yml", "expectedName": null},
+    {"rule": "workflow-file", "fileName": "agent.critic.yaml", "expectedName": null},
+    {"rule": "agent-file", "fileName": "agent.critic.yaml", "expectedName": "critic"},
+    {"rule": "agent-file", "fileName": "agent.a/b.yaml", "expectedName": null},
+    {"rule": "agent-file", "fileName": "agent.critic.yml", "expectedName": null},
+    {"rule": "agent-file", "fileName": "critic.yaml", "expectedName": null},
+    {"rule": "agent-file", "fileName": "wf.critic.yaml", "expectedName": null}
   ]
 }
