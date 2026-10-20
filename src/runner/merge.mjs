@@ -1612,7 +1612,7 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
   const destination = `refs/heads/${targetBranch}`;
   let phase = 'prepare';
   try {
-    const { candidate, receipt: previous } = port.prepare({
+    const { candidate, receipt: previous } = await port.prepare({
       operationId,
       waitMs: lockWaitMs,
       request: {
@@ -1652,11 +1652,11 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
     }
     if (!check.passed) return { outcome: 'verify-fail', branch, check };
     phase = 'publish';
-    const receipt = port.publish({
+    const receipt = await port.publish({
       source: candidate.source, target: candidate.target,
       candidate: candidate.candidate, treeDigest: candidate.treeDigest,
       evidenceDigest: crypto.createHash('sha256').update(JSON.stringify({ item: item.id, check })).digest('hex'),
-    });
+    }, { waitMs: lockWaitMs });
     const operation = createGitRecovery(options).inspectOperation({ operationId });
     return { outcome: 'merged', branch, check, receipt,
       landSettlement: { repoIdentity: operation.intent.repoIdentity, operationId, settlementKind: 'delivered' } };

@@ -82,10 +82,11 @@ test('a checkpoint that holds main while a land waits for it finishes first; the
       await sleep(1500);
       checkpointMainFgos(mainHandle, fgosDir, repoRoot);
     }, { fgosDir });
-    const result = await land;
 
-    assert.equal(result.outcome, 'merge-failed-unclassified', `the trunk moved under the land: ${JSON.stringify(result)}`);
-    assert.match(result.error.message, /update-ref failed/);
+    await assert.rejects(land, (err) => {
+      assert.equal(JSON.parse(err.message).cause, 'land-target-changed', `the trunk moved under the land: ${err.message}`);
+      return true;
+    });
     assert.match(git(repoRoot, ['log', '--format=%s', `${tipBefore}..main`]), /chore\(\.fgos\): fallback events checkpoint/);
     assert.equal(git(repoRoot, ['status', '--porcelain', '--untracked-files=no']).trim(), '', 'the index and tree are consistent, nothing half-applied');
     assert.equal(fs.existsSync(path.join(repoRoot, '.git', 'index.lock')), false);
@@ -94,14 +95,15 @@ test('a checkpoint that holds main while a land waits for it finishes first; the
   }
 });
 
-test('with the hook, a manual commit attempted inside the land\'s ref update is refused while the land holds main; the land completes and no manual commit appears', { skip }, async () => {
+test('with the hook, the land\'s ref update runs no repository hook, a manual commit attempted while main is held is refused, and the land completes with no manual commit', { skip }, async () => {
   const repoRoot = initRepo();
   activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
   installHook(repoRoot);
   const attemptLog = path.join(mkTempDir('fgos-land-attempt-'), 'attempt.log');
-  // A real git hook that fires while `git update-ref` runs: it is where a
-  // concurrent manual commit would land, with the land holding main.
+  // A real git hook that would fire while a plain `git update-ref` runs, where
+  // a concurrent manual commit would ride inside the land. Land's publication
+  // runs Git with repository hooks disabled, so it never fires.
   const refHook = path.join(repoRoot, '.githooks', 'reference-transaction');
   fs.writeFileSync(refHook, `#!/bin/sh
 [ "$1" = "prepared" ] || exit 0
@@ -119,12 +121,20 @@ exit 0
   fs.chmodSync(refHook, 0o755);
   const before = commitCount(repoRoot);
 
-  const result = await mergeRootIntoMainCas(repoRoot, item('item-a'), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000 });
+  const result = await mergeRootIntoMainCas(repoRoot, item('item-a'), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
 
   assert.equal(result.outcome, 'merged', JSON.stringify(result));
-  const attempt = fs.readFileSync(attemptLog, 'utf8');
-  assert.doesNotMatch(attempt, /exit=0/, `the manual commit must be refused while the land holds main:\n${attempt}`);
-  assert.match(attempt, /fgOS is writing the main checkout/);
+  assert.equal(fs.existsSync(attemptLog), false, 'the land ran the reference-transaction hook');
+  // The land publishes holding main; a manual commit under that same lock is refused.
+  await withMainCheckout(createLockScope('land'), 'land', async () => {
+    fs.writeFileSync(path.join(repoRoot, 'manual.txt'), 'manual\n');
+    git(repoRoot, ['add', 'manual.txt']);
+    const res = spawnSync('git', ['-c', 'user.name=Manual', '-c', 'user.email=m@example.com', 'commit', '-q', '-m', 'manual commit during land'], { cwd: repoRoot, encoding: 'utf8', env: sessionEnv() });
+    const attempt = `${res.stdout}${res.stderr}exit=${res.status}`;
+    assert.doesNotMatch(attempt, /exit=0/, `the manual commit must be refused while the land holds main:\n${attempt}`);
+    assert.match(attempt, /fgOS is writing the main checkout/);
+    git(repoRoot, ['reset', '-q', 'manual.txt']);
+  }, { fgosDir: path.join(repoRoot, '.fgos') });
   assert.doesNotMatch(git(repoRoot, ['log', '--format=%s', 'main']), /manual commit during land/);
   assert.equal(commitCount(repoRoot), before + 2, 'the merged branch commit and the merge commit, nothing else');
 });
@@ -145,16 +155,17 @@ test('without the hook (raw git outside fgOS), a manual commit that slips in bef
     const res = spawnSync('git', ['-c', 'core.hooksPath=/dev/null', '-c', 'user.name=Manual', '-c', 'user.email=m@example.com', 'commit', '-q', '-m', 'manual commit without hook'], { cwd: repoRoot, encoding: 'utf8', env: sessionEnv() });
     assert.equal(res.status, 0, res.stderr);
   }, { fgosDir });
-  const result = await land;
 
-  assert.equal(result.outcome, 'merge-failed-unclassified', JSON.stringify(result));
-  assert.match(result.error.message, /update-ref failed/);
+  await assert.rejects(land, (err) => {
+    assert.equal(JSON.parse(err.message).cause, 'land-target-changed', err.message);
+    return true;
+  });
   assert.match(git(repoRoot, ['log', '--format=%s', `${tipBefore}..main`]), /manual commit without hook/);
   assert.doesNotMatch(git(repoRoot, ['log', '--format=%s', 'main']), /^merge fgw\/item-a/m, 'the merge commit never landed on the moved trunk');
   assert.equal(git(repoRoot, ['show', 'main:manual.txt']), 'manual\n', 'the manual commit is not lost');
 });
 
-test('a file staged in main before the land refuses it even outside the item\'s own file set: the working-tree sync would delete it, so the trunk does not move and the staged file is kept', { skip }, async () => {
+test('a file staged in main outside the item\'s own file set does not refuse the land: the trunk moves, the staged file is kept staged and the checkout reports pending', { skip }, async () => {
   const repoRoot = initRepo();
   activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
@@ -164,9 +175,10 @@ test('a file staged in main before the land refuses it even outside the item\'s 
 
   const result = await mergeRootIntoMainCas(repoRoot, item('item-a'), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
 
-  assert.equal(result.outcome, 'main-checkout-dirty-mid-merge', JSON.stringify(result));
-  assert.deepEqual(result.stagedPaths, ['staged.txt']);
-  assert.equal(mainTip(repoRoot), tipBefore, 'update-ref never ran');
+  assert.equal(result.outcome, 'merged', JSON.stringify(result));
+  assert.equal(result.receipt.checkout, 'pending', 'checkout-lagging: the staged bytes are preserved, not synced over');
+  assert.notEqual(mainTip(repoRoot), tipBefore, 'the trunk moved');
+  assert.match(git(repoRoot, ['ls-tree', '--name-only', 'main']), /a\.txt/);
   assert.match(git(repoRoot, ['diff', '--cached', '--name-only']), /staged\.txt/, 'still staged');
   assert.equal(fs.readFileSync(path.join(repoRoot, 'staged.txt'), 'utf8'), 'staged by a person\n');
 });

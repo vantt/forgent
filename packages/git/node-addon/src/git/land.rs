@@ -72,7 +72,7 @@ impl GitLand {
         Ok(result)
     }
     #[napi]
-    pub fn publish(&mut self, evidence: Value) -> Result<Value> {
+    pub fn publish(&mut self, evidence: Value, wait_ms: Option<u32>) -> Result<Value> {
         check()?;
         let evidence: LandEvidence = serde_json::from_value(evidence).map_err(error)?;
         let session = self
@@ -81,7 +81,7 @@ impl GitLand {
             .ok_or_else(|| error("land-session-required"))?;
         Ok(json!(self
             .driver
-            .publish_land(&self.repo, session, &evidence)
+            .publish_land_wait(&self.repo, session, &evidence, wait_ms.unwrap_or(0).into())
             .map_err(operation)?))
     }
     #[napi]

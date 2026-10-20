@@ -706,12 +706,32 @@ impl GitDriver {
     ) -> Result<Receipt> {
         self.publish_land_with_filesystem(repo, session, evidence, &wal::OsFileSystem)
     }
+    /// Wait at most `wait_ms` for the main checkout; publication itself is never retried.
+    pub fn publish_land_wait(
+        &self,
+        repo: &RepoHandle,
+        session: &mut LandSession,
+        evidence: &LandEvidence,
+        wait_ms: u64,
+    ) -> Result<Receipt> {
+        self.publish_land_with_wait(repo, session, evidence, &wal::OsFileSystem, wait_ms)
+    }
     pub fn publish_land_with_filesystem<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         session: &mut LandSession,
         evidence: &LandEvidence,
         filesystem: &F,
+    ) -> Result<Receipt> {
+        self.publish_land_with_wait(repo, session, evidence, filesystem, 0)
+    }
+    fn publish_land_with_wait<F: wal::FileSystem>(
+        &self,
+        repo: &RepoHandle,
+        session: &mut LandSession,
+        evidence: &LandEvidence,
+        filesystem: &F,
+        wait_ms: u64,
     ) -> Result<Receipt> {
         if let Some(receipt) = &session.receipt {
             replay_land_receipt(receipt)?;
@@ -739,7 +759,7 @@ impl GitDriver {
         }
         let mut scope = crate::refs::acquire_worktree_admin(repo, held(&session.slot)?)?;
         scope
-            .acquire("main-checkout", &params(repo), Wait::Ms(5000))
+            .acquire("main-checkout", &params(repo), Wait::Ms(wait_ms))
             .map_err(failure)?;
         let candidate_repo = match self.resolve_repo(&c.worktree, repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => self.checkout_repository(&r)?,

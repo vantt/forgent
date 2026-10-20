@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `approve`/`merge` `--wait` now also bounds Land's wait for the main checkout at publication (previously a fixed 5 s), and a waiting Land no longer stalls its own process, so a release by another holder in the same process is seen.
+
 - Git Land can pin the current destination under its own slot, wait for admission without retrying publication, and freeze exact consumer-declared conflict resolutions before verification. Merge review patches, changed-path lists, ancestry and clean-tree reads now use Git Inspect; the legacy publication callers have not yet been switched.
 
 - Forced session cleanup retains detached commits with a named recovery ref and snapshot, and preserves dirty sessions. Missing checkout registrations are pruned only with inspected ownership evidence. Work event checkpoints and verified archive publication use declared native Git transactions.
