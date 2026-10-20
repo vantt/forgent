@@ -74,6 +74,21 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
   return { addon, manifest, cargoEnv };
 }
 
+/**
+ * Builds the release-profile artifacts the release-tree tests stage from (`fgos`, `fgctl` and the
+ * native addon under `releaseOutputDir()`), as CI does before `npm test`. Incremental: a no-op when
+ * they are current. Runs inside the full-suite queue, so worktrees sharing a cargo target never
+ * rebuild under one another's run.
+ */
+export function ensureReleaseArtifacts(env = process.env, cwd = REPO_ROOT) {
+  const targetDir = path.resolve(cwd, env.CARGO_TARGET_DIR || 'target');
+  execFileSync('cargo', ['build', '--locked', '--release', '-p', 'fgos', '-p', 'fgctl', '-p', 'fgos-node-addon'], {
+    cwd,
+    env: { ...env, CARGO_TARGET_DIR: targetDir },
+    stdio: 'inherit',
+  });
+}
+
 const TEST_FILE_SUFFIX = '.test.mjs';
 
 /**
@@ -602,6 +617,7 @@ if (isMainModule(import.meta.url)) {
         const host = ensureHostBin(process.env, REPO_ROOT);
         process.env.FGOS_HOST_BIN = host;
         ensureGitAddon(process.env, REPO_ROOT);
+        ensureReleaseArtifacts(process.env, REPO_ROOT);
         return release;
       } catch (err) {
         release();

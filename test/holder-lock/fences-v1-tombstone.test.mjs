@@ -110,7 +110,10 @@ test('a run made by the run supervisor after the cutover needs no recovery tombs
 
 test('every real v1 acquire fails loudly against the tombstones instead of taking the lock', (t) => {
   const ws = makeWorkspace('v1-acquires');
-  assert.equal(placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).ok, true);
+  const fenceOptions = { fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot };
+  assert.equal(placeFences(fenceOptions).ok, true);
+  const placed = fenceStatus(fenceOptions);
+  assert.equal(placed.complete, true);
   const fgosDir = JSON.stringify(ws.fgosDir);
   const root = JSON.stringify(ws.root);
 
@@ -146,10 +149,8 @@ test('every real v1 acquire fails loudly against the tombstones instead of takin
     assert.ok(expectations[name](observed), `${name} failed in an unexpected way: ${JSON.stringify({ outcome: observed.outcome, code: observed.code, name: observed.name, message: observed.message, value: observed.value })}`);
   }
 
-  // The tombstones are untouched by the failed acquires.
-  for (const target of fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).targets) {
-    assert.equal(target.fenced, true, `${target.path} still fenced`);
-  }
+  // The failed acquires leave every fence as it was placed (fgctl's controller path stays fgctl's).
+  assert.deepEqual(fenceStatus(fenceOptions), placed);
 });
 
 test('an old lock file still present stops the placement before anything is written', () => {
