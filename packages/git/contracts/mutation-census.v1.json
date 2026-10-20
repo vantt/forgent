@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "37fec4f5e213235e305819cbde7cfa0aaf3c7c9d781f0e5c35a6bee3c878f4ab",
+  "payloadDigest": "cad458e877071d608a2fb891257465354420079a6ce3a198edddc5a02a5ae626",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -66,7 +66,7 @@
     ".agents/skills/fgos-run/SKILL.md": "5d709f70a2c5c735e0374a54f40e66251e037c721e35e2ae8cda4aba3f1473b4",
     ".githooks/pre-commit": "53c4ce05726ed6372d34f15f41d32c563d208204142b1459f4ec1b8d8d58cab2",
     "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
-    "apps/fgctl/tests/git_wal_activation_gate.rs": "7af12a8d93283e26be8009e5eaebf15f09a0b3ac756fd311d62f6e184c7997de",
+    "apps/fgctl/tests/git_wal_activation_gate.rs": "bfea8f7ae0cf3efc8ca60adba26fa645613ccf1b1196dc2d220b69562401b8c6",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c8a6cb7619d9578e02479069fbb0f43a5206583b53a7c6d65373d285d69ca331",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
     "apps/fgos-gateway/src/cf_access.rs": "be105b105b492ce1fe89a11282dd480e2daf4e5fe179d1166b03148df937feca",
@@ -547,9 +547,9 @@
     "scripts/ci-external-consumer.sh": "d097aeeacae5d35e7e2163e8d4fcc859df69efe57c05c22ca940e83beb6ab954",
     "scripts/decision-question-hook.mjs": "5f4d242754bea6fa460288e790a4354d6780d847305ef3779c4547137d6872d1",
     "scripts/dispatch-decide-hook.mjs": "c3385557ec6c469ea6709d30dcbcd704a1a74d1c7f5011109bfc0f999dec08af",
-    "scripts/event-store/forge-probe.sh": "3f83b9300b5918dc35c9816fd71dfd8f83d67328ce772cc70deefa820dfb2778",
-    "scripts/event-store/power-loss-driver.mjs": "aee1d6e31c79c658c339f0583f1392275229af30614062031fcc1d38766d6429",
-    "scripts/event-store/power-loss.sh": "f0ec9f1e7bcbc2ab6993597a9f702ca19de649348e57051df97b10e4553b4ed2",
+    "scripts/event-store/forge-probe.sh": "2abada27150b00189e60a0eb5689a36aff5733b27c100631b618c4b7adb983dc",
+    "scripts/event-store/power-loss-driver.mjs": "11bcd49139d549cdb198f616c3297447cae7f2829774a9ff831c6fa261dd2df3",
+    "scripts/event-store/power-loss.sh": "157295589c47f6d3bc6b740b0754a1b5c6cf08fb98593353eb9c4763ca4cb15c",
     "scripts/event-store/store-increment-worker.mjs": "677424f7dae51f0566c9eb61cd96171347084ef2d93f5da1fc8133cea2f5af2a",
     "scripts/event-store/v-spawn-bench.mjs": "a9f2da47d5410ef6baef1200d9d5261c2bf3fed24cfe7450ce4d6913712a1890",
     "scripts/events-jsonl-truncation-guard.mjs": "772467fc1de75f0ecb39efecd08b607bb593c4f0b38b3586c82e2c4a4f710654",
@@ -557,11 +557,11 @@
     "scripts/export-command-selectors.mjs": "8ef578e5f5c2bfbe350a941b5d3896b0684c4030958505f941365e3f6456cdbd",
     "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",
     "scripts/fgos-shell-integration.sh": "89d74fd3352594dccc46c85174725a7095714ed436a599342ef87c78a60b732c",
-    "scripts/git-addon.mjs": "7bf04b57fc3b7284fe69b136dac3daf5c00202c6c0e9144875c294c6c2dc7705",
+    "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
     "scripts/git/e1-power-cut.mjs": "1a0a4293e5e8f61a2a678a2b9545284138c06c45c87da810b53457611262fdb2",
     "scripts/git/e1-power-cut.sh": "a1eef806c023252b426cc818767b22d1b050de9237c75f96d505ef51f04247a7",
-    "scripts/git/e3-bench.mjs": "d7b7dd054d6b40983a26847d28b84af9f4eb94c8811e248564eb09d6c6e39e89",
-    "scripts/git/p-release-checks.sh": "27b43ab27eb9b7ad834bb45b539f26d740292cddcc413451986959c237465bc4",
+    "scripts/git/e3-bench.mjs": "324b205b6ac185b7d1f1d5e1c10070de9d6261714bb5c4ae334a35307d68e003",
+    "scripts/git/p-release-checks.sh": "08bb9b3c32e7915b27f645f7aa68d42cba0dbddd2a7dc9adc45d43a75b4d0056",
     "scripts/git/p-space-resource.mjs": "2e8dda349394e47f57633274905a5fb63b008d952c8ca7cb594b0ed48dce0328",
     "scripts/git/p-space.sh": "0fc4ca8d1b3d5f20e4897b100fc13e40f655d0ba90ab0a99a7e525d230241f59",
     "scripts/herdr-cockpit-notify.mjs": "f3e1cd7e31438e75a113b2cc2481ca6472c1fadaf94a16ed781204d50ed2ac0e",
@@ -571,7 +571,9 @@
     "scripts/knowledge-canary.mjs": "3a3cb3dafc17a9128a19ec49e33ebf46f0f157bd3a254e783a693aebe4f5845a",
     "scripts/knowledge-classifier.mjs": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
     "scripts/knowledge-migration.mjs": "10193fda8ea6a58e3727847031f372309786ec05f181c4b79a67692791f0ac51",
+    "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
     "scripts/lib/full-suite-queue.mjs": "fa7c31d57af4626de9acb5c5298d618f285c3f7e139c0ac0772a0bc9210e9d06",
+    "scripts/lib/git-addon-stage.mjs": "3112f05d71365bcd379405db58fb4b48de7c809b2b097eb3faeb6ea616c0adcb",
     "scripts/lib/git-dir-layout.mjs": "710ff2406bed4faa4a35ff3ccd2910e97d693112b64cd82802efc2f99027232f",
     "scripts/lib/git-ports.mjs": "119f38a44c2eb068dc2f7f1236f83d44cb1a1f2c10827e2aebf5efd9c7f6b24b",
     "scripts/lib/git-spawn-match.mjs": "f18f85e7107bcacdde3ebe864f13bfc0eb7e3199927824cae8e64f39853037ad",
@@ -592,9 +594,9 @@
     "scripts/probe-storytelling-material.mjs": "c697fb57bee9fd1e4d2464edd31312e41e9f661e540b159f86d7573ff83e9b5c",
     "scripts/project-agents.mjs": "8af93fe4d0c75957a82da98b5c4dfa5aabba78fd4e60338b8cac861996b0e468",
     "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
-    "scripts/run-rust-dev-host.mjs": "23b256c397da248c87d47fee25e3b4eff9bf918d41be1e03b12b17c6f317bb5c",
+    "scripts/run-rust-dev-host.mjs": "bae6761acce9ccc479b9d30134a76ea8fd20993937e8d2b78d1c69a87a0f3741",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "daac24795e6859a5981948d3a185b96b0ebacfef0d6582197d3ed4e333e55eb2",
+    "scripts/run-tests.mjs": "709d73239f1e5b0aaa91a2efdb90f695cacc84a8dc317d83f7f615013efbd1be",
     "scripts/stress-test-files.mjs": "c3ccd385982e8e1865b54e02abef044ae3e85a4547f34c9efd2fcbcc66d37240",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "cbd3324b5fc76b680253283001e9d310bdd782e64148e2f03234b5a75e05904f",
@@ -628,7 +630,7 @@
     "src/git/inspect.mjs": "33f3f72ad93c01f08b74a2da9709b5f2406958ce010283773ffc65d0938aa31c",
     "src/git/land.mjs": "0c8a1c878a46ac19343040b6c85fc11dd0e59ac6d18b7a1490b85a06940524da",
     "src/git/native-lock.mjs": "b75f10cf57a5bc07f916b45c2ef241ab62eff89f1cf6f67505a3cb3a7ad6d515",
-    "src/git/native.mjs": "9e1495a95649c17c689379a2dcb555464d23dbe810210751689c3453939b4a03",
+    "src/git/native.mjs": "5ee8484514af1658682894a487c87896c94714d9790578447e5eac25fb25e280",
     "src/git/recovery.mjs": "9b0baba9cc59665d700d1269c5f35dd5f7750b918d1dbf0273a8c651e03e4941",
     "src/git/refs.mjs": "eb8dfa75531652a19f0c524357d8e1c57d54bf281548f3d0e3a7657a4ee18502",
     "src/git/remote.mjs": "58aafc6f9ff17488427f515268cba52271696f1005ff44e6863977c9859ece4e",
@@ -664,14 +666,15 @@
     "src/report/item-trace.mjs": "bb91d0d9635d0794ed9a979cc4fa6721d26db18905637d465be8ce6d831e7155",
     "src/report/knowledge-projection.mjs": "6e3e4dbacf4da735924b5cc705d9c805a6d8af362c6182298550e708f698d832",
     "src/report/knowledge-resolver.mjs": "eab342bb4296e20fdbc6742cec084be0924e80cfa6d3f7e525395959b6bd0751",
-    "src/run-supervisor/attempt-step.mjs": "a695a3fa8b978585dceb1576fa8374274bc59d2579f1d08cd28e35eaf142cb29",
+    "src/run-supervisor/attempt-step.mjs": "cabe99992da3c5157035f3320abd4a184191297989fe973ae3dbd4f0fc8fb273",
     "src/run-supervisor/cancel-opt-in.mjs": "f5b9a2eadc709918201ed01620098886bd108e8445c2b2304b845b4e73981403",
     "src/run-supervisor/cancel-registry.mjs": "52e79f2a45db7310d1bfbd09168e4e595d38faef3e5b74bfbca9030de85f9d34",
-    "src/run-supervisor/client.mjs": "4a2dd7cbedde90c0036dc2dce335e842961939d3b02340abd1db509ee71cac39",
-    "src/run-supervisor/direct-launch.mjs": "2e03469f972682b331a527330cb171506ca17fa9881ca28f08e5d57dce9cfc48",
+    "src/run-supervisor/client.mjs": "64b632a38eb54f44f97f0020dd46cf362c7837d693a2667aac42209f50a540ec",
+    "src/run-supervisor/direct-launch.mjs": "27cd8e85e0f744d2fa90235698f5fdfbaf91b08080aeb244879016815352a8bf",
     "src/run-supervisor/gate-kill-grace.mjs": "378ca3875bde61e5229cdfd5738854b5ed727b05496ec308b10682c3c0cf6c03",
     "src/run-supervisor/legacy-sweep.mjs": "63d49b8910513337ae01810361b02fdcc2a4c8ab5ab17fcf5c52de1f9474d51a",
     "src/run-supervisor/payload-root.mjs": "b1ad1d5402b921254d06aecf20a7bc1fe322845c0ab72f028c5fb7047402bdd9",
+    "src/run-supervisor/protocol.mjs": "84c0eaa3c8a94429c4c207d2a80d9e7851914cd64985e82f8507ffcbead63b7c",
     "src/run-supervisor/runtime-dir.mjs": "321bbaf39f909ae909face6daa40c0a187e165fd0faebd743a74895b9a3840fc",
     "src/run-supervisor/step-support.mjs": "40c78da932dafd643762ff5c32e1f8a3844d5a7f9cd7ec64055b8b1343f614f9",
     "src/run-supervisor/steps/cleanup-trust.mjs": "4427bcd94a9469eb2063403207866ef1d28ae2941987bc8f31853c2fb4b2f0b6",
@@ -802,7 +805,7 @@
     "src/runner/work-compat.mjs": "a804010f1992b05a28e07e11681c06919b1bc4a72fd1ab3e77bd2590bb020d25",
     "src/runner/work-dispatch.mjs": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f",
     "src/runner/worker-log.mjs": "b33f235b50765aff48b4dfd5ad15ea09fccacea4b7ea4ca52dc4df8dd3226ba1",
-    "src/runner/worktree.mjs": "5f53b99f7cbcfd71be81e28def0cd40f6dfb99497fb68292c169bc770a8bb133",
+    "src/runner/worktree.mjs": "76add3322777d6c33699e07b13566b17c90516ce5f53d35983cf3af755a4af0d",
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/setup/agent-cli-trust.mjs": "6a70801d94f369a216d626b240022c5291ab8efdf742d0e1ce63721ac1669537",
     "src/setup/agent-hooks.mjs": "0109366e1a1a117b0128a729d4753dc8de14d92ac1c5ba5893959d01a62c1088",
@@ -817,7 +820,7 @@
     "src/setup/event-store-fixes.mjs": "4f3a95add8dee1f08c1dd2d38fdb0cf7b5ee7101909faf965c0b2e6ebdaa142e",
     "src/setup/executor-posture-coverage.mjs": "fb5f81c62e01aa7ca3f229a4f2e440f14eb0ac96e73469f942ce418f7854a043",
     "src/setup/executor-profile-warnings.mjs": "7edcf8b4ddb7030651b4607e364b7a2e4a78e9166c967893c25880a949ea37be",
-    "src/setup/git-checks.mjs": "77d5fe8928a7effeccc14af2aa0cf8a5e578978851967c35cfb95a8b853a6e28",
+    "src/setup/git-checks.mjs": "4e4a70076ed3ccbfdd1c331d376c6c2ef6d5127cfeb1a4f1497ac14a68bdcef1",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/holder-lock-checks.mjs": "b51860bfe681104ab3ec462333150ea39d183e707162af4319d90e18040791f6",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
@@ -827,7 +830,7 @@
     "src/setup/model-pool-checks.mjs": "9a5f4c2319d630932b4c1ef3bf97ba90c41a2147271725fa1c87e64b472b1ec1",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
     "src/setup/registrations.mjs": "eac44ceb1bd5bb132964989720ea5b0fde09137aaa0ef0f6e22a70c53aeacdb5",
-    "src/setup/run-supervisor-checks.mjs": "4d44ebc8f640f3aad66f84df74a1c5ce28851ced8c1c708f31313e986a93e1ac",
+    "src/setup/run-supervisor-checks.mjs": "4e8a05f500564f67fbfa7684cd71d160281c4cc345ec1bbecd74505994a9f1fb",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
     "src/setup/terminal-control-checks.mjs": "ce1e85c2d622611d2c6e6b47bfadc49ebb4a0f801c80bfcc7a91d3e8d0139656",
@@ -964,7 +967,7 @@
     "plans": 1740,
     "plugins": 101,
     "rustfmt.toml": 1,
-    "test": 755,
+    "test": 756,
     "tools": 13
   },
   "sites": [],
@@ -1323,7 +1326,7 @@
     },
     {
       "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
-      "line": 342,
+      "line": 345,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2250,7 +2253,7 @@
     },
     {
       "path": "scripts/git-addon.mjs",
-      "line": 13,
+      "line": 16,
       "spawn": "loadNativeAddon -> src/git/index.mjs:10",
       "binary": "(configuration file data)",
       "class": "configured-binary"
@@ -2306,85 +2309,85 @@
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 460,
+      "line": 461,
       "spawn": "checkoutInspect -> scripts/git/e3-bench.mjs:48",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 462,
+      "line": 463,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 464,
+      "line": 465,
       "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 478,
+      "line": 479,
       "spawn": "createGitPublication -> src/git/index.mjs:9",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 495,
+      "line": 496,
       "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 599,
+      "line": 600,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 665,
+      "line": 666,
       "spawn": "loadNativeAddon -> src/git/index.mjs:10",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 678,
+      "line": 679,
       "spawn": "loadNativeAddon -> src/git/index.mjs:10",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 696,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:769",
+      "line": 697,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:770",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 696,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:739",
+      "line": 697,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:740",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 794,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:769",
+      "line": 795,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:770",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 802,
-      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:794",
+      "line": 803,
+      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:795",
       "binary": "(command-line arguments)",
       "class": "configured-binary"
     },
@@ -2410,6 +2413,13 @@
       "class": "configured-binary"
     },
     {
+      "path": "scripts/lib/git-addon-stage.mjs",
+      "line": 82,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
       "path": "scripts/lib/sandbox-git.mjs",
       "line": 49,
       "spawn": "execFileSync",
@@ -2424,14 +2434,14 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/git/e3-bench.mjs:441"
+        "scripts/git/e3-bench.mjs:442"
       ],
       "class": "sandbox-door"
     },
     {
       "path": "scripts/run-tests.mjs",
-      "line": 119,
-      "spawn": "execFileSync",
+      "line": 564,
+      "spawn": "hostSpeaksLockProtocol -> scripts/run-tests.mjs:577",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
