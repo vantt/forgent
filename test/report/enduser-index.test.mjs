@@ -230,7 +230,7 @@ function runDocsIndexAt(cwd) {
   return spawnSync(process.execPath, [FGOS, 'docs-index'], { cwd, encoding: 'utf8' });
 }
 
-test('fgos docs-index on an unreachable store preserves an existing prior sourceCaptureId instead of nulling it', () => {
+test('fgos docs-index refuses an unavailable store and preserves its existing manifest', () => {
   const cwd = tmpFixtureCwd();
   fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
   fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'hello.md'), '# Hello\n');
@@ -255,12 +255,12 @@ test('fgos docs-index on an unreachable store preserves an existing prior source
   );
 
   const result = runDocsIndexAt(cwd);
-  assert.equal(result.status, 0, result.stderr);
+  assert.notEqual(result.status, 0, 'an unavailable store must refuse before writing');
   const manifest = JSON.parse(fs.readFileSync(path.join(cwd, 'docs', 'enduser-docs-index.json'), 'utf8'));
   assert.equal(manifest[0].sourceCaptureId, 'tsk-real-capture', 'an unreachable store must not regress a real prior id to null');
 });
 
-test('fgos docs-index on an unreachable store with no prior manifest value stays null (nothing to preserve)', () => {
+test('fgos docs-index refuses an unavailable store without creating a manifest', () => {
   const cwd = tmpFixtureCwd();
   fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
   fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'hello.md'), '# Hello\n');
@@ -269,12 +269,11 @@ test('fgos docs-index on an unreachable store with no prior manifest value stays
   assert.ok(!fs.existsSync(path.join(cwd, 'docs', 'enduser-docs-index.json')), 'first-ever run: no prior manifest');
 
   const result = runDocsIndexAt(cwd);
-  assert.equal(result.status, 0, result.stderr);
-  const manifest = JSON.parse(fs.readFileSync(path.join(cwd, 'docs', 'enduser-docs-index.json'), 'utf8'));
-  assert.equal(manifest[0].sourceCaptureId, null);
+  assert.notEqual(result.status, 0, 'an unavailable store must refuse before writing');
+  assert.equal(fs.existsSync(path.join(cwd, 'docs', 'enduser-docs-index.json')), false);
 });
 
-test('fgos docs-index run twice in a row against the same unreachable store converges (R7 survives tsk-f31): no second write', () => {
+test('fgos docs-index repeated refusals for an unavailable store leave the manifest unchanged', () => {
   const cwd = tmpFixtureCwd();
   fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
   fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'hello.md'), '# Hello\n');
@@ -300,12 +299,12 @@ test('fgos docs-index run twice in a row against the same unreachable store conv
   const manifestPath = path.join(cwd, 'docs', 'enduser-docs-index.json');
 
   const run1 = runDocsIndexAt(cwd);
-  assert.equal(run1.status, 0, run1.stderr);
+  assert.notEqual(run1.status, 0);
   const afterRun1 = fs.readFileSync(manifestPath, 'utf8');
   const mtimeAfterRun1 = fs.statSync(manifestPath).mtimeMs;
 
   const run2 = runDocsIndexAt(cwd);
-  assert.equal(run2.status, 0, run2.stderr);
+  assert.notEqual(run2.status, 0);
   const afterRun2 = fs.readFileSync(manifestPath, 'utf8');
   const mtimeAfterRun2 = fs.statSync(manifestPath).mtimeMs;
 

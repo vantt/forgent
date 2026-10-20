@@ -7,24 +7,11 @@ import { execFileSync } from 'node:child_process';
 import { fixture, loaderOptions } from './phase07-fixture.mjs';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
 import { root } from '../helpers/git-addon.mjs';
+import { hostBin } from '../helpers/work-store-release.mjs';
 
 test('public Work mutations, same-writer drift and settle use the real facade and one batch', t => {
   const f = fixture(t);
-  // A disposable release descriptor binds this checkout and the actual addon
-  // to a real host. No alternate store implementation or test-only branch.
-  const host = resolveActiveHostBin({ fgosDir: path.join(root, '.fgos') }).bin;
-  assert.ok(host, 'a real host is required');
-  const release = path.join(f.temp, 'release');
-  fs.mkdirSync(path.join(release, 'bin'), { recursive: true });
-  const bin = path.join(release, 'bin/fgos');
-  fs.copyFileSync(host, bin); fs.chmodSync(bin, 0o755);
-  fs.symlinkSync(root, path.join(release, 'payload'));
-  const component = loaderOptions.descriptor.manifest.components.nativeAddon;
-  fs.copyFileSync(path.join(root, component.path), path.join(release, 'fgos.node'));
-  fs.writeFileSync(path.join(release, 'manifest.json'), JSON.stringify({
-    entries: { fgos: 'bin/fgos' },
-    components: { legacyNode: { root: 'payload', entry: 'bin/fgos.mjs' }, nativeAddon: { ...component, path: 'fgos.node' } },
-  }));
+  const bin = hostBin;
   const storeUrl = new URL('../../src/state/store.mjs', import.meta.url).href;
   const claimsUrl = new URL('../../src/state/runtime-coordination.mjs', import.meta.url).href;
   const source = `

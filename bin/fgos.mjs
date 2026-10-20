@@ -43,7 +43,7 @@ import { checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
 import { parseFrontmatter } from '../src/report/frontmatter.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
-import { rebuildViewFromDir } from '../src/state/replay.mjs';
+import { foldEvents } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, runDoorHint, DispatchError } from '../src/runner/dispatch.mjs';
@@ -4235,7 +4235,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
       const claim = readClaim(dir, id);
       if (!claim) return { released: false, reason: 'no-claim' };
-      const durableView = rebuildViewFromDir(dir);
+      const durableView = foldEvents(readRawEvents(dir));
       const durableStatus = durableView.work[id]?.status;
       // Operator recovery: the claim may belong to another (often dead)
       // session, so both release paths name their reason through the admin

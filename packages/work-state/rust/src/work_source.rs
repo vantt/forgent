@@ -1,7 +1,7 @@
 //! Work observation source (Lane A - Phase F6/F7).
 //!
 //! Implements `ObservationSource` with `source_id: "work"`.
-//! Reads `.fgos/events.jsonl` and `.fgos/events/*.jsonl` for timing events
+//! Reads the Event Store project stream for timing events
 //! (`added`, `moved`, `asked`, `answered`, `gate-approved`).
 //! Reads state.json (`.fgos/cache/state.json` or `.fgos/state.json`) for folded state properties:
 //! outcomes, settlements, learnings, and entropy signals (missing-actual, stale-doing, stage-entry, awaiting-human).
@@ -10,9 +10,8 @@ use fgos_observe::{Observation, ObservationSource, SourceError, Subject, Subject
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use std::collections::{HashMap, HashSet};
-use std::fs::{self, File};
-use std::io::{BufRead, BufReader};
-use std::path::{Path, PathBuf};
+use std::fs;
+use std::path::Path;
 
 pub const DOMAIN_ENTRY_STAGES_JSON: &str = include_str!("../../contracts/domain-entry-steps.json");
 
@@ -82,7 +81,7 @@ impl WorkSource {
         Self
     }
 
-    pub const VIEW_SCHEMA_VERSION: u64 = 4;
+    pub const VIEW_SCHEMA_VERSION: u64 = 5;
 
     /// Read raw state json from `.fgos/cache/state.json` or `.fgos/state.json`
     pub fn read_state_json(root: &Path) -> Option<Value> {
@@ -462,196 +461,132 @@ impl ObservationSource for WorkSource {
     }
 
     fn observations(&self, root: &Path, w: &Window) -> Result<Vec<Observation>, SourceError> {
-        let fgos_dir = root.join(".fgos");
-        if !fgos_dir.exists() {
-            return Ok(Vec::new());
-        }
-
-        // Discover files: events.jsonl and events/*.jsonl
-        let mut files: Vec<(String, PathBuf)> = Vec::new();
-        let baseline = fgos_dir.join("events.jsonl");
-        if baseline.is_file() {
-            files.push(("events.jsonl".to_string(), baseline));
-        }
-
-        let events_dir = fgos_dir.join("events");
-        if events_dir.is_dir() {
-            if let Ok(entries) = fs::read_dir(&events_dir) {
-                let mut shard_files = Vec::new();
-                for entry in entries.flatten() {
-                    let p = entry.path();
-                    if p.is_file() && p.extension().and_then(|s| s.to_str()) == Some("jsonl") {
-                        if let Some(file_name) = p.file_name().and_then(|s| s.to_str()) {
-                            shard_files.push((file_name.to_string(), p));
-                        }
-                    }
-                }
-                shard_files.sort_by(|a, b| a.0.cmp(&b.0));
-                files.extend(shard_files);
-            }
-        }
-
         let mut observations = Vec::new();
-        let mut seen: HashSet<(String, u64)> = HashSet::new();
+        for (_default_src, val) in crate::event_reader::events(root)? {
+            let event_type = val.get("type").and_then(|t| t.as_str()).unwrap_or("");
+            let ts = val.get("ts").and_then(|t| t.as_str()).unwrap_or("");
+            if ts.is_empty() {
+                continue;
+            }
 
-        for (default_src, path) in files {
-            let file = match File::open(&path) {
-                Ok(f) => f,
-                Err(e) => return Err(SourceError::Io("work", e)),
+            // Check window bounds if provided
+            if let Some(since) = &w.since {
+                if ts < since.as_str() {
+                    continue;
+                }
+            }
+            if let Some(until) = &w.until {
+                if ts > until.as_str() {
+                    continue;
+                }
+            }
+
+            let payload = match val.get("payload").and_then(|p| p.as_object()) {
+                Some(p) => p,
+                None => continue,
             };
-            let reader = BufReader::new(file);
 
-            for line in reader.lines() {
-                let line = match line {
-                    Ok(l) => l,
-                    Err(e) => return Err(SourceError::Io("work", e)),
-                };
-                let trimmed = line.trim();
-                if trimmed.is_empty() {
-                    continue;
-                }
+            let id = match payload.get("id").and_then(|id_val| id_val.as_str()) {
+                Some(id) if !id.is_empty() => id,
+                _ => continue,
+            };
 
-                let val: Value = match serde_json::from_str(trimmed) {
-                    Ok(v) => v,
-                    Err(_) => continue,
-                };
+            let subject = Subject {
+                kind: SubjectKind::Work,
+                id: id.to_string(),
+            };
 
-                let event_type = val.get("type").and_then(|t| t.as_str()).unwrap_or("");
-                let ts = val.get("ts").and_then(|t| t.as_str()).unwrap_or("");
-                if ts.is_empty() {
-                    continue;
-                }
-
-                // Check window bounds if provided
-                if let Some(since) = &w.since {
-                    if ts < since.as_str() {
-                        continue;
+            match event_type {
+                "work.add" => {
+                    let mut attrs = Map::new();
+                    if let Some(kind) = payload.get("kind") {
+                        attrs.insert("kind".to_string(), kind.clone());
                     }
-                }
-                if let Some(until) = &w.until {
-                    if ts > until.as_str() {
-                        continue;
+                    if let Some(size) = payload.get("size").or_else(|| payload.get("tier")) {
+                        attrs.insert("size".to_string(), size.clone());
                     }
-                }
-
-                let seq = val.get("seq").and_then(|s| s.as_u64()).unwrap_or(0);
-                let src = val
-                    .get("src")
-                    .and_then(|s| s.as_str())
-                    .unwrap_or(&default_src)
-                    .to_string();
-
-                if seq > 0 && !seen.insert((src, seq)) {
-                    continue; // dedupe (src, seq)
-                }
-
-                let payload = match val.get("payload").and_then(|p| p.as_object()) {
-                    Some(p) => p,
-                    None => continue,
-                };
-
-                let id = match payload.get("id").and_then(|id_val| id_val.as_str()) {
-                    Some(id) if !id.is_empty() => id,
-                    _ => continue,
-                };
-
-                let subject = Subject {
-                    kind: SubjectKind::Work,
-                    id: id.to_string(),
-                };
-
-                match event_type {
-                    "work.add" => {
-                        let mut attrs = Map::new();
-                        if let Some(kind) = payload.get("kind") {
-                            attrs.insert("kind".to_string(), kind.clone());
-                        }
-                        if let Some(size) = payload.get("size").or_else(|| payload.get("tier")) {
-                            attrs.insert("size".to_string(), size.clone());
-                        }
-                        if let Some(rigor) = payload.get("rigor") {
-                            attrs.insert("rigor".to_string(), rigor.clone());
-                        }
-                        observations.push(Observation {
-                            ts: ts.to_string(),
-                            subject,
-                            kind: "work.added".to_string(),
-                            attrs,
-                            source: "work",
-                        });
+                    if let Some(rigor) = payload.get("rigor") {
+                        attrs.insert("rigor".to_string(), rigor.clone());
                     }
-                    "work.move" => {
-                        let from = payload
-                            .get("from")
-                            .and_then(|v| v.as_str())
-                            .unwrap_or("")
-                            .to_string();
-                        let to = payload
-                            .get("to")
-                            .and_then(|v| v.as_str())
-                            .unwrap_or("")
-                            .to_string();
+                    observations.push(Observation {
+                        ts: ts.to_string(),
+                        subject,
+                        kind: "work.added".to_string(),
+                        attrs,
+                        source: "work",
+                    });
+                }
+                "work.move" => {
+                    let from = payload
+                        .get("from")
+                        .and_then(|v| v.as_str())
+                        .unwrap_or("")
+                        .to_string();
+                    let to = payload
+                        .get("to")
+                        .and_then(|v| v.as_str())
+                        .unwrap_or("")
+                        .to_string();
 
-                        let mut attrs = Map::new();
-                        attrs.insert("from".to_string(), Value::String(from.clone()));
-                        attrs.insert("to".to_string(), Value::String(to.clone()));
+                    let mut attrs = Map::new();
+                    attrs.insert("from".to_string(), Value::String(from.clone()));
+                    attrs.insert("to".to_string(), Value::String(to.clone()));
 
+                    observations.push(Observation {
+                        ts: ts.to_string(),
+                        subject: subject.clone(),
+                        kind: "work.moved".to_string(),
+                        attrs,
+                        source: "work",
+                    });
+
+                    // work.asked: to == awaiting-human with payload.ask
+                    if to == "awaiting-human" && payload.contains_key("ask") {
+                        let mut ask_attrs = Map::new();
+                        if let Some(ask) = payload.get("ask") {
+                            ask_attrs.insert("ask".to_string(), ask.clone());
+                        }
                         observations.push(Observation {
                             ts: ts.to_string(),
                             subject: subject.clone(),
-                            kind: "work.moved".to_string(),
-                            attrs,
+                            kind: "work.asked".to_string(),
+                            attrs: ask_attrs,
                             source: "work",
                         });
-
-                        // work.asked: to == awaiting-human with payload.ask
-                        if to == "awaiting-human" && payload.contains_key("ask") {
-                            let mut ask_attrs = Map::new();
-                            if let Some(ask) = payload.get("ask") {
-                                ask_attrs.insert("ask".to_string(), ask.clone());
-                            }
-                            observations.push(Observation {
-                                ts: ts.to_string(),
-                                subject: subject.clone(),
-                                kind: "work.asked".to_string(),
-                                attrs: ask_attrs,
-                                source: "work",
-                            });
-                        }
-
-                        // work.answered: from == awaiting-human with payload.answer
-                        if from == "awaiting-human" && payload.contains_key("answer") {
-                            let mut ans_attrs = Map::new();
-                            if let Some(ans) = payload.get("answer") {
-                                ans_attrs.insert("answer".to_string(), ans.clone());
-                            }
-                            observations.push(Observation {
-                                ts: ts.to_string(),
-                                subject,
-                                kind: "work.answered".to_string(),
-                                attrs: ans_attrs,
-                                source: "work",
-                            });
-                        }
                     }
-                    "work.gate-approve" | "work.gate-approved" => {
-                        let mut attrs = Map::new();
-                        if let Some(gate) = payload.get("gate") {
-                            attrs.insert("gate".to_string(), gate.clone());
-                        }
-                        if let Some(actor) = payload.get("actor") {
-                            attrs.insert("actor".to_string(), actor.clone());
+
+                    // work.answered: from == awaiting-human with payload.answer
+                    if from == "awaiting-human" && payload.contains_key("answer") {
+                        let mut ans_attrs = Map::new();
+                        if let Some(ans) = payload.get("answer") {
+                            ans_attrs.insert("answer".to_string(), ans.clone());
                         }
                         observations.push(Observation {
                             ts: ts.to_string(),
                             subject,
-                            kind: "work.gate-approved".to_string(),
-                            attrs,
+                            kind: "work.answered".to_string(),
+                            attrs: ans_attrs,
                             source: "work",
                         });
                     }
-                    _ => {}
                 }
+                "work.gate-approve" | "work.gate-approved" => {
+                    let mut attrs = Map::new();
+                    if let Some(gate) = payload.get("gate") {
+                        attrs.insert("gate".to_string(), gate.clone());
+                    }
+                    if let Some(actor) = payload.get("actor") {
+                        attrs.insert("actor".to_string(), actor.clone());
+                    }
+                    observations.push(Observation {
+                        ts: ts.to_string(),
+                        subject,
+                        kind: "work.gate-approved".to_string(),
+                        attrs,
+                        source: "work",
+                    });
+                }
+                _ => {}
             }
         }
 
@@ -745,7 +680,7 @@ mod tests {
         let event4 = r#"{"type":"work.gate-approved","seq":4,"ts":"2026-09-01T10:15:00Z","payload":{"id":"tsk-1","gate":"plan","actor":"human"}}"#;
 
         let content = format!("{}\n{}\n{}\n{}\n", event1, event2, event3, event4);
-        fs::write(fgos_dir.join("events.jsonl"), content).unwrap();
+        crate::event_reader::import_fixture(&dir, &content);
 
         let source = WorkSource::new();
         let w = Window {
@@ -774,7 +709,7 @@ mod tests {
         fs::create_dir_all(&fgos_dir).unwrap();
 
         let state_json = r#"{
-            "viewSchemaVersion": 4,
+            "viewSchemaVersion": 5,
             "work": {
                 "tsk-1": { "id": "tsk-1", "status": "awaiting-approval", "workflowStep": "executing", "domain": "coding" },
                 "tsk-2": { "id": "tsk-2", "status": "doing", "workflowStep": "executing", "domain": "coding" },

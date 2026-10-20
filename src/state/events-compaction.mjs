@@ -16,7 +16,7 @@
 // SAFETY (per TA-D13, the whole point of T1's content-hash identity): a
 // crash between writing `baseline-<ts>.jsonl` and archiving the originals
 // leaves BOTH coexisting under `.fgos/events/` -- replay's dedupe-by-hash
-// (replay.mjs's `readAllEventsFromDir`) makes that straddle harmless, a
+// (the frozen legacy ordering rule) makes that straddle harmless, a
 // double-apply becomes structurally impossible rather than a discipline to
 // maintain. Never deletes anything: a break in the verify gate deletes only
 // the just-written CANDIDATE baseline file (nothing existed before this
@@ -96,7 +96,7 @@ export function findColdWriterFiles(eventsDirPath, { nowMs = Date.now(), idleThr
  * `payload`/`v` are copied through verbatim -- `h` is a PERMANENT identity
  * stamped once at original append time (TA-D9), never recomputed here, so
  * resequencing `seq` cannot and does not change it. A local reimplementation
- * on purpose, not `replay.mjs`'s `readAllEventsFromDir` -- that function is
+ * on purpose, not the frozen legacy reader -- that function is
  * scoped to a whole `.fgos` dir (baseline-0 + every writer file); this one
  * merges an explicit, caller-chosen subset (the cold files only).
  */

@@ -1034,3 +1034,36 @@ requirement; only the exact documented PID-namespace-unprovable refusal skips.
 The coordinator's host gate requires zero skips. No migrated workspace may
 resume writers before that gate passes. Export paths refuse Windows reserved
 names, colon, trailing dot/space, and other Windows-invalid characters.
+
+
+### Phase 09 Work reader cutover (2026-10-20)
+
+Work consumers no longer discover or read the retired files. Node callers use
+`readRawEvents`/the facade; WorkSource and LegacyFrictionSource share an in-process
+adapter over the Event Store crate and Git's repository resolver. Native readers
+reject incomplete history and propagate integrity/I/O failures. Legacy cursor
+provenance retains its original `events.jsonl`/`events/<name>` token; v4 source
+positions use `origin:stream`, so equal sequence numbers in different stores do
+not collide. Rust cache readers accept Work view schema 5.
+
+Migration parity decodes its explicit HEAD inventory through the crate's frozen
+legacy rule (`decodeLegacyFiles`), and authenticates previous cache anchors from
+those inventory bytes. Frozen vectors and exported-layout parity use that same
+facade; no production filesystem discovery reader remains in `replay.mjs`.
+The reducer and serialized-view fingerprint remain pure.
+
+Docs indexing uses the facade's successful read as reachability evidence. A
+missing legacy file is normal; unavailable or corrupt history throws before
+writing the manifest. This replaces the former file-existence sentinel and its
+best-effort fallback. Actor-to-role, proposed-status and status-category rewrite
+scripts are retired: their only mutation target was the removed file layout.
+Observe fixture generation appends Work events through the store and projects a
+separate golden snapshot; it never restores a Work log under `.fgos`.
+
+Evidence: `test/event-store/work-readers.test.mjs` classifies the phase's reader
+patterns and proves docs-index behavior using real history. Allowed classes are
+the owning facade/crate, migration/export inventories, metadata, frozen fixtures,
+separate workflow/coordination/Observe journals, the requirement-7 porting
+consumer, and the explicit requirement-9 repair/compaction/truncation/checkpoint/
+Land-restore mechanisms awaiting their removal unit. This cutover does not
+claim those later mechanism deletions are complete.

@@ -153,3 +153,9 @@ export function mintEventStoreMachineId(stateRoot, hostname, loaderOptions) {
   outsideGate([]);
   return call(() => loadNativeAddon(loaderOptions).mintEventStoreMachineId(stateRoot, hostname));
 }
+
+/** Decode an explicit legacy inventory through the crate's frozen ordering rule. */
+export function decodeLegacyFiles(files, loaderOptions) {
+  return call(() => loadNativeAddon(loaderOptions).decodeLegacyFiles(files))
+    .map(record => ({ ...record, event: JSON.parse(record.raw) }));
+}

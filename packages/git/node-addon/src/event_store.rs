@@ -594,3 +594,19 @@ impl EventStore {
         fgos_event_store::legacy_import::legacy_layout(driver, repo).map_err(error)
     }
 }
+
+/// Frozen legacy decoding for migration/export proofs; no filesystem discovery.
+#[napi]
+pub fn decode_legacy_files(files: std::collections::BTreeMap<String, String>) -> Result<Value> {
+    available()?;
+    let mut events = Vec::new();
+    for (file, raw) in files {
+        events.extend(fgos_event_store::legacy::parse_file(&file, &raw).map_err(error)?);
+    }
+    Ok(Value::Array(
+        fgos_event_store::legacy::order(events)
+            .into_iter()
+            .map(|e| json!({"raw": e.raw, "provenance": e.provenance}))
+            .collect(),
+    ))
+}

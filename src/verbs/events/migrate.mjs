@@ -3,11 +3,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { eventStoreFacts } from '../../event-store/index.mjs';
+import { decodeLegacyFiles, eventStoreFacts } from '../../event-store/index.mjs';
 import { isDeepStrictEqual } from 'node:util';
 import { checkStopped } from '../../holder-lock/fences.mjs';
 import { fixEventStoreLockDirs, fixEventStoreMachineId, fixEventStoreRefspec } from '../../setup/event-store-fixes.mjs';
-import { foldEvents, readAllEventsFromDir, buildSnapshotFromDir, serializeView } from '../../state/replay.mjs';
+import { foldEvents, serializeView } from '../../state/replay.mjs';
 import { listPorting } from '../../state/porting-store.mjs';
 import { eventsContext } from './context.mjs';
 import { resolveStateRoot } from '../../holder-lock/state-root.mjs';
@@ -23,13 +23,15 @@ function put(root, name, bytes) {
 function attributes(bytes) {
   return Buffer.from(bytes.toString('utf8').split(/(?<=\n)/).filter(line => line.trimStart().startsWith('#') || !['.fgos/events.jsonl', '.fgos/events*.jsonl', '.fgos/events/*.jsonl', '.fgos/events/**'].includes(line.trim().split(/\s+/)[0].replace(/^\//, '')) || !line.split(/\s+/).includes('merge=union')).join(''));
 }
-export function migrationParity({ inventory, events }, { baseline, cache } = {}) {
+export function migrationParity({ inventory, events }, { baseline, cache, loaderOptions } = {}) {
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-migrate-parity-'));
   try {
-    for (const [name, bytes] of Object.entries(inventory.files)) if (name.startsWith('.fgos/')) put(scratch, name.slice(6), Buffer.from(bytes));
     const workEvents = events.filter(e => !e.provenance.file.startsWith('porting/')).map(e => JSON.parse(e.raw));
     const imported = foldEvents(workEvents);
-    const legacy = foldEvents(readAllEventsFromDir(scratch));
+    const files = Object.fromEntries(Object.entries(inventory.files)
+      .filter(([name]) => name === '.fgos/events.jsonl' || /^\.fgos\/events\/[^/]+\.jsonl$/.test(name))
+      .map(([name, bytes]) => [name === '.fgos/events.jsonl' ? '' : path.basename(name), Buffer.from(bytes).toString('utf8')]));
+    const legacy = foldEvents(decodeLegacyFiles(files, loaderOptions).map(e => e.event));
     const differences = entityDifferences(legacy, imported).map(d => ({ source: 'legacy-fold', ...d }));
     if (!differences.length && serializeView(legacy).viewStr !== serializeView(imported).viewStr) differences.push({ source: 'legacy-fold', collection: '$serialization' });
     const compare = (source, value) => {
@@ -43,7 +45,7 @@ export function migrationParity({ inventory, events }, { baseline, cache } = {})
     let cacheCompared = false;
     if (cache && fs.existsSync(cache)) {
       const saved = JSON.parse(fs.readFileSync(cache, 'utf8'));
-      if (isDeepStrictEqual(saved.snapshot, buildSnapshotFromDir(scratch))) { compare('previous-cache', saved); cacheCompared = true; }
+      if (isDeepStrictEqual(saved.snapshot, legacyInventorySnapshot(inventory.files))) { compare('previous-cache', saved); cacheCompared = true; }
     }
     // Porting keeps physical log order and its own reducer, independent of Work.
     const porting = events.filter(e => e.provenance.file.startsWith('porting/'));
@@ -77,7 +79,7 @@ export async function migrateUseCase(ctx, options = {}) {
     if (!check.passed) refuse('event-store-legacy-mismatch', JSON.stringify(check.problems));
     return { unchanged: true, message: 'Event Store migration already complete' };
   }
-  const parity = migrationParity(snapshot, { baseline: options.baseline && path.resolve(cwd, options.baseline), cache: path.join(cwd, '.fgos/cache/state.json') });
+  const parity = migrationParity(snapshot, { baseline: options.baseline && path.resolve(cwd, options.baseline), cache: path.join(cwd, '.fgos/cache/state.json'), loaderOptions: ctx.loaderOptions });
   if (!parity.equal) refuse('event-store-migration-parity', JSON.stringify(parity.differences), { differences: parity.differences });
   const files = Object.fromEntries(Object.entries(snapshot.inventory.files).map(([p, bytes]) => [p, Buffer.from(bytes)]));
   const deletions = Object.keys(files).filter(p => p !== '.gitattributes');
@@ -148,4 +150,18 @@ export function cutoverFailure(error) {
   try { const native = JSON.parse(error.message); code = native.code ?? code; cause = native.cause; } catch {}
   const ordinary = new Set(['commit-rejected', 'checkout-required', 'lock-order-violation', 'git-dual-borrow-unavailable', 'main-checkout-authority-mismatch', 'checkout-custody-required', 'checkout-custody-stale', 'checkout-authority-required', 'git-lockscope-unavailable-windows', 'invalid-commit-message', 'foreign-merge-head', 'foreign-staged-index', 'source-baseline-stale', 'cutover-main-required', 'cutover-exact-deletions-required', 'cutover-legacy-ref-mismatch', 'cutover-seal-digest-mismatch', 'staged-set-mismatch', 'literal-path-staging-failed', 'commit-snapshot-non-file']);
   return { code, cause, restore: (code === 'refused' && ordinary.has(cause)) || ordinary.has(code) };
+}
+
+// Authenticate an old cache against the exact HEAD inventory, never live files.
+export function legacyInventorySnapshot(inventory) {
+  const files = { '': { size: 0, lastLine: null } };
+  let maxTs = '';
+  for (const [name, bytes] of Object.entries(inventory)) {
+    if (name !== '.fgos/events.jsonl' && !/^\.fgos\/events\/[^/]+\.jsonl$/.test(name)) continue;
+    const raw = Buffer.from(bytes).toString('utf8');
+    const lastLine = raw.endsWith('\n') ? raw.slice(0, -1).split('\n').at(-1) || null : null;
+    files[name === '.fgos/events.jsonl' ? '' : path.basename(name)] = { size: Buffer.from(bytes).length, lastLine };
+    if (lastLine) { const ts = JSON.parse(lastLine).ts; if (typeof ts === 'string' && ts > maxTs) maxTs = ts; }
+  }
+  return { files, maxTs };
 }

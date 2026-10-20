@@ -1,4 +1,7 @@
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -11,14 +14,16 @@ import {
   DEFAULTS,
 } from '../../src/state/work.mjs';
 import { RIGOR_VALUES } from '../../src/runner/rigor.mjs';
-import { foldEvents, rebuildView, rebuildViewFromDir } from '../../src/state/replay.mjs';
-import { initStore, addWork, editWork, currentEffectiveView } from '../../src/state/store.mjs';
+import { foldEvents } from '../../src/state/replay.mjs';
+import { rebuild, initStore, addWork, editWork, currentEffectiveView } from '../../src/state/store.mjs';
 import { parseEditFlags } from '../../src/verbs/state/edit.mjs';
 import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
 import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
 
 function mkTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-size-rigor-test-'));
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-size-rigor-test-'));
+  initializeWorkRepository(repo);
+  return repo;
 }
 
 test('event cũ có tier đọc ra size lúc foldEvents và rebuildView', () => {
@@ -69,7 +74,7 @@ test('work.risk: heavy của item cũ không có rigor được đọc thành ri
 test('bắt đầu từ state.json cũ (không có viewSchemaVersion) -> view được rebuild có size', () => {
   const dir = mkTempDir();
   const fgosDir = path.join(dir, '.fgos');
-  fs.mkdirSync(path.join(fgosDir, 'events'), { recursive: true });
+  initStore(fgosDir);
 
   const eventContent = JSON.stringify({
     type: 'work.add',
@@ -83,7 +88,8 @@ test('bắt đầu từ state.json cũ (không có viewSchemaVersion) -> view đ
       tier: 'light',
     },
   }) + '\n';
-  fs.writeFileSync(path.join(fgosDir, 'events', 'events-main.jsonl'), eventContent, 'utf8');
+  const event = JSON.parse(eventContent);
+  prepareWorkStore(fgosDir, fgosDir).store.append('project', [{ eventType: event.type, schemaVersion: 1, payload: event.payload, ts: event.ts }], {}, 'fixture', []);
 
   // Write a legacy state.json without viewSchemaVersion, having obsolete "tier" in folded work
   const legacyState = {
@@ -108,10 +114,10 @@ test('bắt đầu từ state.json cũ (không có viewSchemaVersion) -> view đ
       maxTs: '2026-09-30T10:00:00.000Z',
     },
   };
-  fs.writeFileSync(path.join(fgosDir, 'state.json'), JSON.stringify(legacyState, null, 2), 'utf8');
+  fs.writeFileSync(resolveFgosFile(fgosDir, FGOS_FILE.STATE), JSON.stringify(legacyState, null, 2), 'utf8');
 
   // rebuildViewFromDir must reject the unversioned/mismatched snapshot and re-fold from events
-  const freshView = rebuildViewFromDir(fgosDir);
+  const freshView = rebuild(fgosDir);
   const item = freshView.work['tsk-snap-1'];
   assert.ok(item);
   assert.equal(item.size, 'light', 'view must have size');

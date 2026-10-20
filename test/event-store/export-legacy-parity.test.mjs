@@ -5,8 +5,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { fixture, append } from './phase07-fixture.mjs';
-import { readAllEventsFromDir, foldEvents } from '../../src/state/replay.mjs';
+import { fixture, append, loaderOptions } from './phase07-fixture.mjs';
+import { decodeLegacyFiles } from '../../src/event-store/index.mjs';
+import { foldEvents } from '../../src/state/replay.mjs';
 import { listPorting } from '../../src/state/porting-store.mjs';
 import { exportUseCase } from '../../src/verbs/events/export.mjs';
 const canonical = value => `${JSON.stringify(Object.fromEntries(Object.keys(value).sort().map(k => [k, value[k]])))}\n`;
@@ -95,10 +96,12 @@ test('real legacy subtrees export with exact production Work and porting reader 
   const result = exportUseCase(f.ctx, { out, format: 'legacy-layout' });
   assert.equal(result.parity.equal, true, JSON.stringify(result.parity));
   const raw = f.store.exportLegacyLayout({ streams: ['project', 'project:porting'], out: path.join(f.temp, 'raw-orders') }, []);
-  assert.deepEqual(raw.legacyOrder, readAllEventsFromDir(out));
+  const files = Object.fromEntries(raw.files.filter(file => file === 'events.jsonl' || /^events\/[^/]+\.jsonl$/.test(file))
+    .map(file => [file === 'events.jsonl' ? '' : path.basename(file), fs.readFileSync(path.join(out, file), 'utf8')]));
+  assert.deepEqual(raw.legacyOrder, decodeLegacyFiles(files, loaderOptions).map(e => e.event));
   assert.equal(fs.readFileSync(path.join(out, 'events/a.jsonl'), 'utf8'), event('work.add', { id: 'one', title: 'A' }));
-  assert.equal(foldEvents(readAllEventsFromDir(out)).work.one.title, 'C');
-  assert.equal(readAllEventsFromDir(out).some(e => e.type.startsWith('porting.')), false);
+  assert.equal(foldEvents(raw.legacyOrder).work.one.title, 'C');
+  assert.equal(raw.legacyOrder.some(e => e.type.startsWith('porting.')), false);
   assert.equal(listPorting(out).porting.p.status, 'accepted');
   assert.equal(fs.readFileSync(path.join(out, 'porting/events.jsonl'), 'utf8').startsWith(historical), true);
   assert.equal(fs.existsSync(path.join(out, 'events/v4-project-porting.jsonl')), false);

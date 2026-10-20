@@ -17,14 +17,12 @@ import {
   EventLogError,
   parseEventLines,
   readEvents,
-  readLastLineBefore,
-  readEventsFromByte,
   parsesAsJson,
   appendEventCore,
 } from './event-log.mjs';
 import { withStateTx } from './hot-lock.mjs';
 
-export { EventLogError, parseEventLines, readEvents, readLastLineBefore, readEventsFromByte };
+export { EventLogError, parseEventLines, readEvents };
 
 /**
  * Operator-invoked repair, scoped ONLY to the common crash-mid-append shape:

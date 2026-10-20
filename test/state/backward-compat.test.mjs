@@ -35,6 +35,9 @@
 // mixed with new (v-carrying) events on the same log.
 
 import '../helpers/process-tmp-root.mjs';
+import '../helpers/work-store-release.mjs';
+import { fixture, loaderOptions } from '../event-store/phase07-fixture.mjs';
+import { decodeLegacyFiles } from '../../src/event-store/index.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -42,7 +45,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { appendEvent } from '../../src/state/events.mjs';
-import { foldEvents, rebuildView } from '../../src/state/replay.mjs';
+import { foldEvents } from '../../src/state/replay.mjs';
 import { listWork } from '../../src/state/store.mjs';
 import { DEFAULTS, SCHEMA_VERSION } from '../../src/state/work.mjs';
 
@@ -52,6 +55,10 @@ const FIXTURE_RAW_AT_LOAD = fs.readFileSync(FIXTURE_PATH, 'utf8');
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/ and
 // never write anywhere near the fixture itself.
+function foldFixture(file) {
+  return foldEvents(decodeLegacyFiles({ '': fs.readFileSync(file, 'utf8') }, loaderOptions).map(e => e.event));
+}
+
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-backward-compat-'));
 }
@@ -108,7 +115,7 @@ test('fixture carries the expected 7 events, none with tier/v (old log, pre-Phas
 });
 
 test('rebuildView on the fixture alone injects DEFAULTS.size and folds to the expected view', () => {
-  const view = rebuildView(FIXTURE_PATH);
+  const view = foldFixture(FIXTURE_PATH);
   assert.deepEqual(view, EXPECTED_OLD_VIEW);
 });
 
@@ -120,16 +127,16 @@ test('foldEvents on the fixture parsed by hand matches rebuildView (same fold, t
 });
 
 test('rebuilding the fixture twice is deterministic', () => {
-  const first = rebuildView(FIXTURE_PATH);
-  const second = rebuildView(FIXTURE_PATH);
+  const first = foldFixture(FIXTURE_PATH);
+  const second = foldFixture(FIXTURE_PATH);
   assert.deepEqual(first, second);
 });
 
-test('listWork (store, read-only) folds the fixture the same way as rebuildView', () => {
-  const dir = tmpDir();
-  const fgosDir = path.join(dir, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
+test('listWork folds the committed legacy fixture through the facade', t => {
+  const f = fixture(t);
+  const fgosDir = path.join(f.repo, '.fgos');
   fs.copyFileSync(FIXTURE_PATH, path.join(fgosDir, 'events.jsonl'));
+  f.git('add', '.fgos/events.jsonl'); f.git('commit', '-qm', 'historical Work fixture');
 
   const view = listWork(fgosDir);
   assert.deepEqual(view, EXPECTED_OLD_VIEW);
@@ -174,8 +181,8 @@ test('a log mixing old (fixture) events followed by new (v-carrying) events fold
   appendEvent(logPath, { type: 'work.move', payload: { id: 'build-feature', from: 'todo', to: 'doing' } });
   appendEvent(logPath, { type: 'work.move', payload: { id: 'build-feature', from: 'doing', to: 'awaiting-approval' } });
 
-  const first = rebuildView(logPath);
-  const second = rebuildView(logPath);
+  const first = foldFixture(logPath);
+  const second = foldFixture(logPath);
   assert.deepEqual(first, second);
 
   // Old items retain their defaulted size alongside their updated status.
@@ -225,7 +232,7 @@ test('a pure new log (every event carries v) replays correctly, not just old-alo
   appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'done' } });
   appendEvent(logPath, { type: 'decision', payload: { text: 'all-new log' } });
 
-  const view = rebuildView(logPath);
+  const view = foldFixture(logPath);
   assert.equal(view.work.a.status, 'done');
   assert.equal(view.work.a.size, DEFAULTS.size);
   assert.equal(view.work.b.size, 'light');
@@ -240,7 +247,7 @@ test('a pure new log (every event carries v) replays correctly, not just old-alo
   for (const event of rawLines) assert.equal(event.v, SCHEMA_VERSION);
 
   // Deterministic on a pure-new log too, same as the old and mixed cases.
-  assert.deepEqual(view, rebuildView(logPath));
+  assert.deepEqual(view, foldFixture(logPath));
 });
 
 test('D6 lazy-default: a pre-feature item that reached "done" via the old doing->done edge replays unchanged, no delivered/retrospective/cleanup history required', () => {
@@ -269,7 +276,7 @@ test('D6 lazy-default: a pre-feature item that reached "done" via the old doing-
   appendEvent(logPath, { type: 'work.move', payload: { id: 'old-closed-item', from: 'todo', to: 'doing' } });
   appendEvent(logPath, { type: 'work.move', payload: { id: 'old-closed-item', from: 'doing', to: 'done' } });
 
-  const view = rebuildView(logPath);
+  const view = foldFixture(logPath);
   const item = view.work['old-closed-item'];
 
   assert.equal(item.status, 'done');
@@ -280,7 +287,7 @@ test('D6 lazy-default: a pre-feature item that reached "done" via the old doing-
 
   // Deterministic on repeated rebuilds, same guarantee every other case in
   // this suite already proves.
-  assert.deepEqual(view, rebuildView(logPath));
+  assert.deepEqual(view, foldFixture(logPath));
 });
 
 test('the fixture file itself is never modified by any test in this suite', () => {

@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -6,6 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
+import { foldEvents } from '../../src/state/replay.mjs';
 import {
   discoverWriterFiles,
   findColdWriterFiles,
@@ -14,7 +16,6 @@ import {
   compactColdWriterFiles,
   DEFAULT_COMPACTION_EVENT_THRESHOLD,
 } from '../../src/state/events-compaction.mjs';
-import { readAllEventsFromDir, rebuildViewFromDir } from '../../src/state/replay.mjs';
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -209,7 +210,7 @@ test('compactColdWriterFiles archives cold files into events/archive/, writes a 
   execFileSync('git', ['add', '.'], { cwd: dir });
   execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: dir });
 
-  const viewBefore = rebuildViewFromDir(dir);
+  const viewBefore = foldEvents(mergeAndDedupeEvents(discoverWriterFiles(eventsDir)));
 
   const now = Date.now();
   setMtime(coldAPath, now - 1000 * 60 * 60 * 48);
@@ -232,7 +233,7 @@ test('compactColdWriterFiles archives cold files into events/archive/, writes a 
   assert.equal(manifest.baseline, result.baseline);
   assert.deepEqual(manifest.originals.sort(), ['writer-a-1.jsonl', 'writer-b-1.jsonl']);
 
-  const viewAfter = rebuildViewFromDir(dir);
+  const viewAfter = foldEvents(fs.readFileSync(path.join(eventsDir, result.baseline), 'utf8').trim().split('\n').map(JSON.parse));
   assert.deepEqual(viewAfter, viewBefore, 'compaction must never change the folded view');
   fs.rmSync(dir, { recursive: true, force: true });
 });
@@ -280,23 +281,5 @@ test('compactColdWriterFiles gate-red: a torn/corrupted write of the candidate b
   assert.equal(fs.existsSync(candidatePath), false, 'the failed candidate baseline is removed, not left behind');
   assert.equal(fs.existsSync(coldPath), true, 'the original cold file is untouched -- gate đỏ, không archive gì');
   assert.equal(fs.existsSync(path.join(eventsDir, 'archive')), false, 'archive/ is never even created on a red gate');
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('crash-mid-compaction: baseline-<ts>.jsonl and its originals coexisting (archive step never ran) still folds correctly, thanks to dedupe-by-hash', () => {
-  const dir = mkTempDir('compaction-crash-mid-');
-  const eventsDir = path.join(dir, 'events');
-  fs.writeFileSync(path.join(dir, 'events.jsonl'), '', 'utf8');
-
-  const e1 = ev(1, '2026-01-01T00:00:00.000Z', 'work.add', { id: 'a', title: 'A', status: 'todo' }, 'writer-a');
-  const e2 = ev(2, '2026-01-01T00:00:02.000Z', 'work.move', { id: 'a', from: 'todo', to: 'doing' }, 'writer-a');
-  writeJsonl(path.join(eventsDir, 'writer-a-1.jsonl'), [e1, e2]); // the "original" -- crash left this in place, never archived
-  const merged = mergeAndDedupeEvents([{ name: 'writer-a-1.jsonl', events: [e1, e2] }]);
-  writeJsonl(path.join(eventsDir, 'baseline-20260823T000000000Z.jsonl'), merged); // the candidate, already written before the crash
-
-  const events = readAllEventsFromDir(dir);
-  assert.equal(events.length, 2, 'dedupe-by-hash collapses the straddle -- never double-counted');
-  const view = rebuildViewFromDir(dir);
-  assert.equal(view.work.a.status, 'doing');
   fs.rmSync(dir, { recursive: true, force: true });
 });

@@ -7,8 +7,8 @@ import { execFileSync } from 'node:child_process';
 import { root } from '../helpers/git-addon.mjs';
 import { fixture, addon, loaderOptions } from './phase07-fixture.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
-import { migrationParity, migrateUseCase, importPlan, cutoverFailure } from '../../src/verbs/events/migrate.mjs';
-import { readAllEventsFromDir, foldEvents, buildSnapshotFromDir, serializeView } from '../../src/state/replay.mjs';
+import { legacyInventorySnapshot, migrationParity, migrateUseCase, importPlan, cutoverFailure } from '../../src/verbs/events/migrate.mjs';
+import { foldEvents, serializeView } from '../../src/state/replay.mjs';
 import { checkEventStore } from '../../src/setup/event-store-checks.mjs';
 const ts = '2026-01-01T00:00:00.000Z';
 import { trackedLegacy } from './phase08-fixture.mjs';
@@ -19,14 +19,14 @@ test('HEAD inventory, check-only parity, anchored cache and explicit baseline us
   const before = snapshot(f);
   assert.deepEqual(Object.keys(before.inventory.files).sort(), Object.keys(files).sort());
   assert.equal(before.inventory.portingLog, 'docs/distillery/state/porting/events.jsonl');
-  const view = foldEvents(readAllEventsFromDir(path.join(f.repo, '.fgos')));
+  const view = foldEvents(before.events.filter(e => !e.provenance.file.startsWith('porting/')).map(e => e.event));
   const baseline = path.join(f.temp, 'baseline.json'); fs.writeFileSync(baseline, JSON.stringify({ ...view, revision: serializeView(view).revision }));
-  const cache = path.join(f.temp, 'cache.json'); fs.writeFileSync(cache, JSON.stringify({ ...view, snapshot: buildSnapshotFromDir(path.join(f.repo, '.fgos')) }));
-  const parity = migrationParity(before, { baseline, cache });
+  const cache = path.join(f.temp, 'cache.json'); fs.writeFileSync(cache, JSON.stringify({ ...view, snapshot: legacyInventorySnapshot(before.inventory.files) }));
+  const parity = migrationParity(before, { baseline, cache, loaderOptions });
   assert.equal(parity.equal, true, JSON.stringify(parity)); assert.equal(parity.cacheCompared, true); assert.equal(parity.portingEntities, 1);
   assert.equal(f.git('for-each-ref', 'refs/fgos/legacy'), '');
   fs.writeFileSync(baseline, JSON.stringify({ ...view, work: { ...view.work, one: { title: 'wrong' } } }));
-  assert.equal(migrationParity(before, { baseline }).equal, false);
+  assert.equal(migrationParity(before, { baseline, loaderOptions }).equal, false);
   fs.writeFileSync(path.join(f.repo, '.fgos/events.jsonl'), 'dirty');
   assert.deepEqual(f.store.readLegacyFromHead({}, []).inventory.files, before.inventory.files);
   assert.throws(() => snapshot(f), /dirty or untracked/);
@@ -60,7 +60,7 @@ test('real import is deterministic, preserves nested bytes, replaces unfenced st
 
 test('baseline-only project, multiple porting refusal, migration write admission and missing pinned ref', t => {
   const f = fixture(t); trackedLegacy(f, { porting: false, shards: false });
-  assert.equal(migrationParity(snapshot(f)).equal, true);
+  assert.equal(migrationParity(snapshot(f), { loaderOptions }).equal, true);
   const reopened = openStore(addon.resolveEventStore(f.repo, f.stateRoot, f.repo), 'phase-seven', [path.join(f.temp, 'contract.json')], loaderOptions);
   assert.throws(() => reopened.append('project', [{ eventType: 'work.add', schemaVersion: 1, payload: {}, ts }], {}, 'fixture', []), /event-store-migration-required.*fgos events migrate/);
   const dir = path.join(f.repo, 'other/porting'); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'events.jsonl'), '');
@@ -86,11 +86,11 @@ test('current checkout tracked Work history reproduces its legacy fold in a temp
   }
   f.git('add', ...paths); f.git('commit', '-qm', 'copy tracked Work history');
   const before = snapshot(f);
-  const parity = migrationParity(before);
+  const parity = migrationParity(before, { loaderOptions });
   assert.equal(parity.equal, true, JSON.stringify(parity.differences));
   const pin = f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []);
   const got = f.store.read({ streams: ['project'] }, []);
-  assert.equal(migrationParity({ inventory: before.inventory, events: got.legacy }).equal, true);
+  assert.equal(migrationParity({ inventory: before.inventory, events: got.legacy }, { loaderOptions }).equal, true);
   assert.equal(f.git('rev-parse', 'refs/fgos/legacy'), pin.legacyRefOid);
   t.diagnostic(`Copied ${paths.length} tracked event files; ${parity.workEvents} unique Work records`);
 });
