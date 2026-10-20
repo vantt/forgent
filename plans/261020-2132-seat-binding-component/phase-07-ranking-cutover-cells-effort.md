@@ -1,44 +1,44 @@
-# Phase 07: ranking cutover — cells with effort, hard pins, independence per pattern, continuity, inline-lead removal
+# Phase 07: ranking cutover — cells with effort, hard pins, independence, continuity, inline-lead removal, walk exports
 
 Owner: Sonnet lead in a worktree from the track. Size L (1.5d). After 06.
 
 ## Context
 
-- Spec §4.3 [G4], §4.4 steps 5–6, §6.3 [B3], §7 [R8].
-- Today: Node ranking in `bind.mjs` `prepare` :234, `walkOrder` :428, `bind` :453, `walkBindings` :708, `listCandidates` :724, `nextCandidate` :755, `retrySameCandidate` :786; independence and `acceptDependence` :383-388; inline fallback :498-516; `bindingIdentity` :138 (no effort); invocation choice `resolveLaunch` :174; effort controls `provider-adapter.mjs:255`; gate replay `account-rotation.mjs:60-63,91`; write gate `commit-unit-work.mjs`.
+- Spec `docs/specs/seat-binding.md` §5.3, §5.4 steps 5–6, §7.3, §8 [RT-16b].
+- Today: Node ranking `bind.mjs` `prepare` :234, `walkOrder` :428, `bind` :453, `walkBindings` :708, `listCandidates` :724, `nextCandidate` :755, `retrySameCandidate` :786; `resolveTierModel`/`resolveTierCandidates`/`tierFallbackOf` uses :309, :317, :434 [RT-12]; independence :383-388; inline fallback :498-516; `bindingIdentity` :138; `resolveLaunch` :174; effort controls `provider-adapter.mjs:255`; confinement `confinement/policies.mjs:682-744`; write-gate recompute `assignment-runner.mjs:466-500` (`seatRoleOf` :1171, `walkStateOf`) [RT-5].
 
 ## Requirements
 
-- `bind.mjs` builds `launchView` (per candidate executor: invocations able to carry the posture, from the existing confinement resolution `resolvePostureInvocation`/`pickConfinedInvocation`, `confinement/policies.mjs:682-744`; effort levels each invocation's CLI renders from `REASONING_EFFORT_CONTROLS`) and calls `bindSeat` once per seat per attempt with the cached policy (plan decision 2). The answer names executor, invocation, model, effort, pool; Node maps it to today's binding shape plus `effort`.
-- Delete Node ranking: `prepare`'s candidate filtering, `walkOrder`, spread, independence check, `normalizeCandidates`, `findHerdrInvocation`, `resolveLaunch` decision part (fact collection stays), `poolUnusableReason` logic moves into the crate (Node passes inventory facts). `walkBindings`, `listCandidates`, `nextCandidate`, `retrySameCandidate` become thin calls to the crate with walk state, or are deleted when `run.mjs`/`explain.mjs` can call the facade directly (phase 00 decides per export; one door, no duplicates).
-- Effort: part of `bindingIdentity`, the binding snapshot and the write-gate comparison; `effort-below-cell`, `effort-unsupported` refusals; a cell without effort records the invocation default (e.g. pi/omp `--thinking medium`) as not-a-promise.
-- Hard pin `{executor, invocation}`: unavailable → `pin-unsatisfiable`, never a different invocation (MP-B1 phase 07's `codex-cli-bwrap` → `codex-herdr` swap becomes a refusal).
-- Independence per pattern table §6.3 from posture + peers (seat ledger); `explain` names the filter that moved a seat.
-- Continuity for multi-round seats (Delphi `sameSeat`, debate rebuttal): executor + model + effort kept, else `seat-continuity-unavailable`.
-- Inline-lead escape removed: `session-lead-inline` exists only when the unit configured no candidate at all; any policy/supply rejection is a named refusal.
-- `fgos dispatch explain` prints the crate's explain structure (spec §9.2 format), including tier definition, sources, on-failure chain.
+- `bind.mjs` builds `launchView` (per candidate executor: invocations that can carry the posture, from `resolvePostureInvocation`/`pickConfinedInvocation`; effort levels each invocation's CLI renders from `REASONING_EFFORT_CONTROLS`) and calls `bindSeat` once per seat per attempt with the cached policy. The answer names executor, invocation, model, effort, pool.
+- Delete Node ranking: candidate filtering in `prepare`, `walkOrder`, spread, independence, `normalizeCandidates`, `findHerdrInvocation`, the decision part of `resolveLaunch` (fact collection stays), `poolUnusableReason` logic (facts passed in), and the last uses of `resolveTierModel`, `resolveTierCandidates`, `tierFallbackOf` (deleted from `resolve.mjs`) [RT-12].
+- [RT-16c] **Walk exports, decided**: `bind.mjs` keeps one export for seat choice, `bind(ask, ctx, { walk })`, plus `explainSeat(ask, ctx)` (same crate call, no lease, returns the crate's ranked list, walk chain and explain structure). Deleted: `walkBindings`, `listCandidates`, `nextCandidate`, `retrySameCandidate`. Consumers move: `explain.mjs:7` → `explainSeat`; `blind-steps-proven-pools.mjs:13` → `explainSeat`; `run.mjs:15` walk → `bind` with walk state (`tried`, `excludePools`, same-candidate retry expressed as walk state).
+- Effort: part of `bindingIdentity`, the binding snapshot and the write-gate comparison at `assignment-runner.mjs:466-500` [RT-5] (not `commit-unit-work.mjs`, which has no bind); `effort-below-cell`, `effort-unsupported` refusals; a cell without effort records the invocation default as not-a-promise.
+- Hard pin `{executor, invocation}`: unavailable → `pin-unsatisfiable`.
+- Independence per §7.3 from posture + peers (seat ledger); `explain` names the filter.
+- Continuity (`sameSeat`, debate rebuttal): executor + model + effort kept, else `seat-continuity-unavailable`.
+- Inline-lead escape removed; `session-lead-inline` only when the unit configured no candidate at all.
+- `fgos dispatch explain` prints the crate's explain structure (spec §10.2 format).
 
 ## Files
 
-- Modify: `src/runner/execution/{bind,run,explain,account-rotation,commit-unit-work,dry-bind}.mjs`, `src/runner/dispatch/provider-adapter.mjs` (export the rendered-levels view only), `src/setup/{executor-posture-coverage,blind-steps-proven-pools}.mjs` (call sites only).
-- Tests: `test/runner/execution/{bind,explain,tier-fallback,run-posture,run-provider-failover,account-pin,account-rotation,commit-unit-work}.test.mjs`, `test/runner/dispatch-execute-effort.test.mjs`, pattern tests.
+- Modify: `src/runner/execution/{bind,run,explain,account-rotation,dry-bind}.mjs`, `src/runner/dispatch/assignment-runner.mjs` (gate comparison only, :466-500), `src/runner/dispatch/resolve.mjs` (deletions), `src/runner/dispatch/provider-adapter.mjs` (export rendered levels only), `src/setup/{executor-posture-coverage,blind-steps-proven-pools}.mjs` (call sites).
+- Tests: `test/runner/execution/{bind,explain,tier-fallback,run-posture,run-provider-failover,account-pin,account-rotation}.test.mjs`, `test/runner/dispatch-execute-effort.test.mjs`, pattern tests.
 
 ## Steps
 
-1. `launchView` builder + tests against today's confinement answers.
-2. Switch ranking to the crate; delete Node ranking.
-3. Effort in identity/snapshot/gate.
-4. Remove inline escape; update tests that expected inline producers.
+1. `launchView` builder; compare with today's `resolveLaunch` on every executor of the committed config before deleting.
+2. Switch ranking to the crate; delete Node ranking and the walk exports.
+3. Effort in identity/snapshot/gate comparison.
+4. Remove the inline escape; update tests that expected inline producers.
 5. Explain output.
 
 ## Tests (proofs owned)
 
-- Missing cell skips family; no allowed cell refuses naming the config line; hard pin refuses (§9.2 variant C exact message).
+- Missing cell skips family; no allowed cell refuses naming the config line; hard pin refuses (§10.2 variant C message).
 - Unsupported or lower effort cannot claim the tier.
-- Debate judge hard-independent of both sides; refusal names both sides' families (§9.3).
-- Panel producers never inline (with a lead present and every candidate refused → named refusal, not inline).
+- Debate judge hard-independent of both sides (§10.3).
+- Panel producers never inline (lead present, every candidate refused → named refusal).
 
 ## Risks / rollback
 
-- M×H: `launchView` differs from today's `resolveLaunch` → herdr vs cli flips. Mitigation: step 1 compares old vs new on every executor in the committed config before deleting.
-- Rollback: revert the merge on the track.
+- M×H `launchView` flips herdr vs cli → step 1 comparison. Rollback: revert on the track.
