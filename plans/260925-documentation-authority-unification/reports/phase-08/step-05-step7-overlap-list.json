@@ -1,0 +1,37 @@
+{
+  "ruling": "L12-69",
+  "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "overlaps": [
+    {
+      "file": "src/intake/verify-pattern-check.mjs",
+      "step4": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-015.jsonl",
+        "edgeId": "class6-l-000247",
+        "line": 21
+      },
+      "step5": {
+        "referenceId": "reference-003687",
+        "line": 28
+      },
+      "required": "Compose the two hunks over final pin once; recompute full forward/rollback diffs and expectedAfterSha256; rebind and independently review changed binding."
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "required": "Combine CLI pointer hunk with remaining runtime/generator seam hunks; no pilot after-hash certifies a combined file."
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "required": "Combine doc-sources pointer with generator/runtime quadrant parks only after owning parity; recompute hash."
+    }
+  ],
+  "sharedTestCoCuts": "De-duplicate identical pinned test diffs shared by hook/merge and truncation/doctor owners; compose differing changes per test file, preserving every assertion.",
+  "status": "pending Step 7 final assembly, not applied",
+  "postCensusLegacyCitation": {
+    "file": "src/setup/registrations.mjs",
+    "line": 6659,
+    "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+    "operand": "docs/specs/workflow.md",
+    "evidence": "Absent at frozen census pin; exact post-census comment line/pin stored in setup receipt.",
+    "required": "Step 7 final source/census reconciliation must disposition this legacy-root comment before Phase 9 retirement; no invented frozen id, current code edit or approval carry."
+  }
+}

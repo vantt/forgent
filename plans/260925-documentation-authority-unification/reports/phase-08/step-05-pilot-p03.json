@@ -8,6 +8,210 @@
       "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
       "seam": "cli-help-messages",
       "kind": "references",
+      "index": 2,
+      "value": {
+        "referenceId": "reference-000112",
+        "admission": "REJECT",
+        "inventory": "step-02l-census-class6.json",
+        "edgeId": "class6-l-000008",
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryOrigins": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "id": "class6-l-000008",
+            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+          }
+        ],
+        "slotKey": null,
+        "sourceSpans": [
+          {
+            "line": 14,
+            "columnStart": 9,
+            "columnEndExclusive": 73,
+            "text": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md"
+          }
+        ],
+        "originalSourceSpans": [
+          {
+            "columnEndExclusive": 73,
+            "columnStart": 9,
+            "line": 14,
+            "text": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md"
+          }
+        ],
+        "matchedExpression": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md",
+        "passage": "// OTHER, unrelated worktree -- one that writes to its own separate index\n// and branch and never touches this checkout's own lock hazard at all\n// (see docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md\n// D1/D2/D7). The staged-`.fgos/`-deletion guard (tsk-56u) is the opposite\n// case: it protects exactly that \"away from home\" worktree, so it is",
+        "passageSpan": {
+          "startLine": 12,
+          "endLine": 16
+        },
+        "role": "comment",
+        "disposition": "preserve",
+        "reason": "L12-58 / Step 3–4 comment custody (exact canonical slot joined): Exact own passage: '// OTHER, unrelated worktree -- one that writes to its own separate index\\n// and branch and never touches this checkout\\'s own lock hazard at all\\n// (see docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md\\n// D1/D2/D7). The staged-`.fgos/`-deletion guard (tsk-56u) is the opposite\\n// case: it protects exactly that \"away from home\" worktree, so it is'",
+        "target": null,
+        "anchor": null,
+        "resolverWitness": {
+          "rule": "retained/external project or comment; no replacement claimed",
+          "currentPath": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md",
+          "exists": true
+        },
+        "timing": "none",
+        "diffHunk": null,
+        "blockedCategory": null,
+        "blockedReason": null,
+        "dependency": null,
+        "dependencyCategory": null,
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": false,
+          "destinationIsAlias": false,
+          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+        },
+        "proposedReplacement": null,
+        "priorRecordRefs": [
+          {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-016.jsonl",
+            "recordSha256": "8e53590ff7ac458efbb05db09c3da93b1fba6bd25c091ea088a31105a1fd64a0",
+            "matchingSlots": [
+              {
+                "edgeId": "class6-l-000008",
+                "slotKey": "{\"edgeId\":\"class6-l-000008\",\"file\":\".githooks/pre-commit\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000008\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":14}]}",
+                "sourceSpans": [
+                  {
+                    "line": 14,
+                    "columnStart": 9,
+                    "columnEndExclusive": 73,
+                    "text": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md"
+                  }
+                ],
+                "disposition": "preserve",
+                "consumerFile": ".githooks/pre-commit"
+              }
+            ]
+          }
+        ],
+        "fixtureProvenance": null,
+        "rejectionRule": "prior-comment-slot",
+        "receiptId": "cli-help-messages-pilot"
+      }
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "seam": "cli-help-messages",
+      "kind": "references",
+      "index": 3,
+      "value": {
+        "referenceId": "reference-000113",
+        "admission": "REJECT",
+        "inventory": "step-02l-census-class6.json",
+        "edgeId": "class6-l-000009",
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryOrigins": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "id": "class6-l-000009",
+            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+          }
+        ],
+        "slotKey": null,
+        "sourceSpans": [
+          {
+            "line": 355,
+            "columnStart": 35,
+            "columnEndExclusive": 75,
+            "text": "docs/history/stale-worktree-index-guard/"
+          },
+          {
+            "line": 356,
+            "columnStart": 1,
+            "columnEndExclusive": 14,
+            "text": "// CONTEXT.md"
+          }
+        ],
+        "originalSourceSpans": [
+          {
+            "columnEndExclusive": 75,
+            "columnStart": 35,
+            "line": 342,
+            "text": "docs/history/stale-worktree-index-guard/"
+          },
+          {
+            "columnEndExclusive": 14,
+            "columnStart": 1,
+            "line": 343,
+            "text": "// CONTEXT.md"
+          }
+        ],
+        "matchedExpression": "docs/history/stale-worktree-index-guard/\n// CONTEXT.md",
+        "passage": "}\n\n// STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/\n// CONTEXT.md D1/D2): a linked worktree checked out on a `fgw/*` branch can\n// go stale when an external process (e.g. `approve`'s leaf->root merge)\n// force-moves that branch's ref without ever touching THIS worktree's own",
+        "passageSpan": {
+          "startLine": 353,
+          "endLine": 358
+        },
+        "role": "comment",
+        "disposition": "preserve",
+        "reason": "L12-58 / Step 3–4 comment custody (exact canonical slot joined): Exact own passage: \"}\\n\\n// STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/\\n// CONTEXT.md D1/D2): a linked worktree checked out on a `fgw/*` branch can\\n// go stale when an external process (e.g. `approve`'s leaf->root merge)\\n// force-moves that branch's ref without ever touching THIS worktree's own\"",
+        "target": null,
+        "anchor": null,
+        "resolverWitness": {
+          "rule": "retained/external project or comment; no replacement claimed",
+          "currentPath": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+          "exists": true
+        },
+        "timing": "none",
+        "diffHunk": null,
+        "blockedCategory": null,
+        "blockedReason": null,
+        "dependency": null,
+        "dependencyCategory": null,
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": false,
+          "destinationIsAlias": false,
+          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+        },
+        "proposedReplacement": null,
+        "priorRecordRefs": [
+          {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-016.jsonl",
+            "recordSha256": "8e53590ff7ac458efbb05db09c3da93b1fba6bd25c091ea088a31105a1fd64a0",
+            "matchingSlots": [
+              {
+                "edgeId": "class6-l-000009",
+                "slotKey": "{\"edgeId\":\"class6-l-000009\",\"file\":\".githooks/pre-commit\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000009\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":342},{\"edgeId\":\"class6-l-000009\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":343}]}",
+                "sourceSpans": [
+                  {
+                    "line": 355,
+                    "columnStart": 35,
+                    "columnEndExclusive": 75,
+                    "text": "docs/history/stale-worktree-index-guard/"
+                  },
+                  {
+                    "line": 356,
+                    "columnStart": 1,
+                    "columnEndExclusive": 14,
+                    "text": "// CONTEXT.md"
+                  }
+                ],
+                "disposition": "preserve",
+                "consumerFile": ".githooks/pre-commit"
+              }
+            ]
+          }
+        ],
+        "fixtureProvenance": null,
+        "rejectionRule": "prior-comment-slot",
+        "receiptId": "cli-help-messages-pilot"
+      }
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "seam": "cli-help-messages",
+      "kind": "references",
       "index": 4,
       "value": {
         "referenceId": "reference-000114",
@@ -1742,8 +1946,23 @@
       "kind": "dynamicTraces",
       "index": 32,
       "value": {
-        "proofCommand": null,
-        "parityObligation": null,
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            463,
+            12,
+            463,
+            298,
+            "`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`",
+            "template-string",
+            true,
+            "writer"
+          ],
+          "candidateConstruction": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "comparison": "Exact same-input emitted/read behavior; literal patch owner supplies one diff. No parity pass inferred.",
+          "blocker": null,
+          "literalOwner": "reference-000110"
+        },
         "id": "dynamic-000566",
         "originalTuple": [
           463,
@@ -1759,8 +1978,8 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
+        "admission": "ADMIT",
+        "disposition": "patch",
         "currentLine": 491,
         "currentPassage": {
           "startLine": 489,
@@ -1774,15 +1993,16 @@
         "inputs": [
           "`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`"
         ],
-        "role": "scalar/thread",
-        "targetSetOrConstruction": null,
+        "role": "emitted-message",
+        "targetSetOrConstruction": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: '`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(\\', \\')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`'",
-        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: '`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(\\', \\')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`'",
+        "rejectedAsUnrelatedReason": null,
+        "reason": "L12-69: Same passage as reference-000110; that literal record owns the single outcome and any Phase 9 pointer diff.",
         "blockedSeams": [],
         "blockedReason": null,
-        "receiptId": "cli-help-messages-pilot"
+        "receiptId": "cli-help-messages-pilot",
+        "samePassageOwner": "reference-000110"
       }
     },
     {
@@ -2009,9 +2229,10 @@
             true,
             "writer"
           ],
-          "candidateConstruction": "HOW_TO_DOC or literal recovery pointer",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
+          "candidateConstruction": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "comparison": "Exact same-input emitted/read behavior; literal patch owner supplies one diff. No parity pass inferred.",
+          "blocker": null,
+          "literalOwner": "reference-000111"
         },
         "id": "dynamic-000571",
         "originalTuple": [
@@ -2029,7 +2250,7 @@
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
         "admission": "ADMIT",
-        "disposition": "preserve",
+        "disposition": "patch",
         "currentLine": 523,
         "currentPassage": {
           "startLine": 521,
@@ -2044,14 +2265,15 @@
           "`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`"
         ],
         "role": "emitted-message",
-        "targetSetOrConstruction": "HOW_TO_DOC or literal recovery pointer",
+        "targetSetOrConstruction": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
         "stateExportDependency": null,
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": null,
-        "reason": "refuse writes this exact diagnostic to stderr; canonical literal references own the proposed pointer edits. All other diagnostic bytes and exit 1 remain unchanged.",
+        "reason": "L12-69: Same passage as reference-000111; that literal record owns the single outcome and any Phase 9 pointer diff.",
         "blockedSeams": [],
         "blockedReason": null,
-        "receiptId": "cli-help-messages-pilot"
+        "receiptId": "cli-help-messages-pilot",
+        "samePassageOwner": "reference-000111"
       }
     },
     {
@@ -2968,16 +3190,6 @@
       "startLine": 3501,
       "endLine": 3750,
       "text": "          const footprintDiff = footprintDiffHits(excludeDocsRefResearch(excludeFgosPaths(excludeIronLawEvidence(changed, id)), item), item.footprint);\n          const { event } = settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'awaiting-approval', branchHeadAtReturn: branchHead });\n          addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });\n          return { id, from: 'doing', to: 'awaiting-approval', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };\n        }\n\n        // tsk-53o: a timeout is not proof the item's verify failed (the\n        // machine may simply have been under load) — never let it park as\n        // an indistinguishable 'verify-fail'/'verify-miss', and never state\n        // \"(exit null)\" as if that were a real exit code.\n        settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });\n        addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount: branchAheadCount } });\n        {\n          const detail = check.timedOut\n            ? `goal-check on branch \"${branch}\" timed out after ${timeoutMs}ms — not a verify failure, rerun return`\n            : `goal-check failed on branch \"${branch}\" (exit ${check.status})`;\n          // tsk-4o9: advisory only, never a gate -- a timeout is not proof\n          // of a real verify failure (per the tsk-53o comment above), so it\n          // gets no hint either.\n          const hint = check.timedOut ? null : detachedWorktreeFgosHint(check.output);\n          recordFriction(dir, {\n            producer: 'bin.fgos.return',\n            id,\n            disposition: 'blocked',\n            errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',\n            layer: 'verification',\n            attempts: 1,\n            detail: hint ? `${detail}\\n${hint}` : detail,\n          });\n        }\n        return { id, from: 'doing', to: 'blocked', source: 'branch', branch, aheadCount: branchAheadCount, passed: false, timedOut: check.timedOut, exitStatus: check.status, output: check.output };\n      }\n\n      // tsk-ikd (P44): the branch-source path above already returned before\n      // reaching here, so every path below is main-source -- it reads\n      // `currentHead(repoRoot)`, runs the clean-tree check, verify, and\n      // records `headAtReturn` all against whatever `repoRoot` happens to\n      // be. `approve` (:3355), `sync-root` (:4043), and\n      // `promote-to-component` (:4258) all refuse from a linked worktree for\n      // exactly this hazard class -- verifying/recording a stale or\n      // divergent tree while claiming it verified on main -- but this path\n      // had no such guard. Without it: an item claimed via `take`\n      // (main-source) returned from inside a leftover, UNREGISTERED `fgw/*`\n      // claim worktree instead of main (e.g. left over from a DIFFERENT\n      // item entirely) would pass the progress gate and verify against THAT\n      // worktree's own tree, then record `headAtReturn` as a sha that was\n      // never on main -- `approve`'s later verify-only mode re-verifies on\n      // main and finds it green (main's own HEAD, untouched), and the item\n      // goes `delivered` with its real content never actually on main.\n      // Surfaces only much later, misdiagnosed as a force-push/history-\n      // rewrite loss when cleanup's ancestry check fails.\n      //\n      // A REGISTERED session worktree (`fgos session start`) is deliberately\n      // EXEMPT -- unlike `approve`, which refuses ANY worktree including a\n      // registered session (docs/specs/runner.md: \"a session worktree is\n      // structurally the wrong place for a merge-into-main to happen\"),\n      // `return`'s own progress check (aheadCount + verify) is spike-proven\n      // correct from inside a session worktree and is documented there as\n      // deliberately unchanged: a session worktree's `.fgos` is a symlink to\n      // the real shared store (never copied), so state writes land\n      // correctly, and `session end` (session.mjs's own divergence guard)\n      // already refuses to silently discard a dangling commit -- that is\n      // the layer responsible for making sure returned work actually reaches\n      // main, not this one. Only an UNREGISTERED worktree (an ad-hoc `git\n      // worktree add`, or -- the actual failure scenario here -- a\n      // different item's own leftover `fgw/<id>` claim checkout) is refused.\n      // The branch-source path above needs no such guard at all (its own\n      // comment, D2: \"tree người là việc của người\" -- it never touches\n      // `repoRoot`'s working tree, verify runs in a disposable detached\n      // worktree).\n      const returnCwdReal = realpathOr(repoRoot);\n      const insideRegisteredSession = listSessions(repoRoot).some((session) => {\n        const wtReal = realpathOr(session.worktreePath);\n        return returnCwdReal === wtReal || returnCwdReal.startsWith(`${wtReal}${path.sep}`);\n      });\n      if (!insideRegisteredSession && !isMainWorktree(repoRoot)) {\n        // tsk-2t9c D18: found via a real end-to-end run -- an item claimed\n        // through `fgos take` (never `fgos pick`, which DOES stand up a\n        // registered `fgw/<id>` worktree) into an ad-hoc worktree hits\n        // this refusal with no skill's own prose warning it could happen,\n        // and the fix (`fgos session start`) is easy to miss inside a\n        // longer explanatory sentence. Naming the exact command on its\n        // own line is the same \"chặn và dạy tại chỗ\" discipline\n        // `handoff`'s own refusal already applies (list the legal edges,\n        // don't just say \"refused\"). `session start` resolves its own\n        // repoRoot from `process.cwd()`, never `--dir` (unlike every\n        // other verb here) -- run it from THIS SAME worktree, not with a\n        // `--dir` flag pointed at it.\n        throw new StoreError(\n          'validation',\n          `return: refusing to run from \"${repoRoot}\" — this is a git worktree (not the main checkout, and not a registered \"fgos session start\" worktree). Run return from the main checkout, or register this worktree first, from right here: fgos session start --item \"${id}\"`,\n        );\n      }\n\n      if (typeof item.headAtTake !== 'string' || !item.headAtTake) {\n        throw new StoreError('validation', `return: work \"${id}\" has no recorded headAtTake — cannot verify progress since take.`);\n      }\n\n      const cwd = repoRoot;\n      // head is computed BEFORE the clean-tree check (tsk-598 D1/D2): the\n      // check itself now needs the item's own committed-diff paths\n      // (headAtTake..head) to build ownFileSet — a pure read, reordering it\n      // earlier changes nothing else about this branch.\n      const head = currentHead(cwd);\n      const ownDiff = changedFilesSince(cwd, item.headAtTake, head);\n      const ownFileSet = buildOwnFileSet(ownDiff, item.footprint);\n      if (!isWorkingTreeClean(cwd, ownFileSet)) {\n        throw new StoreError('validation', `return: working tree at \"${cwd}\" is not clean — commit the work for \"${id}\" before returning.`);\n      }\n      const aheadCount = commitsSince(cwd, item.headAtTake, head);\n      if (aheadCount <= 0) {\n        if (!noNewCommitsOk) {\n          throw new StoreError(\n            'validation',\n            `return: HEAD has not advanced past headAtTake for \"${id}\" (${item.headAtTake} -> ${head}) — commit the work before returning, or pass --no-new-commits-ok if the work was already done before this claim.`,\n          );\n        }\n        assertNoPriorBlockedOutcome(view, id);\n      }\n\n      let check = await runGoalCheck(item, cwd, timeoutMs);\n      // tsk-516 (CONTEXT.md D3/D4): same gate as the branch path above, on\n      // the main checkout's own tree. Only after the item's own verify is\n      // green — a red verify already blocks on its own.\n      if (check.passed) {\n        const invariant = await runInvariantChecks(invariantCheckCommands, cwd, timeoutMs);\n        if (!invariant.passed) check = invariantFailureAsCheck(invariant);\n      }\n      if (check.passed) {\n        // STR63: advisory only (per cos) — a hit never blocks this return.\n        const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);\n        // tsk-4hl: see excludeIronLawEvidence's own comment above.\n        const footprintDiff = footprintDiffHits(excludeDocsRefResearch(excludeFgosPaths(excludeIronLawEvidence(ownDiff, id)), item), item.footprint);\n        const { event } = settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'awaiting-approval', headAtReturn: head });\n        addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount } });\n        // tsk-45z D1/D2: this session's own commits (landed straight on the\n        // main checkout, not a branch/worktree) leave the activity beacon\n        // .githooks/pre-commit writes on each one. This point — verify\n        // green, item settling to `proposed` — is the state-machine's own\n        // signal that this session is done with the checkout, so clear the\n        // beacon early instead of leaving another session's commit to wait\n        // out its window. Writer-checked (never a blind unlink, D2): only\n        // removes a beacon this session's own identity wrote.\n        clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);\n        return { id, from: 'doing', to: 'awaiting-approval', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };\n      }\n\n      // tsk-53o: same timeout/fail distinction as the branch-source path\n      // above — a timeout is not proof the item's verify failed.\n      settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });\n      addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount } });\n      {\n        const detail = check.timedOut\n          ? `goal-check timed out after ${timeoutMs}ms — not a verify failure, rerun return`\n          : `goal-check failed (exit ${check.status})`;\n        // tsk-4o9: advisory only, never a gate -- same timeout exclusion as\n        // the branch-source path above (tsk-53o: a timeout is not proof of\n        // a real verify failure).\n        const hint = check.timedOut ? null : detachedWorktreeFgosHint(check.output);\n        recordFriction(dir, {\n          producer: 'bin.fgos.return',\n          id,\n          disposition: 'blocked',\n          errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',\n          layer: 'verification',\n          attempts: 1,\n          detail: hint ? `${detail}\\n${hint}` : detail,\n        });\n      }\n      // Same early beacon clear as the passing branch above (tsk-45z D1/D2) — a\n      // failed verify still means this session is done touching the main\n      // checkout; the item settling to `blocked` is just as much \"done with\n      // the checkout\" as settling to `proposed`.\n      clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);\n      return { id, from: 'doing', to: 'blocked', source: 'main', aheadCount, passed: false, timedOut: check.timedOut, exitStatus: check.status, output: check.output };\n    }\n\n    // Cổng duyệt PR nội bộ (pr-lifecycle D1/D4): a proposed item's diff,\n    // shown from whichever source classifySource resolves (runner branch,\n    // pull-door head range, or legacy degrade — merge.mjs). A pure read —\n    // never appends an event, never mutates state.json, same D1 request-class\n    // as `ready`/`list`/`check`.\n    case 'review': {\n      const id = requireField(positional[0] ?? flags.id, 'review requires an id: fgos review <id>');\n      // `--pr` is forwarded RAW and validated inside the use case, at the\n      // point the old case block validated it: after the found/status\n      // guards, inside the `--github` branch. Checking it here instead\n      // would let a bare `--pr` outrank a nonexistent id in the refusal,\n      // and would turn a stray `--pr` without `--github` — ignored before —\n      // into a new validation error. `approve` already keeps its own `--pr`\n      // check inside its use case for the same reason.\n      return await reviewUseCase(\n        { dir, cwd: process.cwd() },\n        { id, github: Boolean(flags.github), prNumber: flags.pr, ...ghCommandOpts() },\n      );\n    }\n\n    case 'approve': {\n      const id = requireField(positional[0] ?? flags.id, 'approve requires an id: fgos approve <id> [--timeout <ms>|--no-timeout]');\n      // repoRoot: process.cwd() by default -- the use case's guards then\n      // refuse outright when cwd is any linked/session/ad-hoc worktree,\n      // catching a merge that would otherwise land on that worktree's own\n      // (possibly stale) checkout or a goal-check that verifies stale code\n      // while claiming \"verified on main\" (the P44/review-260718 incident\n      // history this file's own comments already document). --trust-dir\n      // (tsk-4uj) opts into deriving repoRoot from --dir instead, the same\n      // substitution tsk-k8u/tsk-5vl already proved for take/pick/catchup\n      // -- but gated behind this explicit flag, never the unconditional\n      // default, given approve's own incident history: the caller must say\n      // it knows --dir is trustworthy rather than getting the relaxed\n      // behavior silently. Byte-identical to today when the flag is\n      // omitted.\n      const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();\n      return await approveUseCase(\n        { dir, repoRoot },\n        parseMergeClusterOptions('approve', flags, dir, { id }),\n      );\n    }\n\n    // sync-root (tsk-50i, docs/history/tsk-3bn-merge-conductor-harness-v2/):\n    // merges fgw/<root-id>'s current tip into its real target — `main`, or\n    // fgw/<parentId> for a nested root — WITHOUT touching the root item's\n    // own status/stage (CONTEXT.md's locked contract: this replaces the\n    // ad-hoc `git merge` tsk-3bn's own origin incident required by hand).\n    // Reuses `mergeRunnerItem`'s exact lock/verify path (constraint #1,\n    // fgos-coding-validating's gate) — never a second bespoke merge mechanism.\n    // Unlike `approve`'s root-into-main path, this never deletes fgw/<id>\n    // afterward: the root stays open for further leaf merges.\n    case 'sync-root': {\n      const id = requireField(positional[0] ?? flags.id, 'sync-root requires a root-id: fgos sync-root <root-id>');\n      // repoRoot: process.cwd() by default -- the use case's isMainWorktree\n      // guard then refuses outright when cwd is any linked worktree,\n      // catching a merge that would otherwise land on that worktree's own\n      // (possibly stale) checkout. --trust-dir (tsk-4uj) opts into deriving\n      // repoRoot from --dir instead, the same substitution tsk-k8u/tsk-5vl\n      // already proved for take/pick/catchup -- but gated behind this\n      // explicit flag here, never the unconditional default: unlike\n      // catchup, sync-root's guard is deliberate (mirrors approve's own\n      // discipline), so the caller must say it knows --dir is trustworthy\n      // rather than getting the relaxed behavior silently. Byte-identical\n      // to today when the flag is omitted.\n      const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();\n      return await syncRootUseCase({ dir, repoRoot }, parseMergeClusterOptions('sync-root', flags, dir, { id }));\n    }\n\n    // tsk-3gx-3: Layer 2 action — takes N flat sibling item ids (D2: caller's\n    // own explicit list, this verb only light-validates, never infers\n    // grouping), resolves/creates the shared root (D1), retargets each\n    // member via tsk-3gx-2's engine (gated per member by tsk-3gx-1's\n    // read-only preflight), and ONLY when a member's own real git merge\n"
-    },
-    {
-      "file": "bin/fgos.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-      "sourceSha256": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
-      "seam": "cli-help-messages",
-      "kind": "source-context",
-      "startLine": 3751,
-      "endLine": 4000,
-      "text": "    // truly succeeds does it set that member's `parent` — never on say-so,\n    // matching the item's own framing (\"CHỈ khi git thành công thật mới set\n    // field parent\"). Records one real decision summarizing every member's\n    // outcome.\n    case 'promote-to-component': {\n      const ids = parseListFlag(flags.ids ?? positional.join(','));\n      if (!Array.isArray(ids) || ids.length < 2) {\n        throw new StoreError('validation', 'promote-to-component requires --ids (or positional args) listing at least 2 member item ids.');\n      }\n      // repoRoot: process.cwd() by default -- the use case's isMainWorktree\n      // guard then refuses outright when cwd is any linked worktree,\n      // catching a batch promotion that would otherwise merge member\n      // branches against that worktree's own (possibly stale) checkout.\n      // --trust-dir (tsk-2bg) opts into deriving repoRoot from --dir\n      // instead, the same substitution tsk-4uj already shipped for\n      // sync-root/approve (CONTEXT.md D5/D6) -- gated behind this explicit\n      // flag here, never the unconditional default: same posture as\n      // sync-root (merges land on a runner-owned integration branch, never\n      // main directly), so the caller must say it knows --dir is\n      // trustworthy rather than getting the relaxed behavior silently.\n      // Byte-identical to today when the flag is omitted. retargetMember's\n      // own isMainWorktree check (promote-engine.mjs) inherits this\n      // relaxation for free -- it receives this same repoRoot value\n      // unchanged, never re-derives it.\n      const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();\n      // Raw Number(), deliberately NOT resolveVerifyTimeoutMs: this verb\n      // has never read the runner config's verify timeout, and keeping it\n      // that way is the only way this stays a pure move.\n      const timeoutMs = flags.timeout !== undefined ? Number(flags.timeout) : undefined;\n      return await promoteToComponentUseCase(\n        { dir, repoRoot },\n        { ids, rootId: flags['root-id'], rootTitle: flags['root-title'], timeoutMs },\n      );\n    }\n\n    // Cổng duyệt — reject (pr-lifecycle D4): awaiting-approval -> todo, reason\n    // mandatory (fsm.mjs already enforces this edge). NEVER runs a single git\n    // command — the code (if any landed on main via a pull-door item) is\n    // history, not something this verb rewrites; a human who wants it gone\n    // commits their own revert and still rejects (D4's \"không auto-revert\").\n    case 'reject': {\n      const id = requireField(positional[0] ?? flags.id, 'reject requires an id: fgos reject <id> --reason \"...\"');\n      const reason = requireField(flags.reason, 'reject requires --reason \"...\"');\n      return rejectUseCase({ dir }, { id, reason });\n    }\n\n    case 'catchup': {\n      const id = requireField(positional[0] ?? flags.id, 'catchup requires an id: fgos catchup <id> [--timeout <ms>|--no-timeout]');\n      const timeoutMs = resolveVerifyTimeoutMs('catchup', flags, path.dirname(dir));\n      // repoRoot from --dir, never raw process.cwd() (tsk-5vl, same class\n      // as tsk-k8u's take/pick fix): a caller running catchup from inside\n      // the item's own linked worktree (e.g. a session that just hit\n      // verify-fail-post-merge and is still sitting inside its own picked\n      // worktree) always passes --dir at the stable main checkout —\n      // deriving repoRoot from it keeps withMergeEphemeralWorktree's own\n      // `git branch -f` (src/runner/worktree.mjs) targeting that stable\n      // root instead of the worktree currently checked out on the same\n      // branch it is about to force-update, which git refuses (\"Cannot\n      // force update the current branch\"). Byte-identical to today when\n      // --dir is omitted (dataDir() resolves dir from process.cwd() too\n      // in that case). This verb has no `--trust-dir` gate, unlike\n      // approve/sync-root/promote-to-component — a real per-verb\n      // difference the adapter owns.\n      return await catchupUseCase({ dir, repoRoot: path.dirname(dir) }, { id, timeoutMs });\n    }\n\n    // Gate A — candidate ranking (self-improve-loop P13 Slice 1, D1/D3/D6):\n    // Backlog-triage impact ranking (P21) — separate from P14's intake-time\n    // risk/lane classification: this ranks open work by blocking fan-out\n    // (how many other open items it unblocks), not by how risky it is.\n    case 'triage': {\n      return paginateVerbResult(rankImpact(listWork(dir), { includeDone: Boolean(flags.all) }), flags, 'triage-v1', 'triage');\n    }\n\n    case 'worktree': {\n      const sub = requireField(positional[0], 'worktree requires a sub-verb: create <path> | remove <path> --delivered-to <ref>');\n      if (sub === 'create') {\n        if (positional.length !== 2) throw new Error('usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');\n        const cwd = process.cwd();\n        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;\n        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;\n        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);\n        return createWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {\n          path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),\n          detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),\n        });\n      }\n      if (sub === 'remove') {\n        if (positional.length !== 2) throw new Error('usage: fgos worktree remove <path> --delivered-to <ref> [--json]');\n        const cwd = process.cwd();\n        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;\n        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;\n        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);\n        return removeWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {\n          path: positional[1], deliveredTo: requireField(flags['delivered-to'], 'worktree remove requires --delivered-to <ref>'),\n        });\n      }\n      throw new Error(`unknown worktree sub-verb: ${sub}`);\n    }\n    // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout\n    // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's\n    // createSession/endSession/listSessions/reclaimOrphanedSessions. `start`\n    // opens a detached-HEAD worktree on the current HEAD (zero new branches)\n    // with a `.fgos` symlink back to the one shared store (D10) and prints\n    // where to `cd`; `end` removes it, refusing a diverged (dangling-commit)\n    // session without --force and naming the sha(s); `list` prints the\n    // registry; `gc` (p-fgos-session-gc) sweeps entries whose worktree is gone\n    // from git or whose one-shot `start` CLI pid has since exited, sparing any\n    // that are diverged or have uncommitted work. session.mjs raises\n    // SessionError for every lifecycle failure (unknown id, divergence\n    // refusal, git failure) — surfaced here as `validation` (exit 4) so a bad\n    // input is a clean categorized exit, never an uncaught crash. repoRoot is\n    // the caller's cwd, the same root every other git-backed verb uses.\n    case 'session': {\n      const sub = requireField(positional[0], 'session requires a sub-verb: fgos session <start|end|list|gc> ...');\n      const repoRoot = process.cwd();\n      try {\n        if (sub === 'start') {\n          const itemId = optionalField(flags.item, 'session start --item requires a non-empty id value (omit --item entirely to start a session with no item bound)');\n          const entry = createSession(repoRoot, { itemId });\n          // Explicit projection, not a spread: decouples the public envelope\n          // from session.mjs's internal registry-entry shape (mirrors every\n          // other converted verb, e.g. move's {id,from,to,seq}).\n          return {\n            sessionId: entry.sessionId,\n            worktreePath: entry.worktreePath,\n            itemId: entry.itemId,\n            startCommit: entry.startCommit,\n            pid: entry.pid,\n            startedAt: entry.startedAt,\n          };\n        }\n        if (sub === 'end') {\n          const sessionId = requireField(positional[1], 'session end requires a session id: fgos session end <session-id> [--force]');\n          const entry = endSession(repoRoot, sessionId, { force: Boolean(flags.force) });\n          return {\n            sessionId: entry.sessionId,\n            worktreePath: entry.worktreePath,\n            itemId: entry.itemId,\n            startCommit: entry.startCommit,\n            pid: entry.pid,\n            startedAt: entry.startedAt,\n            forced: Boolean(flags.force),\n          };\n        }\n        if (sub === 'list') {\n          return listSessions(repoRoot);\n        }\n        if (sub === 'gc') {\n          return reclaimOrphanedSessions(repoRoot);\n        }\n        throw new StoreError('validation', `unknown session sub-verb \"${sub}\". Usage: fgos session <start|end|list|gc> ...`);\n      } catch (err) {\n        if (err instanceof SessionError) {\n          throw new StoreError('validation', err.message);\n        }\n        throw err;\n      }\n    }\n\n    // Gateway process lifecycle (tsk-31v): the one-door way any agent\n    // starts/stops/checks the fgos gateway (REST API + web\n    // dashboard) as a detached background process instead of hand-rolling\n    // nohup/tmux/systemd. AGENTS.md's own dispatch doctrine names this as\n    // the mandatory entry point.\n    case 'gateway': {\n      const sub = requireField(positional[0], 'gateway requires a sub-verb: fgos gateway <start|stop|status>');\n      const repoRoot = path.dirname(dir);\n      try {\n        if (sub === 'start') {\n          return startGateway(repoRoot, dir);\n        }\n        if (sub === 'stop') {\n          return stopGateway(dir);\n        }\n        if (sub === 'status') {\n          return await gatewayStatus(dir);\n        }\n        throw new StoreError('validation', `unknown gateway sub-verb \"${sub}\". Usage: fgos gateway <start|stop|status>`);\n      } catch (err) {\n        if (err instanceof GatewayControlError) {\n          throw new StoreError('validation', err.message);\n        }\n        throw err;\n      }\n    }\n\n    // Persisted-focus CLI surface (str67-goal-directed-planning D3/D4/D6/D7):\n    // reads/writes go through the setFocus/goalFocusShow facades only, never\n    // graph-metrics.mjs directly. Only `set`/`show` exist here — `clear`/\n    // `list` are explicitly deferred (CONTEXT.md Deferred Ideas).\n    case 'goal': {\n      const sub = requireField(positional[0], 'goal requires a sub-verb: fgos goal <set|show> ...');\n      if (sub === 'set') {\n        const id = requireField(positional[1], 'goal set requires an id: fgos goal set <id>');\n        const { view } = setFocus(dir, { id });\n        // Explicit projection, not a spread: decouples the public envelope\n        // from setFocus's internal {event, view} return shape.\n        return { focus: view.focus };\n      }\n      if (sub === 'show') {\n        return goalFocusShow(dir);\n      }\n      throw new StoreError('validation', `unknown goal sub-verb \"${sub}\". Usage: fgos goal <set|show> ...`);\n    }\n\n    // Tool registry (tsk-1dj, ported from repository-harness's\n    // tool-registry-capability per docs/distillery/deep-dives/\n    // tool-registry.md; tsk-in1-1 D1: `register`/`remove` retired — a tool\n    // provider is now declared directly in `runner.executors.<id>`\n    // (`.fgos/config.json`), config-edited like every other executor, never\n    // through the event log): `check` writes ONLY the local, gitignored\n    // status overlay (tool-registry.mjs's readLocalStatus/writeLocalStatus)\n    // — never an event, per CONTEXT.md's pinned \"registered vs present\"\n    // term, and it always succeeds even when every probed tool comes back\n    // missing (absent capability is a fact to report, never a CLI error);\n    // `query` merges the two (config-declared tools + local overlay) at\n    // read time.\n    // Read-only listing of the personas a `--seats \"@name\"` seat can name; a pure read of the\n    // three definition tiers (src/runner/agent-listing.mjs), no store and no event.\n    case 'agents': {\n      const sub = requireField(positional[0], 'agents requires a sub-verb: fgos agents list');\n      if (sub !== 'list') throw new StoreError('validation', `unknown agents sub-verb \"${sub}\". Usage: fgos agents list`);\n      const { listAgents } = await import('../src/runner/agent-listing.mjs');\n      const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');\n      const projectRoot = typeof flags.worktree === 'string' ? path.resolve(flags.worktree) : resolveGitRoots(process.cwd()).worktreeRoot;\n      return { projectRoot, ...listAgents({ projectRoot }) };\n    }\n    case 'tool': {\n      const sub = requireField(positional[0], 'tool requires a sub-verb: fgos tool <check|query> ...');\n      const repoRoot = path.dirname(dir);\n      const cfg = flags.config ? loadRunnerConfig(flags.config) : ensureRunnerConfigForDir(repoRoot);\n      const tools = toolsFromExecutors(cfg.executors);\n      if (sub === 'check') {\n        const name = optionalField(flags.name, 'tool check --name requires a non-empty value.');\n        if (name !== undefined && !tools[name]) {\n          throw new StoreError('validation', `tool \"${name}\" not found.`);\n        }\n        const targets = name !== undefined ? [name] : Object.keys(tools);\n        const localStatus = readLocalStatus(dir);\n        const results = {};\n        for (const toolName of targets) {\n          const status = await probeTool(tools[toolName], repoRoot);\n          const checkedAt = new Date().toISOString();\n          localStatus[toolName] = { status, checkedAt };\n          results[toolName] = { status, checkedAt };\n        }\n        writeLocalStatus(dir, localStatus);\n        return { checked: results };\n      }\n"
     }
   ]
 }

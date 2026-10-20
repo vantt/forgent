@@ -1,0 +1,392 @@
+{
+  "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "initialHits": {
+    "inherited-outcome": 2,
+    "dynamic-operand": 36,
+    "passage-outcome": 13,
+    "co-cut-grep": 13,
+    "pinned-passage": 4,
+    "coverage": 1
+  },
+  "initialFailures": [
+    {
+      "rule": "inherited-outcome",
+      "where": "apps/fgos-gateway/src/gateway.rs:reference-000161:class6-l-000026",
+      "error": "'priorSlotKey'"
+    },
+    {
+      "rule": "inherited-outcome",
+      "where": "apps/fgos-gateway/src/gateway.rs:reference-000182:class6-l-000023",
+      "error": "'priorSlotKey'"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "apps/fgos-gateway/src/mcp.rs:dynamic-000766",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": ".githooks/pre-commit:reference-000110 / dynamic-000566",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": ".githooks/pre-commit:reference-000111 / dynamic-000571",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": ".githooks/pre-commit:reference-000110",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": ".githooks/pre-commit:reference-000111",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": "bin/fgos.mjs:reference-000228",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": "src/cli/command-registry.mjs:reference-003643 / reference-003666",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": "src/cli/command-registry.mjs:reference-003641",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": "src/cli/command-registry.mjs:reference-003655",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": "src/intake/plan.mjs:reference-003682",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": "src/intake/verify-pattern-check.mjs:reference-003687",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": "src/runner/merge.mjs:reference-003749",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": "src/runner/worktree.mjs:reference-003784",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": "src/state/events-jsonl-truncation-guard.mjs:reference-003868",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": "src/setup/instruction-registry.mjs:reference-003798 / dynamic-013969",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-013982",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-013988",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-013989",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-013990",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-013991",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-013992",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-014003",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-014006",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-014007",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-014008",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-014016",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-014017",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-014018",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-014026",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-014027",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/instruction-registry.mjs:dynamic-014028",
+      "error": "condition false"
+    },
+    {
+      "rule": "pinned-passage",
+      "where": "src/setup/model-pool-checks.mjs:dynamic-014060",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/model-pool-checks.mjs:dynamic-014060",
+      "error": "condition false"
+    },
+    {
+      "rule": "pinned-passage",
+      "where": "src/setup/model-pool-checks.mjs:dynamic-014072",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/model-pool-checks.mjs:dynamic-014072",
+      "error": "condition false"
+    },
+    {
+      "rule": "coverage",
+      "where": "whole-file census versus grep src/setup/registrations.mjs",
+      "error": "unaccounted pinned legacy-root grep hit at 6659: docs/specs/workflow.md"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": "src/setup/registrations.mjs:reference-003806 / dynamic-014207",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": "src/setup/registrations.mjs:reference-003804 / dynamic-014307",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": "src/setup/registrations.mjs:reference-003839 / dynamic-014361",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": "src/setup/registrations.mjs:reference-003803 / dynamic-014362",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": "src/setup/registrations.mjs:reference-003828 / dynamic-014367",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": "src/setup/registrations.mjs:reference-003833 / dynamic-014369",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": "src/setup/registrations.mjs:reference-003829 / dynamic-014376",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": "src/setup/registrations.mjs:reference-003834 / dynamic-014378",
+      "error": "condition false"
+    },
+    {
+      "rule": "passage-outcome",
+      "where": "src/setup/registrations.mjs:reference-003811 / dynamic-014907",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": "src/setup/registrations.mjs:reference-003804",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": "src/setup/registrations.mjs:reference-003806",
+      "error": "condition false"
+    },
+    {
+      "rule": "co-cut-grep",
+      "where": "src/setup/registrations.mjs:reference-003811",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/registrations.mjs:dynamic-014338",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/registrations.mjs:dynamic-014345",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/registrations.mjs:dynamic-014346",
+      "error": "condition false"
+    },
+    {
+      "rule": "pinned-passage",
+      "where": "src/setup/run-supervisor-checks.mjs:dynamic-014965",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/run-supervisor-checks.mjs:dynamic-014965",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015044",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015059",
+      "error": "condition false"
+    },
+    {
+      "rule": "pinned-passage",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015060",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015060",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015119",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015125",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015126",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015127",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015175",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015186",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015187",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015194",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015229",
+      "error": "condition false"
+    },
+    {
+      "rule": "dynamic-operand",
+      "where": "src/setup/skill-wrappers.mjs:dynamic-015236",
+      "error": "condition false"
+    }
+  ],
+  "finalFailures": [],
+  "finalFailureCount": 0,
+  "finalChecks": {
+    "coverage": 2206,
+    "source-pins": 37,
+    "passage-outcome": 33,
+    "inherited-outcome": 25,
+    "receipts": 452,
+    "source-spans": 2166,
+    "parks": 257,
+    "rejections": 1754,
+    "fixture-provenance": 14,
+    "pinned-passage": 2017,
+    "dynamic-operand": 330,
+    "patches": 37,
+    "generated": 37,
+    "co-cut-grep": 12,
+    "targets": 12,
+    "missing-proof": 10,
+    "gateway": 1,
+    "message-deltas": 12,
+    "setup": 1,
+    "review": 2424
+  },
+  "sourceCensusGrepOccurrences": 196,
+  "checker": "step-05-pilot-check-result.json",
+  "probes": {
+    "path": "step-05-pilot-probes-result.json",
+    "passed": 36,
+    "total": 36
+  },
+  "outcomes": "step-05-pilot-rework-outcomes.json",
+  "rereview": "step-05-pilot-rereview-index.json",
+  "acceptance": "mechanical author evidence; independent semantic re-review pending"
+}

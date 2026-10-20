@@ -8,6 +8,660 @@
       "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
       "seam": "setup-doctor-roots",
       "kind": "dynamicTraces",
+      "index": 282,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            3911,
+            9,
+            3911,
+            32,
+            "mdPath = path.join(root",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "id": "dynamic-014368",
+        "originalTuple": [
+          3911,
+          9,
+          3911,
+          32,
+          "mdPath = path.join(root",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 3930,
+        "currentPassage": {
+          "startLine": 3928,
+          "endLine": 3932,
+          "text": "  const view = rebuild(fgosDir);\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;"
+        },
+        "caller": {
+          "line": 3918,
+          "declaration": "function checkDocRegistryStale(cwd) {"
+        },
+        "inputs": [
+          "mdPath = path.join(root"
+        ],
+        "role": "doctor-document-reader/writer",
+        "targetSetOrConstruction": "resolveMainCheckout(cwd) ?? cwd; registry/currentPath/sourceCaptureIds or retained docs/** and existing generators",
+        "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Existing doctor registration function checkDocRegistryStale(cwd) { consumes 'mdPath = path.join(root'. Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "blockedSeams": [
+          "setup-doctor-roots"
+        ],
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 283,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            3912,
+            20,
+            3912,
+            61,
+            "path.join(root, 'docs/doc-registry.json')",
+            "path-call",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "id": "dynamic-014369",
+        "originalTuple": [
+          3912,
+          20,
+          3912,
+          61,
+          "path.join(root, 'docs/doc-registry.json')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 3931,
+        "currentPassage": {
+          "startLine": 3929,
+          "endLine": 3933,
+          "text": "  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;"
+        },
+        "caller": {
+          "line": 3918,
+          "declaration": "function checkDocRegistryStale(cwd) {"
+        },
+        "inputs": [
+          "path.join(root, 'docs/doc-registry.json')"
+        ],
+        "role": "doctor-document-reader/writer",
+        "targetSetOrConstruction": "resolveMainCheckout(cwd) ?? cwd; registry/currentPath/sourceCaptureIds or retained docs/** and existing generators",
+        "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Existing doctor registration function checkDocRegistryStale(cwd) { consumes \"path.join(root, 'docs/doc-registry.json')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "blockedSeams": [
+          "setup-doctor-roots"
+        ],
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 284,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            3912,
+            9,
+            3912,
+            34,
+            "jsonPath = path.join(root",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "id": "dynamic-014370",
+        "originalTuple": [
+          3912,
+          9,
+          3912,
+          34,
+          "jsonPath = path.join(root",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 3931,
+        "currentPassage": {
+          "startLine": 3929,
+          "endLine": 3933,
+          "text": "  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;"
+        },
+        "caller": {
+          "line": 3918,
+          "declaration": "function checkDocRegistryStale(cwd) {"
+        },
+        "inputs": [
+          "jsonPath = path.join(root"
+        ],
+        "role": "doctor-document-reader/writer",
+        "targetSetOrConstruction": "resolveMainCheckout(cwd) ?? cwd; registry/currentPath/sourceCaptureIds or retained docs/** and existing generators",
+        "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Existing doctor registration function checkDocRegistryStale(cwd) { consumes 'jsonPath = path.join(root'. Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "blockedSeams": [
+          "setup-doctor-roots"
+        ],
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 285,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            3924,
+            9,
+            3924,
+            35,
+            "root = mainCheckout ?? cwd",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "id": "dynamic-014371",
+        "originalTuple": [
+          3924,
+          9,
+          3924,
+          35,
+          "root = mainCheckout ?? cwd",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 3943,
+        "currentPassage": {
+          "startLine": 3941,
+          "endLine": 3945,
+          "text": "function fixDocRegistryStale(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {"
+        },
+        "caller": {
+          "line": 3941,
+          "declaration": "function fixDocRegistryStale(cwd) {"
+        },
+        "inputs": [
+          "root = mainCheckout ?? cwd"
+        ],
+        "role": "doctor-document-reader/writer",
+        "targetSetOrConstruction": "resolveMainCheckout(cwd) ?? cwd; registry/currentPath/sourceCaptureIds or retained docs/** and existing generators",
+        "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Existing doctor registration function fixDocRegistryStale(cwd) { consumes 'root = mainCheckout ?? cwd'. Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "blockedSeams": [
+          "setup-doctor-roots"
+        ],
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 286,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            3925,
+            19,
+            3925,
+            43,
+            "path.join(root, '.fgos')",
+            "path-call",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "id": "dynamic-014372",
+        "originalTuple": [
+          3925,
+          19,
+          3925,
+          43,
+          "path.join(root, '.fgos')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 3944,
+        "currentPassage": {
+          "startLine": 3942,
+          "endLine": 3946,
+          "text": "  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { changed: false, message: 'skipped -- no events log' };"
+        },
+        "caller": {
+          "line": 3941,
+          "declaration": "function fixDocRegistryStale(cwd) {"
+        },
+        "inputs": [
+          "path.join(root, '.fgos')"
+        ],
+        "role": "doctor-document-reader/writer",
+        "targetSetOrConstruction": "resolveMainCheckout(cwd) ?? cwd; registry/currentPath/sourceCaptureIds or retained docs/** and existing generators",
+        "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "L12-69: State path coupled to owning doc-registry/instruction check, not a document destination. Existing doctor registration function fixDocRegistryStale(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "blockedSeams": [
+          "setup-doctor-roots"
+        ],
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 287,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            3925,
+            9,
+            3925,
+            33,
+            "fgosDir = path.join(root",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "id": "dynamic-014373",
+        "originalTuple": [
+          3925,
+          9,
+          3925,
+          33,
+          "fgosDir = path.join(root",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 3944,
+        "currentPassage": {
+          "startLine": 3942,
+          "endLine": 3946,
+          "text": "  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { changed: false, message: 'skipped -- no events log' };"
+        },
+        "caller": {
+          "line": 3941,
+          "declaration": "function fixDocRegistryStale(cwd) {"
+        },
+        "inputs": [
+          "fgosDir = path.join(root"
+        ],
+        "role": "doctor-document-reader/writer",
+        "targetSetOrConstruction": "resolveMainCheckout(cwd) ?? cwd; registry/currentPath/sourceCaptureIds or retained docs/** and existing generators",
+        "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Existing doctor registration function fixDocRegistryStale(cwd) { consumes 'fgosDir = path.join(root'. Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "blockedSeams": [
+          "setup-doctor-roots"
+        ],
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 288,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            3926,
+            22,
+            3926,
+            56,
+            "path.join(fgosDir, 'events.jsonl')",
+            "path-call",
+            true,
+            "reader"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "id": "dynamic-014374",
+        "originalTuple": [
+          3926,
+          22,
+          3926,
+          56,
+          "path.join(fgosDir, 'events.jsonl')",
+          "path-call",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 3945,
+        "currentPassage": {
+          "startLine": 3943,
+          "endLine": 3947,
+          "text": "  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { changed: false, message: 'skipped -- no events log' };\n  }"
+        },
+        "caller": {
+          "line": 3941,
+          "declaration": "function fixDocRegistryStale(cwd) {"
+        },
+        "inputs": [
+          "path.join(fgosDir, 'events.jsonl')"
+        ],
+        "role": "doctor-document-reader/writer",
+        "targetSetOrConstruction": "resolveMainCheckout(cwd) ?? cwd; registry/currentPath/sourceCaptureIds or retained docs/** and existing generators",
+        "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Existing doctor registration function fixDocRegistryStale(cwd) { consumes \"path.join(fgosDir, 'events.jsonl')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "blockedSeams": [
+          "setup-doctor-roots"
+        ],
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 289,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014375",
+        "originalTuple": [
+          3937,
+          41,
+          3937,
+          68,
+          "`skipped -- ${err.message}`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 3956,
+        "currentPassage": {
+          "startLine": 3954,
+          "endLine": 3958,
+          "text": "  } catch (err) {\n    if (err instanceof StoreError || err.code === 'ENOENT') {\n      return { changed: false, message: `skipped -- ${err.message}` };\n    }\n    throw err;"
+        },
+        "caller": {
+          "line": 3941,
+          "declaration": "function fixDocRegistryStale(cwd) {"
+        },
+        "inputs": [
+          "`skipped -- ${err.message}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`skipped -- ${err.message}`'. It formats values at function fixDocRegistryStale(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`skipped -- ${err.message}`'. It formats values at function fixDocRegistryStale(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 290,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            3942,
+            18,
+            3942,
+            57,
+            "path.join(root, 'docs/doc-registry.md')",
+            "path-call",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "id": "dynamic-014376",
+        "originalTuple": [
+          3942,
+          18,
+          3942,
+          57,
+          "path.join(root, 'docs/doc-registry.md')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 3961,
+        "currentPassage": {
+          "startLine": 3959,
+          "endLine": 3963,
+          "text": "  }\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n"
+        },
+        "caller": {
+          "line": 3941,
+          "declaration": "function fixDocRegistryStale(cwd) {"
+        },
+        "inputs": [
+          "path.join(root, 'docs/doc-registry.md')"
+        ],
+        "role": "doctor-document-reader/writer",
+        "targetSetOrConstruction": "resolveMainCheckout(cwd) ?? cwd; registry/currentPath/sourceCaptureIds or retained docs/** and existing generators",
+        "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Existing doctor registration function fixDocRegistryStale(cwd) { consumes \"path.join(root, 'docs/doc-registry.md')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "blockedSeams": [
+          "setup-doctor-roots"
+        ],
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 291,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            3942,
+            9,
+            3942,
+            32,
+            "mdPath = path.join(root",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "id": "dynamic-014377",
+        "originalTuple": [
+          3942,
+          9,
+          3942,
+          32,
+          "mdPath = path.join(root",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 3961,
+        "currentPassage": {
+          "startLine": 3959,
+          "endLine": 3963,
+          "text": "  }\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n"
+        },
+        "caller": {
+          "line": 3941,
+          "declaration": "function fixDocRegistryStale(cwd) {"
+        },
+        "inputs": [
+          "mdPath = path.join(root"
+        ],
+        "role": "doctor-document-reader/writer",
+        "targetSetOrConstruction": "resolveMainCheckout(cwd) ?? cwd; registry/currentPath/sourceCaptureIds or retained docs/** and existing generators",
+        "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Existing doctor registration function fixDocRegistryStale(cwd) { consumes 'mdPath = path.join(root'. Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "blockedSeams": [
+          "setup-doctor-roots"
+        ],
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
       "index": 292,
       "value": {
         "proofCommand": "missing",
@@ -262,7 +916,7 @@
         "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": null,
-        "reason": "Existing doctor registration function checkDocAliasBroken(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "reason": "L12-69: State path coupled to owning doc-registry/instruction check, not a document destination. Existing doctor registration function checkDocAliasBroken(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
         "blockedSeams": [
           "setup-doctor-roots"
         ],
@@ -785,7 +1439,7 @@
         "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": null,
-        "reason": "Existing doctor registration function checkDocActiveDuplicate(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "reason": "L12-69: State path coupled to owning doc-registry/instruction check, not a document destination. Existing doctor registration function checkDocActiveDuplicate(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
         "blockedSeams": [
           "setup-doctor-roots"
         ],
@@ -1726,7 +2380,7 @@
         "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": null,
-        "reason": "Existing doctor registration function checkDocProvisionalAged(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "reason": "L12-69: State path coupled to owning doc-registry/instruction check, not a document destination. Existing doctor registration function checkDocProvisionalAged(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
         "blockedSeams": [
           "setup-doctor-roots"
         ],
@@ -2045,7 +2699,7 @@
         "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": null,
-        "reason": "Existing doctor registration function checkDocTopicOversized(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "reason": "L12-69: State path coupled to owning doc-registry/instruction check, not a document destination. Existing doctor registration function checkDocTopicOversized(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
         "blockedSeams": [
           "setup-doctor-roots"
         ],
@@ -2415,7 +3069,7 @@
         "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": null,
-        "reason": "Existing doctor registration function checkDocRoleUnderused(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "reason": "L12-69: State path coupled to owning doc-registry/instruction check, not a document destination. Existing doctor registration function checkDocRoleUnderused(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
         "blockedSeams": [
           "setup-doctor-roots"
         ],
@@ -2734,7 +3388,7 @@
         "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": null,
-        "reason": "Existing doctor registration function checkDocCurrentPathMissing(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "reason": "L12-69: State path coupled to owning doc-registry/instruction check, not a document destination. Existing doctor registration function checkDocCurrentPathMissing(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
         "blockedSeams": [
           "setup-doctor-roots"
         ],
@@ -3222,7 +3876,7 @@
         "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": null,
-        "reason": "Existing doctor registration function checkDocSourceUnreachable(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "reason": "L12-69: State path coupled to owning doc-registry/instruction check, not a document destination. Existing doctor registration function checkDocSourceUnreachable(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
         "blockedSeams": [
           "setup-doctor-roots"
         ],
@@ -3726,7 +4380,7 @@
         "stateExportDependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": null,
-        "reason": "Existing doctor registration function checkDocSourceConservation(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
+        "reason": "L12-69: State path coupled to owning doc-registry/instruction check, not a document destination. Existing doctor registration function checkDocSourceConservation(cwd) { consumes \"path.join(root, '.fgos')\". Check/fix intent and output must compare against the same bounded source state, never live state in this pilot.",
         "blockedSeams": [
           "setup-doctor-roots"
         ],
@@ -7481,618 +8135,6 @@
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": "Doctor const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind)); config/default/check operation 'globalRunner = loadGlobalConfig().runner ?? {}' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
         "reason": "Doctor const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind)); config/default/check operation 'globalRunner = loadGlobalConfig().runner ?? {}' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 424,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014510",
-        "originalTuple": [
-          4724,
-          41,
-          4724,
-          128,
-          "`runner config not loadable here, confined pane accounts not evaluated: ${err.message}`",
-          "template-string",
-          false,
-          "reader"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 4743,
-        "currentPassage": {
-          "startLine": 4741,
-          "endLine": 4745,
-          "text": "      if (!globalRunner.executors || typeof globalRunner.executors !== 'object') {\n        if (providerInventory.inventoryUnreadable) return checkConfinedPaneAccounts({}, providerInventory);\n        return { passed: true, message: `runner config not loadable here, confined pane accounts not evaluated: ${err.message}` };\n      }\n      runnerCfg = { executors: globalRunner.executors };"
-        },
-        "caller": {
-          "line": 4650,
-          "declaration": "const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));"
-        },
-        "inputs": [
-          "`runner config not loadable here, confined pane accounts not evaluated: ${err.message}`"
-        ],
-        "role": "non-document-message",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner config not loadable here, confined pane accounts not evaluated: ${err.message}`'. It formats values at const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));; contains no documentation-location operand and is not a filesystem operation.",
-        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner config not loadable here, confined pane accounts not evaluated: ${err.message}`'. It formats values at const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));; contains no documentation-location operand and is not a filesystem operation.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 425,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014511",
-        "originalTuple": [
-          4739,
-          39,
-          4739,
-          127,
-          "`runner config not loadable here, non-claude trust stores not evaluated: ${err.message}`",
-          "template-string",
-          false,
-          "reader"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 4758,
-        "currentPassage": {
-          "startLine": 4756,
-          "endLine": 4760,
-          "text": "      return checkTrustStoresReadable(cwd, loadRunnerConfigFromDir(cwd));\n    } catch (err) {\n      return { passed: true, message: `runner config not loadable here, non-claude trust stores not evaluated: ${err.message}` };\n    }\n  },"
-        },
-        "caller": {
-          "line": 4650,
-          "declaration": "const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));"
-        },
-        "inputs": [
-          "`runner config not loadable here, non-claude trust stores not evaluated: ${err.message}`"
-        ],
-        "role": "non-document-message",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner config not loadable here, non-claude trust stores not evaluated: ${err.message}`'. It formats values at const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));; contains no documentation-location operand and is not a filesystem operation.",
-        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner config not loadable here, non-claude trust stores not evaluated: ${err.message}`'. It formats values at const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));; contains no documentation-location operand and is not a filesystem operation.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 426,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014512",
-        "originalTuple": [
-          4756,
-          18,
-          4756,
-          85,
-          "path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')",
-          "path-call",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 4775,
-        "currentPassage": {
-          "startLine": 4773,
-          "endLine": 4777,
-          "text": "  description: 'for every reviewed Workflow unit, the capability prefer pool supplies a provider family different from the producer\\'s (hard); a panel unit whose pool has fewer families than seats is reported as seats sharing a family, not as a failure',\n  check: (cwd) => checkWorkflowPoolsSatisfyIndependence(cwd, {\n    packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),\n    loadRunnerConfig: loadRunnerConfigFromDir,\n  }),"
-        },
-        "caller": {
-          "line": 4650,
-          "declaration": "const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));"
-        },
-        "inputs": [
-          "path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')"
-        ],
-        "role": "doctor-config/infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Doctor const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind)); config/default/check operation \"path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "reason": "Doctor const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind)); config/default/check operation \"path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 427,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014513",
-        "originalTuple": [
-          4756,
-          5,
-          4756,
-          75,
-          "packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url))",
-          "config/default-root",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 4775,
-        "currentPassage": {
-          "startLine": 4773,
-          "endLine": 4777,
-          "text": "  description: 'for every reviewed Workflow unit, the capability prefer pool supplies a provider family different from the producer\\'s (hard); a panel unit whose pool has fewer families than seats is reported as seats sharing a family, not as a failure',\n  check: (cwd) => checkWorkflowPoolsSatisfyIndependence(cwd, {\n    packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),\n    loadRunnerConfig: loadRunnerConfigFromDir,\n  }),"
-        },
-        "caller": {
-          "line": 4650,
-          "declaration": "const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));"
-        },
-        "inputs": [
-          "packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url))"
-        ],
-        "role": "doctor-config/infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Doctor const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind)); config/default/check operation 'packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url))' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "reason": "Doctor const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind)); config/default/check operation 'packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url))' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 428,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014514",
-        "originalTuple": [
-          4765,
-          18,
-          4765,
-          85,
-          "path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')",
-          "path-call",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 4784,
-        "currentPassage": {
-          "startLine": 4782,
-          "endLine": 4786,
-          "text": "  description: 'every blind Workflow unit can only bind executors whose provider family and transport were proven to keep a worker blind (read-only, no model call)',\n  check: (cwd) => checkBlindStepsUseProvenPools(cwd, {\n    packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),\n    loadRunnerConfig: loadRunnerConfigFromDir,\n  }),"
-        },
-        "caller": {
-          "line": 4650,
-          "declaration": "const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));"
-        },
-        "inputs": [
-          "path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')"
-        ],
-        "role": "doctor-config/infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Doctor const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind)); config/default/check operation \"path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "reason": "Doctor const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind)); config/default/check operation \"path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 429,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014515",
-        "originalTuple": [
-          4765,
-          5,
-          4765,
-          75,
-          "packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url))",
-          "config/default-root",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 4784,
-        "currentPassage": {
-          "startLine": 4782,
-          "endLine": 4786,
-          "text": "  description: 'every blind Workflow unit can only bind executors whose provider family and transport were proven to keep a worker blind (read-only, no model call)',\n  check: (cwd) => checkBlindStepsUseProvenPools(cwd, {\n    packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),\n    loadRunnerConfig: loadRunnerConfigFromDir,\n  }),"
-        },
-        "caller": {
-          "line": 4650,
-          "declaration": "const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));"
-        },
-        "inputs": [
-          "packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url))"
-        ],
-        "role": "doctor-config/infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Doctor const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind)); config/default/check operation 'packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url))' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "reason": "Doctor const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind)); config/default/check operation 'packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url))' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 430,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014516",
-        "originalTuple": [
-          4787,
-          39,
-          4787,
-          115,
-          "`runner config not loadable here, confinement not evaluated: ${err.message}`",
-          "template-string",
-          false,
-          "reader"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 4806,
-        "currentPassage": {
-          "startLine": 4804,
-          "endLine": 4808,
-          "text": "      // A directory with no loadable runner config is not a confinement problem;\n      // saying otherwise would make doctor cry wolf everywhere fgOS is not set up.\n      return { passed: true, message: `runner config not loadable here, confinement not evaluated: ${err.message}` };\n    }\n  },"
-        },
-        "caller": {
-          "line": 4650,
-          "declaration": "const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));"
-        },
-        "inputs": [
-          "`runner config not loadable here, confinement not evaluated: ${err.message}`"
-        ],
-        "role": "non-document-message",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner config not loadable here, confinement not evaluated: ${err.message}`'. It formats values at const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));; contains no documentation-location operand and is not a filesystem operation.",
-        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner config not loadable here, confinement not evaluated: ${err.message}`'. It formats values at const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));; contains no documentation-location operand and is not a filesystem operation.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 431,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014517",
-        "originalTuple": [
-          4799,
-          39,
-          4799,
-          120,
-          "`runner config not loadable here, git write grants not evaluated: ${err.message}`",
-          "template-string",
-          false,
-          "writer"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 4818,
-        "currentPassage": {
-          "startLine": 4816,
-          "endLine": 4820,
-          "text": "      return checkInvocationGitWriteGrants(loadRunnerConfigFromDir(cwd));\n    } catch (err) {\n      return { passed: true, message: `runner config not loadable here, git write grants not evaluated: ${err.message}` };\n    }\n  },"
-        },
-        "caller": {
-          "line": 4650,
-          "declaration": "const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));"
-        },
-        "inputs": [
-          "`runner config not loadable here, git write grants not evaluated: ${err.message}`"
-        ],
-        "role": "non-document-message",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner config not loadable here, git write grants not evaluated: ${err.message}`'. It formats values at const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));; contains no documentation-location operand and is not a filesystem operation.",
-        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner config not loadable here, git write grants not evaluated: ${err.message}`'. It formats values at const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));; contains no documentation-location operand and is not a filesystem operation.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 432,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014518",
-        "originalTuple": [
-          4817,
-          24,
-          4817,
-          49,
-          "path.resolve(releasePath)",
-          "path-call",
-          false,
-          "reader"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 4836,
-        "currentPassage": {
-          "startLine": 4834,
-          "endLine": 4838,
-          "text": " */\nfunction resolveConfinedManifestPath(releasePath, ...segments) {\n  const resolvedBase = path.resolve(releasePath);\n  const resolved = path.resolve(resolvedBase, ...segments);\n  if (resolved !== resolvedBase && !resolved.startsWith(resolvedBase + path.sep)) {"
-        },
-        "caller": {
-          "line": 4835,
-          "declaration": "function resolveConfinedManifestPath(releasePath, ...segments) {"
-        },
-        "inputs": [
-          "path.resolve(releasePath)"
-        ],
-        "role": "doctor-config/infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Doctor function resolveConfinedManifestPath(releasePath, ...segments) { config/default/check operation 'path.resolve(releasePath)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "reason": "Doctor function resolveConfinedManifestPath(releasePath, ...segments) { config/default/check operation 'path.resolve(releasePath)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 433,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014519",
-        "originalTuple": [
-          4818,
-          20,
-          4818,
-          59,
-          "path.resolve(resolvedBase, ...segments)",
-          "path-call",
-          false,
-          "reader"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 4837,
-        "currentPassage": {
-          "startLine": 4835,
-          "endLine": 4839,
-          "text": "function resolveConfinedManifestPath(releasePath, ...segments) {\n  const resolvedBase = path.resolve(releasePath);\n  const resolved = path.resolve(resolvedBase, ...segments);\n  if (resolved !== resolvedBase && !resolved.startsWith(resolvedBase + path.sep)) {\n    return null;"
-        },
-        "caller": {
-          "line": 4835,
-          "declaration": "function resolveConfinedManifestPath(releasePath, ...segments) {"
-        },
-        "inputs": [
-          "path.resolve(resolvedBase, ...segments)"
-        ],
-        "role": "doctor-config/infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Doctor function resolveConfinedManifestPath(releasePath, ...segments) { config/default/check operation 'path.resolve(resolvedBase, ...segments)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "reason": "Doctor function resolveConfinedManifestPath(releasePath, ...segments) { config/default/check operation 'path.resolve(resolvedBase, ...segments)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 434,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014520",
-        "originalTuple": [
-          483,
-          9,
-          483,
-          47,
-          "sharedPath = sharedConfigFilePath(cwd)",
-          "config/default-root",
-          true,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 487,
-        "currentPassage": {
-          "startLine": 485,
-          "endLine": 489,
-          "text": "// note deferred to once the shared file was real.\nfunction checkConfigNotStale(cwd) {\n  const sharedPath = sharedConfigFilePath(cwd);\n  if (!fs.existsSync(sharedPath)) {\n    return { passed: false, message: 'not yet configured -- run fgos setup' };"
-        },
-        "caller": {
-          "line": 486,
-          "declaration": "function checkConfigNotStale(cwd) {"
-        },
-        "inputs": [
-          "sharedPath = sharedConfigFilePath(cwd)"
-        ],
-        "role": "doctor-config/infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Doctor function checkConfigNotStale(cwd) { config/default/check operation 'sharedPath = sharedConfigFilePath(cwd)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "reason": "Doctor function checkConfigNotStale(cwd) { config/default/check operation 'sharedPath = sharedConfigFilePath(cwd)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 435,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-014521",
-        "originalTuple": [
-          4845,
-          45,
-          4845,
-          58,
-          "scope = {}) {",
-          "config/default-root",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 4864,
-        "currentPassage": {
-          "startLine": 4862,
-          "endLine": 4866,
-          "text": "}\n\nfunction resolveActiveReleaseForDoctor(dir, scope = {}) {\n  const root = resolveMainCheckout(dir) ?? dir;\n  const candidateDirs = scope.candidateDirs ?? [dir, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
-        },
-        "caller": {
-          "line": 4864,
-          "declaration": "function resolveActiveReleaseForDoctor(dir, scope = {}) {"
-        },
-        "inputs": [
-          "scope = {}) {"
-        ],
-        "role": "doctor-config/infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Doctor function resolveActiveReleaseForDoctor(dir, scope = {}) { config/default/check operation 'scope = {}) {' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
-        "reason": "Doctor function resolveActiveReleaseForDoctor(dir, scope = {}) { config/default/check operation 'scope = {}) {' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"

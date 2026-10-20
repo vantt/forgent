@@ -167,7 +167,10 @@
           "scripts/check-legacy-docs-ratchet.mjs": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
           "scripts/check-legacy-docs-ratchet.baseline.json": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8"
         },
-        "parked": [],
+        "parked": [
+          "reference-000161",
+          "reference-000182"
+        ],
         "review": {
           "status": "pending",
           "reviewer": null,
@@ -184,7 +187,7 @@
       "index": 0,
       "value": {
         "referenceId": "reference-000161",
-        "admission": "REJECT",
+        "admission": "ADMIT",
         "inventory": "step-02l-census-class6.json",
         "edgeId": "class6-l-000026",
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
@@ -218,22 +221,24 @@
           "startLine": 129,
           "endLine": 133
         },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-58 / Step 3–4 comment custody (exact canonical slot joined): Exact own passage: \"/// D4/D5: read the per-machine gateway token + optional port override from\\n/// `~/.fgos/config.json`. Never creates or writes this file — per\\n/// `docs/specs/distribution.md` row 5b it is only ever created by\\n/// `fgos setup`; a missing file or missing token is a refusal to start, not\\n/// a self-provisioned default (that would also defeat D4's whole point: an\"",
+        "role": "uncovered-comment-navigation",
+        "disposition": "parked",
+        "reason": "L12-69: L12-62: A51, L12-30/31/32/58: Phase 9 carry: source cites gateway token global-config row 5b. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation. Own source passage: '/// `docs/specs/distribution.md` row 5b it is only ever created by' Own passage \"/// D4/D5: read the per-machine gateway token + optional port override from\\n/// `~/.fgos/config.json`. Never creates or writes this file — per\\n/// `docs/specs/distribution.md` row 5b it is only ever created by\\n/// `fgos setup`; a missing file or missing token is a refusal to start, not\\n/// a self-provisioned default (that would also defeat D4's whole point: an\"",
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/specs/distribution.md",
-          "exists": true
+          "rule": "Inherited Step 4 park: distribution row 5b claim requires live-holder carry/reconciliation",
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
+          "recordSha256": "c8468df6da937424f3fccfeeca89d280fd4dd93d30add5c07b16d27527daab8e",
+          "slotKey": "{\"edgeId\":\"class6-l-000026\",\"file\":\"apps/fgos-gateway/src/gateway.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000026\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":131}]}",
+          "pin": "aa8d343746a292d2cb476ab76e6489411fd59a62"
         },
-        "timing": "none",
+        "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
+        "blockedCategory": "phase9-carry",
+        "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: source cites gateway token global-config row 5b. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation. Own source passage: '/// `docs/specs/distribution.md` row 5b it is only ever created by'",
+        "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: source cites gateway token global-config row 5b. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation. Own source passage: '/// `docs/specs/distribution.md` row 5b it is only ever created by'",
+        "dependencyCategory": "phase9-carry",
         "successorNote": null,
         "aliasWriteCheck": {
           "isWriter": false,
@@ -264,8 +269,15 @@
           }
         ],
         "fixtureProvenance": null,
-        "rejectionRule": "prior-comment-slot",
-        "receiptId": "gateway-contract-pilot"
+        "rejectionRule": null,
+        "receiptId": "gateway-contract-pilot",
+        "proofCommand": "missing",
+        "parityObligation": {
+          "current": "docs/specs/distribution.md",
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: source cites gateway token global-config row 5b. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation. Own source passage: '/// `docs/specs/distribution.md` row 5b it is only ever created by'"
+        }
       }
     },
     {
@@ -598,7 +610,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -869,7 +881,7 @@
           "startLine": 893,
           "endLine": 897
         },
-        "role": "reader/default",
+        "role": "emitted-message",
         "disposition": "preserve",
         "reason": "Executable data/message/file operation in own passage: '    if !resolved.starts_with(&docs_history_root) {\\n        return Err(GatewayError::validation(\\n            \"docsRef must resolve inside docs/history/ -- refused (tsk-4id, path-traversal guard)\",\\n        ));\\n    }' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
         "target": null,
@@ -877,7 +889,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -963,7 +975,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -1058,7 +1070,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -1153,7 +1165,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -1246,7 +1258,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/contracts",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -1622,7 +1634,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -2163,7 +2175,7 @@
       "index": 21,
       "value": {
         "referenceId": "reference-000182",
-        "admission": "REJECT",
+        "admission": "ADMIT",
         "inventory": "step-02l-census-class6.json",
         "edgeId": "class6-l-000023",
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
@@ -2197,22 +2209,24 @@
           "startLine": 11,
           "endLine": 15
         },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-58 / Step 3–4 comment custody (exact canonical slot joined): Exact own passage: '//!\\n//! D4/D5: one auth token per machine, read from `~/.fgos/config.json`\\'s\\n//! `gateway.token` field (the global config file `docs/specs/distribution.md`\\n//! row 5b already establishes — this module only ever READS it; per that same\\n//! row (\"not created by anything except fgos setup\") it never writes or'",
+        "role": "uncovered-comment-navigation",
+        "disposition": "parked",
+        "reason": "L12-69: L12-62: A51, L12-30/31/32/58: Phase 9 carry: source cites gateway token global-config row 5b. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation. Own source passage: '//! `gateway.token` field (the global config file `docs/specs/distribution.md`' Own passage '//!\\n//! D4/D5: one auth token per machine, read from `~/.fgos/config.json`\\'s\\n//! `gateway.token` field (the global config file `docs/specs/distribution.md`\\n//! row 5b already establishes — this module only ever READS it; per that same\\n//! row (\"not created by anything except fgos setup\") it never writes or'",
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/specs/distribution.md",
-          "exists": true
+          "rule": "Inherited Step 4 park: distribution row 5b claim requires live-holder carry/reconciliation",
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
+          "recordSha256": "c8468df6da937424f3fccfeeca89d280fd4dd93d30add5c07b16d27527daab8e",
+          "slotKey": "{\"edgeId\":\"class6-l-000023\",\"file\":\"apps/fgos-gateway/src/gateway.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000023\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":13}]}",
+          "pin": "aa8d343746a292d2cb476ab76e6489411fd59a62"
         },
-        "timing": "none",
+        "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
+        "blockedCategory": "phase9-carry",
+        "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: source cites gateway token global-config row 5b. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation. Own source passage: '//! `gateway.token` field (the global config file `docs/specs/distribution.md`'",
+        "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: source cites gateway token global-config row 5b. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation. Own source passage: '//! `gateway.token` field (the global config file `docs/specs/distribution.md`'",
+        "dependencyCategory": "phase9-carry",
         "successorNote": null,
         "aliasWriteCheck": {
           "isWriter": false,
@@ -2243,8 +2257,15 @@
           }
         ],
         "fixtureProvenance": null,
-        "rejectionRule": "prior-comment-slot",
-        "receiptId": "gateway-contract-pilot"
+        "rejectionRule": null,
+        "receiptId": "gateway-contract-pilot",
+        "proofCommand": "missing",
+        "parityObligation": {
+          "current": "docs/specs/distribution.md",
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: source cites gateway token global-config row 5b. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation. Own source passage: '//! `gateway.token` field (the global config file `docs/specs/distribution.md`'"
+        }
       }
     },
     {
@@ -2769,7 +2790,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/fgos-interface-daemon/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -2854,7 +2875,7 @@
           "startLine": 876,
           "endLine": 880
         },
-        "role": "reader/default",
+        "role": "emitted-message",
         "disposition": "preserve",
         "reason": "Executable data/message/file operation in own passage: '        .join(\"history\")\\n        .canonicalize()\\n        .map_err(|err| GatewayError::unexpected(format!(\"could not resolve docs/history/: {err}\")))?;\\n\\n    let candidate = state.root.join(docs_ref);' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
         "target": null,
@@ -2862,7 +2883,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -5444,108 +5465,6 @@
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": "Concrete gateway function async fn static_serving_disabled_leaves_unmatched_route_as_plain_404() { operates on token config, verb argv, static web assets or isolated route fixtures, rather than the contract reader or narrative reader. Operation 'PathBuf::from(\"/tmp\"))'; own complete source context attached.",
         "reason": "Concrete gateway function async fn static_serving_disabled_leaves_unmatched_route_as_plain_404() { operates on token config, verb argv, static web assets or isolated route fixtures, rather than the contract reader or narrative reader. Operation 'PathBuf::from(\"/tmp\"))'; own complete source context attached.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "gateway-contract-pilot"
-      }
-    },
-    {
-      "file": "apps/fgos-gateway/src/gateway.rs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
-      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
-      "seam": "gateway-contract",
-      "kind": "dynamicTraces",
-      "index": 48,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-000709",
-        "originalTuple": [
-          1934,
-          57,
-          1934,
-          77,
-          "Path::new(\"static\"))",
-          "config/default-root",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 1934,
-        "currentPassage": {
-          "startLine": 1932,
-          "endLine": 1936,
-          "text": "        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });\n        let router = build_router(gateway, test_config(), PathBuf::from(\"/tmp\"));\n        let router = with_static_serving(router, false, Path::new(\"static\"));\n\n        let response = router"
-        },
-        "caller": {
-          "line": 1927,
-          "declaration": "async fn static_serving_disabled_leaves_unmatched_route_as_plain_404() {"
-        },
-        "inputs": [
-          "Path::new(\"static\"))"
-        ],
-        "role": "gateway-config/static/verb-fixture",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete gateway function async fn static_serving_disabled_leaves_unmatched_route_as_plain_404() { operates on token config, verb argv, static web assets or isolated route fixtures, rather than the contract reader or narrative reader. Operation 'Path::new(\"static\"))'; own complete source context attached.",
-        "reason": "Concrete gateway function async fn static_serving_disabled_leaves_unmatched_route_as_plain_404() { operates on token config, verb argv, static web assets or isolated route fixtures, rather than the contract reader or narrative reader. Operation 'Path::new(\"static\"))'; own complete source context attached.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "gateway-contract-pilot"
-      }
-    },
-    {
-      "file": "apps/fgos-gateway/src/gateway.rs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
-      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
-      "seam": "gateway-contract",
-      "kind": "dynamicTraces",
-      "index": 49,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-000710",
-        "originalTuple": [
-          1950,
-          59,
-          1950,
-          81,
-          "PathBuf::from(\"/tmp\"))",
-          "config/default-root",
-          false,
-          "reader"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 1950,
-        "currentPassage": {
-          "startLine": 1948,
-          "endLine": 1952,
-          "text": "\n        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });\n        let router = build_router(gateway, test_config(), PathBuf::from(\"/tmp\"));\n        // A static_dir with no index.html forces the embedded-bundle\n        // branch (WebAssets, compiled from apps/fgos-gateway/static/) rather"
-        },
-        "caller": {
-          "line": 1944,
-          "declaration": "async fn static_serving_enabled_serves_the_embedded_bundle_for_an_unmatched_route() {"
-        },
-        "inputs": [
-          "PathBuf::from(\"/tmp\"))"
-        ],
-        "role": "gateway-config/static/verb-fixture",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete gateway function async fn static_serving_enabled_serves_the_embedded_bundle_for_an_unmatched_route() { operates on token config, verb argv, static web assets or isolated route fixtures, rather than the contract reader or narrative reader. Operation 'PathBuf::from(\"/tmp\"))'; own complete source context attached.",
-        "reason": "Concrete gateway function async fn static_serving_enabled_serves_the_embedded_bundle_for_an_unmatched_route() { operates on token config, verb argv, static web assets or isolated route fixtures, rather than the contract reader or narrative reader. Operation 'PathBuf::from(\"/tmp\"))'; own complete source context attached.",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "gateway-contract-pilot"

@@ -34,14 +34,14 @@
           "sha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "apps/fgos-gateway/src/mcp.rs",
           "sha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
@@ -136,7 +136,9 @@
           "httpMissingReadErrorNew": "could not read the OpenAPI contract at {root}/docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml: {err}",
           "mcpParseErrorOld": "could not parse {root}/docs/contracts/fgos-gateway-api-v1.yaml as YAML: {err}",
           "mcpParseErrorNew": "could not parse {root}/docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml as YAML: {err}",
-          "normalization": "same root/error fixture; only explicit path substitution allowed, error text still compared exactly"
+          "normalization": "same root/error fixture; only explicit path substitution allowed, error text still compared exactly",
+          "mcpMissingReadErrorOld": "could not read the OpenAPI contract at {root}/docs/contracts/fgos-gateway-api-v1.yaml: {err}",
+          "mcpMissingReadErrorNew": "could not read the OpenAPI contract at {root}/docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml: {err}"
         }
       },
       "proofs": [
@@ -176,14 +178,18 @@
       "blockedBy": [
         "HTTP body/content-type/fresh-read/error parity missing; no HTTP runtime pass claimed.",
         "MCP error parity missing.",
-        "A45 legacy architecture-map registry co-edit remains Phase 9 only; no contract renumbering."
+        "A45 legacy architecture-map registry co-edit remains Phase 9 only; no contract renumbering.",
+        "Inherited reference-000161/000182 Step 4 parks: distribution row 5b carry/reconciliation before citation changes; Step 7 owns final assembly."
       ],
       "readiness": "pending independent review and listed missing cutover proof",
       "review": {
         "status": "pending",
         "reviewer": null,
         "report": null
-      }
+      },
+      "coCutPaths": [],
+      "coCutTestGreps": [],
+      "coCutTestEdits": []
     },
     {
       "id": "cli-help-messages-pilot",
@@ -295,7 +301,7 @@
           "sha256": "6e510ae19478f1ba71a2ab900f024d98b0150dd20da9fd255afdd407ae9c50c7",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/runner/merge.mjs",
@@ -544,10 +550,12 @@
             "sourceSha256": "65aa9b2dc704b9998383c2929e3fee11377397a1c7ca3635e0e9e7e2446b8c02",
             "diffSha256": "72db80e324f24c14a07714e6c0b6167182193b4e2d72cd6e2c32751c1d853156",
             "parked": [
+              "reference-003641",
               "reference-003643",
               "reference-003652",
               "reference-003653",
-              "reference-003659"
+              "reference-003659",
+              "reference-003666"
             ]
           },
           {
@@ -605,7 +613,7 @@
             "candidateExpression": "    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
             "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
             "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
               "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
@@ -625,7 +633,7 @@
             "candidateExpression": "    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
             "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
             "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
               "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
@@ -645,32 +653,12 @@
             "candidateExpression": "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,",
             "oldPointer": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
             "newPointer": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
               "targetSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
               "anchor": "0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
               "claim": "0020 Chặn fgos khỏi worktree-worker (không khóa, không cô lập): retained narrative states this no-.fgos worker constraint; matches prior Step 3 batch-080 edge maps-j-04927"
-            }
-          },
-          {
-            "file": "src/cli/command-registry.mjs",
-            "referenceId": "reference-003641",
-            "edgeId": "class6-l-000219",
-            "line": 1746,
-            "currentExpression": "    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],",
-            "candidateExpression": "    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],",
-            "oldPointer": "docs/how-to",
-            "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
-            "evidence": {
-              "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
-              "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
-              "registryPath": "docs/doc-registry.json",
-              "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-              "alias": "docs/how-to/check-rollup-progress.md",
-              "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
-              "claim": "live currentPath lookup; no writer destination adopts an alias"
             }
           },
           {
@@ -682,7 +670,7 @@
             "candidateExpression": "    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],",
             "oldPointer": "docs/how-to/check-rollup-progress.md",
             "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
               "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
@@ -702,7 +690,7 @@
             "candidateExpression": "          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',",
             "oldPointer": "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
             "newPointer": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
               "docId": "auto-decompose-can-drop-a-locked-decision-from-every-child-s-footprint:auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint",
@@ -722,7 +710,7 @@
             "candidateExpression": "const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md';",
             "oldPointer": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
             "newPointer": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
               "docId": "avoid-a-vacuous-pass-from-node-test-test-name-pattern:avoid-vacuous-pass-with-node-test-test-name-pattern",
@@ -742,7 +730,7 @@
             "candidateExpression": "  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;",
             "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
             "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
               "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
@@ -762,7 +750,7 @@
             "candidateExpression": "      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,",
             "oldPointer": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
             "newPointer": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
               "docId": "how-to-tell-a-stale-worktree-index-apart-from-real-uncommitted-work:tell-a-stale-worktree-index-apart-from-real-uncommitted-work",
@@ -782,7 +770,7 @@
             "candidateExpression": "      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,",
             "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
             "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
               "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
@@ -841,7 +829,709 @@
         "status": "pending",
         "reviewer": null,
         "report": null
-      }
+      },
+      "coCutPaths": [
+        "CHANGELOG.md",
+        "test/report/enduser-index.test.mjs",
+        "test/report/helpers/docs-index-state-fixture.mjs",
+        "test/runner/merge.test.mjs",
+        "test/runner/worktree.test.mjs",
+        "test/setup/checks.test.mjs"
+      ],
+      "coCutTestGreps": [
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1263,
+              "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1265,
+              "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1497,
+              "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            }
+          ]
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1263,
+              "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1265,
+              "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1497,
+              "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            }
+          ]
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
+            "docs\\/decisions\\/0020-chan-fgos-khoi-worktree-worker.md",
+            "docs\\/decisions\\/0020-chan-fgos-khoi-worktree-worker\\.md"
+          ],
+          "matches": []
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/check-rollup-progress.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/check-rollup-progress.md",
+            "docs\\/how-to\\/check-rollup-progress.md",
+            "docs\\/how-to\\/check-rollup-progress\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 162,
+              "text": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            },
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 167,
+              "text": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            },
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 171,
+              "text": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            },
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 385,
+              "text": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            },
+            {
+              "file": "test/report/helpers/docs-index-state-fixture.mjs",
+              "line": 14,
+              "text": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+              "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+            },
+            {
+              "file": "test/report/helpers/docs-index-state-fixture.mjs",
+              "line": 35,
+              "text": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+              "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+            }
+          ]
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+            "docs\\/explanation\\/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+            "docs\\/explanation\\/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint\\.md"
+          ],
+          "matches": []
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+            "docs\\/how-to\\/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+            "docs\\/how-to\\/avoid-vacuous-pass-with-node-test-test-name-pattern\\.md"
+          ],
+          "matches": []
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1263,
+              "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1265,
+              "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1497,
+              "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            }
+          ]
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+            "docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+            "docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/runner/worktree.test.mjs",
+              "line": 768,
+              "text": "    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,",
+              "sourceSha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7"
+            }
+          ]
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
+            "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/setup/checks.test.mjs",
+              "line": 342,
+              "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+            }
+          ]
+        }
+      ],
+      "coCutTestEdits": [
+        {
+          "file": "test/runner/merge.test.mjs",
+          "referenceId": "reference-000110",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb",
+          "mode": "100644",
+          "grepMatches": [
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1263,
+              "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1265,
+              "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1497,
+              "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            }
+          ],
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "substitutions": [
+            [
+              "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',"
+            ],
+            [
+              "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));"
+            ]
+          ],
+          "diff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
+          "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
+          "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
+          "timing": "phase9",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "grepDecisions": [
+            {
+              "match": {
+                "file": "test/runner/merge.test.mjs",
+                "line": 1263,
+                "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+                "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+              },
+              "disposition": "patch",
+              "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+              "oldLine": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "newLine": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',"
+            },
+            {
+              "match": {
+                "file": "test/runner/merge.test.mjs",
+                "line": 1265,
+                "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+                "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+              },
+              "disposition": "patch",
+              "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+              "oldLine": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "newLine": "  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));"
+            },
+            {
+              "match": {
+                "file": "test/runner/merge.test.mjs",
+                "line": 1497,
+                "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+                "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+              },
+              "disposition": "preserve",
+              "reason": "L12-69: Historical cross-check of the ADR0020 hook pattern at steps 3-4; preserve the evidence citation, not an asserted emitted error.",
+              "oldLine": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "newLine": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field"
+            }
+          ],
+          "disposition": "patch"
+        },
+        {
+          "file": "test/runner/merge.test.mjs",
+          "referenceId": "reference-000111",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb",
+          "mode": "100644",
+          "grepMatches": [
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1263,
+              "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1265,
+              "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1497,
+              "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            }
+          ],
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "substitutions": [
+            [
+              "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',"
+            ],
+            [
+              "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));"
+            ]
+          ],
+          "diff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
+          "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
+          "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
+          "timing": "phase9",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "grepDecisions": [
+            {
+              "match": {
+                "file": "test/runner/merge.test.mjs",
+                "line": 1263,
+                "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+                "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+              },
+              "disposition": "patch",
+              "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+              "oldLine": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "newLine": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',"
+            },
+            {
+              "match": {
+                "file": "test/runner/merge.test.mjs",
+                "line": 1265,
+                "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+                "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+              },
+              "disposition": "patch",
+              "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+              "oldLine": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "newLine": "  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));"
+            },
+            {
+              "match": {
+                "file": "test/runner/merge.test.mjs",
+                "line": 1497,
+                "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+                "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+              },
+              "disposition": "preserve",
+              "reason": "L12-69: Historical cross-check of the ADR0020 hook pattern at steps 3-4; preserve the evidence citation, not an asserted emitted error.",
+              "oldLine": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "newLine": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field"
+            }
+          ],
+          "disposition": "patch"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "referenceId": "reference-003655",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "mode": "100644",
+          "grepMatches": [
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 162,
+              "text": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            },
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 167,
+              "text": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            },
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 171,
+              "text": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            },
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 385,
+              "text": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            }
+          ],
+          "oldPointer": "docs/how-to/check-rollup-progress.md",
+          "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "substitutions": [],
+          "diff": null,
+          "expectedAfterSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "rollbackDiff": null,
+          "timing": "phase9",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "grepDecisions": [
+            {
+              "match": {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 162,
+                "text": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              "disposition": "preserve",
+              "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+              "oldLine": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+              "newLine": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');"
+            },
+            {
+              "match": {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 167,
+                "text": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              "disposition": "preserve",
+              "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+              "oldLine": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+              "newLine": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');"
+            },
+            {
+              "match": {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 171,
+                "text": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              "disposition": "preserve",
+              "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+              "oldLine": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+              "newLine": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —"
+            },
+            {
+              "match": {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 385,
+                "text": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              "disposition": "preserve",
+              "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+              "oldLine": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+              "newLine": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {"
+            }
+          ],
+          "disposition": "preserve"
+        },
+        {
+          "file": "test/report/helpers/docs-index-state-fixture.mjs",
+          "referenceId": "reference-003655",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+          "mode": "100644",
+          "grepMatches": [
+            {
+              "file": "test/report/helpers/docs-index-state-fixture.mjs",
+              "line": 14,
+              "text": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+              "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+            },
+            {
+              "file": "test/report/helpers/docs-index-state-fixture.mjs",
+              "line": 35,
+              "text": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+              "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+            }
+          ],
+          "oldPointer": "docs/how-to/check-rollup-progress.md",
+          "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "substitutions": [],
+          "diff": null,
+          "expectedAfterSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+          "rollbackDiff": null,
+          "timing": "phase9",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "grepDecisions": [
+            {
+              "match": {
+                "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                "line": 14,
+                "text": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+                "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+              },
+              "disposition": "preserve",
+              "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+              "oldLine": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+              "newLine": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is"
+            },
+            {
+              "match": {
+                "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                "line": 35,
+                "text": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+                "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+              },
+              "disposition": "preserve",
+              "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+              "oldLine": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+              "newLine": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';"
+            }
+          ],
+          "disposition": "preserve"
+        },
+        {
+          "file": "test/runner/merge.test.mjs",
+          "referenceId": "reference-003749",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb",
+          "mode": "100644",
+          "grepMatches": [
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1263,
+              "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1265,
+              "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1497,
+              "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            }
+          ],
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "substitutions": [
+            [
+              "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',"
+            ],
+            [
+              "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));"
+            ]
+          ],
+          "diff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
+          "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
+          "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
+          "timing": "phase9",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "grepDecisions": [
+            {
+              "match": {
+                "file": "test/runner/merge.test.mjs",
+                "line": 1263,
+                "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+                "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+              },
+              "disposition": "patch",
+              "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+              "oldLine": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "newLine": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',"
+            },
+            {
+              "match": {
+                "file": "test/runner/merge.test.mjs",
+                "line": 1265,
+                "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+                "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+              },
+              "disposition": "patch",
+              "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+              "oldLine": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "newLine": "  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));"
+            },
+            {
+              "match": {
+                "file": "test/runner/merge.test.mjs",
+                "line": 1497,
+                "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+                "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+              },
+              "disposition": "preserve",
+              "reason": "L12-69: Historical cross-check of the ADR0020 hook pattern at steps 3-4; preserve the evidence citation, not an asserted emitted error.",
+              "oldLine": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "newLine": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field"
+            }
+          ],
+          "disposition": "patch"
+        },
+        {
+          "file": "test/runner/worktree.test.mjs",
+          "referenceId": "reference-003784",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7",
+          "mode": "100644",
+          "grepMatches": [
+            {
+              "file": "test/runner/worktree.test.mjs",
+              "line": 768,
+              "text": "    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,",
+              "sourceSha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7"
+            }
+          ],
+          "oldPointer": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "newPointer": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "substitutions": [
+            [
+              "    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,",
+              "    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,"
+            ]
+          ],
+          "diff": "--- a/test/runner/worktree.test.mjs\n+++ b/test/runner/worktree.test.mjs\n@@ -765,7 +765,7 @@\n   assert.ok(caught instanceof WorktreeError);\n   assert.match(\n     caught.message,\n-    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n+    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n   );\n \n   removeWorktree(repoRoot, first.path, { force: true });\n",
+          "expectedAfterSha256": "9af1b08b099ddd60487dab94a7f6938c925b2b29aa1ee8f522fddba06158dbf5",
+          "rollbackDiff": "--- a/test/runner/worktree.test.mjs\n+++ b/test/runner/worktree.test.mjs\n@@ -765,7 +765,7 @@\n   assert.ok(caught instanceof WorktreeError);\n   assert.match(\n     caught.message,\n-    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n+    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n   );\n \n   removeWorktree(repoRoot, first.path, { force: true });\n",
+          "timing": "phase9",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "grepDecisions": [
+            {
+              "match": {
+                "file": "test/runner/worktree.test.mjs",
+                "line": 768,
+                "text": "    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,",
+                "sourceSha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7"
+              },
+              "disposition": "patch",
+              "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+              "oldLine": "    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,",
+              "newLine": "    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,"
+            }
+          ],
+          "disposition": "patch"
+        },
+        {
+          "file": "test/setup/checks.test.mjs",
+          "referenceId": "reference-003868",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+          "mode": "100644",
+          "grepMatches": [
+            {
+              "file": "test/setup/checks.test.mjs",
+              "line": 342,
+              "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+            }
+          ],
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "substitutions": [
+            [
+              "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
+            ]
+          ],
+          "diff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
+          "expectedAfterSha256": "a19a4a3d2ee134974c4483b9e719df84bc13c045e835c3aa06949ee9f9a059f9",
+          "rollbackDiff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
+          "timing": "phase9",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "grepDecisions": [
+            {
+              "match": {
+                "file": "test/setup/checks.test.mjs",
+                "line": 342,
+                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+              },
+              "disposition": "patch",
+              "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+              "oldLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "newLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
+            }
+          ],
+          "disposition": "patch"
+        }
+      ]
     },
     {
       "id": "setup-doctor-roots-pilot",
@@ -1037,140 +1727,140 @@
           "sha256": "6a70801d94f369a216d626b240022c5291ab8efdf742d0e1ce63721ac1669537",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/agent-hooks.mjs",
           "sha256": "0109366e1a1a117b0128a729d4753dc8de14d92ac1c5ba5893959d01a62c1088",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/agy-permissions.mjs",
           "sha256": "0dd7e2fc1297acf09f0e04236ab69f2c88dcfdc04cb9a0d7f14468973195d97f",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/ansi.mjs",
           "sha256": "02c0e971ac01c71fb7db8d6506debd3c35d55feedceeb93eac7843b83fa0d430",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/bin-discovery.mjs",
           "sha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/blind-steps-proven-pools.mjs",
           "sha256": "6e9d199ed44d58f59e3a98fa1b9ff3c3a30fdfb1d2c4abfaefa1ade3e0d14d12",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/checks.mjs",
           "sha256": "b5280315dd8712ff69e6e2f85a2db87d9e0ddd21c828bfb648d63bfb4e1bfaa4",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/config-merge.mjs",
           "sha256": "2780e5fb05bb3a10aecff0f21eca4394738489960c2dbd9d86dff9f6c74cc176",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/event-store-checks.mjs",
           "sha256": "2af5215a4933ea47638121c0997e8684fe9afb5eb6a616bf8bab8757cd24f645",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/event-store-fixes.mjs",
           "sha256": "4f3a95add8dee1f08c1dd2d38fdb0cf7b5ee7101909faf965c0b2e6ebdaa142e",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/executor-posture-coverage.mjs",
           "sha256": "fb5f81c62e01aa7ca3f229a4f2e440f14eb0ac96e73469f942ce418f7854a043",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/executor-profile-warnings.mjs",
           "sha256": "7edcf8b4ddb7030651b4607e364b7a2e4a78e9166c967893c25880a949ea37be",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/git-checks.mjs",
           "sha256": "3893f566d0b7697cef6dc4af17184faea4c477a5d17c257763db0b4f65f163a0",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/git-hooks.mjs",
           "sha256": "bc64f3591e3fa896770a66491ef5bb1711c81aec96ba821d038cdd051f3addb6",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/holder-lock-checks.mjs",
           "sha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/instruction-composition.mjs",
           "sha256": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/instruction-registry.mjs",
           "sha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/lock-record-checks.mjs",
           "sha256": "d72db4c75a047cf55437b661e42ec7e0cb38b6370e98bfb9f8942f9eef7bb278",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/model-pool-checks.mjs",
           "sha256": "9a5f4c2319d630932b4c1ef3bf97ba90c41a2147271725fa1c87e64b472b1ec1",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/project-launcher.mjs",
           "sha256": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/registrations.mjs",
@@ -1184,35 +1874,35 @@
           "sha256": "4d44ebc8f640f3aad66f84df74a1c5ce28851ced8c1c708f31313e986a93e1ac",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/shell-rc.mjs",
           "sha256": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/skill-wrappers.mjs",
           "sha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/terminal-control-checks.mjs",
           "sha256": "ce1e85c2d622611d2c6e6b47bfadc49ebb4a0f801c80bfcc7a91d3e8d0139656",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         },
         {
           "path": "src/setup/workflow-pool-independence.mjs",
           "sha256": "855b284457a112c3fdb8c21c6f423d6d47d85bb9e9b03c841e0bee2191bb93a2",
           "mode": "100644",
           "bytes": null,
-          "provenance": "Full current-file diff in canonical file record; unapplied Phase 9 specification"
+          "provenance": "unchanged: expectedAfter equals source sha"
         }
       ],
       "comparison": {
@@ -1221,26 +1911,7 @@
             "staticRoots": [
               "core/instructions",
               "components/packaging-distribution/instructions",
-              "domains/coding/instructions",
-              "domains/marketing/instructions"
-            ],
-            "manifestOwners": [
-              "coding",
-              "core",
-              "marketing",
-              "packaging-distribution",
-              "platform"
-            ],
-            "sourceStateExport": null
-          }
-        ],
-        "candidateOutputSet": [
-          {
-            "staticRoots": [
-              "core/instructions",
-              "components/packaging-distribution/instructions",
-              "domains/coding/instructions",
-              "domains/marketing/instructions"
+              "domains/coding/instructions"
             ],
             "manifestOwners": [
               "coding",
@@ -1250,7 +1921,94 @@
               "platform"
             ],
             "sourceStateExport": null,
-            "finalScanSets": null
+            "instructionFiles": [
+              {
+                "path": "components/packaging-distribution/instructions/verification.md",
+                "sha256": "b473c33807c5bb29d2d4384c9626923e0ef70ab168301fec805a1a2a0fbbe59f",
+                "mode": "100644"
+              },
+              {
+                "path": "core/instructions/decision-question.md",
+                "sha256": "44940d17365b08480b556d198bbc617619b7e1da38a76da7b6e434d34b173786",
+                "mode": "100644"
+              },
+              {
+                "path": "core/instructions/design-principles.md",
+                "sha256": "1ce8aecdf134ad53db49ee0643eae4cadc145ac2136ab553c9f2b391d9a5a084",
+                "mode": "100644"
+              },
+              {
+                "path": "core/instructions/platform-laws.md",
+                "sha256": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+                "mode": "100644"
+              },
+              {
+                "path": "domains/coding/instructions/verification-discipline.md",
+                "sha256": "fe5a7b877ad3ba879bd0d48726520c999973a65464e885dc3230ca12ac39a747",
+                "mode": "100644"
+              },
+              {
+                "path": "domains/coding/instructions/worktree-safety.md",
+                "sha256": "e8821f265cba558e0924663e48ac9bcddae181b375551a1a6f78045ccdd0ebb7",
+                "mode": "100644"
+              }
+            ],
+            "absentRoots": [
+              "domains/marketing/instructions"
+            ]
+          }
+        ],
+        "candidateOutputSet": [
+          {
+            "staticRoots": [
+              "core/instructions",
+              "components/packaging-distribution/instructions",
+              "domains/coding/instructions"
+            ],
+            "manifestOwners": [
+              "coding",
+              "core",
+              "marketing",
+              "packaging-distribution",
+              "platform"
+            ],
+            "sourceStateExport": null,
+            "finalScanSets": null,
+            "instructionFiles": [
+              {
+                "path": "components/packaging-distribution/instructions/verification.md",
+                "sha256": "b473c33807c5bb29d2d4384c9626923e0ef70ab168301fec805a1a2a0fbbe59f",
+                "mode": "100644"
+              },
+              {
+                "path": "core/instructions/decision-question.md",
+                "sha256": "44940d17365b08480b556d198bbc617619b7e1da38a76da7b6e434d34b173786",
+                "mode": "100644"
+              },
+              {
+                "path": "core/instructions/design-principles.md",
+                "sha256": "1ce8aecdf134ad53db49ee0643eae4cadc145ac2136ab553c9f2b391d9a5a084",
+                "mode": "100644"
+              },
+              {
+                "path": "core/instructions/platform-laws.md",
+                "sha256": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+                "mode": "100644"
+              },
+              {
+                "path": "domains/coding/instructions/verification-discipline.md",
+                "sha256": "fe5a7b877ad3ba879bd0d48726520c999973a65464e885dc3230ca12ac39a747",
+                "mode": "100644"
+              },
+              {
+                "path": "domains/coding/instructions/worktree-safety.md",
+                "sha256": "e8821f265cba558e0924663e48ac9bcddae181b375551a1a6f78045ccdd0ebb7",
+                "mode": "100644"
+              }
+            ],
+            "absentRoots": [
+              "domains/marketing/instructions"
+            ]
           }
         ],
         "normalization": "none; source/byte hashes retained; no semantic/payload/path delta normalized away",
@@ -1271,7 +2029,7 @@
             "candidateExpression": "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
             "oldPointer": "docs/how-to/cut-a-fgos-release-tag.md",
             "newPointer": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
               "docId": "how-to-cut-a-fgos-release-tag:cut-a-fgos-release-tag",
@@ -1291,7 +2049,7 @@
             "candidateExpression": "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,",
             "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
             "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
               "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
@@ -1311,7 +2069,7 @@
             "candidateExpression": "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };",
             "oldPointer": "docs/how-to/write-a-task-spec.md",
             "newPointer": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
-            "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+            "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
             "evidence": {
               "target": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
               "docId": "how-to-write-a-task-spec:write-a-task-spec",
@@ -1692,14 +2450,12 @@
           "instructionRootsCurrent": [
             "core/instructions",
             "components/packaging-distribution/instructions",
-            "domains/coding/instructions",
-            "domains/marketing/instructions"
+            "domains/coding/instructions"
           ],
           "instructionRootsCandidate": [
             "core/instructions",
             "components/packaging-distribution/instructions",
-            "domains/coding/instructions",
-            "domains/marketing/instructions"
+            "domains/coding/instructions"
           ],
           "trackedInstructionFiles": [
             "components/packaging-distribution/instructions/verification.md",
@@ -5465,7 +6221,10 @@
             ],
             "candidateFinalScannedFiles": null,
             "blocker": "Need final reviewed deletion/carry set and bounded registry/outcome/sourceCaptureIds/inventory export. Cannot infer no finding loss merely from unchanged root."
-          }
+          },
+          "absentInstructionRoots": [
+            "domains/marketing/instructions"
+          ]
         },
         "stateComparisons": [
           "doc-alias-broken: same alias ownership and collision sets",
@@ -5508,14 +6267,158 @@
         "Skill/output provenance and instruction materialization join generators seam; no generated diff.",
         "Final recursive post-retirement scan-set/finding parity missing.",
         "Historical inventory reader is real: source-conservation reads this file, then row.oldPath and registry aliases. Bounded inventory and state export absent; keep reader until separately reviewed evidence-relocation packet.",
-        "Live distribution spec citation in git-hook installation documentation is not joined to a Step 3/4 canonical slot. Step 7 must reconcile its comment navigation with packaging-distribution source; no behavioral code edit inferred."
+        "Live distribution spec citation in git-hook installation documentation is not joined to a Step 3/4 canonical slot. Step 7 must reconcile its comment navigation with packaging-distribution source; no behavioral code edit inferred.",
+        "Generator/projection parks are blockedSeams=generators; exact remaining ids in skill-wrappers record. sourceCaptureId looksLikeDocPath predicate at registrations.mjs:4131-4133 co-cuts any later retiring-root conservation rewrite."
       ],
       "readiness": "pending independent review and listed missing cutover proof",
       "review": {
         "status": "pending",
         "reviewer": null,
         "report": null
-      }
+      },
+      "coCutPaths": [
+        "CHANGELOG.md",
+        "test/setup/checks.test.mjs"
+      ],
+      "coCutTestGreps": [
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/cut-a-fgos-release-tag.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/cut-a-fgos-release-tag.md",
+            "docs\\/how-to\\/cut-a-fgos-release-tag.md",
+            "docs\\/how-to\\/cut-a-fgos-release-tag\\.md"
+          ],
+          "matches": []
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
+            "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/setup/checks.test.mjs",
+              "line": 342,
+              "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+            }
+          ]
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/write-a-task-spec.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/write-a-task-spec.md",
+            "docs\\/how-to\\/write-a-task-spec.md",
+            "docs\\/how-to\\/write-a-task-spec\\.md"
+          ],
+          "matches": []
+        }
+      ],
+      "coCutTestEdits": [
+        {
+          "file": "test/setup/checks.test.mjs",
+          "referenceId": "reference-003806",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+          "mode": "100644",
+          "grepMatches": [
+            {
+              "file": "test/setup/checks.test.mjs",
+              "line": 342,
+              "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+            }
+          ],
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "substitutions": [
+            [
+              "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
+            ]
+          ],
+          "diff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
+          "expectedAfterSha256": "a19a4a3d2ee134974c4483b9e719df84bc13c045e835c3aa06949ee9f9a059f9",
+          "rollbackDiff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
+          "timing": "phase9",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "grepDecisions": [
+            {
+              "match": {
+                "file": "test/setup/checks.test.mjs",
+                "line": 342,
+                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+              },
+              "disposition": "patch",
+              "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+              "oldLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "newLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
+            }
+          ],
+          "disposition": "patch"
+        }
+      ],
+      "postCensusCode": [
+        {
+          "file": "src/setup/skill-wrappers.mjs",
+          "pin": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "passage": "carriesAssembledHeader",
+          "lines": [
+            1100,
+            1111
+          ],
+          "scope": "New generated-skill .md inspection; outside frozen census, no new id minted; generators owns any later output parity."
+        },
+        {
+          "file": "src/setup/workflow-pool-independence.mjs",
+          "pin": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "passage": "debate",
+          "scope": "Post-census non-document workflow pattern; no doc operand."
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "pin": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "line": 6659,
+          "text": "// Workflow case bindings (docs/specs/workflow.md RUL-WF-27): the binding records are a view of each",
+          "scope": "Post-census workflow case-binding comment cites docs/specs/workflow.md; path absent at frozen census pin. Explicit supplemental scope fact, no new census id and no operative reader admitted."
+        }
+      ],
+      "existingOwningProofs": [
+        {
+          "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/run-supervisor-checks.test.mjs",
+          "status": "not-run",
+          "scope": "Existing module behavior; not cutover acceptance."
+        },
+        {
+          "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/skill-wrappers.test.mjs",
+          "status": "not-run",
+          "scope": "Existing module behavior; not cutover acceptance."
+        },
+        {
+          "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/terminal-control-checks.test.mjs",
+          "status": "not-run",
+          "scope": "Existing module behavior; not cutover acceptance."
+        },
+        {
+          "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/workflow-pool-independence-check.test.mjs",
+          "status": "not-run",
+          "scope": "Existing module behavior; not cutover acceptance."
+        },
+        {
+          "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/shell-rc.test.mjs",
+          "status": "not-run",
+          "scope": "Existing module behavior; not cutover acceptance."
+        }
+      ]
     }
   ]
 }

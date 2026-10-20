@@ -1,0 +1,1403 @@
+{
+  "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "files": [
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "changes": [
+        {
+          "id": "reference-000161",
+          "oldOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": [
+              {
+                "line": 131,
+                "columnStart": 6,
+                "columnEndExclusive": 32,
+                "text": "docs/specs/distribution.md"
+              }
+            ],
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": [
+              {
+                "line": 131,
+                "columnStart": 6,
+                "columnEndExclusive": 32,
+                "text": "docs/specs/distribution.md"
+              }
+            ],
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "reference-000182",
+          "oldOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": [
+              {
+                "line": 13,
+                "columnStart": 52,
+                "columnEndExclusive": 78,
+                "text": "docs/specs/distribution.md"
+              }
+            ],
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": [
+              {
+                "line": 13,
+                "columnStart": 52,
+                "columnEndExclusive": 78,
+                "text": "docs/specs/distribution.md"
+              }
+            ],
+            "coCutPaths": null
+          }
+        }
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "changes": [
+        {
+          "id": "dynamic-000766",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        }
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "changes": [
+        {
+          "id": "reference-000110",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 491,
+                "columnStart": 197,
+                "columnEndExclusive": 247,
+                "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md"
+            ]
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 491,
+                "columnStart": 197,
+                "columnEndExclusive": 247,
+                "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/runner/merge.test.mjs"
+            ]
+          }
+        },
+        {
+          "id": "reference-000111",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 523,
+                "columnStart": 206,
+                "columnEndExclusive": 256,
+                "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md"
+            ]
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 523,
+                "columnStart": 206,
+                "columnEndExclusive": 256,
+                "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/runner/merge.test.mjs"
+            ]
+          }
+        },
+        {
+          "id": "dynamic-000566",
+          "oldOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": null,
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/runner/merge.test.mjs"
+            ]
+          }
+        },
+        {
+          "id": "dynamic-000571",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": null,
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/runner/merge.test.mjs"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "changes": [
+        {
+          "id": "reference-003641",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 1746,
+                "columnStart": 34,
+                "columnEndExclusive": 70,
+                "text": "docs/how-to/check-rollup-progress.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md"
+            ]
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": [
+              {
+                "line": 1760,
+                "columnStart": 95,
+                "columnEndExclusive": 106,
+                "text": "docs/how-to"
+              }
+            ],
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "reference-003655",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 1746,
+                "columnStart": 34,
+                "columnEndExclusive": 70,
+                "text": "docs/how-to/check-rollup-progress.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md"
+            ]
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 1746,
+                "columnStart": 34,
+                "columnEndExclusive": 70,
+                "text": "docs/how-to/check-rollup-progress.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/report/enduser-index.test.mjs",
+              "test/report/helpers/docs-index-state-fixture.mjs"
+            ]
+          }
+        },
+        {
+          "id": "reference-003666",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": [
+              {
+                "line": 846,
+                "columnStart": 91,
+                "columnEndExclusive": 102,
+                "text": "docs/specs/"
+              }
+            ],
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": [
+              {
+                "line": 846,
+                "columnStart": 91,
+                "columnEndExclusive": 102,
+                "text": "docs/specs/"
+              }
+            ],
+            "coCutPaths": null
+          }
+        }
+      ]
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "changes": [
+        {
+          "id": "reference-003749",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 996,
+                "columnStart": 128,
+                "columnEndExclusive": 178,
+                "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md"
+            ]
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 996,
+                "columnStart": 128,
+                "columnEndExclusive": 178,
+                "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/runner/merge.test.mjs"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "changes": [
+        {
+          "id": "reference-003784",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 1088,
+                "columnStart": 484,
+                "columnEndExclusive": 559,
+                "text": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md"
+            ]
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 1088,
+                "columnStart": 484,
+                "columnEndExclusive": 559,
+                "text": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/runner/worktree.test.mjs"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "file": "src/state/events-jsonl-truncation-guard.mjs",
+      "changes": [
+        {
+          "id": "reference-003868",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 140,
+                "columnStart": 260,
+                "columnEndExclusive": 309,
+                "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md"
+            ]
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 140,
+                "columnStart": 260,
+                "columnEndExclusive": 309,
+                "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/setup/checks.test.mjs"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "changes": [
+        {
+          "id": "dynamic-013969",
+          "oldOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-013982",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-013988",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-013989",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-013990",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-013991",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-013992",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014003",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014006",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014007",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014008",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014016",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014017",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014018",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014026",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014027",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014028",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        }
+      ]
+    },
+    {
+      "file": "src/setup/model-pool-checks.mjs",
+      "changes": [
+        {
+          "id": "dynamic-014060",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014072",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        }
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "changes": [
+        {
+          "id": "reference-003803",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": [
+              {
+                "line": 3915,
+                "columnStart": 99,
+                "columnEndExclusive": 121,
+                "text": "docs/doc-registry.json"
+              }
+            ],
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": [
+              {
+                "line": 3915,
+                "columnStart": 99,
+                "columnEndExclusive": 121,
+                "text": "docs/doc-registry.json"
+              }
+            ],
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "reference-003804",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 3518,
+                "columnStart": 96,
+                "columnEndExclusive": 133,
+                "text": "docs/how-to/cut-a-fgos-release-tag.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md"
+            ]
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 3518,
+                "columnStart": 96,
+                "columnEndExclusive": 133,
+                "text": "docs/how-to/cut-a-fgos-release-tag.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/setup/checks.test.mjs"
+            ]
+          }
+        },
+        {
+          "id": "reference-003806",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 2094,
+                "columnStart": 109,
+                "columnEndExclusive": 158,
+                "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md"
+            ]
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 2094,
+                "columnStart": 109,
+                "columnEndExclusive": 158,
+                "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/setup/checks.test.mjs"
+            ]
+          }
+        },
+        {
+          "id": "reference-003811",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 874,
+                "columnStart": 142,
+                "columnEndExclusive": 174,
+                "text": "docs/how-to/write-a-task-spec.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md"
+            ]
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": [
+              {
+                "line": 874,
+                "columnStart": 142,
+                "columnEndExclusive": 174,
+                "text": "docs/how-to/write-a-task-spec.md"
+              }
+            ],
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/setup/checks.test.mjs"
+            ]
+          }
+        },
+        {
+          "id": "reference-003828",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": [
+              {
+                "line": 3930,
+                "columnStart": 35,
+                "columnEndExclusive": 55,
+                "text": "docs/doc-registry.md"
+              }
+            ],
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": [
+              {
+                "line": 3930,
+                "columnStart": 35,
+                "columnEndExclusive": 55,
+                "text": "docs/doc-registry.md"
+              }
+            ],
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "reference-003829",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": [
+              {
+                "line": 3961,
+                "columnStart": 35,
+                "columnEndExclusive": 55,
+                "text": "docs/doc-registry.md"
+              }
+            ],
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": [
+              {
+                "line": 3961,
+                "columnStart": 35,
+                "columnEndExclusive": 55,
+                "text": "docs/doc-registry.md"
+              }
+            ],
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "reference-003833",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": [
+              {
+                "line": 3931,
+                "columnStart": 37,
+                "columnEndExclusive": 59,
+                "text": "docs/doc-registry.json"
+              }
+            ],
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": [
+              {
+                "line": 3931,
+                "columnStart": 37,
+                "columnEndExclusive": 59,
+                "text": "docs/doc-registry.json"
+              }
+            ],
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "reference-003834",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": [
+              {
+                "line": 3962,
+                "columnStart": 37,
+                "columnEndExclusive": 59,
+                "text": "docs/doc-registry.json"
+              }
+            ],
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": [
+              {
+                "line": 3962,
+                "columnStart": 37,
+                "columnEndExclusive": 59,
+                "text": "docs/doc-registry.json"
+              }
+            ],
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "reference-003839",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": [
+              {
+                "line": 3915,
+                "columnStart": 41,
+                "columnEndExclusive": 61,
+                "text": "docs/doc-registry.md"
+              }
+            ],
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": [
+              {
+                "line": 3915,
+                "columnStart": 41,
+                "columnEndExclusive": 61,
+                "text": "docs/doc-registry.md"
+              }
+            ],
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014207",
+          "oldOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": null,
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/setup/checks.test.mjs"
+            ]
+          }
+        },
+        {
+          "id": "dynamic-014299",
+          "oldOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014300",
+          "oldOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014301",
+          "oldOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014302",
+          "oldOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014307",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": null,
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/setup/checks.test.mjs"
+            ]
+          }
+        },
+        {
+          "id": "dynamic-014338",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014345",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014346",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-014907",
+          "oldOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "ADMIT",
+            "disposition": "patch",
+            "sourceSpans": null,
+            "coCutPaths": [
+              "CHANGELOG.md",
+              "test/setup/checks.test.mjs"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "file": "src/setup/run-supervisor-checks.mjs",
+      "changes": [
+        {
+          "id": "dynamic-014965",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        }
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "changes": [
+        {
+          "id": "dynamic-015044",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015059",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015060",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015119",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015125",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015126",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015127",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015175",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015186",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015187",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015194",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015229",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        },
+        {
+          "id": "dynamic-015236",
+          "oldOutcome": {
+            "admission": "ADMIT",
+            "disposition": "parked",
+            "sourceSpans": null,
+            "coCutPaths": null
+          },
+          "newOutcome": {
+            "admission": "REJECT",
+            "disposition": "preserve",
+            "sourceSpans": null,
+            "coCutPaths": null
+          }
+        }
+      ]
+    }
+  ],
+  "fileCount": 12,
+  "changedIds": 65,
+  "additionalNonOperandRejects": [
+    "dynamic-000766",
+    "dynamic-013982",
+    "dynamic-013988",
+    "dynamic-013989",
+    "dynamic-013990",
+    "dynamic-013991",
+    "dynamic-013992",
+    "dynamic-014003",
+    "dynamic-014006",
+    "dynamic-014007",
+    "dynamic-014008",
+    "dynamic-014016",
+    "dynamic-014017",
+    "dynamic-014018",
+    "dynamic-014026",
+    "dynamic-014027",
+    "dynamic-014028",
+    "dynamic-015044",
+    "dynamic-015059",
+    "dynamic-015119",
+    "dynamic-015125",
+    "dynamic-015126",
+    "dynamic-015127",
+    "dynamic-015175",
+    "dynamic-015186",
+    "dynamic-015187",
+    "dynamic-015194",
+    "dynamic-015229",
+    "dynamic-015236"
+  ],
+  "status": "pending independent bounded re-review"
+}

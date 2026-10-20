@@ -1003,3 +1003,20 @@ Lead handoff: resize review and start independent readers; provide bounded state
 Merge `f12d2a505` accounted: eight main commits / five changed docs (`docs/platform/README.md`, `docs/platform/agent-mailbox/spec.md`, `docs/platform/component-boundary.md`, `docs/specs/platform-foundations.md`, `docs/specs/reading-map.md`). One reading-map ratchet exception refreshed (`714844844a88...`), platform-foundations requires no exception (generated projection); all five docs in mainMergeAccounting. Ratchet clean (997 checked / 28 accounted edits / 3 accounted new), ratchet tests **28/28** pass.
 
 Step 0: both reproduction extractors agree on units across all five files. 273 direct bindings checked; exactly 1 content-bound rebinding applied (`plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json`, `registryGaps[2]` pointing to `docs/platform/component-boundary.md#unheaded-block-11`), marked pending independent review with 0 remaining drift. 10 physical Step 3 overlap records deferred once to Step 7 (reading map 4, platform foundations 4, README 1, component boundary 1); zero Step 4 or Step 5 consumer overlaps. No consumer, code, or gate edits; needsWrites empty.
+
+
+## Step 5 pilot rework — 2026-10-20
+
+In progress: six independent reports read; verifying pinned passages before records-only rework. Checker extension and complete sweep pending. No consumer changes or cutover application.
+
+
+## Step 5 pilot rework — complete author handback (2026-10-21)
+
+All 13 requested items completed as records only. Canonical pilot pin remains `aa8d343746a292d2cb476ab76e6489411fd59a62`; no consumer/census/protected-code change or git write. L12-69 records every ruling, counter-evidence and owner option B (2026-10-20 23:55) for the remaining five seams.
+
+- Complete sweep: same-passage outcome 13 hits; inherited outcome 2; stale pinned passage 4; non-operand admission 36; emitted-patch test-grep custody 13. All resolved; the 13 initial patch-grep hits include 003641, which correctly became park, leaving 12 patch references. Existing coverage also found one post-census legacy-root comment, now pinned in the receipt and Step 7 handoff.
+- Full checker: 37 files / 149 references / 2,017 tuples / **0 failures**; all 196 whole-file legacy-root grep occurrences accounted. **36/36 rejecting probes**, 20 rule families. Logs and JSON results are refreshed at final checker/spec/record bytes.
+- Co-cut: 11 distinct test lines in five files; four assertion/navigation lines patch, seven retained real-file/capture/historical provenance lines preserve. Exact proposed diffs/rollback or unchanged hashes are specifications only. 153 actual generator-path parks name generators. Missing runtime/state/cutover proofs remain explicit.
+- Re-review: only **12 outcome-changed files / 65 ids**, **4 parts / 122 logical records**, max **33 records / 389,048 UTF-8 bytes**. `step-05-pilot-rereview-request.md` and its hash-bound index name `review-a38-step-05-pilot-rr-p01..04.md`; reviewers never run checker/probes. No reviewer launched or acceptance claimed.
+
+Step 7 receives verify-pattern-check's two source hunks, later bin/command-registry composition, shared test-diff de-duplication and the post-census workflow comment. Runner commits; independent semantic review and final assembly remain Lead custody. Markdown preview remains with Lead's authorized environment.

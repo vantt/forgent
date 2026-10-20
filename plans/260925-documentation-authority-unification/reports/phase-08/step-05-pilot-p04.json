@@ -8,6 +8,16 @@
       "sourceSha256": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
       "seam": "cli-help-messages",
       "kind": "source-context",
+      "startLine": 3751,
+      "endLine": 4000,
+      "text": "    // truly succeeds does it set that member's `parent` — never on say-so,\n    // matching the item's own framing (\"CHỈ khi git thành công thật mới set\n    // field parent\"). Records one real decision summarizing every member's\n    // outcome.\n    case 'promote-to-component': {\n      const ids = parseListFlag(flags.ids ?? positional.join(','));\n      if (!Array.isArray(ids) || ids.length < 2) {\n        throw new StoreError('validation', 'promote-to-component requires --ids (or positional args) listing at least 2 member item ids.');\n      }\n      // repoRoot: process.cwd() by default -- the use case's isMainWorktree\n      // guard then refuses outright when cwd is any linked worktree,\n      // catching a batch promotion that would otherwise merge member\n      // branches against that worktree's own (possibly stale) checkout.\n      // --trust-dir (tsk-2bg) opts into deriving repoRoot from --dir\n      // instead, the same substitution tsk-4uj already shipped for\n      // sync-root/approve (CONTEXT.md D5/D6) -- gated behind this explicit\n      // flag here, never the unconditional default: same posture as\n      // sync-root (merges land on a runner-owned integration branch, never\n      // main directly), so the caller must say it knows --dir is\n      // trustworthy rather than getting the relaxed behavior silently.\n      // Byte-identical to today when the flag is omitted. retargetMember's\n      // own isMainWorktree check (promote-engine.mjs) inherits this\n      // relaxation for free -- it receives this same repoRoot value\n      // unchanged, never re-derives it.\n      const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();\n      // Raw Number(), deliberately NOT resolveVerifyTimeoutMs: this verb\n      // has never read the runner config's verify timeout, and keeping it\n      // that way is the only way this stays a pure move.\n      const timeoutMs = flags.timeout !== undefined ? Number(flags.timeout) : undefined;\n      return await promoteToComponentUseCase(\n        { dir, repoRoot },\n        { ids, rootId: flags['root-id'], rootTitle: flags['root-title'], timeoutMs },\n      );\n    }\n\n    // Cổng duyệt — reject (pr-lifecycle D4): awaiting-approval -> todo, reason\n    // mandatory (fsm.mjs already enforces this edge). NEVER runs a single git\n    // command — the code (if any landed on main via a pull-door item) is\n    // history, not something this verb rewrites; a human who wants it gone\n    // commits their own revert and still rejects (D4's \"không auto-revert\").\n    case 'reject': {\n      const id = requireField(positional[0] ?? flags.id, 'reject requires an id: fgos reject <id> --reason \"...\"');\n      const reason = requireField(flags.reason, 'reject requires --reason \"...\"');\n      return rejectUseCase({ dir }, { id, reason });\n    }\n\n    case 'catchup': {\n      const id = requireField(positional[0] ?? flags.id, 'catchup requires an id: fgos catchup <id> [--timeout <ms>|--no-timeout]');\n      const timeoutMs = resolveVerifyTimeoutMs('catchup', flags, path.dirname(dir));\n      // repoRoot from --dir, never raw process.cwd() (tsk-5vl, same class\n      // as tsk-k8u's take/pick fix): a caller running catchup from inside\n      // the item's own linked worktree (e.g. a session that just hit\n      // verify-fail-post-merge and is still sitting inside its own picked\n      // worktree) always passes --dir at the stable main checkout —\n      // deriving repoRoot from it keeps withMergeEphemeralWorktree's own\n      // `git branch -f` (src/runner/worktree.mjs) targeting that stable\n      // root instead of the worktree currently checked out on the same\n      // branch it is about to force-update, which git refuses (\"Cannot\n      // force update the current branch\"). Byte-identical to today when\n      // --dir is omitted (dataDir() resolves dir from process.cwd() too\n      // in that case). This verb has no `--trust-dir` gate, unlike\n      // approve/sync-root/promote-to-component — a real per-verb\n      // difference the adapter owns.\n      return await catchupUseCase({ dir, repoRoot: path.dirname(dir) }, { id, timeoutMs });\n    }\n\n    // Gate A — candidate ranking (self-improve-loop P13 Slice 1, D1/D3/D6):\n    // Backlog-triage impact ranking (P21) — separate from P14's intake-time\n    // risk/lane classification: this ranks open work by blocking fan-out\n    // (how many other open items it unblocks), not by how risky it is.\n    case 'triage': {\n      return paginateVerbResult(rankImpact(listWork(dir), { includeDone: Boolean(flags.all) }), flags, 'triage-v1', 'triage');\n    }\n\n    case 'worktree': {\n      const sub = requireField(positional[0], 'worktree requires a sub-verb: create <path> | remove <path> --delivered-to <ref>');\n      if (sub === 'create') {\n        if (positional.length !== 2) throw new Error('usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');\n        const cwd = process.cwd();\n        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;\n        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;\n        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);\n        return createWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {\n          path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),\n          detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),\n        });\n      }\n      if (sub === 'remove') {\n        if (positional.length !== 2) throw new Error('usage: fgos worktree remove <path> --delivered-to <ref> [--json]');\n        const cwd = process.cwd();\n        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;\n        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;\n        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);\n        return removeWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {\n          path: positional[1], deliveredTo: requireField(flags['delivered-to'], 'worktree remove requires --delivered-to <ref>'),\n        });\n      }\n      throw new Error(`unknown worktree sub-verb: ${sub}`);\n    }\n    // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout\n    // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's\n    // createSession/endSession/listSessions/reclaimOrphanedSessions. `start`\n    // opens a detached-HEAD worktree on the current HEAD (zero new branches)\n    // with a `.fgos` symlink back to the one shared store (D10) and prints\n    // where to `cd`; `end` removes it, refusing a diverged (dangling-commit)\n    // session without --force and naming the sha(s); `list` prints the\n    // registry; `gc` (p-fgos-session-gc) sweeps entries whose worktree is gone\n    // from git or whose one-shot `start` CLI pid has since exited, sparing any\n    // that are diverged or have uncommitted work. session.mjs raises\n    // SessionError for every lifecycle failure (unknown id, divergence\n    // refusal, git failure) — surfaced here as `validation` (exit 4) so a bad\n    // input is a clean categorized exit, never an uncaught crash. repoRoot is\n    // the caller's cwd, the same root every other git-backed verb uses.\n    case 'session': {\n      const sub = requireField(positional[0], 'session requires a sub-verb: fgos session <start|end|list|gc> ...');\n      const repoRoot = process.cwd();\n      try {\n        if (sub === 'start') {\n          const itemId = optionalField(flags.item, 'session start --item requires a non-empty id value (omit --item entirely to start a session with no item bound)');\n          const entry = createSession(repoRoot, { itemId });\n          // Explicit projection, not a spread: decouples the public envelope\n          // from session.mjs's internal registry-entry shape (mirrors every\n          // other converted verb, e.g. move's {id,from,to,seq}).\n          return {\n            sessionId: entry.sessionId,\n            worktreePath: entry.worktreePath,\n            itemId: entry.itemId,\n            startCommit: entry.startCommit,\n            pid: entry.pid,\n            startedAt: entry.startedAt,\n          };\n        }\n        if (sub === 'end') {\n          const sessionId = requireField(positional[1], 'session end requires a session id: fgos session end <session-id> [--force]');\n          const entry = endSession(repoRoot, sessionId, { force: Boolean(flags.force) });\n          return {\n            sessionId: entry.sessionId,\n            worktreePath: entry.worktreePath,\n            itemId: entry.itemId,\n            startCommit: entry.startCommit,\n            pid: entry.pid,\n            startedAt: entry.startedAt,\n            forced: Boolean(flags.force),\n          };\n        }\n        if (sub === 'list') {\n          return listSessions(repoRoot);\n        }\n        if (sub === 'gc') {\n          return reclaimOrphanedSessions(repoRoot);\n        }\n        throw new StoreError('validation', `unknown session sub-verb \"${sub}\". Usage: fgos session <start|end|list|gc> ...`);\n      } catch (err) {\n        if (err instanceof SessionError) {\n          throw new StoreError('validation', err.message);\n        }\n        throw err;\n      }\n    }\n\n    // Gateway process lifecycle (tsk-31v): the one-door way any agent\n    // starts/stops/checks the fgos gateway (REST API + web\n    // dashboard) as a detached background process instead of hand-rolling\n    // nohup/tmux/systemd. AGENTS.md's own dispatch doctrine names this as\n    // the mandatory entry point.\n    case 'gateway': {\n      const sub = requireField(positional[0], 'gateway requires a sub-verb: fgos gateway <start|stop|status>');\n      const repoRoot = path.dirname(dir);\n      try {\n        if (sub === 'start') {\n          return startGateway(repoRoot, dir);\n        }\n        if (sub === 'stop') {\n          return stopGateway(dir);\n        }\n        if (sub === 'status') {\n          return await gatewayStatus(dir);\n        }\n        throw new StoreError('validation', `unknown gateway sub-verb \"${sub}\". Usage: fgos gateway <start|stop|status>`);\n      } catch (err) {\n        if (err instanceof GatewayControlError) {\n          throw new StoreError('validation', err.message);\n        }\n        throw err;\n      }\n    }\n\n    // Persisted-focus CLI surface (str67-goal-directed-planning D3/D4/D6/D7):\n    // reads/writes go through the setFocus/goalFocusShow facades only, never\n    // graph-metrics.mjs directly. Only `set`/`show` exist here — `clear`/\n    // `list` are explicitly deferred (CONTEXT.md Deferred Ideas).\n    case 'goal': {\n      const sub = requireField(positional[0], 'goal requires a sub-verb: fgos goal <set|show> ...');\n      if (sub === 'set') {\n        const id = requireField(positional[1], 'goal set requires an id: fgos goal set <id>');\n        const { view } = setFocus(dir, { id });\n        // Explicit projection, not a spread: decouples the public envelope\n        // from setFocus's internal {event, view} return shape.\n        return { focus: view.focus };\n      }\n      if (sub === 'show') {\n        return goalFocusShow(dir);\n      }\n      throw new StoreError('validation', `unknown goal sub-verb \"${sub}\". Usage: fgos goal <set|show> ...`);\n    }\n\n    // Tool registry (tsk-1dj, ported from repository-harness's\n    // tool-registry-capability per docs/distillery/deep-dives/\n    // tool-registry.md; tsk-in1-1 D1: `register`/`remove` retired — a tool\n    // provider is now declared directly in `runner.executors.<id>`\n    // (`.fgos/config.json`), config-edited like every other executor, never\n    // through the event log): `check` writes ONLY the local, gitignored\n    // status overlay (tool-registry.mjs's readLocalStatus/writeLocalStatus)\n    // — never an event, per CONTEXT.md's pinned \"registered vs present\"\n    // term, and it always succeeds even when every probed tool comes back\n    // missing (absent capability is a fact to report, never a CLI error);\n    // `query` merges the two (config-declared tools + local overlay) at\n    // read time.\n    // Read-only listing of the personas a `--seats \"@name\"` seat can name; a pure read of the\n    // three definition tiers (src/runner/agent-listing.mjs), no store and no event.\n    case 'agents': {\n      const sub = requireField(positional[0], 'agents requires a sub-verb: fgos agents list');\n      if (sub !== 'list') throw new StoreError('validation', `unknown agents sub-verb \"${sub}\". Usage: fgos agents list`);\n      const { listAgents } = await import('../src/runner/agent-listing.mjs');\n      const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');\n      const projectRoot = typeof flags.worktree === 'string' ? path.resolve(flags.worktree) : resolveGitRoots(process.cwd()).worktreeRoot;\n      return { projectRoot, ...listAgents({ projectRoot }) };\n    }\n    case 'tool': {\n      const sub = requireField(positional[0], 'tool requires a sub-verb: fgos tool <check|query> ...');\n      const repoRoot = path.dirname(dir);\n      const cfg = flags.config ? loadRunnerConfig(flags.config) : ensureRunnerConfigForDir(repoRoot);\n      const tools = toolsFromExecutors(cfg.executors);\n      if (sub === 'check') {\n        const name = optionalField(flags.name, 'tool check --name requires a non-empty value.');\n        if (name !== undefined && !tools[name]) {\n          throw new StoreError('validation', `tool \"${name}\" not found.`);\n        }\n        const targets = name !== undefined ? [name] : Object.keys(tools);\n        const localStatus = readLocalStatus(dir);\n        const results = {};\n        for (const toolName of targets) {\n          const status = await probeTool(tools[toolName], repoRoot);\n          const checkedAt = new Date().toISOString();\n          localStatus[toolName] = { status, checkedAt };\n          results[toolName] = { status, checkedAt };\n        }\n        writeLocalStatus(dir, localStatus);\n        return { checked: results };\n      }\n"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sourceSha256": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+      "seam": "cli-help-messages",
+      "kind": "source-context",
       "startLine": 4001,
       "endLine": 4250,
       "text": "      if (sub === 'query') {\n        const localStatus = readLocalStatus(dir);\n        const capabilityFlag = optionalField(flags.capability, 'tool query --capability requires a non-empty value.');\n        const normalizedCapability = capabilityFlag !== undefined ? normalizeCapability(capabilityFlag) : undefined;\n        const statusFlag = optionalField(flags.status, 'tool query --status requires a non-empty value.');\n        const providers = Object.values(tools)\n          .filter((tool) => normalizedCapability === undefined || tool.capability === normalizedCapability)\n          .map((tool) => ({ ...tool, status: resolvedStatus(tool.name, localStatus) }))\n          .filter((tool) => statusFlag === undefined || tool.status === statusFlag);\n        return { providers };\n      }\n      throw new StoreError('validation', `unknown tool sub-verb \"${sub}\". Usage: fgos tool <check|query> ...`);\n    }\n\n    // Do-and-announce shell-integration + config bootstrap (str87-fgos-setup-doctor\n    // D6, retargeted per tsk-2ta D1 amended / tsk-5vf D2/D4): inserts the\n    // shell-integration source line into every DETECTED rc file (bash/zsh,\n    // D4) — never creates a new rc file (shell-rc.mjs's own refusal) — then\n    // ensures the shared config file (`.fgos/config.json`) exists and has\n    // every current default key from EVERY registered `registerConfigDefault`\n    // entry, via `ensureSharedConfigDefaults` (the one write path allowed\n    // here; `doctor`, unlike `setup`, never calls it). tsk-1ri: also ensures\n    // the GLOBAL config file (`~/.fgos/config.json`) the same way —\n    // `ensureSharedConfigDefaults` is already generic over its `dir`\n    // argument (`sharedConfigFilePath(os.homedir())` resolves to the exact\n    // same path `src/config/global-config.mjs`'s `defaultGlobalConfigPath()`\n    // uses), so this reuses it as-is rather than adding a parallel\n    // global-specific writer.\n    case 'setup': {\n      // tsk-2xj: same --dir resolution as `doctor`/`uninstall` below and\n      // `resync-worktree` (:4939) — setup's writes are unconditional (tsk-5hi),\n      // so run from a linked worktree this used to materialize .fgos/config.json\n      // INSIDE the worktree (ADR0020 violation), not just report wrong.\n      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());\n      const scriptPath = integrationScriptPath();\n      const rcFiles = detectRcFiles(os.homedir());\n      const rcFilesInserted = [];\n      const rcFilesAlreadyConfigured = [];\n      // A null scriptPath means this copy of fgos has no location stable enough\n      // to name in a shell profile — it is not inside a git checkout, so it is\n      // ephemeral by nature. Writing its path would leave a `source` line that\n      // outlives the directory it points at and errors on every shell open.\n      // Everything else setup does still runs; only the rc write is declined.\n      const rcWriteDeclinedReason = scriptPath === null\n        ? 'this copy of fgos is not inside a git checkout, so it has no stable path to source — source scripts/fgos-shell-integration.sh by hand from a permanent checkout'\n        : null;\n      if (scriptPath !== null) {\n        for (const rcFile of rcFiles) {\n          if (insertSourceLine(rcFile, scriptPath)) {\n            rcFilesInserted.push(rcFile);\n          } else {\n            rcFilesAlreadyConfigured.push(rcFile);\n          }\n        }\n      }\n      const configPath = sharedConfigFilePath(repoRoot);\n      const configExisted = fs.existsSync(configPath);\n      const { addedKeys } = ensureSharedConfigDefaults(repoRoot);\n      const globalConfigPath = sharedConfigFilePath(os.homedir());\n      const globalConfigExisted = fs.existsSync(globalConfigPath);\n      const { addedKeys: globalAddedKeys } = ensureSharedConfigDefaults(os.homedir());\n      // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`\n      // does — a second, non-npm-lifecycle-dependent activation path for the\n      // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a\n      // git-hosted dependency (str88) and nothing re-automated it since.\n      // Idempotent, no-ops silently when repoRoot has no `.git` at all.\n      // Fill-only like the two side effects above: a pre-existing custom\n      // core.hooksPath is left untouched, never silently repointed.\n      const { wired: hooksWired, skippedExisting: hooksSkippedExisting } = installGitHooks(repoRoot);\n      // tsk-60f D1/D5: wires the PreToolUse dispatch-decide enforcement hook\n      // into .claude/settings.json the same fill-only way — a pre-existing\n      // hooks.SessionStart entry (or any other settings.json content) is\n      // left untouched; a malformed settings.json is left alone entirely.\n      const { wired: dispatchDecideHookWired, skippedExisting: dispatchDecideHookSkippedExisting } = installClaudeCodeHook(repoRoot);\n      // tsk-5hi: setup now also runs every registered fix — the same\n      // runFixes() `doctor --fix` already calls (RUL9/RUL11) — instead of\n      // leaving a person to separately discover and run `doctor --fix` to\n      // reach the state a plain `setup` should already leave a project in.\n      // Unconditional, no confirmation, per RUL10's existing act-then-report\n      // contract for this verb; every registered fix is already required\n      // idempotent/fail-soft, so running the full list here is safe.\n      const fixed = runFixes(repoRoot);\n      // tsk-1qi D5/D7: materializes `.agents/skills` (canonical source) +\n      // generated `.claude/skills` thin wrappers into repoRoot -- copying\n      // from THIS running copy's own package root when repoRoot is a\n      // different (external) project, or just regenerating wrappers\n      // in-place for forgentX's own dev-checkout self-hosting run (see\n      // materializeSkillsIntoProject's own self-hosting no-copy branch).\n      const { copied: skillsSourceCopied, wrappersWritten: skillWrappersGenerated } = materializeSkillsIntoProject(PACKAGE_ROOT, repoRoot);\n      const deprecation = COMMAND_REGISTRY.find((entry) => entry.name === 'setup')?.deprecated ?? null;\n      const deprecationText = formatDeprecation(deprecation);\n      return {\n        deprecation,\n        deprecationMessage: deprecationText\n          ? `fgos setup is legacy compatibility; ${deprecationText}.`\n          : undefined,\n        rcFilesInserted,\n        rcFilesAlreadyConfigured,\n        ...(rcWriteDeclinedReason !== null && { rcWriteDeclinedReason }),\n        configPath,\n        configCreated: !configExisted,\n        configAddedKeys: configExisted ? addedKeys : [],\n        globalConfigPath,\n        globalConfigCreated: !globalConfigExisted,\n        globalConfigAddedKeys: globalConfigExisted ? globalAddedKeys : [],\n        hooksWired,\n        hooksSkippedExisting,\n        dispatchDecideHookWired,\n        dispatchDecideHookSkippedExisting,\n        fixed,\n        skillsSourceCopied,\n        skillWrappersGenerated: skillWrappersGenerated.length,\n      };\n    }\n\n    // Reverses `setup`'s own wiring (tsk-4iv-1, docs/history/fgos-uninstall/\n    // CONTEXT.md D2-D4). Requires `--yes` (D3): with no flag, refuses before\n    // touching anything — destructive, unlike `setup`/`doctor`, which never\n    // ask. Two side effects, both mirroring `setup`'s own fill-only rules in\n    // the opposite direction:\n    //   - git hooks (D2): `uninstallGitHooks` unwires `core.hooksPath` and\n    //     deletes `.githooks/pre-commit` (+ the dir, if left empty) ONLY when\n    //     hooksPath is still exactly `.githooks` — a custom value the caller\n    //     repointed is left untouched, same as `installGitHooks` leaves one\n    //     alone when installing.\n    //   - shell-rc (D4): never edits an rc file — reuses `hasSourceLine`\n    //     read-only, the same primitive `deadSourceLines`/`doctor` already\n    //     use, to report which rc file(s) still carry the fgOS source line so\n    //     the caller can remove it by hand (docs/history/\n    //     shell-rc-dead-source-lines/CONTEXT.md D1: \"deletion stays a human\n    //     act\" — this item does not carve out an exception to that).\n    // Never touches `.fgos/` data or `.fgos/config.json` (pinned constraint,\n    // CONTEXT.md) — structurally true: this case never imports or calls any\n    // config-writing function (`ensureSharedConfigDefaults`/`writeSharedConfig`).\n    //\n    // Package removal (D1, tsk-4iv-2 SPIKE): opt-in via `--remove-package`,\n    // additive on top of tsk-4iv-1's already-shipped, already-documented\n    // default behavior (`--yes` alone stays wiring-only, byte-identical to\n    // before this flag existed — preserves that contract rather than\n    // silently widening it). Scoped narrowly per the spike's own locked\n    // scope: npm global installs only, Linux/macOS only — shells out to\n    // `npm uninstall -g forgent`, the officially-supported removal path,\n    // rather than hand-rolling file deletion. Runs LAST, after the\n    // confirmation gate and wiring reversal above, since removing the\n    // package first would strand the process mid-run before it could\n    // finish undoing its own wiring (plan.md's own ordering rationale).\n    // Never throws on failure — a failed removal is exactly the outcome\n    // this spike exists to measure, not a bug to crash on.\n    case 'uninstall': {\n      if (!flags.yes) {\n        throw new StoreError(\n          'validation',\n          'fgos uninstall requires --yes to confirm — it unwires git hooks (core.hooksPath/.githooks) and reports (never deletes) the shell-rc source line. Rerun with --yes once ready.',\n        );\n      }\n      // tsk-2xj: same --dir resolution as `doctor`/`setup` above.\n      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());\n      const scriptPath = integrationScriptPath();\n      const shellRcSourceLinesFound = scriptPath === null\n        ? []\n        : detectRcFiles(os.homedir())\n          .filter((rcFile) => hasSourceLine(rcFile, scriptPath))\n          .map((rcFile) => ({ rcFile, sourceLine: `source \"${scriptPath}\"` }));\n      const { unwired: hooksUnwired, skippedExisting: hooksSkippedExisting } = uninstallGitHooks(repoRoot);\n      let packageRemoval = { attempted: false, outcome: null };\n      if (flags['remove-package']) {\n        // tsk-652: `npm uninstall -g forgent` exits 0 and reports nothing\n        // wrong even when this copy was never npm-installed at all (a\n        // pnpm/yarn global install lives in a different store npm never\n        // touches) -- confirm npm's own global node_modules actually has\n        // this package BEFORE claiming success, the same \"detected\n        // manager\" scope tsk-4iv-2's own SPIKE locked (npm-only), never\n        // widened here to actually support pnpm/yarn removal.\n        let npmRootG = null;\n        const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';\n        try {\n          npmRootG = execFileSync(npmCmd, ['root', '-g'], { encoding: 'utf8', shell: process.platform === 'win32' }).trim();\n        } catch {\n          npmRootG = null;\n        }\n        const npmInstalled = npmRootG !== null && npmRootG !== '' && fs.existsSync(path.join(npmRootG, 'forgent'));\n        if (!npmInstalled) {\n          packageRemoval = {\n            attempted: false,\n            outcome: 'skipped',\n            reason: npmRootG\n              ? `this copy of fgOS is not visible under npm's own global node_modules (${npmRootG}) -- --remove-package only supports npm global installs (tsk-4iv-2); if installed via pnpm/yarn, remove it with that tool's own global uninstall command instead`\n              : 'npm root -g did not resolve (npm not on PATH?) -- --remove-package only supports npm global installs (tsk-4iv-2), and could not confirm this is one',\n          };\n        } else {\n          try {\n            const output = execFileSync(npmCmd, ['uninstall', '-g', 'forgent'], { encoding: 'utf8', shell: process.platform === 'win32' });\n            packageRemoval = { attempted: true, outcome: 'removed', output };\n          } catch (err) {\n            packageRemoval = {\n              attempted: true,\n              outcome: 'failed',\n              error: err.message,\n              stderr: typeof err.stderr === 'string' ? err.stderr : (err.stderr?.toString() ?? null),\n            };\n          }\n        }\n      }\n      return {\n        shellRcSourceLinesFound,\n        packageRemoval,\n        shellRcRemovalInstructions: shellRcSourceLinesFound.length > 0\n          ? 'fgOS never edits your shell profile — remove the line(s) above by hand.'\n          : null,\n        hooksUnwired,\n        hooksSkippedExisting,\n      };\n    }\n\n    // Diagnostic by default (D2, docs/specs/distribution.md RUL9): runs every\n    // DOCTOR_CHECKS entry against the current cwd, writing nothing — no rc\n    // file insertion, no config write — unless `--fix` is given.\n    //\n    // `--fix` (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2, deliberate\n    // reversal of RUL9/RUL11 per distribution-vision.md §3): runs every\n    // registered `fix` (`runFixes`, `src/setup/registrations.mjs`) BEFORE\n    // re-running the checks, so the returned `checks` array reflects\n    // post-fix state — the same \"report what changed\" shape\n    // `ensureRunnerConfig`/`ensureSharedConfigDefaults` already use. Without\n    // `--fix`, behavior is byte-identical to before this flag existed.\n    case 'doctor': {\n      // tsk-2xj: resolve the real main checkout the same way `resync-worktree`\n      // (:4939) already does — an explicit --dir always wins, otherwise\n      // self-detect via resolveMainCheckoutRoot so this reports/fixes the\n      // shared store even when run from a linked worktree (ADR0020: a\n      // worktree never carries its own .fgos/, so process.cwd() there was\n      // silently checking/writing the wrong tree).\n      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());\n      const fixed = flags.fix ? runFixes(repoRoot) : undefined;\n      // A check may return its result directly or as a promise (one drives promise-based runner code).\n      const checks = [];\n      for (const { id, description, check } of DOCTOR_CHECKS) {\n        const { passed, message } = await check(repoRoot);\n        checks.push({ id, description, passed, message });\n      }\n      return fixed === undefined ? { checks } : { fixed, checks };\n    }\n\n    case 'unclaim': {\n      const id = requireField(positional[0] ?? flags.id, 'unclaim requires an id: fgos unclaim <id>');\n      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());\n      const claim = readClaim(dir, id);\n      if (!claim) return { released: false, reason: 'no-claim' };\n      const durableView = rebuildViewFromDir(dir);\n      const durableStatus = durableView.work[id]?.status;\n"
@@ -189,6 +199,17 @@
           "candidate": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
+            "docs\\/decisions\\/0020-chan-fgos-khoi-worktree-worker.md",
+            "docs\\/decisions\\/0020-chan-fgos-khoi-worktree-worker\\.md"
+          ],
+          "matches": []
         }
       }
     },
@@ -1098,7 +1119,9 @@
         "expectedAfterSha256": "65aa9b2dc704b9998383c2929e3fee11377397a1c7ca3635e0e9e7e2446b8c02",
         "rollbackDiff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n",
         "coCutPaths": [
-          "CHANGELOG.md"
+          "CHANGELOG.md",
+          "test/report/enduser-index.test.mjs",
+          "test/report/helpers/docs-index-state-fixture.mjs"
         ],
         "receiptIds": [
           "cli-help-messages-pilot"
@@ -1113,10 +1136,12 @@
           "scripts/check-legacy-docs-ratchet.baseline.json": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8"
         },
         "parked": [
+          "reference-003641",
           "reference-003643",
           "reference-003652",
           "reference-003653",
-          "reference-003659"
+          "reference-003659",
+          "reference-003666"
         ],
         "review": {
           "status": "pending",
@@ -1148,10 +1173,10 @@
         "slotKey": null,
         "sourceSpans": [
           {
-            "line": 1746,
-            "columnStart": 34,
-            "columnEndExclusive": 70,
-            "text": "docs/how-to/check-rollup-progress.md"
+            "line": 1760,
+            "columnStart": 95,
+            "columnEndExclusive": 106,
+            "text": "docs/how-to"
           }
         ],
         "originalSourceSpans": [
@@ -1169,32 +1194,27 @@
           "endLine": 1762
         },
         "role": "emitted-message",
-        "disposition": "patch",
-        "reason": "Executable data/message/file operation in own passage: \"      type: 'object',\\n      properties: {\\n        quadrant: { type: 'string', description: 'The docs/<quadrant> directory to scan (e.g. docs/how-to).' },\\n        topic: { type: 'string', description: 'The subject text to skeleton-match against each doc\\\\'s authoritative_for (required unless --check-duplicates is set).' },\\n        'check-duplicates': { type: 'boolean', description: 'Scan for docs that claim the same subject instead of matching one topic.' },\" This census prefix is the same physical example as reference-003655; bind the full pointer once and retain both original qualifiers. The exact registry alias names currentPath docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md; Phase 9 changes this emitted pointer only.",
-        "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+        "disposition": "parked",
+        "reason": "L12-69: Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it. Own passage \"      type: 'object',\\n      properties: {\\n        quadrant: { type: 'string', description: 'The docs/<quadrant> directory to scan (e.g. docs/how-to).' },\\n        topic: { type: 'string', description: 'The subject text to skeleton-match against each doc\\\\'s authoritative_for (required unless --check-duplicates is set).' },\\n        'check-duplicates': { type: 'boolean', description: 'Scan for docs that claim the same subject instead of matching one topic.' },\"",
+        "target": null,
         "anchor": null,
         "resolverWitness": {
-          "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
-          "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
-          "registryPath": "docs/doc-registry.json",
-          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-          "alias": "docs/how-to/check-rollup-progress.md",
-          "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
-          "claim": "live currentPath lookup; no writer destination adopts an alias"
+          "rule": "Own quadrant description at pinned line 1760; not doc-sources example line 1746",
+          "pin": "aa8d343746a292d2cb476ab76e6489411fd59a62"
         },
         "timing": "phase9",
-        "diffHunk": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n",
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
+        "diffHunk": null,
+        "blockedCategory": "step5-parity",
+        "blockedReason": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it.",
+        "dependency": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it.",
+        "dependencyCategory": "step5-parity",
         "successorNote": null,
         "aliasWriteCheck": {
           "isWriter": false,
           "destinationIsAlias": false,
           "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
         },
-        "proposedReplacement": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+        "proposedReplacement": null,
         "priorRecordRefs": [
           {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
@@ -1209,9 +1229,9 @@
         "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
         "parityObligation": {
           "current": "docs/how-to",
-          "candidate": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it."
         }
       }
     },
@@ -1954,7 +1974,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/tsk-65q-gate-bypass-global-install-resolution/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -2126,7 +2146,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/how-to",
-          "exists": false
+          "exists": true
         },
         "timing": "phase9",
         "diffHunk": null,
@@ -2212,7 +2232,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/how-to",
-          "exists": false
+          "exists": true
         },
         "timing": "phase9",
         "diffHunk": null,
@@ -2420,6 +2440,54 @@
           "candidate": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/check-rollup-progress.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/check-rollup-progress.md",
+            "docs\\/how-to\\/check-rollup-progress.md",
+            "docs\\/how-to\\/check-rollup-progress\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 162,
+              "text": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            },
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 167,
+              "text": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            },
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 171,
+              "text": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            },
+            {
+              "file": "test/report/enduser-index.test.mjs",
+              "line": 385,
+              "text": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+              "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+            },
+            {
+              "file": "test/report/helpers/docs-index-state-fixture.mjs",
+              "line": 14,
+              "text": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+              "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+            },
+            {
+              "file": "test/report/helpers/docs-index-state-fixture.mjs",
+              "line": 35,
+              "text": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+              "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+            }
+          ]
         }
       }
     },
@@ -2855,350 +2923,6 @@
         "parityObligation": {
           "current": "docs/doc-registry.md",
           "candidate": "docs/doc-registry.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
-      }
-    },
-    {
-      "file": "src/cli/command-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
-      "seam": "cli-help-messages",
-      "kind": "references",
-      "index": 20,
-      "value": {
-        "referenceId": "reference-003661",
-        "admission": "ADMIT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000216",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000216",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 1034,
-            "columnStart": 65,
-            "columnEndExclusive": 96,
-            "text": "docs/history/tsk-19j/CONTEXT.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 96,
-            "columnStart": 65,
-            "line": 1030,
-            "text": "docs/history/tsk-19j/CONTEXT.md"
-          }
-        ],
-        "matchedExpression": "docs/history/tsk-19j/CONTEXT.md",
-        "passage": "    },\n    examples: [\n      'fgos gate-check tsk-19j --gate contextApprove --artifact docs/history/tsk-19j/CONTEXT.md',\n      'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children \"[]\" --cost REVERSIBLE',\n    ],",
-        "passageSpan": {
-          "startLine": 1032,
-          "endLine": 1036
-        },
-        "role": "emitted-message",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: '    },\\n    examples: [\\n      \\'fgos gate-check tsk-19j --gate contextApprove --artifact docs/history/tsk-19j/CONTEXT.md\\',\\n      \\'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children \"[]\" --cost REVERSIBLE\\',\\n    ],' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/tsk-19j/CONTEXT.md",
-          "exists": false
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [
-          {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
-            "recordSha256": "898023ac4d86282c9921b35f4a4262593b09648dcab538a71beefaddcc651f51",
-            "matchingSlots": []
-          }
-        ],
-        "fixtureProvenance": null,
-        "rejectionRule": null,
-        "receiptId": "cli-help-messages-pilot",
-        "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
-        "parityObligation": {
-          "current": "docs/history/tsk-19j/CONTEXT.md",
-          "candidate": "docs/history/tsk-19j/CONTEXT.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
-      }
-    },
-    {
-      "file": "src/cli/command-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
-      "seam": "cli-help-messages",
-      "kind": "references",
-      "index": 21,
-      "value": {
-        "referenceId": "reference-003662",
-        "admission": "ADMIT",
-        "inventory": "step-02-census-cli-help.json",
-        "edgeId": "cli-009",
-        "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02-census-cli-help.json",
-            "id": "cli-009",
-            "pin": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 1035,
-            "columnStart": 62,
-            "columnEndExclusive": 90,
-            "text": "docs/history/tsk-19j/plan.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "line": 1035,
-            "columnStart": 62,
-            "columnEndExclusive": 90,
-            "text": "docs/history/tsk-19j/plan.md"
-          }
-        ],
-        "matchedExpression": "docs/history/tsk-19j/plan.md",
-        "passage": "    examples: [\n      'fgos gate-check tsk-19j --gate contextApprove --artifact docs/history/tsk-19j/CONTEXT.md',\n      'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children \"[]\" --cost REVERSIBLE',\n    ],\n    touchesState: false,",
-        "passageSpan": {
-          "startLine": 1033,
-          "endLine": 1037
-        },
-        "role": "emitted-message",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: '    examples: [\\n      \\'fgos gate-check tsk-19j --gate contextApprove --artifact docs/history/tsk-19j/CONTEXT.md\\',\\n      \\'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children \"[]\" --cost REVERSIBLE\\',\\n    ],\\n    touchesState: false,' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": null,
-          "exists": false
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [
-          {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
-            "recordSha256": "898023ac4d86282c9921b35f4a4262593b09648dcab538a71beefaddcc651f51",
-            "matchingSlots": []
-          }
-        ],
-        "fixtureProvenance": null,
-        "rejectionRule": null,
-        "receiptId": "cli-help-messages-pilot",
-        "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
-        "parityObligation": {
-          "current": "docs/history/tsk-19j/plan.md",
-          "candidate": "docs/history/tsk-19j/plan.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
-      }
-    },
-    {
-      "file": "src/cli/command-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
-      "seam": "cli-help-messages",
-      "kind": "references",
-      "index": 22,
-      "value": {
-        "referenceId": "reference-003663",
-        "admission": "ADMIT",
-        "inventory": "step-02-census-cli-help.json",
-        "edgeId": "cli-010",
-        "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02-census-cli-help.json",
-            "id": "cli-010",
-            "pin": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 1864,
-            "columnStart": 72,
-            "columnEndExclusive": 92,
-            "text": "docs/doc-registry.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "line": 1864,
-            "columnStart": 72,
-            "columnEndExclusive": 92,
-            "text": "docs/doc-registry.md"
-          }
-        ],
-        "matchedExpression": "docs/doc-registry.md",
-        "passage": "    name: 'doc-registry',\n    invoke: 'fgos doc-registry',\n    description: 'Generate machine (docs/doc-registry.json) and human (docs/doc-registry.md) projection files for the knowledge registry.',\n    parameters: { type: 'object', properties: {}, required: [] },\n    examples: ['fgos doc-registry'],",
-        "passageSpan": {
-          "startLine": 1862,
-          "endLine": 1866
-        },
-        "role": "emitted-message",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: \"    name: 'doc-registry',\\n    invoke: 'fgos doc-registry',\\n    description: 'Generate machine (docs/doc-registry.json) and human (docs/doc-registry.md) projection files for the knowledge registry.',\\n    parameters: { type: 'object', properties: {}, required: [] },\\n    examples: ['fgos doc-registry'],\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": null,
-          "exists": false
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [
-          {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
-            "recordSha256": "898023ac4d86282c9921b35f4a4262593b09648dcab538a71beefaddcc651f51",
-            "matchingSlots": []
-          }
-        ],
-        "fixtureProvenance": null,
-        "rejectionRule": null,
-        "receiptId": "cli-help-messages-pilot",
-        "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
-        "parityObligation": {
-          "current": "docs/doc-registry.md",
-          "candidate": "docs/doc-registry.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
-      }
-    },
-    {
-      "file": "src/cli/command-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
-      "seam": "cli-help-messages",
-      "kind": "references",
-      "index": 23,
-      "value": {
-        "referenceId": "reference-003664",
-        "admission": "ADMIT",
-        "inventory": "step-02-census-cli-help.json",
-        "edgeId": "cli-011",
-        "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02-census-cli-help.json",
-            "id": "cli-011",
-            "pin": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 2075,
-            "columnStart": 383,
-            "columnEndExclusive": 409,
-            "text": "docs/specs/distribution.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "line": 2075,
-            "columnStart": 383,
-            "columnEndExclusive": 409,
-            "text": "docs/specs/distribution.md"
-          }
-        ],
-        "matchedExpression": "docs/specs/distribution.md",
-        "passage": "    name: 'doctor',\n    invoke: 'fgos doctor',\n    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n    parameters: {\n      type: 'object',",
-        "passageSpan": {
-          "startLine": 2073,
-          "endLine": 2077
-        },
-        "role": "emitted-message",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: \"    name: 'doctor',\\n    invoke: 'fgos doctor',\\n    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\\n    parameters: {\\n      type: 'object',\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": null,
-          "exists": false
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [
-          {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
-            "recordSha256": "898023ac4d86282c9921b35f4a4262593b09648dcab538a71beefaddcc651f51",
-            "matchingSlots": []
-          }
-        ],
-        "fixtureProvenance": null,
-        "rejectionRule": null,
-        "receiptId": "cli-help-messages-pilot",
-        "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
-        "parityObligation": {
-          "current": "docs/specs/distribution.md",
-          "candidate": "docs/specs/distribution.md",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
         }

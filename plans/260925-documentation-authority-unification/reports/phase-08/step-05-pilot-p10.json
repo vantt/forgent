@@ -8,6 +8,772 @@
       "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
       "seam": "setup-doctor-roots",
       "kind": "dynamicTraces",
+      "index": 63,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            598,
+            28,
+            598,
+            61,
+            "coreRoot ?? path.join(projectRoot",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": null
+        },
+        "id": "dynamic-013993",
+        "originalTuple": [
+          598,
+          28,
+          598,
+          61,
+          "coreRoot ?? path.join(projectRoot",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 598,
+        "currentPassage": {
+          "startLine": 596,
+          "endLine": 600,
+          "text": " */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "coreRoot ?? path.join(projectRoot"
+        ],
+        "role": "instruction-discovery",
+        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 64,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            598,
+            40,
+            598,
+            86,
+            "path.join(projectRoot, 'core', 'instructions')",
+            "path-call",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": null
+        },
+        "id": "dynamic-013994",
+        "originalTuple": [
+          598,
+          40,
+          598,
+          86,
+          "path.join(projectRoot, 'core', 'instructions')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 598,
+        "currentPassage": {
+          "startLine": 596,
+          "endLine": 600,
+          "text": " */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "path.join(projectRoot, 'core', 'instructions')"
+        ],
+        "role": "instruction-discovery",
+        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 65,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            598,
+            9,
+            598,
+            61,
+            "coreRoot = options.coreRoot ?? path.join(projectRoot",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": null
+        },
+        "id": "dynamic-013995",
+        "originalTuple": [
+          598,
+          9,
+          598,
+          61,
+          "coreRoot = options.coreRoot ?? path.join(projectRoot",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 598,
+        "currentPassage": {
+          "startLine": 596,
+          "endLine": 600,
+          "text": " */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "coreRoot = options.coreRoot ?? path.join(projectRoot"
+        ],
+        "role": "instruction-discovery",
+        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 66,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            599,
+            34,
+            599,
+            73,
+            "componentsRoot ?? path.join(projectRoot",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": null
+        },
+        "id": "dynamic-013996",
+        "originalTuple": [
+          599,
+          34,
+          599,
+          73,
+          "componentsRoot ?? path.join(projectRoot",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 599,
+        "currentPassage": {
+          "startLine": 597,
+          "endLine": 601,
+          "text": "export function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "componentsRoot ?? path.join(projectRoot"
+        ],
+        "role": "instruction-discovery",
+        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 67,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            599,
+            52,
+            599,
+            88,
+            "path.join(projectRoot, 'components')",
+            "path-call",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": null
+        },
+        "id": "dynamic-013997",
+        "originalTuple": [
+          599,
+          52,
+          599,
+          88,
+          "path.join(projectRoot, 'components')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 599,
+        "currentPassage": {
+          "startLine": 597,
+          "endLine": 601,
+          "text": "export function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "path.join(projectRoot, 'components')"
+        ],
+        "role": "instruction-discovery",
+        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 68,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            599,
+            9,
+            599,
+            73,
+            "componentsRoot = options.componentsRoot ?? path.join(projectRoot",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": null
+        },
+        "id": "dynamic-013998",
+        "originalTuple": [
+          599,
+          9,
+          599,
+          73,
+          "componentsRoot = options.componentsRoot ?? path.join(projectRoot",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 599,
+        "currentPassage": {
+          "startLine": 597,
+          "endLine": 601,
+          "text": "export function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "componentsRoot = options.componentsRoot ?? path.join(projectRoot"
+        ],
+        "role": "instruction-discovery",
+        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 69,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            600,
+            31,
+            600,
+            67,
+            "domainsRoot ?? path.join(projectRoot",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": null
+        },
+        "id": "dynamic-013999",
+        "originalTuple": [
+          600,
+          31,
+          600,
+          67,
+          "domainsRoot ?? path.join(projectRoot",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 600,
+        "currentPassage": {
+          "startLine": 598,
+          "endLine": 602,
+          "text": "  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "domainsRoot ?? path.join(projectRoot"
+        ],
+        "role": "instruction-discovery",
+        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 70,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            600,
+            46,
+            600,
+            79,
+            "path.join(projectRoot, 'domains')",
+            "path-call",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": null
+        },
+        "id": "dynamic-014000",
+        "originalTuple": [
+          600,
+          46,
+          600,
+          79,
+          "path.join(projectRoot, 'domains')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 600,
+        "currentPassage": {
+          "startLine": 598,
+          "endLine": 602,
+          "text": "  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "path.join(projectRoot, 'domains')"
+        ],
+        "role": "instruction-discovery",
+        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 71,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            600,
+            9,
+            600,
+            67,
+            "domainsRoot = options.domainsRoot ?? path.join(projectRoot",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": null
+        },
+        "id": "dynamic-014001",
+        "originalTuple": [
+          600,
+          9,
+          600,
+          67,
+          "domainsRoot = options.domainsRoot ?? path.join(projectRoot",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 600,
+        "currentPassage": {
+          "startLine": 598,
+          "endLine": 602,
+          "text": "  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "domainsRoot = options.domainsRoot ?? path.join(projectRoot"
+        ],
+        "role": "instruction-discovery",
+        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 72,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            610,
+            7,
+            610,
+            41,
+            "manifestPath: options.manifestPath",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": null
+        },
+        "id": "dynamic-014002",
+        "originalTuple": [
+          610,
+          7,
+          610,
+          41,
+          "manifestPath: options.manifestPath",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 610,
+        "currentPassage": {
+          "startLine": 608,
+          "endLine": 612,
+          "text": "  } else {\n    knownOwners = discoverKnownOwners(projectRoot, {\n      manifestPath: options.manifestPath,\n      allowedComponents: options.allowedComponents,\n      allowedDomains: options.allowedDomains,"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "manifestPath: options.manifestPath"
+        ],
+        "role": "instruction-discovery",
+        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 73,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014003",
+        "originalTuple": [
+          617,
+          9,
+          617,
+          30,
+          "idToPaths = new Map()",
+          "config/default-root",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 617,
+        "currentPassage": {
+          "startLine": 615,
+          "endLine": 619,
+          "text": "\n  const collected = [];\n  const idToPaths = new Map();\n\n  // 1. Core / platform instructions"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "idToPaths = new Map()"
+        ],
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'idToPaths = new Map()'. Pinned current passage: '\\n  const collected = [];\\n  const idToPaths = new Map();\\n\\n  // 1. Core / platform instructions'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'idToPaths = new Map()'. Pinned current passage: '\\n  const collected = [];\\n  const idToPaths = new Map();\\n\\n  // 1. Core / platform instructions'",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 74,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            621,
+            66,
+            621,
+            89,
+            "coreRoot : projectRoot)",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": null
+        },
+        "id": "dynamic-014004",
+        "originalTuple": [
+          621,
+          66,
+          621,
+          89,
+          "coreRoot : projectRoot)",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 621,
+        "currentPassage": {
+          "startLine": 619,
+          "endLine": 623,
+          "text": "  // 1. Core / platform instructions\n  if (fs.existsSync(coreRoot)) {\n    const files = scanMarkdownFiles(coreRoot, options.coreRoot ? coreRoot : projectRoot);\n    for (const fullPath of files) {\n      const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));"
+        },
+        "caller": {
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "coreRoot : projectRoot)"
+        ],
+        "role": "instruction-discovery",
+        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
       "index": 75,
       "value": {
         "proofCommand": "missing",
@@ -75,22 +841,8 @@
       "kind": "dynamicTraces",
       "index": 76,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            630,
-            9,
-            630,
-            29,
-            "rootType: 'platform'",
-            "config/default-root",
-            false,
-            "reader"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-014006",
         "originalTuple": [
           630,
@@ -106,7 +858,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 630,
         "currentPassage": {
@@ -121,12 +873,12 @@
         "inputs": [
           "rootType: 'platform'"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"rootType: 'platform'\". Pinned current passage: \"        fullPath,\\n        sourcePath,\\n        rootType: 'platform',\\n        rootOwner: 'core',\\n        knownOwners,\"",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"rootType: 'platform'\". Pinned current passage: \"        fullPath,\\n        sourcePath,\\n        rootType: 'platform',\\n        rootOwner: 'core',\\n        knownOwners,\"",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -140,22 +892,8 @@
       "kind": "dynamicTraces",
       "index": 77,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            631,
-            9,
-            631,
-            26,
-            "rootOwner: 'core'",
-            "config/default-root",
-            false,
-            "reader"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-014007",
         "originalTuple": [
           631,
@@ -171,7 +909,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 631,
         "currentPassage": {
@@ -186,12 +924,12 @@
         "inputs": [
           "rootOwner: 'core'"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"rootOwner: 'core'\". Pinned current passage: \"        sourcePath,\\n        rootType: 'platform',\\n        rootOwner: 'core',\\n        knownOwners,\\n        fgosDir: options.fgosDir,\"",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"rootOwner: 'core'\". Pinned current passage: \"        sourcePath,\\n        rootType: 'platform',\\n        rootOwner: 'core',\\n        knownOwners,\\n        fgosDir: options.fgosDir,\"",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -205,22 +943,8 @@
       "kind": "dynamicTraces",
       "index": 78,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            633,
-            9,
-            633,
-            33,
-            "fgosDir: options.fgosDir",
-            "config/default-root",
-            false,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-014008",
         "originalTuple": [
           633,
@@ -236,7 +960,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 633,
         "currentPassage": {
@@ -251,12 +975,12 @@
         "inputs": [
           "fgosDir: options.fgosDir"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: \"        rootOwner: 'core',\\n        knownOwners,\\n        fgosDir: options.fgosDir,\\n      });\\n      collected.push(unit);\"",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: \"        rootOwner: 'core',\\n        knownOwners,\\n        fgosDir: options.fgosDir,\\n      });\\n      collected.push(unit);\"",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -711,22 +1435,8 @@
       "kind": "dynamicTraces",
       "index": 86,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            666,
-            13,
-            666,
-            34,
-            "rootType: 'component'",
-            "config/default-root",
-            false,
-            "reader"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-014016",
         "originalTuple": [
           666,
@@ -742,7 +1452,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 666,
         "currentPassage": {
@@ -757,12 +1467,12 @@
         "inputs": [
           "rootType: 'component'"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"rootType: 'component'\". Pinned current passage: \"            fullPath,\\n            sourcePath,\\n            rootType: 'component',\\n            rootOwner: componentName,\\n            knownOwners,\"",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"rootType: 'component'\". Pinned current passage: \"            fullPath,\\n            sourcePath,\\n            rootType: 'component',\\n            rootOwner: componentName,\\n            knownOwners,\"",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -776,22 +1486,8 @@
       "kind": "dynamicTraces",
       "index": 87,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            667,
-            13,
-            667,
-            37,
-            "rootOwner: componentName",
-            "config/default-root",
-            false,
-            "reader"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-014017",
         "originalTuple": [
           667,
@@ -807,7 +1503,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 667,
         "currentPassage": {
@@ -822,12 +1518,12 @@
         "inputs": [
           "rootOwner: componentName"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'rootOwner: componentName'. Pinned current passage: \"            sourcePath,\\n            rootType: 'component',\\n            rootOwner: componentName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\"",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'rootOwner: componentName'. Pinned current passage: \"            sourcePath,\\n            rootType: 'component',\\n            rootOwner: componentName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\"",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -841,22 +1537,8 @@
       "kind": "dynamicTraces",
       "index": 88,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            669,
-            13,
-            669,
-            37,
-            "fgosDir: options.fgosDir",
-            "config/default-root",
-            false,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-014018",
         "originalTuple": [
           669,
@@ -872,7 +1554,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 669,
         "currentPassage": {
@@ -887,12 +1569,12 @@
         "inputs": [
           "fgosDir: options.fgosDir"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: '            rootOwner: componentName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\\n          });\\n          collected.push(unit);'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: '            rootOwner: componentName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\\n          });\\n          collected.push(unit);'",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -1347,22 +2029,8 @@
       "kind": "dynamicTraces",
       "index": 96,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            704,
-            13,
-            704,
-            31,
-            "rootType: 'domain'",
-            "config/default-root",
-            false,
-            "reader"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-014026",
         "originalTuple": [
           704,
@@ -1378,7 +2046,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 704,
         "currentPassage": {
@@ -1393,12 +2061,12 @@
         "inputs": [
           "rootType: 'domain'"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"rootType: 'domain'\". Pinned current passage: \"            fullPath,\\n            sourcePath,\\n            rootType: 'domain',\\n            rootOwner: domainName,\\n            knownOwners,\"",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"rootType: 'domain'\". Pinned current passage: \"            fullPath,\\n            sourcePath,\\n            rootType: 'domain',\\n            rootOwner: domainName,\\n            knownOwners,\"",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -1412,22 +2080,8 @@
       "kind": "dynamicTraces",
       "index": 97,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            705,
-            13,
-            705,
-            34,
-            "rootOwner: domainName",
-            "config/default-root",
-            false,
-            "reader"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-014027",
         "originalTuple": [
           705,
@@ -1443,7 +2097,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 705,
         "currentPassage": {
@@ -1458,12 +2112,12 @@
         "inputs": [
           "rootOwner: domainName"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'rootOwner: domainName'. Pinned current passage: \"            sourcePath,\\n            rootType: 'domain',\\n            rootOwner: domainName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\"",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'rootOwner: domainName'. Pinned current passage: \"            sourcePath,\\n            rootType: 'domain',\\n            rootOwner: domainName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\"",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -1477,22 +2131,8 @@
       "kind": "dynamicTraces",
       "index": 98,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            707,
-            13,
-            707,
-            37,
-            "fgosDir: options.fgosDir",
-            "config/default-root",
-            false,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-014028",
         "originalTuple": [
           707,
@@ -1508,7 +2148,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 707,
         "currentPassage": {
@@ -1523,12 +2163,12 @@
         "inputs": [
           "fgosDir: options.fgosDir"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: '            rootOwner: domainName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\\n          });\\n          collected.push(unit);'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: '            rootOwner: domainName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\\n          });\\n          collected.push(unit);'",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -2473,10 +3113,7 @@
           "scripts/check-legacy-docs-ratchet.mjs": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
           "scripts/check-legacy-docs-ratchet.baseline.json": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8"
         },
-        "parked": [
-          "dynamic-014060",
-          "dynamic-014072"
-        ],
+        "parked": [],
         "review": {
           "status": "pending",
           "reviewer": null,
@@ -3308,22 +3945,8 @@
       "kind": "dynamicTraces",
       "index": 16,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            62,
-            129,
-            62,
-            139,
-            "join(', ')",
-            "path-call",
-            false,
-            "reader"
-          ],
-          "candidateConstruction": null,
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": "Frozen dynamic tuple has no unique content relocation at current pin; later owning seam must rebind actual operation."
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-014060",
         "originalTuple": [
           62,
@@ -3339,31 +3962,29 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "parked",
-        "currentLine": null,
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 131,
         "currentPassage": {
-          "startLine": 62,
-          "endLine": 62,
-          "text": "      message: `warning: tier cells name pools runner.llmAccounts does not declare: ${missing.map((e) => `${e.cell}@${e.pool}`).join(', ')}; these entries cannot run until the pool has accounts`,"
+          "startLine": 129,
+          "endLine": 133,
+          "text": "    return {\n      passed: true,\n      message: `warning: tier cells name pools runner.llmAccounts does not declare: ${missing.map((e) => `${e.cell}@${e.pool}`).join(', ')}; the walk skips these entries until the pool has an enabled account holding a login store for the CLI of the invocation (fgos dispatch explain shows each)`,\n    };\n  }"
         },
         "caller": {
-          "line": 1,
-          "declaration": "module declarations / data"
+          "line": 114,
+          "declaration": "export function checkModelPolicyPools(cwd) {"
         },
         "inputs": [
           "join(', ')"
         ],
-        "role": "unresolved-construction",
+        "role": "non-document-operation",
         "targetSetOrConstruction": null,
-        "stateExportDependency": "Frozen dynamic tuple has no unique content relocation at current pin; later owning seam must rebind actual operation.",
+        "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": null,
-        "blockedSeams": [
-          "setup-doctor-roots"
-        ],
-        "blockedReason": "Frozen dynamic tuple has no unique content relocation at current pin; later owning seam must rebind actual operation.",
+        "rejectedAsUnrelatedReason": "L12-69: Pinned diagnostic/header text has no documentation-location operand; interpolation formats pool/release/assembly status. Own frozen operation \"join(', ')\". Pinned current passage: \"    return {\\n      passed: true,\\n      message: `warning: tier cells name pools runner.llmAccounts does not declare: ${missing.map((e) => `${e.cell}@${e.pool}`).join(', ')}; the walk skips these entries until the pool has an enabled account holding a login store for the CLI of the invocation (fgos dispatch explain shows each)`,\\n    };\\n  }\"",
+        "reason": "L12-69: Pinned diagnostic/header text has no documentation-location operand; interpolation formats pool/release/assembly status. Own frozen operation \"join(', ')\". Pinned current passage: \"    return {\\n      passed: true,\\n      message: `warning: tier cells name pools runner.llmAccounts does not declare: ${missing.map((e) => `${e.cell}@${e.pool}`).join(', ')}; the walk skips these entries until the pool has an enabled account holding a login store for the CLI of the invocation (fgos dispatch explain shows each)`,\\n    };\\n  }\"",
+        "blockedSeams": [],
+        "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
       }
     },
@@ -3936,22 +4557,8 @@
       "kind": "dynamicTraces",
       "index": 28,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            91,
-            57,
-            91,
-            127,
-            "`warning: the lease still reads runner.providers; ${parts.join('; ')}`",
-            "template-string",
-            true,
-            "reader"
-          ],
-          "candidateConstruction": null,
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": "Frozen dynamic tuple has no unique content relocation at current pin; later owning seam must rebind actual operation."
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-014072",
         "originalTuple": [
           91,
@@ -3967,31 +4574,29 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "parked",
-        "currentLine": null,
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 167,
         "currentPassage": {
-          "startLine": 91,
-          "endLine": 91,
-          "text": "  if (parts.length > 0) return { passed: true, message: `warning: the lease still reads runner.providers; ${parts.join('; ')}` };"
+          "startLine": 165,
+          "endLine": 169,
+          "text": "  if (onlyNew.length > 0) parts.push(`only in runner.llmAccounts: ${onlyNew.map((a) => `${a.pool}/${a.account}`).join(', ')}`);\n  if (storeMismatch.length > 0) parts.push(`different login directories: ${storeMismatch.map((a) => `${a.pool}/${a.account}`).join(', ')}`);\n  if (parts.length > 0) return { passed: true, message: `warning: the lease reads runner.llmAccounts for a pool it declares and runner.providers for the rest; ${parts.join('; ')}` };\n  return { passed: true, message: 'runner.llmAccounts matches runner.providers' };\n}"
         },
         "caller": {
-          "line": 1,
-          "declaration": "module declarations / data"
+          "line": 158,
+          "declaration": "export function checkLlmAccountsVsLegacy(cwd) {"
         },
         "inputs": [
           "`warning: the lease still reads runner.providers; ${parts.join('; ')}`"
         ],
-        "role": "unresolved-construction",
+        "role": "non-document-operation",
         "targetSetOrConstruction": null,
-        "stateExportDependency": "Frozen dynamic tuple has no unique content relocation at current pin; later owning seam must rebind actual operation.",
+        "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": null,
-        "blockedSeams": [
-          "setup-doctor-roots"
-        ],
-        "blockedReason": "Frozen dynamic tuple has no unique content relocation at current pin; later owning seam must rebind actual operation.",
+        "rejectedAsUnrelatedReason": "L12-69: Pinned diagnostic/header text has no documentation-location operand; interpolation formats pool/release/assembly status. Own frozen operation \"`warning: the lease still reads runner.providers; ${parts.join('; ')}`\". Pinned current passage: \"  if (onlyNew.length > 0) parts.push(`only in runner.llmAccounts: ${onlyNew.map((a) => `${a.pool}/${a.account}`).join(', ')}`);\\n  if (storeMismatch.length > 0) parts.push(`different login directories: ${storeMismatch.map((a) => `${a.pool}/${a.account}`).join(', ')}`);\\n  if (parts.length > 0) return { passed: true, message: `warning: the lease reads runner.llmAccounts for a pool it declares and runner.providers for the rest; ${parts.join('; ')}` };\\n  return { passed: true, message: 'runner.llmAccounts matches runner.providers' };\\n}\"",
+        "reason": "L12-69: Pinned diagnostic/header text has no documentation-location operand; interpolation formats pool/release/assembly status. Own frozen operation \"`warning: the lease still reads runner.providers; ${parts.join('; ')}`\". Pinned current passage: \"  if (onlyNew.length > 0) parts.push(`only in runner.llmAccounts: ${onlyNew.map((a) => `${a.pool}/${a.account}`).join(', ')}`);\\n  if (storeMismatch.length > 0) parts.push(`different login directories: ${storeMismatch.map((a) => `${a.pool}/${a.account}`).join(', ')}`);\\n  if (parts.length > 0) return { passed: true, message: `warning: the lease reads runner.llmAccounts for a pool it declares and runner.providers for the rest; ${parts.join('; ')}` };\\n  return { passed: true, message: 'runner.llmAccounts matches runner.providers' };\\n}\"",
+        "blockedSeams": [],
+        "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
       }
     },
@@ -4806,26 +5411,6 @@
       "startLine": 2001,
       "endLine": 2250,
       "text": "  if (entries.length === 0) {\n    return { passed: true, message: \"every handed-over item's content is on the trunk\" };\n  }\n\n  // Two causes, two fixes — see unmergedDeliveries' own comment. Reported\n  // separately so the reader is not sent to re-merge a leaf that already\n  // merged correctly into a root that simply has not synced yet.\n  const neverMerged = entries.filter(([, s]) => s.landedOn === null);\n  const awaitingRootSync = entries.filter(([, s]) => s.landedOn !== null);\n  const parts = [];\n  if (neverMerged.length > 0) {\n    parts.push(\n      `${neverMerged.length} item(s) marked handed-over whose branch merged nowhere: `\n        + `${neverMerged.map(([id, s]) => `${id} (${s.status}, ${s.branch}, ${s.unmatched} commit(s) not on trunk by patch-id)`).join(', ')}`\n        + ' — land the content through a new item, never by re-driving the closed item\\'s status backward',\n    );\n  }\n  if (awaitingRootSync.length > 0) {\n    parts.push(\n      `${awaitingRootSync.length} item(s) landed on a root branch that has not reached the trunk: `\n        + `${awaitingRootSync.map(([id, s]) => `${id} (${s.status}, on ${s.landedOn})`).join(', ')}`\n        + ' — run fgos sync-root on the root, not on these',\n    );\n  }\n  return { passed: false, message: parts.join('; ') };\n}\n\nregisterCheck({\n  id: 'delivered-not-on-trunk',\n  description: \"every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk (tsk-1l9)\",\n  check: (cwd) => checkDeliveredNotOnTrunk(cwd),\n});\n\n// events-jsonl-not-truncated (tsk-cgg, docs/history/events-jsonl-git-\n// tracked-truncation/CONTEXT.md D1): catches a stash/checkout/reset/clean-\n// style silent truncation of the shared, git-tracked .fgos/events.jsonl --\n// a failure class a seq-contiguity check is structurally blind to, since\n// a truncate-then-reappend renumbers forward and stays perfectly\n// contiguous. See src/state/events-jsonl-truncation-guard.mjs's own\n// header for the full detection mechanism. No matching registerFix: a\n// break here means real data is already gone -- auto-repairing would\n// erase the loud signal before a human ever saw it, defeating the\n// reason this check exists. The\n// re-baseline-after-acknowledgment step is a deliberate, documented\n// manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not\n// a blanket `doctor --fix` sweep.\n// Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under\n// .fgos/events/, each against its OWN entry in the shared guard sidecar\n// (the same `events/<name>` fileKey scheme `runOpportunisticMainCheckout\n// Checks` uses, so the two never disagree about which mark belongs to\n// which file). Per-session files stay git-tracked (TA-D2 only removes the\n// NEED for merge=union, not git tracking itself), so they carry the exact\n// same git reset/checkout/stash truncation risk baseline-0 always has\n// (tsk-cgg) — leaving this check baseline-only would be Tầng A quietly\n// opening a new observability gap.\nfunction checkEventsJsonlNotTruncated(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  if (mainCheckout === null) {\n    return { passed: true, message: 'not inside a git checkout — nothing to check' };\n  }\n  const fgosDir = path.join(mainCheckout, '.fgos');\n  const guardPath = resolveFgosFile(fgosDir, FGOS_FILE.GUARD_MARK);\n  const filesToCheck = [{ fileKey: 'events.jsonl', logPath: path.join(fgosDir, 'events.jsonl') }];\n  const eventsDirPath = path.join(fgosDir, 'events');\n  try {\n    const names = fs\n      .readdirSync(eventsDirPath, { withFileTypes: true })\n      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))\n      .map((entry) => entry.name);\n    for (const name of names) filesToCheck.push({ fileKey: `events/${name}`, logPath: path.join(eventsDirPath, name) });\n  } catch {\n    // .fgos/events/ doesn't exist yet -- baseline-0 alone is still checked below\n  }\n\n  const existingFiles = filesToCheck.filter(({ logPath }) => fs.existsSync(logPath));\n  if (existingFiles.length === 0) {\n    return { passed: true, message: 'no .fgos/events.jsonl yet — nothing to check' };\n  }\n\n  const broken = [];\n  for (const { fileKey, logPath } of existingFiles) {\n    const report = advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey);\n    if (!report.ok) broken.push({ fileKey, message: report.message });\n  }\n\n  if (broken.length === 0) {\n    return {\n      passed: true,\n      message: `truncation guard holds across events.jsonl${existingFiles.length > 1 ? ` + ${existingFiles.length - 1} per-writer file(s)` : ''}`,\n    };\n  }\n  return {\n    passed: false,\n    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n  };\n}\n\nregisterCheck({\n  id: 'events-jsonl-not-truncated',\n  description: 'shared .fgos/events.jsonl has not been silently reverted by a git stash/checkout/reset/clean (tsk-cgg)',\n  check: (cwd) => checkEventsJsonlNotTruncated(cwd),\n});\n\n// events-compaction-verified (Tầng A/T6, TA-D6): retroactively re-proves\n// every past compaction recorded in .fgos/events/archive/*.manifest.json\n// still holds -- re-reads the manifest's own `baseline` (still a live file\n// under .fgos/events/) and its `originals` (now under archive/) and re-runs\n// the SAME verify gate compactColdWriterFiles ran before archiving anything\n// (deep-equal view + count + hash-set, src/state/events-compaction.mjs).\n// No matching registerFix, same posture as events-jsonl-not-truncated above:\n// a break here means the compacted baseline and its own archived originals\n// have drifted apart after the fact (tampering, partial restore, a bug) --\n// real data may be at stake, so this only ever surfaces the finding for a\n// human to investigate (docs/how-to/... none yet; the manifest + both file\n// sets are still on disk for manual inspection), never auto-repairs.\nfunction checkEventsCompactionVerified(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  if (mainCheckout === null) {\n    return { passed: true, message: 'not inside a git checkout — nothing to check' };\n  }\n  const eventsDirPath = path.join(mainCheckout, '.fgos', 'events');\n  const archiveDirPath = path.join(eventsDirPath, 'archive');\n  let manifestNames = [];\n  try {\n    manifestNames = fs\n      .readdirSync(archiveDirPath, { withFileTypes: true })\n      .filter((entry) => entry.isFile() && entry.name.endsWith('.manifest.json'))\n      .map((entry) => entry.name);\n  } catch {\n    return { passed: true, message: 'no compactions recorded yet — nothing to verify' };\n  }\n  if (manifestNames.length === 0) {\n    return { passed: true, message: 'no compactions recorded yet — nothing to verify' };\n  }\n\n  // Never throws (same contract events-jsonl-not-truncated above already\n  // keeps): a corrupt line in an archived original\n  // or the baseline itself is exactly the \"tampering, partial restore, a\n  // bug\" shape this check exists to catch, per its own doc comment above --\n  // it must surface as a normal `broken` finding, never crash the rest of\n  // `fgos doctor` (bin/fgos.mjs's doctor handler runs every check in one\n  // .map(), with no per-check try/catch of its own).\n  const broken = [];\n  for (const manifestName of manifestNames) {\n    try {\n      const manifest = JSON.parse(fs.readFileSync(path.join(archiveDirPath, manifestName), 'utf8'));\n      const baselinePath = path.join(eventsDirPath, manifest.baseline);\n      if (!fs.existsSync(baselinePath)) {\n        broken.push({ manifest: manifestName, reason: `baseline \"${manifest.baseline}\" is missing` });\n        continue;\n      }\n      const originalEntries = [];\n      let missingOriginal = null;\n      for (const name of manifest.originals ?? []) {\n        const originalPath = path.join(archiveDirPath, name);\n        if (!fs.existsSync(originalPath)) {\n          missingOriginal = name;\n          break;\n        }\n        originalEntries.push({ name, events: readEventsJsonLines(originalPath) });\n      }\n      if (missingOriginal) {\n        broken.push({ manifest: manifestName, reason: `archived original \"${missingOriginal}\" is missing` });\n        continue;\n      }\n      const candidateEvents = readEventsJsonLines(baselinePath);\n      const verify = verifyCompactionCandidate(originalEntries, candidateEvents);\n      if (!verify.ok) {\n        broken.push({ manifest: manifestName, reason: verify.reason });\n      }\n    } catch (err) {\n      broken.push({ manifest: manifestName, reason: `could not verify: ${err.message}` });\n    }\n  }\n\n  if (broken.length === 0) {\n    return { passed: true, message: `${manifestNames.length} past compaction(s) verified — baseline still matches its archived originals` };\n  }\n  return {\n    passed: false,\n    message: `compaction verify gate no longer holds for ${broken.map((b) => `${b.manifest} (${b.reason})`).join(', ')}`,\n  };\n}\n\nfunction readEventsJsonLines(filePath) {\n  return fs\n    .readFileSync(filePath, 'utf8')\n    .split('\\n')\n    .filter((line) => line !== '')\n    .map((line) => JSON.parse(line));\n}\n\nregisterCheck({\n  id: 'events-compaction-verified',\n  description: 'every past .fgos/events/ compaction (archive/*.manifest.json) still deep-equal/count/hash-set matches its archived originals (Tầng A/T6)',\n  check: (cwd) => checkEventsCompactionVerified(cwd),\n});\n\n// main-checkout-guard-warnings (tsk-1vc-3 D6, docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md):\n// surfaces recordMainCheckoutGuardWarning's write-only output (main-checkout-guard-warnings.jsonl)\n// to fgos doctor.\nfunction checkMainCheckoutGuardWarnings(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  if (mainCheckout === null) {\n    return { passed: true, message: 'not inside a git checkout — nothing to check' };\n  }\n  const warnings = readMainCheckoutGuardWarnings(mainCheckout);\n  if (warnings.length === 0) {\n    return { passed: true, message: 'no main checkout guard warnings recorded' };\n  }\n  const latest = warnings[warnings.length - 1];\n  return {\n    passed: false,\n    message: `${warnings.length} main checkout guard warning(s) recorded — latest: [${latest.ts}] ${latest.reason}: ${latest.message}`,\n  };\n}\n\nregisterCheck({\n  id: 'main-checkout-guard-warnings',\n  description: 'main checkout eventlog guard warnings log has no recorded regression or truncation warnings (D6)',\n  check: (cwd) => checkMainCheckoutGuardWarnings(cwd),\n});\n\n\n// docs/history/global-project-config-awareness/CONTEXT.md D1: reports which\n// config level is currently active (project always wins when present) and\n// whether the other level is also on disk, so \"aware\" means visible in\n// `fgos doctor` output, not just correct-but-silent precedence at runtime.\n// READ-ONLY by construction (same as every other check here) —\n// describeConfigAwareness only calls fs.existsSync, never writes.\nfunction checkGlobalProjectAwareness(cwd) {\n  const { active, globalPresent, projectPresent, globalConfigPath, projectConfigPath } =\n    describeConfigAwareness(cwd);\n  if (active === 'none') {\n    return {\n      passed: true,\n      message: `no config at either level yet — project: ${projectConfigPath}, global: ${globalConfigPath}`,\n    };\n  }\n  const other = active === 'project' ? 'global' : 'project';\n  const otherPresent = active === 'project' ? globalPresent : projectPresent;\n  return {\n    passed: true,\n    message: `active: ${active} (${active === 'project' ? projectConfigPath : globalConfigPath}) — ${other} config ${otherPresent ? 'also present' : 'not present'}`,\n  };\n}\n\nregisterCheck({\n  id: 'config-awareness',\n  description: 'which config level (global/project) is active, and whether the other is also present (tsk-2ta-2)',\n"
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "source-context",
-      "startLine": 2251,
-      "endLine": 2500,
-      "text": "  check: (cwd) => checkGlobalProjectAwareness(cwd),\n});\n\nfunction checkProviderCapacityState() {\n  let report;\n  try {\n    report = inspectProviderCapacity({ runnerConfig: loadGlobalConfig() });\n  } catch (err) {\n    return { passed: false, message: `provider-capacity state unreadable: ${err.message}` };\n  }\n  const providers = Object.values(report.providers || {});\n  const accounts = providers.flatMap((provider) => Object.values(provider.accounts || {}));\n  if (!accounts.length) {\n    return { passed: true, message: 'inactive — no global runner.providers.*.accounts inventory configured' };\n  }\n  const quarantined = accounts.filter((account) => account.quarantine);\n  if (!quarantined.length) {\n    return { passed: true, message: `provider-capacity healthy — ${accounts.length} account(s), no quarantine` };\n  }\n  // C2a: inspectProviderCapacity's account shape names the field\n  // `accountId`, not `id` (always undefined here before this fix), and a\n  // quarantine record's own field is `kind` ('temporary' | 'manual-clear'\n  // | 'manual-clear' evidence), never a `manualClear` boolean.\n  const summary = quarantined\n    .map((account) => `${account.accountId}:${account.quarantine.reasonCode || 'quarantined'}${account.quarantine.kind === 'manual-clear' ? ':manual-clear' : ''}${account.quarantine.until ? `:until=${account.quarantine.until}` : ''}`)\n    .join(', ');\n  return {\n    passed: false,\n    message: `provider-capacity quarantine present (${summary}) — inspect with \"fgos dispatch inspect --provider-capacity\"; clear manually with \"fgos dispatch reconcile provider-capacity clear-quarantine\" after the operator fix`,\n  };\n}\n\nregisterCheck({\n  id: 'provider-capacity-state',\n  description: 'provider-capacity account leases/quarantine state is reportable; doctor never auto-clears quarantine',\n  check: () => checkProviderCapacityState(),\n});\n\n// Holder-lock (docs/platform/holder-lock/spec.md): the kernel-lock guarantee\n// of both lock directories, the borrow vectors, who holds each lock, the\n// cutover fences, the predecessor kill wait and the one state root. Bodies\n// live in holder-lock-checks.mjs. The `lock-dirs` fix creates the two lock\n// directories; the `lock-fences` fix is the cutover step and acts only in a\n// workspace whose activated release already runs these locks.\nregisterCheck({\n  id: 'lock-kernel-semantics',\n  description: 'the holder-lock driver gives kernel lock exclusion on <fgosDir>/locks and <lockRoot>, proven by a two-process probe on each mount',\n  check: (cwd) => checkLockKernelSemantics(cwd),\n});\nregisterCheck({\n  id: 'lock-borrow-vectors',\n  description: 'a lock description borrowed by a git child never leaks to a background process (fgos internal lock-borrow-vectors)',\n  check: (cwd) => checkLockBorrowVectors(cwd),\n});\nregisterCheck({\n  id: 'lock-holders',\n  description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, and no predecessor domain is left running',\n  check: (cwd) => checkLockHolders(cwd),\n});\nregisterCheck({\n  id: 'lock-fences',\n  description: 'every legacy lock path carries its cutover fence, so an older fgOS binary fails loudly instead of holding the old lock',\n  check: (cwd) => checkLockFences(cwd),\n});\nregisterCheck({\n  id: 'lock-record-unreadable',\n  description: 'the state and porting-events hot records parse and their holder can be judged; otherwise fgos lock fence names the way out',\n  check: (cwd) => checkLockRecordUnreadable(cwd),\n});\nregisterCheck({\n  id: 'lock-predecessor-kill-wait',\n  description: 'lock.predecessorKillWaitMs is an integer from 1 to 60000 ms (default 2000)',\n  check: (cwd) => checkLockPredecessorKillWait(cwd),\n});\nregisterCheck({\n  id: 'state-root',\n  description: 'Node and the Rust host resolve the same state root and lock root',\n  check: (cwd) => checkStateRoot(cwd),\n});\nregisterConfigDefault({ id: 'lock', key: 'lock', shape: { predecessorKillWaitMs: DEFAULT_KILL_WAIT_MS } });\nregisterFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });\n\n// Run supervisor (docs/platform/run-supervisor/spec.md): the containment driver agents run in, the\n// host routes, the runtime socket directory, attempts nobody holds and the gate's kill grace.\n// `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` are read with a default and never written by setup.\nregisterCheck({\n  id: 'process-containment',\n  description: 'the host names the containment driver agents run in and its level (kernel or best-effort) with the routes around it',\n  check: (cwd) => checkProcessContainment(cwd),\n});\nregisterCheck({\n  id: 'run-supervisor-route',\n  description: 'the host binary serves supervise, gate, adopt and attempt-step at protocol 1',\n  check: (cwd) => checkRunSupervisorRoute(cwd),\n});\nregisterCheck({\n  id: 'runtime-socket-dir',\n  description: 'the runtime socket directory exists, is owned by this user and is 0700',\n  check: () => checkRuntimeSocketDir(),\n});\nregisterCheck({\n  id: 'run-attempts-stuck',\n  description: 'no attempt with a v3 envelope is left without a closed.json while its lock is free (fgos doctor --fix adopts it)',\n  check: (cwd) => checkRunAttemptsStuck(cwd),\n});\nregisterCheck({\n  id: 'gate-kill-grace',\n  description: 'dispatch.gateKillGraceMs is an integer of at least 1000 ms (default 10000)',\n  check: (cwd) => checkGateKillGrace(cwd),\n});\nregisterCheck({\n  id: 'legacy-attempts-stuck',\n  description: 'no run from before the run supervisor is left running with every recorded process dead (fgos doctor --fix settles it as abandoned-legacy; a run that cannot be proven dead is kept and its reason named)',\n  check: (cwd) => checkLegacyAttemptsStuck(cwd),\n});\nregisterCheck({\n  id: 'units-awaiting-resume',\n  description: 'lists unit runs whose controller is gone and whose last attempt is closed, with the fgos run --resume command (information, never a failure)',\n  check: (cwd) => checkUnitsAwaitingResume(cwd),\n});\nregisterCheck({\n  id: 'cancel-wait',\n  description: 'dispatch.cancelWaitMs is an integer of at least 1000 ms and not shorter than dispatch.gateKillGraceMs (default gateKillGraceMs + 5000)',\n  check: (cwd) => checkCancelWait(cwd),\n});\nregisterFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });\nregisterFix({ id: 'run-attempts-stuck', fix: (cwd) => fixRunAttemptsStuck(cwd) });\nregisterFix({ id: 'legacy-attempts-stuck', fix: (cwd) => fixLegacyAttemptsStuck(cwd, { door: { observe: recoverObserveUseCase, apply: recoverApplyUseCase } }) });\nregisterFix({ id: 'lock-fences', fix: (cwd) => fixLockFences(cwd) });\n\n// tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/\n// CONTEXT.md D2): the two role-by-intelligence capability slots --\n// `advise` (value comes from disagreement, never changes state, one\n// question/one answer) and `execute` (value comes from compliance,\n// changes files, must pass verify). `decide --for <purpose>` already\n// validates a `--for` name against `runner.capabilities` (dispatch.mjs's\n// `validateCapabilitiesShape`/`resolveExecutorAndOverrides`), but the\n// shared config's `capabilities` map shipped with neither name declared,\n// so neither purpose could ever resolve. Layered onto the SAME `runner`\n// config-default below (never a second, colliding `key: 'runner'`\n// registration -- `assembleRegistryDefaults` combines registrations by\n// flat per-key assignment, not a deep merge across entries sharing a\n// key) so `DEFAULT_RUNNER_CONFIG` itself (src/runner/dispatch.mjs,\n// tsk-2uf-1's own footprint) stays untouched -- this only ADDS a\n// `capabilities` key that constant has never declared. Deliberately no\n// `prefer`/`aliases`/`overrides`: naming which executor serves a purpose\n// is a dispatch-mechanism decision, and tsk-5tm-3 D5 forbids `execute`\n// (or, by the same reasoning, this registration) re-deciding that.\n// Capabilities the shipped Workflow units\n// name. Without a `runner.capabilities` entry bind() has no candidate pool for\n// the unit and refuses it, so a fresh project could not run these Workflows.\n// Description-only on purpose (no `prefer`): which executors serve a\n// capability is that project's own taste, and `mergeConfigDefaults` only adds\n// a missing slot, never overwrites one the project already tuned.\nfunction workflowCapabilitySlots(verbsByDomain) {\n  const slots = {};\n  for (const [domain, verbs] of Object.entries(verbsByDomain)) {\n    for (const verb of verbs) {\n      slots[`${domain}:${verb}`] = {\n        description: `Workflow unit capability \"${domain}:${verb}\" -- declare a \"prefer\" pool to choose which executors serve it.`,\n      };\n    }\n  }\n  return slots;\n}\n\nexport const DEFAULT_CAPABILITY_SLOTS = Object.freeze({\n  advise: {\n    description:\n      'Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',\n    // Interim posture: P06 must first wire a production backend binding.\n    // Required here would otherwise universally refuse group-thinking.\n    confinement: { mode: 'unconfined' },\n    serves: { outputKind: 'decision', mutates: false },\n  },\n  execute: {\n    description:\n      'Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',\n    serves: { outputKind: 'change', mutates: true },\n  },\n  // I19 (core/skills/_shared/capability-matching.md, capability-catalog.md):\n  // generic, domain-neutral independent review -- docs/design/spec/config,\n  // never code (that stays `code:review`). No `prefer`/`overrides` either,\n  // same curated-default-never-pins reasoning as every other slot here.\n  review: {\n    description:\n      'Independent read-only review of a non-code artifact (docs, design, spec, config) before merge/decision -- distinct from code:review (I19, core/skills/_shared/capability-catalog.md).',\n    confinement: { mode: 'unconfined' },\n    serves: { outputKind: 'finding', mutates: false },\n  },\n  // The documentation counterpart of code:implement: the capability `fgos run --capability docs:write`\n  // and the fgos-run skill name for writing docs. Same curated-default-never-pins reasoning.\n  'docs:write': {\n    description:\n      'Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a \"prefer\" pool to choose which executors serve it.',\n    serves: { outputKind: 'change', domain: 'docs', mutates: true },\n  },\n  'code:implement': {\n    description:\n      'Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)',\n    serves: { outputKind: 'change', domain: 'code', mutates: true },\n  },\n  // P2-runtime (docs/history/agent-coordination-foundation/plan.md):\n  // extended by observed frequency, in this priority order. Deliberately\n  // no `prefer`/`overrides` here either, same reasoning as `code:implement`\n  // above -- a curated default never pins which executor serves it.\n  'code:review': {\n    description:\n      'Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',\n    confinement: { mode: 'unconfined' },\n    serves: { outputKind: 'finding', domain: 'code', mutates: false },\n  },\n  'code:test': {\n    description:\n      'Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',\n    serves: { outputKind: 'verification', domain: 'code' },\n  },\n  'code:debug': {\n    description:\n      'Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',\n    confinement: { mode: 'unconfined' },\n    serves: { outputKind: 'finding', domain: 'code' },\n  },\n  'code:refactor': {\n    description:\n      'Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',\n    serves: { outputKind: 'change', domain: 'code', mutates: true, behaviorPreserving: true },\n  },\n  ...workflowCapabilitySlots({\n    marketing: ['research', 'write', 'publish'],\n    architecture: ['frame', 'shape', 'critique', 'synthesize', 'explain'],\n    business: ['frame', 'perspectives', 'critique', 'synthesize', 'plan'],\n    delphi: ['propose', 'synthesize'],\n    'group-cognition': ['explore', 'critique', 'synthesize'],\n    'nominal-group': ['generate', 'share', 'vote', 'rank'],\n    coding: ['discover', 'explore', 'plan', 'validate', 'implement'],\n  }),\n});\n\n// tsk-47r: `pi` as a second `agent`-kind executor, layered onto this SAME\n// `runner` config-default for the same reason `capabilities` above is (a\n// second `key: 'runner'` registration would silently overwrite this one,\n// never merge with it). `mergeConfigDefaults`'s fill-missing-only\n// recursion (`config-merge.mjs`) adds `runner.executors.openai` and\n// `runner.modelPolicies.openai` on the next `fgos setup` run without\n// touching the live `executors.gemini`/`modelPolicies.claude`/\n// `modelPolicies.gemini` entries. `--provider openai-codex` in `args`\n// stays a literal string -- that is pi's OWN real `--provider` value\n// (confirmed via `pi --list-models`), independent of what this config\n// internally calls the provider (`openai`, executor-provider-naming\n"
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "source-context",
-      "startLine": 2501,
-      "endLine": 2750,
-      "text": "// 2026-09-17 -- \"openai-codex\" was conflating the provider with \"Codex\",\n// which is just OpenAI's own CLI product name, not a distinct provider).\n// `--model gpt-5.5` and the `read,write,edit,bash,grep,find,ls` allowlist\n// are the EXACT invocation a live D4 proof-test dispatch ran and\n// confirmed GREEN (worker contract followed: layered skill-pointer chain\n// read natively, footprint honored, correct `[BLOCKED]`/`[DONE]`\n// two-token reporting) — see\n// docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4.\n// Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple\n// tests assert this exact shape instead of duplicating the literal.\nexport const PI_EXECUTOR_DEFAULT = Object.freeze({\n  kind: 'agent',\n  description: 'pi coding agent (openai/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)',\n  allowCrossProvider: true,\n  invocations: [\n    {\n      via: 'cli',\n      adapter: 'cli-spawn',\n      command: 'pi',\n      args: [\n        '--provider',\n        'openai-codex',\n        '--model',\n        '{model}',\n        '--tools',\n        'read,write,edit,bash,grep,find,ls',\n        '--mode',\n        'json',\n        '--approve',\n        '-p',\n        '{prompt}',\n      ],\n    },\n  ],\n  providerModel: 'openai',\n});\n\nregisterConfigDefault({\n  id: 'runner',\n  key: 'runner',\n  shape: {\n    ...DEFAULT_RUNNER_CONFIG,\n    capabilities: DEFAULT_CAPABILITY_SLOTS,\n    modelPolicies: {\n      ...DEFAULT_RUNNER_CONFIG.modelPolicies,\n      openai: { nano: 'gpt-5.5' },\n    },\n    executors: { openai: PI_EXECUTOR_DEFAULT },\n  },\n});\n\n// `checkConfigNotStale` above already catches `runner.capabilities` (or\n// either slot inside it) being wholly ABSENT, generically, via\n// `assembleRegistryDefaults`'s merge -- same \"generic scan covers missing,\n// a dedicated check covers present-but-malformed\" split every other\n// present-but-unusable check in this file already follows (gateway/\n// workerSlots/invariantChecks above). What slips past the generic scan is\n// a slot present as the wrong shape (a string, an array, `null`) -- never\n// \"missing\", so `mergeConfigDefaults` has nothing to add, and `decide\n// --for advise`/`--for execute` would still fail validateCapabilitiesShape\n// with no doctor signal pointing at why.\n// Checked names are every curated slot `DEFAULT_CAPABILITY_SLOTS` declares\n// (D1, docs/history/agent-coordination-foundation/plan.md's P2-runtime) --\n// generalized from the original fixed ['advise', 'execute', 'code:implement']\n// list so a future curated addition is covered by this SAME check without a\n// second, drifting hardcoded list.\nconst CURATED_CAPABILITY_NAMES = Object.keys(DEFAULT_CAPABILITY_SLOTS);\n\nfunction checkAdviseExecuteCapabilitiesConfigured(cwd) {\n  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;\n  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {\n    return {\n      passed: false,\n      message: 'runner.capabilities section missing -- run fgos setup (decide --for advise/execute/code:implement cannot resolve until it exists)',\n    };\n  }\n  const missing = CURATED_CAPABILITY_NAMES.filter(\n    (name) => !capabilities[name] || typeof capabilities[name] !== 'object' || Array.isArray(capabilities[name]),\n  );\n  if (missing.length > 0) {\n    return {\n      passed: false,\n      message: `runner.capabilities is missing or has a malformed slot for: ${missing.join(', ')} -- run fgos setup`,\n    };\n  }\n  const extras = CURATED_CAPABILITY_NAMES.filter((name) => !['advise', 'execute', 'code:implement'].includes(name));\n  return {\n    passed: true,\n    message: `runner.capabilities declares \"advise\", \"execute\", and \"code:implement\" (plus ${extras.join(', ')})`,\n  };\n}\n\nregisterCheck({\n  id: 'advise-execute-capabilities-configured',\n  description: 'runner.capabilities declares the \"advise\" and \"execute\" purpose slots decide --for resolves against (tsk-2uf-3)',\n  check: (cwd) => checkAdviseExecuteCapabilitiesConfigured(cwd),\n});\n\n// Every capability a core/domain Workflow unit names must resolve the way\n// bind() resolves it (exact name, then the bare verb). One that does not has\n// no candidate pool, so that unit is refused at run time with no earlier signal.\n// A declared entry that carries no `prefer` pool (exact or bare verb) is reported too.\n// Definition files come from the one Workflow reader (readWorkflowDefinitionFiles) and every string\n// under a key named `capability`, at any depth, is a use. A file that cannot be read or parsed is\n// reported by name, never skipped.\nfunction workflowCapabilityUses(files) {\n  const uses = new Map();\n  for (const { fileId, raw } of files) {\n    for (const capability of capabilityValues(raw)) {\n      if (!uses.has(capability)) uses.set(capability, new Set());\n      uses.get(capability).add(fileId);\n    }\n  }\n  return uses;\n}\n\n// Every string stored under a key named `capability`, at any depth. Iterative with a visited set:\n// a YAML alias can make a document reference itself, and a recursive walk would never end.\nfunction capabilityValues(root) {\n  const found = [];\n  const visited = new Set();\n  const queue = [root];\n  for (let next = 0; next < queue.length; next += 1) {\n    const node = queue[next];\n    if (node === null || typeof node !== 'object' || visited.has(node)) continue;\n    visited.add(node);\n    for (const [key, value] of Array.isArray(node) ? node.entries() : Object.entries(node)) {\n      if (key === 'capability' && typeof value === 'string' && value.trim() !== '') found.push(value.trim());\n      else queue.push(value);\n    }\n  }\n  return found;\n}\n\n// Capabilities the runner loop's worker asks for that no Workflow unit names. A coding item's\n// executing step runs as a Unit of `code:implement` (work-compat.mjs's curated mapping); its other\n// steps ask for `<domain>:<verb>`, the names the domain's Workflow units already use.\nconst RUNNER_LOOP_CAPABILITY_USES = Object.freeze([['code:implement', 'runner loop: coding executing step']]);\n\nfunction checkWorkflowCapabilitiesConfigured(cwd) {\n  const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\n  const { files, unreadable } = readWorkflowDefinitionFiles(workflowRoots(cwd, packageRoot));\n  const uses = workflowCapabilityUses(files);\n  for (const [capability, id] of RUNNER_LOOP_CAPABILITY_USES) {\n    uses.set(capability, new Set([...(uses.get(capability) ?? []), id]));\n  }\n  return withUnreadableDefinitions(evaluateWorkflowCapabilities(cwd, uses), unreadable);\n}\n\nfunction evaluateWorkflowCapabilities(cwd, uses) {\n  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;\n  const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};\n  const missing = [...uses].filter(\n    ([capability]) => !declared[capability] && !(capability.includes(':') && declared[capability.split(':')[1]]),\n  );\n  if (missing.length > 0) {\n    const list = missing.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');\n    return {\n      passed: false,\n      message: `runner.capabilities has no entry for Workflow capabilities: ${list} -- declare each under runner.capabilities (fgos setup adds every shipped Workflow's)`,\n    };\n  }\n  // Declared is not enough: bind() needs a prefer pool, on the exact entry or the bare\n  // verb, or it refuses the unit headless. Setup's own slots are description-only on\n  // purpose (which executors serve a capability is the project's taste), so this is a\n  // warning that names the gap rather than a failure on a fresh project.\n  const noPool = [...uses].filter(\n    ([capability]) => !hasUsablePrefer(declared[capability]) && !(capability.includes(':') && hasUsablePrefer(declared[capability.split(':')[1]])),\n  );\n  if (noPool.length > 0) {\n    const list = noPool.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');\n    return {\n      passed: true,\n      message: `warning: Workflow capabilities declared but with no \"prefer\" pool, so a headless run of those units is refused: ${list} -- add \"prefer\" under the exact name or its bare verb in runner.capabilities`,\n    };\n  }\n  return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is declared in runner.capabilities with a prefer pool` };\n}\n\nregisterCheck({\n  id: 'workflow-capabilities-configured',\n  description: 'every capability a core/domain Workflow unit names is declared in runner.capabilities',\n  check: (cwd) => checkWorkflowCapabilitiesConfigured(cwd),\n});\n\n// I19 (core/skills/_shared/capability-matching.md): `serves` is optional at\n// load time (`validateCapabilitiesShape`'s hot path never rejects an old\n// entry with none), but a live config's DECLARED `serves` values still need\n// a doctor signal -- a malformed one, or two capabilities that declare the\n// identical attribute set (permanently tied, capability-matching.md's\n// \"Ties and misses\" rule), silently degrades Q1 steering with no error\n// anywhere else. `review`'s presence is already covered generically by\n// `advise-execute-capabilities-configured` above (CURATED_CAPABILITY_NAMES\n// derives from DEFAULT_CAPABILITY_SLOTS, which now includes it) -- checked\n// again here too since it is this doctrine's own explicit requirement.\nfunction normalizeServesForComparison(serves) {\n  return JSON.stringify(Object.fromEntries(Object.entries(serves).sort(([a], [b]) => a.localeCompare(b))));\n}\n\nfunction checkCapabilityServesValid(cwd) {\n  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;\n  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {\n    return {\n      passed: false,\n      message: 'runner.capabilities section missing -- run fgos setup (\"serves\" cannot be validated until it exists)',\n    };\n  }\n  const invalid = [];\n  const servesByName = new Map();\n  for (const [name, entry] of Object.entries(capabilities)) {\n    if (!entry || typeof entry !== 'object' || Array.isArray(entry) || entry.serves === undefined) continue;\n    try {\n      validateCapabilityServesShape(entry.serves, `runner.capabilities.${name}.serves`);\n      servesByName.set(name, entry.serves);\n    } catch (error) {\n      invalid.push(`${name}: ${error.message}`);\n    }\n  }\n  if (invalid.length > 0) {\n    return { passed: false, message: `invalid \"serves\": ${invalid.join('; ')}` };\n  }\n  const seenBySignature = new Map();\n  for (const [name, serves] of servesByName) {\n    const signature = normalizeServesForComparison(serves);\n    const priorName = seenBySignature.get(signature);\n    if (priorName) {\n      return {\n        passed: false,\n        message: `\"${priorName}\" and \"${name}\" declare the identical \"serves\" attribute set -- capability matching can never distinguish them`,\n      };\n    }\n    seenBySignature.set(signature, name);\n  }\n  if (!capabilities.review || typeof capabilities.review !== 'object' || Array.isArray(capabilities.review)) {\n    return { passed: false, message: 'runner.capabilities is missing the \"review\" slot -- run fgos setup' };\n  }\n  return {\n    passed: true,\n    message: `${servesByName.size} capability entr${servesByName.size === 1 ? 'y declares' : 'ies declare'} a valid \"serves\" attribute set, none identical, and \"review\" is present`,\n  };\n}\n\nregisterCheck({\n  id: 'capability-serves-valid',\n  description: 'runner.capabilities\\' \"serves\" attribute sets are well-formed, mutually distinct, and include the \"review\" slot (I19)',\n  check: (cwd) => checkCapabilityServesValid(cwd),\n});\n\n// Unit I21 (Phase 5 item 2): every discoverable CoordinationProtocol\n// operation's declared `policy.capability` resolves against the LIVE runner\n"
     }
   ]
 }

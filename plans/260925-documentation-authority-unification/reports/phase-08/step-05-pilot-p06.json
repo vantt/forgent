@@ -7,6 +7,176 @@
       "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
       "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
       "seam": "cli-help-messages",
+      "kind": "source-context",
+      "startLine": 1501,
+      "endLine": 1615,
+      "text": "      // at once -- confirmed still possible even after that identity fix,\n      // since a TTL-starvation reclaim can happen while the original\n      // holder's own `fn()` (this whole merge) is still running, unaware\n      // its lock was reclaimed. D2 still holds: fail loudly here, never\n      // retry automatically -- the caller (merge-loop, or a person\n      // re-running `fgos approve`) owns retrying against the new tip.\n      try {\n        git(repoRoot, ['update-ref', `refs/heads/${branch}`, endCommit, worktree.startCommit]);\n      } catch {\n        // update-ref's own error already named the mismatch on stderr; read\n        // the branch's actual current tip here only to report it back in\n        // the same message/field shape callers and tests already expect --\n        // this read is diagnostic, never the guard itself (the guard\n        // already ran, atomically, in the update-ref call above).\n        const liveTip = git(repoRoot, ['rev-parse', branch]).trim();\n        throw new WorktreeError(\n          `refusing to force-move \"${branch}\" to ${endCommit} -- its tip changed from ${worktree.startCommit} to ${liveTip} since this merge started (a concurrent merge into the same branch already landed). Retry against the new tip instead of overwriting it.`,\n          { branch, expectedTip: worktree.startCommit, actualTip: liveTip, endCommit },\n        );\n      }\n    }\n    return result;\n  } finally {\n    removeWorktree(repoRoot, worktree.path, { force: true });\n  }\n}\n\n/**\n * runner-dispatch: a worktree created for one dispatch attempt (startup\n * reap's throwaway goal-check checkout, or a claimed item's worker run).\n * `opts` carries whatever baseRef/worktreeDir the caller's own leaf/root\n * logic already resolved (D3 \"leaf fork-from-tip-of-parent\" stays call-site\n * business logic, not a choke-point — only the cleanup policy was\n * duplicated). Pair with `removeDispatchWorktree` below: a cleanup failure\n * there is logged, never thrown, so it can never mask the attempt's real\n * outcome — the same policy `loop.mjs` used to define as its own private\n * `safeRemoveWorktree` at every call site.\n */\nexport function createDispatchWorktree(repoRoot, id, opts = {}) {\n  return createWorktree(repoRoot, id, opts);\n}\n\n/** Cleanup half of the runner-dispatch pair — see `createDispatchWorktree`. */\nexport function removeDispatchWorktree(repoRoot, worktreePath, log = () => {}) {\n  try {\n    removeWorktree(repoRoot, worktreePath, { force: true });\n  } catch (err) {\n    if (typeof log === 'function') {\n      log(`fgos-runner: worktree cleanup failed for \"${worktreePath}\": ${err.message}`);\n    }\n  }\n}\n\n/**\n * Remove the worktree checkout at `worktreePath` (per CWD DISCIPLINE above:\n * always run from `repoRoot`, never from inside `worktreePath`). Does NOT\n * delete the branch itself — the branch is the durable D1-level proposal\n * artifact (per D4) and survives worktree teardown for human/review to\n * inspect or merge later.\n */\nexport function removeWorktree(repoRoot, worktreePath, opts = {}) {\n  const args = ['worktree', 'remove', worktreePath];\n  if (opts.force) args.push('--force');\n  try {\n    git(repoRoot, args);\n  } catch (err) {\n    throw new WorktreeError(`git worktree remove failed for \"${worktreePath}\": ${err.message}`, {\n      worktreePath,\n    });\n  }\n  try {\n    git(repoRoot, ['worktree', 'prune']);\n  } catch {\n    // best-effort — a failed prune does not invalidate a successful remove.\n  }\n}\n\n/**\n * List every `fgw/*` branch left in `repoRoot`, each with its `aheadCount`\n * (commits reachable from the branch but not from its merge-base with\n * `opts.base`, default `HEAD`). POLICY (caller's to enforce, documented\n * here since this is where the fact is computed): `aheadCount === 0` means\n * an orphan — a worktree that was created and torn down without ever\n * committing anything on it — safe for a caller's prune loop to delete\n * outright; `aheadCount > 0` means the branch carries a real proposal and\n * must be kept for human/review, never auto-deleted.\n */\nexport function listLeftovers(repoRoot, opts = {}) {\n  const base = opts.base ?? 'HEAD';\n  let refsOut;\n  try {\n    refsOut = git(repoRoot, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);\n  } catch (err) {\n    throw new WorktreeError(`listing \"fgw/\" branches failed: ${err.message}`, {});\n  }\n\n  const branches = refsOut\n    .split('\\n')\n    .map((line) => line.trim())\n    .filter(Boolean);\n\n  return branches.map((branch) => {\n    let aheadCount;\n    try {\n      const mergeBase = git(repoRoot, ['merge-base', base, branch]).trim();\n      const countOut = git(repoRoot, ['rev-list', '--count', `${mergeBase}..${branch}`]);\n      aheadCount = parseInt(countOut.trim(), 10) || 0;\n    } catch (err) {\n      throw new WorktreeError(`computing ahead-count for branch \"${branch}\" failed: ${err.message}`, {\n        branch,\n      });\n    }\n    return { branch, aheadCount };\n  });\n}\n"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+      "seam": "cli-help-messages",
+      "kind": "record-metadata",
+      "value": {
+        "file": "src/runner/worktree.mjs",
+        "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+        "sourceMode": "100644",
+        "censusOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "seamIds": [
+          "cli-help-messages"
+        ],
+        "wholeFileRead": true,
+        "wholeFileReadEvidence": {
+          "bytes": 78643,
+          "lines": 1615,
+          "sha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+          "method": "Complete body read by authoring pass; every frozen literal/current passage and dynamic tuple classified; independent whole-context semantic review pending."
+        },
+        "inheritedCarries": [],
+        "diff": "--- a/src/runner/worktree.mjs\n+++ b/src/runner/worktree.mjs\n@@ -1085,7 +1085,7 @@\n \n   if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n     throw new WorktreeError(\n-      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n+      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n       { branch, worktreePath, lastSynced, branchTip },\n     );\n   }\n",
+        "expectedAfterSha256": "10560a188e78a1be725a7b57ed095b7bddda63216c3c00e0b08f79b47396af21",
+        "rollbackDiff": "--- a/src/runner/worktree.mjs\n+++ b/src/runner/worktree.mjs\n@@ -1085,7 +1085,7 @@\n \n   if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n     throw new WorktreeError(\n-      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n+      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n       { branch, worktreePath, lastSynced, branchTip },\n     );\n   }\n",
+        "coCutPaths": [
+          "CHANGELOG.md",
+          "test/runner/worktree.test.mjs"
+        ],
+        "receiptIds": [
+          "cli-help-messages-pilot"
+        ],
+        "protectedPins": {
+          "scripts/generate-shipped-path-inventory.mjs": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+          "plans/260925-documentation-authority-unification/transitional-switchboard.json": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "docs/transitional-switchboard.md": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+          "AGENTS.md": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+          "CLAUDE.md": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
+          "scripts/check-legacy-docs-ratchet.mjs": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
+          "scripts/check-legacy-docs-ratchet.baseline.json": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8"
+        },
+        "parked": [],
+        "review": {
+          "status": "pending",
+          "reviewer": null,
+          "report": null
+        }
+      }
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+      "seam": "cli-help-messages",
+      "kind": "references",
+      "index": 0,
+      "value": {
+        "referenceId": "reference-003784",
+        "admission": "ADMIT",
+        "inventory": "step-02l-census-class6.json",
+        "edgeId": "class6-l-000333",
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryOrigins": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "id": "class6-l-000333",
+            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+          }
+        ],
+        "slotKey": null,
+        "sourceSpans": [
+          {
+            "line": 1088,
+            "columnStart": 484,
+            "columnEndExclusive": 559,
+            "text": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
+          }
+        ],
+        "originalSourceSpans": [
+          {
+            "columnEndExclusive": 559,
+            "columnStart": 484,
+            "line": 949,
+            "text": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
+          }
+        ],
+        "matchedExpression": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+        "passage": "  if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n    throw new WorktreeError(\n      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n      { branch, worktreePath, lastSynced, branchTip },\n    );",
+        "passageSpan": {
+          "startLine": 1086,
+          "endLine": 1090
+        },
+        "role": "emitted-message",
+        "disposition": "patch",
+        "reason": "Executable data/message/file operation in own passage: '  if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\\n    throw new WorktreeError(\\n      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch\\'s current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\\n      { branch, worktreePath, lastSynced, branchTip },\\n    );' The exact registry alias names currentPath docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md; Phase 9 changes this emitted pointer only.",
+        "target": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+        "anchor": null,
+        "resolverWitness": {
+          "target": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "docId": "how-to-tell-a-stale-worktree-index-apart-from-real-uncommitted-work:tell-a-stale-worktree-index-apart-from-real-uncommitted-work",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "targetSha256": "244a4504e597b7f82e136e10591700372c52626b425931a69bbba2e392d65478",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        },
+        "timing": "phase9",
+        "diffHunk": "--- a/src/runner/worktree.mjs\n+++ b/src/runner/worktree.mjs\n@@ -1085,7 +1085,7 @@\n \n   if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n     throw new WorktreeError(\n-      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n+      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n       { branch, worktreePath, lastSynced, branchTip },\n     );\n   }\n",
+        "blockedCategory": null,
+        "blockedReason": null,
+        "dependency": null,
+        "dependencyCategory": null,
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": false,
+          "destinationIsAlias": false,
+          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+        },
+        "proposedReplacement": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+        "priorRecordRefs": [
+          {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+            "recordSha256": "164be32089036bab3177b993ab38db740650653c18d9c3137a740c37798e7fb0",
+            "matchingSlots": []
+          }
+        ],
+        "fixtureProvenance": null,
+        "rejectionRule": null,
+        "receiptId": "cli-help-messages-pilot",
+        "proofCommand": "missing",
+        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "parityObligation": {
+          "current": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "candidate": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
+          "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+            "docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+            "docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/runner/worktree.test.mjs",
+              "line": 768,
+              "text": "    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,",
+              "sourceSha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+      "seam": "cli-help-messages",
       "kind": "priorRecordRefs",
       "index": 0,
       "value": {
@@ -262,7 +432,8 @@
         "expectedAfterSha256": "695215a9ab63d21a5eef2d314aa146e65269cc078efeb0462c7b252cb8c22c02",
         "rollbackDiff": "--- a/src/state/events-jsonl-truncation-guard.mjs\n+++ b/src/state/events-jsonl-truncation-guard.mjs\n@@ -137,7 +137,7 @@\n     return {\n       ok: false,\n       reason: \"content-mismatch\",\n-      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,\n+      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n       mark: currentMark,\n     };\n   }\n",
         "coCutPaths": [
-          "CHANGELOG.md"
+          "CHANGELOG.md",
+          "test/setup/checks.test.mjs"
         ],
         "receiptIds": [
           "cli-help-messages-pilot"
@@ -371,6 +542,24 @@
           "candidate": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
+            "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/setup/checks.test.mjs",
+              "line": 342,
+              "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+            }
+          ]
         }
       }
     },
@@ -4188,7 +4377,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/agy-permission-capability-allowlist/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -6252,404 +6441,6 @@
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${mark} ${label}${suffix}`'. It formats values at export function formatCheck(passed, label, detail) {; contains no documentation-location operand and is not a filesystem operation.",
         "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${mark} ${label}${suffix}`'. It formats values at export function formatCheck(passed, label, detail) {; contains no documentation-location operand and is not a filesystem operation.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/bin-discovery.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
-      "seam": "setup-doctor-roots",
-      "kind": "source-context",
-      "startLine": 1,
-      "endLine": 145,
-      "text": "// bin-discovery.mjs — 3-tier deterministic fgos bin resolution (tsk-2qc-1,\n// D2/D4 of docs/history/install-setup-external-project-reliability/\n// CONTEXT.md).\n//\n// Tier 1 (dev-checkout self-hosting) and tier 2 (project-local install) are\n// cheap file-checks, re-run on every call -- no caching needed. Tier 3\n// (global install) is the only tier that needs a PATH lookup (a real\n// subprocess spawn), so it is config-cached (D4): `fgos setup`/`doctor\n// --fix` populate the global config's `bin.globalFgosPath` once via\n// `refreshGlobalBinCache`; every other caller reads that cached path first\n// and only falls back to a live PATH probe when the cached path no longer\n// exists on disk (self-heal via a cheap `existsSync` check) or the cache\n// was never populated at all.\n\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { execFileSync } from 'node:child_process';\nimport { loadGlobalConfig, writeGlobalConfig } from '../config/global-config.mjs';\nimport { hostBinFromActivation } from '../util/host-bin-path.mjs';\n\n/**\n * Tier 0: the Rust host binary the workspace's fgctl activation runs, by the\n * same rule as the fgctl shim (src/util/host-bin-path.mjs): a ready\n * `<cwd>/.fgos/installation/activation.json`, binary at\n * `<releasePath>/bin/fgos`, executable and really inside the release (a\n * symlink escaping it is refused).\n */\nexport function resolveWorkspaceInstallationBin(cwd) {\n  return hostBinFromActivation(path.join(cwd, '.fgos', 'installation'));\n}\n\n/**\n * Tier 1: dev-checkout self-hosting -- `cwd` itself is a forgent checkout.\n */\nexport function resolveDevCheckoutBin(cwd) {\n  const candidate = path.join(cwd, 'bin', 'fgos.mjs');\n  return fs.existsSync(candidate) ? candidate : null;\n}\n\n/**\n * Tier 2: project-local install (`node_modules/.bin/fgos`, kept as a real\n * mode for cross-project version pinning per D2). Walks up from `startDir`\n * the same way Node's own module resolution does -- bounded by the\n * filesystem root, never infinite.\n */\nexport function resolveProjectLocalBin(startDir) {\n  let dir = path.resolve(startDir);\n  for (;;) {\n    const candidate = path.join(dir, 'node_modules', '.bin', 'fgos');\n    if (fs.existsSync(candidate)) return candidate;\n    const parent = path.dirname(dir);\n    if (parent === dir) return null;\n    dir = parent;\n  }\n}\n\n/**\n * Tier 3, live: a real `command -v fgos` PATH probe (a subprocess spawn --\n * never called on a hot path without the cache-first check below first).\n */\nexport function probeGlobalBin() {\n  const dirs = typeof process.env.PATH === 'string' && process.env.PATH\n    ? process.env.PATH.split(path.delimiter).filter(Boolean)\n    : [];\n  const exts = process.platform === 'win32'\n    ? (process.env.PATHEXT || '.EXE;.CMD;.BAT').split(';').filter(Boolean)\n    : [''];\n  for (const dir of dirs) {\n    const candidates = process.platform === 'win32' ? ['', ...exts] : [''];\n    for (const ext of candidates) {\n      const candidatePath = path.join(dir, `fgos${ext}`);\n      try {\n        fs.accessSync(candidatePath, fs.constants.X_OK);\n        return candidatePath;\n      } catch {\n        // keep scanning\n      }\n    }\n  }\n  return null;\n}\n\n/**\n * Tier 3, cache-first (D4): the cached path, only if it still exists on\n * disk. Never spawns a subprocess -- a stale/missing cache resolves to\n * `null` here, letting the caller fall back to `probeGlobalBin`.\n */\nexport function cachedGlobalBin(globalConfigPath = undefined) {\n  const cached = loadGlobalConfig(globalConfigPath)?.bin?.globalFgosPath;\n  return typeof cached === 'string' && cached && fs.existsSync(cached) ? cached : null;\n}\n\n/**\n * Populate (or refresh) the global config's cached tier-3 path. The one\n * write this module performs -- called only from `fgos setup`/`doctor\n * --fix` (D4: \"multi-tier probing is a one-time populate/repair step\",\n * never run on every call). Clears the cached key when nothing resolves,\n * rather than leaving a stale path behind.\n *\n * Only writes when the resolved value actually differs from what is\n * already cached (`fgos setup` calls every registered fix unconditionally\n * on every run, `bin/fgos.mjs`'s own `runFixes(repoRoot)` call -- an\n * unconditional write here would break `fgos setup`'s own idempotency\n * guarantee, \"run twice does not rewrite an already-complete config\",\n * the same discipline `ensureSharedConfigDefaults`/`insertSourceLine`\n * already apply to their own write paths).\n */\nexport function refreshGlobalBinCache(globalConfigPath = undefined) {\n  const resolved = probeGlobalBin();\n  const existing = loadGlobalConfig(globalConfigPath);\n  const currentCached = existing.bin?.globalFgosPath ?? null;\n  if ((resolved ?? null) === currentCached) {\n    return { resolved, changed: false };\n  }\n  const bin = { ...(existing.bin ?? {}) };\n  if (resolved) {\n    bin.globalFgosPath = resolved;\n  } else {\n    delete bin.globalFgosPath;\n  }\n  writeGlobalConfig({ ...existing, bin }, globalConfigPath);\n  return { resolved, changed: true };\n}\n\n/**\n * The full 4-tier resolution (D2 plus the tier-0 workspace-installation\n * shim), in priority order:\n * workspace installation (tier 0) > dev-checkout (tier 1) >\n * project-local (tier 2) > global (tier 3, cache-first with a live\n * fallback so a cold cache never hard-fails). Returns `{ tier, path }` or\n * `null` when nothing resolves at any tier.\n */\nexport function resolveFgosBin(cwd, { globalConfigPath = undefined } = {}) {\n  const workspaceBin = resolveWorkspaceInstallationBin(cwd);\n  if (workspaceBin) return { tier: 0, path: workspaceBin };\n  const devBin = resolveDevCheckoutBin(cwd);\n  if (devBin) return { tier: 1, path: devBin };\n  const projectLocalBin = resolveProjectLocalBin(cwd);\n  if (projectLocalBin) return { tier: 2, path: projectLocalBin };\n  const cached = cachedGlobalBin(globalConfigPath);\n  if (cached) return { tier: 3, path: cached };\n  const live = probeGlobalBin();\n  if (live) return { tier: 3, path: live };\n  return null;\n}\n"
-    },
-    {
-      "file": "src/setup/bin-discovery.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
-      "seam": "setup-doctor-roots",
-      "kind": "record-metadata",
-      "value": {
-        "file": "src/setup/bin-discovery.mjs",
-        "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-        "sourceSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
-        "sourceMode": "100644",
-        "censusOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "seamIds": [
-          "setup-doctor-roots"
-        ],
-        "wholeFileRead": true,
-        "wholeFileReadEvidence": {
-          "bytes": 5948,
-          "lines": 145,
-          "sha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
-          "method": "Complete body read by authoring pass; every frozen literal/current passage and dynamic tuple classified; independent whole-context semantic review pending."
-        },
-        "inheritedCarries": [],
-        "diff": null,
-        "expectedAfterSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
-        "rollbackDiff": null,
-        "coCutPaths": [],
-        "receiptIds": [
-          "setup-doctor-roots-pilot"
-        ],
-        "protectedPins": {
-          "scripts/generate-shipped-path-inventory.mjs": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
-          "plans/260925-documentation-authority-unification/transitional-switchboard.json": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
-          "docs/transitional-switchboard.md": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
-          "AGENTS.md": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
-          "CLAUDE.md": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
-          "scripts/check-legacy-docs-ratchet.mjs": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
-          "scripts/check-legacy-docs-ratchet.baseline.json": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8"
-        },
-        "parked": [],
-        "review": {
-          "status": "pending",
-          "reviewer": null,
-          "report": null
-        }
-      }
-    },
-    {
-      "file": "src/setup/bin-discovery.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
-      "seam": "setup-doctor-roots",
-      "kind": "references",
-      "index": 0,
-      "value": {
-        "referenceId": "reference-003794",
-        "admission": "REJECT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000340",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000340",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 2,
-            "columnStart": 13,
-            "columnEndExclusive": 69,
-            "text": "docs/history/install-setup-external-project-reliability/"
-          },
-          {
-            "line": 3,
-            "columnStart": 1,
-            "columnEndExclusive": 14,
-            "text": "// CONTEXT.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 69,
-            "columnStart": 13,
-            "line": 2,
-            "text": "docs/history/install-setup-external-project-reliability/"
-          },
-          {
-            "columnEndExclusive": 14,
-            "columnStart": 1,
-            "line": 3,
-            "text": "// CONTEXT.md"
-          }
-        ],
-        "matchedExpression": "docs/history/install-setup-external-project-reliability/\n// CONTEXT.md",
-        "passage": "// bin-discovery.mjs — 3-tier deterministic fgos bin resolution (tsk-2qc-1,\n// D2/D4 of docs/history/install-setup-external-project-reliability/\n// CONTEXT.md).\n//\n// Tier 1 (dev-checkout self-hosting) and tier 2 (project-local install) are",
-        "passageSpan": {
-          "startLine": 1,
-          "endLine": 5
-        },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: '// bin-discovery.mjs — 3-tier deterministic fgos bin resolution (tsk-2qc-1,\\n// D2/D4 of docs/history/install-setup-external-project-reliability/\\n// CONTEXT.md).\\n//\\n// Tier 1 (dev-checkout self-hosting) and tier 2 (project-local install) are'",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/install-setup-external-project-reliability/CONTEXT.md",
-          "exists": true
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": "history-design-contract-evidence",
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/bin-discovery.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 0,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-013559",
-        "originalTuple": [
-          108,
-          39,
-          108,
-          70,
-          "globalConfigPath = undefined) {",
-          "config/default-root",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 108,
-        "currentPassage": {
-          "startLine": 106,
-          "endLine": 110,
-          "text": " * already apply to their own write paths).\n */\nexport function refreshGlobalBinCache(globalConfigPath = undefined) {\n  const resolved = probeGlobalBin();\n  const existing = loadGlobalConfig(globalConfigPath);"
-        },
-        "caller": {
-          "line": 108,
-          "declaration": "export function refreshGlobalBinCache(globalConfigPath = undefined) {"
-        },
-        "inputs": [
-          "globalConfigPath = undefined) {"
-        ],
-        "role": "non-document-infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete owning subsystem: installed host/legacy payload resolution. export function refreshGlobalBinCache(globalConfigPath = undefined) { uses 'globalConfigPath = undefined) {' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
-        "reason": "Concrete owning subsystem: installed host/legacy payload resolution. export function refreshGlobalBinCache(globalConfigPath = undefined) { uses 'globalConfigPath = undefined) {' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/bin-discovery.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 1,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-013560",
-        "originalTuple": [
-          111,
-          39,
-          111,
-          61,
-          "globalFgosPath ?? null",
-          "config/default-root",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 111,
-        "currentPassage": {
-          "startLine": 109,
-          "endLine": 113,
-          "text": "  const resolved = probeGlobalBin();\n  const existing = loadGlobalConfig(globalConfigPath);\n  const currentCached = existing.bin?.globalFgosPath ?? null;\n  if ((resolved ?? null) === currentCached) {\n    return { resolved, changed: false };"
-        },
-        "caller": {
-          "line": 108,
-          "declaration": "export function refreshGlobalBinCache(globalConfigPath = undefined) {"
-        },
-        "inputs": [
-          "globalFgosPath ?? null"
-        ],
-        "role": "non-document-infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete owning subsystem: installed host/legacy payload resolution. export function refreshGlobalBinCache(globalConfigPath = undefined) { uses 'globalFgosPath ?? null' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
-        "reason": "Concrete owning subsystem: installed host/legacy payload resolution. export function refreshGlobalBinCache(globalConfigPath = undefined) { uses 'globalFgosPath ?? null' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/bin-discovery.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 2,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-013561",
-        "originalTuple": [
-          117,
-          9,
-          117,
-          34,
-          "globalFgosPath = resolved",
-          "config/default-root",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 117,
-        "currentPassage": {
-          "startLine": 115,
-          "endLine": 119,
-          "text": "  const bin = { ...(existing.bin ?? {}) };\n  if (resolved) {\n    bin.globalFgosPath = resolved;\n  } else {\n    delete bin.globalFgosPath;"
-        },
-        "caller": {
-          "line": 108,
-          "declaration": "export function refreshGlobalBinCache(globalConfigPath = undefined) {"
-        },
-        "inputs": [
-          "globalFgosPath = resolved"
-        ],
-        "role": "non-document-infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete owning subsystem: installed host/legacy payload resolution. export function refreshGlobalBinCache(globalConfigPath = undefined) { uses 'globalFgosPath = resolved' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
-        "reason": "Concrete owning subsystem: installed host/legacy payload resolution. export function refreshGlobalBinCache(globalConfigPath = undefined) { uses 'globalFgosPath = resolved' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/bin-discovery.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 3,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-013562",
-        "originalTuple": [
-          133,
-          39,
-          133,
-          77,
-          "globalConfigPath = undefined } = {}) {",
-          "config/default-root",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 133,
-        "currentPassage": {
-          "startLine": 131,
-          "endLine": 135,
-          "text": " * `null` when nothing resolves at any tier.\n */\nexport function resolveFgosBin(cwd, { globalConfigPath = undefined } = {}) {\n  const workspaceBin = resolveWorkspaceInstallationBin(cwd);\n  if (workspaceBin) return { tier: 0, path: workspaceBin };"
-        },
-        "caller": {
-          "line": 133,
-          "declaration": "export function resolveFgosBin(cwd, { globalConfigPath = undefined } = {}) {"
-        },
-        "inputs": [
-          "globalConfigPath = undefined } = {}) {"
-        ],
-        "role": "non-document-infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete owning subsystem: installed host/legacy payload resolution. export function resolveFgosBin(cwd, { globalConfigPath = undefined } = {}) { uses 'globalConfigPath = undefined } = {}) {' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
-        "reason": "Concrete owning subsystem: installed host/legacy payload resolution. export function resolveFgosBin(cwd, { globalConfigPath = undefined } = {}) { uses 'globalConfigPath = undefined } = {}) {' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/bin-discovery.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 4,
-      "value": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-013563",
-        "originalTuple": [
-          135,
-          39,
-          135,
-          59,
-          "path: workspaceBin }",
-          "config/default-root",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 135,
-        "currentPassage": {
-          "startLine": 133,
-          "endLine": 137,
-          "text": "export function resolveFgosBin(cwd, { globalConfigPath = undefined } = {}) {\n  const workspaceBin = resolveWorkspaceInstallationBin(cwd);\n  if (workspaceBin) return { tier: 0, path: workspaceBin };\n  const devBin = resolveDevCheckoutBin(cwd);\n  if (devBin) return { tier: 1, path: devBin };"
-        },
-        "caller": {
-          "line": 133,
-          "declaration": "export function resolveFgosBin(cwd, { globalConfigPath = undefined } = {}) {"
-        },
-        "inputs": [
-          "path: workspaceBin }"
-        ],
-        "role": "non-document-infrastructure",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete owning subsystem: installed host/legacy payload resolution. export function resolveFgosBin(cwd, { globalConfigPath = undefined } = {}) { uses 'path: workspaceBin }' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
-        "reason": "Concrete owning subsystem: installed host/legacy payload resolution. export function resolveFgosBin(cwd, { globalConfigPath = undefined } = {}) { uses 'path: workspaceBin }' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"

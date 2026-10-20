@@ -8,6 +8,350 @@
       "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
       "seam": "cli-help-messages",
       "kind": "references",
+      "index": 20,
+      "value": {
+        "referenceId": "reference-003661",
+        "admission": "ADMIT",
+        "inventory": "step-02l-census-class6.json",
+        "edgeId": "class6-l-000216",
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryOrigins": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "id": "class6-l-000216",
+            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+          }
+        ],
+        "slotKey": null,
+        "sourceSpans": [
+          {
+            "line": 1034,
+            "columnStart": 65,
+            "columnEndExclusive": 96,
+            "text": "docs/history/tsk-19j/CONTEXT.md"
+          }
+        ],
+        "originalSourceSpans": [
+          {
+            "columnEndExclusive": 96,
+            "columnStart": 65,
+            "line": 1030,
+            "text": "docs/history/tsk-19j/CONTEXT.md"
+          }
+        ],
+        "matchedExpression": "docs/history/tsk-19j/CONTEXT.md",
+        "passage": "    },\n    examples: [\n      'fgos gate-check tsk-19j --gate contextApprove --artifact docs/history/tsk-19j/CONTEXT.md',\n      'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children \"[]\" --cost REVERSIBLE',\n    ],",
+        "passageSpan": {
+          "startLine": 1032,
+          "endLine": 1036
+        },
+        "role": "emitted-message",
+        "disposition": "preserve",
+        "reason": "Executable data/message/file operation in own passage: '    },\\n    examples: [\\n      \\'fgos gate-check tsk-19j --gate contextApprove --artifact docs/history/tsk-19j/CONTEXT.md\\',\\n      \\'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children \"[]\" --cost REVERSIBLE\\',\\n    ],' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "target": null,
+        "anchor": null,
+        "resolverWitness": {
+          "rule": "retained/external project or comment; no replacement claimed",
+          "currentPath": "docs/history/tsk-19j/CONTEXT.md",
+          "exists": false
+        },
+        "timing": "none",
+        "diffHunk": null,
+        "blockedCategory": null,
+        "blockedReason": null,
+        "dependency": null,
+        "dependencyCategory": null,
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": false,
+          "destinationIsAlias": false,
+          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+        },
+        "proposedReplacement": null,
+        "priorRecordRefs": [
+          {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+            "recordSha256": "898023ac4d86282c9921b35f4a4262593b09648dcab538a71beefaddcc651f51",
+            "matchingSlots": []
+          }
+        ],
+        "fixtureProvenance": null,
+        "rejectionRule": null,
+        "receiptId": "cli-help-messages-pilot",
+        "proofCommand": "missing",
+        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "parityObligation": {
+          "current": "docs/history/tsk-19j/CONTEXT.md",
+          "candidate": "docs/history/tsk-19j/CONTEXT.md",
+          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
+          "blocker": null
+        }
+      }
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "seam": "cli-help-messages",
+      "kind": "references",
+      "index": 21,
+      "value": {
+        "referenceId": "reference-003662",
+        "admission": "ADMIT",
+        "inventory": "step-02-census-cli-help.json",
+        "edgeId": "cli-009",
+        "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryOrigins": [
+          {
+            "inventory": "step-02-census-cli-help.json",
+            "id": "cli-009",
+            "pin": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a"
+          }
+        ],
+        "slotKey": null,
+        "sourceSpans": [
+          {
+            "line": 1035,
+            "columnStart": 62,
+            "columnEndExclusive": 90,
+            "text": "docs/history/tsk-19j/plan.md"
+          }
+        ],
+        "originalSourceSpans": [
+          {
+            "line": 1035,
+            "columnStart": 62,
+            "columnEndExclusive": 90,
+            "text": "docs/history/tsk-19j/plan.md"
+          }
+        ],
+        "matchedExpression": "docs/history/tsk-19j/plan.md",
+        "passage": "    examples: [\n      'fgos gate-check tsk-19j --gate contextApprove --artifact docs/history/tsk-19j/CONTEXT.md',\n      'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children \"[]\" --cost REVERSIBLE',\n    ],\n    touchesState: false,",
+        "passageSpan": {
+          "startLine": 1033,
+          "endLine": 1037
+        },
+        "role": "emitted-message",
+        "disposition": "preserve",
+        "reason": "Executable data/message/file operation in own passage: '    examples: [\\n      \\'fgos gate-check tsk-19j --gate contextApprove --artifact docs/history/tsk-19j/CONTEXT.md\\',\\n      \\'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children \"[]\" --cost REVERSIBLE\\',\\n    ],\\n    touchesState: false,' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "target": null,
+        "anchor": null,
+        "resolverWitness": {
+          "rule": "retained/external project or comment; no replacement claimed",
+          "currentPath": null,
+          "exists": false
+        },
+        "timing": "none",
+        "diffHunk": null,
+        "blockedCategory": null,
+        "blockedReason": null,
+        "dependency": null,
+        "dependencyCategory": null,
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": false,
+          "destinationIsAlias": false,
+          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+        },
+        "proposedReplacement": null,
+        "priorRecordRefs": [
+          {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+            "recordSha256": "898023ac4d86282c9921b35f4a4262593b09648dcab538a71beefaddcc651f51",
+            "matchingSlots": []
+          }
+        ],
+        "fixtureProvenance": null,
+        "rejectionRule": null,
+        "receiptId": "cli-help-messages-pilot",
+        "proofCommand": "missing",
+        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "parityObligation": {
+          "current": "docs/history/tsk-19j/plan.md",
+          "candidate": "docs/history/tsk-19j/plan.md",
+          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
+          "blocker": null
+        }
+      }
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "seam": "cli-help-messages",
+      "kind": "references",
+      "index": 22,
+      "value": {
+        "referenceId": "reference-003663",
+        "admission": "ADMIT",
+        "inventory": "step-02-census-cli-help.json",
+        "edgeId": "cli-010",
+        "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryOrigins": [
+          {
+            "inventory": "step-02-census-cli-help.json",
+            "id": "cli-010",
+            "pin": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a"
+          }
+        ],
+        "slotKey": null,
+        "sourceSpans": [
+          {
+            "line": 1864,
+            "columnStart": 72,
+            "columnEndExclusive": 92,
+            "text": "docs/doc-registry.md"
+          }
+        ],
+        "originalSourceSpans": [
+          {
+            "line": 1864,
+            "columnStart": 72,
+            "columnEndExclusive": 92,
+            "text": "docs/doc-registry.md"
+          }
+        ],
+        "matchedExpression": "docs/doc-registry.md",
+        "passage": "    name: 'doc-registry',\n    invoke: 'fgos doc-registry',\n    description: 'Generate machine (docs/doc-registry.json) and human (docs/doc-registry.md) projection files for the knowledge registry.',\n    parameters: { type: 'object', properties: {}, required: [] },\n    examples: ['fgos doc-registry'],",
+        "passageSpan": {
+          "startLine": 1862,
+          "endLine": 1866
+        },
+        "role": "emitted-message",
+        "disposition": "preserve",
+        "reason": "Executable data/message/file operation in own passage: \"    name: 'doc-registry',\\n    invoke: 'fgos doc-registry',\\n    description: 'Generate machine (docs/doc-registry.json) and human (docs/doc-registry.md) projection files for the knowledge registry.',\\n    parameters: { type: 'object', properties: {}, required: [] },\\n    examples: ['fgos doc-registry'],\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "target": null,
+        "anchor": null,
+        "resolverWitness": {
+          "rule": "retained/external project or comment; no replacement claimed",
+          "currentPath": null,
+          "exists": false
+        },
+        "timing": "none",
+        "diffHunk": null,
+        "blockedCategory": null,
+        "blockedReason": null,
+        "dependency": null,
+        "dependencyCategory": null,
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": false,
+          "destinationIsAlias": false,
+          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+        },
+        "proposedReplacement": null,
+        "priorRecordRefs": [
+          {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+            "recordSha256": "898023ac4d86282c9921b35f4a4262593b09648dcab538a71beefaddcc651f51",
+            "matchingSlots": []
+          }
+        ],
+        "fixtureProvenance": null,
+        "rejectionRule": null,
+        "receiptId": "cli-help-messages-pilot",
+        "proofCommand": "missing",
+        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "parityObligation": {
+          "current": "docs/doc-registry.md",
+          "candidate": "docs/doc-registry.md",
+          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
+          "blocker": null
+        }
+      }
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "seam": "cli-help-messages",
+      "kind": "references",
+      "index": 23,
+      "value": {
+        "referenceId": "reference-003664",
+        "admission": "ADMIT",
+        "inventory": "step-02-census-cli-help.json",
+        "edgeId": "cli-011",
+        "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryOrigins": [
+          {
+            "inventory": "step-02-census-cli-help.json",
+            "id": "cli-011",
+            "pin": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a"
+          }
+        ],
+        "slotKey": null,
+        "sourceSpans": [
+          {
+            "line": 2075,
+            "columnStart": 383,
+            "columnEndExclusive": 409,
+            "text": "docs/specs/distribution.md"
+          }
+        ],
+        "originalSourceSpans": [
+          {
+            "line": 2075,
+            "columnStart": 383,
+            "columnEndExclusive": 409,
+            "text": "docs/specs/distribution.md"
+          }
+        ],
+        "matchedExpression": "docs/specs/distribution.md",
+        "passage": "    name: 'doctor',\n    invoke: 'fgos doctor',\n    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n    parameters: {\n      type: 'object',",
+        "passageSpan": {
+          "startLine": 2073,
+          "endLine": 2077
+        },
+        "role": "emitted-message",
+        "disposition": "preserve",
+        "reason": "Executable data/message/file operation in own passage: \"    name: 'doctor',\\n    invoke: 'fgos doctor',\\n    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\\n    parameters: {\\n      type: 'object',\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "target": null,
+        "anchor": null,
+        "resolverWitness": {
+          "rule": "retained/external project or comment; no replacement claimed",
+          "currentPath": null,
+          "exists": false
+        },
+        "timing": "none",
+        "diffHunk": null,
+        "blockedCategory": null,
+        "blockedReason": null,
+        "dependency": null,
+        "dependencyCategory": null,
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": false,
+          "destinationIsAlias": false,
+          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+        },
+        "proposedReplacement": null,
+        "priorRecordRefs": [
+          {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+            "recordSha256": "898023ac4d86282c9921b35f4a4262593b09648dcab538a71beefaddcc651f51",
+            "matchingSlots": []
+          }
+        ],
+        "fixtureProvenance": null,
+        "rejectionRule": null,
+        "receiptId": "cli-help-messages-pilot",
+        "proofCommand": "missing",
+        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "parityObligation": {
+          "current": "docs/specs/distribution.md",
+          "candidate": "docs/specs/distribution.md",
+          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
+          "blocker": null
+        }
+      }
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "seam": "cli-help-messages",
+      "kind": "references",
       "index": 24,
       "value": {
         "referenceId": "reference-003665",
@@ -47,7 +391,7 @@
         },
         "role": "emitted-message",
         "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: '        source: { type: \\'string\\', description: \\'Free text identifying who/what made the decision (optional, defaults to \"session\").\\' },\\n        id: { type: \\'string\\', description: \\'Work item id to also fold this decision under (optional; omit for the global log only).\\' },\\n        relation: { type: \\'string\\', description: \\'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.\\' },\\n        scope: { type: \\'string\\', description: \\'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.\\' },\\n      },' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "reason": "Executable data/message/file operation in own passage: '        source: { type: \\'string\\', description: \\'Free text identifying who/what made the decision (optional, defaults to \"session\").\\' },\\n        id: { type: \\'string\\', description: \\'Work item id to also fold this decision under (optional; omit for the global log only).\\' },\\n        relation: { type: \\'string\\', description: \\'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.\\' },\\n        scope: { type: \\'string\\', description: \\'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.\\' },\\n      },' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass. L12-69: bare directory/help scan-scope text preserves; any later citation-root change co-cuts the owning citation seam.",
         "target": null,
         "anchor": null,
         "resolverWitness": {
@@ -132,8 +476,8 @@
           "endLine": 848
         },
         "role": "emitted-message",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: '        id: { type: \\'string\\', description: \\'Work item id to also fold this decision under (optional; omit for the global log only).\\' },\\n        relation: { type: \\'string\\', description: \\'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.\\' },\\n        scope: { type: \\'string\\', description: \\'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.\\' },\\n      },\\n      positional: [\\'text\\'],' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "disposition": "parked",
+        "reason": "L12-69: Generic scope/quadrant help must co-cut its owning construction and generator/default contract; no generic root substitution. Exact text candidate awaits source/default receipt. Own passage '        id: { type: \\'string\\', description: \\'Work item id to also fold this decision under (optional; omit for the global log only).\\' },\\n        relation: { type: \\'string\\', description: \\'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.\\' },\\n        scope: { type: \\'string\\', description: \\'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.\\' },\\n      },\\n      positional: [\\'text\\'],'",
         "target": null,
         "anchor": null,
         "resolverWitness": {
@@ -141,12 +485,12 @@
           "currentPath": null,
           "exists": false
         },
-        "timing": "none",
+        "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
+        "blockedCategory": "step5-parity",
+        "blockedReason": "Generic scope/quadrant help must co-cut its owning construction and generator/default contract; no generic root substitution. Exact text candidate awaits source/default receipt.",
+        "dependency": "Generic scope/quadrant help must co-cut its owning construction and generator/default contract; no generic root substitution. Exact text candidate awaits source/default receipt.",
+        "dependencyCategory": "step5-parity",
         "successorNote": null,
         "aliasWriteCheck": {
           "isWriter": false,
@@ -168,10 +512,11 @@
         "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
         "parityObligation": {
           "current": "docs/specs/",
-          "candidate": "docs/specs/",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "Generic scope/quadrant help must co-cut its owning construction and generator/default contract; no generic root substitution. Exact text candidate awaits source/default receipt."
+        },
+        "samePassageOwner": "reference-003643"
       }
     },
     {
@@ -1097,6 +1442,17 @@
           "candidate": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+            "docs\\/explanation\\/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+            "docs\\/explanation\\/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint\\.md"
+          ],
+          "matches": []
         }
       }
     },
@@ -1359,6 +1715,17 @@
           "candidate": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+            "docs\\/how-to\\/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+            "docs\\/how-to\\/avoid-vacuous-pass-with-node-test-test-name-pattern\\.md"
+          ],
+          "matches": []
         }
       }
     },
@@ -1702,7 +2069,8 @@
         "expectedAfterSha256": "255d832c8ce5d6bbc3cf658da358b140587c3a8e24545e41c3c7f27a32a659ea",
         "rollbackDiff": "--- a/src/runner/merge.mjs\n+++ b/src/runner/merge.mjs\n@@ -993,7 +993,7 @@\n }\n \n export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {\n-  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;\n+  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;\n }\n \n // tsk-4gi: `git checkout HEAD -- <path>` is oblivious to merge attributes --\n",
         "coCutPaths": [
-          "CHANGELOG.md"
+          "CHANGELOG.md",
+          "test/runner/merge.test.mjs"
         ],
         "receiptIds": [
           "cli-help-messages-pilot"
@@ -1811,6 +2179,36 @@
           "candidate": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1263,
+              "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1265,
+              "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1497,
+              "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            }
+          ]
         }
       }
     },
@@ -1859,7 +2257,7 @@
         },
         "role": "emitted-message",
         "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: '  const m = oldPath.match(DECISION_FILE_RE);\\n  if (!m) {\\n    throw new MergeError(`renumberDecisionFile: \"${oldPath}\" is not a docs/decisions/NNNN-slug.md path`, { oldPath });\\n  }\\n  const [, oldId, slug] = m;' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "reason": "Executable data/message/file operation in own passage: '  const m = oldPath.match(DECISION_FILE_RE);\\n  if (!m) {\\n    throw new MergeError(`renumberDecisionFile: \"${oldPath}\" is not a docs/decisions/NNNN-slug.md path`, { oldPath });\\n  }\\n  const [, oldId, slug] = m;' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass. L12-69: DECISION_FILE_RE / renumberDecisionFile still describes the retired corpus filename construction; preserve its error with that existing code, rather than claiming this pattern is a retained file.",
         "target": null,
         "anchor": null,
         "resolverWitness": {
@@ -2240,157 +2638,6 @@
       "startLine": 1251,
       "endLine": 1500,
       "text": " * that's provably safe (tsk-2cd: `resyncClaimWorktree` above — the branch\n * may have advanced past this checkout via a child merge while this\n * worktree sat claimed-but-anchored; see that function's own doc for why\n * \"untouched\" was the bug, not the fix). The case was originally routine\n * rather than exotic — an item's claim was released back to `todo` the\n * moment it reached stage `executing` (`releaseClaimOnExecuting`,\n * src/intake/plan.mjs), and the session that held it then claimed it again\n * to do the work, from inside the very worktree the claim stands up.\n * tsk-40m D5 retired that release (a runtime claim now stays active\n * unbroken through clarify->executing, so this exact re-claim-at-executing\n * trigger no longer fires for a new item) — this reattach path stays live\n * for every OTHER reason the same worktree gets claimed again (a stale\n * session reclaimed via claim-lock, a human re-`pick`ing after a crash,\n * legacy pre-migration history), so it is not dead code, just no longer\n * this ONE trigger's routine case. Going through `createWorktree`'s reuse\n * path there would reclaim that live checkout: force-removed when clean —\n * pulling the directory out from under the running session — or a hard\n * failure when dirty. Neither is what a re-claim means.\n *\n * This is why the reattach lives here and not in `createWorktree`: the reuse\n * path is shared with the runner's own retry, which deliberately wants a\n * FRESH directory on the reused branch so a retry never builds on a previous\n * attempt's debris (see RETRY-WITHOUT-SELF-COLLISION in the module doc).\n * Keeping the decision in this wrapper leaves that path, and the\n * merge-ephemeral one, byte-for-byte unchanged.\n */\nexport function createClaimWorktree(repoRoot, id, opts = {}) {\n  const branch = branchNameFor(id);\n  if (branchExists(repoRoot, branch)) {\n    const baseDir = opts.worktreeDir ?? path.join(os.tmpdir(), 'fgos-worktrees');\n    const existing = reattachableCheckout(repoRoot, branch, baseDir);\n    // `reused: true` is the same answer the add-on-an-existing-branch path\n    // already gives, and means the same thing to a caller: this claim did not\n    // fork a new branch.\n    if (existing) {\n      resyncClaimWorktree(repoRoot, existing, branch);\n      return { path: existing, branch, reused: true };\n    }\n    // tsk-55p: no LIVE checkout to reattach to, but the branch ref already\n    // exists -- the decompose-time bare-ref case (createBranchRef, D17),\n    // never yet picked. createWorktree's own reuse path below checks this\n    // branch out exactly as it stands, ignoring opts.baseRef by design (its\n    // own docblock) -- so a branch minted long before this pick, from a\n    // base that has since moved, would stand on that stale tip with no\n    // refresh at all. refreshUnstartedBranch closes that gap HERE, before\n    // the checkout is created, not inside createWorktree itself (shared\n    // with the runner's own retry-without-self-collision dispatch path,\n    // which must stay byte-identical).\n    const refresh = opts.baseRef ? refreshUnstartedBranch(repoRoot, branch, opts.baseRef) : undefined;\n    return { ...createWorktree(repoRoot, id, opts), refresh };\n  }\n  return createWorktree(repoRoot, id, opts);\n}\n\n/**\n * Refreshes `branch` onto `targetRef`'s current tip, but ONLY when `branch`\n * provably has no commits of its own yet (tsk-55p, closing the decompose-\n * to-pick staleness gap: `fgw/<id>` is normally minted at decompose time,\n * `createBranchRef(..., baseRef: 'main')`, then sits untouched until\n * someone picks it -- by which point `main`/its parent may have moved\n * considerably).\n *\n * \"No commits of its own\" is decided the same way D2 requires everywhere\n * else in this module: `branch`'s tip must be its own merge-base with\n * `targetRef` -- i.e. an ancestor of it. That is the literal \"compare the\n * branch's tip to its own base\" test, not \"does a worktree exist for it\" --\n * and it fails CLOSED: any error probing the relationship (a corrupt ref,\n * a detached/unreachable commit) is treated as \"has its own commits, do not\n * touch\", never as license to refresh. Because the check already proved\n * `branch` is an ancestor of `targetRef`, the refresh itself is a provable\n * fast-forward -- the degenerate, always-safe case of merge-target-into-\n * branch (D2: never rebase a branch with commits of its own; there are\n * none here to rewrite).\n *\n * `checkoutPath`, when supplied, refreshes via a real `merge --ff-only`\n * inside that checkout instead of a bare `git branch -f` -- git itself\n * refuses either form if it would discard anything, so both refusal paths\n * downgrade to `{refreshed: false, reason: 'refresh-refused'}` rather than\n * failing the claim outright.\n */\nexport function refreshUnstartedBranch(repoRoot, branch, targetRef, checkoutPath = null) {\n  const branchTip = git(repoRoot, ['rev-parse', branch]).trim();\n  const targetTip = git(repoRoot, ['rev-parse', targetRef]).trim();\n\n  let ahead = 0;\n  let behind = 0;\n  try {\n    const counts = git(repoRoot, ['rev-list', '--left-right', '--count', `${targetRef}...${branch}`]).trim();\n    const [behindStr, aheadStr] = counts.split(/\\s+/);\n    const parsedBehind = Number.parseInt(behindStr, 10);\n    const parsedAhead = Number.parseInt(aheadStr, 10);\n    behind = Number.isFinite(parsedBehind) ? parsedBehind : 0;\n    ahead = Number.isFinite(parsedAhead) ? parsedAhead : 0;\n  } catch {\n    // Rare ref race (e.g. a ref deleted between the two rev-parse calls\n    // above and this rev-list) -- report zero drift rather than throwing;\n    // the ancestor check right below is the real safety gate, not this.\n  }\n\n  if (branchTip === targetTip) {\n    return { target: targetRef, ahead, behind, refreshed: false, reason: 'already-current' };\n  }\n\n  let unstarted = false;\n  try {\n    git(repoRoot, ['merge-base', '--is-ancestor', branch, targetRef]);\n    unstarted = true;\n  } catch {\n    unstarted = false;\n  }\n  if (!unstarted) {\n    return { target: targetRef, ahead, behind, refreshed: false, reason: 'own-commits' };\n  }\n\n  try {\n    if (checkoutPath) {\n      git(repoRoot, ['-C', checkoutPath, 'merge', '--ff-only', targetTip]);\n    } else {\n      git(repoRoot, ['branch', '-f', branch, targetTip]);\n    }\n  } catch (err) {\n    return { target: targetRef, ahead, behind, refreshed: false, reason: 'refresh-refused', detail: err.message };\n  }\n  return { target: targetRef, ahead, behind, refreshed: true, from: branchTip, to: targetTip };\n}\n\n/**\n * merge-ephemeral: a worktree created ONLY to stage one merge (approve's\n * leaf-into-root merge, catchup's target-into-item merge) against a branch\n * that already exists — `opts.baseRef` is never needed here (createWorktree's\n * branch-reuse path ignores it) — and force-removed unconditionally once\n * `fn` settles, whether it returns or throws. Replaces the identical\n * try/finally both call sites used to write out by hand.\n */\n/**\n * The checkout `withMergeEphemeralWorktree` uses for `id`'s branch —\n * detached at the branch's current tip COMMIT, never the branch ref\n * itself. Git only refuses a second checkout of the same BRANCH; a\n * detached checkout of the same commit is unrestricted, so this never\n * inspects, moves, or removes any existing checkout of the branch —\n * including one a person is deliberately keeping open (`ExitWorktree`\n * \"keep\"), clean or dirty, live session or not (docs/history/\n * merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md D1). This\n * sidesteps the conflict entirely rather than detecting and refusing it —\n * `createWorktree`'s own reuse/relocate path above stays exactly as-is\n * for its other callers (`pick`/`take` reclaiming a session's own\n * abandoned checkout, a genuinely different, intentional use case\n * CONTEXT.md D1 explicitly leaves untouched).\n *\n * `fgw/<id>` is normally created EARLY as a ref only, via `createBranchRef`\n * (D17, `loop.mjs`'s own leaf-dispatch call) — but a root only ever driven\n * by a live session (never through the runner's own dispatch loop) never\n * gets that early call, so the branch can genuinely not exist yet the\n * first time a merge needs it (docs/history/\n * tsk-6ch-merge-worktree-branch-fallback/CONTEXT.md). Falling back to\n * `createBranchRef` here — idempotent, same early-creation step\n * `loop.mjs` already uses — replaces that missing step instead of crashing\n * the merge outright. No explicit `baseRef` (tsk-386): `createBranchRef`'s\n * own default already resolves through `detectTrunk(repoRoot)`, never a\n * hardcoded `'main'` — a host repo whose trunk is `master` would otherwise\n * fail this exact fallback outright.\n */\nfunction createDetachedMergeWorktree(repoRoot, id) {\n  const scope = createLockScope('worktree');\n  const branch = branchNameFor(id);\n  if (!branchExists(repoRoot, branch)) {\n    createBranchRef(repoRoot, id);\n  }\n  const startCommit = git(repoRoot, ['rev-parse', branch]).trim();\n  const baseDir = path.join(os.tmpdir(), 'fgos-worktrees');\n  fs.mkdirSync(baseDir, { recursive: true });\n  const worktreePath = fs.mkdtempSync(path.join(baseDir, `${branch.replace(/\\//g, '-')}-merge-`));\n\n  try {\n    addWorktreeSync(scope, repoRoot, ['--detach', worktreePath, startCommit]);\n  } catch (err) {\n    try {\n      fs.rmSync(worktreePath, { recursive: true, force: true });\n    } catch {\n      // best-effort cleanup of the empty dir mkdtemp created; the real\n      // failure below is what the caller needs to see.\n    }\n    if (err instanceof HolderLockError) throw err;\n    throw new WorktreeError(`git worktree add --detach failed for \"${branch}\" at ${startCommit}: ${err.message}`, {\n      branch,\n      worktreePath,\n    });\n  }\n\n  // tsk-4yv: same reasoning as createWorktree's own identical wrap above --\n  // `git worktree add --detach` has already succeeded by this point, so a\n  // `finishWorktreeSetup` failure (the `.fgos/` strip, or\n  // `provisionDependencies`'s `npm ci`/`npm install`) must force-remove the\n  // now-registered worktree before rethrowing, or it leaks: this is\n  // specifically the DETACHED case (a `withMergeEphemeralWorktree` call\n  // during `approve`), which `reclaimOrphanedCheckout`/`findCheckoutPath`\n  // (both branch-keyed) never reclaim, unlike a branch-attached\n  // `createWorktree` checkout, which mostly self-heals via the\n  // relocate/reattach paths. Left unfixed, a repeated npm registry flake\n  // during `approve` accumulates full checkouts under tmp indefinitely.\n  try {\n    finishWorktreeSetup(repoRoot, worktreePath, branch);\n  } catch (err) {\n    try {\n      removeWorktree(repoRoot, worktreePath, { force: true });\n    } catch {\n      // best-effort — a failed cleanup here must never mask the real\n      // finishWorktreeSetup failure the caller needs to see.\n    }\n    throw err;\n  }\n\n  return { path: worktreePath, branch, startCommit };\n}\n\nexport async function withMergeEphemeralWorktree(repoRoot, id, fn) {\n  const branch = branchNameFor(id);\n  const worktree = createDetachedMergeWorktree(repoRoot, id);\n  try {\n    const result = await fn(worktree);\n    // fn committed on top of startCommit (a successful merge) -- land it on\n    // the real branch via a plain ref update, which needs no exclusive\n    // checkout, instead of the ephemeral checkout ever having BEEN the real\n    // branch. fn that only read/verified without committing (conflict,\n    // verify-fail, already-caught-up) leaves HEAD at startCommit, so no\n    // ref move happens -- the real branch is untouched, same as today.\n    const endCommit = git(worktree.path, ['rev-parse', 'HEAD']).trim();\n    if (endCommit !== worktree.startCommit) {\n      // CAS GUARD (tsk-46a, docs/history/merge-ephemeral-branch-force-race/\n      // CONTEXT.md D1; hardened tsk-18k): `startCommit` was captured back in\n      // createDetachedMergeWorktree, before `fn` ran and before any lock was\n      // held over THIS step -- a second concurrent call for the same `id`\n      // (e.g. two leaf approves into the same fgw/<rootId>) can land its own\n      // ref update in between, moving `branch` out from under this call\n      // without this call ever knowing.\n      //\n      // `git update-ref <ref> <new> <old>` is git's own atomic\n      // compare-and-swap on the ref: it refuses the write outright\n      // (non-zero exit, ref left completely untouched) unless the ref's\n      // CURRENT value still equals `<old>` at the exact moment of the\n      // write -- there is no separate read-then-write window left for a\n      // second caller to land in between. The prior shape here was a plain\n      // `git rev-parse` (read) followed by an unconditional `git branch -f`\n      // (write): two genuinely concurrent callers could BOTH pass that read\n      // before either one wrote, letting the second `branch -f` silently\n      // discard whichever commit the first one had just landed, with no\n      // error and no conflict. That window is exactly what tsk-18k's own\n      // bug (the merge-target-slot lock's release/renew misidentifying a\n      // sibling's live lock as its own after a TTL-starvation reclaim,\n      // fixed above in `withMergeTargetSlot`) could put two callers through\n"
-    },
-    {
-      "file": "src/runner/worktree.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-      "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
-      "seam": "cli-help-messages",
-      "kind": "source-context",
-      "startLine": 1501,
-      "endLine": 1615,
-      "text": "      // at once -- confirmed still possible even after that identity fix,\n      // since a TTL-starvation reclaim can happen while the original\n      // holder's own `fn()` (this whole merge) is still running, unaware\n      // its lock was reclaimed. D2 still holds: fail loudly here, never\n      // retry automatically -- the caller (merge-loop, or a person\n      // re-running `fgos approve`) owns retrying against the new tip.\n      try {\n        git(repoRoot, ['update-ref', `refs/heads/${branch}`, endCommit, worktree.startCommit]);\n      } catch {\n        // update-ref's own error already named the mismatch on stderr; read\n        // the branch's actual current tip here only to report it back in\n        // the same message/field shape callers and tests already expect --\n        // this read is diagnostic, never the guard itself (the guard\n        // already ran, atomically, in the update-ref call above).\n        const liveTip = git(repoRoot, ['rev-parse', branch]).trim();\n        throw new WorktreeError(\n          `refusing to force-move \"${branch}\" to ${endCommit} -- its tip changed from ${worktree.startCommit} to ${liveTip} since this merge started (a concurrent merge into the same branch already landed). Retry against the new tip instead of overwriting it.`,\n          { branch, expectedTip: worktree.startCommit, actualTip: liveTip, endCommit },\n        );\n      }\n    }\n    return result;\n  } finally {\n    removeWorktree(repoRoot, worktree.path, { force: true });\n  }\n}\n\n/**\n * runner-dispatch: a worktree created for one dispatch attempt (startup\n * reap's throwaway goal-check checkout, or a claimed item's worker run).\n * `opts` carries whatever baseRef/worktreeDir the caller's own leaf/root\n * logic already resolved (D3 \"leaf fork-from-tip-of-parent\" stays call-site\n * business logic, not a choke-point — only the cleanup policy was\n * duplicated). Pair with `removeDispatchWorktree` below: a cleanup failure\n * there is logged, never thrown, so it can never mask the attempt's real\n * outcome — the same policy `loop.mjs` used to define as its own private\n * `safeRemoveWorktree` at every call site.\n */\nexport function createDispatchWorktree(repoRoot, id, opts = {}) {\n  return createWorktree(repoRoot, id, opts);\n}\n\n/** Cleanup half of the runner-dispatch pair — see `createDispatchWorktree`. */\nexport function removeDispatchWorktree(repoRoot, worktreePath, log = () => {}) {\n  try {\n    removeWorktree(repoRoot, worktreePath, { force: true });\n  } catch (err) {\n    if (typeof log === 'function') {\n      log(`fgos-runner: worktree cleanup failed for \"${worktreePath}\": ${err.message}`);\n    }\n  }\n}\n\n/**\n * Remove the worktree checkout at `worktreePath` (per CWD DISCIPLINE above:\n * always run from `repoRoot`, never from inside `worktreePath`). Does NOT\n * delete the branch itself — the branch is the durable D1-level proposal\n * artifact (per D4) and survives worktree teardown for human/review to\n * inspect or merge later.\n */\nexport function removeWorktree(repoRoot, worktreePath, opts = {}) {\n  const args = ['worktree', 'remove', worktreePath];\n  if (opts.force) args.push('--force');\n  try {\n    git(repoRoot, args);\n  } catch (err) {\n    throw new WorktreeError(`git worktree remove failed for \"${worktreePath}\": ${err.message}`, {\n      worktreePath,\n    });\n  }\n  try {\n    git(repoRoot, ['worktree', 'prune']);\n  } catch {\n    // best-effort — a failed prune does not invalidate a successful remove.\n  }\n}\n\n/**\n * List every `fgw/*` branch left in `repoRoot`, each with its `aheadCount`\n * (commits reachable from the branch but not from its merge-base with\n * `opts.base`, default `HEAD`). POLICY (caller's to enforce, documented\n * here since this is where the fact is computed): `aheadCount === 0` means\n * an orphan — a worktree that was created and torn down without ever\n * committing anything on it — safe for a caller's prune loop to delete\n * outright; `aheadCount > 0` means the branch carries a real proposal and\n * must be kept for human/review, never auto-deleted.\n */\nexport function listLeftovers(repoRoot, opts = {}) {\n  const base = opts.base ?? 'HEAD';\n  let refsOut;\n  try {\n    refsOut = git(repoRoot, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);\n  } catch (err) {\n    throw new WorktreeError(`listing \"fgw/\" branches failed: ${err.message}`, {});\n  }\n\n  const branches = refsOut\n    .split('\\n')\n    .map((line) => line.trim())\n    .filter(Boolean);\n\n  return branches.map((branch) => {\n    let aheadCount;\n    try {\n      const mergeBase = git(repoRoot, ['merge-base', base, branch]).trim();\n      const countOut = git(repoRoot, ['rev-list', '--count', `${mergeBase}..${branch}`]);\n      aheadCount = parseInt(countOut.trim(), 10) || 0;\n    } catch (err) {\n      throw new WorktreeError(`computing ahead-count for branch \"${branch}\" failed: ${err.message}`, {\n        branch,\n      });\n    }\n    return { branch, aheadCount };\n  });\n}\n"
-    },
-    {
-      "file": "src/runner/worktree.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-      "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
-      "seam": "cli-help-messages",
-      "kind": "record-metadata",
-      "value": {
-        "file": "src/runner/worktree.mjs",
-        "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-        "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
-        "sourceMode": "100644",
-        "censusOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "seamIds": [
-          "cli-help-messages"
-        ],
-        "wholeFileRead": true,
-        "wholeFileReadEvidence": {
-          "bytes": 78643,
-          "lines": 1615,
-          "sha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
-          "method": "Complete body read by authoring pass; every frozen literal/current passage and dynamic tuple classified; independent whole-context semantic review pending."
-        },
-        "inheritedCarries": [],
-        "diff": "--- a/src/runner/worktree.mjs\n+++ b/src/runner/worktree.mjs\n@@ -1085,7 +1085,7 @@\n \n   if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n     throw new WorktreeError(\n-      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n+      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n       { branch, worktreePath, lastSynced, branchTip },\n     );\n   }\n",
-        "expectedAfterSha256": "10560a188e78a1be725a7b57ed095b7bddda63216c3c00e0b08f79b47396af21",
-        "rollbackDiff": "--- a/src/runner/worktree.mjs\n+++ b/src/runner/worktree.mjs\n@@ -1085,7 +1085,7 @@\n \n   if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n     throw new WorktreeError(\n-      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n+      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n       { branch, worktreePath, lastSynced, branchTip },\n     );\n   }\n",
-        "coCutPaths": [
-          "CHANGELOG.md"
-        ],
-        "receiptIds": [
-          "cli-help-messages-pilot"
-        ],
-        "protectedPins": {
-          "scripts/generate-shipped-path-inventory.mjs": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
-          "plans/260925-documentation-authority-unification/transitional-switchboard.json": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
-          "docs/transitional-switchboard.md": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
-          "AGENTS.md": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
-          "CLAUDE.md": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
-          "scripts/check-legacy-docs-ratchet.mjs": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
-          "scripts/check-legacy-docs-ratchet.baseline.json": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8"
-        },
-        "parked": [],
-        "review": {
-          "status": "pending",
-          "reviewer": null,
-          "report": null
-        }
-      }
-    },
-    {
-      "file": "src/runner/worktree.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-      "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
-      "seam": "cli-help-messages",
-      "kind": "references",
-      "index": 0,
-      "value": {
-        "referenceId": "reference-003784",
-        "admission": "ADMIT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000333",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000333",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 1088,
-            "columnStart": 484,
-            "columnEndExclusive": 559,
-            "text": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 559,
-            "columnStart": 484,
-            "line": 949,
-            "text": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
-          }
-        ],
-        "matchedExpression": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
-        "passage": "  if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n    throw new WorktreeError(\n      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n      { branch, worktreePath, lastSynced, branchTip },\n    );",
-        "passageSpan": {
-          "startLine": 1086,
-          "endLine": 1090
-        },
-        "role": "emitted-message",
-        "disposition": "patch",
-        "reason": "Executable data/message/file operation in own passage: '  if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\\n    throw new WorktreeError(\\n      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch\\'s current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\\n      { branch, worktreePath, lastSynced, branchTip },\\n    );' The exact registry alias names currentPath docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md; Phase 9 changes this emitted pointer only.",
-        "target": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
-        "anchor": null,
-        "resolverWitness": {
-          "target": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
-          "docId": "how-to-tell-a-stale-worktree-index-apart-from-real-uncommitted-work:tell-a-stale-worktree-index-apart-from-real-uncommitted-work",
-          "registryPath": "docs/doc-registry.json",
-          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-          "alias": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
-          "targetSha256": "244a4504e597b7f82e136e10591700372c52626b425931a69bbba2e392d65478",
-          "claim": "live currentPath lookup; no writer destination adopts an alias"
-        },
-        "timing": "phase9",
-        "diffHunk": "--- a/src/runner/worktree.mjs\n+++ b/src/runner/worktree.mjs\n@@ -1085,7 +1085,7 @@\n \n   if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n     throw new WorktreeError(\n-      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n+      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n       { branch, worktreePath, lastSynced, branchTip },\n     );\n   }\n",
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
-        "priorRecordRefs": [
-          {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
-            "recordSha256": "164be32089036bab3177b993ab38db740650653c18d9c3137a740c37798e7fb0",
-            "matchingSlots": []
-          }
-        ],
-        "fixtureProvenance": null,
-        "rejectionRule": null,
-        "receiptId": "cli-help-messages-pilot",
-        "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
-        "parityObligation": {
-          "current": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
-          "candidate": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
-      }
     }
   ]
 }

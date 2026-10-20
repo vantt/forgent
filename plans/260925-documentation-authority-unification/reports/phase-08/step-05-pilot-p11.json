@@ -8,6 +8,26 @@
       "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
       "seam": "setup-doctor-roots",
       "kind": "source-context",
+      "startLine": 2251,
+      "endLine": 2500,
+      "text": "  check: (cwd) => checkGlobalProjectAwareness(cwd),\n});\n\nfunction checkProviderCapacityState() {\n  let report;\n  try {\n    report = inspectProviderCapacity({ runnerConfig: loadGlobalConfig() });\n  } catch (err) {\n    return { passed: false, message: `provider-capacity state unreadable: ${err.message}` };\n  }\n  const providers = Object.values(report.providers || {});\n  const accounts = providers.flatMap((provider) => Object.values(provider.accounts || {}));\n  if (!accounts.length) {\n    return { passed: true, message: 'inactive — no global runner.providers.*.accounts inventory configured' };\n  }\n  const quarantined = accounts.filter((account) => account.quarantine);\n  if (!quarantined.length) {\n    return { passed: true, message: `provider-capacity healthy — ${accounts.length} account(s), no quarantine` };\n  }\n  // C2a: inspectProviderCapacity's account shape names the field\n  // `accountId`, not `id` (always undefined here before this fix), and a\n  // quarantine record's own field is `kind` ('temporary' | 'manual-clear'\n  // | 'manual-clear' evidence), never a `manualClear` boolean.\n  const summary = quarantined\n    .map((account) => `${account.accountId}:${account.quarantine.reasonCode || 'quarantined'}${account.quarantine.kind === 'manual-clear' ? ':manual-clear' : ''}${account.quarantine.until ? `:until=${account.quarantine.until}` : ''}`)\n    .join(', ');\n  return {\n    passed: false,\n    message: `provider-capacity quarantine present (${summary}) — inspect with \"fgos dispatch inspect --provider-capacity\"; clear manually with \"fgos dispatch reconcile provider-capacity clear-quarantine\" after the operator fix`,\n  };\n}\n\nregisterCheck({\n  id: 'provider-capacity-state',\n  description: 'provider-capacity account leases/quarantine state is reportable; doctor never auto-clears quarantine',\n  check: () => checkProviderCapacityState(),\n});\n\n// Holder-lock (docs/platform/holder-lock/spec.md): the kernel-lock guarantee\n// of both lock directories, the borrow vectors, who holds each lock, the\n// cutover fences, the predecessor kill wait and the one state root. Bodies\n// live in holder-lock-checks.mjs. The `lock-dirs` fix creates the two lock\n// directories; the `lock-fences` fix is the cutover step and acts only in a\n// workspace whose activated release already runs these locks.\nregisterCheck({\n  id: 'lock-kernel-semantics',\n  description: 'the holder-lock driver gives kernel lock exclusion on <fgosDir>/locks and <lockRoot>, proven by a two-process probe on each mount',\n  check: (cwd) => checkLockKernelSemantics(cwd),\n});\nregisterCheck({\n  id: 'lock-borrow-vectors',\n  description: 'a lock description borrowed by a git child never leaks to a background process (fgos internal lock-borrow-vectors)',\n  check: (cwd) => checkLockBorrowVectors(cwd),\n});\nregisterCheck({\n  id: 'lock-holders',\n  description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, and no predecessor domain is left running',\n  check: (cwd) => checkLockHolders(cwd),\n});\nregisterCheck({\n  id: 'lock-fences',\n  description: 'every legacy lock path carries its cutover fence, so an older fgOS binary fails loudly instead of holding the old lock',\n  check: (cwd) => checkLockFences(cwd),\n});\nregisterCheck({\n  id: 'lock-record-unreadable',\n  description: 'the state and porting-events hot records parse and their holder can be judged; otherwise fgos lock fence names the way out',\n  check: (cwd) => checkLockRecordUnreadable(cwd),\n});\nregisterCheck({\n  id: 'lock-predecessor-kill-wait',\n  description: 'lock.predecessorKillWaitMs is an integer from 1 to 60000 ms (default 2000)',\n  check: (cwd) => checkLockPredecessorKillWait(cwd),\n});\nregisterCheck({\n  id: 'state-root',\n  description: 'Node and the Rust host resolve the same state root and lock root',\n  check: (cwd) => checkStateRoot(cwd),\n});\nregisterConfigDefault({ id: 'lock', key: 'lock', shape: { predecessorKillWaitMs: DEFAULT_KILL_WAIT_MS } });\nregisterFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });\n\n// Run supervisor (docs/platform/run-supervisor/spec.md): the containment driver agents run in, the\n// host routes, the runtime socket directory, attempts nobody holds and the gate's kill grace.\n// `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` are read with a default and never written by setup.\nregisterCheck({\n  id: 'process-containment',\n  description: 'the host names the containment driver agents run in and its level (kernel or best-effort) with the routes around it',\n  check: (cwd) => checkProcessContainment(cwd),\n});\nregisterCheck({\n  id: 'run-supervisor-route',\n  description: 'the host binary serves supervise, gate, adopt and attempt-step at protocol 1',\n  check: (cwd) => checkRunSupervisorRoute(cwd),\n});\nregisterCheck({\n  id: 'runtime-socket-dir',\n  description: 'the runtime socket directory exists, is owned by this user and is 0700',\n  check: () => checkRuntimeSocketDir(),\n});\nregisterCheck({\n  id: 'run-attempts-stuck',\n  description: 'no attempt with a v3 envelope is left without a closed.json while its lock is free (fgos doctor --fix adopts it)',\n  check: (cwd) => checkRunAttemptsStuck(cwd),\n});\nregisterCheck({\n  id: 'gate-kill-grace',\n  description: 'dispatch.gateKillGraceMs is an integer of at least 1000 ms (default 10000)',\n  check: (cwd) => checkGateKillGrace(cwd),\n});\nregisterCheck({\n  id: 'legacy-attempts-stuck',\n  description: 'no run from before the run supervisor is left running with every recorded process dead (fgos doctor --fix settles it as abandoned-legacy; a run that cannot be proven dead is kept and its reason named)',\n  check: (cwd) => checkLegacyAttemptsStuck(cwd),\n});\nregisterCheck({\n  id: 'units-awaiting-resume',\n  description: 'lists unit runs whose controller is gone and whose last attempt is closed, with the fgos run --resume command (information, never a failure)',\n  check: (cwd) => checkUnitsAwaitingResume(cwd),\n});\nregisterCheck({\n  id: 'cancel-wait',\n  description: 'dispatch.cancelWaitMs is an integer of at least 1000 ms and not shorter than dispatch.gateKillGraceMs (default gateKillGraceMs + 5000)',\n  check: (cwd) => checkCancelWait(cwd),\n});\nregisterFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });\nregisterFix({ id: 'run-attempts-stuck', fix: (cwd) => fixRunAttemptsStuck(cwd) });\nregisterFix({ id: 'legacy-attempts-stuck', fix: (cwd) => fixLegacyAttemptsStuck(cwd, { door: { observe: recoverObserveUseCase, apply: recoverApplyUseCase } }) });\nregisterFix({ id: 'lock-fences', fix: (cwd) => fixLockFences(cwd) });\n\n// tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/\n// CONTEXT.md D2): the two role-by-intelligence capability slots --\n// `advise` (value comes from disagreement, never changes state, one\n// question/one answer) and `execute` (value comes from compliance,\n// changes files, must pass verify). `decide --for <purpose>` already\n// validates a `--for` name against `runner.capabilities` (dispatch.mjs's\n// `validateCapabilitiesShape`/`resolveExecutorAndOverrides`), but the\n// shared config's `capabilities` map shipped with neither name declared,\n// so neither purpose could ever resolve. Layered onto the SAME `runner`\n// config-default below (never a second, colliding `key: 'runner'`\n// registration -- `assembleRegistryDefaults` combines registrations by\n// flat per-key assignment, not a deep merge across entries sharing a\n// key) so `DEFAULT_RUNNER_CONFIG` itself (src/runner/dispatch.mjs,\n// tsk-2uf-1's own footprint) stays untouched -- this only ADDS a\n// `capabilities` key that constant has never declared. Deliberately no\n// `prefer`/`aliases`/`overrides`: naming which executor serves a purpose\n// is a dispatch-mechanism decision, and tsk-5tm-3 D5 forbids `execute`\n// (or, by the same reasoning, this registration) re-deciding that.\n// Capabilities the shipped Workflow units\n// name. Without a `runner.capabilities` entry bind() has no candidate pool for\n// the unit and refuses it, so a fresh project could not run these Workflows.\n// Description-only on purpose (no `prefer`): which executors serve a\n// capability is that project's own taste, and `mergeConfigDefaults` only adds\n// a missing slot, never overwrites one the project already tuned.\nfunction workflowCapabilitySlots(verbsByDomain) {\n  const slots = {};\n  for (const [domain, verbs] of Object.entries(verbsByDomain)) {\n    for (const verb of verbs) {\n      slots[`${domain}:${verb}`] = {\n        description: `Workflow unit capability \"${domain}:${verb}\" -- declare a \"prefer\" pool to choose which executors serve it.`,\n      };\n    }\n  }\n  return slots;\n}\n\nexport const DEFAULT_CAPABILITY_SLOTS = Object.freeze({\n  advise: {\n    description:\n      'Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',\n    // Interim posture: P06 must first wire a production backend binding.\n    // Required here would otherwise universally refuse group-thinking.\n    confinement: { mode: 'unconfined' },\n    serves: { outputKind: 'decision', mutates: false },\n  },\n  execute: {\n    description:\n      'Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',\n    serves: { outputKind: 'change', mutates: true },\n  },\n  // I19 (core/skills/_shared/capability-matching.md, capability-catalog.md):\n  // generic, domain-neutral independent review -- docs/design/spec/config,\n  // never code (that stays `code:review`). No `prefer`/`overrides` either,\n  // same curated-default-never-pins reasoning as every other slot here.\n  review: {\n    description:\n      'Independent read-only review of a non-code artifact (docs, design, spec, config) before merge/decision -- distinct from code:review (I19, core/skills/_shared/capability-catalog.md).',\n    confinement: { mode: 'unconfined' },\n    serves: { outputKind: 'finding', mutates: false },\n  },\n  // The documentation counterpart of code:implement: the capability `fgos run --capability docs:write`\n  // and the fgos-run skill name for writing docs. Same curated-default-never-pins reasoning.\n  'docs:write': {\n    description:\n      'Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a \"prefer\" pool to choose which executors serve it.',\n    serves: { outputKind: 'change', domain: 'docs', mutates: true },\n  },\n  'code:implement': {\n    description:\n      'Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)',\n    serves: { outputKind: 'change', domain: 'code', mutates: true },\n  },\n  // P2-runtime (docs/history/agent-coordination-foundation/plan.md):\n  // extended by observed frequency, in this priority order. Deliberately\n  // no `prefer`/`overrides` here either, same reasoning as `code:implement`\n  // above -- a curated default never pins which executor serves it.\n  'code:review': {\n    description:\n      'Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',\n    confinement: { mode: 'unconfined' },\n    serves: { outputKind: 'finding', domain: 'code', mutates: false },\n  },\n  'code:test': {\n    description:\n      'Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',\n    serves: { outputKind: 'verification', domain: 'code' },\n  },\n  'code:debug': {\n    description:\n      'Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',\n    confinement: { mode: 'unconfined' },\n    serves: { outputKind: 'finding', domain: 'code' },\n  },\n  'code:refactor': {\n    description:\n      'Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',\n    serves: { outputKind: 'change', domain: 'code', mutates: true, behaviorPreserving: true },\n  },\n  ...workflowCapabilitySlots({\n    marketing: ['research', 'write', 'publish'],\n    architecture: ['frame', 'shape', 'critique', 'synthesize', 'explain'],\n    business: ['frame', 'perspectives', 'critique', 'synthesize', 'plan'],\n    delphi: ['propose', 'synthesize'],\n    'group-cognition': ['explore', 'critique', 'synthesize'],\n    'nominal-group': ['generate', 'share', 'vote', 'rank'],\n    coding: ['discover', 'explore', 'plan', 'validate', 'implement'],\n  }),\n});\n\n// tsk-47r: `pi` as a second `agent`-kind executor, layered onto this SAME\n// `runner` config-default for the same reason `capabilities` above is (a\n// second `key: 'runner'` registration would silently overwrite this one,\n// never merge with it). `mergeConfigDefaults`'s fill-missing-only\n// recursion (`config-merge.mjs`) adds `runner.executors.openai` and\n// `runner.modelPolicies.openai` on the next `fgos setup` run without\n// touching the live `executors.gemini`/`modelPolicies.claude`/\n// `modelPolicies.gemini` entries. `--provider openai-codex` in `args`\n// stays a literal string -- that is pi's OWN real `--provider` value\n// (confirmed via `pi --list-models`), independent of what this config\n// internally calls the provider (`openai`, executor-provider-naming\n"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "source-context",
+      "startLine": 2501,
+      "endLine": 2750,
+      "text": "// 2026-09-17 -- \"openai-codex\" was conflating the provider with \"Codex\",\n// which is just OpenAI's own CLI product name, not a distinct provider).\n// `--model gpt-5.5` and the `read,write,edit,bash,grep,find,ls` allowlist\n// are the EXACT invocation a live D4 proof-test dispatch ran and\n// confirmed GREEN (worker contract followed: layered skill-pointer chain\n// read natively, footprint honored, correct `[BLOCKED]`/`[DONE]`\n// two-token reporting) — see\n// docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4.\n// Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple\n// tests assert this exact shape instead of duplicating the literal.\nexport const PI_EXECUTOR_DEFAULT = Object.freeze({\n  kind: 'agent',\n  description: 'pi coding agent (openai/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)',\n  allowCrossProvider: true,\n  invocations: [\n    {\n      via: 'cli',\n      adapter: 'cli-spawn',\n      command: 'pi',\n      args: [\n        '--provider',\n        'openai-codex',\n        '--model',\n        '{model}',\n        '--tools',\n        'read,write,edit,bash,grep,find,ls',\n        '--mode',\n        'json',\n        '--approve',\n        '-p',\n        '{prompt}',\n      ],\n    },\n  ],\n  providerModel: 'openai',\n});\n\nregisterConfigDefault({\n  id: 'runner',\n  key: 'runner',\n  shape: {\n    ...DEFAULT_RUNNER_CONFIG,\n    capabilities: DEFAULT_CAPABILITY_SLOTS,\n    modelPolicies: {\n      ...DEFAULT_RUNNER_CONFIG.modelPolicies,\n      openai: { nano: 'gpt-5.5' },\n    },\n    executors: { openai: PI_EXECUTOR_DEFAULT },\n  },\n});\n\n// `checkConfigNotStale` above already catches `runner.capabilities` (or\n// either slot inside it) being wholly ABSENT, generically, via\n// `assembleRegistryDefaults`'s merge -- same \"generic scan covers missing,\n// a dedicated check covers present-but-malformed\" split every other\n// present-but-unusable check in this file already follows (gateway/\n// workerSlots/invariantChecks above). What slips past the generic scan is\n// a slot present as the wrong shape (a string, an array, `null`) -- never\n// \"missing\", so `mergeConfigDefaults` has nothing to add, and `decide\n// --for advise`/`--for execute` would still fail validateCapabilitiesShape\n// with no doctor signal pointing at why.\n// Checked names are every curated slot `DEFAULT_CAPABILITY_SLOTS` declares\n// (D1, docs/history/agent-coordination-foundation/plan.md's P2-runtime) --\n// generalized from the original fixed ['advise', 'execute', 'code:implement']\n// list so a future curated addition is covered by this SAME check without a\n// second, drifting hardcoded list.\nconst CURATED_CAPABILITY_NAMES = Object.keys(DEFAULT_CAPABILITY_SLOTS);\n\nfunction checkAdviseExecuteCapabilitiesConfigured(cwd) {\n  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;\n  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {\n    return {\n      passed: false,\n      message: 'runner.capabilities section missing -- run fgos setup (decide --for advise/execute/code:implement cannot resolve until it exists)',\n    };\n  }\n  const missing = CURATED_CAPABILITY_NAMES.filter(\n    (name) => !capabilities[name] || typeof capabilities[name] !== 'object' || Array.isArray(capabilities[name]),\n  );\n  if (missing.length > 0) {\n    return {\n      passed: false,\n      message: `runner.capabilities is missing or has a malformed slot for: ${missing.join(', ')} -- run fgos setup`,\n    };\n  }\n  const extras = CURATED_CAPABILITY_NAMES.filter((name) => !['advise', 'execute', 'code:implement'].includes(name));\n  return {\n    passed: true,\n    message: `runner.capabilities declares \"advise\", \"execute\", and \"code:implement\" (plus ${extras.join(', ')})`,\n  };\n}\n\nregisterCheck({\n  id: 'advise-execute-capabilities-configured',\n  description: 'runner.capabilities declares the \"advise\" and \"execute\" purpose slots decide --for resolves against (tsk-2uf-3)',\n  check: (cwd) => checkAdviseExecuteCapabilitiesConfigured(cwd),\n});\n\n// Every capability a core/domain Workflow unit names must resolve the way\n// bind() resolves it (exact name, then the bare verb). One that does not has\n// no candidate pool, so that unit is refused at run time with no earlier signal.\n// A declared entry that carries no `prefer` pool (exact or bare verb) is reported too.\n// Definition files come from the one Workflow reader (readWorkflowDefinitionFiles) and every string\n// under a key named `capability`, at any depth, is a use. A file that cannot be read or parsed is\n// reported by name, never skipped.\nfunction workflowCapabilityUses(files) {\n  const uses = new Map();\n  for (const { fileId, raw } of files) {\n    for (const capability of capabilityValues(raw)) {\n      if (!uses.has(capability)) uses.set(capability, new Set());\n      uses.get(capability).add(fileId);\n    }\n  }\n  return uses;\n}\n\n// Every string stored under a key named `capability`, at any depth. Iterative with a visited set:\n// a YAML alias can make a document reference itself, and a recursive walk would never end.\nfunction capabilityValues(root) {\n  const found = [];\n  const visited = new Set();\n  const queue = [root];\n  for (let next = 0; next < queue.length; next += 1) {\n    const node = queue[next];\n    if (node === null || typeof node !== 'object' || visited.has(node)) continue;\n    visited.add(node);\n    for (const [key, value] of Array.isArray(node) ? node.entries() : Object.entries(node)) {\n      if (key === 'capability' && typeof value === 'string' && value.trim() !== '') found.push(value.trim());\n      else queue.push(value);\n    }\n  }\n  return found;\n}\n\n// Capabilities the runner loop's worker asks for that no Workflow unit names. A coding item's\n// executing step runs as a Unit of `code:implement` (work-compat.mjs's curated mapping); its other\n// steps ask for `<domain>:<verb>`, the names the domain's Workflow units already use.\nconst RUNNER_LOOP_CAPABILITY_USES = Object.freeze([['code:implement', 'runner loop: coding executing step']]);\n\nfunction checkWorkflowCapabilitiesConfigured(cwd) {\n  const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\n  const { files, unreadable } = readWorkflowDefinitionFiles(workflowRoots(cwd, packageRoot));\n  const uses = workflowCapabilityUses(files);\n  for (const [capability, id] of RUNNER_LOOP_CAPABILITY_USES) {\n    uses.set(capability, new Set([...(uses.get(capability) ?? []), id]));\n  }\n  return withUnreadableDefinitions(evaluateWorkflowCapabilities(cwd, uses), unreadable);\n}\n\nfunction evaluateWorkflowCapabilities(cwd, uses) {\n  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;\n  const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};\n  const missing = [...uses].filter(\n    ([capability]) => !declared[capability] && !(capability.includes(':') && declared[capability.split(':')[1]]),\n  );\n  if (missing.length > 0) {\n    const list = missing.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');\n    return {\n      passed: false,\n      message: `runner.capabilities has no entry for Workflow capabilities: ${list} -- declare each under runner.capabilities (fgos setup adds every shipped Workflow's)`,\n    };\n  }\n  // Declared is not enough: bind() needs a prefer pool, on the exact entry or the bare\n  // verb, or it refuses the unit headless. Setup's own slots are description-only on\n  // purpose (which executors serve a capability is the project's taste), so this is a\n  // warning that names the gap rather than a failure on a fresh project.\n  const noPool = [...uses].filter(\n    ([capability]) => !hasUsablePrefer(declared[capability]) && !(capability.includes(':') && hasUsablePrefer(declared[capability.split(':')[1]])),\n  );\n  if (noPool.length > 0) {\n    const list = noPool.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');\n    return {\n      passed: true,\n      message: `warning: Workflow capabilities declared but with no \"prefer\" pool, so a headless run of those units is refused: ${list} -- add \"prefer\" under the exact name or its bare verb in runner.capabilities`,\n    };\n  }\n  return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is declared in runner.capabilities with a prefer pool` };\n}\n\nregisterCheck({\n  id: 'workflow-capabilities-configured',\n  description: 'every capability a core/domain Workflow unit names is declared in runner.capabilities',\n  check: (cwd) => checkWorkflowCapabilitiesConfigured(cwd),\n});\n\n// I19 (core/skills/_shared/capability-matching.md): `serves` is optional at\n// load time (`validateCapabilitiesShape`'s hot path never rejects an old\n// entry with none), but a live config's DECLARED `serves` values still need\n// a doctor signal -- a malformed one, or two capabilities that declare the\n// identical attribute set (permanently tied, capability-matching.md's\n// \"Ties and misses\" rule), silently degrades Q1 steering with no error\n// anywhere else. `review`'s presence is already covered generically by\n// `advise-execute-capabilities-configured` above (CURATED_CAPABILITY_NAMES\n// derives from DEFAULT_CAPABILITY_SLOTS, which now includes it) -- checked\n// again here too since it is this doctrine's own explicit requirement.\nfunction normalizeServesForComparison(serves) {\n  return JSON.stringify(Object.fromEntries(Object.entries(serves).sort(([a], [b]) => a.localeCompare(b))));\n}\n\nfunction checkCapabilityServesValid(cwd) {\n  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;\n  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {\n    return {\n      passed: false,\n      message: 'runner.capabilities section missing -- run fgos setup (\"serves\" cannot be validated until it exists)',\n    };\n  }\n  const invalid = [];\n  const servesByName = new Map();\n  for (const [name, entry] of Object.entries(capabilities)) {\n    if (!entry || typeof entry !== 'object' || Array.isArray(entry) || entry.serves === undefined) continue;\n    try {\n      validateCapabilityServesShape(entry.serves, `runner.capabilities.${name}.serves`);\n      servesByName.set(name, entry.serves);\n    } catch (error) {\n      invalid.push(`${name}: ${error.message}`);\n    }\n  }\n  if (invalid.length > 0) {\n    return { passed: false, message: `invalid \"serves\": ${invalid.join('; ')}` };\n  }\n  const seenBySignature = new Map();\n  for (const [name, serves] of servesByName) {\n    const signature = normalizeServesForComparison(serves);\n    const priorName = seenBySignature.get(signature);\n    if (priorName) {\n      return {\n        passed: false,\n        message: `\"${priorName}\" and \"${name}\" declare the identical \"serves\" attribute set -- capability matching can never distinguish them`,\n      };\n    }\n    seenBySignature.set(signature, name);\n  }\n  if (!capabilities.review || typeof capabilities.review !== 'object' || Array.isArray(capabilities.review)) {\n    return { passed: false, message: 'runner.capabilities is missing the \"review\" slot -- run fgos setup' };\n  }\n  return {\n    passed: true,\n    message: `${servesByName.size} capability entr${servesByName.size === 1 ? 'y declares' : 'ies declare'} a valid \"serves\" attribute set, none identical, and \"review\" is present`,\n  };\n}\n\nregisterCheck({\n  id: 'capability-serves-valid',\n  description: 'runner.capabilities\\' \"serves\" attribute sets are well-formed, mutually distinct, and include the \"review\" slot (I19)',\n  check: (cwd) => checkCapabilityServesValid(cwd),\n});\n\n// Unit I21 (Phase 5 item 2): every discoverable CoordinationProtocol\n// operation's declared `policy.capability` resolves against the LIVE runner\n"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "source-context",
       "startLine": 2751,
       "endLine": 3000,
       "text": "// config -- the SAME `resolveExecutorAndOverrides` (dispatch/resolve.mjs) a\n// real dispatch re-resolves at execution time, never a second, drifting\n// lookup. An operation naming a capability with nothing registered for it\n// does not fail at dispatch time (it quietly falls back to the runner's\n// global default executor, per `resolveAssignmentDispatchPolicy`'s own\n// precedence) -- this check is the only place that quiet degradation is\n// surfaced before it happens for real. Also reports the count of distinct\n// provider families reachable across every resolved capability (design\n// record §12 item 3: \"Doctor báo số họ provider cấu hình\").\nfunction checkOperationCapabilitiesResolve(cwd) {\n  const runnerConfig = readSharedConfig(cwd)?.runner;\n  if (!runnerConfig) {\n    return { passed: false, message: 'runner config section missing -- run fgos setup' };\n  }\n  return { passed: true, message: 'no coordination protocols active (retired in favor of workflows)' };\n}\n\nregisterCheck({\n  id: 'operation-capability-resolves',\n  description: 'every discoverable CoordinationProtocol operation\\'s declared policy.capability resolves against the live runner config, and reports reachable provider-family diversity (Unit I21)',\n  check: (cwd) => checkOperationCapabilitiesResolve(cwd),\n});\n\n// tsk-slq D6 (AGENTS.md's install/setup/doctor gate — a new infra\n// dependency must register into doctor's check registry, not stand alone\n// undiscoverable by doctor): forgent had zero npm dependencies until tsk-slq\n// added `yaml` (D4) as the first one. A bare checkout (e.g. a fresh clone,\n// or a disposable worktree like `fgos return`'s own goal-check checkout)\n// never runs `npm install` on its own — this check makes that gap visible\n// to a human/session running `fgos doctor`, the same \"absent capability =\n// clean skip, never hidden\" contract `checkToolRegistryConfigured` already\n// gives tool-registry posture. READ-ONLY by construction (same as every\n// other check here) — only fs.existsSync, doctor never writes.\nfunction checkDependenciesInstalled(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const packageJsonPath = path.join(root, 'package.json');\n  if (!fs.existsSync(packageJsonPath)) {\n    return { passed: true, message: 'no package.json — nothing to check' };\n  }\n  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));\n  const deps = Object.keys(pkg.dependencies ?? {});\n  if (deps.length === 0) {\n    return { passed: true, message: 'no runtime dependencies declared — nothing to check' };\n  }\n  const nodeModulesPath = path.join(root, 'node_modules');\n  const missing = deps.filter((dep) => !fs.existsSync(path.join(nodeModulesPath, dep)));\n  if (missing.length > 0) {\n    return { passed: false, message: `missing from node_modules: ${missing.join(', ')} — run npm install` };\n  }\n  return { passed: true, message: `${deps.length} dependenc${deps.length === 1 ? 'y' : 'ies'} installed` };\n}\n\nregisterCheck({\n  id: 'dependencies-installed',\n  description: 'package.json dependencies are present in node_modules (tsk-slq D6)',\n  check: (cwd) => checkDependenciesInstalled(cwd),\n});\n\n// gate-bypass.json's real registry entry (docs/history/doctor-fix-gate-bypass/\n// CONTEXT.md D1/D3, tsk-2qz-2) -- the registry's first consumer to register\n// all three independent capabilities (check + configDefault + fix), per\n// tsk-2cs's own D5 (\"gate-bypass is the registry's first real consumer\").\n// `checkConfigNotStale` above already detects a MISSING `gateBypass` key\n// generically via `assembleRegistryDefaults()` once the configDefault below\n// is registered; this dedicated check adds the one thing that generic\n// staleness check cannot: whether a PRESENT `level` value is actually one of\n// `LEVELS`, since a malformed-but-present value is never \"missing\" from\n// `mergeConfigDefaults`' point of view.\nfunction checkGateBypassConfigured(cwd) {\n  const shared = readSharedConfig(cwd);\n  const level = shared?.gateBypass?.level;\n  if (typeof level !== 'string' || !LEVELS.includes(level)) {\n    return {\n      passed: false,\n      message: `gateBypass.level missing or not a recognized level (${LEVELS.join('/')}) -- run fgos doctor --fix`,\n    };\n  }\n  return { passed: true, message: `gateBypass.level = \"${level}\"` };\n}\n\n// Idempotent (D3 of the parent CONTEXT.md's pinned \"fix\" term): a\n// already-valid level is left untouched and reported unchanged, mirroring\n// `ensureSharedConfigDefaults`'s own \"only write when something was actually\n// added\" discipline.\nfunction fixGateBypassConfigured(cwd) {\n  const shared = readSharedConfig(cwd);\n  const currentLevel = shared?.gateBypass?.level;\n  if (typeof currentLevel === 'string' && LEVELS.includes(currentLevel)) {\n    return { changed: false, message: `gateBypass.level already \"${currentLevel}\"` };\n  }\n  const existingGateBypass =\n    shared.gateBypass && typeof shared.gateBypass === 'object' && !Array.isArray(shared.gateBypass)\n      ? shared.gateBypass\n      : {};\n  const merged = { ...shared, gateBypass: { ...existingGateBypass, level: DEFAULT_LEVEL } };\n  writeSharedConfig(cwd, merged);\n  return { changed: true, message: `wrote gateBypass.level = \"${DEFAULT_LEVEL}\" to ${sharedConfigFilePath(cwd)}` };\n}\n\nregisterConfigDefault({\n  id: 'gateBypass',\n  key: 'gateBypass',\n  shape: { level: DEFAULT_LEVEL },\n});\n\n// work-item-status-delivered-retrospective-cleanup D7: the cleanup-stage\n// TTL is global config, not per-item/per-domain (YAGNI — no demonstrated\n// need yet). cleanup-harness.mjs's checkCleanupTTLElapsed reads this via\n// readSharedConfig; the value here is only the doctor/setup-visible\n// default, same shape as gateBypass's own registration immediately above.\nexport const DEFAULT_CLEANUP_TTL_DAYS = 7;\n\n// tsk-59x D1: supersedes D7's global-only premise for the leaf/root axis\n// specifically, now that the demonstrated need D7 flagged as missing\n// exists (25% of open list is children, 0/99 cleanup-pool items ever\n// elapse the 7-day TTL). A leaf's own content already lives on its\n// still-alive root branch the moment it merges, so reclaiming its\n// worktree/branch immediately loses nothing. Root items are unaffected —\n// they keep DEFAULT_CLEANUP_TTL_DAYS above.\nexport const DEFAULT_CLEANUP_LEAF_TTL_DAYS = 0;\n\nregisterConfigDefault({\n  id: 'cleanup',\n  key: 'cleanup',\n  shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },\n});\n\n// docs/history/orchestrator-worker-slots/plan.md §Shape T1: the worker-slot\n// ceiling is project config, not a runner constant -- registered here so\n// `fgos setup` writes the section and `fgos doctor` can see it at all, per\n// AGENTS.md's install/setup/doctor gate.\n//\n// `ceiling` ships as `null` -- present but unarmed -- and that is the whole\n// point of this entry (tsk-1oz). Shipping the recommended NUMBER here would\n// arm the gate the moment anyone runs `fgos setup`, and `fgos doctor` asks\n// every project to run exactly that (\"stale config — missing keys ... — run\n// fgos setup\") as routine maintenance, never as an opt-in. A repo already\n// running more items than the recommended number would then have its very\n// next `take`/`pick` refused, freezing the whole backlog until a person\n// parked enough work by hand. `worker-slots.mjs` already refuses to treat\n// silence as a reason to start refusing work; writing a live number here\n// would have re-introduced that same trap one command away from the nag\n// that points at it. A person arms the gate by replacing `null` with a real\n// count (see DEFAULT_WORKER_SLOT_CEILING for the recommended starting\n// value), which is the only moment the intent is unambiguous.\n//\n// `adminReservation` is deliberately NOT a key here. The admin lane\n// (merge/retro/cleanup loops plus one spare) is a FIXED reservation whose\n// size is constant by definition, not a project knob -- it never claims a\n// work item, so nothing counts it and nothing could enforce a different\n// number. It lives as `ADMIN_LANE_RESERVATION` in `worker-slots.mjs` and is\n// reported by `fgos slots`; offering it as config would have been a dial\n// wired to nothing.\nregisterConfigDefault({\n  id: 'workerSlots',\n  key: 'workerSlots',\n  shape: { ceiling: null },\n});\n\n// A present-but-unusable `ceiling` is the misconfiguration that actually\n// bites, and it fails SILENTLY: `hasWorkerSlotRoom` treats anything that is\n// not a positive integer as \"no ceiling configured\" and allows every claim,\n// so a project that believes it is capped runs uncapped. `\"8\"` (a string,\n// the easiest hand-edit slip), `8.5`, `0` and `-1` all land there. The\n// generic `checkConfigNotStale` above only catches a wholly-missing section,\n// exactly the same blind spot `checkInvariantChecksConfigured` was written\n// to cover for `invariantChecks`. `null` is the one non-number that is not a\n// mistake: it is what `fgos setup` writes to mean \"deliberately unarmed\".\nfunction checkWorkerSlotsCeiling(cwd) {\n  // Deliberately NOT the fail-soft reader the claim paths use: those want an\n  // unreadable file to read as \"no ceiling\", but naming a broken config is\n  // this check's entire job, and degrading to `{}` would report the file as\n  // merely unconfigured while every claim silently ran uncapped.\n  let section;\n  try {\n    section = readSharedConfig(cwd).workerSlots;\n  } catch (err) {\n    return { passed: false, message: `shared config cannot be parsed, so no worker-slot ceiling can be read: ${err.message}` };\n  }\n  if (section === undefined) {\n    return {\n      passed: false,\n      message: 'workerSlots section missing -- run fgos setup (no worker-slot ceiling is enforced until it exists)',\n    };\n  }\n  const { ceiling } = section;\n  if (ceiling === null || ceiling === undefined) {\n    return {\n      passed: true,\n      message: `workerSlots.ceiling is unarmed (null) -- no claim is refused; set a positive integer (recommended: ${DEFAULT_WORKER_SLOT_CEILING}) to enforce a ceiling`,\n    };\n  }\n  if (!Number.isInteger(ceiling) || ceiling <= 0) {\n    return {\n      passed: false,\n      message: `workerSlots.ceiling is ${JSON.stringify(ceiling)}, which enforces NOTHING -- expected a positive integer (recommended: ${DEFAULT_WORKER_SLOT_CEILING}) or null to mean deliberately unarmed`,\n    };\n  }\n  return { passed: true, message: `workerSlots.ceiling = ${ceiling} running work item(s)` };\n}\n\nregisterCheck({\n  id: 'worker-slots-ceiling-usable',\n  description: 'workerSlots.ceiling is either a positive integer or explicitly null (a malformed value silently enforces nothing)',\n  check: (cwd) => checkWorkerSlotsCeiling(cwd),\n});\n\n// docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D6: the invariant\n// check commands are project config, not a hardcoded runner constant --\n// registered here so `fgos setup`'s config-merge writes the default and\n// `fgos doctor` can see the section at all, the same registry every other\n// module's config already goes through.\nregisterConfigDefault({\n  id: 'invariantChecks',\n  key: 'invariantChecks',\n  shape: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },\n});\n\nregisterConfigDefault({\n  id: 'checkpoint',\n  key: 'checkpoint',\n  shape: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },\n});\n\n// Deliberately does NOT execute the configured commands. `doctor` is a\n// cheap, side-effect-free diagnosis (RUL9's doctor-never-writes discipline),\n// and these are arbitrary project-supplied shell strings -- running them\n// here would let a config entry turn `fgos doctor` into an unbounded, and\n// potentially destructive, command. What this check CAN answer without\n// executing anything is the misconfiguration that actually bites: a present\n// but malformed `invariantChecks` section reads as zero commands at\n// return/merge, silently disabling the gate while looking configured.\n// `checkConfigNotStale` already covers the wholly-missing case generically\n// via the registration above; this covers present-but-unusable.\nfunction checkInvariantChecksConfigured(cwd) {\n  const section = readSharedConfig(cwd).invariantChecks;\n  if (section === undefined) {\n    return {\n      passed: false,\n      message: 'invariantChecks section missing -- run fgos setup (no invariant check runs at return/merge until it exists)',\n    };\n  }\n  const commands = readInvariantCheckCommands(cwd);\n  if (commands.length === 0) {\n    return {\n      passed: false,\n      message: 'invariantChecks is present but yields no runnable command -- expected { \"commands\": [\"<shell command>\", ...] } with at least one non-empty string',\n    };\n  }\n"
@@ -276,7 +296,8 @@
         "expectedAfterSha256": "e5a0579e471f1e173a045ffd28eed898cbc2d7c2462db3c3d438836e9a489d62",
         "rollbackDiff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
         "coCutPaths": [
-          "CHANGELOG.md"
+          "CHANGELOG.md",
+          "test/setup/checks.test.mjs"
         ],
         "receiptIds": [
           "setup-doctor-roots-pilot"
@@ -292,7 +313,12 @@
         },
         "parked": [
           "reference-003802",
-          "dynamic-014307",
+          "reference-003803",
+          "reference-003828",
+          "reference-003829",
+          "reference-003833",
+          "reference-003834",
+          "reference-003839",
           "dynamic-014314",
           "dynamic-014316",
           "dynamic-014317",
@@ -303,12 +329,9 @@
           "dynamic-014331",
           "dynamic-014332",
           "dynamic-014333",
-          "dynamic-014338",
           "dynamic-014339",
           "dynamic-014340",
           "dynamic-014341",
-          "dynamic-014345",
-          "dynamic-014346",
           "dynamic-014347",
           "dynamic-014348",
           "dynamic-014349",
@@ -583,8 +606,8 @@
           "endLine": 3917
         },
         "role": "reader/default",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: \"// The doc registry is opt-in per project: doctor --fix only refreshes it.\\nfunction docRegistryAdopted(root) {\\n  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));\\n}\\n\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "disposition": "parked",
+        "reason": "L12-69: Cross-seam bounded consumer target proof pending. Own passage \"// The doc registry is opt-in per project: doctor --fix only refreshes it.\\nfunction docRegistryAdopted(root) {\\n  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));\\n}\\n\"",
         "target": null,
         "anchor": null,
         "resolverWitness": {
@@ -592,12 +615,12 @@
           "currentPath": "docs/doc-registry.json",
           "exists": true
         },
-        "timing": "none",
+        "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
+        "blockedCategory": "step5-parity",
+        "blockedReason": "Cross-seam bounded consumer target proof pending.",
+        "dependency": "Cross-seam bounded consumer target proof pending.",
+        "dependencyCategory": "step5-parity",
         "successorNote": null,
         "aliasWriteCheck": {
           "isWriter": null,
@@ -613,10 +636,11 @@
         "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
         "parityObligation": {
           "current": "docs/doc-registry.json",
-          "candidate": "docs/doc-registry.json",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "Cross-seam bounded consumer target proof pending."
+        },
+        "samePassageOwner": "dynamic-014362"
       }
     },
     {
@@ -700,6 +724,17 @@
           "candidate": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/cut-a-fgos-release-tag.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/cut-a-fgos-release-tag.md",
+            "docs\\/how-to\\/cut-a-fgos-release-tag.md",
+            "docs\\/how-to\\/cut-a-fgos-release-tag\\.md"
+          ],
+          "matches": []
         }
       }
     },
@@ -864,6 +899,24 @@
           "candidate": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
+            "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/setup/checks.test.mjs",
+              "line": 342,
+              "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+            }
+          ]
         }
       }
     },
@@ -1268,6 +1321,17 @@
           "candidate": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/write-a-task-spec.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/write-a-task-spec.md",
+            "docs\\/how-to\\/write-a-task-spec.md",
+            "docs\\/how-to\\/write-a-task-spec\\.md"
+          ],
+          "matches": []
         }
       }
     },
@@ -2282,7 +2346,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/setup-doctor-config-registry/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -2491,8 +2555,8 @@
           "endLine": 3932
         },
         "role": "reader/default",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: \"  const view = rebuild(fgosDir);\\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "disposition": "parked",
+        "reason": "L12-69: Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized. Own passage \"  const view = rebuild(fgosDir);\\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\"",
         "target": null,
         "anchor": null,
         "resolverWitness": {
@@ -2500,12 +2564,12 @@
           "currentPath": "docs/doc-registry.md",
           "exists": true
         },
-        "timing": "none",
+        "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
+        "blockedCategory": "step5-parity",
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependencyCategory": "step5-parity",
         "successorNote": null,
         "aliasWriteCheck": {
           "isWriter": null,
@@ -2521,10 +2585,11 @@
         "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
         "parityObligation": {
           "current": "docs/doc-registry.md",
-          "candidate": "docs/doc-registry.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "samePassageOwner": "dynamic-014367"
       }
     },
     {
@@ -2571,8 +2636,8 @@
           "endLine": 3963
         },
         "role": "reader/default",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: \"  }\\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "disposition": "parked",
+        "reason": "L12-69: Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized. Own passage \"  }\\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n\"",
         "target": null,
         "anchor": null,
         "resolverWitness": {
@@ -2580,12 +2645,12 @@
           "currentPath": "docs/doc-registry.md",
           "exists": true
         },
-        "timing": "none",
+        "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
+        "blockedCategory": "step5-parity",
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependencyCategory": "step5-parity",
         "successorNote": null,
         "aliasWriteCheck": {
           "isWriter": null,
@@ -2601,10 +2666,11 @@
         "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
         "parityObligation": {
           "current": "docs/doc-registry.md",
-          "candidate": "docs/doc-registry.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "samePassageOwner": "dynamic-014376"
       }
     },
     {
@@ -2875,8 +2941,8 @@
           "endLine": 3933
         },
         "role": "reader/default",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: \"  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "disposition": "parked",
+        "reason": "L12-69: Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized. Own passage \"  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;\"",
         "target": null,
         "anchor": null,
         "resolverWitness": {
@@ -2884,12 +2950,12 @@
           "currentPath": "docs/doc-registry.json",
           "exists": true
         },
-        "timing": "none",
+        "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
+        "blockedCategory": "step5-parity",
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependencyCategory": "step5-parity",
         "successorNote": null,
         "aliasWriteCheck": {
           "isWriter": null,
@@ -2905,10 +2971,11 @@
         "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
         "parityObligation": {
           "current": "docs/doc-registry.json",
-          "candidate": "docs/doc-registry.json",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "samePassageOwner": "dynamic-014369"
       }
     },
     {
@@ -2955,8 +3022,8 @@
           "endLine": 3964
         },
         "role": "reader/default",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: \"  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n\\n  fs.mkdirSync(path.dirname(mdPath), { recursive: true });\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "disposition": "parked",
+        "reason": "L12-69: Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized. Own passage \"  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n\\n  fs.mkdirSync(path.dirname(mdPath), { recursive: true });\"",
         "target": null,
         "anchor": null,
         "resolverWitness": {
@@ -2964,12 +3031,12 @@
           "currentPath": "docs/doc-registry.json",
           "exists": true
         },
-        "timing": "none",
+        "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
+        "blockedCategory": "step5-parity",
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependencyCategory": "step5-parity",
         "successorNote": null,
         "aliasWriteCheck": {
           "isWriter": null,
@@ -2985,10 +3052,11 @@
         "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
         "parityObligation": {
           "current": "docs/doc-registry.json",
-          "candidate": "docs/doc-registry.json",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "samePassageOwner": "dynamic-014378"
       }
     },
     {
@@ -3186,7 +3254,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/stage-status-driving-coordination/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -3258,7 +3326,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/tsk-3bn-merge-conductor-harness-v2/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -3323,8 +3391,8 @@
           "endLine": 3917
         },
         "role": "reader/default",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: \"// The doc registry is opt-in per project: doctor --fix only refreshes it.\\nfunction docRegistryAdopted(root) {\\n  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));\\n}\\n\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "disposition": "parked",
+        "reason": "L12-69: Cross-seam bounded consumer target proof pending. Own passage \"// The doc registry is opt-in per project: doctor --fix only refreshes it.\\nfunction docRegistryAdopted(root) {\\n  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));\\n}\\n\"",
         "target": null,
         "anchor": null,
         "resolverWitness": {
@@ -3332,12 +3400,12 @@
           "currentPath": "docs/doc-registry.md",
           "exists": true
         },
-        "timing": "none",
+        "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
+        "blockedCategory": "step5-parity",
+        "blockedReason": "Cross-seam bounded consumer target proof pending.",
+        "dependency": "Cross-seam bounded consumer target proof pending.",
+        "dependencyCategory": "step5-parity",
         "successorNote": null,
         "aliasWriteCheck": {
           "isWriter": null,
@@ -3353,10 +3421,11 @@
         "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
         "parityObligation": {
           "current": "docs/doc-registry.md",
-          "candidate": "docs/doc-registry.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "Cross-seam bounded consumer target proof pending."
+        },
+        "samePassageOwner": "dynamic-014361"
       }
     },
     {
@@ -3410,7 +3479,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/how-to",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -3554,710 +3623,6 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/tsk-4xg-plugin-marketplace-doctor-check/",
-          "exists": false
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": "history-design-contract-evidence",
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "references",
-      "index": 42,
-      "value": {
-        "referenceId": "reference-003843",
-        "admission": "REJECT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000363",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000363",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 2453,
-            "columnStart": 18,
-            "columnEndExclusive": 68,
-            "text": "docs/history/agent-coordination-foundation/plan.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 68,
-            "columnStart": 18,
-            "line": 2434,
-            "text": "docs/history/agent-coordination-foundation/plan.md"
-          }
-        ],
-        "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
-        "passage": "    serves: { outputKind: 'change', domain: 'code', mutates: true },\n  },\n  // P2-runtime (docs/history/agent-coordination-foundation/plan.md):\n  // extended by observed frequency, in this priority order. Deliberately\n  // no `prefer`/`overrides` here either, same reasoning as `code:implement`",
-        "passageSpan": {
-          "startLine": 2451,
-          "endLine": 2455
-        },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: \"    serves: { outputKind: 'change', domain: 'code', mutates: true },\\n  },\\n  // P2-runtime (docs/history/agent-coordination-foundation/plan.md):\\n  // extended by observed frequency, in this priority order. Deliberately\\n  // no `prefer`/`overrides` here either, same reasoning as `code:implement`\"",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/agent-coordination-foundation/plan.md",
-          "exists": true
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": "history-design-contract-evidence",
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "references",
-      "index": 43,
-      "value": {
-        "referenceId": "reference-003844",
-        "admission": "REJECT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000359",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000359",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 2381,
-            "columnStart": 15,
-            "columnEndExclusive": 69,
-            "text": "docs/history/dispatch-activation-and-handoff-redesign/"
-          },
-          {
-            "line": 2382,
-            "columnStart": 1,
-            "columnEndExclusive": 14,
-            "text": "// CONTEXT.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 69,
-            "columnStart": 15,
-            "line": 2362,
-            "text": "docs/history/dispatch-activation-and-handoff-redesign/"
-          },
-          {
-            "columnEndExclusive": 14,
-            "columnStart": 1,
-            "line": 2363,
-            "text": "// CONTEXT.md"
-          }
-        ],
-        "matchedExpression": "docs/history/dispatch-activation-and-handoff-redesign/\n// CONTEXT.md",
-        "passage": "registerFix({ id: 'lock-fences', fix: (cwd) => fixLockFences(cwd) });\n\n// tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/\n// CONTEXT.md D2): the two role-by-intelligence capability slots --\n// `advise` (value comes from disagreement, never changes state, one\n// question/one answer) and `execute` (value comes from compliance,",
-        "passageSpan": {
-          "startLine": 2379,
-          "endLine": 2384
-        },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: \"registerFix({ id: 'lock-fences', fix: (cwd) => fixLockFences(cwd) });\\n\\n// tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/\\n// CONTEXT.md D2): the two role-by-intelligence capability slots --\\n// `advise` (value comes from disagreement, never changes state, one\\n// question/one answer) and `execute` (value comes from compliance,\"",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md",
-          "exists": true
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": "history-design-contract-evidence",
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "references",
-      "index": 44,
-      "value": {
-        "referenceId": "reference-003845",
-        "admission": "REJECT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000354",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000354",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 2045,
-            "columnStart": 20,
-            "columnEndExclusive": 69,
-            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 69,
-            "columnStart": 20,
-            "line": 2026,
-            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
-          }
-        ],
-        "matchedExpression": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-        "passage": "// reason this check exists. The\n// re-baseline-after-acknowledgment step is a deliberate, documented\n// manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not\n// a blanket `doctor --fix` sweep.\n// Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under",
-        "passageSpan": {
-          "startLine": 2043,
-          "endLine": 2047
-        },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: '// reason this check exists. The\\n// re-baseline-after-acknowledgment step is a deliberate, documented\\n// manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not\\n// a blanket `doctor --fix` sweep.\\n// Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under'",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-          "exists": false
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": "history-design-contract-evidence",
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "references",
-      "index": 45,
-      "value": {
-        "referenceId": "reference-003846",
-        "admission": "ADMIT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000394",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000394",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 3967,
-            "columnStart": 49,
-            "columnEndExclusive": 69,
-            "text": "docs/doc-registry.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 69,
-            "columnStart": 49,
-            "line": 3948,
-            "text": "docs/doc-registry.md"
-          }
-        ],
-        "matchedExpression": "docs/doc-registry.md",
-        "passage": "  fs.writeFileSync(mdPath, mdContent, 'utf8');\n  fs.writeFileSync(jsonPath, jsonContent, 'utf8');\n  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };\n}\n",
-        "passageSpan": {
-          "startLine": 3965,
-          "endLine": 3969
-        },
-        "role": "emitted-message",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: \"  fs.writeFileSync(mdPath, mdContent, 'utf8');\\n  fs.writeFileSync(jsonPath, jsonContent, 'utf8');\\n  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };\\n}\\n\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/doc-registry.md",
-          "exists": true
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": null,
-        "receiptId": "setup-doctor-roots-pilot",
-        "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
-        "parityObligation": {
-          "current": "docs/doc-registry.md",
-          "candidate": "docs/doc-registry.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "references",
-      "index": 46,
-      "value": {
-        "referenceId": "reference-003847",
-        "admission": "REJECT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000380",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000380",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 3581,
-            "columnStart": 20,
-            "columnEndExclusive": 70,
-            "text": "docs/history/herdr-web-dashboard-plan-realignment/"
-          },
-          {
-            "line": 3582,
-            "columnStart": 1,
-            "columnEndExclusive": 14,
-            "text": "// CONTEXT.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 70,
-            "columnStart": 20,
-            "line": 3562,
-            "text": "docs/history/herdr-web-dashboard-plan-realignment/"
-          },
-          {
-            "columnEndExclusive": 14,
-            "columnStart": 1,
-            "line": 3563,
-            "text": "// CONTEXT.md"
-          }
-        ],
-        "matchedExpression": "docs/history/herdr-web-dashboard-plan-realignment/\n// CONTEXT.md",
-        "passage": "});\n\n// tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/\n// CONTEXT.md, carrying forward D10 of the original cluster's own\n// CONTEXT.md): the web dashboard's static-serving toggle, read fail-OPEN\n// from Rust (packages/herdr-fgos-common/rust/src/settings.rs's `WebDashboardSettings` --",
-        "passageSpan": {
-          "startLine": 3579,
-          "endLine": 3584
-        },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: \"});\\n\\n// tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/\\n// CONTEXT.md, carrying forward D10 of the original cluster's own\\n// CONTEXT.md): the web dashboard's static-serving toggle, read fail-OPEN\\n// from Rust (packages/herdr-fgos-common/rust/src/settings.rs's `WebDashboardSettings` --\"",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md",
-          "exists": true
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": "history-design-contract-evidence",
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "references",
-      "index": 47,
-      "value": {
-        "referenceId": "reference-003848",
-        "admission": "REJECT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000349",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000349",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 215,
-            "columnStart": 24,
-            "columnEndExclusive": 70,
-            "text": "docs/history/doctor-fix-gate-bypass/CONTEXT.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 70,
-            "columnStart": 24,
-            "line": 211,
-            "text": "docs/history/doctor-fix-gate-bypass/CONTEXT.md"
-          }
-        ],
-        "matchedExpression": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
-        "passage": "\n/**\n * Register a fix (D3, docs/history/doctor-fix-gate-bypass/CONTEXT.md):\n * `fix` is a function `(cwd) => { changed, message }` that repairs whatever\n * this entry's own `check` (if any) reports as failing — idempotent, and",
-        "passageSpan": {
-          "startLine": 213,
-          "endLine": 217
-        },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: \"\\n/**\\n * Register a fix (D3, docs/history/doctor-fix-gate-bypass/CONTEXT.md):\\n * `fix` is a function `(cwd) => { changed, message }` that repairs whatever\\n * this entry's own `check` (if any) reports as failing — idempotent, and\"",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
-          "exists": true
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": "history-design-contract-evidence",
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "references",
-      "index": 48,
-      "value": {
-        "referenceId": "reference-003849",
-        "admission": "REJECT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000353",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000353",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 2034,
-            "columnStart": 41,
-            "columnEndExclusive": 71,
-            "text": "docs/history/events-jsonl-git-"
-          },
-          {
-            "line": 2035,
-            "columnStart": 1,
-            "columnEndExclusive": 33,
-            "text": "// tracked-truncation/CONTEXT.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 71,
-            "columnStart": 41,
-            "line": 2015,
-            "text": "docs/history/events-jsonl-git-"
-          },
-          {
-            "columnEndExclusive": 33,
-            "columnStart": 1,
-            "line": 2016,
-            "text": "// tracked-truncation/CONTEXT.md"
-          }
-        ],
-        "matchedExpression": "docs/history/events-jsonl-git-\n// tracked-truncation/CONTEXT.md",
-        "passage": "});\n\n// events-jsonl-not-truncated (tsk-cgg, docs/history/events-jsonl-git-\n// tracked-truncation/CONTEXT.md D1): catches a stash/checkout/reset/clean-\n// style silent truncation of the shared, git-tracked .fgos/events.jsonl --\n// a failure class a seq-contiguity check is structurally blind to, since",
-        "passageSpan": {
-          "startLine": 2032,
-          "endLine": 2037
-        },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: '});\\n\\n// events-jsonl-not-truncated (tsk-cgg, docs/history/events-jsonl-git-\\n// tracked-truncation/CONTEXT.md D1): catches a stash/checkout/reset/clean-\\n// style silent truncation of the shared, git-tracked .fgos/events.jsonl --\\n// a failure class a seq-contiguity check is structurally blind to, since'",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/events-jsonl-git-tracked-truncation/CONTEXT.md",
-          "exists": true
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": "history-design-contract-evidence",
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "references",
-      "index": 49,
-      "value": {
-        "referenceId": "reference-003850",
-        "admission": "REJECT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000374",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000374",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 3063,
-            "columnStart": 43,
-            "columnEndExclusive": 72,
-            "text": "docs/explanation/gate-bypass-"
-          },
-          {
-            "line": 3064,
-            "columnStart": 1,
-            "columnEndExclusive": 13,
-            "text": "// design.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 72,
-            "columnStart": 43,
-            "line": 3044,
-            "text": "docs/explanation/gate-bypass-"
-          },
-          {
-            "columnEndExclusive": 13,
-            "columnStart": 1,
-            "line": 3045,
-            "text": "// design.md"
-          }
-        ],
-        "matchedExpression": "docs/explanation/gate-bypass-\n// design.md",
-        "passage": "// OWN key, modeled on gateBypass's three registrations immediately above but\n// deliberately never folded into that section: gateBypass's floor is\n// documented as never touching Iron Law (docs/explanation/gate-bypass-\n// design.md), and reusing its level vocabulary here would erase that line.\n//\n// `ask` is both the default this fix writes and what every unreadable value",
-        "passageSpan": {
-          "startLine": 3061,
-          "endLine": 3066
-        },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: \"// OWN key, modeled on gateBypass's three registrations immediately above but\\n// deliberately never folded into that section: gateBypass's floor is\\n// documented as never touching Iron Law (docs/explanation/gate-bypass-\\n// design.md), and reusing its level vocabulary here would erase that line.\\n//\\n// `ask` is both the default this fix writes and what every unreadable value\"",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/explanation/gate-bypass-design.md",
-          "exists": false
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": "history-design-contract-evidence",
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "seam": "setup-doctor-roots",
-      "kind": "references",
-      "index": 50,
-      "value": {
-        "referenceId": "reference-003851",
-        "admission": "REJECT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000377",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000377",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 3431,
-            "columnStart": 13,
-            "columnEndExclusive": 74,
-            "text": "docs/history/automated-changelog-compound-learn/DISCUSSION.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 74,
-            "columnStart": 13,
-            "line": 3412,
-            "text": "docs/history/automated-changelog-compound-learn/DISCUSSION.md"
-          }
-        ],
-        "matchedExpression": "docs/history/automated-changelog-compound-learn/DISCUSSION.md",
-        "passage": "});\n\n// tsk-3ip (docs/history/automated-changelog-compound-learn/DISCUSSION.md\n// §6.1/§6.4): observe/remind only -- never judges whether a change\n// deserved an entry, never blocks merge (R2, tsk-28x §6.4). Exported so",
-        "passageSpan": {
-          "startLine": 3429,
-          "endLine": 3433
-        },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: '});\\n\\n// tsk-3ip (docs/history/automated-changelog-compound-learn/DISCUSSION.md\\n// §6.1/§6.4): observe/remind only -- never judges whether a change\\n// deserved an entry, never blocks merge (R2, tsk-28x §6.4). Exported so'",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/automated-changelog-compound-learn/DISCUSSION.md",
           "exists": true
         },
         "timing": "none",

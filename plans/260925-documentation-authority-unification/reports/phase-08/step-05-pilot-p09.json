@@ -8,6 +8,669 @@
       "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
       "seam": "setup-doctor-roots",
       "kind": "dynamicTraces",
+      "index": 137,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013805",
+        "originalTuple": [
+          71,
+          14,
+          71,
+          64,
+          "lockRoot: resolveStateRoot({ fgosDir }).lockRoot }",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 71,
+        "currentPassage": {
+          "startLine": 69,
+          "endLine": 73,
+          "text": "function machineLockRoot(fgosDir) {\n  try {\n    return { lockRoot: resolveStateRoot({ fgosDir }).lockRoot };\n  } catch (err) {\n    return { error: err.message };"
+        },
+        "caller": {
+          "line": 69,
+          "declaration": "function machineLockRoot(fgosDir) {"
+        },
+        "inputs": [
+          "lockRoot: resolveStateRoot({ fgosDir }).lockRoot }"
+        ],
+        "role": "non-document-infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete owning subsystem: holder-lock registry/record diagnostics. function machineLockRoot(fgosDir) { uses 'lockRoot: resolveStateRoot({ fgosDir }).lockRoot }' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "reason": "Concrete owning subsystem: holder-lock registry/record diagnostics. function machineLockRoot(fgosDir) { uses 'lockRoot: resolveStateRoot({ fgosDir }).lockRoot }' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 138,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013806",
+        "originalTuple": [
+          719,
+          32,
+          719,
+          54,
+          "path.resolve(repoRoot)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 719,
+        "currentPassage": {
+          "startLine": 717,
+          "endLine": 721,
+          "text": "  let global;\n  try {\n    project = readSharedConfig(path.resolve(repoRoot));\n    global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig();\n  } catch (err) {"
+        },
+        "caller": {
+          "line": 715,
+          "declaration": "export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {"
+        },
+        "inputs": [
+          "path.resolve(repoRoot)"
+        ],
+        "role": "non-document-infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete owning subsystem: holder-lock registry/record diagnostics. export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) { uses 'path.resolve(repoRoot)' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "reason": "Concrete owning subsystem: holder-lock registry/record diagnostics. export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) { uses 'path.resolve(repoRoot)' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 139,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013807",
+        "originalTuple": [
+          720,
+          5,
+          720,
+          88,
+          "global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig()",
+          "config/default-root",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 720,
+        "currentPassage": {
+          "startLine": 718,
+          "endLine": 722,
+          "text": "  try {\n    project = readSharedConfig(path.resolve(repoRoot));\n    global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig();\n  } catch (err) {\n    return { passed: false, message: `${KILL_WAIT_CONFIG_KEY} unreadable: ${err.message}` };"
+        },
+        "caller": {
+          "line": 715,
+          "declaration": "export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {"
+        },
+        "inputs": [
+          "global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig()"
+        ],
+        "role": "non-document-infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete owning subsystem: holder-lock registry/record diagnostics. export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) { uses 'global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig()' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "reason": "Concrete owning subsystem: holder-lock registry/record diagnostics. export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) { uses 'global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig()' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 140,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013808",
+        "originalTuple": [
+          722,
+          38,
+          722,
+          90,
+          "`${KILL_WAIT_CONFIG_KEY} unreadable: ${err.message}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 722,
+        "currentPassage": {
+          "startLine": 720,
+          "endLine": 724,
+          "text": "    global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig();\n  } catch (err) {\n    return { passed: false, message: `${KILL_WAIT_CONFIG_KEY} unreadable: ${err.message}` };\n  }\n  const fromProject = killWaitOf(project);"
+        },
+        "caller": {
+          "line": 715,
+          "declaration": "export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {"
+        },
+        "inputs": [
+          "`${KILL_WAIT_CONFIG_KEY} unreadable: ${err.message}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${KILL_WAIT_CONFIG_KEY} unreadable: ${err.message}`'. It formats values at export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${KILL_WAIT_CONFIG_KEY} unreadable: ${err.message}`'. It formats values at export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 141,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013809",
+        "originalTuple": [
+          725,
+          9,
+          725,
+          40,
+          "fromGlobal = killWaitOf(global)",
+          "config/default-root",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 725,
+        "currentPassage": {
+          "startLine": 723,
+          "endLine": 727,
+          "text": "  }\n  const fromProject = killWaitOf(project);\n  const fromGlobal = killWaitOf(global);\n  const [value, source] = fromProject !== undefined ? [fromProject, 'project'] : fromGlobal !== undefined ? [fromGlobal, 'global'] : [undefined, 'default'];\n  if (value === undefined) return { passed: true, message: `${KILL_WAIT_CONFIG_KEY} = ${DEFAULT_KILL_WAIT_MS} (default)` };"
+        },
+        "caller": {
+          "line": 715,
+          "declaration": "export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {"
+        },
+        "inputs": [
+          "fromGlobal = killWaitOf(global)"
+        ],
+        "role": "non-document-infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete owning subsystem: holder-lock registry/record diagnostics. export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) { uses 'fromGlobal = killWaitOf(global)' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "reason": "Concrete owning subsystem: holder-lock registry/record diagnostics. export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) { uses 'fromGlobal = killWaitOf(global)' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 142,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013810",
+        "originalTuple": [
+          727,
+          60,
+          727,
+          121,
+          "`${KILL_WAIT_CONFIG_KEY} = ${DEFAULT_KILL_WAIT_MS} (default)`",
+          "template-string",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 727,
+        "currentPassage": {
+          "startLine": 725,
+          "endLine": 729,
+          "text": "  const fromGlobal = killWaitOf(global);\n  const [value, source] = fromProject !== undefined ? [fromProject, 'project'] : fromGlobal !== undefined ? [fromGlobal, 'global'] : [undefined, 'default'];\n  if (value === undefined) return { passed: true, message: `${KILL_WAIT_CONFIG_KEY} = ${DEFAULT_KILL_WAIT_MS} (default)` };\n  if (!Number.isInteger(value) || value < 1 || value > MAX_KILL_WAIT_MS) {\n    return { passed: false, message: `${KILL_WAIT_CONFIG_KEY} = ${JSON.stringify(value)} (${source}) must be an integer from 1 to ${MAX_KILL_WAIT_MS}` };"
+        },
+        "caller": {
+          "line": 715,
+          "declaration": "export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {"
+        },
+        "inputs": [
+          "`${KILL_WAIT_CONFIG_KEY} = ${DEFAULT_KILL_WAIT_MS} (default)`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${KILL_WAIT_CONFIG_KEY} = ${DEFAULT_KILL_WAIT_MS} (default)`'. It formats values at export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${KILL_WAIT_CONFIG_KEY} = ${DEFAULT_KILL_WAIT_MS} (default)`'. It formats values at export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 143,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013811",
+        "originalTuple": [
+          729,
+          38,
+          729,
+          151,
+          "`${KILL_WAIT_CONFIG_KEY} = ${JSON.stringify(value)} (${source}) must be an integer from 1 to ${MAX_KILL_WAIT_MS}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 729,
+        "currentPassage": {
+          "startLine": 727,
+          "endLine": 731,
+          "text": "  if (value === undefined) return { passed: true, message: `${KILL_WAIT_CONFIG_KEY} = ${DEFAULT_KILL_WAIT_MS} (default)` };\n  if (!Number.isInteger(value) || value < 1 || value > MAX_KILL_WAIT_MS) {\n    return { passed: false, message: `${KILL_WAIT_CONFIG_KEY} = ${JSON.stringify(value)} (${source}) must be an integer from 1 to ${MAX_KILL_WAIT_MS}` };\n  }\n  return { passed: true, message: `${KILL_WAIT_CONFIG_KEY} = ${value} (${source})` };"
+        },
+        "caller": {
+          "line": 715,
+          "declaration": "export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {"
+        },
+        "inputs": [
+          "`${KILL_WAIT_CONFIG_KEY} = ${JSON.stringify(value)} (${source}) must be an integer from 1 to ${MAX_KILL_WAIT_MS}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${KILL_WAIT_CONFIG_KEY} = ${JSON.stringify(value)} (${source}) must be an integer from 1 to ${MAX_KILL_WAIT_MS}`'. It formats values at export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${KILL_WAIT_CONFIG_KEY} = ${JSON.stringify(value)} (${source}) must be an integer from 1 to ${MAX_KILL_WAIT_MS}`'. It formats values at export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 144,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013812",
+        "originalTuple": [
+          731,
+          35,
+          731,
+          83,
+          "`${KILL_WAIT_CONFIG_KEY} = ${value} (${source})`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 731,
+        "currentPassage": {
+          "startLine": 729,
+          "endLine": 733,
+          "text": "    return { passed: false, message: `${KILL_WAIT_CONFIG_KEY} = ${JSON.stringify(value)} (${source}) must be an integer from 1 to ${MAX_KILL_WAIT_MS}` };\n  }\n  return { passed: true, message: `${KILL_WAIT_CONFIG_KEY} = ${value} (${source})` };\n}\n"
+        },
+        "caller": {
+          "line": 715,
+          "declaration": "export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {"
+        },
+        "inputs": [
+          "`${KILL_WAIT_CONFIG_KEY} = ${value} (${source})`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${KILL_WAIT_CONFIG_KEY} = ${value} (${source})`'. It formats values at export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${KILL_WAIT_CONFIG_KEY} = ${value} (${source})`'. It formats values at export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 145,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013813",
+        "originalTuple": [
+          744,
+          9,
+          744,
+          38,
+          "fgosDir = fgosDirOf(repoRoot)",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 744,
+        "currentPassage": {
+          "startLine": 742,
+          "endLine": 746,
+          "text": " */\nexport function checkStateRoot(repoRoot, { env = process.env } = {}) {\n  const fgosDir = fgosDirOf(repoRoot);\n  let node;\n  let host;"
+        },
+        "caller": {
+          "line": 743,
+          "declaration": "export function checkStateRoot(repoRoot, { env = process.env } = {}) {"
+        },
+        "inputs": [
+          "fgosDir = fgosDirOf(repoRoot)"
+        ],
+        "role": "non-document-infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete owning subsystem: holder-lock registry/record diagnostics. export function checkStateRoot(repoRoot, { env = process.env } = {}) { uses 'fgosDir = fgosDirOf(repoRoot)' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "reason": "Concrete owning subsystem: holder-lock registry/record diagnostics. export function checkStateRoot(repoRoot, { env = process.env } = {}) { uses 'fgosDir = fgosDirOf(repoRoot)' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 146,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013814",
+        "originalTuple": [
+          751,
+          38,
+          751,
+          85,
+          "`cannot resolve the state root: ${err.message}`",
+          "template-string",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 751,
+        "currentPassage": {
+          "startLine": 749,
+          "endLine": 753,
+          "text": "    host = runStateRootRoute({ fgosDir, env });\n  } catch (err) {\n    return { passed: false, message: `cannot resolve the state root: ${err.message}` };\n  }\n  const describe = (r) => `stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`;"
+        },
+        "caller": {
+          "line": 743,
+          "declaration": "export function checkStateRoot(repoRoot, { env = process.env } = {}) {"
+        },
+        "inputs": [
+          "`cannot resolve the state root: ${err.message}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`cannot resolve the state root: ${err.message}`'. It formats values at export function checkStateRoot(repoRoot, { env = process.env } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`cannot resolve the state root: ${err.message}`'. It formats values at export function checkStateRoot(repoRoot, { env = process.env } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 147,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013815",
+        "originalTuple": [
+          753,
+          27,
+          753,
+          91,
+          "`stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 753,
+        "currentPassage": {
+          "startLine": 751,
+          "endLine": 755,
+          "text": "    return { passed: false, message: `cannot resolve the state root: ${err.message}` };\n  }\n  const describe = (r) => `stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`;\n  // Two spellings of one directory (a trailing slash in a pin) are the same root.\n  const same = (a, b) => path.resolve(a) === path.resolve(b);"
+        },
+        "caller": {
+          "line": 753,
+          "declaration": "const describe = (r) => `stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`;"
+        },
+        "inputs": [
+          "`stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`'. It formats values at const describe = (r) => `stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`;; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`'. It formats values at const describe = (r) => `stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`;; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 148,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013816",
+        "originalTuple": [
+          755,
+          26,
+          755,
+          41,
+          "path.resolve(a)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 755,
+        "currentPassage": {
+          "startLine": 753,
+          "endLine": 757,
+          "text": "  const describe = (r) => `stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`;\n  // Two spellings of one directory (a trailing slash in a pin) are the same root.\n  const same = (a, b) => path.resolve(a) === path.resolve(b);\n  if (!same(node.stateRoot, host.stateRoot) || !same(node.lockRoot, host.lockRoot)) {\n    return { passed: false, message: `Node and the host disagree: Node ${describe(node)}; host ${describe(host)}` };"
+        },
+        "caller": {
+          "line": 755,
+          "declaration": "const same = (a, b) => path.resolve(a) === path.resolve(b);"
+        },
+        "inputs": [
+          "path.resolve(a)"
+        ],
+        "role": "non-document-infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete owning subsystem: holder-lock registry/record diagnostics. const same = (a, b) => path.resolve(a) === path.resolve(b); uses 'path.resolve(a)' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "reason": "Concrete owning subsystem: holder-lock registry/record diagnostics. const same = (a, b) => path.resolve(a) === path.resolve(b); uses 'path.resolve(a)' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 149,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013817",
+        "originalTuple": [
+          755,
+          46,
+          755,
+          61,
+          "path.resolve(b)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 755,
+        "currentPassage": {
+          "startLine": 753,
+          "endLine": 757,
+          "text": "  const describe = (r) => `stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`;\n  // Two spellings of one directory (a trailing slash in a pin) are the same root.\n  const same = (a, b) => path.resolve(a) === path.resolve(b);\n  if (!same(node.stateRoot, host.stateRoot) || !same(node.lockRoot, host.lockRoot)) {\n    return { passed: false, message: `Node and the host disagree: Node ${describe(node)}; host ${describe(host)}` };"
+        },
+        "caller": {
+          "line": 755,
+          "declaration": "const same = (a, b) => path.resolve(a) === path.resolve(b);"
+        },
+        "inputs": [
+          "path.resolve(b)"
+        ],
+        "role": "non-document-infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete owning subsystem: holder-lock registry/record diagnostics. const same = (a, b) => path.resolve(a) === path.resolve(b); uses 'path.resolve(b)' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "reason": "Concrete owning subsystem: holder-lock registry/record diagnostics. const same = (a, b) => path.resolve(a) === path.resolve(b); uses 'path.resolve(b)' in this subsystem; whole source/body and exact current passage are attached. This is not a documentation-authority root rewrite.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/holder-lock-checks.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "9b01d9709d1e4f5a29c5d3ea2049c7c9e9e75c11f371c1ad383249c76731a1ac",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
       "index": 150,
       "value": {
         "proofCommand": null,
@@ -3110,7 +3773,7 @@
         },
         "role": "comment",
         "disposition": "preserve",
-        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: ' * In production default discovery, instruction sources are strictly discovered\\n * from within projectRoot. Allowed component and domain owners are authoritatively\\n * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.\\n *\\n * Custom roots (coreRoot, componentsRoot, domainsRoot) are test-only/internal options'",
+        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: ' * In production default discovery, instruction sources are strictly discovered\\n * from within projectRoot. Allowed component and domain owners are authoritatively\\n * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.\\n *\\n * Custom roots (coreRoot, componentsRoot, domainsRoot) are test-only/internal options' L12-69: live-behavior comment navigation to retained architecture manifest; it follows the actual manifest reader if that contract changes.",
         "target": null,
         "anchor": null,
         "resolverWitness": {
@@ -3133,7 +3796,7 @@
         "proposedReplacement": null,
         "priorRecordRefs": [],
         "fixtureProvenance": null,
-        "rejectionRule": "history-design-contract-evidence",
+        "rejectionRule": "retained-live-contract-comment",
         "receiptId": "setup-doctor-roots-pilot"
       }
     },
@@ -3182,7 +3845,7 @@
         },
         "role": "comment",
         "disposition": "preserve",
-        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: '/**\\n * Discover allowed components and domains under project root from the authoritative\\n * architecture manifest (e.g. docs/architecture-manifest.json), rejecting unregistered roots.\\n *\\n * Options:'",
+        "reason": "L12-26(5) history/design/contract evidence citation in a source comment; the quoted implementation rationale is not an operative runtime read of the citation: Exact own passage: '/**\\n * Discover allowed components and domains under project root from the authoritative\\n * architecture manifest (e.g. docs/architecture-manifest.json), rejecting unregistered roots.\\n *\\n * Options:' L12-69: live-behavior comment navigation to retained architecture manifest; it follows the actual manifest reader if that contract changes.",
         "target": null,
         "anchor": null,
         "resolverWitness": {
@@ -3205,7 +3868,7 @@
         "proposedReplacement": null,
         "priorRecordRefs": [],
         "fixtureProvenance": null,
-        "rejectionRule": "history-design-contract-evidence",
+        "rejectionRule": "retained-live-contract-comment",
         "receiptId": "setup-doctor-roots-pilot"
       }
     },
@@ -5206,8 +5869,23 @@
       "kind": "dynamicTraces",
       "index": 39,
       "value": {
-        "proofCommand": null,
-        "parityObligation": null,
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            361,
+            9,
+            361,
+            104,
+            "`Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`",
+            "template-string",
+            true,
+            "reader"
+          ],
+          "candidateConstruction": "docs/decisions/index.md",
+          "comparison": "Exact same-input emitted/read behavior; literal patch owner supplies one diff. No parity pass inferred.",
+          "blocker": null,
+          "literalOwner": "reference-003798"
+        },
         "id": "dynamic-013969",
         "originalTuple": [
           361,
@@ -5223,7 +5901,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
+        "admission": "ADMIT",
         "disposition": "preserve",
         "currentLine": 361,
         "currentPassage": {
@@ -5238,15 +5916,16 @@
         "inputs": [
           "`Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`"
         ],
-        "role": "instruction-metadata",
-        "targetSetOrConstruction": null,
+        "role": "emitted-message",
+        "targetSetOrConstruction": "docs/decisions/index.md",
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Metadata parsing/validation in const toArrayOfStrings = (val, fieldName) => {; '`Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`' is not a new doc root or filesystem target.",
-        "reason": "Metadata parsing/validation in const toArrayOfStrings = (val, fieldName) => {; '`Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`' is not a new doc root or filesystem target.",
+        "rejectedAsUnrelatedReason": null,
+        "reason": "L12-69: Same passage as reference-003798; that literal record owns the single outcome and any Phase 9 pointer diff.",
         "blockedSeams": [],
         "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
+        "receiptId": "setup-doctor-roots-pilot",
+        "samePassageOwner": "reference-003798"
       }
     },
     {
@@ -5995,22 +6674,8 @@
       "kind": "dynamicTraces",
       "index": 52,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            453,
-            8,
-            453,
-            79,
-            "manifestPath: custom path to architecture manifest (internal/test-only)",
-            "config/default-root",
-            true,
-            "comment"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-013982",
         "originalTuple": [
           453,
@@ -6026,7 +6691,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 453,
         "currentPassage": {
@@ -6041,12 +6706,12 @@
         "inputs": [
           "manifestPath: custom path to architecture manifest (internal/test-only)"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'manifestPath: custom path to architecture manifest (internal/test-only)'. Pinned current passage: ' *\\n * Options:\\n *   - manifestPath: custom path to architecture manifest (internal/test-only)\\n *   - allowedComponents: explicit array/set of allowed component names (internal/test-only)\\n *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'manifestPath: custom path to architecture manifest (internal/test-only)'. Pinned current passage: ' *\\n * Options:\\n *   - manifestPath: custom path to architecture manifest (internal/test-only)\\n *   - allowedComponents: explicit array/set of allowed component names (internal/test-only)\\n *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)'",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -6291,11 +6956,16 @@
         "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Failed to parse architecture manifest at ${manifestPath}: ${err.message}`'. It formats values at export function discoverKnownOwners(projectRoot, options = {}) {; contains no documentation-location operand and is not a filesystem operation.",
-        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Failed to parse architecture manifest at ${manifestPath}: ${err.message}`'. It formats values at export function discoverKnownOwners(projectRoot, options = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Failed to parse architecture manifest at ${manifestPath}: ${err.message}`'. It formats values at export function discoverKnownOwners(projectRoot, options = {}) {; contains no documentation-location operand and is not a filesystem operation. L12-69: manifestPath derives from preserved dynamic-013983..013985; its error path is carried by that unchanged retained-manifest construction receipt.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Failed to parse architecture manifest at ${manifestPath}: ${err.message}`'. It formats values at export function discoverKnownOwners(projectRoot, options = {}) {; contains no documentation-location operand and is not a filesystem operation. L12-69: manifestPath derives from preserved dynamic-013983..013985; its error path is carried by that unchanged retained-manifest construction receipt.",
         "blockedSeams": [],
         "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
+        "receiptId": "setup-doctor-roots-pilot",
+        "sameConstructionOwner": [
+          "dynamic-013983",
+          "dynamic-013984",
+          "dynamic-013985"
+        ]
       }
     },
     {
@@ -6371,22 +7041,8 @@
       "kind": "dynamicTraces",
       "index": 58,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            571,
-            33,
-            571,
-            49,
-            "scope === scope)",
-            "config/default-root",
-            true,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-013988",
         "originalTuple": [
           571,
@@ -6402,7 +7058,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 571,
         "currentPassage": {
@@ -6417,12 +7073,12 @@
         "inputs": [
           "scope === scope)"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'scope === scope)'. Pinned current passage: '\\n  findByScope(scope) {\\n    return this.filter((u) => u.scope === scope);\\n  }\\n}'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'scope === scope)'. Pinned current passage: '\\n  findByScope(scope) {\\n    return this.filter((u) => u.scope === scope);\\n  }\\n}'",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -6436,22 +7092,8 @@
       "kind": "dynamicTraces",
       "index": 59,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            590,
-            8,
-            590,
-            72,
-            "coreRoot: (internal/test-only) custom path to core/instructions/",
-            "config/default-root",
-            true,
-            "comment"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-013989",
         "originalTuple": [
           590,
@@ -6467,7 +7109,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 590,
         "currentPassage": {
@@ -6482,12 +7124,12 @@
         "inputs": [
           "coreRoot: (internal/test-only) custom path to core/instructions/"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'coreRoot: (internal/test-only) custom path to core/instructions/'. Pinned current passage: ' *\\n * Options:\\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'coreRoot: (internal/test-only) custom path to core/instructions/'. Pinned current passage: ' *\\n * Options:\\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/'",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -6501,22 +7143,8 @@
       "kind": "dynamicTraces",
       "index": 60,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            591,
-            8,
-            591,
-            71,
-            "componentsRoot: (internal/test-only) custom path to components/",
-            "config/default-root",
-            true,
-            "comment"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-013990",
         "originalTuple": [
           591,
@@ -6532,7 +7160,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 591,
         "currentPassage": {
@@ -6547,12 +7175,12 @@
         "inputs": [
           "componentsRoot: (internal/test-only) custom path to components/"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'componentsRoot: (internal/test-only) custom path to components/'. Pinned current passage: ' * Options:\\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'componentsRoot: (internal/test-only) custom path to components/'. Pinned current passage: ' * Options:\\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest'",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -6566,22 +7194,8 @@
       "kind": "dynamicTraces",
       "index": 61,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            592,
-            8,
-            592,
-            65,
-            "domainsRoot: (internal/test-only) custom path to domains/",
-            "config/default-root",
-            true,
-            "comment"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-013991",
         "originalTuple": [
           592,
@@ -6597,7 +7211,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 592,
         "currentPassage": {
@@ -6612,12 +7226,12 @@
         "inputs": [
           "domainsRoot: (internal/test-only) custom path to domains/"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'domainsRoot: (internal/test-only) custom path to domains/'. Pinned current passage: ' *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'domainsRoot: (internal/test-only) custom path to domains/'. Pinned current passage: ' *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)'",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -6631,22 +7245,8 @@
       "kind": "dynamicTraces",
       "index": 62,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            593,
-            8,
-            593,
-            79,
-            "manifestPath: (internal/test-only) custom path to architecture manifest",
-            "config/default-root",
-            true,
-            "comment"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-013992",
         "originalTuple": [
           593,
@@ -6662,7 +7262,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 593,
         "currentPassage": {
@@ -6677,792 +7277,12 @@
         "inputs": [
           "manifestPath: (internal/test-only) custom path to architecture manifest"
         ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 63,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            598,
-            28,
-            598,
-            61,
-            "coreRoot ?? path.join(projectRoot",
-            "config/default-root",
-            true,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-013993",
-        "originalTuple": [
-          598,
-          28,
-          598,
-          61,
-          "coreRoot ?? path.join(projectRoot",
-          "config/default-root",
-          true,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 598,
-        "currentPassage": {
-          "startLine": 596,
-          "endLine": 600,
-          "text": " */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "coreRoot ?? path.join(projectRoot"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 64,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            598,
-            40,
-            598,
-            86,
-            "path.join(projectRoot, 'core', 'instructions')",
-            "path-call",
-            true,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-013994",
-        "originalTuple": [
-          598,
-          40,
-          598,
-          86,
-          "path.join(projectRoot, 'core', 'instructions')",
-          "path-call",
-          true,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 598,
-        "currentPassage": {
-          "startLine": 596,
-          "endLine": 600,
-          "text": " */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "path.join(projectRoot, 'core', 'instructions')"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 65,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            598,
-            9,
-            598,
-            61,
-            "coreRoot = options.coreRoot ?? path.join(projectRoot",
-            "config/default-root",
-            true,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-013995",
-        "originalTuple": [
-          598,
-          9,
-          598,
-          61,
-          "coreRoot = options.coreRoot ?? path.join(projectRoot",
-          "config/default-root",
-          true,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 598,
-        "currentPassage": {
-          "startLine": 596,
-          "endLine": 600,
-          "text": " */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "coreRoot = options.coreRoot ?? path.join(projectRoot"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 66,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            599,
-            34,
-            599,
-            73,
-            "componentsRoot ?? path.join(projectRoot",
-            "config/default-root",
-            true,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-013996",
-        "originalTuple": [
-          599,
-          34,
-          599,
-          73,
-          "componentsRoot ?? path.join(projectRoot",
-          "config/default-root",
-          true,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 599,
-        "currentPassage": {
-          "startLine": 597,
-          "endLine": 601,
-          "text": "export function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "componentsRoot ?? path.join(projectRoot"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 67,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            599,
-            52,
-            599,
-            88,
-            "path.join(projectRoot, 'components')",
-            "path-call",
-            true,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-013997",
-        "originalTuple": [
-          599,
-          52,
-          599,
-          88,
-          "path.join(projectRoot, 'components')",
-          "path-call",
-          true,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 599,
-        "currentPassage": {
-          "startLine": 597,
-          "endLine": 601,
-          "text": "export function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "path.join(projectRoot, 'components')"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 68,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            599,
-            9,
-            599,
-            73,
-            "componentsRoot = options.componentsRoot ?? path.join(projectRoot",
-            "config/default-root",
-            true,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-013998",
-        "originalTuple": [
-          599,
-          9,
-          599,
-          73,
-          "componentsRoot = options.componentsRoot ?? path.join(projectRoot",
-          "config/default-root",
-          true,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 599,
-        "currentPassage": {
-          "startLine": 597,
-          "endLine": 601,
-          "text": "export function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "componentsRoot = options.componentsRoot ?? path.join(projectRoot"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 69,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            600,
-            31,
-            600,
-            67,
-            "domainsRoot ?? path.join(projectRoot",
-            "config/default-root",
-            true,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-013999",
-        "originalTuple": [
-          600,
-          31,
-          600,
-          67,
-          "domainsRoot ?? path.join(projectRoot",
-          "config/default-root",
-          true,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 600,
-        "currentPassage": {
-          "startLine": 598,
-          "endLine": 602,
-          "text": "  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "domainsRoot ?? path.join(projectRoot"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 70,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            600,
-            46,
-            600,
-            79,
-            "path.join(projectRoot, 'domains')",
-            "path-call",
-            true,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-014000",
-        "originalTuple": [
-          600,
-          46,
-          600,
-          79,
-          "path.join(projectRoot, 'domains')",
-          "path-call",
-          true,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 600,
-        "currentPassage": {
-          "startLine": 598,
-          "endLine": 602,
-          "text": "  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "path.join(projectRoot, 'domains')"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 71,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            600,
-            9,
-            600,
-            67,
-            "domainsRoot = options.domainsRoot ?? path.join(projectRoot",
-            "config/default-root",
-            true,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-014001",
-        "originalTuple": [
-          600,
-          9,
-          600,
-          67,
-          "domainsRoot = options.domainsRoot ?? path.join(projectRoot",
-          "config/default-root",
-          true,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 600,
-        "currentPassage": {
-          "startLine": 598,
-          "endLine": 602,
-          "text": "  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "domainsRoot = options.domainsRoot ?? path.join(projectRoot"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 72,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            610,
-            7,
-            610,
-            41,
-            "manifestPath: options.manifestPath",
-            "config/default-root",
-            false,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-014002",
-        "originalTuple": [
-          610,
-          7,
-          610,
-          41,
-          "manifestPath: options.manifestPath",
-          "config/default-root",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 610,
-        "currentPassage": {
-          "startLine": 608,
-          "endLine": 612,
-          "text": "  } else {\n    knownOwners = discoverKnownOwners(projectRoot, {\n      manifestPath: options.manifestPath,\n      allowedComponents: options.allowedComponents,\n      allowedDomains: options.allowedDomains,"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "manifestPath: options.manifestPath"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 73,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            617,
-            9,
-            617,
-            30,
-            "idToPaths = new Map()",
-            "config/default-root",
-            false,
-            "reader"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-014003",
-        "originalTuple": [
-          617,
-          9,
-          617,
-          30,
-          "idToPaths = new Map()",
-          "config/default-root",
-          false,
-          "reader"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 617,
-        "currentPassage": {
-          "startLine": 615,
-          "endLine": 619,
-          "text": "\n  const collected = [];\n  const idToPaths = new Map();\n\n  // 1. Core / platform instructions"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "idToPaths = new Map()"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "seam": "setup-doctor-roots",
-      "kind": "dynamicTraces",
-      "index": 74,
-      "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            621,
-            66,
-            621,
-            89,
-            "coreRoot : projectRoot)",
-            "config/default-root",
-            false,
-            "default-root"
-          ],
-          "candidateConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
-        "id": "dynamic-014004",
-        "originalTuple": [
-          621,
-          66,
-          621,
-          89,
-          "coreRoot : projectRoot)",
-          "config/default-root",
-          false,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 621,
-        "currentPassage": {
-          "startLine": 619,
-          "endLine": 623,
-          "text": "  // 1. Core / platform instructions\n  if (fs.existsSync(coreRoot)) {\n    const files = scanMarkdownFiles(coreRoot, options.coreRoot ? coreRoot : projectRoot);\n    for (const fullPath of files) {\n      const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));"
-        },
-        "caller": {
-          "line": 597,
-          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "coreRoot : projectRoot)"
-        ],
-        "role": "instruction-discovery",
-        "targetSetOrConstruction": "projectRoot/{core/instructions,components/<registered>/instructions,domains/<registered>/instructions}; manifest options.manifestPath ?? docs/architecture-manifest.json",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Retained manifest/default discovery door; actual scan rejects canonical paths escaping projectRoot, skips hidden entries, recognizes lowercase .md, rejects unknown owner/duplicate id. No root delta in pilot.",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'manifestPath: (internal/test-only) custom path to architecture manifest'. Pinned current passage: ' *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)\\n *   - allowDuplicates: boolean (default false, throws on duplicate id)'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'manifestPath: (internal/test-only) custom path to architecture manifest'. Pinned current passage: ' *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)\\n *   - allowDuplicates: boolean (default false, throws on duplicate id)'",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"

@@ -8,6 +8,108 @@
       "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
       "seam": "gateway-contract",
       "kind": "dynamicTraces",
+      "index": 48,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-000709",
+        "originalTuple": [
+          1934,
+          57,
+          1934,
+          77,
+          "Path::new(\"static\"))",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1934,
+        "currentPassage": {
+          "startLine": 1932,
+          "endLine": 1936,
+          "text": "        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });\n        let router = build_router(gateway, test_config(), PathBuf::from(\"/tmp\"));\n        let router = with_static_serving(router, false, Path::new(\"static\"));\n\n        let response = router"
+        },
+        "caller": {
+          "line": 1927,
+          "declaration": "async fn static_serving_disabled_leaves_unmatched_route_as_plain_404() {"
+        },
+        "inputs": [
+          "Path::new(\"static\"))"
+        ],
+        "role": "gateway-config/static/verb-fixture",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete gateway function async fn static_serving_disabled_leaves_unmatched_route_as_plain_404() { operates on token config, verb argv, static web assets or isolated route fixtures, rather than the contract reader or narrative reader. Operation 'Path::new(\"static\"))'; own complete source context attached.",
+        "reason": "Concrete gateway function async fn static_serving_disabled_leaves_unmatched_route_as_plain_404() { operates on token config, verb argv, static web assets or isolated route fixtures, rather than the contract reader or narrative reader. Operation 'Path::new(\"static\"))'; own complete source context attached.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "gateway-contract-pilot"
+      }
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "seam": "gateway-contract",
+      "kind": "dynamicTraces",
+      "index": 49,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-000710",
+        "originalTuple": [
+          1950,
+          59,
+          1950,
+          81,
+          "PathBuf::from(\"/tmp\"))",
+          "config/default-root",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1950,
+        "currentPassage": {
+          "startLine": 1948,
+          "endLine": 1952,
+          "text": "\n        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });\n        let router = build_router(gateway, test_config(), PathBuf::from(\"/tmp\"));\n        // A static_dir with no index.html forces the embedded-bundle\n        // branch (WebAssets, compiled from apps/fgos-gateway/static/) rather"
+        },
+        "caller": {
+          "line": 1944,
+          "declaration": "async fn static_serving_enabled_serves_the_embedded_bundle_for_an_unmatched_route() {"
+        },
+        "inputs": [
+          "PathBuf::from(\"/tmp\"))"
+        ],
+        "role": "gateway-config/static/verb-fixture",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete gateway function async fn static_serving_enabled_serves_the_embedded_bundle_for_an_unmatched_route() { operates on token config, verb argv, static web assets or isolated route fixtures, rather than the contract reader or narrative reader. Operation 'PathBuf::from(\"/tmp\"))'; own complete source context attached.",
+        "reason": "Concrete gateway function async fn static_serving_enabled_serves_the_embedded_bundle_for_an_unmatched_route() { operates on token config, verb argv, static web assets or isolated route fixtures, rather than the contract reader or narrative reader. Operation 'PathBuf::from(\"/tmp\"))'; own complete source context attached.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "gateway-contract-pilot"
+      }
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "seam": "gateway-contract",
+      "kind": "dynamicTraces",
       "index": 50,
       "value": {
         "proofCommand": null,
@@ -3407,7 +3509,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/contracts",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -3502,7 +3604,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/contracts",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -3597,7 +3699,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/contracts",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -4070,7 +4172,7 @@
         "resolverWitness": {
           "rule": "retained/external project or comment; no replacement claimed",
           "currentPath": "docs/history/fgos-interface-daemon/",
-          "exists": false
+          "exists": true
         },
         "timing": "none",
         "diffHunk": null,
@@ -4524,22 +4626,8 @@
       "kind": "dynamicTraces",
       "index": 2,
       "value": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            126,
-            38,
-            126,
-            48,
-            "path::Path",
-            "config/default-root",
-            true,
-            "default-root"
-          ],
-          "candidateConstruction": "root/docs/contracts/fgos-gateway-api-v1.yaml",
-          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
-          "blocker": null
-        },
+        "proofCommand": null,
+        "parityObligation": null,
         "id": "dynamic-000766",
         "originalTuple": [
           126,
@@ -4555,7 +4643,7 @@
           "step-02l-census-class6.json"
         ],
         "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
+        "admission": "REJECT",
         "disposition": "preserve",
         "currentLine": 126,
         "currentPassage": {
@@ -4570,12 +4658,12 @@
         "inputs": [
           "path::Path"
         ],
-        "role": "contract-reader",
-        "targetSetOrConstruction": "root/docs/contracts/fgos-gateway-api-v1.yaml",
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "Caller async fn search_contract(root: &std::path::Path, query: Option<String>) -> Result<String, String> { binds root into the retained contract read/test fixture; HTTP and MCP keep identical path and fixture bytes. Exact operation: 'path::Path'",
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'path::Path'. Pinned current passage: '}\\n\\nasync fn search_contract(root: &std::path::Path, query: Option<String>) -> Result<String, String> {\\n    let contract_path = root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\");\\n    let raw = tokio::fs::read_to_string(&contract_path)'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'path::Path'. Pinned current passage: '}\\n\\nasync fn search_contract(root: &std::path::Path, query: Option<String>) -> Result<String, String> {\\n    let contract_path = root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\");\\n    let raw = tokio::fs::read_to_string(&contract_path)'",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "gateway-contract-pilot"
@@ -6268,7 +6356,8 @@
         "expectedAfterSha256": "cf683921c398ba07c573e1bb03ea6efffded6f69f2378d5a687d919dfb06fdd9",
         "rollbackDiff": "--- a/.githooks/pre-commit\n+++ b/.githooks/pre-commit\n@@ -488,7 +488,7 @@\n \n   const fgosWorkerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);\n   if (fgosWorkerChanges.length > 0) {\n-    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n+    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n     return;\n   }\n \n@@ -520,7 +520,7 @@\n   }\n   if (fgosRegressed.regressedPaths.length > 0) {\n     const paths = fgosRegressed.regressedPaths.map((r) => r.path).join(', ');\n-    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n+    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n     return;\n   }\n \n",
         "coCutPaths": [
-          "CHANGELOG.md"
+          "CHANGELOG.md",
+          "test/runner/merge.test.mjs"
         ],
         "receiptIds": [
           "cli-help-messages-pilot"
@@ -6377,6 +6466,36 @@
           "candidate": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1263,
+              "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1265,
+              "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1497,
+              "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            }
+          ]
         }
       }
     },
@@ -6467,211 +6586,37 @@
           "candidate": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
           "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block.md",
+            "docs\\/how-to\\/fix-fgos-write-rejected-merge-block\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1263,
+              "text": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1265,
+              "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            },
+            {
+              "file": "test/runner/merge.test.mjs",
+              "line": 1497,
+              "text": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+              "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb"
+            }
+          ]
         }
-      }
-    },
-    {
-      "file": ".githooks/pre-commit",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
-      "seam": "cli-help-messages",
-      "kind": "references",
-      "index": 2,
-      "value": {
-        "referenceId": "reference-000112",
-        "admission": "REJECT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000008",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000008",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 14,
-            "columnStart": 9,
-            "columnEndExclusive": 73,
-            "text": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 73,
-            "columnStart": 9,
-            "line": 14,
-            "text": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md"
-          }
-        ],
-        "matchedExpression": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md",
-        "passage": "// OTHER, unrelated worktree -- one that writes to its own separate index\n// and branch and never touches this checkout's own lock hazard at all\n// (see docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md\n// D1/D2/D7). The staged-`.fgos/`-deletion guard (tsk-56u) is the opposite\n// case: it protects exactly that \"away from home\" worktree, so it is",
-        "passageSpan": {
-          "startLine": 12,
-          "endLine": 16
-        },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-58 / Step 3–4 comment custody (exact canonical slot joined): Exact own passage: '// OTHER, unrelated worktree -- one that writes to its own separate index\\n// and branch and never touches this checkout\\'s own lock hazard at all\\n// (see docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md\\n// D1/D2/D7). The staged-`.fgos/`-deletion guard (tsk-56u) is the opposite\\n// case: it protects exactly that \"away from home\" worktree, so it is'",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md",
-          "exists": true
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [
-          {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-016.jsonl",
-            "recordSha256": "8e53590ff7ac458efbb05db09c3da93b1fba6bd25c091ea088a31105a1fd64a0",
-            "matchingSlots": [
-              {
-                "edgeId": "class6-l-000008",
-                "slotKey": "{\"edgeId\":\"class6-l-000008\",\"file\":\".githooks/pre-commit\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000008\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":14}]}",
-                "sourceSpans": [
-                  {
-                    "line": 14,
-                    "columnStart": 9,
-                    "columnEndExclusive": 73,
-                    "text": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md"
-                  }
-                ],
-                "disposition": "preserve",
-                "consumerFile": ".githooks/pre-commit"
-              }
-            ]
-          }
-        ],
-        "fixtureProvenance": null,
-        "rejectionRule": "prior-comment-slot",
-        "receiptId": "cli-help-messages-pilot"
-      }
-    },
-    {
-      "file": ".githooks/pre-commit",
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
-      "seam": "cli-help-messages",
-      "kind": "references",
-      "index": 3,
-      "value": {
-        "referenceId": "reference-000113",
-        "admission": "REJECT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000009",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000009",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 355,
-            "columnStart": 35,
-            "columnEndExclusive": 75,
-            "text": "docs/history/stale-worktree-index-guard/"
-          },
-          {
-            "line": 356,
-            "columnStart": 1,
-            "columnEndExclusive": 14,
-            "text": "// CONTEXT.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 75,
-            "columnStart": 35,
-            "line": 342,
-            "text": "docs/history/stale-worktree-index-guard/"
-          },
-          {
-            "columnEndExclusive": 14,
-            "columnStart": 1,
-            "line": 343,
-            "text": "// CONTEXT.md"
-          }
-        ],
-        "matchedExpression": "docs/history/stale-worktree-index-guard/\n// CONTEXT.md",
-        "passage": "}\n\n// STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/\n// CONTEXT.md D1/D2): a linked worktree checked out on a `fgw/*` branch can\n// go stale when an external process (e.g. `approve`'s leaf->root merge)\n// force-moves that branch's ref without ever touching THIS worktree's own",
-        "passageSpan": {
-          "startLine": 353,
-          "endLine": 358
-        },
-        "role": "comment",
-        "disposition": "preserve",
-        "reason": "L12-58 / Step 3–4 comment custody (exact canonical slot joined): Exact own passage: \"}\\n\\n// STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/\\n// CONTEXT.md D1/D2): a linked worktree checked out on a `fgw/*` branch can\\n// go stale when an external process (e.g. `approve`'s leaf->root merge)\\n// force-moves that branch's ref without ever touching THIS worktree's own\"",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/stale-worktree-index-guard/CONTEXT.md",
-          "exists": true
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [
-          {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-016.jsonl",
-            "recordSha256": "8e53590ff7ac458efbb05db09c3da93b1fba6bd25c091ea088a31105a1fd64a0",
-            "matchingSlots": [
-              {
-                "edgeId": "class6-l-000009",
-                "slotKey": "{\"edgeId\":\"class6-l-000009\",\"file\":\".githooks/pre-commit\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000009\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":342},{\"edgeId\":\"class6-l-000009\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":343}]}",
-                "sourceSpans": [
-                  {
-                    "line": 355,
-                    "columnStart": 35,
-                    "columnEndExclusive": 75,
-                    "text": "docs/history/stale-worktree-index-guard/"
-                  },
-                  {
-                    "line": 356,
-                    "columnStart": 1,
-                    "columnEndExclusive": 14,
-                    "text": "// CONTEXT.md"
-                  }
-                ],
-                "disposition": "preserve",
-                "consumerFile": ".githooks/pre-commit"
-              }
-            ]
-          }
-        ],
-        "fixtureProvenance": null,
-        "rejectionRule": "prior-comment-slot",
-        "receiptId": "cli-help-messages-pilot"
       }
     }
   ]

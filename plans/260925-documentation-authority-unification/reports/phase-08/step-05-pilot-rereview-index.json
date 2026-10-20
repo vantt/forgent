@@ -1,0 +1,141 @@
+{
+  "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "changedFileCount": 12,
+  "changedIdCount": 65,
+  "selection": "Only outcome-changed consumer files; all admitted literals in those files plus every changed reference/tuple; no unchanged-outcome files dispatched.",
+  "limits": {
+    "records": 60,
+    "bytes": 400000
+  },
+  "parts": [
+    {
+      "part": 1,
+      "payload": "step-05-pilot-rr-p01.json",
+      "sha256": "cac41fdc6eab40f8a1bf2d3e741387e710c717500945bdd257f70729e7477d88",
+      "bytes": 385889,
+      "records": 28,
+      "files": [
+        ".githooks/pre-commit",
+        "apps/fgos-gateway/src/gateway.rs",
+        "apps/fgos-gateway/src/mcp.rs",
+        "src/cli/command-registry.mjs"
+      ],
+      "changedIds": [
+        "reference-000161",
+        "reference-000182",
+        "dynamic-000766",
+        "reference-000110",
+        "reference-000111",
+        "dynamic-000566",
+        "dynamic-000571",
+        "reference-003641"
+      ],
+      "report": "review-a38-step-05-pilot-rr-p01.md"
+    },
+    {
+      "part": 2,
+      "payload": "step-05-pilot-rr-p02.json",
+      "sha256": "970e97aafaa34a1da85be1d7d62b7bfb0d4a0e1a024eb8addad8cd65d2814ad9",
+      "bytes": 389048,
+      "records": 33,
+      "files": [
+        "src/cli/command-registry.mjs",
+        "src/runner/merge.mjs",
+        "src/runner/worktree.mjs",
+        "src/setup/instruction-registry.mjs",
+        "src/state/events-jsonl-truncation-guard.mjs"
+      ],
+      "changedIds": [
+        "reference-003655",
+        "reference-003666",
+        "reference-003749",
+        "reference-003784",
+        "reference-003868",
+        "dynamic-013969",
+        "dynamic-013982",
+        "dynamic-013988",
+        "dynamic-013989",
+        "dynamic-013990"
+      ],
+      "report": "review-a38-step-05-pilot-rr-p02.md"
+    },
+    {
+      "part": 3,
+      "payload": "step-05-pilot-rr-p03.json",
+      "sha256": "0ea8445653389bf0c6ea39029416a0b8e1f2632dac35fb0ce27607b7075f73b5",
+      "bytes": 379520,
+      "records": 32,
+      "files": [
+        "src/setup/instruction-registry.mjs",
+        "src/setup/model-pool-checks.mjs",
+        "src/setup/registrations.mjs"
+      ],
+      "changedIds": [
+        "dynamic-013991",
+        "dynamic-013992",
+        "dynamic-014003",
+        "dynamic-014006",
+        "dynamic-014007",
+        "dynamic-014008",
+        "dynamic-014016",
+        "dynamic-014017",
+        "dynamic-014018",
+        "dynamic-014026",
+        "dynamic-014027",
+        "dynamic-014028",
+        "dynamic-014060",
+        "dynamic-014072",
+        "reference-003803",
+        "reference-003804",
+        "reference-003806",
+        "reference-003811",
+        "reference-003828",
+        "reference-003829",
+        "reference-003833",
+        "reference-003834"
+      ],
+      "report": "review-a38-step-05-pilot-rr-p03.md"
+    },
+    {
+      "part": 4,
+      "payload": "step-05-pilot-rr-p04.json",
+      "sha256": "e0f14eb9ed18b88de1a504be37fee9b75128c0cc94bd40d08b96fe14546719de",
+      "bytes": 264765,
+      "records": 29,
+      "files": [
+        "src/setup/registrations.mjs",
+        "src/setup/run-supervisor-checks.mjs",
+        "src/setup/skill-wrappers.mjs"
+      ],
+      "changedIds": [
+        "reference-003839",
+        "dynamic-014207",
+        "dynamic-014299",
+        "dynamic-014300",
+        "dynamic-014301",
+        "dynamic-014302",
+        "dynamic-014307",
+        "dynamic-014338",
+        "dynamic-014345",
+        "dynamic-014346",
+        "dynamic-014907",
+        "dynamic-014965",
+        "dynamic-015044",
+        "dynamic-015059",
+        "dynamic-015060",
+        "dynamic-015119",
+        "dynamic-015125",
+        "dynamic-015126",
+        "dynamic-015127",
+        "dynamic-015175",
+        "dynamic-015186",
+        "dynamic-015187",
+        "dynamic-015194",
+        "dynamic-015229",
+        "dynamic-015236"
+      ],
+      "report": "review-a38-step-05-pilot-rr-p04.md"
+    }
+  ],
+  "status": "Lead dispatch pending; no independent acceptance"
+}
