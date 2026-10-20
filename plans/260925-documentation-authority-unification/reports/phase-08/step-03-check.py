@@ -609,10 +609,28 @@ class Checker:
         self.tree=set(git('ls-tree','-r','--name-only',commit).decode().splitlines())
         self.dirs={str(pathlib.PurePosixPath(p).parent) for p in self.tree}
         self.dirs.update('/'.join(p.split('/')[:i]) for p in self.tree for i in range(1,len(p.split('/'))))
+    def declared_history_region(self,r,e):
+        """L12-46: a source-bound completed-action section, never a reason-only exemption."""
+        region=e.get('historyRegion')
+        if region is None:return False
+        assert set(region)=={'heading','line','marker'}, 'historyRegion fields'
+        assert isinstance(region['line'],int) and not isinstance(region['line'],bool)
+        assert isinstance(region['heading'],str) and region['heading']
+        assert isinstance(region['marker'],str) and region['marker'].strip()
+        lines=blob(self.commit,r['file']).decode().splitlines()
+        start=region['line'];assert 1<=start<=len(lines)
+        match=re.fullmatch(r'(#{1,6}) +(.+?) *#*',lines[start-1])
+        assert match and match[2]==region['heading'], 'historyRegion heading does not match pinned line'
+        section=next((h for h in heading_sections(self.commit,r['file']) if h['startLine']==start),None)
+        assert section is not None, 'historyRegion line is not a Markdown heading'
+        end=section['sectionEndLine']+1
+        assert all(start<s['line']<end for s in e['sourceSpans']), 'historyRegion does not enclose edge'
+        assert region['marker'] in '\n'.join(lines[start:end-1]), 'historyRegion marker absent from section'
+        return True
     def renamed_alias_holders(self,r,e):
         """L12-37(2): missing preserved navigation with a committed live alias."""
         f=r['file'];body=blob(self.commit,f).decode()
-        if e.get('disposition')!='preserve' or carriage_declaration(body,e['sourceSpans'][0]['line']) or history_at(body,e['sourceSpans'][0]['line'],f) or captured_evidence_at(body,e['sourceSpans'][0]['line']):return []
+        if e.get('disposition')!='preserve' or self.declared_history_region(r,e) or carriage_declaration(body,e['sourceSpans'][0]['line']) or history_at(body,e['sourceSpans'][0]['line'],f) or captured_evidence_at(body,e['sourceSpans'][0]['line']):return []
         if '/history/' in f or f.startswith('docs/journals/') or re.search(r'^Document type:\s*History|Superseded / implementation history only',body[:7000],re.M|re.I):return []
         inv=self.entries.get(e['edgeId']) or e.get('authorAddedEdge',{})
         path=re.sub(r':\d+(?:[-–]\d+)?$','',path_identity(inv['normalizedReference'].removeprefix('repo/')))
@@ -634,7 +652,7 @@ class Checker:
         def check(name,fn):
             try: assert fn() is not False
             except (AssertionError,KeyError,ValueError,IndexError,TypeError,StopIteration,subprocess.CalledProcessError) as ex: failures.append({'file':r.get('file'),'check':name,'detail':str(ex)[:300]})
-        check('schema',lambda: set(r)==FIELDS and all((set(e)=={'edgeId','sourceSpans','matchedExpression','retiresWithTree','reason'}|({'authorAddedEdge'} if e.get('authorAddedEdge') else set()) if e.get('retiresWithTree') else EDGE_FIELDS<=set(e)<=EDGE_FIELDS|{'searchWitness','authorAddedEdge','targetFacts','unitId','unitDispositionReason'}) for e in r['edges']) and isinstance(r['diff'],str) and all(isinstance(r['checks'][k],dict) for k in ['coverage','anchors','relativeResolution','labelForm']))
+        check('schema',lambda: set(r)==FIELDS and all((set(e)=={'edgeId','sourceSpans','matchedExpression','retiresWithTree','reason'}|({'authorAddedEdge'} if e.get('authorAddedEdge') else set()) if e.get('retiresWithTree') else EDGE_FIELDS<=set(e)<=EDGE_FIELDS|{'searchWitness','authorAddedEdge','targetFacts','unitId','unitDispositionReason','historyRegion'}) for e in r['edges']) and isinstance(r['diff'],str) and all(isinstance(r['checks'][k],dict) for k in ['coverage','anchors','relativeResolution','labelForm']))
         f=r['file']; before=blob(self.commit,f).decode(); old=blob(INVENTORY,f).decode()
         check('digest',lambda:r['authorInputCommit']==self.commit and r['inventoryInputCommit']==INVENTORY and r['digest']==sha(before) and r['inventoryFileDigest']==sha(old)==self.files[f]['sha256'])
         expected=self.files[f]['edgeIds'];actual=[e['edgeId'] for e in r['edges'] if not e.get('authorAddedEdge')]
@@ -732,6 +750,7 @@ class Checker:
                      'normalizedReference':e['authorAddedEdge']['normalizedReference'],'locatorTokens':[]}
             if not inv: continue
             check('related-retiring-preserve',lambda e=e,inv=inv:not (e.get('disposition')=='preserve' and inv['normalizedReference'].startswith(RETIRING_ROOTS) and related_header(before,e['sourceSpans'][0]['line'])))
+            check('history-region',lambda e=e:self.declared_history_region(r,e) if 'historyRegion' in e else True)
             check('renamed-alias-preserve',lambda e=e:not self.renamed_alias_holders(r,e))
             check('live-decision-citation-preserve',lambda e=e,inv=inv:not (e.get('disposition')=='preserve' and live_decision_citation(f,before,e,inv['normalizedReference'].split('#')[0])))
             def narrative_successor(e=e,inv=inv):

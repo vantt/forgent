@@ -1,0 +1,72 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "selectedFiles": 2,
+  "selectedEdges": 14,
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-batch073-r2-p01.md",
+      "files": [
+        {
+          "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+          "set": "batch-073",
+          "strata": [
+            "L12-45-targeted-re-review"
+          ],
+          "edges": 11,
+          "recordSha256": "f93246ab3f69be14aa65133421b83f904a0f5aee8171b54d15f3146d6590e10b",
+          "sourceDigest": "1a8538b7cdea6dd66d14df178bef307bad333305eaae3a9a3893c0c96a662605",
+          "diffSha256": "be0df61e629c6c2e4ffde31231920c6f3ea3c6258dd8196ee883bf1b4723373d",
+          "recordBytes": 103378,
+          "sourceBytes": 13958,
+          "contextPlusRecordBytes": 117336
+        },
+        {
+          "file": "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+          "set": "batch-073",
+          "strata": [
+            "L12-45-targeted-re-review"
+          ],
+          "edges": 3,
+          "recordSha256": "e86b8dbefdebeee26a8798c511df794360b8b88fbece91e7227fa051d39b66ef",
+          "sourceDigest": "627526f65f8b85949f2538f35c3fc9814959a4c958caac1a5b329372ad8062dd",
+          "diffSha256": "a55faa6bfa38cdf5bc07499bc87a2441608f0cf7c87c310efcd25cf519f56f84",
+          "recordBytes": 17778,
+          "sourceBytes": 5355,
+          "contextPlusRecordBytes": 23133
+        }
+      ],
+      "fileCount": 2,
+      "edges": 14,
+      "sourcePlusRecordBytes": 140469,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 11
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "scope": "Exactly the two L12-45 batch-073 files, all edges/diffs in full-file context. No other batches assigned.",
+  "reviewersStarted": 0,
+  "accepted": 0
+}

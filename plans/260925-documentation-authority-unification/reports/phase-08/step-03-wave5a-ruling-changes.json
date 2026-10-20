@@ -1,0 +1,144 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "changes": [
+    {
+      "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+      "set": "batch-073",
+      "semanticOrRulingEdges": [
+        {
+          "edgeId": "maps-j-04472",
+          "fields": [
+            "anchor",
+            "blockedCategory",
+            "blockedReason",
+            "dependency",
+            "dependencyCategory",
+            "diffHunk",
+            "disposition",
+            "reason",
+            "searchWitness",
+            "target",
+            "targetFacts",
+            "timing"
+          ]
+        }
+      ],
+      "unifiedHunkJoinMetadataOnly": [
+        {
+          "edgeId": "maps-j-04467",
+          "fields": [
+            "diffHunk"
+          ]
+        },
+        {
+          "edgeId": "maps-j-04469",
+          "fields": [
+            "diffHunk"
+          ]
+        },
+        {
+          "edgeId": "maps-j-04470",
+          "fields": [
+            "diffHunk"
+          ]
+        },
+        {
+          "edgeId": "maps-j-04473",
+          "fields": [
+            "diffHunk"
+          ]
+        }
+      ],
+      "recordSha256": "f93246ab3f69be14aa65133421b83f904a0f5aee8171b54d15f3146d6590e10b",
+      "diffSha256": "be0df61e629c6c2e4ffde31231920c6f3ea3c6258dd8196ee883bf1b4723373d"
+    },
+    {
+      "file": "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+      "set": "batch-073",
+      "semanticOrRulingEdges": [
+        {
+          "edgeId": "maps-j-04485",
+          "fields": [
+            "anchor",
+            "blockedCategory",
+            "blockedReason",
+            "dependency",
+            "dependencyCategory",
+            "diffHunk",
+            "disposition",
+            "reason",
+            "searchWitness",
+            "target",
+            "targetFacts",
+            "timing"
+          ]
+        }
+      ],
+      "unifiedHunkJoinMetadataOnly": [],
+      "recordSha256": "e86b8dbefdebeee26a8798c511df794360b8b88fbece91e7227fa051d39b66ef",
+      "diffSha256": "a55faa6bfa38cdf5bc07499bc87a2441608f0cf7c87c310efcd25cf519f56f84"
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+      "set": "batch-077",
+      "semanticOrRulingEdges": [
+        {
+          "edgeId": "maps-j-04741",
+          "fields": [
+            "blockedCategory",
+            "blockedReason",
+            "dependency",
+            "dependencyCategory",
+            "disposition",
+            "historyRegion",
+            "reason",
+            "searchWitness"
+          ]
+        },
+        {
+          "edgeId": "maps-j-04742",
+          "fields": [
+            "blockedCategory",
+            "blockedReason",
+            "dependency",
+            "dependencyCategory",
+            "disposition",
+            "historyRegion",
+            "reason",
+            "searchWitness"
+          ]
+        },
+        {
+          "edgeId": "maps-j-04743",
+          "fields": [
+            "blockedCategory",
+            "blockedReason",
+            "dependency",
+            "dependencyCategory",
+            "disposition",
+            "historyRegion",
+            "reason",
+            "searchWitness"
+          ]
+        },
+        {
+          "edgeId": "maps-j-04744",
+          "fields": [
+            "blockedCategory",
+            "blockedReason",
+            "dependency",
+            "dependencyCategory",
+            "disposition",
+            "historyRegion",
+            "reason",
+            "searchWitness"
+          ]
+        }
+      ],
+      "unifiedHunkJoinMetadataOnly": [],
+      "recordSha256": "6724b578435a82be89a7869829c60ccc588775560c6d41237cdae70350ee6e06",
+      "diffSha256": "b859f3955e7b6ee3f0aeec6000f9f8f53c40d03dcd807cfbb3fb590c74d02873"
+    }
+  ],
+  "hunkNote": "The 04472 patch merges adjacent Related diff hunks under the unchanged canonical diff checker. Four neighboring patch edges receive only the resulting shared diffHunk header; their dispositions, target, anchor, replacement, reasons and all other proof fields are identical to input HEAD. No other earlier edge is reauthored."
+}

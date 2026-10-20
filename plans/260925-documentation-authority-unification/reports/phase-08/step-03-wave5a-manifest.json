@@ -1,0 +1,1974 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+      "set": "batch-079",
+      "sourceBytes": 10135,
+      "digest": "a6ac755bdb9dfeb43868110a1c0b019bb22f226bf12b7d9693a058ffada618ec",
+      "inventoryFileDigest": "a6ac755bdb9dfeb43868110a1c0b019bb22f226bf12b7d9693a058ffada618ec",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "61f6059a742324f06287031ad672eef5a9868976f53cde4148929d46f2cfd4ee",
+      "recordBytes": 6764,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-concurrency-tests-batch-spawned-processes-to-redu/why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout.md",
+      "set": "batch-079",
+      "sourceBytes": 3944,
+      "digest": "448732b1d0b72e814611a7ae2876492b7c6749d0b2378482caf5b19844eb7823",
+      "inventoryFileDigest": "448732b1d0b72e814611a7ae2876492b7c6749d0b2378482caf5b19844eb7823",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c67811ca67f664f86e8aedd76ba9a1122b1016368abdf77939ca1eb2ba72ca75",
+      "recordBytes": 2579,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g/why-fgos-citations-carry-a-gloss-and-check-mechanically.md",
+      "set": "batch-079",
+      "sourceBytes": 13256,
+      "digest": "3aa62a6355737122ab3c24d11f6a2a583576e039922dd340fccd85f024b60daa",
+      "inventoryFileDigest": "3aa62a6355737122ab3c24d11f6a2a583576e039922dd340fccd85f024b60daa",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d822a3fe5505cbe3f3be8898fb089333991006d3c12a3cba008013e5700006d0",
+      "recordBytes": 12608,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 7,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-merge-safety-work-shipped-as-ten-items-under-one/why-fgos-merge-safety-shipped-as-ten-items-under-one-milestone.md",
+      "set": "batch-079",
+      "sourceBytes": 3945,
+      "digest": "be3b3cf92faf09b2b4da7770ed6dba12cb01eafe744eba2aed6874c6ab9d59aa",
+      "inventoryFileDigest": "be3b3cf92faf09b2b4da7770ed6dba12cb01eafe744eba2aed6874c6ab9d59aa",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "adcc7cf84b0d125c230095e05a28ffdd2a2b228dc9631e38a2dc6441a31ddb39",
+      "recordBytes": 967,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+      "set": "batch-079",
+      "sourceBytes": 5707,
+      "digest": "c5505f67234d9209bab7eb9af7bf61060cb7f187a1499e83b3f9609fb28a0146",
+      "inventoryFileDigest": "c5505f67234d9209bab7eb9af7bf61060cb7f187a1499e83b3f9609fb28a0146",
+      "diffSha256": "e433f6ca3870cea03d70044f1ee590fc2bfe4b086dae5e3c3b7387cb79c645ef",
+      "recordSha256": "14012119edd72ce5cdb04f2a7e1562476b964010d753de05c2088edd6eaf867b",
+      "recordBytes": 27905,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-sync-root-fgos-merge-next-and-fgos-review-resolve-c/why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards.md",
+      "set": "batch-079",
+      "sourceBytes": 6744,
+      "digest": "4c129ea2ea4625d6e883ad95c7a027a84a1a399499d0bf164f033f7b26a40d98",
+      "inventoryFileDigest": "4c129ea2ea4625d6e883ad95c7a027a84a1a399499d0bf164f033f7b26a40d98",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "887994052d523f76507c0ccef3d36f4655f58e6a56a0c369bebd9ecb02a74cf4",
+      "recordBytes": 976,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+      "set": "batch-079",
+      "sourceBytes": 2491,
+      "digest": "fe55f43e065c29fe3dc2a6cc3f1787ade4b4574322af20ae913f6726bcd195a7",
+      "inventoryFileDigest": "fe55f43e065c29fe3dc2a6cc3f1787ade4b4574322af20ae913f6726bcd195a7",
+      "diffSha256": "5d3334fcddc233529b929828ea0afdb24833f7cf819dba914905d74ef77929d6",
+      "recordSha256": "0af76ddf57cf699f97df8c8908afce16fae55fcbadb7685e8381e0c8a15d37ca",
+      "recordBytes": 24743,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "parked": 2,
+        "patch": 1,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md",
+      "set": "batch-079",
+      "sourceBytes": 3228,
+      "digest": "6a71703b2f1e64985d653e8fd82c7c2b8d52bede41f11a59171fd3786cb445a3",
+      "inventoryFileDigest": "6a71703b2f1e64985d653e8fd82c7c2b8d52bede41f11a59171fd3786cb445a3",
+      "diffSha256": "26f872da555ff4591dee1d303868d8a80707706709e2340eeac8d4655f77bfc0",
+      "recordSha256": "a55b0405ff95957a1499ef895d7ac01aca1a847546767a8c20e4fc2c3ec8c358",
+      "recordBytes": 23784,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-unlock-s-error-message-stopped-claiming-a-live-sess/why-fgos-unlocks-error-message-stopped-claiming-a-live-session-it-never-checked.md",
+      "set": "batch-079",
+      "sourceBytes": 2567,
+      "digest": "ff99f8e298527ebe111df175a485350fcb1c2ee865119da9aca139452881efa3",
+      "inventoryFileDigest": "ff99f8e298527ebe111df175a485350fcb1c2ee865119da9aca139452881efa3",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "41948b25c45b1a3811e3782581ac43fd1236c3d10996ab5cfd8a6bc4d2367e93",
+      "recordBytes": 2037,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
+      "set": "batch-079",
+      "sourceBytes": 4797,
+      "digest": "2dd7698fbdc5aaaf83971dbac5bcab099f90763e65fc7bcbc19709adf09a7838",
+      "inventoryFileDigest": "2dd7698fbdc5aaaf83971dbac5bcab099f90763e65fc7bcbc19709adf09a7838",
+      "diffSha256": "332ae8bac4c9ed4bfff879be5c82b686153b61381226e628b91b0ca91fbadcf0",
+      "recordSha256": "6ba565498503042547c4478f928899f4f4f629e7fb7e22ee131d676f54ee196b",
+      "recordBytes": 26013,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 7,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-gate-approval-was-separated-from-move-next/why-gate-approval-was-separated-from-move-next.md",
+      "set": "batch-079",
+      "sourceBytes": 6896,
+      "digest": "0947e361f333ba99c553bf6d9bba957b0b70e4e237a4f1ad0785c6c7c2112702",
+      "inventoryFileDigest": "0947e361f333ba99c553bf6d9bba957b0b70e4e237a4f1ad0785c6c7c2112702",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "49b29b0761e8da1959b412d51b413c2335a3a6901e1c4f83ecd7f8d17dd5bc9c",
+      "recordBytes": 938,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+      "set": "batch-079",
+      "sourceBytes": 19791,
+      "digest": "062af6c9bf24067dd2c739af0ad913014dc068b95ea6165393a51e324a19522f",
+      "inventoryFileDigest": "062af6c9bf24067dd2c739af0ad913014dc068b95ea6165393a51e324a19522f",
+      "diffSha256": "0a212e3af334be0daaca9722bc13236cf5d0a795e49759bf23dc12fd95e5546f",
+      "recordSha256": "9ba285d3a6beafe7d1750f9e94dfac1264133e5caf8f59488eb7c512479dab06",
+      "recordBytes": 13646,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-heavy-keywords-matching-moved-from-substring-to-word-bou/why-heavy-keywords-matching-moved-to-word-boundaries.md",
+      "set": "batch-079",
+      "sourceBytes": 6774,
+      "digest": "52bd8adfff958021d9dfd21dfc064393823a24bb366cbf1700642b2a5c2b12cd",
+      "inventoryFileDigest": "52bd8adfff958021d9dfd21dfc064393823a24bb366cbf1700642b2a5c2b12cd",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7190df76930cd00f21560611982874c06da7c7f37295983459e555d2d2d2e5a2",
+      "recordBytes": 6031,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+      "set": "batch-079",
+      "sourceBytes": 6242,
+      "digest": "d0c5864dab33c83d4e42cd966104952d1f29576dec4d4df738213e1954791c2e",
+      "inventoryFileDigest": "d0c5864dab33c83d4e42cd966104952d1f29576dec4d4df738213e1954791c2e",
+      "diffSha256": "724068369c2973b3f29ab9c6f5fed7ea8f888cdc8c52f7c01695c34a7fc674e6",
+      "recordSha256": "9bd1d58bbe0de0ed9d8b8cef48d6dd507596605510d760ed1f8943b871975a5a",
+      "recordBytes": 15163,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-herdr-plugin-s-discover-pane-launches-always-pass-autocl/why-herdr-plugins-discover-pane-launches-always-pass-autoclose.md",
+      "set": "batch-079",
+      "sourceBytes": 3049,
+      "digest": "da3e0bf76557ad5b5f0207e5ef15ca39f9bd1a34766d8f99d5f56c1c95a1cbd4",
+      "inventoryFileDigest": "da3e0bf76557ad5b5f0207e5ef15ca39f9bd1a34766d8f99d5f56c1c95a1cbd4",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "670363ab4c63d428d6633af5a5c0e267beaade85e3804fe1d92d81c7355bff1e",
+      "recordBytes": 2919,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-herdr-s-dashboard-lists-became-real-tables-and-why-in-pr/herdr-dashboard-table-view-scope-and-sort.md",
+      "set": "batch-079",
+      "sourceBytes": 5033,
+      "digest": "63aa3090dcb2b33bc76cf4a3df18034568173359fcb4b086e23ff8da90f87014",
+      "inventoryFileDigest": "63aa3090dcb2b33bc76cf4a3df18034568173359fcb4b086e23ff8da90f87014",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c315efc0c06ad5ae9d599de4adb09430396e7c9349da0e636c9fa13294764c35",
+      "recordBytes": 2569,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-hook-registrations-guard-against-gitignored-scripts/hook-registration-guard.md",
+      "set": "batch-079",
+      "sourceBytes": 3320,
+      "digest": "382ecbd50778843ebd23e9613a2841eb1eb40001906ba6cb496e4da158d15fb6",
+      "inventoryFileDigest": "382ecbd50778843ebd23e9613a2841eb1eb40001906ba6cb496e4da158d15fb6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a597b9626c15d3dcab6e2263582c81796d1e521d87b0d01c108c523b56215a49",
+      "recordBytes": 2315,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-intake-classification-moved-to-after-clarify-and-back-to/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md",
+      "set": "batch-079",
+      "sourceBytes": 6575,
+      "digest": "83eb01b4ef6195790f0105fe4dff836662b17dd5847e1c2cd178bd0fc6cee7f5",
+      "inventoryFileDigest": "83eb01b4ef6195790f0105fe4dff836662b17dd5847e1c2cd178bd0fc6cee7f5",
+      "diffSha256": "034c90bf88cad3cadfdb3391b222d7ef149f38a27e554ec8f318d6352df3fe92",
+      "recordSha256": "c3dcdc9a8afd900791a182d6324696f27c97044a1e2c032eb22434d98aa8d213",
+      "recordBytes": 23715,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-isdepsandlineageready-uses-resolved-statuses-not-just-do/why-isdepsandlineageready-uses-resolved-statuses-not-just-done.md",
+      "set": "batch-079",
+      "sourceBytes": 3259,
+      "digest": "58b8845f96a996cd9fec805a0f4f6e158df2d3c8b0f330a2036903f07d443467",
+      "inventoryFileDigest": "58b8845f96a996cd9fec805a0f4f6e158df2d3c8b0f330a2036903f07d443467",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d63f237051b427141f0172bfe8182dfc50d51b3af6d081a83b2769b8c42e1a3f",
+      "recordBytes": 968,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md",
+      "set": "batch-079",
+      "sourceBytes": 21992,
+      "digest": "368825821224bbb384d4807b973c845707b291b5fc88c5873cf42a5281a845c0",
+      "inventoryFileDigest": "368825821224bbb384d4807b973c845707b291b5fc88c5873cf42a5281a845c0",
+      "diffSha256": "b9d9bcaca0fc9cef7a790a6aec94759b2c3f0fc30da209324a5b27bbde64daa5",
+      "recordSha256": "39a3dadcd13e1d61551465770ff835d1814cdd5134ffed064c817684b98d411e",
+      "recordBytes": 15116,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verd/keywordriskgate-skips-when-verdict-cites-a-locked-decision.md",
+      "set": "batch-079",
+      "sourceBytes": 5718,
+      "digest": "7da56ca8c37d3603b0178693dc023a287da5c6ce484fa0b5bbe4bb74b5efb623",
+      "inventoryFileDigest": "7da56ca8c37d3603b0178693dc023a287da5c6ce484fa0b5bbe4bb74b5efb623",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cbe33f3e225dbb813daaed4176958eeb407a1dc502668fcef7ae31409a3d0c23",
+      "recordBytes": 3701,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-locking-a-new-risk-kind-vocabulary-didn-t-fix-the-68-ite/why-a-vocabulary-lock-alone-cant-fix-grandfathered-risk-and-kind-values.md",
+      "set": "batch-079",
+      "sourceBytes": 4882,
+      "digest": "3b6e0215394dad05b1fe779dc3a924d311dfbc6c539b1a974509cce754ba8dda",
+      "inventoryFileDigest": "3b6e0215394dad05b1fe779dc3a924d311dfbc6c539b1a974509cce754ba8dda",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3ac84530b62b2be00176b35902a748128013f4fcece6892c2f590d5eeddcaed8",
+      "recordBytes": 2941,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+      "set": "batch-079",
+      "sourceBytes": 5246,
+      "digest": "c042758613c38d11a73235a5d4242d18421939ebcc8a41108d63c45fd07cce37",
+      "inventoryFileDigest": "c042758613c38d11a73235a5d4242d18421939ebcc8a41108d63c45fd07cce37",
+      "diffSha256": "b39d3a0845a529d9f44f7f6e15bb0aebe9232de695fd44c5850d73c478c34071",
+      "recordSha256": "4bc6f4eb994c8953c123ab20217e19b1aafc6111365094e3fa0d471e2ebf4a2c",
+      "recordBytes": 16294,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-malformed-cli-invocations-now-leave-a-provenance-trace/cli-invocation-fault-provenance.md",
+      "set": "batch-079",
+      "sourceBytes": 6077,
+      "digest": "2173ca93aa7af34c0cce9bf71f745804ca32257d642517cb5457a947b1026f62",
+      "inventoryFileDigest": "2173ca93aa7af34c0cce9bf71f745804ca32257d642517cb5457a947b1026f62",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b6869821ed8e5692face9afafdc74465e318996f67ec387bb300a6f6e0292fae",
+      "recordBytes": 935,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
+      "set": "batch-079",
+      "sourceBytes": 5929,
+      "digest": "0af5e2b9e32d366135284b452edde73f8fc1d1507e1beeb850d95b5b71d407e5",
+      "inventoryFileDigest": "0af5e2b9e32d366135284b452edde73f8fc1d1507e1beeb850d95b5b71d407e5",
+      "diffSha256": "0c95b43d18f00ce146c0457d3586420560f5748ecb117945a3e94943ec5f4c9e",
+      "recordSha256": "3393b93df1d094361c3dc78cf2b9a7a5973f017837004db09ba9ea21ee4a4f05",
+      "recordBytes": 62675,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 3,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md",
+      "set": "batch-080",
+      "sourceBytes": 15755,
+      "digest": "33b6d7ac26f3b80d4c8155465603d063723095b689ed8b71a5298c6b413e92ad",
+      "inventoryFileDigest": "33b6d7ac26f3b80d4c8155465603d063723095b689ed8b71a5298c6b413e92ad",
+      "diffSha256": "761ae3baac65266e2247729d5fbe65504adccc6497885f0286f1c31e327638e7",
+      "recordSha256": "b2e13d3a4f78d74becc1798c5c010a77d6bf256ac5ae9b6c8bb07586ddfcc095",
+      "recordBytes": 15130,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-merge-standardization-tsk-4j9-reuses-existing-mechanisms/why-merge-standardization-reuses-existing-mechanisms.md",
+      "set": "batch-080",
+      "sourceBytes": 4893,
+      "digest": "d58479b913fada689c095d8822618c29d6a6825880f617cb7ac2bcdcf5b2e596",
+      "inventoryFileDigest": "d58479b913fada689c095d8822618c29d6a6825880f617cb7ac2bcdcf5b2e596",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "faf034cdb133581e7385c709e471da3bae17d9de50b4e2107a4577941ecbbe8c",
+      "recordBytes": 3211,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-mergereadiness-excludes-superseded-items/why-mergereadiness-excludes-superseded-items.md",
+      "set": "batch-080",
+      "sourceBytes": 5028,
+      "digest": "a4f2b5b6e3b0968ee3c58752f166a3881367a05dd59f1141fde8d58da32c09dd",
+      "inventoryFileDigest": "a4f2b5b6e3b0968ee3c58752f166a3881367a05dd59f1141fde8d58da32c09dd",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "fb429c743b0dedddf89f38ea99f1f8375f25b97df8a621e9c56807a5dad8e993",
+      "recordBytes": 2621,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-mergerunneritem-now-checks-ancestry-before-attempting-a/merge-idempotent-on-already-merged-branch.md",
+      "set": "batch-080",
+      "sourceBytes": 5488,
+      "digest": "03a93249a7a4676ae0d4274481fd6767d48b2f2e4954a8662a183451ce5ae7b0",
+      "inventoryFileDigest": "03a93249a7a4676ae0d4274481fd6767d48b2f2e4954a8662a183451ce5ae7b0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "59893607ca3a4772344e0d504b1f77a57f724a7814281194590f95672c533899",
+      "recordBytes": 2419,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-mergerunneritem-returns-merge-failed-unclassified-instea/why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing.md",
+      "set": "batch-080",
+      "sourceBytes": 6479,
+      "digest": "cc4b9a3505afd445faa711cdd4a9336139f37b8bb5615e9d27e67736d6060b26",
+      "inventoryFileDigest": "cc4b9a3505afd445faa711cdd4a9336139f37b8bb5615e9d27e67736d6060b26",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "06a14d426a87c10225dd6650f8d7f4d60b6cb9e79e2f9d875f7e4ee763e21c08",
+      "recordBytes": 2301,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-mergerunneritem-s-already-merged-fast-path-checks-conten/why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry.md",
+      "set": "batch-080",
+      "sourceBytes": 5849,
+      "digest": "19cd1f0d94834d774d7ae6e6731647de25627011c11c0ea4ee6ec8916d21832a",
+      "inventoryFileDigest": "19cd1f0d94834d774d7ae6e6731647de25627011c11c0ea4ee6ec8916d21832a",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d9ce9bcce04592b5c681c58ce95cce97d8e9cf26338f5db4dd39a1da9f6fedf9",
+      "recordBytes": 984,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-mergerunneritem-s-commit-failure-error-now-carries-git-s/why-mergeruneritems-commit-failure-error-now-carries-gits-real-stderr.md",
+      "set": "batch-080",
+      "sourceBytes": 3334,
+      "digest": "6896bf5609e588577090c5b7bb9f3b3b7a308fd917a015bf3e926230f13ef0d4",
+      "inventoryFileDigest": "6896bf5609e588577090c5b7bb9f3b3b7a308fd917a015bf3e926230f13ef0d4",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7b7b04682f76f9d0b57b740895eabd3fe207fce8b064211e290cc3fe3aa96374",
+      "recordBytes": 2083,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-mergerunneritem-takes-a-separate-lockroot-param/why-mergerunneritem-takes-a-separate-lockroot-param.md",
+      "set": "batch-080",
+      "sourceBytes": 4986,
+      "digest": "f2460a129d6116a75cf8ba3ff07008e17ebcf028994013a03278863b73e575f5",
+      "inventoryFileDigest": "f2460a129d6116a75cf8ba3ff07008e17ebcf028994013a03278863b73e575f5",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "187812279e55c8b2fa52911426921633d9be95e82cfc3bacaf6ca1ef1be36024",
+      "recordBytes": 948,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-mergesets-groups-conflicts-instead-of-dropping-them-from/why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready.md",
+      "set": "batch-080",
+      "sourceBytes": 4491,
+      "digest": "d72546f4209382ef013e77c2823130cd7bb2d3b65e6816401b467cc8ebdeebac",
+      "inventoryFileDigest": "d72546f4209382ef013e77c2823130cd7bb2d3b65e6816401b467cc8ebdeebac",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a84aafc6155643c765d43abb34221170ef37f6bf9e3d2d1e8799fabfc2275d27",
+      "recordBytes": 972,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md",
+      "set": "batch-080",
+      "sourceBytes": 6375,
+      "digest": "accbc9b3b34449dc43362941baa186205becf51162cefc0639f293a786674acd",
+      "inventoryFileDigest": "accbc9b3b34449dc43362941baa186205becf51162cefc0639f293a786674acd",
+      "diffSha256": "3774f8a703d41b32df7ab45ac76845c8d1d9dbbe0badc06a126838d4ee872b88",
+      "recordSha256": "36a35c668f702de7b4f9f438529f66f0b67c0c8236d23d9e0645491f12711022",
+      "recordBytes": 13337,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-plan-mjs-s-refined-pass-skips-its-priority-write-when-a/why-plan-mjs-refined-pass-skips-priority-when-a-human-override-decision-exists.md",
+      "set": "batch-080",
+      "sourceBytes": 4252,
+      "digest": "f2f37b1d6dcb81dff0bf92bab2593fcdcfaa2cd60a2492e8e22d9f147ad9641d",
+      "inventoryFileDigest": "f2f37b1d6dcb81dff0bf92bab2593fcdcfaa2cd60a2492e8e22d9f147ad9641d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3e1ebd94b9091c012c2bf2066488205ede5c166553a5256b93aa2de4efe00302",
+      "recordBytes": 983,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
+      "set": "batch-080",
+      "sourceBytes": 3231,
+      "digest": "bd7b41fad86b31df2aeb779ed7d5278ce0fdb84d02ba2da6e9073b671fc9ffb4",
+      "inventoryFileDigest": "bd7b41fad86b31df2aeb779ed7d5278ce0fdb84d02ba2da6e9073b671fc9ffb4",
+      "diffSha256": "b52c4707417b24334dd1920f88fc556a4082146d6190ad42cac83275f08b3b1c",
+      "recordSha256": "9cd715a7d7bc0baab43800c84a1a48622de8ade46315cf03e21c6d42f7091d4c",
+      "recordBytes": 11925,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-promote-engine-merges-members-instead-of-rebasing-them/why-promote-engine-merges-members-instead-of-rebasing-them.md",
+      "set": "batch-080",
+      "sourceBytes": 5276,
+      "digest": "e94de3a209a668fa9596f20671ce844cc266004a3db01afba683581bfcba563b",
+      "inventoryFileDigest": "e94de3a209a668fa9596f20671ce844cc266004a3db01afba683581bfcba563b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "210fb33500273ec67ce3fcaa530cc6b3eeef09b9fd80a9c3a71f28c2fca33019",
+      "recordBytes": 2288,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-promote-preflight-uses-git-merge-tree-instead-of-a-real/why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge.md",
+      "set": "batch-080",
+      "sourceBytes": 4878,
+      "digest": "6929d591447c43e2b2bbd6ae0628334b75f8f247093e83d71880d89523e8ef03",
+      "inventoryFileDigest": "6929d591447c43e2b2bbd6ae0628334b75f8f247093e83d71880d89523e8ef03",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "671314dfd1d74d3865dc246a328bd10190c07add3159e1272784b740ef7dbea8",
+      "recordBytes": 1959,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-promote-to-component-reports-merged-parent-rejected-sepa/why-promote-to-component-reports-merged-parent-rejected-separately.md",
+      "set": "batch-080",
+      "sourceBytes": 4121,
+      "digest": "72208fa160dba1e126a66fb33cf647bb328a368a00e2cc2ace7ce90a084f1c38",
+      "inventoryFileDigest": "72208fa160dba1e126a66fb33cf647bb328a368a00e2cc2ace7ce90a084f1c38",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c446c9a431968b5dbe736e6f6c95a9ddb4d6c6311a830d0ba75c9379000d2264",
+      "recordBytes": 2424,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-promote-to-component-restructures-git-before-writing-par/why-promote-to-component-restructures-git-before-writing-parent-state.md",
+      "set": "batch-080",
+      "sourceBytes": 5470,
+      "digest": "8c02839641dff66d5c4222f6bbcadc1cfd6d127f8717d50490eb172a8be77249",
+      "inventoryFileDigest": "8c02839641dff66d5c4222f6bbcadc1cfd6d127f8717d50490eb172a8be77249",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8e034065a4e8413937381e316d35c51d3994b053b2d6b2a659cec929139a1b47",
+      "recordBytes": 975,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-reclaiming-an-orphaned-worktree-checkout-must-check-for/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md",
+      "set": "batch-080",
+      "sourceBytes": 3278,
+      "digest": "214f92a87de9ecbd944aa63df9de0682de0a858f5bf63871630c7c35c3c5b251",
+      "inventoryFileDigest": "214f92a87de9ecbd944aa63df9de0682de0a858f5bf63871630c7c35c3c5b251",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0a93090d5559c159e2a6dba443ee361a5a54e5e2a1e34d7b74de939247358ad7",
+      "recordBytes": 967,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-s/why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md",
+      "set": "batch-080",
+      "sourceBytes": 4462,
+      "digest": "1736f5ac4c5f4be0e93e7431147b044a438e04168f0daf7e584a105f39daa905",
+      "inventoryFileDigest": "1736f5ac4c5f4be0e93e7431147b044a438e04168f0daf7e584a105f39daa905",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "82250274c4f51eb51893c414700c140a580e9635df4fbeb355f89803f3febe32",
+      "recordBytes": 1909,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-register-a-finished-item-into-the-merge-list-needs-no-ne/merge-ready-registration-is-already-idempotent.md",
+      "set": "batch-080",
+      "sourceBytes": 3242,
+      "digest": "199e66bc263202b6d3d37ee81d4acb4f7ed62125630db0a0169b4f7aeacd26dc",
+      "inventoryFileDigest": "199e66bc263202b6d3d37ee81d4acb4f7ed62125630db0a0169b4f7aeacd26dc",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f93f664e15a7325cd45d05c36729df9d49a177ff53f7538c3ac5f529464ef5b8",
+      "recordBytes": 3275,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-resolvediscovery-guards-re-parking-an-already-parked-ite/why-resolvediscovery-guards-re-parking-an-already-parked-item.md",
+      "set": "batch-080",
+      "sourceBytes": 3396,
+      "digest": "1b70c94ada204bd25c52d27deb3ff90a59253430b3516fd39a87d09107cc2c34",
+      "inventoryFileDigest": "1b70c94ada204bd25c52d27deb3ff90a59253430b3516fd39a87d09107cc2c34",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3250c4b015e45179ebb8f41e9fe5e9e1663fbef6c439ca7216b56f58da96b089",
+      "recordBytes": 967,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md",
+      "set": "batch-080",
+      "sourceBytes": 4302,
+      "digest": "fd41b1809659ad5b5e34a3ad2ebaf1ea86639c9bbf6f50e8ad7b2c09b9af8421",
+      "inventoryFileDigest": "fd41b1809659ad5b5e34a3ad2ebaf1ea86639c9bbf6f50e8ad7b2c09b9af8421",
+      "diffSha256": "64c40c059d180f8d59e5f1ef1b27c6c699746d539e699f5a3b9cff193176f97f",
+      "recordSha256": "bb9a0ad3878a5ac6022015e7524c92fff8d263926c27a60bf4c8573b53925b3d",
+      "recordBytes": 12381,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-resolveplan-s-pass-through-path-now-checks-planapproveve/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md",
+      "set": "batch-080",
+      "sourceBytes": 5850,
+      "digest": "8f938126c47a1c135da8b1d25b7bd90a17a5fca2b1a30eba56e12f66e6c1095f",
+      "inventoryFileDigest": "8f938126c47a1c135da8b1d25b7bd90a17a5fca2b1a30eba56e12f66e6c1095f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ba3e798d5d96ed783246282a9380429a586a1f98c5d9abccbda0f67456fc2fb8",
+      "recordBytes": 2327,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-retrospective-documents-vanished-on-orphaned-branches/why-retrospective-documents-vanished-on-orphaned-branches.md",
+      "set": "batch-080",
+      "sourceBytes": 5059,
+      "digest": "a6406008ab472aaa32efac38d4e82fdfb3711be64dd7247d2042e93c199d5860",
+      "inventoryFileDigest": "a6406008ab472aaa32efac38d4e82fdfb3711be64dd7247d2042e93c199d5860",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0c3491c8ad4ced9f3e9406299f3735f3783850736e4a38f0cdeadfdcfbea59bc",
+      "recordBytes": 3036,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-return-s-blocked-friction-hint-checks-real-output-not-th/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md",
+      "set": "batch-080",
+      "sourceBytes": 3492,
+      "digest": "b05caaea2c00d62457ecc702a1d9c04c4cac2aae07701f574271d5d52163d342",
+      "inventoryFileDigest": "b05caaea2c00d62457ecc702a1d9c04c4cac2aae07701f574271d5d52163d342",
+      "diffSha256": "8370df3859d76b12d6d4a964d86950f9a7e0fceea09575602f80441572e85675",
+      "recordSha256": "03eccb0446c459b7487d50f151ca85abd3dae0d0f675be521b527fb7da42a728",
+      "recordBytes": 16220,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-runner-config-splits-capability-curated-vocab-executor-n/why-capability-executor-and-capacity-are-three-separate-concepts.md",
+      "set": "batch-080",
+      "sourceBytes": 12583,
+      "digest": "17f3d9220d7e36c2dabf350e26eaf86c24dcaceaa55928bddd356bd65df837bb",
+      "inventoryFileDigest": "17f3d9220d7e36c2dabf350e26eaf86c24dcaceaa55928bddd356bd65df837bb",
+      "diffSha256": "1ac2a555bf189486f308106298b1a6b648f08cda6d859a278e29090e309b7bec",
+      "recordSha256": "082aaf00fccac717ef5d996707e54ab3c024fe6a34e3d5b39feb91aa11a36acc",
+      "recordBytes": 36676,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+      "set": "batch-081",
+      "sourceBytes": 6036,
+      "digest": "108ec9e58c3f720454a6949aad1a687f28d507e504cb416bec1d571ee8f0ab02",
+      "inventoryFileDigest": "108ec9e58c3f720454a6949aad1a687f28d507e504cb416bec1d571ee8f0ab02",
+      "diffSha256": "13e8c8e5fc80051dc2097a48edf62dbb656854903424d60d360acb19cad76e69",
+      "recordSha256": "551990d917604295f554aede7272ccd0389fd7b05b19ec2733f96dfcb4b85c31",
+      "recordBytes": 14978,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 4,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-splitting-test-files-hits-a-floor-and-why-narrowing-veri/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md",
+      "set": "batch-081",
+      "sourceBytes": 13673,
+      "digest": "997b1643436909261e53ff5fdfe0251b8a4b671751fb069f20bd617aab26a0f0",
+      "inventoryFileDigest": "997b1643436909261e53ff5fdfe0251b8a4b671751fb069f20bd617aab26a0f0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1ed1605a807bbe6046d5fe50ce706614cc128510c1d2fcc159c0b124656db9c1",
+      "recordBytes": 977,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+      "set": "batch-081",
+      "sourceBytes": 9813,
+      "digest": "baa3695dba0d2b34592eb5157ec2b3b71e46d445a2c74e7a875f1d2dc4a8956d",
+      "inventoryFileDigest": "baa3695dba0d2b34592eb5157ec2b3b71e46d445a2c74e7a875f1d2dc4a8956d",
+      "diffSha256": "f2200240ca205202e24be921b56b90b883b048affcaa006121e08434ce5d0276",
+      "recordSha256": "b764627949d8a5f743e6461908d901a17601401a2edccddf7e4436739a346da6",
+      "recordBytes": 13542,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+      "set": "batch-081",
+      "sourceBytes": 19262,
+      "digest": "9e4e9b80adf24affa29bd09ac8cee6e6f899341e9b5d7950abcd4140fad3aa44",
+      "inventoryFileDigest": "9e4e9b80adf24affa29bd09ac8cee6e6f899341e9b5d7950abcd4140fad3aa44",
+      "diffSha256": "2511a82b907794c493d386f7c1c9bf5236e8c816694019871479bc83684d1f3e",
+      "recordSha256": "b3819ab06a328725b9082b94c81babb3e9c0a251aec7cb870b57d10a50c4f623",
+      "recordBytes": 43013,
+      "retiresWithTree": false,
+      "edgeCount": 20,
+      "dispositions": {
+        "preserve": 17,
+        "parked": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+      "set": "batch-081",
+      "sourceBytes": 4907,
+      "digest": "c118ef423ecbfc5bd260709f010b5f977cfffc1c0812c8ff8fad17b28074d827",
+      "inventoryFileDigest": "c118ef423ecbfc5bd260709f010b5f977cfffc1c0812c8ff8fad17b28074d827",
+      "diffSha256": "09cea7917b5db78dafd748aa8d2fd3c8409ffcfb5882fb002a8b6398181c7cc2",
+      "recordSha256": "ddea3fcc7a317b46215362acef5de25b5de1e3a5f90ae40e0f8e56a899a4e020",
+      "recordBytes": 23780,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-state-json-s-write-became-atomic-while-its-lock-scope-cl/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md",
+      "set": "batch-081",
+      "sourceBytes": 3491,
+      "digest": "f3665f981acc26b93ba3ad39c9c8221b75634b8c24b7d3b204ab599fa754c2c7",
+      "inventoryFileDigest": "f3665f981acc26b93ba3ad39c9c8221b75634b8c24b7d3b204ab599fa754c2c7",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "033924635f0548a2a1e09858006a3e76186782323a61361d4943a48665518349",
+      "recordBytes": 2086,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "set": "batch-081",
+      "sourceBytes": 22451,
+      "digest": "7cf21351c63b388bb6d6fdba95f7351fc3fbd3c632de2b97f81aa7dd60878048",
+      "inventoryFileDigest": "7cf21351c63b388bb6d6fdba95f7351fc3fbd3c632de2b97f81aa7dd60878048",
+      "diffSha256": "8e43c49add2736ac3483851b70a110bf341cba75e9b6996928979d6a6e39c38c",
+      "recordSha256": "a404e64251fb63ba0e61c227db1edb6d0d46829c4e82f172bf885902607b1308",
+      "recordBytes": 81009,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "preserve": 7,
+        "parked": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-agy-cli-executor-needs-new-project-in-its-invocation/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md",
+      "set": "batch-081",
+      "sourceBytes": 5833,
+      "digest": "4a7053b67ac5f2dd23a243504edad6b3d1c7661ae3a453937df9a0b84b3a33dd",
+      "inventoryFileDigest": "4a7053b67ac5f2dd23a243504edad6b3d1c7661ae3a453937df9a0b84b3a33dd",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ed6a80d4c669369e322e7ba7aa264b962332ecae6ba0f92ceefd709d3b8ce554",
+      "recordBytes": 3016,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-decision-code-check-ratchets-against-a-baseline-inst/why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything.md",
+      "set": "batch-081",
+      "sourceBytes": 3559,
+      "digest": "721432d91385d3e2cc85e3c188323f09f07680d47c46822e2904baec2d786cc1",
+      "inventoryFileDigest": "721432d91385d3e2cc85e3c188323f09f07680d47c46822e2904baec2d786cc1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6fbf53004a432bbf0921ef6b10204427ff6b33c6f71f26a1a5418fd00156a830",
+      "recordBytes": 1964,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+      "set": "batch-081",
+      "sourceBytes": 6102,
+      "digest": "a66490ef5283c0e51ce78f5565ead3ce54cf7e7e0ebd283cd03c615b31be9544",
+      "inventoryFileDigest": "a66490ef5283c0e51ce78f5565ead3ce54cf7e7e0ebd283cd03c615b31be9544",
+      "diffSha256": "d14ca5b507299003f1d71bb3cba6bb44f453f31b735e2b060739a53e48c47b77",
+      "recordSha256": "0681999906c909fdd7d379751597317cd3062720b86805617636b2ba6d6302b0",
+      "recordBytes": 50094,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "patch": 3,
+        "parked": 2,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-dispatch-gate-widened-to-kind-task-and-mechanism-val/dispatch-gate-widens-to-kind-not-task-and-mechanism-renames-to-process-location.md",
+      "set": "batch-081",
+      "sourceBytes": 3603,
+      "digest": "a3b67cbf2102040a83873c54b3e08e6eed2530453bd9d5941f68d7e5321be3a4",
+      "inventoryFileDigest": "a3b67cbf2102040a83873c54b3e08e6eed2530453bd9d5941f68d7e5321be3a4",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ad64808b0721ce1e4124076d8990642011d7f2de1d73f7141beba9b83cc0c968",
+      "recordBytes": 985,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+      "set": "batch-081",
+      "sourceBytes": 7146,
+      "digest": "7e181e8a4f754c4d33bfcae2f8e18cc93ea372eb878eca3fb532910c59677f76",
+      "inventoryFileDigest": "7e181e8a4f754c4d33bfcae2f8e18cc93ea372eb878eca3fb532910c59677f76",
+      "diffSha256": "352480813776ba03c59c36bf1e6426d8b8b2d280864dc0c97857021a0a1971b7",
+      "recordSha256": "c661f229e259815fd889534a1cd4fe811bc5c10dcfa707b8e290925dac9c7abf",
+      "recordBytes": 37693,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "parked": 2,
+        "preserve": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+      "set": "batch-081",
+      "sourceBytes": 3951,
+      "digest": "6140cc8ffe078af0f134362f60c032e633c413da36c96621fc1342fb9b743598",
+      "inventoryFileDigest": "6140cc8ffe078af0f134362f60c032e633c413da36c96621fc1342fb9b743598",
+      "diffSha256": "94d27086582e15a5b56fcf10a6f09231ae92abf9b33438aa557153af66f10bdd",
+      "recordSha256": "473276c8b89bcefe35c27fafd3ec1c1450f6f7f993a6634d92a112ec07cd939c",
+      "recordBytes": 16313,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+      "set": "batch-081",
+      "sourceBytes": 6582,
+      "digest": "6e66d7b812d8b9ba0a748ac9c824d53e990dd442596a5558b74de2351068b8f9",
+      "inventoryFileDigest": "6e66d7b812d8b9ba0a748ac9c824d53e990dd442596a5558b74de2351068b8f9",
+      "diffSha256": "7670a776bc7746cb6f5676ca8ee2ddb64b8ef4c4c4a4a4f671d11f851cc5e663",
+      "recordSha256": "7ede0a3277bc4a2c69e08c3077e3f33d2405850bedf6672b8fbf2a8a52618238",
+      "recordBytes": 75253,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt/why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement.md",
+      "set": "batch-081",
+      "sourceBytes": 3240,
+      "digest": "e52946b5e42cccc11594ac25ce718fe1276b54f93c1e3d940e7d93a604990b6b",
+      "inventoryFileDigest": "e52946b5e42cccc11594ac25ce718fe1276b54f93c1e3d940e7d93a604990b6b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "104910a946448f232247d739e53b336192f3336363379aa2adf62aa388edece9",
+      "recordBytes": 3564,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+      "set": "batch-081",
+      "sourceBytes": 12820,
+      "digest": "3dd951c1355ef5cdc335d12f57954edeb7e90628bb42e0ab311f6f5d9d4ef4e7",
+      "inventoryFileDigest": "3dd951c1355ef5cdc335d12f57954edeb7e90628bb42e0ab311f6f5d9d4ef4e7",
+      "diffSha256": "fbbc6d018c79faa157cbeab4d401dfd8c2a0527250cd85c230876735fc95802e",
+      "recordSha256": "10082becc41c35be433239a8c3c835f81a4f82842431173c1718fb26c2a081b1",
+      "recordBytes": 44836,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 4,
+        "patch": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-install-packaging-e2e-test-replaced-a-byte-identical/why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot.md",
+      "set": "batch-081",
+      "sourceBytes": 3263,
+      "digest": "20c4b6f082ebee52b742f709a06fd4330d324e9464f9616e370bc8b4120bf0a4",
+      "inventoryFileDigest": "20c4b6f082ebee52b742f709a06fd4330d324e9464f9616e370bc8b4120bf0a4",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2ebe77a4338cf6f067bb588c5e02f61dde68fd8489096f9ac300a77d8c0346f2",
+      "recordBytes": 999,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+      "set": "batch-081",
+      "sourceBytes": 5161,
+      "digest": "d6a3fe8f3bb758e1f6cea7b8f3ce75a22d455a8e79672170264aae7f09803aeb",
+      "inventoryFileDigest": "d6a3fe8f3bb758e1f6cea7b8f3ce75a22d455a8e79672170264aae7f09803aeb",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e23c030a9efb2347941e0472ab0df4405af54c5443922d7dd57737d10361971e",
+      "recordBytes": 4421,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+      "set": "batch-081",
+      "sourceBytes": 5155,
+      "digest": "12c8cb390f839db3791eb37bf1765e96550549fb08490f9e50e8b6419e99268a",
+      "inventoryFileDigest": "12c8cb390f839db3791eb37bf1765e96550549fb08490f9e50e8b6419e99268a",
+      "diffSha256": "a9280d8b5ed4bfb3f16eeb9db5dec34fe74e7f677169ae551139c951cd8e772c",
+      "recordSha256": "813e91dab6c7d25ec90bc9e75fbbe191a3b3cc329f551af1b3d9daf90e5658db",
+      "recordBytes": 22827,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+      "set": "batch-081",
+      "sourceBytes": 1516,
+      "digest": "e0a05376da5ee6e1c34334aec846766cf8d068bff87464b0b632b99cd7eca60b",
+      "inventoryFileDigest": "e0a05376da5ee6e1c34334aec846766cf8d068bff87464b0b632b99cd7eca60b",
+      "diffSha256": "dbebe84957e1fe19bd19b5d9359bc1416f41230d3f698dda3203d3f3cfd429b5",
+      "recordSha256": "bb18b4ebdff95b62abf518168c6602b9234da8e873ddeb2e7c854d99ea43eb91",
+      "recordBytes": 17042,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+      "set": "batch-081",
+      "sourceBytes": 3901,
+      "digest": "1cbc795929d012368ede09260f179a75576defb1c1c3a17c4f56ce2d1245ac81",
+      "inventoryFileDigest": "1cbc795929d012368ede09260f179a75576defb1c1c3a17c4f56ce2d1245ac81",
+      "diffSha256": "adcdd6a655969ac68a7e9d1f49777b25d7da626b72f60ac450a6a7b738e46612",
+      "recordSha256": "128bbc1e07661539b88fa6e0dba907e4073dfb82ea77069c146edb03c06ae6bb",
+      "recordBytes": 25706,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 5,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+      "set": "batch-081",
+      "sourceBytes": 6138,
+      "digest": "7bfa0d8af1bbbb8cbc48ffacedc710b7b879ae3b4a5b4611f383b115c2981623",
+      "inventoryFileDigest": "7bfa0d8af1bbbb8cbc48ffacedc710b7b879ae3b4a5b4611f383b115c2981623",
+      "diffSha256": "2b88241596f19f860cc74a5cdc7d0e8f2589798b0e6a1efb440b638792610889",
+      "recordSha256": "f6f8f5604103462398b1fc1fd9a829150e2b7e9e2b1c7492a8b478432b4c81c7",
+      "recordBytes": 36367,
+      "retiresWithTree": false,
+      "edgeCount": 10,
+      "dispositions": {
+        "preserve": 7,
+        "patch": 2,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
+      "set": "batch-081",
+      "sourceBytes": 8346,
+      "digest": "76374ba65e53d2ac73b4a89bbdf995ec54d7b1ba6ba34445ccda83357547c666",
+      "inventoryFileDigest": "76374ba65e53d2ac73b4a89bbdf995ec54d7b1ba6ba34445ccda83357547c666",
+      "diffSha256": "1b541111edb8ceb7db80c76ce6bf8acbde692d2bea28de7fb46dc2af00e4ad26",
+      "recordSha256": "b03e04f1e16a211732cb64009fdbab708acf9a022401b134a93f0c543c428bb1",
+      "recordBytes": 30790,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "preserve": 7,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-main-checkout-lock-hook-used-to-block-worktree-commi/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md",
+      "set": "batch-081",
+      "sourceBytes": 4779,
+      "digest": "d1c92b16b111d9a0f2e607324cd82a181881dea907289c12c9cd6c03b68cdb9f",
+      "inventoryFileDigest": "d1c92b16b111d9a0f2e607324cd82a181881dea907289c12c9cd6c03b68cdb9f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b3c992bba1e04ea1fcc2b6c5b56875ad38bf4821eff1388b4457c87c39cebe21",
+      "recordBytes": 2468,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-ve/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify.md",
+      "set": "batch-081",
+      "sourceBytes": 8751,
+      "digest": "f30b57cc38dc2b49ffdc84c1620075253dac1973b3289c6b622de5bbe354c5b0",
+      "inventoryFileDigest": "f30b57cc38dc2b49ffdc84c1620075253dac1973b3289c6b622de5bbe354c5b0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "bf7dc75c575e5a33968d2fae1babaa079cb03c92ab03a1dd3db47016928b5614",
+      "recordBytes": 3673,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
+      "set": "batch-082",
+      "sourceBytes": 5322,
+      "digest": "5ada81e933888a03e387baf8e614b5d4bca3b8307443241e7524ac687f66a080",
+      "inventoryFileDigest": "5ada81e933888a03e387baf8e614b5d4bca3b8307443241e7524ac687f66a080",
+      "diffSha256": "60c1ff20474ba037ebd7eb98a41cf4be680018fe94ccbff1b8556619abaadd0e",
+      "recordSha256": "d943f0d6e3a391446b29d3b7ed8240c5c2555c1a6e0213e1234e3d6150049e76",
+      "recordBytes": 21857,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-s/why-the-stage-status-driving-split-decision-got-superseded.md",
+      "set": "batch-082",
+      "sourceBytes": 6410,
+      "digest": "2864db6b7e220327d3120b22e2d2bbc142c89efabebc03cd7ef428e50dcf9155",
+      "inventoryFileDigest": "2864db6b7e220327d3120b22e2d2bbc142c89efabebc03cd7ef428e50dcf9155",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c9eef92955005b28fc9042caf08c68781495657306fe795f76836c627706596a",
+      "recordBytes": 4419,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md",
+      "set": "batch-082",
+      "sourceBytes": 13406,
+      "digest": "76bc924026b31c1a8f8ac9e8521ccd2ec55f26ab493ce96516f21e6dc3a51bca",
+      "inventoryFileDigest": "76bc924026b31c1a8f8ac9e8521ccd2ec55f26ab493ce96516f21e6dc3a51bca",
+      "diffSha256": "816f3524ccf733ba80cd744f1ba1eab56983064ff1b1ac5ad42e3269b29f26f7",
+      "recordSha256": "4dbecd4b25bf43bed3421b7606a6d14d159b4084efb40119c684527940a4a936",
+      "recordBytes": 19462,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 5,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+      "set": "batch-082",
+      "sourceBytes": 7914,
+      "digest": "767c690e8abe45c7cf4dc1bd9758ab42ea378ca54b03f5665d9c2aa9d0327fa0",
+      "inventoryFileDigest": "767c690e8abe45c7cf4dc1bd9758ab42ea378ca54b03f5665d9c2aa9d0327fa0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "26bf652c99376e1f2161a50745c08e43c02bb8806a41b975cce70e0e0e75abe7",
+      "recordBytes": 5107,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+      "set": "batch-082",
+      "sourceBytes": 12589,
+      "digest": "4fb03d17657b334ccdf5f3a8dea55357f8fc5964f6511de4819c6d94a3fd3e0b",
+      "inventoryFileDigest": "4fb03d17657b334ccdf5f3a8dea55357f8fc5964f6511de4819c6d94a3fd3e0b",
+      "diffSha256": "a7beb97cc17b1a6c0033091ba67463a86aa79efaf2c117bedf0ca271f1aca28d",
+      "recordSha256": "b2d12e48e8215e7e7c7b685358ee775f66700986bf7546ca232108c31580887b",
+      "recordBytes": 13846,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-wontfix-had-to-join-done-at-every-is-this-resolved-check/wontfix-terminal-status-filter-consistency.md",
+      "set": "batch-082",
+      "sourceBytes": 7213,
+      "digest": "bf58b7f4a79d90d17d4ee75196fea2232e76b4c791235f30bfdfbe9aa5148073",
+      "inventoryFileDigest": "bf58b7f4a79d90d17d4ee75196fea2232e76b4c791235f30bfdfbe9aa5148073",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "bc0bf30c08702021553ede294ad4078fed812d82d9f3e720552d946dca7fde22",
+      "recordBytes": 2547,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-work-acceptance-gets-a-narrow-write-time-evidence-tracea/acceptance-evidence-traceability-gate.md",
+      "set": "batch-082",
+      "sourceBytes": 3871,
+      "digest": "52ac9bbcd996eef240a70d019c9e26496107de91f8ee29b0d30340b58fb017e3",
+      "inventoryFileDigest": "52ac9bbcd996eef240a70d019c9e26496107de91f8ee29b0d30340b58fb017e3",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a7de990e58b097e8413200456570ee94e867a0f8fbcd121894fb3f3eddc3150b",
+      "recordBytes": 8197,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-work-item-titles-get-a-100-character-ceiling-at-the-stor/work-item-title-length-ceiling.md",
+      "set": "batch-082",
+      "sourceBytes": 5902,
+      "digest": "c1cee13f46cbfa02f2e194a676d68d3abec3768d0ce2a9bc027a663a4d58d46e",
+      "inventoryFileDigest": "c1cee13f46cbfa02f2e194a676d68d3abec3768d0ce2a9bc027a663a4d58d46e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b75945f1d299bc0c1f421ffdde3d190eaaba8f039937dea8d474e753bc177433",
+      "recordBytes": 936,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-workflow-prose-gates-on-a-capability-query-not-a-hardcod/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md",
+      "set": "batch-082",
+      "sourceBytes": 11708,
+      "digest": "6546931d7683a58ca77fea1581bac5c165d7482cf69fbbf4d070041e5d74071f",
+      "inventoryFileDigest": "6546931d7683a58ca77fea1581bac5c165d7482cf69fbbf4d070041e5d74071f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "211b0b1c1ae1747ea03839b2b4babdfbddb9c2f3014abbbf4068d314e6801ae7",
+      "recordBytes": 2230,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/windows-npm-install-g-prefix-has-no-lib-or-bin-subfolder/windows-npm-global-install-has-no-lib-or-bin-subfolder.md",
+      "set": "batch-082",
+      "sourceBytes": 3150,
+      "digest": "425cc636f23aaa702328c90faace7de53defccd6480978e698308da2eda5f416",
+      "inventoryFileDigest": "425cc636f23aaa702328c90faace7de53defccd6480978e698308da2eda5f416",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cbfa4325175bb6c556b603a33a96abca355bdb55550c17e8b06b310f1f74d16d",
+      "recordBytes": 956,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md",
+      "set": "batch-082",
+      "sourceBytes": 10536,
+      "digest": "cd6d69131eab5bcef9abb5a41bb1af1c432fb328932900525919295b3348cc78",
+      "inventoryFileDigest": "cd6d69131eab5bcef9abb5a41bb1af1c432fb328932900525919295b3348cc78",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a5032c31c3aacfcf7023ad00a05d33cad552e9563a9343ec980001e8564dcd94",
+      "recordBytes": 7388,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md",
+      "set": "batch-082",
+      "sourceBytes": 10646,
+      "digest": "6eaf8a9eca523a4eab98549a28ab7c190b551d23414d0ff96c2b5e9e92c382b7",
+      "inventoryFileDigest": "6eaf8a9eca523a4eab98549a28ab7c190b551d23414d0ff96c2b5e9e92c382b7",
+      "diffSha256": "c285e0ea06cc7f3b8e4170bc10d65b4cc812d4643a34ba4a4a9d57259ee6ef3d",
+      "recordSha256": "1cc313e5f09fc34776e8633f255507610e52f628b9f59de8aa264311807448f4",
+      "recordBytes": 61337,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "preserve": 6,
+        "patch": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+      "set": "batch-082",
+      "sourceBytes": 26182,
+      "digest": "cf92920a8a721b0bba1b6dc080e89f7f103a65c175d333a5a64d5d0db9383033",
+      "inventoryFileDigest": "cf92920a8a721b0bba1b6dc080e89f7f103a65c175d333a5a64d5d0db9383033",
+      "diffSha256": "d1483b68a4f56744ec17f399763043dcf07a95cba6bf0b724461aac47e4ad895",
+      "recordSha256": "4dabc8fb5aca45649ebc026f617aca90511d2b76fccb3d514d9c8b744dabedce",
+      "recordBytes": 864755,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "parked": 1,
+        "preserve": 4,
+        "patch": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md",
+      "set": "batch-082",
+      "sourceBytes": 10631,
+      "digest": "4d8a7fc2492d9336fbf69e578667db72cbe6200c428c51f950af77f747c2211a",
+      "inventoryFileDigest": "4d8a7fc2492d9336fbf69e578667db72cbe6200c428c51f950af77f747c2211a",
+      "diffSha256": "1fe79895fa9f37fe6eca2754334bb29e6a45d6eaf01600b0648f61a9e5bb4575",
+      "recordSha256": "86b244d44d5e8049c0d9c856966b6af269d674e340ded95a7a2fd5c3f2412a99",
+      "recordBytes": 12627,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-079",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000079",
+      "population": [
+        "docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+        "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+        "docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md",
+        "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
+        "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+        "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+        "docs/knowledge/why-intake-classification-moved-to-after-clarify-and-back-to/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md",
+        "docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md",
+        "docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+        "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md"
+      ],
+      "populationCount": 10,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+          "rankHash": "00320f975bdfd1e78ede652471597b03852c3880be47221c2b6867c93744037f"
+        },
+        {
+          "file": "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+          "rankHash": "0bef9b72dcc4a8b802b46f2447cf4c21a6f3d571050134eef60bfbf2de1de254"
+        },
+        {
+          "file": "docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md",
+          "rankHash": "18b5d059e4811681159723973489f8e48a3e36ea63c0f080d23684cdf894570a"
+        },
+        {
+          "file": "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
+          "rankHash": "22a8b25fc2ec4b22429330d5b28999a80e3fd6bb7c8fd38ab5292ede06505068"
+        },
+        {
+          "file": "docs/knowledge/why-intake-classification-moved-to-after-clarify-and-back-to/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md",
+          "rankHash": "4888fac0186e532efd9100066495a6981381e7488eabd0c48d14ff18b4d097ae"
+        },
+        {
+          "file": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+          "rankHash": "67c274c2da671da7e1a2e03dda359a142703432d5e8ccc98c1a1d3d55948b48d"
+        },
+        {
+          "file": "docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+          "rankHash": "6aac4fe78986cf0c2f4691eb3d6cd2cd1a2270a09f02745e74aedf35e323e949"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+          "rankHash": "aaad449d25e9f21527b5d217e79f4a0d40fb73054ab3bfea825c70fa04b5f1e7"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md",
+          "rankHash": "c8741c5585d50ea7922c60fdb8c42aa15dc96851c0b2eadd47e1122d1218d6d5"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
+          "rankHash": "f9beb13fb96b662a5554f18018491cbfe1486503455d7fa1403a6e63ea1eba30"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+        "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+        "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+        "docs/knowledge/why-fgos-s-concurrency-tests-batch-spawned-processes-to-redu/why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout.md",
+        "docs/knowledge/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g/why-fgos-citations-carry-a-gloss-and-check-mechanically.md",
+        "docs/knowledge/why-fgos-s-merge-safety-work-shipped-as-ten-items-under-one/why-fgos-merge-safety-shipped-as-ten-items-under-one-milestone.md",
+        "docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+        "docs/knowledge/why-fgos-sync-root-fgos-merge-next-and-fgos-review-resolve-c/why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards.md",
+        "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+        "docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md",
+        "docs/knowledge/why-fgos-unlock-s-error-message-stopped-claiming-a-live-sess/why-fgos-unlocks-error-message-stopped-claiming-a-live-session-it-never-checked.md",
+        "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
+        "docs/knowledge/why-gate-approval-was-separated-from-move-next/why-gate-approval-was-separated-from-move-next.md",
+        "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+        "docs/knowledge/why-heavy-keywords-matching-moved-from-substring-to-word-bou/why-heavy-keywords-matching-moved-to-word-boundaries.md",
+        "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+        "docs/knowledge/why-herdr-plugin-s-discover-pane-launches-always-pass-autocl/why-herdr-plugins-discover-pane-launches-always-pass-autoclose.md",
+        "docs/knowledge/why-herdr-s-dashboard-lists-became-real-tables-and-why-in-pr/herdr-dashboard-table-view-scope-and-sort.md",
+        "docs/knowledge/why-hook-registrations-guard-against-gitignored-scripts/hook-registration-guard.md",
+        "docs/knowledge/why-intake-classification-moved-to-after-clarify-and-back-to/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md",
+        "docs/knowledge/why-isdepsandlineageready-uses-resolved-statuses-not-just-do/why-isdepsandlineageready-uses-resolved-statuses-not-just-done.md",
+        "docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md",
+        "docs/knowledge/why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verd/keywordriskgate-skips-when-verdict-cites-a-locked-decision.md",
+        "docs/knowledge/why-locking-a-new-risk-kind-vocabulary-didn-t-fix-the-68-ite/why-a-vocabulary-lock-alone-cant-fix-grandfathered-risk-and-kind-values.md",
+        "docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+        "docs/knowledge/why-malformed-cli-invocations-now-leave-a-provenance-trace/cli-invocation-fault-provenance.md",
+        "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md"
+      ],
+      "dispositions": {
+        "preserve": 50,
+        "parked": 4,
+        "patch": 15
+      }
+    },
+    {
+      "set": "batch-080",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000080",
+      "population": [
+        "docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md",
+        "docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md",
+        "docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
+        "docs/knowledge/why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md",
+        "docs/knowledge/why-return-s-blocked-friction-hint-checks-real-output-not-th/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md",
+        "docs/knowledge/why-runner-config-splits-capability-curated-vocab-executor-n/why-capability-executor-and-capacity-are-three-separate-concepts.md"
+      ],
+      "populationCount": 6,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
+          "rankHash": "066597e29875064327070ea5a91dde3c3ab68127bbe2ae7b65c18af07f5ef4b0"
+        },
+        {
+          "file": "docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md",
+          "rankHash": "1186aabccb4631bc1f2b3a17df74066ed1f915feb5241702f805a04f7b99482e"
+        },
+        {
+          "file": "docs/knowledge/why-runner-config-splits-capability-curated-vocab-executor-n/why-capability-executor-and-capacity-are-three-separate-concepts.md",
+          "rankHash": "69a46fa566710cd44170ec91377e5be606204284e77a824df29ea38c5a98ad53"
+        },
+        {
+          "file": "docs/knowledge/why-return-s-blocked-friction-hint-checks-real-output-not-th/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md",
+          "rankHash": "941a2825555b6c6677b6fa4c3c5cf1695329779a99089857a3dbdb393c4eb75e"
+        },
+        {
+          "file": "docs/knowledge/why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md",
+          "rankHash": "a226102a15c875e014ed14004afe4264f7261e1ec883fbf30484fbe01cd5cbd3"
+        },
+        {
+          "file": "docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md",
+          "rankHash": "e97de0d716032300f6999ad1dc6cc25c044539dca2dc85f7c53b68d71d976a9c"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md",
+        "docs/knowledge/why-merge-standardization-tsk-4j9-reuses-existing-mechanisms/why-merge-standardization-reuses-existing-mechanisms.md",
+        "docs/knowledge/why-mergereadiness-excludes-superseded-items/why-mergereadiness-excludes-superseded-items.md",
+        "docs/knowledge/why-mergerunneritem-now-checks-ancestry-before-attempting-a/merge-idempotent-on-already-merged-branch.md",
+        "docs/knowledge/why-mergerunneritem-returns-merge-failed-unclassified-instea/why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing.md",
+        "docs/knowledge/why-mergerunneritem-s-already-merged-fast-path-checks-conten/why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry.md",
+        "docs/knowledge/why-mergerunneritem-s-commit-failure-error-now-carries-git-s/why-mergeruneritems-commit-failure-error-now-carries-gits-real-stderr.md",
+        "docs/knowledge/why-mergerunneritem-takes-a-separate-lockroot-param/why-mergerunneritem-takes-a-separate-lockroot-param.md",
+        "docs/knowledge/why-mergesets-groups-conflicts-instead-of-dropping-them-from/why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready.md",
+        "docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md",
+        "docs/knowledge/why-plan-mjs-s-refined-pass-skips-its-priority-write-when-a/why-plan-mjs-refined-pass-skips-priority-when-a-human-override-decision-exists.md",
+        "docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
+        "docs/knowledge/why-promote-engine-merges-members-instead-of-rebasing-them/why-promote-engine-merges-members-instead-of-rebasing-them.md",
+        "docs/knowledge/why-promote-preflight-uses-git-merge-tree-instead-of-a-real/why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge.md",
+        "docs/knowledge/why-promote-to-component-reports-merged-parent-rejected-sepa/why-promote-to-component-reports-merged-parent-rejected-separately.md",
+        "docs/knowledge/why-promote-to-component-restructures-git-before-writing-par/why-promote-to-component-restructures-git-before-writing-parent-state.md",
+        "docs/knowledge/why-reclaiming-an-orphaned-worktree-checkout-must-check-for/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md",
+        "docs/knowledge/why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-s/why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md",
+        "docs/knowledge/why-register-a-finished-item-into-the-merge-list-needs-no-ne/merge-ready-registration-is-already-idempotent.md",
+        "docs/knowledge/why-resolvediscovery-guards-re-parking-an-already-parked-ite/why-resolvediscovery-guards-re-parking-an-already-parked-item.md",
+        "docs/knowledge/why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md",
+        "docs/knowledge/why-resolveplan-s-pass-through-path-now-checks-planapproveve/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md",
+        "docs/knowledge/why-retrospective-documents-vanished-on-orphaned-branches/why-retrospective-documents-vanished-on-orphaned-branches.md",
+        "docs/knowledge/why-return-s-blocked-friction-hint-checks-real-output-not-th/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md",
+        "docs/knowledge/why-runner-config-splits-capability-curated-vocab-executor-n/why-capability-executor-and-capacity-are-three-separate-concepts.md"
+      ],
+      "dispositions": {
+        "preserve": 23,
+        "patch": 7
+      }
+    },
+    {
+      "set": "batch-081",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000081",
+      "population": [
+        "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+        "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+        "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+        "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+        "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+        "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+        "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+        "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+        "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+        "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+        "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+        "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+        "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+        "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+        "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md"
+      ],
+      "populationCount": 15,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+          "rankHash": "0f8b5753462aa6bbeb9e5a208bfecdb06c512098ebf8d554f65c5e06d580c80d"
+        },
+        {
+          "file": "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+          "rankHash": "0f9b8efead04c40f0beb781972154617e1a7eaa07e6b10b9317e788ae4396a44"
+        },
+        {
+          "file": "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+          "rankHash": "226e82d7ef5ecbc7f01d6dded24492be62a3ab5dbd1723fe9c9cb2c4f998db37"
+        },
+        {
+          "file": "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
+          "rankHash": "22e9dce2b5bb013c3ff12523f9c91041543df18b3262396d0a9b29abe22e2815"
+        },
+        {
+          "file": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+          "rankHash": "2a7eba6a319577118addce686d43b591fa93efa04552fa725e34a84e81677679"
+        },
+        {
+          "file": "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+          "rankHash": "7d1b9f524e9163e09e9d3d491061a13a4507e43c5db7a8414d0e68bb1bd6a053"
+        },
+        {
+          "file": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+          "rankHash": "7ea8ed5b49b847f6df339a9c7bec0d2cb3d41753643e70bc8961c3dc534f5154"
+        },
+        {
+          "file": "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+          "rankHash": "978f8aaf21a540df4c1a0894ff01ed7bd0d6c73baa43c0f95a92c734844415ca"
+        },
+        {
+          "file": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+          "rankHash": "9c08525b6934ae5251807ec6f30a0bc798b0e292abd63e4eb9404d7e4a92d6db"
+        },
+        {
+          "file": "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+          "rankHash": "a8793aecb7cb86163e33aedb7abfab30aa9c8a92d5626716ff7a7f4810269961"
+        },
+        {
+          "file": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+          "rankHash": "bd34f8fc84eb4ef8e1a9e8c014a3c99cd33a0cf9115035d2a21146baf1101720"
+        },
+        {
+          "file": "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+          "rankHash": "bd830dfcdd63f156cd7fab663a55cb87fea477140f5df545234d7a2ca7ffd047"
+        },
+        {
+          "file": "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+          "rankHash": "d47bfe03e731491e3d95398f4842c5b39bce450012c71a696e31883899e20af5"
+        },
+        {
+          "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+          "rankHash": "ee2409950320f3b5ecd3262ff5fa16c71e47ba5b487149504900f89450bcfa35"
+        },
+        {
+          "file": "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+          "rankHash": "f5c6ab2ffeeb636edf38f06cec7b1fd6476363f1eba150381b95705c463f7e1a"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+        "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+        "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+        "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+        "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md"
+      ],
+      "distinctReviewCount": 3,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+        "docs/knowledge/why-splitting-test-files-hits-a-floor-and-why-narrowing-veri/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md",
+        "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+        "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+        "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+        "docs/knowledge/why-state-json-s-write-became-atomic-while-its-lock-scope-cl/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md",
+        "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+        "docs/knowledge/why-the-agy-cli-executor-needs-new-project-in-its-invocation/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md",
+        "docs/knowledge/why-the-decision-code-check-ratchets-against-a-baseline-inst/why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything.md",
+        "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+        "docs/knowledge/why-the-dispatch-gate-widened-to-kind-task-and-mechanism-val/dispatch-gate-widens-to-kind-not-task-and-mechanism-renames-to-process-location.md",
+        "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+        "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+        "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+        "docs/knowledge/why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt/why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement.md",
+        "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+        "docs/knowledge/why-the-install-packaging-e2e-test-replaced-a-byte-identical/why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot.md",
+        "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+        "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+        "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+        "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+        "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+        "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
+        "docs/knowledge/why-the-main-checkout-lock-hook-used-to-block-worktree-commi/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md",
+        "docs/knowledge/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-ve/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify.md"
+      ],
+      "dispositions": {
+        "preserve": 76,
+        "patch": 25,
+        "parked": 8
+      }
+    },
+    {
+      "set": "batch-082",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000082",
+      "population": [
+        "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
+        "docs/knowledge/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md",
+        "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+        "docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md",
+        "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+        "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md"
+      ],
+      "populationCount": 6,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
+          "rankHash": "593e1234ac50e2db739b79a4976169fb22d8db2ac35620d747d6208b411ca020"
+        },
+        {
+          "file": "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md",
+          "rankHash": "59e4f4d872cddc48bd105e8e13afba74c3f77eae230e39651d35368208bf99f9"
+        },
+        {
+          "file": "docs/knowledge/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md",
+          "rankHash": "7b369bde1e92c3d748c300a52779a2c69a829b2e489682b903c1b7cb897ffd07"
+        },
+        {
+          "file": "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+          "rankHash": "8938aaf9fde0629b940a743bae58c5f5c60d076926fb9ba0b5ec9355cd45d9ec"
+        },
+        {
+          "file": "docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md",
+          "rankHash": "93ad73ca42ce13671d26c9336fc477a2e2aef1fc621e12834666116ac197e4fa"
+        },
+        {
+          "file": "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+          "rankHash": "c13c863069841d2a65a7d80c6c6b703a4e0676a66cfdd6bf26b2f4cb6ed22ade"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
+        "docs/knowledge/why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-s/why-the-stage-status-driving-split-decision-got-superseded.md",
+        "docs/knowledge/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md",
+        "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+        "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+        "docs/knowledge/why-wontfix-had-to-join-done-at-every-is-this-resolved-check/wontfix-terminal-status-filter-consistency.md",
+        "docs/knowledge/why-work-acceptance-gets-a-narrow-write-time-evidence-tracea/acceptance-evidence-traceability-gate.md",
+        "docs/knowledge/why-work-item-titles-get-a-100-character-ceiling-at-the-stor/work-item-title-length-ceiling.md",
+        "docs/knowledge/why-workflow-prose-gates-on-a-capability-query-not-a-hardcod/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md",
+        "docs/knowledge/windows-npm-install-g-prefix-has-no-lib-or-bin-subfolder/windows-npm-global-install-has-no-lib-or-bin-subfolder.md",
+        "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md",
+        "docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md",
+        "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+        "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md"
+      ],
+      "dispositions": {
+        "patch": 11,
+        "preserve": 29,
+        "parked": 2
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "079": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-079",
+      "population": [
+        "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+        "docs/knowledge/why-fgos-s-concurrency-tests-batch-spawned-processes-to-redu/why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout.md",
+        "docs/knowledge/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g/why-fgos-citations-carry-a-gloss-and-check-mechanically.md",
+        "docs/knowledge/why-fgos-unlock-s-error-message-stopped-claiming-a-live-sess/why-fgos-unlocks-error-message-stopped-claiming-a-live-session-it-never-checked.md",
+        "docs/knowledge/why-heavy-keywords-matching-moved-from-substring-to-word-bou/why-heavy-keywords-matching-moved-to-word-boundaries.md",
+        "docs/knowledge/why-herdr-plugin-s-discover-pane-launches-always-pass-autocl/why-herdr-plugins-discover-pane-launches-always-pass-autoclose.md",
+        "docs/knowledge/why-herdr-s-dashboard-lists-became-real-tables-and-why-in-pr/herdr-dashboard-table-view-scope-and-sort.md",
+        "docs/knowledge/why-hook-registrations-guard-against-gitignored-scripts/hook-registration-guard.md",
+        "docs/knowledge/why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verd/keywordriskgate-skips-when-verdict-cites-a-locked-decision.md",
+        "docs/knowledge/why-locking-a-new-risk-kind-vocabulary-didn-t-fix-the-68-ite/why-a-vocabulary-lock-alone-cant-fix-grandfathered-risk-and-kind-values.md"
+      ],
+      "populationCount": 10,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+          "rankHash": "0103312d9ecaceb1a5f9b8646558fe6eb3377765ab0597ae97b1407d27c590c1"
+        },
+        {
+          "file": "docs/knowledge/why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verd/keywordriskgate-skips-when-verdict-cites-a-locked-decision.md",
+          "rankHash": "062b5119d5822f965c6c153948469cf06fa98ece28d955bbc98418b856e10aad"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g/why-fgos-citations-carry-a-gloss-and-check-mechanically.md",
+          "rankHash": "23bd916bb4b18bef5a6cddca5542b249030c8fb2637a96039478419acfadf420"
+        },
+        {
+          "file": "docs/knowledge/why-locking-a-new-risk-kind-vocabulary-didn-t-fix-the-68-ite/why-a-vocabulary-lock-alone-cant-fix-grandfathered-risk-and-kind-values.md",
+          "rankHash": "3d40ab2dce6f0f2be528e48037831a589d74d7413a75f7abee4c98e8872dbe73"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-s-concurrency-tests-batch-spawned-processes-to-redu/why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout.md",
+          "rankHash": "6a63db37708ec9fe563ca329dee1b99ade54c1c044d81b16d7d5f554b475fd01"
+        },
+        {
+          "file": "docs/knowledge/why-herdr-s-dashboard-lists-became-real-tables-and-why-in-pr/herdr-dashboard-table-view-scope-and-sort.md",
+          "rankHash": "772639b2dd7789eb9d5e5ad321dd4a5d0351bf4820058ac88de596661623e173"
+        },
+        {
+          "file": "docs/knowledge/why-hook-registrations-guard-against-gitignored-scripts/hook-registration-guard.md",
+          "rankHash": "a02f32a4d06b77b8a828574ca80ad717bc0010aa97ded1d1b945d804647f2068"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-unlock-s-error-message-stopped-claiming-a-live-sess/why-fgos-unlocks-error-message-stopped-claiming-a-live-session-it-never-checked.md",
+          "rankHash": "c1a7e38208bd5d1ea8ccd4029ccc42ee99bfab8c55d79ea4e42520dddd75536d"
+        },
+        {
+          "file": "docs/knowledge/why-heavy-keywords-matching-moved-from-substring-to-word-bou/why-heavy-keywords-matching-moved-to-word-boundaries.md",
+          "rankHash": "cf3623a69fc228ac166a324d3cbabe7ad1fb319355a5c662aae050845923e14e"
+        },
+        {
+          "file": "docs/knowledge/why-herdr-plugin-s-discover-pane-launches-always-pass-autocl/why-herdr-plugins-discover-pane-launches-always-pass-autoclose.md",
+          "rankHash": "e6e28759e1c82a6bf9affd75d750e2a1d267cb9958e4ebf5c57a706587e02d9b"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+        "docs/knowledge/why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verd/keywordriskgate-skips-when-verdict-cites-a-locked-decision.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "080": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-080",
+      "population": [
+        "docs/knowledge/why-merge-standardization-tsk-4j9-reuses-existing-mechanisms/why-merge-standardization-reuses-existing-mechanisms.md",
+        "docs/knowledge/why-mergereadiness-excludes-superseded-items/why-mergereadiness-excludes-superseded-items.md",
+        "docs/knowledge/why-mergerunneritem-now-checks-ancestry-before-attempting-a/merge-idempotent-on-already-merged-branch.md",
+        "docs/knowledge/why-mergerunneritem-returns-merge-failed-unclassified-instea/why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing.md",
+        "docs/knowledge/why-mergerunneritem-s-commit-failure-error-now-carries-git-s/why-mergeruneritems-commit-failure-error-now-carries-gits-real-stderr.md",
+        "docs/knowledge/why-promote-engine-merges-members-instead-of-rebasing-them/why-promote-engine-merges-members-instead-of-rebasing-them.md",
+        "docs/knowledge/why-promote-preflight-uses-git-merge-tree-instead-of-a-real/why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge.md",
+        "docs/knowledge/why-promote-to-component-reports-merged-parent-rejected-sepa/why-promote-to-component-reports-merged-parent-rejected-separately.md",
+        "docs/knowledge/why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-s/why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md",
+        "docs/knowledge/why-register-a-finished-item-into-the-merge-list-needs-no-ne/merge-ready-registration-is-already-idempotent.md",
+        "docs/knowledge/why-resolveplan-s-pass-through-path-now-checks-planapproveve/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md",
+        "docs/knowledge/why-retrospective-documents-vanished-on-orphaned-branches/why-retrospective-documents-vanished-on-orphaned-branches.md"
+      ],
+      "populationCount": 12,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-mergereadiness-excludes-superseded-items/why-mergereadiness-excludes-superseded-items.md",
+          "rankHash": "09eefed6f82f1e18bebe38287dc67afbba359e17fca9d2d43ef3e475f80a2bbd"
+        },
+        {
+          "file": "docs/knowledge/why-resolveplan-s-pass-through-path-now-checks-planapproveve/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md",
+          "rankHash": "0ffe9b9c5b68d140e4bcc86d86d9fa76f234bb871e0d4942b04c8d376a790a31"
+        },
+        {
+          "file": "docs/knowledge/why-promote-engine-merges-members-instead-of-rebasing-them/why-promote-engine-merges-members-instead-of-rebasing-them.md",
+          "rankHash": "1cf58533df5bb770e862f97be942c604bf9150115ab4839da6b598991ecec981"
+        },
+        {
+          "file": "docs/knowledge/why-mergerunneritem-s-commit-failure-error-now-carries-git-s/why-mergeruneritems-commit-failure-error-now-carries-gits-real-stderr.md",
+          "rankHash": "28252b57eca73a1f2d85e020d9ba9d05ac521b33028a5f61d5a3c5ae3dba810f"
+        },
+        {
+          "file": "docs/knowledge/why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-s/why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md",
+          "rankHash": "5f96a73004dc6b8fdf7201626b7598e522b7e8fa9016afe1ac9ab0947e057e46"
+        },
+        {
+          "file": "docs/knowledge/why-mergerunneritem-now-checks-ancestry-before-attempting-a/merge-idempotent-on-already-merged-branch.md",
+          "rankHash": "6fa6d0f54b3b8718e6c6fa3f125cb8555379439972d98ed7c0e9330d70aada90"
+        },
+        {
+          "file": "docs/knowledge/why-promote-to-component-reports-merged-parent-rejected-sepa/why-promote-to-component-reports-merged-parent-rejected-separately.md",
+          "rankHash": "8e6e0abd9ba7c34262b799f9f4f3fb1baba77a4411426a5a51eab9db8260b1d0"
+        },
+        {
+          "file": "docs/knowledge/why-merge-standardization-tsk-4j9-reuses-existing-mechanisms/why-merge-standardization-reuses-existing-mechanisms.md",
+          "rankHash": "991640e565ac8e3bc1d21e93e46026159bf22ff8d473491386934ef58a4efb1d"
+        },
+        {
+          "file": "docs/knowledge/why-register-a-finished-item-into-the-merge-list-needs-no-ne/merge-ready-registration-is-already-idempotent.md",
+          "rankHash": "b55d158c0defd24541b03366ed8d356239f2896323e81a8fc9e687a0a9173128"
+        },
+        {
+          "file": "docs/knowledge/why-retrospective-documents-vanished-on-orphaned-branches/why-retrospective-documents-vanished-on-orphaned-branches.md",
+          "rankHash": "bdda49d858050c520ac5496364eb489753c40174cce706991a8160d786080e8a"
+        },
+        {
+          "file": "docs/knowledge/why-mergerunneritem-returns-merge-failed-unclassified-instea/why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing.md",
+          "rankHash": "d04fabcf2c57514e13c3884aecd8ad254d81ae8ac0333966882aac62abf16eed"
+        },
+        {
+          "file": "docs/knowledge/why-promote-preflight-uses-git-merge-tree-instead-of-a-real/why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge.md",
+          "rankHash": "df6ec15f1948c1107052b0af51849fe0bc83d5ba244ffe4ca9f338a7108e8501"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/why-mergereadiness-excludes-superseded-items/why-mergereadiness-excludes-superseded-items.md",
+        "docs/knowledge/why-resolveplan-s-pass-through-path-now-checks-planapproveve/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "081": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-081",
+      "population": [
+        "docs/knowledge/why-state-json-s-write-became-atomic-while-its-lock-scope-cl/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md",
+        "docs/knowledge/why-the-agy-cli-executor-needs-new-project-in-its-invocation/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md",
+        "docs/knowledge/why-the-decision-code-check-ratchets-against-a-baseline-inst/why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything.md",
+        "docs/knowledge/why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt/why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement.md",
+        "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+        "docs/knowledge/why-the-main-checkout-lock-hook-used-to-block-worktree-commi/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md",
+        "docs/knowledge/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-ve/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify.md"
+      ],
+      "populationCount": 7,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-state-json-s-write-became-atomic-while-its-lock-scope-cl/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md",
+          "rankHash": "4361c4512680d12caa7528f13e6b0bc2dd33fc2649393538d8ed4eb1b604a9e7"
+        },
+        {
+          "file": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+          "rankHash": "47548d016063accafd6a51d1087fe14c7123c1b2dfbcc127283117ee1307b234"
+        },
+        {
+          "file": "docs/knowledge/why-the-main-checkout-lock-hook-used-to-block-worktree-commi/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md",
+          "rankHash": "6ddc4be08985f3e2ad4a4d3bf7d77387978a374feb1145bde0da25b294cb7371"
+        },
+        {
+          "file": "docs/knowledge/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-ve/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify.md",
+          "rankHash": "8117be31a9e31c8d5a7d546ae1b0973c7f52b0394bf727aa5488a8f1494346d7"
+        },
+        {
+          "file": "docs/knowledge/why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt/why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement.md",
+          "rankHash": "b4d914f8a0b39f722fda71338ffd60443866b165a6fa4af136f035746a9b1a8e"
+        },
+        {
+          "file": "docs/knowledge/why-the-agy-cli-executor-needs-new-project-in-its-invocation/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md",
+          "rankHash": "c3edfb91fa2d3ace2bcd7127f733cd32ed5ea6570a4438f180bbabda79de6500"
+        },
+        {
+          "file": "docs/knowledge/why-the-decision-code-check-ratchets-against-a-baseline-inst/why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything.md",
+          "rankHash": "ed4d59d1edf556364fdd864e6a8664c705045507a09d43100996dc7c82efb74e"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/why-state-json-s-write-became-atomic-while-its-lock-scope-cl/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md",
+        "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "082": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-082",
+      "population": [
+        "docs/knowledge/why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-s/why-the-stage-status-driving-split-decision-got-superseded.md",
+        "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+        "docs/knowledge/why-wontfix-had-to-join-done-at-every-is-this-resolved-check/wontfix-terminal-status-filter-consistency.md",
+        "docs/knowledge/why-work-acceptance-gets-a-narrow-write-time-evidence-tracea/acceptance-evidence-traceability-gate.md",
+        "docs/knowledge/why-workflow-prose-gates-on-a-capability-query-not-a-hardcod/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md",
+        "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md"
+      ],
+      "populationCount": 6,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-s/why-the-stage-status-driving-split-decision-got-superseded.md",
+          "rankHash": "134f7d61d5d35b2b0c57f3bf028bb2f161f07375cdf5b2afd490c7afb0c1a744"
+        },
+        {
+          "file": "docs/knowledge/why-wontfix-had-to-join-done-at-every-is-this-resolved-check/wontfix-terminal-status-filter-consistency.md",
+          "rankHash": "1bfc3af69f089ed48fd32ea5ad0cdc55adaed1ec6210ff642f282912018970d5"
+        },
+        {
+          "file": "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md",
+          "rankHash": "387ed5cdc593dba5324c9c6f5486f6146b6e7311b108e8a4f159d63d43789fde"
+        },
+        {
+          "file": "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+          "rankHash": "55d72943c9ac76a54facb92c520f659b372009a765d7e188788d99ed293f24b1"
+        },
+        {
+          "file": "docs/knowledge/why-workflow-prose-gates-on-a-capability-query-not-a-hardcod/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md",
+          "rankHash": "c46565615b2843c21a3ff37d6bd9874deca81ab2a48b5040664f89aad467d4c4"
+        },
+        {
+          "file": "docs/knowledge/why-work-acceptance-gets-a-narrow-write-time-evidence-tracea/acceptance-evidence-traceability-gate.md",
+          "rankHash": "e5f2e68d5869179f7c2d7b4af17076ab24bc0871bee190de56aef5bf2fb3b74d"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-s/why-the-stage-status-driving-split-decision-got-superseded.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-079.jsonl",
+      "sha256": "877f411fe6faa1b17d50bd25e9d8a6ba209003634d7e3c998b7f5bd61e376cde"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-080.jsonl",
+      "sha256": "5b00a4a48894b07626759f3cbf548cf0b498cf571e0af4018383aa682a215bbb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-081.jsonl",
+      "sha256": "437b8e0ecfa1e80a9d62841c71956cdcf340dd4eaa1529ab3c5015fcc9b40bab"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-082.jsonl",
+      "sha256": "8d90dfa7f77e6bb77065c33727f694cd8d6e37fc7347cc8d52470a1d4c367b8e"
+    }
+  ]
+}

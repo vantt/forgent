@@ -1,0 +1,427 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "assignmentInputHead": "0d712158929b0028f1a549fc16595302763859f8",
+  "samplingReplay": [
+    {
+      "set": "batch-079",
+      "files": 25,
+      "edges": 69,
+      "patchedPopulation": 10,
+      "patchedSample": 2,
+      "mandatory": 0,
+      "unpatchedPopulation": 10,
+      "unpatchedSample": 2,
+      "dispositions": {
+        "preserve": 50,
+        "parked": 4,
+        "patch": 15
+      }
+    },
+    {
+      "set": "batch-080",
+      "files": 25,
+      "edges": 30,
+      "patchedPopulation": 6,
+      "patchedSample": 1,
+      "mandatory": 0,
+      "unpatchedPopulation": 12,
+      "unpatchedSample": 2,
+      "dispositions": {
+        "preserve": 23,
+        "patch": 7
+      }
+    },
+    {
+      "set": "batch-081",
+      "files": 25,
+      "edges": 109,
+      "patchedPopulation": 15,
+      "patchedSample": 3,
+      "mandatory": 0,
+      "unpatchedPopulation": 7,
+      "unpatchedSample": 2,
+      "dispositions": {
+        "preserve": 76,
+        "patch": 25,
+        "parked": 8
+      }
+    },
+    {
+      "set": "batch-082",
+      "files": 14,
+      "edges": 42,
+      "patchedPopulation": 6,
+      "patchedSample": 1,
+      "mandatory": 0,
+      "unpatchedPopulation": 6,
+      "unpatchedSample": 1,
+      "dispositions": {
+        "patch": 11,
+        "preserve": 29,
+        "parked": 2
+      }
+    }
+  ],
+  "selectedFiles": 14,
+  "packetParts": 3,
+  "targetedReReviewFiles": 2,
+  "targetedReReviewEdges": 14,
+  "protectedPriorPaths": 4013,
+  "protectedPathsSha256": "fe1591321b3ea81ddacbdee1cd50896a9b1caea02c977bb9c201dee1ea2181fb",
+  "trackedChangedPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-073.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-077.jsonl"
+  ],
+  "earlierChangedEdges": [
+    "maps-j-04467",
+    "maps-j-04469",
+    "maps-j-04470",
+    "maps-j-04472",
+    "maps-j-04473",
+    "maps-j-04485",
+    "maps-j-04741",
+    "maps-j-04742",
+    "maps-j-04743",
+    "maps-j-04744"
+  ],
+  "hunkMetadataOnlyEdges": [
+    "maps-j-04467",
+    "maps-j-04469",
+    "maps-j-04470",
+    "maps-j-04473"
+  ],
+  "limits": "Record-only mechanical proof. Independent semantics, committed-byte accounting, runtime/Step 5 parity and Phase 9 remain unaccepted. No full npm suite or preview/service.",
+  "checker": {
+    "files": 741,
+    "edges": 4487,
+    "failureCount": 0,
+    "result": "step-03-wave5a-check-result.json",
+    "inheritedLocatorFlags": 5,
+    "newLocatorFlags": 0,
+    "openLeadRulingEdgesPerSet": {
+      "batch-001": [],
+      "batch-002": [],
+      "batch-003": [],
+      "batch-004": [],
+      "batch-005": [],
+      "batch-006": [],
+      "batch-007": [],
+      "batch-008": [],
+      "batch-009": [],
+      "batch-010": [],
+      "batch-011": [],
+      "batch-012": [],
+      "batch-013": [],
+      "batch-014": [],
+      "batch-015": [],
+      "batch-016": [],
+      "batch-017": [],
+      "batch-018": [],
+      "batch-019": [],
+      "batch-020": [],
+      "batch-021": [],
+      "batch-022": [],
+      "batch-023": [],
+      "batch-024": [],
+      "batch-025": [],
+      "batch-026": [],
+      "batch-027": [],
+      "batch-028": [],
+      "batch-029": [],
+      "batch-030": [],
+      "batch-031": [],
+      "batch-032": [],
+      "batch-033": [],
+      "batch-034": [],
+      "batch-035": [],
+      "batch-036": [],
+      "batch-037": [],
+      "batch-038": [],
+      "batch-039": [],
+      "batch-040": [],
+      "batch-041": [],
+      "batch-042": [],
+      "batch-043": [],
+      "batch-044": [],
+      "batch-045": [],
+      "batch-046": [],
+      "batch-047": [],
+      "batch-048": [],
+      "batch-049": [],
+      "batch-050": [],
+      "batch-051": [],
+      "batch-052": [],
+      "batch-053": [],
+      "batch-054": [],
+      "batch-055": [],
+      "batch-056": [],
+      "batch-057": [],
+      "batch-058": [],
+      "batch-059": [],
+      "batch-060": [],
+      "batch-061": [],
+      "batch-062": [],
+      "batch-063": [],
+      "batch-064": [],
+      "batch-065": [],
+      "batch-066": [],
+      "batch-067": [],
+      "batch-068": [],
+      "batch-069": [],
+      "batch-070": [],
+      "batch-071": [],
+      "batch-072": [],
+      "batch-073": [],
+      "batch-074": [],
+      "batch-075": [],
+      "batch-076": [],
+      "batch-077": [],
+      "batch-078": [],
+      "batch-079": [],
+      "batch-080": [],
+      "batch-081": [],
+      "batch-082": []
+    },
+    "notClosableSets": []
+  },
+  "probes": {
+    "negativeProbes": 193,
+    "inherited": 187,
+    "newHistoryRegion": 6,
+    "allRejected": true,
+    "receipt": "step-03-wave5a-probe-replay.json"
+  },
+  "lightTests": {
+    "passed": 95,
+    "failed": 0,
+    "skipped": 0,
+    "log": "step-03-wave5a-light-tests.log"
+  },
+  "newPopulation": {
+    "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "completedBatches": [
+      "079",
+      "080",
+      "081",
+      "082"
+    ],
+    "pendingBatches": [
+      "083",
+      "084",
+      "085",
+      "086",
+      "087",
+      "088",
+      "089",
+      "090",
+      "091",
+      "092",
+      "093",
+      "094",
+      "095",
+      "096",
+      "097",
+      "098",
+      "099",
+      "100",
+      "101",
+      "102",
+      "103",
+      "104",
+      "105",
+      "106",
+      "107",
+      "108",
+      "109",
+      "110",
+      "111",
+      "112",
+      "113",
+      "114",
+      "115",
+      "116",
+      "117",
+      "118",
+      "119",
+      "120",
+      "121",
+      "122",
+      "123",
+      "124",
+      "125",
+      "126",
+      "127",
+      "128",
+      "129",
+      "130"
+    ],
+    "stopReason": "Whole-file authoring budget boundary after batch 082; batches 083 onward remain unauthored.",
+    "files": 89,
+    "inventoryEdges": 249,
+    "addedEdges": 1,
+    "edges": 250,
+    "patchedFiles": 37,
+    "dispositions": {
+      "preserve": 178,
+      "parked": 14,
+      "patch": 58
+    },
+    "parks": {
+      "step5-parity": 3,
+      "GAP-02": 3,
+      "description-rewrite": 7,
+      "phase9-carry": 1
+    },
+    "reviewAcceptance": "pending independent A51 review",
+    "perSet": {
+      "batch-079": {
+        "files": 25,
+        "inventoryEdges": 68,
+        "addedEdges": 1,
+        "edges": 69,
+        "patchedFiles": 10,
+        "dispositions": {
+          "preserve": 50,
+          "parked": 4,
+          "patch": 15
+        },
+        "parks": {
+          "step5-parity": 1,
+          "GAP-02": 2,
+          "description-rewrite": 1
+        },
+        "openLeadRulingEdges": []
+      },
+      "batch-080": {
+        "files": 25,
+        "inventoryEdges": 30,
+        "addedEdges": 0,
+        "edges": 30,
+        "patchedFiles": 6,
+        "dispositions": {
+          "preserve": 23,
+          "patch": 7
+        },
+        "parks": {},
+        "openLeadRulingEdges": []
+      },
+      "batch-081": {
+        "files": 25,
+        "inventoryEdges": 109,
+        "addedEdges": 0,
+        "edges": 109,
+        "patchedFiles": 15,
+        "dispositions": {
+          "preserve": 76,
+          "patch": 25,
+          "parked": 8
+        },
+        "parks": {
+          "description-rewrite": 4,
+          "phase9-carry": 1,
+          "step5-parity": 2,
+          "GAP-02": 1
+        },
+        "openLeadRulingEdges": []
+      },
+      "batch-082": {
+        "files": 14,
+        "inventoryEdges": 42,
+        "addedEdges": 0,
+        "edges": 42,
+        "patchedFiles": 6,
+        "dispositions": {
+          "patch": 11,
+          "preserve": 29,
+          "parked": 2
+        },
+        "parks": {
+          "description-rewrite": 2
+        },
+        "openLeadRulingEdges": []
+      }
+    }
+  },
+  "commands": {
+    "fullChecker": "env -u CLAUDE_CODE_SESSION_ID python3 plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5a-check.py",
+    "serialProbes": "env -u CLAUDE_CODE_SESSION_ID python3 plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5a-replay.py",
+    "independentSelectionBindingsAndScope": "env -u CLAUDE_CODE_SESSION_ID python3 plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5a-verify.py",
+    "lightTests": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-link-pass.test.mjs test/scripts/check-doc-candidate-status.test.mjs test/scripts/check-doc-constitution.test.mjs",
+    "whitespace": "git diff --check"
+  },
+  "verificationNotes": [
+    "Independent replay initially used the short batch number for the unpatched seed; corrected the replay to the existing full set id batch-NNN per L12-34. Actual selector, ranks and sample membership were never changed.",
+    "Author-only new-record attempt 1 caught ten wording/target-evidence record errors; corrected the records. Attempt 2 passed 079–080; attempt 3 passed all new records. No checker predicate was relaxed to pass an authored diff.",
+    "Only the L12-46 declaration/schema/renamed-alias exemption changes the existing checker; all inherited negative mutations remain active.",
+    "No independent review was dispatched. Existing ≤078 requests and memberships remain immutable; the 073 targeted request is additional, and the new wave request contains only 079–082.",
+    "Markdown preview remains with the Lead authorized environment; no preview registration or service started in this confined Unit."
+  ],
+  "artifactBindings": [
+    {
+      "file": "step-03-check.py",
+      "sha256": "9049a171e9f1037fcd45581fe6442410d0d982f55fdc1f45799d0b47134f4a28"
+    },
+    {
+      "file": "step-03-wave5a-check.py",
+      "sha256": "b8dcb63c70c0b392b49bff272166fba4f6a0c6394e94469cb7f6a08a8877abbe"
+    },
+    {
+      "file": "step-03-wave5a-author.py",
+      "sha256": "e9bba205251cfff6151626fd869b7d2bca0a8948ae343fb546178d8229f41bfe"
+    },
+    {
+      "file": "step-03-wave5a-probes.py",
+      "sha256": "4d4a70547ff76fd3dfc399f029fb65dc57b0fc5dd28bd8c8367b0940729218db"
+    },
+    {
+      "file": "step-03-wave5a-replay.py",
+      "sha256": "7874c28ff7819298339b3e885572dd979b13503b59b9f8b2e4003b86d67a568f"
+    },
+    {
+      "file": "step-03-wave5a-packet.py",
+      "sha256": "465e57d1563117e3e963b6363aba17cf134c009a2667772bb96c7b0291fc0a42"
+    },
+    {
+      "file": "step-03-wave5a-verify.py",
+      "sha256": "c1f395c250d24a0fd6935c72a2f773b089d6b8f10d307669e128895254167a9e"
+    },
+    {
+      "file": "step-03-wave5a-check-result.json",
+      "sha256": "6492d9aae0928336d4716ad04bb2d2d53f143b9e3cd4eaef5b212e6f5fdbb79e"
+    },
+    {
+      "file": "step-03-wave5a-probe-replay.json",
+      "sha256": "5e1fc3853f70a38dd088e0e30ac273cd00a6147363dbee1f19aeefd659f3ded8"
+    },
+    {
+      "file": "step-03-wave5a-manifest.json",
+      "sha256": "0de7acf8736c338303b9ceb46293b11c6eaabe14de34bdeb26d8bf0bae634385"
+    },
+    {
+      "file": "step-03-wave5a-binding-manifest.json",
+      "sha256": "6e772cdb6c9b51a207781a866d84f1285deba5d9798ae7f4750171b89e47d441"
+    },
+    {
+      "file": "step-03-wave5a-review-index.json",
+      "sha256": "f0b9d6cf8803073d249cd3395c226873b2d2bf64b74d13504fdd202a3df1070f"
+    },
+    {
+      "file": "step-03-batch073-r2-review-index.json",
+      "sha256": "16847efee573e9d29a081395428a6a53be18134bf99bbebdb5982f9b697f91f0"
+    },
+    {
+      "file": "step-03-wave5a-ruling-changes.json",
+      "sha256": "f0f9567972dbf97f20522391b02a26a2914e9f72cb39ad6d1404a19830e6bb63"
+    },
+    {
+      "file": "step-03-wave5a-whole-file-reads.json",
+      "sha256": "fb379166857d2f76e6eebb7504bcfba18a76d7fc34c699cce2568f4e25c8557e"
+    },
+    {
+      "file": "step-03-wave5a-light-tests.log",
+      "sha256": "95609aad5f614a29da88d158595f4c20519749662a9be089b21240aef97444a9"
+    }
+  ]
+}

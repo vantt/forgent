@@ -1,0 +1,484 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "manifest": "step-03-wave5a-manifest.json",
+  "binding": "step-03-wave5a-binding-manifest.json",
+  "selectedFiles": 14,
+  "selectedEdges": 37,
+  "perSet": [
+    {
+      "set": "batch-079",
+      "allFiles": 25,
+      "patchedPopulation": 10,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 10,
+      "unpatchedSample": 2,
+      "distinctSelected": 4,
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-080",
+      "allFiles": 25,
+      "patchedPopulation": 6,
+      "patchedSeedSample": 1,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 12,
+      "unpatchedSample": 2,
+      "distinctSelected": 3,
+      "patchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-081",
+      "allFiles": 25,
+      "patchedPopulation": 15,
+      "patchedSeedSample": 3,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 3,
+      "unpatchedEligiblePopulation": 7,
+      "unpatchedSample": 2,
+      "distinctSelected": 5,
+      "patchedStratum": {
+        "selectedDenominator": 3,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-082",
+      "allFiles": 14,
+      "patchedPopulation": 6,
+      "patchedSeedSample": 1,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 6,
+      "unpatchedSample": 1,
+      "distinctSelected": 2,
+      "patchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave5a-p01.md",
+      "files": [
+        {
+          "file": "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+          "set": "batch-079",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 4,
+          "recordSha256": "61f6059a742324f06287031ad672eef5a9868976f53cde4148929d46f2cfd4ee",
+          "sourceDigest": "a6ac755bdb9dfeb43868110a1c0b019bb22f226bf12b7d9693a058ffada618ec",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 6764,
+          "sourceBytes": 10135,
+          "contextPlusRecordBytes": 16899
+        },
+        {
+          "file": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+          "set": "batch-079",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 5,
+          "recordSha256": "0af76ddf57cf699f97df8c8908afce16fae55fcbadb7685e8381e0c8a15d37ca",
+          "sourceDigest": "fe55f43e065c29fe3dc2a6cc3f1787ade4b4574322af20ae913f6726bcd195a7",
+          "diffSha256": "5d3334fcddc233529b929828ea0afdb24833f7cf819dba914905d74ef77929d6",
+          "recordBytes": 24743,
+          "sourceBytes": 2491,
+          "contextPlusRecordBytes": 27234
+        },
+        {
+          "file": "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+          "set": "batch-079",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 4,
+          "recordSha256": "9bd1d58bbe0de0ed9d8b8cef48d6dd507596605510d760ed1f8943b871975a5a",
+          "sourceDigest": "d0c5864dab33c83d4e42cd966104952d1f29576dec4d4df738213e1954791c2e",
+          "diffSha256": "724068369c2973b3f29ab9c6f5fed7ea8f888cdc8c52f7c01695c34a7fc674e6",
+          "recordBytes": 15163,
+          "sourceBytes": 6242,
+          "contextPlusRecordBytes": 21405
+        },
+        {
+          "file": "docs/knowledge/why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verd/keywordriskgate-skips-when-verdict-cites-a-locked-decision.md",
+          "set": "batch-079",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "cbe33f3e225dbb813daaed4176958eeb407a1dc502668fcef7ae31409a3d0c23",
+          "sourceDigest": "7da56ca8c37d3603b0178693dc023a287da5c6ce484fa0b5bbe4bb74b5efb623",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3701,
+          "sourceBytes": 5718,
+          "contextPlusRecordBytes": 9419
+        },
+        {
+          "file": "docs/knowledge/why-mergereadiness-excludes-superseded-items/why-mergereadiness-excludes-superseded-items.md",
+          "set": "batch-080",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "fb429c743b0dedddf89f38ea99f1f8375f25b97df8a621e9c56807a5dad8e993",
+          "sourceDigest": "a4f2b5b6e3b0968ee3c58752f166a3881367a05dd59f1141fde8d58da32c09dd",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2621,
+          "sourceBytes": 5028,
+          "contextPlusRecordBytes": 7649
+        },
+        {
+          "file": "docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
+          "set": "batch-080",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "9cd715a7d7bc0baab43800c84a1a48622de8ade46315cf03e21c6d42f7091d4c",
+          "sourceDigest": "bd7b41fad86b31df2aeb779ed7d5278ce0fdb84d02ba2da6e9073b671fc9ffb4",
+          "diffSha256": "b52c4707417b24334dd1920f88fc556a4082146d6190ad42cac83275f08b3b1c",
+          "recordBytes": 11925,
+          "sourceBytes": 3231,
+          "contextPlusRecordBytes": 15156
+        }
+      ],
+      "fileCount": 6,
+      "edges": 18,
+      "sourcePlusRecordBytes": 97762,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 5
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verd/keywordriskgate-skips-when-verdict-cites-a-locked-decision.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-mergereadiness-excludes-superseded-items/why-mergereadiness-excludes-superseded-items.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave5a-p02.md",
+      "files": [
+        {
+          "file": "docs/knowledge/why-resolveplan-s-pass-through-path-now-checks-planapproveve/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md",
+          "set": "batch-080",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "ba3e798d5d96ed783246282a9380429a586a1f98c5d9abccbda0f67456fc2fb8",
+          "sourceDigest": "8f938126c47a1c135da8b1d25b7bd90a17a5fca2b1a30eba56e12f66e6c1095f",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2327,
+          "sourceBytes": 5850,
+          "contextPlusRecordBytes": 8177
+        },
+        {
+          "file": "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+          "set": "batch-081",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 5,
+          "recordSha256": "551990d917604295f554aede7272ccd0389fd7b05b19ec2733f96dfcb4b85c31",
+          "sourceDigest": "108ec9e58c3f720454a6949aad1a687f28d507e504cb416bec1d571ee8f0ab02",
+          "diffSha256": "13e8c8e5fc80051dc2097a48edf62dbb656854903424d60d360acb19cad76e69",
+          "recordBytes": 14978,
+          "sourceBytes": 6036,
+          "contextPlusRecordBytes": 21014
+        },
+        {
+          "file": "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+          "set": "batch-081",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "b764627949d8a5f743e6461908d901a17601401a2edccddf7e4436739a346da6",
+          "sourceDigest": "baa3695dba0d2b34592eb5157ec2b3b71e46d445a2c74e7a875f1d2dc4a8956d",
+          "diffSha256": "f2200240ca205202e24be921b56b90b883b048affcaa006121e08434ce5d0276",
+          "recordBytes": 13542,
+          "sourceBytes": 9813,
+          "contextPlusRecordBytes": 23355
+        },
+        {
+          "file": "docs/knowledge/why-state-json-s-write-became-atomic-while-its-lock-scope-cl/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md",
+          "set": "batch-081",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "033924635f0548a2a1e09858006a3e76186782323a61361d4943a48665518349",
+          "sourceDigest": "f3665f981acc26b93ba3ad39c9c8221b75634b8c24b7d3b204ab599fa754c2c7",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2086,
+          "sourceBytes": 3491,
+          "contextPlusRecordBytes": 5577
+        },
+        {
+          "file": "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+          "set": "batch-081",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "7ede0a3277bc4a2c69e08c3077e3f33d2405850bedf6672b8fbf2a8a52618238",
+          "sourceDigest": "6e66d7b812d8b9ba0a748ac9c824d53e990dd442596a5558b74de2351068b8f9",
+          "diffSha256": "7670a776bc7746cb6f5676ca8ee2ddb64b8ef4c4c4a4a4f671d11f851cc5e663",
+          "recordBytes": 75253,
+          "sourceBytes": 6582,
+          "contextPlusRecordBytes": 81835
+        },
+        {
+          "file": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+          "set": "batch-081",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "e23c030a9efb2347941e0472ab0df4405af54c5443922d7dd57737d10361971e",
+          "sourceDigest": "d6a3fe8f3bb758e1f6cea7b8f3ce75a22d455a8e79672170264aae7f09803aeb",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 4421,
+          "sourceBytes": 5161,
+          "contextPlusRecordBytes": 9582
+        }
+      ],
+      "fileCount": 6,
+      "edges": 14,
+      "sourcePlusRecordBytes": 149540,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/why-resolveplan-s-pass-through-path-now-checks-planapproveve/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 5
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-state-json-s-write-became-atomic-while-its-lock-scope-cl/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 3,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave5a-p03.md",
+      "files": [
+        {
+          "file": "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
+          "set": "batch-082",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "d943f0d6e3a391446b29d3b7ed8240c5c2555c1a6e0213e1234e3d6150049e76",
+          "sourceDigest": "5ada81e933888a03e387baf8e614b5d4bca3b8307443241e7524ac687f66a080",
+          "diffSha256": "60c1ff20474ba037ebd7eb98a41cf4be680018fe94ccbff1b8556619abaadd0e",
+          "recordBytes": 21857,
+          "sourceBytes": 5322,
+          "contextPlusRecordBytes": 27179
+        },
+        {
+          "file": "docs/knowledge/why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-s/why-the-stage-status-driving-split-decision-got-superseded.md",
+          "set": "batch-082",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "c9eef92955005b28fc9042caf08c68781495657306fe795f76836c627706596a",
+          "sourceDigest": "2864db6b7e220327d3120b22e2d2bbc142c89efabebc03cd7ef428e50dcf9155",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 4419,
+          "sourceBytes": 6410,
+          "contextPlusRecordBytes": 10829
+        }
+      ],
+      "fileCount": 2,
+      "edges": 5,
+      "sourcePlusRecordBytes": 38008,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-s/why-the-stage-status-driving-split-decision-got-superseded.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0,
+  "scope": "New batches 079–082 only. Batches 083 onward unauthored; records ≤078 and their review requests are not assigned."
+}

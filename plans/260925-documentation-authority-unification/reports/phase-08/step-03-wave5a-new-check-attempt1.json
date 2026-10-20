@@ -1,0 +1,61 @@
+{
+  "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 25,
+  "edges": 69,
+  "failures": [
+    {
+      "file": "docs/knowledge/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g/why-fgos-citations-carry-a-gloss-and-check-mechanically.md",
+      "check": "retiring-preserve-wording",
+      "detail": ""
+    },
+    {
+      "file": "docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+      "check": "description-truth-record",
+      "detail": ""
+    },
+    {
+      "file": "docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+      "check": "description-truth-record",
+      "detail": ""
+    },
+    {
+      "file": "docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+      "check": "description-truth-record",
+      "detail": ""
+    },
+    {
+      "file": "docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md",
+      "check": "description-truth-record",
+      "detail": ""
+    },
+    {
+      "file": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+      "check": "description-truth-record",
+      "detail": ""
+    },
+    {
+      "file": "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+      "check": "description-truth-record",
+      "detail": ""
+    },
+    {
+      "file": "docs/knowledge/why-intake-classification-moved-to-after-clarify-and-back-to/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md",
+      "check": "description-truth-record",
+      "detail": ""
+    },
+    {
+      "file": "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
+      "check": "description-truth-record",
+      "detail": ""
+    },
+    {
+      "file": "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
+      "check": "description-truth-record",
+      "detail": ""
+    }
+  ],
+  "failureCount": 10,
+  "locatorReviewFlags": [],
+  "openLeadRulingEdgesBySet": {},
+  "notClosableSets": []
+}

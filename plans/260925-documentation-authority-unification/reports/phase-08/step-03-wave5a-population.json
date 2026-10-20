@@ -1,0 +1,145 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "completedBatches": [
+    "079",
+    "080",
+    "081",
+    "082"
+  ],
+  "pendingBatches": [
+    "083",
+    "084",
+    "085",
+    "086",
+    "087",
+    "088",
+    "089",
+    "090",
+    "091",
+    "092",
+    "093",
+    "094",
+    "095",
+    "096",
+    "097",
+    "098",
+    "099",
+    "100",
+    "101",
+    "102",
+    "103",
+    "104",
+    "105",
+    "106",
+    "107",
+    "108",
+    "109",
+    "110",
+    "111",
+    "112",
+    "113",
+    "114",
+    "115",
+    "116",
+    "117",
+    "118",
+    "119",
+    "120",
+    "121",
+    "122",
+    "123",
+    "124",
+    "125",
+    "126",
+    "127",
+    "128",
+    "129",
+    "130"
+  ],
+  "stopReason": "Whole-file authoring budget boundary after batch 082; batches 083 onward remain unauthored.",
+  "files": 89,
+  "inventoryEdges": 249,
+  "addedEdges": 1,
+  "edges": 250,
+  "patchedFiles": 37,
+  "dispositions": {
+    "preserve": 178,
+    "parked": 14,
+    "patch": 58
+  },
+  "parks": {
+    "step5-parity": 3,
+    "GAP-02": 3,
+    "description-rewrite": 7,
+    "phase9-carry": 1
+  },
+  "reviewAcceptance": "pending independent A51 review",
+  "perSet": {
+    "batch-079": {
+      "files": 25,
+      "inventoryEdges": 68,
+      "addedEdges": 1,
+      "edges": 69,
+      "patchedFiles": 10,
+      "dispositions": {
+        "preserve": 50,
+        "parked": 4,
+        "patch": 15
+      },
+      "parks": {
+        "step5-parity": 1,
+        "GAP-02": 2,
+        "description-rewrite": 1
+      },
+      "openLeadRulingEdges": []
+    },
+    "batch-080": {
+      "files": 25,
+      "inventoryEdges": 30,
+      "addedEdges": 0,
+      "edges": 30,
+      "patchedFiles": 6,
+      "dispositions": {
+        "preserve": 23,
+        "patch": 7
+      },
+      "parks": {},
+      "openLeadRulingEdges": []
+    },
+    "batch-081": {
+      "files": 25,
+      "inventoryEdges": 109,
+      "addedEdges": 0,
+      "edges": 109,
+      "patchedFiles": 15,
+      "dispositions": {
+        "preserve": 76,
+        "patch": 25,
+        "parked": 8
+      },
+      "parks": {
+        "description-rewrite": 4,
+        "phase9-carry": 1,
+        "step5-parity": 2,
+        "GAP-02": 1
+      },
+      "openLeadRulingEdges": []
+    },
+    "batch-082": {
+      "files": 14,
+      "inventoryEdges": 42,
+      "addedEdges": 0,
+      "edges": 42,
+      "patchedFiles": 6,
+      "dispositions": {
+        "patch": 11,
+        "preserve": 29,
+        "parked": 2
+      },
+      "parks": {
+        "description-rewrite": 2
+      },
+      "openLeadRulingEdges": []
+    }
+  }
+}
