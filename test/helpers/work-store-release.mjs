@@ -16,13 +16,29 @@ const release = fs.mkdtempSync(path.join(path.dirname(built.addon), 'work-releas
 fs.mkdirSync(path.join(release, 'bin'));
 export const hostBin = path.join(release, 'bin/fgos');
 fs.copyFileSync(host, hostBin); fs.chmodSync(hostBin, 0o755);
-fs.symlinkSync(root, path.join(release, 'payload'));
-const component = manifest.components.nativeAddon;
-fs.linkSync(path.join(root, component.path), path.join(release, 'fgos.node'));
-fs.writeFileSync(path.join(release, 'manifest.json'), JSON.stringify({
-  entries: { fgos: 'bin/fgos' },
-  components: { legacyNode: { root: 'payload', entry: 'bin/fgos.mjs' }, nativeAddon: { ...component, path: 'fgos.node' } },
-}));
+function writeWorkDescriptor(fixtureHost) {
+  const fixtureRelease = path.dirname(path.dirname(fixtureHost));
+  fs.symlinkSync(root, path.join(fixtureRelease, 'payload'));
+  const component = manifest.components.nativeAddon;
+  fs.linkSync(path.join(root, component.path), path.join(fixtureRelease, 'fgos.node'));
+  fs.writeFileSync(path.join(fixtureRelease, 'manifest.json'), JSON.stringify({
+    entries: { fgos: path.relative(fixtureRelease, fixtureHost) },
+    components: { legacyNode: { root: 'payload', entry: 'bin/fgos.mjs' }, nativeAddon: { ...component, path: 'fgos.node' } },
+  }));
+}
+writeWorkDescriptor(hostBin);
+export function attachWorkAddon(fixtureHost) {
+  // Keep the addon on its original filesystem: a second copied image is
+  // intentionally refused by the native process-wide single-load guard.
+  const fixtureRelease = fs.mkdtempSync(path.join(path.dirname(built.addon), 'work-host-'));
+  fs.mkdirSync(path.join(fixtureRelease, 'bin'));
+  const stagedHost = path.join(fixtureRelease, 'bin/fgos');
+  fs.copyFileSync(fixtureHost, stagedHost);
+  fs.chmodSync(stagedHost, 0o755);
+  writeWorkDescriptor(stagedHost);
+  process.on('exit', () => fs.rmSync(fixtureRelease, { recursive: true, force: true }));
+  return stagedHost;
+}
 process.env.FGOS_HOST_BIN = hostBin;
 
 process.on('exit', () => fs.rmSync(release, { recursive: true, force: true }));
@@ -45,3 +61,9 @@ const stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-state-root-')
 fs.chmodSync(stateRoot, 0o700);
 fs.writeFileSync(path.join(stateRoot, 'machine-id'), 'work-fixture\n');
 process.env.FGOS_STATE_ROOT = stateRoot;
+
+// Legacy readers consume immutable HEAD inventory, never mutable working files.
+export function freezeLegacyWorkFixture(repo) {
+  execFileSync('git', ['-C', repo, 'add', '.fgos/events.jsonl'], { stdio: 'pipe' });
+  execFileSync('git', ['-C', repo, 'commit', '-qm', 'frozen legacy Work fixture'], { stdio: 'pipe' });
+}

@@ -1,5 +1,6 @@
 // instruction-registry.test.mjs — tests for instruction source registry and discovery (P3)
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -41,7 +42,7 @@ function writeRecordedDecisionIndex(projectRoot, {
   rationale = 'fixture',
   scope = 'test',
 } = {}) {
-  const fgosDir = path.join(projectRoot, '.fgos');
+  const fgosDir = initializeWorkRepository(projectRoot);
   fs.mkdirSync(fgosDir, { recursive: true });
   addDecision(fgosDir, { text, rationale, scope, source: 'test' });
   generateDecisionIndex(projectRoot, fgosDir);

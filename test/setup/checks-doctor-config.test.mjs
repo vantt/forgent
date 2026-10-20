@@ -1,3 +1,4 @@
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import '../helpers/process-tmp-root.mjs';
 // checks-doctor-config.test.mjs -- config/CLI-wiring/doctor-runtime checks
 // tách khỏi checks.test.mjs (tsk-25b), tiếp tục cùng invariant chẻ cơ học D2
@@ -85,6 +86,7 @@ test('setup/doctor CLI e2e tests fail closed against real Claude provider execut
 
 test('tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)', () => {
   const cwd = mkTemp('fgos-tool-registry-inactive-');
+  initializeWorkRepository(cwd);
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
@@ -95,6 +97,7 @@ test('tool-registry-configured passes when no tool-capable executor is declared 
 
 test('tool-registry-configured passes when every declared tool is checked present (full)', () => {
   const cwd = mkTemp('fgos-tool-registry-full-');
+  initializeWorkRepository(cwd);
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
@@ -108,6 +111,7 @@ test('tool-registry-configured passes when every declared tool is checked presen
 
 test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
   const cwd = mkTemp('fgos-tool-registry-degraded-');
+  initializeWorkRepository(cwd);
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   declareExecutor(cwd, 'never-checked-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
@@ -251,7 +255,6 @@ test('config-not-stale passes when the existing config already has every default
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       eventStore: EVENT_STORE_DEFAULTS,
       docRegistry: DEFAULT_DOC_REGISTRY_SETTINGS,
-      eventStore: { remote: 'origin' },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);

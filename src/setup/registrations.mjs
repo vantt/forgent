@@ -6113,7 +6113,8 @@ export function checkObserveFrictionMigrated(cwd) {
   const { store } = prepareWorkStore(fgosDir, fgosDir);
   const legacyFrictions = store.read({ streams: ['project'] }, []).legacy
     .filter(record => record.event.type === 'work.friction')
-    .map(record => ({ src: record.provenance.file, seq: record.event.seq ?? 0 }));
+    // Observe's historical cursor is relative to .fgos, as in Rust event_reader.
+    .map(record => ({ src: record.provenance.file.replace(/^\.fgos\//, ''), seq: record.event.seq ?? 0 }));
 
   if (legacyFrictions.length === 0) {
     return { passed: true, message: 'no legacy work.friction records to migrate' };

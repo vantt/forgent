@@ -234,7 +234,7 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
     const freshRevision = getItemDurableRevision(freshDurableView, id);
 
     if (!isPotentialStaleClaimReclaim) {
-      const room = hasWorkerSlotRoom(buildEffectiveView(freshDurableView, readClaims(dir)), { ceiling, excludeId: id });
+      const room = hasWorkerSlotRoom(buildEffectiveView(freshDurableView, readClaims(dir, tx)), { ceiling, excludeId: id });
       if (!room.allowed) {
         throw new ClaimError(
           'worker-slot-ceiling',

@@ -9,7 +9,7 @@ import { openStore, eventStoreConfig } from '../../src/event-store/index.mjs';
 import { withWorkState, readWorkState } from '../../src/state/work-event-store.mjs';
 import { hotLockDepth } from '../../src/state/hot-lock.mjs';
 import { readRawEvents, currentEffectiveView } from '../../src/state/store.mjs';
-import { releaseClaimTx } from '../../src/state/runtime-coordination.mjs';
+import { releaseClaimTx, readClaim, readClaims } from '../../src/state/runtime-coordination.mjs';
 import { viewRevision, VIEW_SCHEMA_VERSION } from '../../src/state/replay.mjs';
 
 const contract = path.resolve('packages/work-state/contracts/event-streams.v1.json');
@@ -261,4 +261,32 @@ test('two real processes sharing a gate fold both acknowledged batches into the 
   assert.deepEqual(Object.keys(cache(f).work).sort(), ['one', 'two']);
   assert.equal(Object.values(cache(f).cursor.cover)[0], 2);
   assert.equal(readWorkState(f.store).events.length, 2);
+});
+
+test('staged file reads observe unlink, write and rename before acknowledgement', t => {
+  const f = workFixture(t);
+  const first = path.join(f.hot, 'runtime/first.json');
+  const moved = path.join(f.hot, 'runtime/moved.json');
+  fs.mkdirSync(path.dirname(first), { recursive: true });
+  fs.writeFileSync(first, '{"old":true}');
+  f.run(tx => {
+    assert.throws(() => readClaim(f.hot, 'claim'), { category: 'state-tx-read-required' });
+    assert.throws(() => readClaims(f.hot), { category: 'state-tx-read-required' });
+    assert.equal(tx.unlink(first), true);
+    assert.equal(tx.exists(first), false);
+    assert.equal(tx.readJson(first), null);
+    assert.throws(() => tx.readText(first), { code: 'ENOENT' });
+    assert.deepEqual(tx.list(path.dirname(first)), []);
+    tx.writeJson(first, { next: true });
+    assert.deepEqual(tx.readJson(first), { next: true });
+    tx.rename(first, moved);
+    assert.equal(tx.exists(first), false);
+    assert.deepEqual(tx.readJson(moved), { next: true });
+    assert.deepEqual(tx.list(path.dirname(first)), ['moved.json']);
+    assert.deepEqual(JSON.parse(fs.readFileSync(first)), { old: true });
+    assert.equal(fs.existsSync(moved), false);
+    tx.append({ type: 'work.add', payload: { id: 'visible', title: 'visible' } });
+  });
+  assert.equal(fs.existsSync(first), false);
+  assert.deepEqual(JSON.parse(fs.readFileSync(moved)), { next: true });
 });

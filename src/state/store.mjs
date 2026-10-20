@@ -527,17 +527,17 @@ function refsGitDir(repoRoot) {
 // Tip of `refs/heads/<branch>` read from the ref files only (no child process):
 // the loose ref, else packed-refs, else null. Used inside the state lock to
 // tell whether the plan-evidence snapshot still describes the branch.
-function readBranchTip(repoRoot, branch) {
-  const gitDir = refsGitDir(repoRoot);
+function readBranchTip(repoRoot, branch, tx, gitDir = refsGitDir(repoRoot)) {
+  const readText = file => tx ? tx.readText(file) : fs.readFileSync(file, 'utf8');
   if (!gitDir) return null;
   try {
-    const loose = fs.readFileSync(path.join(gitDir, 'refs', 'heads', ...branch.split('/')), 'utf8').trim();
+    const loose = readText(path.join(gitDir, 'refs', 'heads', ...branch.split('/'))).trim();
     if (!loose.startsWith('ref:')) return loose;
   } catch (err) {
     if (err.code !== 'ENOENT' && err.code !== 'ENOTDIR') throw err;
   }
   try {
-    const line = fs.readFileSync(path.join(gitDir, 'packed-refs'), 'utf8').split('\n').find((l) => l.endsWith(` refs/heads/${branch}`));
+    const line = readText(path.join(gitDir, 'packed-refs')).split('\n').find((l) => l.endsWith(` refs/heads/${branch}`));
     return line ? line.split(' ')[0] : null;
   } catch (err) {
     if (err.code !== 'ENOENT' && err.code !== 'ENOTDIR') throw err;
@@ -556,15 +556,16 @@ function snapshotPlanEvidence(dir, id) {
   if (!work || work.risk !== 'heavy') return null;
   const repoRoot = path.dirname(dir);
   return {
+    gitDir: refsGitDir(repoRoot),
     revision: getItemDurableRevision(view, id),
     tip: readBranchTip(repoRoot, `fgw/${id}`),
     failure: checkPlanEvidence(id, work, repoRoot),
   };
 }
 
-function applyPlanEvidenceSnapshot(dir, snapshot, view, id, work) {
+function applyPlanEvidenceSnapshot(dir, snapshot, view, id, work, tx) {
   if (work.risk !== 'heavy') return;
-  if (!snapshot || snapshot.revision !== getItemDurableRevision(view, id) || snapshot.tip !== readBranchTip(path.dirname(dir), `fgw/${id}`)) {
+  if (!snapshot || snapshot.revision !== getItemDurableRevision(view, id) || snapshot.tip !== readBranchTip(path.dirname(dir), `fgw/${id}`, tx, snapshot.gitDir)) {
     throw new PlanEvidenceStale();
   }
   if (snapshot.failure) throw new StoreError('precondition', snapshot.failure);
@@ -818,7 +819,7 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
   // that don't go through that pre-flight.
   if (to === 'delivered') {
     assertAcceptanceEvidence(id, work);
-    applyPlanEvidenceSnapshot(dir, planSnapshot, before, id, work);
+    applyPlanEvidenceSnapshot(dir, planSnapshot, before, id, work, tx);
   }
 
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
@@ -849,7 +850,7 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
     }
   }
   return tx.append(rawEvent); // captures the real seq; rawEvent itself has none
-  });
+  }, { readRoots: planSnapshot?.gitDir ? [planSnapshot.gitDir] : [] });
   if (answer) {
     try {
       resolveFriction(dir, { id, reason: 'answer', by: 'work' });
@@ -1098,7 +1099,7 @@ export function settleClaim(dir, {
       // the state lock, closes the window: no release/
       // reacquire and no durable write can
       // land between this read and our own append below.
-      const freshClaim = readClaim(dir, id);
+      const freshClaim = readClaim(dir, id, tx);
       if (!freshClaim || freshClaim.claimId !== targetClaimId) {
         throw new StoreError(
           'conflict',

@@ -67,9 +67,8 @@ test("fgos doctor's DOCTOR_CHECKS/FIX_REGISTRATIONS no longer register the retir
   const { DOCTOR_CHECKS, FIX_REGISTRATIONS } = await import('../../src/setup/registrations.mjs');
   assert.equal(DOCTOR_CHECKS.some((c) => c.id === 'events-jsonl-contiguous'), false);
   assert.equal(FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-contiguous'), false);
-  // The sibling truncation-detection check (tsk-cgg, a different failure
-  // class, out of this retirement's scope) must still be registered.
-  assert.equal(DOCTOR_CHECKS.some((c) => c.id === 'events-jsonl-not-truncated'), true);
+  // Event Store cutover retires the sibling file-truncation check too (§19).
+  assert.equal(DOCTOR_CHECKS.some((c) => c.id === 'events-jsonl-not-truncated'), false);
 });
 
 test('no remaining production source (src/, scripts/) imports the retired contiguity modules', () => {

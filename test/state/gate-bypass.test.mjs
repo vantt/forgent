@@ -435,7 +435,7 @@ const FGOS_BIN = path.join(REPO_ROOT, 'bin/fgos.mjs');
 
 function tmpGateCheckFixture() {
   const fgosRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-check-cli-'));
-  const fgosDir = path.join(fgosRoot, '.fgos');
+  const fgosDir = initializeWorkRepository(fgosRoot);
   fs.mkdirSync(fgosDir, { recursive: true });
   addWork(fgosDir, { id: 'gate-check-fixture', title: 'Fixture item', description: 'fixture, not real work', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', size: 'light' });
   fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'standard' }));

@@ -3,6 +3,7 @@
 // full `fgos setup` first, ~17s apiece — kept apart so no single file
 // carries two of them and crosses the ~30s per-file ceiling.
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -28,6 +29,7 @@ function run(cwd, args, extraEnv = {}) {
 }
 
 function initGitRepo(cwd) {
+  initializeWorkRepository(cwd);
   execFileSync('git', ['init', '-q'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });

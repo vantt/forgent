@@ -123,3 +123,18 @@ test('a thrown callback releases the lock and rethrows its own error', () => {
     f.cleanup();
   }
 });
+
+test('prefetched read roots allow gated reference reads without granting writes', () => {
+  const f = fixture();
+  const refs = path.join(f.dir, 'refs');
+  fs.mkdirSync(refs);
+  const head = path.join(refs, 'head');
+  fs.writeFileSync(head, 'branch-tip');
+  try {
+    withStateTx(f.fgosDir, tx => {
+      assert.equal(tx.readText(head), 'branch-tip');
+      assert.throws(() => tx.writeText(head, 'changed'), { code: 'state-tx-path-outside' });
+      assert.throws(() => tx.unlink(head), { code: 'state-tx-path-outside' });
+    }, { prefetched: { readRoots: [refs] } });
+  } finally { fs.rmSync(f.dir, { recursive: true, force: true }); }
+});

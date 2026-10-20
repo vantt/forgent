@@ -16,8 +16,10 @@ test('doctor pass bodies are read-only in a real repo; no implicit repair of cor
   assert.equal(checkEventStore(f.repo, 'event-store-integrity', f.ctx).passed, false);
   assert.deepEqual(fs.readFileSync(active), before);
 });
-test('unsealed thresholds 599, 601 and 3601 seconds', t => {
-  for (const [age, expected] of [[599, 'pass'], [601, 'warn'], [3601, 'fail']]) {
+test('unsealed events pass below twice the interval, warn above it, and fail beyond an hour', t => {
+  // Native reads use the OS clock. Leave a minute between fixture age and
+  // threshold so concurrent suite work cannot age a passing case into a warning.
+  for (const [age, expected] of [[540, 'pass'], [660, 'warn'], [3660, 'fail']]) {
     const f = fixture(t); append(f.store, [{ ts: new Date(Date.now() - age * 1000).toISOString() }]);
     const got = checkEventStore(f.repo, 'event-store-unsealed', f.ctx);
     assert.equal(got.passed, expected !== 'fail', JSON.stringify(got));

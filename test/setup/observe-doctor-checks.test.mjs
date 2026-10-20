@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository, attachWorkAddon, freezeLegacyWorkFixture, hostBin as realFixtureHost } from '../helpers/work-store-release.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
@@ -20,7 +21,7 @@ seedFileLocalBwrapRegistry();
 function mkTempDir() {
   const dir = path.join(tmpdir(), 'fgos-doctor-observe-test-' + Math.random().toString(36).slice(2));
   fs.mkdirSync(dir, { recursive: true });
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  initializeWorkRepository(dir);
   return dir;
 }
 
@@ -47,6 +48,7 @@ test('observe-friction-migrated passes when no legacy friction exists', () => {
   try {
     // Empty events.jsonl
     fs.writeFileSync(path.join(cwd, '.fgos', 'events.jsonl'), '', 'utf8');
+    freezeLegacyWorkFixture(cwd);
     const res = checkObserveFrictionMigrated(cwd);
     assert.equal(res.passed, true);
     assert.match(res.message, /no legacy work\.friction records/);
@@ -66,6 +68,7 @@ test('observe-friction-migrated fails when legacy friction exists but no observe
     };
     fs.writeFileSync(path.join(cwd, '.fgos', 'events.jsonl'), JSON.stringify(event) + '\n', 'utf8');
 
+    freezeLegacyWorkFixture(cwd);
     const res = checkObserveFrictionMigrated(cwd);
     assert.equal(res.passed, false);
     assert.match(res.message, /friction migration not run/);
@@ -79,11 +82,15 @@ test('observe-friction-migrated names the resolved host binary in its fix comman
   const cwd = mkTempDir();
   const prev = process.env.FGOS_HOST_BIN;
   try {
-    const hostBin = path.join(cwd, 'host-bin');
-    fs.writeFileSync(hostBin, '', 'utf8');
+    fs.mkdirSync(path.join(cwd, 'bin'));
+    let hostBin = path.join(cwd, 'bin/host');
+    fs.copyFileSync(realFixtureHost, hostBin);
+    fs.chmodSync(hostBin, 0o755);
+    hostBin = attachWorkAddon(hostBin);
     process.env.FGOS_HOST_BIN = hostBin;
     const event = { seq: 1, ts: '2026-09-29T10:00:00Z', type: 'work.friction', payload: { id: 'tsk-1' } };
     fs.writeFileSync(path.join(cwd, '.fgos', 'events.jsonl'), JSON.stringify(event) + '\n', 'utf8');
+    freezeLegacyWorkFixture(cwd);
     const res = checkObserveFrictionMigrated(cwd);
     assert.equal(res.passed, false);
     assert.ok(res.message.includes(`run: ${hostBin} friction migrate --dir `), res.message);
@@ -131,6 +138,7 @@ test('observe-friction-migrated fails when unmigrated records exist past cursor'
       'utf8'
     );
 
+    freezeLegacyWorkFixture(cwd);
     const res = checkObserveFrictionMigrated(cwd);
     assert.equal(res.passed, false);
     assert.match(res.message, /1 legacy work\.friction record\(s\) newer than cursor/);
@@ -165,6 +173,7 @@ test('observe-friction-migrated passes when all legacy records are migrated', ()
       'utf8'
     );
 
+    freezeLegacyWorkFixture(cwd);
     const res = checkObserveFrictionMigrated(cwd);
     assert.equal(res.passed, true);
     assert.match(res.message, /all 1 legacy work\.friction record\(s\) migrated/);

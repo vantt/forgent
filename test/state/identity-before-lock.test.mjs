@@ -1,5 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
-import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { initializeWorkRepository, attachWorkAddon } from '../helpers/work-store-release.mjs';
 // identity-before-lock.test.mjs -- the identity bridge never runs the host
 // binary while the calling process holds the state lock.
 //
@@ -41,6 +41,7 @@ function setup({ store = 'main' } = {}) {
   const base = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-identity-lock-')));
   const realRepo = path.join(base, 'real', 'repo');
   fs.mkdirSync(realRepo, { recursive: true });
+  initializeWorkRepository(realRepo);
   git(realRepo, 'init', '-q');
   git(realRepo, 'config', 'user.email', 'test@example.com');
   git(realRepo, 'config', 'user.name', 'Test');
@@ -54,7 +55,8 @@ function setup({ store = 'main' } = {}) {
   initStore(dir);
   addWork(dir, { id: 'item-a', title: 'Item A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
 
-  const wrapper = path.join(base, 'host');
+  fs.mkdirSync(path.join(base, 'bin'));
+  const wrapper = path.join(base, 'bin/host');
   fs.writeFileSync(wrapper, `#!/bin/sh
 caller=""; prev=""
 for a in "$@"; do [ "$prev" = "--pid" ] && caller="$a"; prev="$a"; done
@@ -66,7 +68,7 @@ for f in $(find "${path.join(base, 'real')}" -name state.hot -o -name porting-ev
 done
 exec "${HOST}" "$@"
 `, { mode: 0o755 });
-  return { base, repoRoot, dir, wrapper };
+  return { base, repoRoot, dir, wrapper: attachWorkAddon(wrapper) };
 }
 
 function childEnv(wrapper, extra = {}) {

@@ -62,6 +62,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   for (const entry of ['bin', 'src', 'scripts', 'domains', 'package.json']) {
     fs.cpSync(path.join(repoRoot, entry), path.join(copyRoot, entry), { recursive: true });
   }
+  fs.cpSync(path.join(repoRoot, 'packages/work-state/contracts'), path.join(copyRoot, 'packages/work-state/contracts'), { recursive: true });
   assert.equal(fs.existsSync(path.join(copyRoot, '.git')), false);
 
   const homeDir = mkTemp('checks-nongit-home-');

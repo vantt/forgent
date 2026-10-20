@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -52,7 +53,7 @@ test('knowledge-doctor - doctor registry includes all 10 design-required checks 
 test('knowledge-doctor - doc-registry-stale check passes when up to date', () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doctor-test-'));
   try {
-    const fgosDir = path.join(tmpDir, '.fgos');
+    const fgosDir = initializeWorkRepository(tmpDir);
     initStore(fgosDir);
     registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
     registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docLifecycle: 'active' });
@@ -84,7 +85,7 @@ function setupGitRepoWithStore() {
   execSync('git config user.email "test@example.com"', { cwd: tmpDir, stdio: 'ignore' });
   fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Test\n', 'utf8');
   execSync('git add README.md && git commit -m "initial commit"', { cwd: tmpDir, stdio: 'ignore' });
-  const fgosDir = path.join(tmpDir, '.fgos');
+  const fgosDir = initializeWorkRepository(tmpDir);
   initStore(fgosDir);
   return { tmpDir, fgosDir };
 }

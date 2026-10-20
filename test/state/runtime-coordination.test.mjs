@@ -290,7 +290,7 @@ test('readClaims resolves the main checkout once, not once per claim file', () =
 // the lock) release claim A and acquire claim B, and leave. The settle must
 // re-read the claim under the lock and conflict, never overwrite claim B's
 // durable state.
-test('settleClaim re-validates the claim AFTER taking the state lock: a stale settle stuck behind the lock while the claim is reclaimed by a different actor must conflict, never overwrite the new claim\'s durable state', async () => {
+test('settleClaim re-validates the claim AFTER taking the state lock: a stale settle stuck behind the lock while the claim is reclaimed by a different actor must conflict, never overwrite the new claim\'s durable state', async t => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 11', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
   const claimA = acquireClaim(dir, { id: 'tsk-1', actor: 'session-a', preClaimStatus: 'todo' });
@@ -300,6 +300,7 @@ test('settleClaim re-validates the claim AFTER taking the state lock: a stale se
   const readyPath = path.join(workDir, 'holder-ready');
   const goPath = path.join(workDir, 'holder-go');
   const holderScript = `
+import fs from 'node:fs';
 import { withMainState, releaseClaimTx, acquireClaimTx } from ${JSON.stringify(coordinationUrl)};
 withMainState(${JSON.stringify(dir)}, (tx) => {
   fs.writeFileSync(${JSON.stringify(readyPath)}, 'held');
@@ -311,8 +312,13 @@ withMainState(${JSON.stringify(dir)}, (tx) => {
   const holderPath = path.join(workDir, 'holder.mjs');
   fs.writeFileSync(holderPath, holderScript);
   const holder = fork(holderPath, { stdio: 'inherit' });
-  const holderExit = new Promise((resolve) => holder.once('exit', resolve));
-  while (!fs.existsSync(readyPath)) await new Promise((resolve) => setTimeout(resolve, 5));
+  t.after(() => holder.kill());
+  let holderExited = false;
+  const holderExit = new Promise((resolve) => holder.once('exit', code => { holderExited = true; resolve(code); }));
+  while (!fs.existsSync(readyPath)) {
+    assert.equal(holderExited, false, 'holder must reach its coordination barrier before exiting');
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
 
   // The child does its OWN pre-check readClaim and acks it BEFORE calling the
   // real settleClaim, in the same synchronous tick — so by the time this test
@@ -336,21 +342,23 @@ try {
   fs.writeFileSync(childPath, childScript);
 
   const child = fork(childPath, { stdio: 'inherit' });
+  t.after(() => child.kill());
   const ack = await new Promise((resolve, reject) => {
     child.once('message', resolve);
     child.once('error', reject);
+    child.once('exit', code => reject(new Error(`settle-race-child exited ${code} before its acknowledgement`)));
   });
   assert.equal(ack.claimId, claimA.claimId, "the child's own pre-check must see claim A before the holder reclaims it");
   const childDone = new Promise((resolve, reject) => {
     child.on('message', resolve);
     child.on('error', reject);
     child.on('exit', (code) => {
-      if (code !== 0) reject(new Error(`settle-race-child exited ${code} with no message`));
+      reject(new Error(`settle-race-child exited ${code} with no result message`));
     });
   });
 
   fs.writeFileSync(goPath, 'go');
-  await holderExit;
+  assert.equal(await holderExit, 0, 'holder must replace the claim successfully');
   const result = await childDone;
 
   assert.equal(result.ok, false, 'the stale settle must conflict, never silently succeed against the reclaimed item');

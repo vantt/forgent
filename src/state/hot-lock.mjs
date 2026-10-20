@@ -275,16 +275,17 @@ function underDir(fgosDir, target) {
   return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
 }
 
-function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eventStore = null, extraRoots = [], stageEffects = false, commitEvents = null, afterApply = null } = {}) {
+function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eventStore = null, extraRoots = [], readRoots = [], stageEffects = false, commitEvents = null, afterApply = null } = {}) {
   let live = true;
   const roots = [fgosDir, ...extraRoots];
   const effects = [];
   const events = [];
+  const stagedFiles = stageEffects ? new Map() : null;
   let staging = stageEffects;
   const effect = (apply) => { if (staging) effects.push(apply); else return apply(); };
-  const guard = (target) => {
+  const guard = (target, reading = false) => {
     if (!live) throw new HotLockError('state-tx-revoked', 'the state transaction was used after its callback returned');
-    if (target !== undefined && !roots.some((root) => underDir(root, target))) {
+    if (target !== undefined && ![...roots, ...(reading ? readRoots : [])].some((root) => underDir(root, target))) {
       throw new HotLockError('state-tx-path-outside', `"${target}" is not under ${fgosDir}; a state transaction touches only its own .fgos`);
     }
   };
@@ -309,6 +310,7 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     /** Replace `target` with `text` atomically (temp file, then rename). */
     writeText(target, text) {
       guard(target);
+      if (staging) stagedFiles.set(path.resolve(target), String(text));
       effect(() => {
         fs.mkdirSync(path.dirname(target), { recursive: true });
         const tmp = `${target}.tmp-${uniqueTmpTag()}`;
@@ -316,10 +318,38 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
         fs.renameSync(tmp, target);
       });
     },
-    readJson(target) {
+    readText(target) {
+      guard(target, true);
+      const key = path.resolve(target);
+      if (staging && stagedFiles.has(key)) {
+        const text = stagedFiles.get(key);
+        if (text === null) throw Object.assign(new Error(`ENOENT: ${target}`), { code: 'ENOENT' });
+        return text;
+      }
+      return fs.readFileSync(target, 'utf8');
+    },
+    exists(target) {
       guard(target);
+      const key = path.resolve(target);
+      return staging && stagedFiles.has(key) ? stagedFiles.get(key) !== null : fs.existsSync(target);
+    },
+    list(target) {
+      guard(path.join(target, '.'));
+      let names;
+      try { names = new Set(fs.readdirSync(target)); }
+      catch (error) { if (error.code !== 'ENOENT') throw error; names = new Set(); }
+      if (staging) for (const [file, text] of stagedFiles) {
+        if (path.dirname(file) === path.resolve(target)) {
+          if (text === null) names.delete(path.basename(file));
+          else names.add(path.basename(file));
+        }
+      }
+      return [...names].sort();
+    },
+    readJson(target) {
+      guard(target, true);
       try {
-        return JSON.parse(fs.readFileSync(target, 'utf8'));
+        return JSON.parse(tx.readText(target));
       } catch (err) {
         if (err.code === 'ENOENT') return null;
         throw err;
@@ -329,6 +359,11 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     rename(from, to) {
       guard(from);
       guard(to);
+      if (staging) {
+        const text = tx.readText(from);
+        stagedFiles.set(path.resolve(from), null);
+        stagedFiles.set(path.resolve(to), text);
+      }
       effect(() => {
         fs.mkdirSync(path.dirname(to), { recursive: true });
         fs.renameSync(from, to);
@@ -336,7 +371,8 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     },
     unlink(target) {
       guard(target);
-      const existed = staging ? fs.existsSync(target) : undefined;
+      const existed = staging ? tx.exists(target) : undefined;
+      if (staging) stagedFiles.set(path.resolve(target), null);
       const removed = effect(() => {
         try { fs.unlinkSync(target); return true; }
         catch (err) { if (err.code !== 'ENOENT') throw err; return false; }
@@ -369,6 +405,7 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
  * caller did not pass it. A reentrant call throws `hot-lock-reentry` at once.
  * `prefetched.extraRoots` lists further directories the transaction may write
  * under (a log directory that is not the lock's own `.fgos`).
+ * `prefetched.readRoots` grants only reads, e.g. already-resolved Git refs.
  */
 export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} } = {}) {
   assertResource(resource);

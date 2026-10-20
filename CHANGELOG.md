@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Work transactions read their staged claim/file changes before acknowledgement; malformed shared project config no longer blocks claims through optional Event Store settings.
+
 - Event history moves from tracked JSONL files to the Event Store; every existing fgOS project must run `fgos events migrate` with its writers stopped. `fgos repair` is removed.
 - Added `fgos events sync|status|export|migrate`; `fgos rebuild` rebuilds all registered consumer views. Setup registers Event Store fetch refspecs and doctor diagnoses integrity, publication and migration readiness.
 - Added `eventStore.seal.intervalSec` (300), `eventStore.sync.intervalSec` (300; 0 disables automatic sync), `eventStore.rebuild.maxAttempts` (5), and `eventStore.remote` (`origin`). Commands seal due streams at start/end and owner sessions synchronize at command end; dispatched workers do not push.

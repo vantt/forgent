@@ -1,4 +1,4 @@
-import { readSharedConfig } from '../config/shared-config-file.mjs';
+import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../config/global-config.mjs';
 
 // Phase 09 extends the existing eventStore registration with this ONE shape.
@@ -22,5 +22,7 @@ export function eventStoreConfig(config = {}) {
   return result;
 }
 export function readEventStoreConfig(root, globalConfigPath) {
-  return eventStoreConfig(mergeWithGlobalConfig(readSharedConfig(root), globalConfigPath));
+  // The shared file is hand edited; only our optional subtree is owned here.
+  // Doctor reports malformed shared JSON through its dedicated check.
+  return eventStoreConfig(mergeWithGlobalConfig(readSharedConfigOrEmpty(root), globalConfigPath));
 }

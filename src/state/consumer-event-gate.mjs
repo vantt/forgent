@@ -17,7 +17,7 @@ function advance(cursor, events) {
  * An already-prepared store is also accepted (the same native facade, useful
  * to callers that already resolved repository authority).
  */
-export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config, rebuild = false, beforeGate, heldRanks = [], policy } = {}) {
+export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config, rebuild = false, beforeGate, heldRanks = [], readRoots = [], policy } = {}) {
   const { stream, resource, readState, fold, persist, prepareEvents, lifecycle } = policy;
   if (hotLockDepth() > 0) throw new HotLockError('hot-lock-reentry', 'Work cannot open a nested state transaction');
   if (!store) throw new TypeError('a prepared consumer store is required');
@@ -47,7 +47,7 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
         tx.tail = tail;
         return fn(tx);
       }, { resource, prefetched: {
-        mainFgosDir, writer, extraRoots, eventStore: store, stageEffects: true,
+        mainFgosDir, writer, extraRoots, readRoots, eventStore: store, stageEffects: true,
         commitEvents(tx, events) {
           if (!events.length) return;
           prepareEvents?.(tx, events);
