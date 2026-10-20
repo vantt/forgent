@@ -1,14 +1,15 @@
-import { execFileSync } from 'node:child_process';
 import { moveWork, addDecision, listWork, StoreError } from '../../state/store.mjs';
-import { branchNameFor, branchExists, detectTrunk } from '../../runner/worktree.mjs';
+import { branchNameFor, branchExists, detectTrunk, inspectGit } from '../../runner/worktree.mjs';
 
 function isBranchReachableFromTrunk(cwd, branch, trunk) {
   try {
-    execFileSync('git', ['merge-base', '--is-ancestor', `refs/heads/${branch}`, trunk], { cwd, encoding: 'utf8', shell: false });
-    return true;
+    const inspect = inspectGit(cwd);
+    const ancestor = inspect.resolveCommit({ name: `refs/heads/${branch}` });
+    const descendant = inspect.resolveCommit({ name: trunk });
+    if (typeof ancestor !== 'string' || typeof descendant !== 'string') throw new Error(`"${typeof ancestor === 'string' ? trunk : branch}" names no commit`);
+    return inspect.ancestry({ ancestor, descendant }).answer === 'yes';
   } catch (err) {
-    if (err.status === 1) return false;
-    throw new StoreError('validation', `git merge-base --is-ancestor "${branch}" "${trunk}" failed in "${cwd}": ${err.message}`);
+    throw new StoreError('validation', `reading whether "${branch}" is reachable from "${trunk}" failed in "${cwd}": ${err.message}`);
   }
 }
 

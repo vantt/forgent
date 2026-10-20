@@ -8,7 +8,6 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath, resolveContentRoot } from './paths.mjs';
 import { loadAgentRoster, readTaskSpecHeader } from './agent-roster.mjs';
@@ -25,6 +24,9 @@ import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHints, buildPrompt } from './work-compat.mjs';
 import { DOMAINS, getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';
 import { listWork } from '../state/store.mjs';
+import { captureDispatchAttestation } from './dispatch/transport.mjs';
+import { safeGitHead } from './dispatch/settlement.mjs';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 
 // The lookup runs once per dispatch, so the same broken file would repeat on every one; each distinct
 // problem in a project is written once per process.
@@ -115,8 +117,7 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
   const { unitData, warnings: unitWarnings } = workUnitFor(work, { cfg, stage: opts.stage, feedback: opts.feedback, worktree: cwd });
   const templateName = selectTemplate({ kind: work.kind, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
-  const baseCommit = gitIn(cwd, ['rev-parse', 'HEAD']);
-  const headRef = gitIn(cwd, ['symbolic-ref', '--quiet', '--short', 'HEAD']);
+  const { baseCommit, headRef } = captureDispatchAttestation(null, cwd);
 
   const mainRoot = repoRoot ?? resolveGitRoots(cwd).mainCheckoutRoot;
   // Settling says the worker finished, not where it wrote: a file outside its worktree that
@@ -180,7 +181,7 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
   if (outcome === 'pass') {
     const commitStatus = seat.commit?.status;
     const commit = commitStatus === 'committed' ? 'runner'
-      : gitIn(cwd, ['rev-parse', 'HEAD']) === baseCommit ? 'none' : 'self';
+      : safeGitHead(cwd) === baseCommit ? 'none' : 'self';
     return { ...facts, commit, runnerCommit: seat.commit ?? null };
   }
   // Refused before any worker started: the launch itself could not happen.
@@ -209,17 +210,19 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
   // that round is a failed attempt. A round that left nothing behind is judged on the branch as
   // it stands, as before.
   const reason = runResult.classification?.outcome?.reason ?? seat.refused?.reason ?? outcome;
-  if (gitIn(cwd, ['status', '--porcelain', '--untracked-files=all'])) {
+  if (hasUncommittedChanges(cwd)) {
     throw fail('worker-failed', `the worker round ended ${outcome} (${reason}, unit run ${unitRunId}); its uncommitted changes were not committed`);
   }
   return { ...facts, commit: 'none', runnerCommit: seat.commit ?? null, outcome };
 }
 
-function gitIn(cwd, args) {
+// Whether the checkout at `cwd` holds any change or untracked file; an
+// unreadable checkout reads as clean, as the round's own facts then decide.
+function hasUncommittedChanges(cwd) {
   try {
-    return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    return createGitInspect(gitPortOptions(cwd)).status({ untracked: 'all', maxEntries: 1 }).entries.length > 0;
   } catch {
-    return null;
+    return false;
   }
 }
 

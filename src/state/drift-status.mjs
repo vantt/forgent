@@ -15,6 +15,7 @@
 // surface next to `events.jsonl`, which is already known fragile under
 // concurrency (tsk-3wq).
 import { execFileSync } from 'node:child_process';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { isResolvedStatus } from './frontier.mjs';
 
 // `trunk` is supplied by the caller, never detected here (tsk-49i D1): the
@@ -34,6 +35,12 @@ function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
+// One Git Inspect port per call over `repoRoot`; every read below but the
+// patch-equivalence count goes through it.
+function inspectRepo(repoRoot) {
+  return createGitInspect(gitPortOptions(repoRoot));
+}
+
 // A "root" is any item that is some other item's `parent` — the same
 // definition CONTEXT.md's pinned term uses ("a work item whose fgw/<id>
 // branch is a merge target for its own children").
@@ -45,21 +52,23 @@ function findRootIds(work) {
   return rootIds;
 }
 
-// Whether `branch` exists as a real local ref in `repoRoot`.
-function branchExists(repoRoot, branch) {
+// The commit `branch` names as a real local ref, or null when it has none.
+function branchTip(inspect, branch) {
   try {
-    git(repoRoot, ['show-ref', '--verify', '--quiet', `refs/heads/${branch}`]);
-    return true;
+    const ref = inspect.resolveRef({ name: `refs/heads/${branch}` });
+    return ref.kind === 'direct' ? ref.oid : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
 // Whether every commit on `branch` is already reachable from `from`.
-function isAncestor(repoRoot, branch, from) {
+function isAncestor(inspect, branch, from) {
+  const ancestor = branchTip(inspect, branch);
+  const descendant = branchTip(inspect, from);
+  if (!ancestor || !descendant) return false;
   try {
-    git(repoRoot, ['merge-base', '--is-ancestor', branch, from]);
-    return true;
+    return inspect.ancestry({ ancestor, descendant }).answer === 'yes';
   } catch {
     return false;
   }
@@ -71,11 +80,14 @@ function isAncestor(repoRoot, branch, from) {
 // carried trunk's own content back in, which is what a synced-up root branch
 // looks like. Nothing there can possibly be missing, whatever the commit
 // count says.
-function introducesNothing(repoRoot, branch, from) {
+function introducesNothing(inspect, branch, from) {
+  const tip = branchTip(inspect, branch);
+  const fromTip = branchTip(inspect, from);
+  if (!tip || !fromTip) return false;
   try {
-    const base = git(repoRoot, ['merge-base', from, branch]).trim();
-    if (!base) return false;
-    return git(repoRoot, ['diff', '--name-only', base, branch]).trim() === '';
+    const { mergeBase } = inspect.compareCommits({ left: fromTip, right: tip });
+    if (!mergeBase) return false;
+    return inspect.compareContent({ before: mergeBase, after: tip }).equal;
   } catch {
     return false;
   }
@@ -132,10 +144,12 @@ export function driftStatus(repoRoot, view, { trunk } = {}) {
   requireTrunk('driftStatus', trunk);
   const work = view?.work ?? {};
   const result = {};
+  const inspect = inspectRepo(repoRoot);
 
   for (const rootId of findRootIds(work)) {
     const branch = `fgw/${rootId}`;
-    if (!branchExists(repoRoot, branch)) continue;
+    const tip = branchTip(inspect, branch);
+    if (!tip) continue;
 
     const rootItem = work[rootId];
     // tsk-2ec: a parent that has already resolved (done/delivered/...) is
@@ -147,25 +161,24 @@ export function driftStatus(repoRoot, view, { trunk } = {}) {
     // already answers one line below for needsSync.
     const parentItem = rootItem?.parent ? work[rootItem.parent] : null;
     const targetBranch = rootItem?.parent && !isResolvedStatus(parentItem) ? `fgw/${rootItem.parent}` : trunk;
-    if (targetBranch !== trunk && !branchExists(repoRoot, targetBranch)) continue;
+    const targetTip = branchTip(inspect, targetBranch);
+    if (targetBranch !== trunk && !targetTip) continue;
 
     let aheadOfTarget = 0;
     let behindTarget = 0;
     let lastSyncedTip = null;
     try {
-      const counts = git(repoRoot, ['rev-list', '--left-right', '--count', `${targetBranch}...${branch}`]).trim();
-      const [behind, ahead] = counts.split(/\s+/).map((n) => Number.parseInt(n, 10));
-      behindTarget = Number.isFinite(behind) ? behind : 0;
-      aheadOfTarget = Number.isFinite(ahead) ? ahead : 0;
+      // `left` counts the target's commits the branch lacks, `right` the
+      // branch's own; `mergeBase` is the last tip the two shared.
+      const compared = inspect.compareCommits({ left: targetTip, right: tip });
+      behindTarget = compared.left;
+      aheadOfTarget = compared.right;
+      lastSyncedTip = compared.mergeBase || null;
     } catch {
-      // one of the two refs became unreachable between the existence
-      // checks above and this call (rare race) — report zero drift rather
-      // than throw; the next call will see current reality.
-    }
-    try {
-      lastSyncedTip = git(repoRoot, ['merge-base', targetBranch, branch]).trim() || null;
-    } catch {
-      // no common ancestor (orphan branch) — leave null.
+      // the trunk has no local ref, the two share no history (orphan
+      // branch), or a ref moved between the reads above and this one (rare
+      // race) — report zero drift and no synced tip rather than throw; the
+      // next call will see current reality.
     }
 
     // tsk-1l9 follow-up: `aheadOfTarget` counts COMMITS, which is the wrong
@@ -177,7 +190,7 @@ export function driftStatus(repoRoot, view, { trunk } = {}) {
     // next`'s own auto-sync path (bin/fgos.mjs), and narrowing it here would
     // silently change what the unattended merge loop acts on. Only
     // `fgos doctor`'s root-drift check reads this.
-    const carriesContent = !introducesNothing(repoRoot, branch, targetBranch)
+    const carriesContent = !introducesNothing(inspect, branch, targetBranch)
       && unmatchedCommitCount(repoRoot, branch, targetBranch) > 0;
 
     result[rootId] = {
@@ -224,18 +237,19 @@ export function unmergedDeliveries(repoRoot, view, { trunk } = {}) {
   requireTrunk('unmergedDeliveries', trunk);
   const work = view?.work ?? {};
   const result = {};
+  const inspect = inspectRepo(repoRoot);
 
   for (const item of Object.values(work)) {
     if (!DELIVERED_STATUSES.has(item.status)) continue;
     const branch = `fgw/${item.id}`;
-    if (!branchExists(repoRoot, branch)) continue;
-    if (isAncestor(repoRoot, branch, trunk)) continue;
+    if (!branchTip(inspect, branch)) continue;
+    if (isAncestor(inspect, branch, trunk)) continue;
 
     // Not merged, but is anything actually missing? Two ways the answer is
     // no, and neither is an incident: the branch changes no file at all
     // against its fork point, or every commit it does carry already has a
     // patch-equivalent on trunk. Both are stale refs, pure housekeeping.
-    if (introducesNothing(repoRoot, branch, trunk)) continue;
+    if (introducesNothing(inspect, branch, trunk)) continue;
     const unmatched = unmatchedCommitCount(repoRoot, branch, trunk);
     if (unmatched === 0) continue;
 
@@ -245,7 +259,7 @@ export function unmergedDeliveries(repoRoot, view, { trunk } = {}) {
     // re-merging the leaf would be wrong. A branch that merged nowhere needs
     // its content landed on its own.
     const parentBranch = item.parent ? `fgw/${item.parent}` : null;
-    const landedOn = parentBranch && branchExists(repoRoot, parentBranch) && isAncestor(repoRoot, branch, parentBranch)
+    const landedOn = parentBranch && isAncestor(inspect, branch, parentBranch)
       ? parentBranch
       : null;
 
