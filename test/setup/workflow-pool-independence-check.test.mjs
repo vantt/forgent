@@ -177,3 +177,42 @@ test('the registered check runs against the shipped Workflows without throwing',
   assert.equal(typeof result.passed, 'boolean');
   assert.equal(typeof result.message, 'string');
 });
+
+const DEBATE_WORKFLOW = `
+id: debate-fixture
+title: Debate fixture
+steps:
+  - id: argue
+    title: Argue
+    units:
+      - id: dispute
+        template:
+          capability: fixture:dispute
+          pattern: debate
+          objective: Decide the question
+`;
+
+test('a debate whose pool has a third family for the judge passes with independent families', async () => {
+  const result = await run(DEBATE_WORKFLOW, { 'fixture:dispute': prefer('alpha', 'beta', 'gamma') });
+  assert.equal(result.passed, true, result.message);
+  assert.match(result.message, /independent provider families/);
+});
+
+test('a debate whose pool has only two families cannot seat an independent judge and fails on the judge', async () => {
+  const result = await run(DEBATE_WORKFLOW, { 'fixture:dispute': prefer('alpha', 'beta') });
+  assert.equal(result.passed, false);
+  assert.match(result.message, /debate-fixture\/argue\/dispute \(debate/);
+  assert.match(result.message, /judge refused for independence/);
+});
+
+test('two families of three seat the sides apart and the judge on the third; one extra executor of a side family changes nothing', async () => {
+  const config = runnerConfig({ 'fixture:dispute': prefer('alpha', 'alpha-twin', 'beta', 'gamma') });
+  config.executors['alpha-twin'] = { agentType: 'alpha-twin', providerModel: 'claude' };
+  const unit = { id: 'u', capability: 'fixture:dispute', pattern: 'debate', writes: [] };
+  const { outcome, roles } = await simulateUnitBindings(unit, config);
+  assert.equal(outcome, 'pass');
+  const first = Object.fromEntries(roles.filter((r) => !r.refused).slice(0, 2).map((r) => [r.role, r.executor]));
+  assert.deepEqual(first, { thesis: 'alpha', antithesis: 'beta' }, 'the sides spread over distinct families');
+  const judge = roles.find((r) => r.role === 'judge');
+  assert.equal(judge.executor, 'gamma', 'the judge takes the family neither side used, skipping the twin of a side');
+});

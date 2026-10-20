@@ -168,9 +168,9 @@ test('group-cognition.yaml schema validation & discovery', () => {
   assert.equal(wf.steps[0].units[0].template.capability, 'group-cognition:explore');
   assert.equal(wf.steps[0].units[0].template.pattern, 'panel');
 
-  // Step 2: dialectical-inquiry (reviewed with red-team)
+  // Step 2: dialectical-inquiry (two opposed sides ruled by an independent judge)
   assert.equal(wf.steps[1].units[0].template.capability, 'group-cognition:critique');
-  assert.equal(wf.steps[1].units[0].template.pattern, 'reviewed');
+  assert.equal(wf.steps[1].units[0].template.pattern, 'debate');
 
   // Step 3: action-synthesis (synthesizer)
   assert.equal(wf.steps[2].units[0].template.capability, 'group-cognition:synthesize');
@@ -337,10 +337,10 @@ test('the independent panel steps of the council-like workflows run blind and no
   assert.deepEqual(blindUnits('business-discussion'), ['explore-perspectives']);
 });
 
-test('critique checkers of group-cognition and business-discussion read the supplied artifact, not the latest commit', () => {
+test('critique checkers of business-discussion read the supplied artifact, not the latest commit', () => {
   const critiqueParams = (id, unitId) =>
     loadWorkflow(id).steps.flatMap((s) => s.units).find((u) => u.id === unitId).template.params;
-  for (const [id, unitId] of [['group-cognition', 'dialectical-critique'], ['business-discussion', 'challenge-assumptions']]) {
+  for (const [id, unitId] of [['business-discussion', 'challenge-assumptions']]) {
     const { roleTasks } = critiqueParams(id, unitId);
     for (const role of ['reviewer', 'red-team']) {
       const text = roleTasks[role];

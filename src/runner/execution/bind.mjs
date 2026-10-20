@@ -14,9 +14,11 @@ import { PIN_REFUSES_SEAT, parseAccountPin, resolveAccountPin } from './account-
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
 
-const CHECKER_ROLES = new Set(['reviewer', 'red-team', 'tester', 'panelist', 'synthesizer']);
+// The one list of pattern roles that never run inline or in-process: checkers, panel seats, and the
+// debate's two sides and its judge.
+const CHECKER_ROLES = new Set(['reviewer', 'red-team', 'tester', 'panelist', 'synthesizer', 'thesis', 'antithesis', 'judge']);
 
-/** Checker and panel roles never run inline or in-process. */
+/** Checker, panel and debate roles never run inline or in-process. */
 function isCheckerOrPanelRole(role) {
   return CHECKER_ROLES.has(role) || Boolean(role && role.startsWith('panelist-'));
 }
