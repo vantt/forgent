@@ -35,7 +35,7 @@ function hook(f, owned) {
   else f.git(f.main,'config','core.hooksPath',hooks);
   return {count,file:path.join(hooks,'pre-commit')};
 }
-for(const owned of [false,true]) test(`E6 retargeted: clean Sync ${owned?'owned':'foreign'} hook evidence, abort timing and persisted operation id`,()=>{
+for(const owned of [false,true]) test(`clean Sync ${owned?'owned':'foreign'} hook evidence, abort timing and persisted operation id`,()=>{
  const f=fixture();try {
   const h=hook(f,owned);const before=f.git(f.tree,'rev-parse','HEAD');
   const result=runPendingSync(f.record,f.main,f.persist,f.custody);
@@ -53,7 +53,7 @@ for(const owned of [false,true]) test(`E6 retargeted: clean Sync ${owned?'owned'
  }finally{f.close();}
 });
 
-test('E6 retargeted: captured baseline, custody-backed resume and commit-only retry retain resolver and producer writes',()=>{
+test('captured baseline, custody-backed resume and commit-only retry retain resolver and producer writes',()=>{
  const f=fixture(true);try {
   const h=hook(f,true);
   assert.equal(runPendingSync(f.record,f.main,f.persist,f.custody),null);
@@ -74,7 +74,7 @@ test('E6 retargeted: captured baseline, custody-backed resume and commit-only re
  }finally{f.close();}
 });
 
-test('E6 retargeted: a pending ScopedCommit recovers its durable native receipt without another commit or hook',()=>{
+test('a pending ScopedCommit recovers its durable native receipt without another commit or hook',()=>{
  const f=fixture();try {
   const hooks=path.join(f.main,'count-hooks'),count=path.join(f.temp,'commit-count');fs.mkdirSync(hooks);
   fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\necho called >> '${count}'\n`,{mode:0o755});f.git(f.main,'config','core.hooksPath',hooks);
@@ -90,7 +90,7 @@ test('E6 retargeted: a pending ScopedCommit recovers its durable native receipt 
  }finally{f.close();}
 });
 
-test('E6 retargeted: native marker details and unexpected resolver children survive adapter translation',()=>{
+test('native marker details and unexpected resolver children survive adapter translation',()=>{
  const f=fixture(true);try {
   runPendingSync(f.record,f.main,f.persist,f.custody);
   const marked=commitRoundWithSync(f.record,f.main,()=>assert.fail('must not commit producer before resolving'),[],f.custody);
@@ -102,7 +102,7 @@ test('E6 retargeted: native marker details and unexpected resolver children surv
  }finally{f.close();}
 });
 
-test('E6 retargeted: manual merge completion settles native custody before the remaining Unit commit',()=>{
+test('manual merge completion settles native custody before the remaining Unit commit',()=>{
  const f=fixture(true);try {
   runPendingSync(f.record,f.main,f.persist,f.custody);
   const baseline=preflightUnitWorktree({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs','a'],sync:f.record.sync}).baseline;
@@ -115,7 +115,7 @@ test('E6 retargeted: manual merge completion settles native custody before the r
  }finally{f.close();}
 });
 
-test('E6 retargeted: manual merge abort refuses resume and releases the old native operation for a new run',()=>{
+test('manual merge abort refuses resume and releases the old native operation for a new run',()=>{
  const f=fixture(true);try {
   runPendingSync(f.record,f.main,f.persist,f.custody);
   f.git(f.tree,'merge','--abort');
@@ -127,7 +127,7 @@ test('E6 retargeted: manual merge abort refuses resume and releases the old nati
  }finally{f.close();}
 });
 
-test('E6 retargeted: diagnostic provenance failure retains the original commit stderr without replay',()=>{
+test('diagnostic provenance failure retains the original commit stderr without replay',()=>{
  const f=fixture();try {
   const h=hook(f,true);
   fs.writeFileSync(h.file,`#!/bin/sh\necho call >> '${h.count}'\nprintf 'original before diagnostic\\n' >&2\nmkdir -p '${f.main}/.git/fgos/git/operations/broken'\nprintf invalid > '${f.main}/.git/fgos/git/operations/broken/000000.json'\nexit 1\n`,{mode:0o755});
@@ -136,4 +136,20 @@ test('E6 retargeted: diagnostic provenance failure retains the original commit s
   assert.equal(f.record.sync.stderr,'original before diagnostic\n');
   assert.equal(fs.readFileSync(h.count,'utf8'),'call\n');
  }finally{f.close();}
+});
+
+for (const owned of [false, true]) test(`ScopedCommit ${owned ? 'owned' : 'foreign'} hook refusal preserves original evidence`, () => {
+ const f = fixture(); try {
+  const h = hook(f, owned);
+  const baseline = preflightUnitWorktree({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs']}).baseline;
+  fs.mkdirSync(path.join(f.tree,'docs')); fs.writeFileSync(path.join(f.tree,'docs/new'),'new');
+  const result = commitUnitWork({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs'],unitId:'hook',baseline});
+  assert.equal(result.status,'failed');
+  assert.equal(result.reason,owned ? 'hook-refused' : 'git-error');
+  assert.equal(result.stderr,'  original refusal\nsecond line\n');
+  assert.deepEqual(result.stderrBytes,[...Buffer.from(result.stderr)]);
+  assert.equal(fs.readFileSync(h.count,'utf8'),'call\n'.repeat(owned ? 2 : 1));
+  assert.equal(f.git(f.tree,'diff','--cached','--name-only'),'');
+  assert.equal(fs.readFileSync(path.join(f.tree,'docs/new'),'utf8'),'new');
+ } finally { f.close(); }
 });

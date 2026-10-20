@@ -2006,3 +2006,45 @@ test('an in-process caller keeps its own signal handling: runUnit installs no SI
   assert.deepEqual(during, before);
   assert.deepEqual(counts(), before);
 });
+
+test('resume settles a pending runner record after the native commit completed', async () => {
+ const { acquireSync, createLockScope } = await import('../../../src/holder-lock/index.mjs');
+ const { preflightUnitWorktree, commitUnitWork } = await import('../../../src/runner/execution/commit-unit-work.mjs');
+ const { prepareActivatedGitFixture } = await import('../../helpers/run-unit-with-port.mjs');
+ const {repoRoot:main,worktreeDir:tree} = setupGitRepo();
+ prepareActivatedGitFixture(main);
+ const lease = acquireSync(createLockScope(),'dispatch-cwd',{fgosDir:path.join(main,'.fgos'),cwd:tree});
+ assert.equal(lease.result,'acquired');
+ const f = {main,tree,custody:lease.handle,git:gitIn,close() {
+  lease.handle.release(); fs.rmSync(tree,{recursive:true,force:true}); fs.rmSync(main,{recursive:true,force:true});
+ }};
+ try {
+  const baseline = preflightUnitWorktree({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs']}).baseline;
+  fs.mkdirSync(path.join(f.tree,'docs')); fs.writeFileSync(path.join(f.tree,'docs/new'),'new');
+  let pending;
+  const first = commitUnitWork({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs'],unitId:'crash',baseline,
+   onPrepared:prepared => { pending = {...prepared,state:'pending'}; }});
+  assert.equal(first.status,'committed',JSON.stringify(first));
+  const landed = first.sha;
+  f.custody.release();
+  let id;
+  // Stop before a producer can launch; install the exact persisted crash-point state below.
+  await assert.rejects(runUnit({repoRoot:f.main,cwd:f.tree,worktree:f.tree,pattern:'solo',
+   unitData:{id:'crash',objective:'Write docs',capability:'not-configured:answer',writes:['docs']},
+   onUnitRunCreated:value => { id = value; throw new Error('controller stopped'); }}), /controller stopped/);
+  const file = path.join(f.main,'.fgos/assignments',id,'unit.json');
+  const record = JSON.parse(fs.readFileSync(file,'utf8'));
+  record.bindings['producer/1'] = [{binding:{executor:'never-launch'},nativeBaseline:baseline,commitOperation:pending,outcome:'pass'}];
+  fs.writeFileSync(file,JSON.stringify(record));
+  const resumed = await runUnit({repoRoot:f.main,cwd:f.tree,resumeUnitRunId:id});
+  assert.equal(resumed.outcome,'pass',JSON.stringify(resumed));
+  assert.equal(resumed.results[0].commit.status,'committed');
+  assert.equal(resumed.results[0].commit.sha,landed);
+  assert.deepEqual(resumed.results[0].commit.files,['docs/new']);
+  assert.equal(f.git(f.tree,'rev-parse','HEAD').trim(),landed);
+  const settled = JSON.parse(fs.readFileSync(file,'utf8'));
+  assert.equal(settled.bindings['producer/1'][0].commitOperation.state,'settled');
+  assert.equal(settled.bindings['producer/1'][0].commit.status,'committed');
+  assert.equal(settled.settlement.outcome,'pass');
+ } finally { f.close(); }
+});

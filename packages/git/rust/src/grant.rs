@@ -72,7 +72,7 @@ impl GitDriver {
             if payload.cutover_grant.is_none() {
                 let request: CommitRequest = serde_json::from_str(&payload.request).map_err(failure)?;
                 let layout = request.legacy_events.ok_or_else(|| failure("cutover-grant-missing"))?;
-                layout.validate(repo)?;
+                layout.validate_paths(repo)?;
                 if staged.is_empty() || staged.iter().any(|p| !layout.exact_paths.contains(p) || !payload.paths.contains(p)) {
                     return Err(failure("legacy-event-deletions-mismatch"));
                 }

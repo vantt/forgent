@@ -3169,3 +3169,31 @@ impl GitDriver {
         Ok(objects)
     }
 }
+
+impl GitDriver {
+    /// G-062: only RepositoryConfig-owned guard provenance permits diagnostic
+    /// replay. Preserve the original commit stderr, never the replay's output.
+    pub(crate) fn checkout_commit_failure(
+        &self,
+        repo: &RepoHandle,
+        scope: &fgos_holder_lock::LockScope<'_>,
+        out: crate::driver::Output,
+    ) -> Result<OperationError> {
+        let diagnostic = (|| -> Result<&str> {
+            if let Some(path) = self.hooks_value(repo)? {
+                let report = self.inspect_hooks(repo, &repo.trusted_main_root().join(&path))?;
+                if report.status == "owned" && report.provenance.is_some() && !report.enforcement_missing {
+                    let replay = self.checkout_call(repo, scope, &["hook", "run", "pre-commit"], &[], true)?;
+                    if !replay.success { return Ok("hook-refused"); }
+                }
+            }
+            Ok("commit-rejected")
+        })();
+        let cause = diagnostic.map_err(|mut error| {
+            error.stderr = out.stderr.clone();
+            error.exit_code = out.code;
+            error
+        })?;
+        Ok(out.error(cause))
+    }
+}

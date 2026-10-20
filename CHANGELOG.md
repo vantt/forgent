@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Scoped Unit commits exclude tracked and untracked `.fgos` paths under broad scopes; legacy event commits require main-checkout authority. ScopedCommit and Sync classify owned hook refusals consistently, and unknown recovery ids fail explicitly.
+
 - Unit commits and syncs use the native Git component with persisted baselines, custody-backed recovery and literal filenames. Original hook failure output is preserved; foreign hooks are never replayed. Legacy Work event checkpoints use an explicit, main-only temporary declaration.
 
 - Add `fgos worktree remove <path> --delivered-to <ref>`: removes a worktree through the Worktree port, which refuses a dirty checkout, one a process stands in, preserved worker state, or a tip not contained in the delivery target (branch name, full ref or object id). No force flag; the delivery statement is recorded as the operation's evidence digest.

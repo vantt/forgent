@@ -531,8 +531,7 @@ fn recovery_preserves_attempt_while_native_index_lock_exists() {
     interrupted(&f, "interrupted", 2, false);
     let gitdir = git(&f.tree, &["rev-parse", "--absolute-git-dir"]);
     fs::write(Path::new(&gitdir).join("index.lock"), "native residue").unwrap();
-    let error = f
-        .driver
+    let error = f.driver
         .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
         .unwrap_err();
     assert!(error.cause.starts_with("native-index-lock-unowned:"));
@@ -1194,20 +1193,12 @@ fn sync_native_index_lock_refusal_names_inspection_and_preserves_bytes() {
     let gitdir = git(&f.tree, &["rev-parse", "--absolute-git-dir"]);
     let path = Path::new(&gitdir).join("index.lock");
     fs::write(&path, b"external sync lock").unwrap();
-    let error = f
-        .driver
-        .inspect_sync(&f.repo, f.held(), "fixture", "interrupted")
-        .unwrap_err();
+    let error = f.driver.inspect_sync(&f.repo, f.held(), "fixture", "interrupted").unwrap_err();
     assert!(error.cause.starts_with("native-index-lock-unowned:"));
     assert!(error.cause.contains("repairNativeIndexLock"));
     assert!(error.cause.contains("§11"));
     assert_eq!(fs::read(&path).unwrap(), b"external sync lock");
-    assert!(wal::Wal::open(&f.repo)
-        .unwrap()
-        .inspect("interrupted")
-        .unwrap()
-        .outcome()
-        .is_none());
+    assert!(wal::Wal::open(&f.repo).unwrap().inspect("interrupted").unwrap().outcome().is_none());
 }
 
 #[test]
@@ -1215,9 +1206,7 @@ fn scoped_commit_ignores_signature_and_display_config() {
     let f = Fixture::new();
     enable_signing(&f.tree, &f.temp);
     fresh_commit(&f, "signed");
-    assert!(
-        git(&f.tree, &["cat-file", "-p", "HEAD"]).contains("gpgsig -----BEGIN SSH SIGNATURE-----")
-    );
+    assert!(git(&f.tree, &["cat-file", "-p", "HEAD"]).contains("gpgsig -----BEGIN SSH SIGNATURE-----"));
     assert!(git(&f.tree, &["show", "-s", "--format=%H"]).contains("Good "));
 }
 
@@ -1314,4 +1303,18 @@ fn sync_observed_rejection_retry_recovers_each_pre_commit_interruption() {
             matches!(wal.inspect("prior").unwrap().outcome(),Some(Outcome::CommitRejected {cause}) if cause == "commit-rejected")
         );
     }
+}
+
+#[test]
+fn unknown_commit_recovery_is_an_error_but_pending_intent_can_be_abandoned() {
+    let f = Fixture::new();
+    let head = git(&f.tree, &["rev-parse", "HEAD"]);
+    let error = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", "missing").unwrap_err();
+    assert_eq!(error.cause, "unknown-scoped-commit-operation");
+    interrupted(&f, "pending", 0, false);
+    let outcome = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", "pending").unwrap();
+    assert_eq!(outcome, wal::Outcome::AbandonedBeforeAttempt);
+    assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), head);
+    assert_eq!(wal::Wal::open(&f.repo).unwrap().compacted("pending").unwrap().unwrap().outcome().unwrap(), wal::Outcome::AbandonedBeforeAttempt);
+    assert!(wal::Wal::open(&f.repo).unwrap().inspect("missing").is_err());
 }

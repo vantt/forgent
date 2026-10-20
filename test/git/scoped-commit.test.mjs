@@ -178,7 +178,7 @@ test('baseline-dirty paths changed by the producer are excluded with an explicit
   assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'after producer');
  }finally{f.close();}
 });
-for(const name of ['literal*star','control\tname','control\nname']) test(`E6 retargeted: literal path ${JSON.stringify(name)} commits and replays losslessly`,()=>{
+for(const name of ['literal*star','control\tname','control\nname']) test(`literal path ${JSON.stringify(name)} commits and replays losslessly`,()=>{
  const f=fixture();try {
   const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,name),'producer');
   const args={operationId:'literal-path',baseline,request:{writes:['**'],message:'literal path',cutoverGrant:null}};

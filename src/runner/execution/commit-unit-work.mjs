@@ -43,7 +43,7 @@ function refusal(error) {
     : ['foreign-staged-index','staged-set-mismatch','merge-refused','hook-refused'].includes(cause) ? cause
     : cause.startsWith('conflict-markers') ? 'conflict-markers' : 'git-error';
   const stderr = Buffer.from(e.stderr ?? []).toString('utf8');
-  return { status: 'failed', reason, error: stderr || cause, ...(stderr ? { stderr, stderrBytes: e.stderr } : {}), nativeCause: cause, ...(e.detail ?? {}) };
+  return { ...(e.detail ?? {}), status: 'failed', reason, error: stderr || cause, ...(stderr ? { stderr, stderrBytes: e.stderr } : {}), nativeCause: cause };
 }
 export function preflightUnitWorktree(args) {
   const ctx = gitContext(args);

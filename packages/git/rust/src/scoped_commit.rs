@@ -27,7 +27,18 @@ pub struct LegacyEventLayout {
     pub exact_paths: Vec<String>,
 }
 impl LegacyEventLayout {
-    pub(crate) fn validate(&self, repo: &RepoHandle) -> Result<()> {
+    pub(crate) fn validate(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<()> {
+        self.validate_paths(repo)?;
+        let main = scope.handle("main-checkout")
+            .ok_or_else(|| failure("legacy-events-main-borrow-required"))?;
+        if main.path() != repo.trusted_main_root().join(".fgos/locks/main-checkout.lock") {
+            return Err(failure("legacy-events-main-borrow-required"));
+        }
+        fgos_holder_lock::validate(main)
+            .map_err(|_| failure("legacy-events-main-borrow-required"))
+    }
+    // The hook already proves main-50 borrowing from its inherited descriptor.
+    pub(crate) fn validate_paths(&self, repo: &RepoHandle) -> Result<()> {
         if root(repo)? != repo.trusted_main_root() || self.exact_paths.is_empty() {
             return Err(failure("legacy-events-main-required"));
         }
@@ -515,8 +526,8 @@ impl GitDriver {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let mut scope = scope(repo, held)?;
-        crate::recovery::leaf(&mut scope, repo)?;
         let wal = Wal::open(repo).map_err(failure)?;
+        crate::recovery::leaf(&mut scope, repo)?;
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
             let intent = Intent {
                 kind: OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
@@ -541,7 +552,7 @@ impl GitDriver {
             }
             return compact.outcome().map_err(failure);
         }
-        if !wal.known_id(id).map_err(failure)? { return Ok(Outcome::AbandonedBeforeAttempt); }
+        if !wal.known_id(id).map_err(failure)? { return Err(failure("unknown-scoped-commit-operation")); }
         let chain = wal.inspect(id).map_err(failure)?;
         let OperationKind::ScopedCommit(payload) = &chain.intent().kind else {
             return Err(failure("not-scoped-commit-operation"));
@@ -838,6 +849,9 @@ impl GitDriver {
         {
             return Err(failure("invalid-commit-message"));
         }
+        if let Some(layout) = &request.legacy_events {
+            layout.validate(repo, scope)?;
+        }
         let writes = fgos_write_scope::canonicalize_all(&request.writes).map_err(failure)?;
         if baseline.worktree != root(repo)?.to_string_lossy()
             || baseline.authority != binding(handle(scope, repo)?)?
@@ -1014,14 +1028,14 @@ impl GitDriver {
         let mut selected = vec![];
         let dirty_paths = self.dirty_paths(repo, scope)?;
         for path in dirty_paths.iter().cloned() {
-            if !excluded.contains(&path)
+            if path != ".fgos" && !path.starts_with(".fgos/")
+                && !excluded.contains(&path)
                 && fgos_write_scope::matches(path.as_bytes(), &writes).map_err(failure)?
             {
                 selected.push(path);
             }
         }
         if let Some(layout) = &request.legacy_events {
-            layout.validate(repo)?;
             selected.extend(layout.exact_paths.iter().filter(|p| dirty_paths.contains(p) && !excluded.contains(p)).cloned());
         }
         if let Some(grant) = &request.cutover_grant {
@@ -1243,14 +1257,12 @@ impl GitDriver {
             if observed == baseline.head {
                 // Keep the attempt durable. Retrying uses a new id after a fresh preflight.
                 if !out.success {
+                    let error = self.checkout_commit_failure(repo, scope, out)?;
                     wal.append(
                         &attempted,
-                        Phase::Outcome(Outcome::CommitRejected {
-                            cause: "commit-rejected".into(),
-                        }),
-                    )
-                    .map_err(failure)?;
-                    return Err(out.error("commit-rejected"));
+                        Phase::Outcome(Outcome::CommitRejected { cause: error.cause.clone() }),
+                    ).map_err(failure)?;
+                    return Err(error);
                 }
                 return Err(recovery("commit-effect-unknown"));
             }
@@ -1424,7 +1436,7 @@ impl GitDriver {
             return Err(failure("checkpoint-non-event-main-required"));
         }
         if let Some(layout) = &legacy_events {
-            layout.validate(repo)?;
+            layout.validate_paths(repo)?;
             if layout.exact_paths.iter().any(|p| !files.contains(p)) { return Err(failure("invalid-legacy-event-path")); }
         }
         let operation_repo = self.checkout_repository(repo)?;

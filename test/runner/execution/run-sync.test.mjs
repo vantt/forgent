@@ -128,7 +128,7 @@ const subjectOf = (cwd, rev = 'HEAD') => gitIn(cwd, 'log', '-1', '--format=%s', 
 // ---------------------------------------------------------------------------------------------
 // The Unit contract
 
-test('E6 retargeted: syncBase needs writes, names a ref git can read, and without an objective makes a sync-only unit', () => {
+test('syncBase needs writes, names a ref git can read, and without an objective makes a sync-only unit', () => {
   assert.throws(() => validateUnit({ id: 'u', objective: 'x', capability: 'c', syncBase: 'main' }), /syncBase needs writes/);
   for (const bad of ['', ' ', '-main', 'a..b', 'main@{1}', 'ma in', 'main^', 'main:x', 42]) {
     assert.throws(() => validateUnit({ id: 'u', objective: 'x', capability: 'c', writes: ['docs'], syncBase: bad }), RunnerConfigError, String(bad));
@@ -148,7 +148,7 @@ test('E6 retargeted: syncBase needs writes, names a ref git can read, and withou
 // ---------------------------------------------------------------------------------------------
 // Clean merges
 
-test('E6 retargeted: a sync-only unit whose merge is clean is committed by the runner and passes without any worker', async () => {
+test('a sync-only unit whose merge is clean is committed by the runner and passes without any worker', async () => {
   const { repoRoot, worktree, script } = setup();
   writeWorker(script, { files: { 'docs/never.md': 'x\n' } });
   const before = headOf(worktree);
@@ -171,7 +171,7 @@ test('E6 retargeted: a sync-only unit whose merge is clean is committed by the r
   assert.equal(mergeHeadOf(worktree), null);
 });
 
-test('E6 retargeted: a unit with an objective and a clean sync gets the merge commit first, then the worker commit', async () => {
+test('a unit with an objective and a clean sync gets the merge commit first, then the worker commit', async () => {
   const { repoRoot, worktree, script } = setup();
   writeWorker(script, { files: { 'docs/page.md': 'page\n' } });
   const mainSha = headOf(repoRoot);
@@ -186,7 +186,7 @@ test('E6 retargeted: a unit with an objective and a clean sync gets the merge co
   assert.equal(res.sync.commit.sha, mergeCommit);
 });
 
-test('E6 retargeted: a sync-only unit already holding the base is up to date: no commit, no worker', async () => {
+test('a sync-only unit already holding the base is up to date: no commit, no worker', async () => {
   const { repoRoot, worktree, script } = setup({ mainFiles: {} });
   writeWorker(script);
   const before = headOf(worktree);
@@ -205,7 +205,7 @@ const conflicting = () => setup({
   branchFiles: { 'README.md': 'line one\nbranch says two\nline three\n' },
 });
 
-test('E6 retargeted: conflicted paths enter the write scope and the brief; the runner finishes the merge after the worker resolves them', async () => {
+test('conflicted paths enter the write scope and the brief; the runner finishes the merge after the worker resolves them', async () => {
   const { repoRoot, worktree, script } = conflicting();
   writeWorker(script, { files: { 'README.md': 'line one\nboth say two\nline three\n' } });
   const before = headOf(worktree);
@@ -233,7 +233,7 @@ test('E6 retargeted: conflicted paths enter the write scope and the brief; the r
   assert.equal(res.results[0].commit.sync.status, 'committed');
 });
 
-test('E6 retargeted: a worker that passes with markers left gets no commit; fixing them and resuming commits only', async () => {
+test('a worker that passes with markers left gets no commit; fixing them and resuming commits only', async () => {
   const { repoRoot, worktree, script } = conflicting();
   // It edits the file but leaves one side's marker in it.
   writeWorker(script, { files: { 'README.md': 'line one\n<<<<<<< HEAD\nhalf done\nline three\n' } });
@@ -255,7 +255,7 @@ test('E6 retargeted: a worker that passes with markers left gets no commit; fixi
   assert.equal(gitIn(worktree, 'show', 'HEAD:README.md'), 'line one\nfixed by hand\nline three\n');
 });
 
-test('E6 retargeted: a worker that fails over a conflicted merge leaves the merge for the resume, which runs the worker again', async () => {
+test('a worker that fails over a conflicted merge leaves the merge for the resume, which runs the worker again', async () => {
   const { repoRoot, worktree, script } = conflicting();
   writeWorker(script, { settle: false });
   const first = await runUnit({ unitData: { id: 'u-sync-f', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
@@ -278,7 +278,7 @@ test('E6 retargeted: a worker that fails over a conflicted merge leaves the merg
 // `.fgos/` deletion (ADR0020 (a worker branch never commits `.fgos/`)).
 const REAL_HOOKS = path.resolve('.githooks');
 
-test('E6 retargeted: a sync never brings the base side of .fgos/ in: every .fgos path keeps the branch side, through the real hook on a fgw/* branch', async () => {
+test('a sync never brings the base side of .fgos/ in: every .fgos path keeps the branch side, through the real hook on a fgw/* branch', async () => {
   const { repoRoot, worktree, script } = setup({
     branch: 'fgw/item-sync',
     forkFiles: { '.fgos/state.json': '{"v":"fork"}\n', '.fgos/gone.json': 'kept\n' },
@@ -301,7 +301,7 @@ test('E6 retargeted: a sync never brings the base side of .fgos/ in: every .fgos
   assert.equal(gitIn(worktree, 'status', '--porcelain'), '');
 });
 
-test('E6 retargeted: a .fgos conflict keeps the branch side and never reaches the worker, through the real hook on a fgw/* branch', async () => {
+test('a .fgos conflict keeps the branch side and never reaches the worker, through the real hook on a fgw/* branch', async () => {
   const { repoRoot, worktree, script } = setup({
     branch: 'fgw/item-sync-c',
     mainFiles: { '.fgos/tracked.json': '{"from":"main"}\n', 'README.md': 'line one\nmain says two\nline three\n' },
@@ -325,7 +325,7 @@ function refusingHook(repoRoot, message) {
   return () => gitIn(repoRoot, 'config', '--unset', 'core.hooksPath');
 }
 
-test('E6 retargeted: a pre-commit hook refusing the clean merge commit ends the run hook-refused with its words, leaves no merge open, and a resume tries once more', async () => {
+test('a pre-commit hook refusing the clean merge commit ends the run hook-refused with its words, leaves no merge open, and a resume tries once more', async () => {
   const { repoRoot, worktree, script } = setup();
   writeWorker(script);
   refusingHook(repoRoot, 'not on a friday');
@@ -341,7 +341,7 @@ test('E6 retargeted: a pre-commit hook refusing the clean merge commit ends the 
   assert.equal(producerSpawns(repoRoot, res.unitRunId), 0);
 });
 
-test('E6 retargeted: a pre-commit hook refusing the conclusion of a conflicted merge is hook-refused, keeps the merge, and the resume only commits once the hook lets it', async () => {
+test('a pre-commit hook refusing the conclusion of a conflicted merge is hook-refused, keeps the merge, and the resume only commits once the hook lets it', async () => {
   const { repoRoot, worktree, script } = conflicting();
   writeWorker(script, { files: { 'README.md': 'line one\nresolved\nline three\n' } });
   const unhook = refusingHook(repoRoot, 'tests are red');
@@ -363,7 +363,7 @@ test('E6 retargeted: a pre-commit hook refusing the conclusion of a conflicted m
 // ---------------------------------------------------------------------------------------------
 // Refusals
 
-test('E6 retargeted: a merge git refuses (a dirty file it would overwrite) leaves the worktree as it was', async () => {
+test('a merge git refuses (a dirty file it would overwrite) leaves the worktree as it was', async () => {
   const { repoRoot, worktree, script } = setup({ mainFiles: { 'README.md': 'changed on main\n' }, branchFiles: {} });
   writeWorker(script);
   fs.writeFileSync(path.join(worktree, 'README.md'), 'a person is editing\n');
@@ -377,7 +377,7 @@ test('E6 retargeted: a merge git refuses (a dirty file it would overwrite) leave
   assert.equal(producerSpawns(repoRoot, res.unitRunId), 0);
 });
 
-test('E6 retargeted: a merge someone else left in the worktree is refused, by a sync unit and by any writing unit', async () => {
+test('a merge someone else left in the worktree is refused, by a sync unit and by any writing unit', async () => {
   const { repoRoot, worktree, script } = conflicting();
   writeWorker(script, { files: { 'docs/a.md': 'a\n' } });
   try { gitIn(worktree, 'merge', '--no-commit', 'main'); } catch { /* conflicts */ }
@@ -390,7 +390,7 @@ test('E6 retargeted: a merge someone else left in the worktree is refused, by a 
   assert.equal(producerSpawns(repoRoot, plain.unitRunId), 0);
 });
 
-test('E6 retargeted: a sync ref that names no commit, or a sync from the main checkout, is refused before any unit run exists', async () => {
+test('a sync ref that names no commit, or a sync from the main checkout, is refused before any unit run exists', async () => {
   const { repoRoot, worktree } = setup();
   const runs = () => (fs.existsSync(path.join(repoRoot, '.fgos', 'assignments')) ? fs.readdirSync(path.join(repoRoot, '.fgos', 'assignments')) : []);
   await assert.rejects(
@@ -404,7 +404,7 @@ test('E6 retargeted: a sync ref that names no commit, or a sync from the main ch
   assert.deepEqual(runs(), []);
 });
 
-test('E6 retargeted: a writing unit without a sync whose worker only rewrites a file already dirty in scope still has no evidence', async () => {
+test('a writing unit without a sync whose worker only rewrites a file already dirty in scope still has no evidence', async () => {
   const { repoRoot, worktree, script } = setup({ mainFiles: {}, branchFiles: { 'docs/page.md': 'committed\n' } });
   writeWorker(script, { files: { 'docs/page.md': 'the worker rewrote it\n' } });
   fs.writeFileSync(path.join(worktree, 'docs', 'page.md'), 'a person is half way through this\n');
@@ -413,7 +413,7 @@ test('E6 retargeted: a writing unit without a sync whose worker only rewrites a 
   assert.equal(res.results[0].runResult.evidence.editedSyncConflicts, undefined);
 });
 
-test('E6 retargeted: a conflicted path a scope cannot name exactly (surrounding whitespace) aborts the merge', async () => {
+test('a conflicted path a scope cannot name exactly (surrounding whitespace) aborts the merge', async () => {
   const { repoRoot, worktree, script } = setup({ mainFiles: { ' padded.txt': 'main\n' }, branchFiles: { ' padded.txt': 'branch\n' } });
   writeWorker(script);
   const res = await runUnit({ unitData: { id: 'u-ws', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
@@ -422,7 +422,7 @@ test('E6 retargeted: a conflicted path a scope cannot name exactly (surrounding 
   assert.equal(mergeHeadOf(worktree), null);
 });
 
-test('E6 retargeted: conflicted paths a scope would read differently (":" magic, a newline) abort the merge instead of reaching the scope or the brief', async () => {
+test('conflicted paths a scope would read differently (":" magic, a newline) abort the merge instead of reaching the scope or the brief', async () => {
   for (const name of [':colon.txt', 'line\nbreak.txt']) {
     const { repoRoot, worktree, script } = setup({ mainFiles: { [name]: 'main\n' }, branchFiles: { [name]: 'branch\n' } });
     writeWorker(script);
@@ -433,7 +433,7 @@ test('E6 retargeted: conflicted paths a scope would read differently (":" magic,
   }
 });
 
-test('E6 retargeted: markers longer than seven characters (conflict-marker-size) are still found', async () => {
+test('markers longer than seven characters (conflict-marker-size) are still found', async () => {
   const { repoRoot, worktree, script } = setup({
     mainFiles: { '.gitattributes': 'README.md conflict-marker-size=10\n' },
     branchFiles: {},
@@ -447,7 +447,7 @@ test('E6 retargeted: markers longer than seven characters (conflict-marker-size)
   assert.equal(res.results[0].commit.reason, 'conflict-markers');
 });
 
-test('E6 retargeted: a clean merge commit holding more than the merge (a hook added a file) is not taken as a pass, nor resumed past', async () => {
+test('a clean merge commit holding more than the merge (a hook added a file) is not taken as a pass, nor resumed past', async () => {
   const { repoRoot, worktree, script } = setup();
   writeWorker(script);
   const hooks = path.join(repoRoot, 'test-hooks');
@@ -460,7 +460,7 @@ test('E6 retargeted: a clean merge commit holding more than the merge (a hook ad
   await assert.rejects(() => runUnit({ resumeUnitRunId: res.unitRunId, repoRoot, cwd: worktree }), /sneaky\.txt/);
 });
 
-test('E6 retargeted: resuming a sync-only run that was up to date passes again without a worker', async () => {
+test('resuming a sync-only run that was up to date passes again without a worker', async () => {
   const { repoRoot, worktree, script } = setup({ mainFiles: {} });
   writeWorker(script, { files: { 'docs/x.md': 'x\n' } });
   const first = await runUnit({ unitData: { id: 'u-up2', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
@@ -471,7 +471,7 @@ test('E6 retargeted: resuming a sync-only run that was up to date passes again w
   assert.equal(fs.existsSync(path.join(worktree, 'docs', 'x.md')), false);
 });
 
-test('E6 retargeted: a conflicted file the worker turned into a directory refuses the conclusion and leaves no staging of the runner behind', async () => {
+test('a conflicted file the worker turned into a directory refuses the conclusion and leaves no staging of the runner behind', async () => {
   const { repoRoot, worktree, script } = conflicting();
   writeWorker(script, { files: {} });
   fs.writeFileSync(script, fs.readFileSync(script, 'utf8').replace("const prompt =", "fs.rmSync('README.md'); fs.mkdirSync('README.md'); fs.writeFileSync('README.md/inner.txt', 'x\\n');\n    const prompt ="));
@@ -483,7 +483,7 @@ test('E6 retargeted: a conflicted file the worker turned into a directory refuse
 });
 
 
-test('E6 retargeted: sync aggregation preserves receipt warnings in existing result fields', async () => {
+test('sync aggregation preserves receipt warnings in existing result fields', async () => {
   const { runPendingSync, commitRoundWithSync, syncSummary } = await import('../../../src/runner/execution/unit-sync.mjs');
   const warning = 'checkout-compaction-deferred: retained evidence';
   const record = { unit: { syncOnly: true }, sync: { status: 'merged', warnings: [warning], commit: { sha: 'abc', subject: 'merge' } } };
