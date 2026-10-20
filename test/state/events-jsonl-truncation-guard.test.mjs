@@ -678,3 +678,20 @@ test("CLI --force-rebaseline-all mode calls forceRebaselineTruncationGuard and o
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
+
+
+test('committed event read errors remain errors rather than an empty committed baseline', () => {
+  const repoRoot = mkTempDir('truncguard-object-error-');
+  execFileSync('git', ['init', '-q'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Fixture'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'fixture@example.invalid'], { cwd: repoRoot });
+  const dir = path.join(repoRoot, '.fgos'); fs.mkdirSync(dir);
+  fs.writeFileSync(path.join(dir, 'events.jsonl'), ev(1, '2026-01-01', 'base') + '\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-qm', 'base'], { cwd: repoRoot });
+  fs.appendFileSync(path.join(dir, 'events.jsonl'), ev(2, '2026-01-02', 'new') + '\n');
+  assert.equal(getUncommittedEventCount(dir, repoRoot), 1);
+  fs.renameSync(path.join(repoRoot, '.git/objects'), path.join(repoRoot, '.git/objects-kept'));
+  try { assert.throws(() => getUncommittedEventCount(dir, repoRoot)); }
+  finally { fs.renameSync(path.join(repoRoot, '.git/objects-kept'), path.join(repoRoot, '.git/objects')); fs.rmSync(repoRoot, { recursive: true, force: true }); }
+});

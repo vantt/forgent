@@ -84,3 +84,56 @@ test('SafeRestore retry keeps its snapshot before discarding local bytes and ret
     assert.throws(() => git('rev-parse', '--verify', 'refs/fgos/git-operations/retry/candidate'));
   } finally { custody?.handle.release(); f.cleanup(); }
 });
+
+
+test('SafeRestore retains a detached session HEAD through cleanup and dirty baselines refuse before reset', () => {
+  const f = fixture(); let custody;
+  try {
+    const worker = path.join(f.temp, 'detached');
+    f.port.createDetached({ path: worker, base: f.tip, operationId: 'create-detached' });
+    const git = (...args) => execFileSync('git', ['-C', worker, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+    fs.writeFileSync(path.join(worker, 'session'), 'unique session bytes');
+    git('add', 'session'); git('commit', '-qm', 'session');
+    const expectedHead = git('rev-parse', 'HEAD');
+    custody = acquireSync(createLockScope(), 'dispatch-cwd', { fgosDir: f.fgosDir, cwd: worker });
+    assert.equal(custody.result, 'acquired');
+    const port = createGitSafeRestore({ ...f.options, repoPath: worker }, f.loader);
+    const request = { expectedHead, target: f.tip, reason: 'retain session before cleanup', discardLocalDelta: true, requireCleanBaseline: true };
+    fs.writeFileSync(path.join(worker, 'dirty'), 'keep');
+    assert.throws(() => port.apply({ operationId: 'dirty-session', request }, [custody.handle]), /baseline-dirty/);
+    assert.equal(git('rev-parse', 'HEAD'), expectedHead);
+    assert.equal(fs.readFileSync(path.join(worker, 'dirty'), 'utf8'), 'keep');
+    fs.unlinkSync(path.join(worker, 'dirty'));
+    const saved = port.apply({ operationId: 'retain-session', request }, [custody.handle]);
+    assert.equal(saved.outcome.state, 'restored');
+    assert.equal(git('rev-parse', 'HEAD'), f.tip);
+    assert.equal(git('rev-parse', 'refs/fgos/git-operations/retain-session/candidate'), expectedHead);
+    assert.equal(port.recover({ operationId: 'retain-session' }, [custody.handle]).outcome.state, 'restored');
+    custody.handle.release(); custody = null;
+    f.port.remove({ path: worker, expectedTip: f.tip, deliveredTo: f.tip, evidenceDigest: 'a'.repeat(64), operationId: 'remove-session' });
+    assert.equal(fs.existsSync(worker), false);
+    assert.equal(f.git('show', 'refs/fgos/git-operations/retain-session/candidate:session'), 'unique session bytes');
+    assert.ok(fs.existsSync(path.join(f.repoPath, '.git/fgos/git/restore-snapshots', saved.snapshot)));
+  } finally { custody?.handle.release(); f.cleanup(); }
+});
+
+
+test('Worktree creation preserves branch reservations hidden by detached rebase and bisect HEADs', () => {
+  for (const marker of ['rebase-merge/head-name', 'BISECT_START']) {
+    const f = fixture();
+    try {
+      const worker = path.join(f.temp, 'worker'), blocked = path.join(f.temp, 'blocked');
+      f.port.create({ path: worker, branch: 'fgw/topic', base: f.tip, operationId: 'create' });
+      const git = (...args) => execFileSync('git', ['-C', worker, ...args], {encoding:'utf8',stdio:'pipe'}).trim();
+      git('checkout', '--detach', '-q');
+      const file = path.join(git('rev-parse', '--absolute-git-dir'), marker);
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      const reservation = marker === 'BISECT_START' ? 'fgw/topic' : 'refs/heads/fgw/topic';
+      fs.writeFileSync(file, reservation + '\n');
+      assert.throws(() => f.port.create({ path: blocked, branch: 'fgw/topic', base: f.tip, operationId: 'blocked' }), /branch-in-use/);
+      assert.equal(fs.existsSync(blocked), false);
+      assert.equal(fs.readFileSync(file, 'utf8'), reservation + '\n');
+      assert.equal(f.git('rev-parse', 'refs/heads/fgw/topic'), f.tip);
+    } finally { f.cleanup(); }
+  }
+});

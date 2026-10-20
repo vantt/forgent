@@ -165,7 +165,7 @@ test('createWorktree reclaims a branch already checked out at an orphaned path s
   removeWorktree(repoRoot, second.path);
 });
 
-test('createWorktree reclaims a branch registered as checked out at a path that is already gone from disk (prune), instead of throwing', () => {
+test('createWorktree prunes a missing checkout with owned create evidence and preserves its branch', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
   const first = createWorktree(repoRoot, 'item-e', { worktreeDir });
@@ -1135,7 +1135,7 @@ test('createClaimWorktree ignores a checkout outside its own worktreeDir (a runn
   discardFixtureWorktree(repoRoot, claim.path);
 });
 
-test('createClaimWorktree falls through to a fresh checkout when the registered path is gone from disk', () => {
+test('createClaimWorktree prunes an owned missing registration before allocating a fresh checkout', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
   const first = createClaimWorktree(repoRoot, 'reattach-vanished', { worktreeDir });

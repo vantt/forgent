@@ -358,7 +358,8 @@ export function createSession(repoRoot, opts = {}) {
  * from the recorded startCommit and `force` is not set, naming the exact
  * dangling sha(s) via `git rev-list startCommit..HEAD`. A non-diverged
  * removal uses PLAIN `git worktree remove` (git's own dirty-tree refusal is
- * the base safety net); only `force` uses `--force`.
+ * the base safety net). Force retains a clean divergent HEAD through
+ * SafeRestore; it never bypasses dirty-checkout refusal.
  */
 export function endSession(repoRoot, sessionId, { force = false } = {}) {
   const fgosDir = fgosDirOf(repoRoot);
@@ -390,8 +391,9 @@ export function endSession(repoRoot, sessionId, { force = false } = {}) {
     }
 
     const sessionLink = unlinkFgosSymlink(entry.worktreePath);
+    let retained;
     try {
-      removeWorktree(repoRoot, entry.worktreePath, { force });
+      retained = removeWorktree(repoRoot, entry.worktreePath, { force, ...(force ? { retainTo: entry.startCommit } : {}) });
     } catch (err) {
       restoreFgosSymlink(entry.worktreePath, sessionLink);
       throw new SessionError(`git worktree remove failed for session "${sessionId}": ${err.message}`, {
@@ -404,7 +406,9 @@ export function endSession(repoRoot, sessionId, { force = false } = {}) {
       fgosDir,
       entries.filter((e) => e.sessionId !== sessionId),
     );
-    return { ...entry };
+    const warnings = retained ? [`Session commit preserved at ${retained.retainedRef}; snapshot ${retained.snapshot}`] : [];
+    for (const warning of warnings) console.warn(warning);
+    return { ...entry, ...(retained ? { ...retained, warnings } : {}) };
   } finally {
     lock.release();
   }

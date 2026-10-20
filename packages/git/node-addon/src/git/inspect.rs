@@ -50,6 +50,10 @@ impl GitInspect {
             serde_json::from_value(args.get("paths").cloned().unwrap_or(json!([]))).map_err(error)
         };
         match method.as_str() {
+            "lastPathCommitTime" => {
+                let files: Vec<String> = serde_json::from_value(args["files"].clone()).map_err(error)?;
+                Ok(json!(self.driver.last_path_commit_time(&repo, &files).map_err(operation)?))
+            }
             "compareCommits" => Ok(json!(self
                 .driver
                 .compare_commits(&repo, &oid("left")?, &oid("right")?)

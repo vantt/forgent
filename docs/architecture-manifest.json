@@ -171,7 +171,7 @@
     "src/state/events.mjs": "infra",
     "src/state/event-log.mjs": "kernel",
     "src/state/hot-lock.mjs": "infra",
-    "src/state/events-jsonl-truncation-guard.mjs": "kernel",
+    "src/state/events-jsonl-truncation-guard.mjs": "infra",
     "src/state/main-checkout-guard-warnings.mjs": "kernel",
     "src/state/work.mjs": "kernel",
     "src/state/envelope.mjs": "kernel",

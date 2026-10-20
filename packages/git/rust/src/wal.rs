@@ -387,7 +387,7 @@ impl Intent {
         }
         if let OperationKind::Restore(p) = &self.kind {
             if !Path::new(&p.worktree).is_absolute() || !checkout_resource_valid(&self.resource_set, &p.worktree)
-                || RefName::parse(&p.reference).is_err() || !digest_valid(&p.snapshot)
+                || (p.reference != "HEAD" && RefName::parse(&p.reference).is_err()) || !digest_valid(&p.snapshot)
                 || canonical_digest(&p.request)? != self.request_digest
                 || self.expected != Tip::Oid(p.request.expected_head.clone()) || self.next != Tip::Oid(p.request.target.clone()) {
                 return Err(corrupt("restore binding"));
@@ -1220,7 +1220,7 @@ impl<F: FileSystem> Wal<F> {
         id: &str,
         bytes: &[u8],
     ) -> WalResult<PathBuf> {
-        if !valid_id(id) || !reference.starts_with("refs/heads/") {
+        if !valid_id(id) || (reference != "HEAD" && !reference.starts_with("refs/heads/")) {
             return Err(corrupt("invalid restore patch identity"));
         }
         let branch = reference

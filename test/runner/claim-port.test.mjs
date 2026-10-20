@@ -143,6 +143,7 @@ test('claimWork reads the event log fully at most 7 times per call, not 8+ (tsk-
 });
 
 test('claimWork refuses with a categorized ClaimError naming the lock and the holder pid while another process holds main, and claims nothing', { skip: HOOK_TEST_SKIP }, async () => {
+  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
   const { repoRoot, dir } = setup();
   const holder = await holdLockInChild('main-checkout', { fgosDir: dir });
   try {
@@ -159,6 +160,7 @@ test('claimWork refuses with a categorized ClaimError naming the lock and the ho
       },
     );
     assert.equal(readClaim(dir, 'item-a'), null, 'a refused claim leaves no claim behind');
+    assert.ok(fs.existsSync(resolveFgosFile(dir, FGOS_FILE.GUARD_MARK)), 'Work truncation policy runs even when main remains held and checkpoint admission refuses');
   } finally {
     holder.child.kill('SIGKILL');
     await holder.exited;
@@ -178,6 +180,7 @@ test('claimWork with waitMs waits for the holder of main and then claims', { ski
 test('claimWork checkpoints .fgos through the borrowed main mutex under the real hook, and releases main when it returns', { skip: HOOK_TEST_SKIP }, async () => {
   delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
   const repoRoot = initRepoWithHook();
+  activateGitFixture(repoRoot);
   const dir = path.join(repoRoot, '.fgos');
   initStore(dir);
   addWork(dir, { id: 'item-a', title: 'Item A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });

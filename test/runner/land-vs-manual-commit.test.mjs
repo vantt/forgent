@@ -1,5 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -66,6 +67,7 @@ test('a checkpoint that holds main while a land waits for it finishes first; the
   fs.mkdirSync(fgosDir, { recursive: true });
   fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ checkpoint: { fallbackIntervalSec: 0 } }));
   fs.writeFileSync(path.join(fgosDir, 'events.jsonl'), '{"seq":1}\n{"seq":2}\n');
+  activateGitFixture(repoRoot);
   const tipBefore = mainTip(repoRoot);
 
   const saved = process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;

@@ -1040,7 +1040,7 @@ impl GitDriver {
             }
         }
         if let Some(layout) = &request.legacy_events {
-            selected.extend(layout.exact_paths.iter().filter(|p| dirty_paths.contains(p) && !excluded.contains(p)).cloned());
+            selected.extend(layout.exact_paths.iter().filter(|p| dirty_paths.contains(p)).cloned());
         }
         if let Some(grant) = &request.cutover_grant {
             if root(repo)? != repo.trusted_main_root() {

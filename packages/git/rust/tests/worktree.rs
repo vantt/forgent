@@ -662,3 +662,19 @@ fn missing_checkout_prune_requires_owned_create_and_preserves_unknown_residue() 
         .unwrap_err().cause.contains("ownership-unproven"));
     assert!(f.repo.common_dir().join("worktrees/unowned/HEAD").exists());
 }
+
+#[test]
+fn missing_owned_detached_history_keeps_its_registration_when_no_delivery_ref_exists() {
+    let f = Fixture::new();
+    let owned = f.root.join("owned");
+    f.create(&owned);
+    fs::write(owned.join("valuable"), "keep unique history").unwrap();
+    git(&owned, &["add", "valuable"]);
+    git(&owned, &["commit", "-qm", "unique detached history"]);
+    let tip = git(&owned, &["rev-parse", "HEAD"]);
+    fs::remove_dir_all(&owned).unwrap();
+    let error = f.driver.prune_missing_worktree(&f.repo, vec![], &owned, "fixture", "unreachable-prune").unwrap_err();
+    assert!(error.cause.contains("tip-unreachable"));
+    assert_eq!(fs::read_to_string(f.repo.common_dir().join("worktrees/owned/HEAD")).unwrap().trim(), tip);
+    assert_eq!(git(&f.path, &["show", &format!("{tip}:valuable")]), "keep unique history");
+}

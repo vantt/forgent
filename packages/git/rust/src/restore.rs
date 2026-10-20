@@ -171,8 +171,11 @@ impl GitDriver {
         if self.checkout_text(repo, scope, &["rev-parse", "HEAD"])? != head.as_str() {
             return Err(failure("restore-head-mismatch"));
         }
-        let reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
-        RefName::parse(&reference).map_err(failure)?;
+        let reference = match self.resolve_head(repo)? {
+            HeadFact::Attached { target, .. } => target.as_str().to_owned(),
+            HeadFact::Detached { .. } => "HEAD".into(),
+            HeadFact::Unborn { .. } => return Err(failure("restore-unborn-head")),
+        };
         if request.discard_local_delta && repo.work_tree() == Some(repo.trusted_main_root()) {
             return Err(failure("restore-discard-requires-producer"));
         }
@@ -1177,7 +1180,11 @@ impl GitDriver {
             // No replay, reset or rollback. Even expected HEAD can conceal ABA.
             self.restore_native_gate(repo, scope)?;
             let head = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
-            let reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
+            let reference = match self.resolve_head(repo)? {
+                HeadFact::Attached { target, .. } => target.as_str().to_owned(),
+                HeadFact::Detached { .. } => "HEAD".into(),
+                HeadFact::Unborn { .. } => return Err(recovery("restore-unborn-head")),
+            };
             let mut state = "recoveryRequired";
             if let Phase::RestoreApplied { snapshot } = chain.last_state() {
                 match wal.read_restore_snapshot::<Snapshot>(snapshot) {

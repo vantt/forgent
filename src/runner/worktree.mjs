@@ -1294,15 +1294,28 @@ export function removeDispatchWorktree(repoRoot, worktreePath, log = () => {}) {
  */
 export function removeWorktree(repoRoot, worktreePath, opts = {}) {
   const id = operationId();
+  let retained;
   try {
     withCheckoutCustody(worktreePath, (options, custody) => {
-      const expectedTip = currentHead(worktreePath);
+      let expectedTip = currentHead(worktreePath);
+      if (opts.retainTo && expectedTip !== opts.retainTo) {
+        // SafeRestore durably pins the old HEAD before resetting. Keep its
+        // evidence unacknowledged: the session is gone but its commit is not.
+        const restoreId = operationId();
+        const saved = createGitSafeRestore(options).apply({ operationId: restoreId, request: {
+          expectedHead: expectedTip, target: opts.retainTo, reason: 'retain forced session HEAD before cleanup',
+          discardLocalDelta: true, requireCleanBaseline: true,
+        } }, [custody]);
+        retained = { retainedRef: `refs/fgos/git-operations/${restoreId}/candidate`, snapshot: saved.snapshot };
+        expectedTip = currentHead(worktreePath);
+      }
       const deliveredTo = opts.deliveredTo ?? expectedTip;
       const evidenceDigest = crypto.createHash('sha256').update(JSON.stringify({ worktreePath, expectedTip, deliveredTo })).digest('hex');
       createGitWorktree({ ...options, repoPath: options.trustedMain }).remove({ path: worktreePath, expectedTip, deliveredTo, evidenceDigest, operationId: id }, [custody]);
     }, opts);
-  } catch (err) { throw new WorktreeError(`git worktree remove failed for "${worktreePath}": ${err.message}`, { worktreePath }); }
+  } catch (err) { throw new WorktreeError(`git worktree remove failed for "${worktreePath}": ${err.message}${retained ? `; commit preserved at ${retained.retainedRef}; snapshot ${retained.snapshot}` : ''}`, { worktreePath, ...retained }); }
   try { pruneWorktrees(repoRoot, id); } catch { /* removal already succeeded */ }
+  return retained;
 }
 
 /**

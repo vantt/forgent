@@ -234,8 +234,8 @@ impl GitDriver {
             cursor = page.next_cursor;
         }
     }
-    fn exclude_nested(&self, repo: &RepoHandle, path: &Path) -> Result<()> {
-        for row in self.worktree_rows(repo)? {
+    fn exclude_nested(&self, repo: &RepoHandle, path: &Path, rows: &[WorktreeFact]) -> Result<()> {
+        for row in rows {
             let registered = byte_path(&row.path)?;
             let registered = if missing(&registered)? {
                 registered
@@ -673,7 +673,10 @@ impl GitDriver {
             }
             return Ok(handle);
         }
-        self.exclude_nested(repo, &path)?;
+        // One admin-held Git inventory supplies nesting and branch-use facts.
+        // Git worktree add checks branch occupancy again at the actual effect.
+        let rows = self.worktree_rows(repo)?;
+        self.exclude_nested(repo, &path, &rows)?;
         if !missing(&path)?
             && !(owned_empty && fs::read_dir(&path).map_err(failure)?.next().is_none())
         {
@@ -691,8 +694,19 @@ impl GitDriver {
             if !branch.as_str().starts_with("refs/heads/") {
                 return Err(failure("worktree-branch-invalid"));
             }
-            for (fact, target) in self.checkouts(repo)? {
-                if crate::refs::branch_in_use(&fact, target.as_ref(), branch)? {
+            for fact in &rows {
+                if fact.prunable.is_some() || fact.locked.as_deref() == Some(b"initializing") {
+                    return Err(failure("worktree-registration-uncertain"));
+                }
+                // Reuse Git's inventory for HEAD facts, but retain reciprocal
+                // topology and rebase/bisect branch reservations on disk.
+                let target = if fact.bare { None } else {
+                    match self.resolve_topology(&byte_path(&fact.path)?, repo.trusted_main_root())? {
+                        ResolveRepo::Repository(target) => Some(target),
+                        _ => return Err(failure("worktree-registration-uncertain")),
+                    }
+                };
+                if crate::refs::branch_in_use(fact, target.as_ref(), branch)? {
                     return Err(failure("branch-in-use"));
                 }
             }
@@ -1060,7 +1074,7 @@ impl GitDriver {
             return self.worktree_handle(repo, &destination);
         }
         let source = source.canonicalize().map_err(failure)?;
-        self.exclude_nested(repo, &destination)?;
+        self.exclude_nested(repo, &destination, &self.worktree_rows(repo)?)?;
         if !missing(&destination)? {
             return Err(failure("worktree-destination-exists"));
         }
@@ -1263,6 +1277,14 @@ impl GitDriver {
         } else {
             Oid::parse(head.trim_end(), repo.object_format()).map_err(failure)?
         };
+        // A vanished detached checkout can still be the only root of valuable
+        // history. Preserve its registration unless a non-operation ref owns it.
+        let reachable = self.checked(repo, &["for-each-ref", "--format=%(refname)",
+            &format!("--contains={}", tip.as_str())], Policy::Inspect)?;
+        if !reachable.split(|b| *b == b'\n')
+            .any(|name| name.starts_with(b"refs/") && !name.starts_with(b"refs/fgos/")) {
+            return Err(failure("worktree-prune-tip-unreachable: registration preserved"));
+        }
         let evidence = wal::canonical_digest(&(owned, text(&path)?, &identity)).map_err(failure)?;
         let chain = self.begin_worktree(repo, &scope, &wal,
             OperationKind::WorktreeRemove {
@@ -1323,7 +1345,7 @@ impl GitDriver {
             let name = entry.file_name();
             let kind = entry.file_type().map_err(failure)?;
             if kind.is_file()
-                && ["gitdir", "commondir", "HEAD", "index", "ORIG_HEAD"]
+                && ["gitdir", "commondir", "HEAD", "index", "ORIG_HEAD", "COMMIT_EDITMSG"]
                     .iter()
                     .any(|s| name == *s)
             {

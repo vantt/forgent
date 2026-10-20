@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Forced session cleanup retains detached commits with a named recovery ref and snapshot, and preserves dirty sessions. Missing checkout registrations are pruned only with inspected ownership evidence. Work event checkpoints and verified archive publication use declared native Git transactions.
+
 - Mutating Units refuse the main checkout before native Git preflight; resuming under a live worktree holder reports `dispatch-in-flight`.
 
 - Scoped Unit commits exclude tracked and untracked `.fgos` paths under broad scopes; legacy event commits require main-checkout authority. ScopedCommit and Sync classify owned hook refusals consistently, and unknown recovery ids fail explicitly.

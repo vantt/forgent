@@ -426,8 +426,10 @@ test('endSession refuses a diverged session without force, naming the dangling s
     assert.ok(fs.existsSync(sess.worktreePath), 'worktree still present after refusal');
     assert.equal(listSessions(repoRoot).length, 1, 'registry unchanged after refusal');
 
-    // force removes it, knowingly discarding the dangling commit
-    endSession(repoRoot, 'diverged', { force: true });
+    // Force removes the checkout but retains the detached commit durably.
+    const ended = endSession(repoRoot, 'diverged', { force: true });
+    assert.equal(execFileSync('git', ['rev-parse', ended.retainedRef], { cwd: repoRoot, encoding: 'utf8' }).trim(), danglingSha);
+    assert.ok(ended.warnings.some(warning => warning.includes(ended.retainedRef)));
     assert.ok(!fs.existsSync(sess.worktreePath), 'worktree removed with force');
     assert.equal(listSessions(repoRoot).length, 0);
   } finally {
@@ -594,7 +596,9 @@ test('guarded removal refusal preserves the session store link, checkout and reg
     const tip = commitInside(session.worktreePath);
     const link = path.join(session.worktreePath, '.fgos');
     const target = fs.readlinkSync(link);
-    assert.throws(() => endSession(repoRoot, session.sessionId, { force: true }), /delivery-unreachable/);
+    fs.writeFileSync(path.join(session.worktreePath, 'dirty.txt'), 'preserve me\n');
+    assert.throws(() => endSession(repoRoot, session.sessionId, { force: true }), /dirty/);
+    assert.equal(fs.readFileSync(path.join(session.worktreePath, 'dirty.txt'), 'utf8'), 'preserve me\n');
     assert.equal(fs.readlinkSync(link), target);
     assert.equal(listSessions(repoRoot).length, 1);
     assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: session.worktreePath, encoding: 'utf8' }).trim(), tip);

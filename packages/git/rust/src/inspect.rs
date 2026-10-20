@@ -138,6 +138,22 @@ impl GitDriver {
             Duration::from_secs(30),
         )
     }
+    /// Work's existing fallback timing read, with bounded literal paths.
+    pub fn last_path_commit_time(&self, repo: &RepoHandle, files: &[String]) -> Result<Option<i64>> {
+        if files.is_empty() || files.len() > 4096
+            || files.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
+            || files.iter().any(|p| p.contains('*') || p.chars().any(char::is_control)
+                || fgos_write_scope::canonicalize(p).as_deref() != Ok(p.as_str()))
+        {
+            return Err(refused("invalid-literal-path"));
+        }
+        let mut args = vec!["--literal-pathspecs", "log", "-1", "--format=%ct", "--"];
+        args.extend(files.iter().map(String::as_str));
+        let raw = self.checked(repo, &args, Policy::Inspect)?;
+        let text = std::str::from_utf8(&raw).map_err(|_| refused("invalid-commit-time"))?.trim();
+        if text.is_empty() { return Ok(None); }
+        text.parse().map(Some).map_err(|_| refused("invalid-commit-time"))
+    }
     /// Literal full refs only; missing remains distinct from errors and symbolic.
     pub fn resolve_ref(&self, repo: &RepoHandle, name: &RefName) -> Result<RefValue> {
         let prefix = RefPrefix::parse(name.as_str()).map_err(|_| refused("invalid-ref"))?;
