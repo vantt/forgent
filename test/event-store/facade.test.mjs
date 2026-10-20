@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { ensureGitAddon, root } from '../helpers/git-addon.mjs';
+import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { prepareStore, openStore } from '../../src/event-store/index.mjs';
 import { withStateTx } from '../../src/state/hot-lock.mjs';
@@ -161,4 +161,12 @@ test('hot-section release is one-shot and nested sections preserve the process g
     assert.throws(() => execFileSync(process.execPath, ['-e', '']), { code: 'exec-under-hot-lock' });
   } finally { inner(); outer(); outer(); }
   assert.equal(hotLockDepth(), 0);
+});
+
+test('ownOrigin is explicitly absent until the first local append', t => {
+  const { store, hot } = fixture(t);
+  assert.equal(store.ownOrigin, null);
+  withStateTx(hot, () => store.append('project', [event], {}, 'fixture', [60]), { prefetched: { writer: 'fixture', eventStore: store } });
+  assert.equal(typeof store.ownOrigin, 'string');
+  assert.ok(store.ownOrigin.length > 0);
 });

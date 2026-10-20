@@ -387,3 +387,15 @@ test('regenerate removes a stored summary the current writer cannot establish bu
     assert.equal(fs.readFileSync(activeFile, 'utf8'), stale);
   }
 });
+
+test('a debate summary names each seat by its owner kind and derives the outcome from the judge', (t) => {
+  const { dir } = fixture(t, { pattern: 'debate' });
+  for (const role of ['thesis', 'antithesis']) for (const round of ['1', '2']) result(dir, role, round, '01', { agentClaim: {} });
+  const unruled = buildUnitSummary(dir);
+  assert.equal(unruled.outcome, 'unknown', 'no ruling yet, so completion cannot be established');
+  result(dir, 'judge', '1', '01', { agentClaim: {} });
+  const summary = buildUnitSummary(dir);
+  assert.equal(summary.outcome, 'pass');
+  const kinds = Object.fromEntries(summary.seats.filter((seat) => seat.round === 1).map((seat) => [seat.role, seat.kind]));
+  assert.deepEqual(kinds, { antithesis: 'producer', judge: 'judge', thesis: 'producer' });
+});

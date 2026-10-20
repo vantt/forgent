@@ -789,6 +789,9 @@
             "medium",
             "high"
           ],
+          "skills": [
+            "ak:cook"
+          ],
           "systemPrompt": false,
           "toolGating": "allowedTools"
         },
@@ -878,12 +881,18 @@
                 "models-store.json",
                 "settings.json",
                 "trust.json",
-                "bin/fd"
+                "bin/fd",
+                "models.json"
               ]
             }
           }
         ],
-        "providerModel": "z-ai"
+        "providerModel": "z-ai",
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "gitnexus": {
         "kind": "tool",
@@ -1008,7 +1017,12 @@
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "gemini": {
         "kind": "agent",
@@ -1082,7 +1096,12 @@
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "xai": {
         "kind": "agent",
@@ -1158,7 +1177,12 @@
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "deepseek": {
         "kind": "agent",
@@ -1195,7 +1219,8 @@
                 "models-store.json",
                 "settings.json",
                 "trust.json",
-                "bin/fd"
+                "bin/fd",
+                "models.json"
               ]
             }
           },
@@ -1228,11 +1253,17 @@
                 "models-store.json",
                 "settings.json",
                 "trust.json",
-                "bin/fd"
+                "bin/fd",
+                "models.json"
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       }
     },
     "timeoutMs": 2100000,
@@ -1263,11 +1294,17 @@
         "frontier": "gpt-6-astra"
       },
       "z-ai": {
-        "nano": "z-ai/glm-5.3",
-        "standard": "z-ai/glm-5.3",
-        "advanced": "z-ai/glm-5.3",
-        "flagship": "z-ai/glm-5.3",
-        "frontier": "z-ai/glm-5.3"
+        "nano": [
+          "thehive/zai-org/glm-5.3-flash@thehive",
+          "z-ai/glm-5.3-flash@openrouter"
+        ],
+        "standard": [
+          "thehive/zai-org/glm-5.3-flash@thehive",
+          "z-ai/glm-5.3-flash@openrouter"
+        ],
+        "advanced": "z-ai/glm-5.3@openrouter",
+        "flagship": "z-ai/glm-5.3@openrouter",
+        "frontier": "z-ai/glm-5.3@openrouter"
       },
       "xai": {
         "nano": "grok-4.3",
@@ -1277,11 +1314,17 @@
         "frontier": "grok-4.6"
       },
       "deepseek": {
-        "nano": "deepseek/deepseek-v4.1-flash",
-        "standard": "deepseek/deepseek-v4.1-flash",
-        "advanced": "deepseek/deepseek-v4-pro",
-        "flagship": "deepseek/deepseek-v4-pro",
-        "frontier": "deepseek/deepseek-v4-pro"
+        "nano": [
+          "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive",
+          "deepseek/deepseek-v4.1-flash@openrouter"
+        ],
+        "standard": [
+          "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive",
+          "deepseek/deepseek-v4.1-flash@openrouter"
+        ],
+        "advanced": "deepseek/deepseek-v4-pro@openrouter",
+        "flagship": "deepseek/deepseek-v4-pro@openrouter",
+        "frontier": "deepseek/deepseek-v4-pro@openrouter"
       }
     },
     "rigorToTier": {
@@ -1403,7 +1446,7 @@
   },
   "worktreeSetup": {
     "commands": [
-      "cargo build --release --workspace"
+      "for d in .claude/skills .agents/skills .omp/skills .pi/skills .grok/skills; do [ -d \"$FGOS_REPO_ROOT/$d\" ] || continue; mkdir -p \"$d\"; for s in \"$FGOS_REPO_ROOT/$d\"/ak-*; do [ -d \"$s\" ] && cp -R \"$s\" \"$d/\"; done; done; true"
     ]
   },
   "lock": {

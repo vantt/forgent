@@ -1,6 +1,6 @@
 // A tier cell of runner.modelPolicies.<family>.<tier> is a model, a model served by a named pool
-// (model@pool), or an ordered list of those. The run picks the first entry served by the family's
-// own pool; the other entries are read so explain and doctor can show them.
+// (model@pool), or an ordered list of those. Every entry is a candidate of the seat's walk; the model
+// a family runs first is the first entry's.
 
 import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
@@ -58,15 +58,16 @@ const policies = {
   },
 };
 
-test('resolveTierModel returns the first entry served by the family pool, unchanged for a plain string', () => {
+test('resolveTierModel returns the first entry, unchanged for a plain string, whichever pool serves it', () => {
   assert.equal(resolveTierModel(policies, 'standard', 'claude'), 'sonnet');
-  assert.equal(resolveTierModel(policies, 'standard', 'deepseek'), 'deepseek-v4-std');
+  assert.equal(resolveTierModel(policies, 'standard', 'deepseek'), 'deepseek-v4');
+  assert.equal(resolveTierModel(policies, 'advanced', 'deepseek'), 'deepseek-v4-pro');
 });
 
-test('resolveTierModel refuses a cell that names only other pools', () => {
-  assert.throws(() => resolveTierModel(policies, 'advanced', 'deepseek'), (err) => {
+test('resolveTierModel refuses a tier the family has no cell for', () => {
+  assert.throws(() => resolveTierModel(policies, 'nano', 'deepseek'), (err) => {
     assert.ok(err instanceof RunnerConfigError);
-    assert.match(err.message, /pool "deepseek"/);
+    assert.match(err.message, /no model configured for tier "nano"/);
     return true;
   });
 });
@@ -80,7 +81,7 @@ test('resolveTierCandidates lists every entry, other pools included', () => {
 
 test('supportsPolicyTier answers what resolveTierModel would do, without throwing', () => {
   assert.equal(supportsPolicyTier(policies, 'deepseek', 'standard'), true);
-  assert.equal(supportsPolicyTier(policies, 'deepseek', 'advanced'), false);
+  assert.equal(supportsPolicyTier(policies, 'deepseek', 'advanced'), true);
   assert.equal(supportsPolicyTier(policies, 'deepseek', 'nano'), false);
   assert.equal(supportsPolicyTier({ modelPolicies: { claude: { standard: [] } } }, 'claude', 'standard'), false);
 });
@@ -150,14 +151,14 @@ function bindConfig(cell) {
 const ask = { unit: { id: 'u', capability: 'work', writes: [], rigor: 'standard' }, role: 'reviewer' };
 const headless = { session: { herdrPresent: false, hasNativeAgent: false } };
 
-test('bind runs the first entry of the family pool and passes over entries for other pools', () => {
+test('bind skips an entry whose pool has no account and runs the next entry served by the family pool', () => {
   const result = bind(ask, { runnerConfig: bindConfig(['x@other', 'y']), ...headless });
   assert.ok(!result.refused, JSON.stringify(result.refused));
   assert.equal(result.model, 'y');
 });
 
-test('bind never runs an entry served by another pool, even when it is the only one', () => {
-  // The lease cannot reach another pool yet, so such a tier is treated as not covered.
+test('bind never runs an entry whose pool nothing can pay for, even when it is the only one', () => {
+  // The pool declares no account in either inventory and is not the family-named pool.
   const result = bind(ask, { runnerConfig: bindConfig('x@other'), ...headless });
   assert.notEqual(result.model, 'x');
   assert.notEqual(result.model, 'x@other');

@@ -13,6 +13,12 @@ type Key = (String, String, String, u64);
 fn key(e: &Envelope) -> Key {
     (e.ts.clone(), e.origin.clone(), e.stream.clone(), e.seq)
 }
+/// Opaque proof of envelope validation, owned by a consumer's retained view.
+/// Contains no Git observations; every read still observes refs and HEAD anew.
+#[derive(Debug)]
+pub struct VerifiedView {
+    pub(crate) events: Vec<Envelope>,
+}
 #[derive(Debug, Default)]
 pub struct Ordered {
     pub events: Vec<Envelope>,
@@ -30,9 +36,24 @@ fn dependencies(e: &Envelope) -> Vec<Position> {
 /// `base` is trusted previously emitted coverage. Project placement contracts
 /// promoted events into their promote node; other branch events stay hidden.
 pub fn order(input: &[Envelope], base: &Positions, project: bool) -> Result<Ordered, Error> {
+    order_retained(input, base, project, None)
+}
+pub(crate) fn order_retained(
+    input: &[Envelope],
+    base: &Positions,
+    project: bool,
+    view: Option<&VerifiedView>,
+) -> Result<Ordered, Error> {
+    let verified: BTreeMap<_, _> = view
+        .into_iter()
+        .flat_map(|v| &v.events)
+        .map(|e| (e.h.as_str(), e))
+        .collect();
     let mut unique = BTreeMap::new();
     for e in input {
-        e.validate()?;
+        if verified.get(e.h.as_str()).copied() != Some(e) {
+            e.validate()?;
+        }
         let pos = (stream_key(e), e.seq);
         if let Some(old) = unique.insert(pos, e.clone()) {
             if old.h != e.h {

@@ -10,6 +10,8 @@
 #   FAKE_HERDR_READ_JSON     set: `pane read` answers in the JSON envelope (older herdr)
 #   FAKE_HERDR_GARBLE     set: every command answers text that is not JSON
 #   FAKE_HERDR_FDS        file that receives the list of open fds of this process
+#   FAKE_HERDR_FOREGROUND  `shell`: `pane process-info` reports only the shell in the
+#                         foreground (default: a foreign `sleep 300`)
 dir=$(dirname "$0")
 if [ -n "$FAKE_HERDR_LOG" ]; then
   { printf '%s\t' "$@"; printf '\n'; } >> "$FAKE_HERDR_LOG"
@@ -38,7 +40,7 @@ case "$1 $2" in
   "pane layout") cat "$dir/pane-layout-two-panes.json" ;;
   "agent explain") cat "$dir/agent-explain.json" ;;
   "agent get"|"pane get") cat "$dir/pane-get.json" ;;
-  "pane process-info") cat "$dir/pane-process-info-running.json" ;;
+  "pane process-info") cat "$dir/pane-process-info-${FAKE_HERDR_FOREGROUND:-running}.json" ;;
   "pane read") if [ -n "$FAKE_HERDR_READ_JSON" ]; then echo '{"id":"cli:pane:read","result":{"read":{"text":"enveloped screen"}}}'; else printf 'line one\nline two\n'; fi ;;
   "pane close") [ -n "$FAKE_HERDR_ON_CLOSE" ] && sh -c "$FAKE_HERDR_ON_CLOSE"; cat "$dir/pane-close-ok.json" ;;
   *) echo '{"error":{"code":"unknown_command","message":"fake"}}' >&2; exit 2 ;;

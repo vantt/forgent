@@ -2,7 +2,7 @@
 import '../helpers/process-tmp-root.mjs';
 import fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { ensureGitAddon, root } from '../helpers/git-addon.mjs';
+import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 const built=ensureGitAddon();
 const facade=`
 import { loadNativeAddon } from ${JSON.stringify(pathToFileURL(root+'/src/git/native.mjs').href)};

@@ -7,7 +7,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { spawn, execFileSync } from 'node:child_process';
 import { once } from 'node:events';
-import { ensureGitAddon, root } from '../helpers/git-addon.mjs';
+import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { createGitScopedCommit, createGitSync } from '../../src/git/index.mjs';
 const built = ensureGitAddon();
