@@ -196,8 +196,8 @@ fn deadline_kills_and_drains_even_when_child_never_reads_stdin() {
         &io,
     )
     .unwrap_err();
-    assert!(matches!(error, BorrowError::Deadline), "{error}");
-    assert_eq!(error.to_string(), "borrow-deadline");
+    assert!(matches!(error, BorrowError::Deadline { .. }), "{error}");
+    assert_eq!(error.to_string(), "borrow-deadline: terminated");
     pids_gone(&dir);
     assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
     assert!(matches!(release(held(&res)), fgos_holder_lock::Release::Released { .. }));
@@ -782,6 +782,41 @@ fn adopted_direct_child_is_drained_on_borrow_and_release() {
         assert!(matches!(result, Release::Released { .. }), "{result:?}");
         assert!(matches!(state, fgos_process::facts::Observed::Absent | fgos_process::facts::Observed::Zombie));
         assert!(matches!(release(held(&res)), Release::Released { .. }));
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[test]
+fn deadline_reports_cooperative_cleanup_or_forced_residue() {
+    let _serial = serial();
+    for cooperative in [true, false] {
+        let dir = temp_dir("io-term-lock");
+        let handle = held(&resource(&dir, "io"));
+        let script = format!(r#"import os,signal,time
+fd=os.open('index.lock',os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+def cleanup(sig,frame):
+ os.unlink('index.lock')
+ os._exit(0)
+signal.signal(signal.SIGTERM,{})
+open('ready','w').close()
+while True: time.sleep(.01)
+"#, if cooperative { "cleanup" } else { "signal.SIG_IGN" });
+        let spec = BorrowSpec {
+            argv: vec!["python3".into(), "-c".into(), script],
+            cwd: Some(dir.clone()),
+            ..Default::default()
+        };
+        let mut io = bounds(vec![]);
+        io.deadline = Instant::now() + Duration::from_secs(5);
+        let started = Instant::now();
+        let error = run_borrowed_io(&handle, &spec, &io).unwrap_err();
+        assert!(dir.join("ready").exists(), "handler was not installed");
+        let expected = if cooperative { Termination::Terminated } else { Termination::KilledAfterGrace };
+        assert!(matches!(error, BorrowError::Deadline { termination } if termination == expected), "{error}");
+        assert_eq!(dir.join("index.lock").exists(), !cooperative);
+        if !cooperative { assert!(started.elapsed() >= Duration::from_secs(8)); }
+        assert!(started.elapsed() < Duration::from_secs(15));
+        assert!(matches!(release(handle), Release::Released { .. }));
         fs::remove_dir_all(dir).unwrap();
     }
 }

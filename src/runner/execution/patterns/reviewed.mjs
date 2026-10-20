@@ -184,7 +184,7 @@ export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}) {
  * @param {object} [params] - Pattern parameters (from preset or caller).
  * @returns {Promise<{ outcome: string, rounds: number, results: Array<object>, findings: Array<string> }>}
  */
-export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, params = {}) {
+export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaunchRoom } = {}, params = {}) {
   const maxRounds = params?.maxRounds ?? cfg?.patterns?.reviewed?.maxRounds ?? 2;
   const priorResults = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
 
@@ -260,6 +260,12 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
         results: allResults,
         findings: [],
       };
+    }
+
+    // A round that cannot launch its seats under the Unit's seat-launch ceiling does not start: the run
+    // ends at the last evaluation it has, which found something (or the loop would not be here).
+    if (r > 1 && typeof hasLaunchRoom === 'function' && !hasLaunchRoom(1 + checkerList.length)) {
+      return { outcome: 'findings', rounds: r - 1, results: allResults, findings: allFindings };
     }
 
     // Round is live (partially or not in history)

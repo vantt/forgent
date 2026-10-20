@@ -116,7 +116,7 @@ function writeRunnerConfig(repoRoot, executorScript) {
         // The fixture domains' execute step resolves to the generic `execute` capability;
         // a Unit binds only from a pool the config names.
         capabilities: { execute: { prefer: [{ executor: 'fgos-coding-implement' }] } },
-        executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
+        executor: { providerModel: 'claude', allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
         modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
         rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
         timeoutMs: 15000,

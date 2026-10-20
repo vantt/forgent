@@ -10,7 +10,7 @@ import path from 'node:path';
 
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { resolveGitRoots } from '../runner/execution/run.mjs';
-import { appendWorkflowEvent, projectWorkflowState, readWorkflowEvents } from './store.mjs';
+import { projectWorkflowState, readWorkflowEvents } from './store.mjs';
 import {
   acquireAdvanceLock,
   advanceReport,
@@ -20,13 +20,12 @@ import {
   workflowRunDirOf,
 } from './case-lock.mjs';
 import { drainCaseInbox, recordGateAnswerRound } from './case-runtime.mjs';
-import { projectCase } from './case-projection.mjs';
-import { unbindWorktree } from './case-bindings.mjs';
-import { detachedResult, openCaseOnLedger, prepareWorkflowRun, spawnDetachedAdvance } from './case-start.mjs';
+import { closeCaseUnderHold, readCaseProjection } from './case-close.mjs';
+import { detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
 import { advanceWorkflowRun } from './runner.mjs';
 import { normalizeSeats } from './seats.mjs';
 import { seatProviders } from './seat-providers.mjs';
-import { playbookSubjectDigests, stepSubjectDigest } from './unit-handoff.mjs';
+import { stepSubjectDigest } from './unit-handoff.mjs';
 
 const isConductor = (projection) => projection.kind === 'guide';
 
@@ -41,12 +40,9 @@ function rootsOf(workflowRunId, options, verb) {
 
 /** The case as an agent reads it: the projection with the digests the playbook's subjects have now. */
 function readCase(mainRoot, workflowRunId) {
-  const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
-  if (events.length === 0) throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
-  const state = projectWorkflowState(events);
-  const guide = projectCase(events).guide;
-  const projection = projectCase(events, { currentDigests: playbookSubjectDigests({ state, workflow: state.workflow, guide, mainRoot }) });
-  return { events, state, projection };
+  const read = readCaseProjection(mainRoot, workflowRunId);
+  if (read.events.length === 0) throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
+  return read;
 }
 
 /** What `status` adds to a run's own fields: the projection, as one block. */
@@ -88,8 +84,14 @@ function conductorResult(mainRoot, workflowRunId, extra = {}) {
  * @returns {object} Projected state of the just-recorded run plus `detached: { pid, logPath, statusCommand }`
  */
 export function startWorkflowDetached(params = {}) {
-  const { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request } = prepareWorkflowRun(params);
-  withAdvanceLockSync(mainRoot, workflowRunId, (hold) => openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath }));
+  const { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request, parent } = prepareWorkflowRun(params);
+  let opened = false;
+  try {
+    withAdvanceLockSync(mainRoot, workflowRunId, (hold) => openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath, parent }));
+    opened = true;
+  } finally {
+    refundIfNotOpened({ mainRoot, parent, opened });
+  }
   if (workflow.guide.kind === 'guide') return conductorResult(mainRoot, workflowRunId);
   const detached = spawnDetachedAdvance({
     mainRoot,
@@ -120,13 +122,19 @@ export function startWorkflowDetached(params = {}) {
  * @returns {Promise<object>} Projected workflow state
  */
 export async function startWorkflow(params = {}) {
-  const { workflowRunId, workflow, mainRoot, worktreePath, frame, request } = prepareWorkflowRun(params);
+  const { workflowRunId, workflow, mainRoot, worktreePath, frame, request, parent } = prepareWorkflowRun(params);
 
-  return await withAdvanceLock(mainRoot, workflowRunId, async (hold) => {
-    openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath });
-    if (workflow.guide.kind === 'guide') return conductorResult(mainRoot, workflowRunId);
-    return advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, onLog: params.onLog });
-  });
+  let opened = false;
+  try {
+    return await withAdvanceLock(mainRoot, workflowRunId, async (hold) => {
+      openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath, parent });
+      opened = true;
+      if (workflow.guide.kind === 'guide') return conductorResult(mainRoot, workflowRunId);
+      return advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, onLog: params.onLog });
+    });
+  } finally {
+    refundIfNotOpened({ mainRoot, parent, opened });
+  }
 }
 
 /**
@@ -347,24 +355,13 @@ export function resumeWorkflowDetached(workflowRunId, options = {}) {
 export function closeWorkflow(workflowRunId, options = {}) {
   const { mainRoot } = rootsOf(workflowRunId, options, 'closeWorkflow');
   return withAdvanceLockSync(mainRoot, workflowRunId, (hold) => {
-    const { projection } = readCase(mainRoot, workflowRunId);
-    if (!projection.open) throw new RunnerConfigError(`Workflow case "${workflowRunId}" is already closed`, { code: 'case-closed' });
-    if (!projection.closable.ok) {
-      throw new RunnerConfigError(`Workflow case "${workflowRunId}" cannot close: ${projection.closable.reasons.join(', ')}`, { code: 'close-refused' });
+    readCase(mainRoot, workflowRunId);
+    const result = closeCaseUnderHold({ mainRoot, workflowRunId, hold, reason: options.reason });
+    if (!result.closed) {
+      throw result.code === 'case-closed'
+        ? new RunnerConfigError(`Workflow case "${workflowRunId}" is already closed`, { code: 'case-closed' })
+        : new RunnerConfigError(`Workflow case "${workflowRunId}" cannot close: ${result.reasons.join(', ')}`, { code: 'close-refused' });
     }
-    appendWorkflowEvent({
-      repoRoot: mainRoot,
-      workflowRunId,
-      hold,
-      event: { type: 'case.closed', payload: { closedAt: new Date().toISOString(), ...(options.reason ? { reason: options.reason } : {}) } },
-    });
-    const unbound = [];
-    const kept = [];
-    for (const binding of projection.bindings) {
-      const result = unbindWorktree({ mainRoot, hold, caseId: workflowRunId, generation: binding.generation, key: binding.key, worktree: binding.worktreeRoot });
-      if (result.unbound) unbound.push(binding.key);
-      else kept.push({ key: binding.key, reason: result.reason });
-    }
-    return { closed: true, caseId: workflowRunId, unbound, kept };
+    return { closed: true, caseId: workflowRunId, unbound: result.unbound, kept: result.kept };
   });
 }

@@ -1,6 +1,11 @@
 //! Opaque repository and seal authority stay in Rust for their entire lifetime.
+mod config;
+mod recovery;
+mod native_lock;
 mod scoped_commit;
 mod sync;
+mod land;
+mod restore;
 mod write_scope;
 #[allow(unused_imports)] // N-API registration is used by Node, not Rust unit tests.
 pub use write_scope::write_scope;
@@ -169,6 +174,7 @@ impl GitPublication {
             }
             "ensureFetchMapping" => Ok(json!(self.driver.ensure_fetch_mapping(repo, text(&args,"remote")?, &strings(&args,"refspecs")?, text(&args,"operationId")?).map_err(operation)?)),
             "recover" => Ok(json!(port.recover(repo,text(&args,"operationId")?).map_err(operation)?)),
+            "reconcile" => self.driver.reconcile_operation(repo, vec![], &self.writer, text(&args,"operationId")?, Some(&port)).map_err(operation),
             "supersede" => Ok(json!(port.supersede(repo,text(&args,"oldId")?,text(&args,"laterId")?).map_err(operation)?)),
             "configuredFetchRefspecs" | "pushRefspecs" => {
                 let remote = text(&args,"remote")?;

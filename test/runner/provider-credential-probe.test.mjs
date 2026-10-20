@@ -9,10 +9,10 @@ import path from 'node:path';
 import {
   createCredentialProbe,
   credentialProbeCommand,
-  expandCredentialHome,
   judgeProbeOutput,
   withKillTimeout,
 } from '../../src/runner/dispatch/provider-credential-probe.mjs';
+import { expandCredentialHome } from '../../src/runner/dispatch/provider-capacity.mjs';
 
 const codexSource = { kind: 'codex-home', home: '${HOME}/.codex-test' };
 const piSource = { kind: 'home-files', home: '/home/someone/.pi/accounts/x', files: ['auth.json', 'settings.json'] };

@@ -21,6 +21,7 @@ import { resolveExecutorAndOverrides, resolveExecutorConfig } from './dispatch/r
 import { DispatchError } from './dispatch/dispatch-error.mjs';
 import { resolveAgentTypeForTaskSpec, watchWritesOutsideWorkspace, strayWriteWarning } from './dispatch/cli.mjs';
 import { runUnit, resolveGitRoots } from './execution/run.mjs';
+import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHints, buildPrompt } from './work-compat.mjs';
 import { DOMAINS, getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';
 import { listWork } from '../state/store.mjs';
@@ -128,6 +129,8 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
     worktree: cwd,
     cwd,
     ...(repoRoot ? { repoRoot } : {}),
+    // The claim worktree is no case's: the real port answers `unbound` and the run goes on as before.
+    caseAdmission: createCaseAdmissionPort({ repoRoot: mainRoot }),
     session: { headless: true, herdrPresent: false },
     onUnitRunCreated: (id) => {
       unitRunId = id;

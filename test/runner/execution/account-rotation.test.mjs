@@ -1,6 +1,6 @@
 // test/runner/execution/account-rotation.test.mjs -- the pure decisions behind provider failover:
-// whether a failed seat has another account to rotate to, which families a walk must avoid, and how
-// bind() excludes them.
+// whether a failed seat has another account to rotate to, which pools a walk must avoid, how the
+// seat's earlier bindings are read back from its attempts, and how bind() excludes the pools.
 
 import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { bind, nextCandidate, retrySameCandidate } from '../../../src/runner/execution/bind.mjs';
-import { credentialFaultFamilies, inspectAccountRotation, mayRotateAccount } from '../../../src/runner/execution/account-rotation.mjs';
+import { credentialFaultPools, inspectAccountRotation, mayRotateAccount, triedBindingsOf } from '../../../src/runner/execution/account-rotation.mjs';
 import { quarantineProviderAccount } from '../../../src/runner/dispatch/provider-capacity.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -47,7 +47,7 @@ test('a retry needs a usable account and never exceeds the accounts the provider
   assert.equal(mayRotateAccount({ total: 2, healthy: 2 }, 1), false);
 });
 
-test('the rotation state counts the accounts of the executor\'s provider and drops the quarantined ones', () => {
+test('the rotation state counts the enabled accounts of the pool and drops the quarantined ones', () => {
   const home = makeFixtureDir('fgos-rotation-');
   try {
     const providers = {
@@ -61,27 +61,42 @@ test('the rotation state counts the accounts of the executor\'s provider and dro
     const cfg = runnerConfig(['alpha', 'beta'], providers);
     const runtimeDir = path.join(home, 'capacity');
     fs.mkdirSync(runtimeDir, { recursive: true });
-    assert.deepEqual(inspectAccountRotation({ runnerConfig: cfg, executorId: 'alpha', runtimeDir }), { provider: 'alpha', total: 2, healthy: 2 });
-    assert.equal(inspectAccountRotation({ runnerConfig: cfg, executorId: 'beta', runtimeDir }), null, 'a provider without inventory has nothing to rotate');
+    assert.deepEqual(inspectAccountRotation({ runnerConfig: cfg, pool: 'alpha', runtimeDir }), { pool: 'alpha', total: 2, healthy: 2 });
+    assert.equal(inspectAccountRotation({ runnerConfig: cfg, pool: 'beta', runtimeDir }), null, 'a pool without inventory has nothing to rotate');
     quarantineProviderAccount({ provider: 'alpha', accountId: 'a1', reasonCode: 'auth-token', quarantineKind: 'manual-clear', runtimeDir });
-    assert.deepEqual(inspectAccountRotation({ runnerConfig: cfg, executorId: 'alpha', runtimeDir }), { provider: 'alpha', total: 2, healthy: 1 });
+    assert.deepEqual(inspectAccountRotation({ runnerConfig: cfg, pool: 'alpha', runtimeDir }), { pool: 'alpha', total: 2, healthy: 1 });
   } finally {
     fs.rmSync(home, { recursive: true, force: true });
   }
 });
 
-test('nextCandidate skips a family the caller excludes and says it walked to the next candidate', () => {
+test('a disabled account of a declared pool is not one to rotate to', () => {
+  const home = makeFixtureDir('fgos-rotation-');
+  try {
+    const cfg = runnerConfig(['alpha']);
+    cfg.executors.alpha.invocations[0].credentialStore = { use: 'alpha', homeEnv: 'ALPHA_HOME', files: ['login'] };
+    cfg.llmAccounts = { alpha: { a1: { credentialStore: { alpha: home } }, a2: { credentialStore: { alpha: home }, disabled: true } } };
+    const runtimeDir = path.join(home, 'capacity');
+    fs.mkdirSync(runtimeDir, { recursive: true });
+    assert.deepEqual(inspectAccountRotation({ runnerConfig: cfg, pool: 'alpha', runtimeDir }), { pool: 'alpha', total: 1, healthy: 1 });
+  } finally {
+    fs.rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('nextCandidate skips a pool the caller excludes and says it walked to the next candidate', () => {
   const cfg = runnerConfig(['alpha', 'alpha-lite', 'beta']);
   const first = bind(ask, ctx(cfg));
   assert.equal(first.executor, 'alpha');
   const plain = nextCandidate(first, ask, ctx(cfg));
   assert.equal(plain.executor, 'alpha-lite');
   assert.equal(plain.provenance.fallbackFrom.kind, 'next-candidate');
-  const excluded = nextCandidate(first, ask, ctx(cfg), 'provider-limit', { excludeFamilies: ['Alpha'] });
+  assert.equal(plain.provenance.fallbackFrom.walk, 'entry', 'another executor of the same family is a step within the family');
+  const excluded = nextCandidate(first, ask, ctx(cfg), 'provider-limit', { excludePools: ['alpha'] });
   assert.equal(excluded.executor, 'beta');
-  assert.equal(excluded.candidateIndex, 2);
-  const none = nextCandidate(bind(ask, ctx(runnerConfig(['alpha', 'alpha-lite']))), ask, ctx(runnerConfig(['alpha', 'alpha-lite'])), 'provider-limit', { excludeFamilies: ['alpha'] });
-  assert.equal(none.refused.reason, 'family-excluded');
+  assert.equal(excluded.provenance.fallbackFrom.walk, 'family');
+  const none = nextCandidate(bind(ask, ctx(runnerConfig(['alpha', 'alpha-lite']))), ask, ctx(runnerConfig(['alpha', 'alpha-lite'])), 'provider-limit', { excludePools: ['alpha'] });
+  assert.equal(none.refused.reason, 'pool-excluded');
 });
 
 test('the walk keeps preferring a family the sibling seats did not use', () => {
@@ -96,34 +111,48 @@ test('the walk keeps preferring a family the sibling seats did not use', () => {
 test('a retry on another account is the same binding with provenance saying so', () => {
   const cfg = runnerConfig(['alpha', 'beta']);
   const first = bind(ask, ctx(cfg));
-  const retry = retrySameCandidate(first, { provider: 'alpha', accountsHealthy: 1 });
+  const retry = retrySameCandidate(first, { accountsHealthy: 1 });
   assert.equal(retry.executor, first.executor);
   assert.equal(retry.invocation, first.invocation);
-  assert.equal(retry.candidateIndex, first.candidateIndex);
+  assert.equal(retry.pool, first.pool);
+  assert.equal(retry.model, first.model);
   assert.deepEqual(retry.provenance.fallbackFrom, {
-    executor: 'alpha', invocation: first.invocation, transport: first.transport, reason: 'provider-limit', kind: 'account-rotation', provider: 'alpha', accountsHealthy: 1,
+    executor: 'alpha', invocation: first.invocation, transport: first.transport, pool: 'alpha', reason: 'provider-limit', kind: 'account-rotation', accountsHealthy: 1,
   });
   assert.equal(first.provenance.fallbackFrom, undefined, 'the original binding is left as it was');
 });
 
-test('the families to avoid are rebuilt from the attempts: only logins that failed and were walked away from', () => {
-  const cfg = runnerConfig(['alpha', 'beta', 'gamma']);
+test('the pools to avoid are rebuilt from the attempts: only logins that failed and were walked away from', () => {
   const unitRecord = {
-    configSnapshot: { runner: cfg },
     bindings: {
       'producer/1': [
-        { binding: { executor: 'alpha' }, outcome: 'provider-limit', failureCause: 'credential', boundAt: '2026-10-11T00:00:00.000Z' },
-        { binding: { executor: 'beta' }, outcome: 'provider-limit', fallbackFrom: { kind: 'next-candidate' }, boundAt: '2026-10-11T00:00:01.000Z' },
-        { binding: { executor: 'gamma' }, outcome: 'pass', fallbackFrom: { kind: 'next-candidate' }, boundAt: '2026-10-11T00:00:02.000Z' },
+        { binding: { executor: 'alpha', pool: 'alpha' }, outcome: 'provider-limit', failureCause: 'credential', boundAt: '2026-10-11T00:00:00.000Z' },
+        { binding: { executor: 'beta', pool: 'beta' }, outcome: 'provider-limit', fallbackFrom: { kind: 'next-candidate' }, boundAt: '2026-10-11T00:00:01.000Z' },
+        { binding: { executor: 'gamma', pool: 'gamma' }, outcome: 'pass', fallbackFrom: { kind: 'next-candidate' }, boundAt: '2026-10-11T00:00:02.000Z' },
       ],
       'other/1': [
-        { binding: { executor: 'gamma' }, outcome: 'provider-limit', failureCause: 'credential', boundAt: '2026-10-11T00:00:03.000Z' },
-        { binding: { executor: 'gamma' }, outcome: 'pass', fallbackFrom: { kind: 'account-rotation' }, boundAt: '2026-10-11T00:00:04.000Z' },
+        { binding: { executor: 'gamma', pool: 'router' }, outcome: 'provider-limit', failureCause: 'credential', boundAt: '2026-10-11T00:00:03.000Z' },
+        { binding: { executor: 'gamma', pool: 'router' }, outcome: 'pass', fallbackFrom: { kind: 'account-rotation' }, boundAt: '2026-10-11T00:00:04.000Z' },
+      ],
+      'old/1': [
+        { binding: { executor: 'alpha', candidateIndex: 0 }, outcome: 'provider-limit', failureCause: 'credential', boundAt: '2026-10-11T00:00:05.000Z' },
+        { binding: { executor: 'beta', candidateIndex: 1 }, outcome: 'pass', fallbackFrom: { kind: 'next-candidate' }, boundAt: '2026-10-11T00:00:06.000Z' },
       ],
     },
   };
-  assert.deepEqual([...credentialFaultFamilies(unitRecord)], ['alpha'], 'beta failed on a quota not a login, and a rotation did not leave gamma');
-  assert.deepEqual([...credentialFaultFamilies(unitRecord, { boundBefore: Date.parse('2026-10-11T00:00:00.500Z') })], [], 'a walk made after the attempt was bound is not known to it');
-  assert.deepEqual([...credentialFaultFamilies(unitRecord, { boundBefore: Date.parse('2026-10-11T00:00:01.000Z') })], ['alpha']);
-  assert.deepEqual([...credentialFaultFamilies({})], []);
+  assert.deepEqual([...credentialFaultPools(unitRecord)], ['alpha'], 'beta failed on a quota not a login, a rotation did not leave router, and a record without a pool is unreadable');
+  assert.deepEqual([...credentialFaultPools(unitRecord, { boundBefore: Date.parse('2026-10-11T00:00:00.500Z') })], [], 'a walk made after the attempt was bound is not known to it');
+  assert.deepEqual([...credentialFaultPools(unitRecord, { boundBefore: Date.parse('2026-10-11T00:00:01.000Z') })], ['alpha']);
+  assert.deepEqual([...credentialFaultPools({})], []);
+});
+
+test('the walk state of an attempt is the bindings before it, without the attempts a rotation repeats or a record that carries no pool', () => {
+  const attempt = (executor, pool, extra = {}) => ({ binding: pool === undefined ? { executor } : { executor, invocation: 'cli', pool, model: 'm' }, ...extra });
+  const attempts = [attempt('alpha', 'alpha'), attempt('alpha', 'alpha'), attempt('beta', 'beta'), attempt('gamma', undefined)];
+  assert.deepEqual(triedBindingsOf(attempts, 0), []);
+  assert.deepEqual(triedBindingsOf(attempts, 1).map((b) => b.executor), [], 'a rotation retry resumes where the attempt it retries did');
+  assert.deepEqual(triedBindingsOf(attempts, 2).map((b) => b.executor), ['alpha', 'alpha'], 'the walk step sees every attempt before it');
+  assert.deepEqual(triedBindingsOf(attempts, 3).map((b) => b.executor), ['alpha', 'alpha', 'beta']);
+  assert.deepEqual(triedBindingsOf(attempts, 4).map((b) => b.executor), ['alpha', 'alpha', 'beta'], 'an old record (no pool) is not walk state, the walk restarts at the primary for it');
+  assert.deepEqual(triedBindingsOf(undefined, 2), []);
 });

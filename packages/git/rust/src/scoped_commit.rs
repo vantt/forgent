@@ -1,6 +1,6 @@
 //! Exact, custody-backed commit transaction. Hooks run once, via Git.
 use crate::{
-    driver::{Output, Policy},
+    driver::Output,
     refs::{failure, recovery, Authority},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
@@ -11,7 +11,6 @@ use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
     path::Path,
-    time::Duration,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -199,7 +198,7 @@ impl GitDriver {
                             &chain,
                             Phase::Outcome(Outcome::CommitRejected {
                                 cause: if matches!(
-                                    chain.last().phase,
+                                    *chain.last_state(),
                                     Phase::Intent(_) | Phase::Prepared
                                 ) {
                                     "foreign-checkout-abandoned"
@@ -243,7 +242,7 @@ impl GitDriver {
             )
             .map_err(failure)?;
             if chain.outcome().is_none()
-                && matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared)
+                && matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared)
             {
                 fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
                 if let OperationKind::ScopedCommit(payload) = &chain.intent().kind {
@@ -338,7 +337,7 @@ impl GitDriver {
                 )
             }
             OperationKind::Sync(payload) => {
-                let Phase::SyncCommitAttempt { tree } = &chain.last().phase else {
+                let Phase::SyncCommitAttempt { tree } = chain.last_state() else {
                     return Err(recovery("sync-state-recovery-required"));
                 };
                 (
@@ -478,7 +477,10 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<Outcome> {
-        let scope = scope(repo, held)?;
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
+        let mut scope = scope(repo, held)?;
+        crate::recovery::leaf(&mut scope, repo)?;
         let wal = Wal::open(repo).map_err(failure)?;
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
             let intent = Intent {
@@ -520,7 +522,7 @@ impl GitDriver {
             return Ok(outcome.clone());
         }
         fgos_holder_lock::validate_quiescent(handle(&scope, repo)?).map_err(failure)?;
-        let outcome = if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
+        let outcome = if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
             let baseline: CommitBaseline =
                 serde_json::from_str(&payload.baseline).map_err(failure)?;
             if self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])? == baseline.head
@@ -532,7 +534,8 @@ impl GitDriver {
         } else {
             match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                _ => return Err(recovery("commit-index-lock-present")),
+                Ok(_) => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
+                Err(e) => return Err(failure(e)),
             }
             let baseline: CommitBaseline =
                 serde_json::from_str(&payload.baseline).map_err(failure)?;
@@ -582,16 +585,6 @@ impl GitDriver {
         input: &[u8],
         hooks: bool,
     ) -> Result<Output> {
-        self.require_floor()?;
-        self.preflight(repo)?;
-        // Re-resolve topology, including reciprocal registration, before every child.
-        let current = match self.resolve_repo(root(repo)?, repo.trusted_main_root())? {
-            ResolveRepo::Repository(r) => r,
-            _ => return Err(failure("untrusted-worktree")),
-        };
-        if current.git_dir != repo.git_dir || current.work_tree != repo.work_tree {
-            return Err(failure("untrusted-worktree"));
-        }
         let h = handle(scope, repo)?;
         #[cfg(unix)]
         if h.name() == "dispatch-cwd"
@@ -599,21 +592,7 @@ impl GitDriver {
         {
             return Err(failure("checkout-custody-stale"));
         }
-        self.invoke_input(
-            Some(repo),
-            root(repo)?,
-            args,
-            if hooks {
-                Policy::HookContext
-            } else {
-                Policy::Publication
-            },
-            Some(h),
-            true,
-            64 * 1024 * 1024,
-            Duration::from_secs(120),
-            input,
-        )
+        self.checkout_call_borrowed(repo, h, args, input, hooks)
     }
     pub(crate) fn checkout_bytes(
         &self,
@@ -703,7 +682,7 @@ impl GitDriver {
             Err(out.error("merge-head-unreadable"))
         }
     }
-    fn dirty_paths(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<Vec<String>> {
+    pub(crate) fn dirty_paths(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<Vec<String>> {
         let mut result = paths(&self.checkout_bytes(
             repo,
             scope,
@@ -730,6 +709,8 @@ impl GitDriver {
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,
     ) -> Result<CommitBaseline> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         if self.merge_head(repo, &scope)?.is_some() {
             return Err(failure("foreign-merge-head"));
@@ -761,6 +742,8 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<CommitResult> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         self.commit_scoped(repo, &scope, baseline, request, writer, id)
     }
@@ -953,7 +936,8 @@ impl GitDriver {
         }
         let excluded: BTreeSet<_> = baseline.dirty.iter().map(|(p, _)| p).collect();
         let mut selected = vec![];
-        for path in self.dirty_paths(repo, scope)? {
+        let dirty_paths = self.dirty_paths(repo, scope)?;
+        for path in dirty_paths.iter().cloned() {
             if !excluded.contains(&path)
                 && fgos_write_scope::matches(path.as_bytes(), &writes).map_err(failure)?
             {
@@ -982,7 +966,7 @@ impl GitDriver {
             {
                 let fence = ".fgos/events".to_string();
                 let tracked = paths(&self.checkout_bytes(repo, scope, &["ls-files", "-z"])?)?;
-                if !tracked.contains(&fence) || self.dirty_paths(repo, scope)?.contains(&fence) {
+                if !tracked.contains(&fence) || dirty_paths.contains(&fence) {
                     selected.push(fence);
                 }
             }
@@ -1038,7 +1022,7 @@ impl GitDriver {
         // Snapshot producer bytes before staging. Clean tracked paths retain
         // only a HEAD marker; dirty, ignored and absent paths retain their state.
         let checkout = root(repo)?;
-        let dirty: BTreeSet<_> = self.dirty_paths(repo, scope)?.into_iter().collect();
+        let dirty: BTreeSet<_> = dirty_paths.into_iter().collect();
         let inventory = paths(&self.checkout_bytes(repo, scope, &["ls-files", "-v", "-z"])?)?;
         let skipped: BTreeSet<_> = inventory
             .iter()
@@ -1166,7 +1150,13 @@ impl GitDriver {
                 request.message.as_bytes(),
                 true,
             )?;
-            let observed = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
+            // One immutable header observation binds oid, tree and parents together.
+            let header = self.checkout_text(repo, scope, &["show", "-s", "--format=%H%x00%T%x00%P%x00", "HEAD"])?;
+            let mut fields = header.split_terminator('\0');
+            let observed = fields.next().ok_or_else(|| recovery("commit-header-invalid"))?.to_owned();
+            let actual_tree = fields.next().ok_or_else(|| recovery("commit-header-invalid"))?;
+            let parents = fields.next().ok_or_else(|| recovery("commit-header-invalid"))?;
+            if fields.next().is_some() { return Err(recovery("commit-header-invalid")); }
             if observed == baseline.head {
                 // Keep the attempt durable. Retrying uses a new id after a fresh preflight.
                 if !out.success {
@@ -1181,7 +1171,6 @@ impl GitDriver {
                 }
                 return Err(recovery("commit-effect-unknown"));
             }
-            let actual_tree = self.checkout_text(repo, scope, &["rev-parse", "HEAD^{tree}"])?;
             let actual = paths(&self.checkout_bytes(
                 repo,
                 scope,
@@ -1194,12 +1183,10 @@ impl GitDriver {
                     &observed,
                 ],
             )?)?;
-            let parents =
-                self.checkout_text(repo, scope, &["rev-list", "--parents", "-n", "1", "HEAD"])?;
             let violation = !out.success
                 || actual_tree != tree
                 || actual != selected
-                || parents.split_whitespace().skip(1).collect::<Vec<_>>()
+                || parents.split_whitespace().collect::<Vec<_>>()
                     != vec![baseline.head.as_str()];
             let oid = Oid::parse(&observed, repo.object_format()).map_err(failure)?;
             crate::refs::sync_refs(repo, &RefName::parse(&baseline.reference).map_err(failure)?)?;
@@ -1298,7 +1285,7 @@ impl GitDriver {
         }
         if prepared.is_err() && wal.known_id(id).map_err(failure)? {
             let chain = wal.inspect(id).map_err(failure)?;
-            if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
+            if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
                 wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                     .map_err(failure)?;
             }
@@ -1353,6 +1340,8 @@ impl GitDriver {
         {
             return Err(failure("checkpoint-non-event-main-required"));
         }
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         let tracked = paths(&self.checkout_bytes(repo, &scope, &["ls-files", "-z"])?)?;
         if files
@@ -1405,22 +1394,46 @@ fn content_digest(root: &Path, path: &str) -> Result<String> {
 
 // Transaction-local snapshot: uncertain/crashed attempts retain their WAL and
 // refuse replay; any inline failure with unchanged HEAD restores producer bytes.
-enum SavedPath {
+#[derive(Serialize, Deserialize)]
+pub(crate) enum SavedPath {
+    #[serde(skip)]
     Head(Option<fs::Permissions>),
     Absent,
-    File(Vec<u8>, fs::Permissions),
+    File(Vec<u8>, #[serde(with = "saved_permissions")] fs::Permissions),
     Link(std::path::PathBuf),
 }
 impl SavedPath {
-    fn capture(path: &Path) -> Result<Self> {
+    pub(crate) fn capture(path: &Path) -> Result<Self> {
+        Self::capture_bounded(path, u64::MAX - 1)
+    }
+    pub(crate) fn capture_bounded(path: &Path, limit: u64) -> Result<Self> {
+        use std::io::Read;
         match fs::symlink_metadata(path) {
             Ok(m) if m.file_type().is_symlink() => {
                 Ok(Self::Link(fs::read_link(path).map_err(failure)?))
             }
-            Ok(m) if m.is_file() => Ok(Self::File(
-                fs::read(path).map_err(failure)?,
-                m.permissions(),
-            )),
+            Ok(m) if m.is_file() => {
+                let mut options = fs::OpenOptions::new();
+                options.read(true);
+                #[cfg(unix)]
+                {
+                    use std::os::unix::fs::OpenOptionsExt;
+                    options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
+                }
+                let file = options.open(path).map_err(failure)?;
+                let actual = file.metadata().map_err(failure)?;
+                if !actual.is_file() || actual.len() > limit {
+                    return Err(failure("snapshot-file-capacity-or-type"));
+                }
+                let mut bytes = Vec::new();
+                file.take(limit.saturating_add(1))
+                    .read_to_end(&mut bytes)
+                    .map_err(failure)?;
+                if bytes.len() as u64 > limit {
+                    return Err(failure("snapshot-file-capacity"));
+                }
+                Ok(Self::File(bytes, actual.permissions()))
+            }
             Ok(_) => Err(failure("commit-snapshot-non-file")),
             Err(e)
                 if matches!(
@@ -1433,7 +1446,7 @@ impl SavedPath {
             Err(e) => Err(failure(e)),
         }
     }
-    fn restore(&self, path: &Path) -> std::io::Result<()> {
+    pub(crate) fn restore(&self, path: &Path) -> std::io::Result<()> {
         // Do not follow a hook-created parent symlink outside the checkout.
         for parent in path.ancestors().skip(1) {
             if fs::symlink_metadata(parent).is_ok_and(|m| m.file_type().is_symlink()) {
@@ -1478,6 +1491,38 @@ impl SavedPath {
                     Err(std::io::Error::other("snapshot symlink unsupported"))
                 }
             }
+        }
+    }
+}
+
+mod saved_permissions {
+    use super::*;
+    pub fn serialize<S: serde::Serializer>(
+        p: &fs::Permissions,
+        s: S,
+    ) -> std::result::Result<S::Ok, S::Error> {
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            p.mode().serialize(s)
+        }
+        #[cfg(not(unix))]
+        {
+            p.readonly().serialize(s)
+        }
+    }
+    pub fn deserialize<'de, D: serde::Deserializer<'de>>(
+        d: D,
+    ) -> std::result::Result<fs::Permissions, D::Error> {
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            Ok(fs::Permissions::from_mode(u32::deserialize(d)?))
+        }
+        #[cfg(not(unix))]
+        {
+            let _ = d;
+            Err(serde::de::Error::custom("snapshot-platform-unsupported"))
         }
     }
 }

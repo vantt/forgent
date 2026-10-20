@@ -252,7 +252,7 @@ if (priorRuns === 0) {
 }
 
 const DUMMY_CONFIG = {
-  executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+  executor: { providerModel: 'claude', allowCrossProvider: true, command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
   modelPolicies: {
     claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
     node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
@@ -1593,7 +1593,7 @@ test('bin/fgos-runner.mjs run from a SUBDIRECTORY of another repo operates on th
     path.join(repoRoot, '.fgos', 'config.json'),
     JSON.stringify({
       runner: confinedRunnerConfig({
-        executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
+        executor: { providerModel: 'node', allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
         modelPolicies: { node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
         timeoutMs: 30000,
       }),
@@ -1908,7 +1908,7 @@ test('wgi-8: even a TIMED-OUT worker (output on the err.stdout path) has its fgo
   const body = JSON.stringify({ title: 'Investigate the slow path' });
   const scriptPath = writeHangingDiscoveringExecutor(scriptDir, body);
   const config = {
-    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executor: { providerModel: 'node', allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}'] },
     modelPolicies: { node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
     timeoutMs: 400,
   };

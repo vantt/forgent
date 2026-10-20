@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { readUnitRunSeats } from './unit-run-history.mjs';
+import { normalizeWorkflowLink } from './unit.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
 import { reviewedHistoryOutcome } from './patterns/reviewed.mjs';
 import { resolvePanelRoles, VALID_OUTCOMES } from './patterns/panel.mjs';
@@ -33,8 +34,7 @@ function timestamp(value) {
 }
 
 function workflowLink(value) {
-  return value && ['runId', 'stepId', 'unitId'].every((key) => typeof value[key] === 'string' && value[key].trim())
-    ? { runId: value.runId, stepId: value.stepId, unitId: value.unitId } : null;
+  try { return normalizeWorkflowLink(value); } catch { return null; }
 }
 
 /** A published attempt without its terminal result remains unsettled, even after a crash. */

@@ -71,19 +71,99 @@ impl wal::PublicationAuthority for Authority<'_> {
         Ok(())
     }
 }
+fn checkout_facts(rows: &[(WorktreeFact, Option<RepoHandle>)]) -> Vec<(Vec<u8>, Option<RefName>)> {
+    rows.iter()
+        .map(|(f, _)| (f.path.clone(), f.branch.clone()))
+        .collect()
+}
+/// Shared post-attempt classification. Only a third-party tip is a CAS loss.
+pub(crate) fn classify_ref_attempt(
+    out: crate::driver::Output,
+    observed: &ExpectedTip,
+    old: &ExpectedTip,
+    next: &ExpectedTip,
+    before: &[(WorktreeFact, Option<RepoHandle>)],
+    after: &[(WorktreeFact, Option<RepoHandle>)],
+) -> Result<bool> {
+    if checkout_facts(before) != checkout_facts(after) {
+        return Err(recovery("checkout-switch-recovery-required"));
+    }
+    if !out.success {
+        if observed == old || observed == next {
+            return Err(out.error("ref-write-failed-recovery-required"));
+        }
+        return Ok(true);
+    }
+    if observed != next {
+        return Err(recovery("ref-read-back-recovery-required"));
+    }
+    Ok(false)
+}
 pub(crate) fn admission<F: wal::FileSystem>(
     wal: &Wal<F>,
     id: &str,
     resources: &[String],
+) -> Result<()> {
+    admission_with_land(wal, id, resources, None)
+}
+pub(crate) fn admission_land<F: wal::FileSystem>(
+    wal: &Wal<F>,
+    id: &str,
+    resources: &[String],
+    binding: &str,
+    driver: &GitDriver,
+    repo: &RepoHandle,
+) -> Result<()> {
+    admission_with_land(wal, id, resources, Some((binding, driver, repo)))
+}
+fn admission_with_land<F: wal::FileSystem>(
+    wal: &Wal<F>,
+    id: &str,
+    resources: &[String],
+    land_binding: Option<(&str, &GitDriver, &RepoHandle)>,
 ) -> Result<()> {
     let scan = wal.scan(100_000).map_err(failure)?;
     if !scan.complete || scan.entries.iter().any(|e| e.error.is_some()) {
         return Err(recovery("git-wal-unreadable"));
     }
     for chain in wal.active(100_000).map_err(failure)? {
+        let exempt = if let Some((binding, driver, repo)) = land_binding {
+            if binding == chain.intent().authority_binding
+                && matches!(&chain.intent().kind, OperationKind::Land(_))
+            {
+                let attempted = chain
+                    .records()
+                    .iter()
+                    .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }));
+                if !attempted {
+                    true
+                } else {
+                    let OperationKind::Land(p) = &chain.intent().kind else {
+                        unreachable!()
+                    };
+                    let current = direct(
+                        driver,
+                        repo,
+                        &RefName::parse(&p.request.destination).map_err(failure)?,
+                    )?;
+                    match (&chain.intent().next, current) {
+                        (Tip::Oid(next), ExpectedTip::Oid(current)) => {
+                            let next = Oid::parse(next, repo.object_format()).map_err(failure)?;
+                            current != next && !driver.ancestry(repo, &next, &current)?
+                        }
+                        _ => true,
+                    }
+                }
+            } else {
+                false
+            }
+        } else {
+            false
+        };
         if chain.last().operation_id != id
             && chain.intent().resource_set.iter().any(|r| {
-                resources.contains(r)
+                (resources.contains(r) && !(exempt
+                    && matches!(&chain.intent().kind, OperationKind::Land(p) if &p.request.destination == r)))
                     || matches!(
                         chain.intent().kind,
                         OperationKind::WorktreeCreate { .. }
@@ -96,7 +176,7 @@ pub(crate) fn admission<F: wal::FileSystem>(
                     })
             })
         {
-            return Err(recovery("resource-recovery-required"));
+            return Err(pending(recovery("resource-recovery-required"), &chain.last().operation_id));
         }
     }
     Ok(())
@@ -255,7 +335,7 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
     wal: &Wal<F>,
     terminal: &wal::Chain,
 ) -> Result<()> {
-    if matches!(terminal.last().phase, Phase::PinReleased) {
+    if matches!(terminal.last_state(), Phase::PinReleased) {
         return Ok(());
     }
     let candidate = match terminal.intent().candidate() {
@@ -267,7 +347,7 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
         terminal.last().operation_id
     ))
     .map_err(failure)?;
-    let release = if matches!(terminal.last().phase, Phase::PinReleaseAttempt { .. }) {
+    let release = if matches!(terminal.last_state(), Phase::PinReleaseAttempt { .. }) {
         terminal.clone()
     } else {
         wal.append(
@@ -310,6 +390,49 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
     Ok(())
 }
 impl GitDriver {
+    pub(crate) fn ignored_checkout_collisions(
+        &self,
+        repo: &RepoHandle,
+        candidate: &str,
+    ) -> Result<Vec<Vec<u8>>> {
+        let ignored = self.checked(
+            repo,
+            &[
+                "ls-files",
+                "--full-name",
+                "--others",
+                "--ignored",
+                "--exclude-standard",
+                "-z",
+            ],
+            Policy::Inspect,
+        )?;
+        let incoming = self.checked(
+            repo,
+            &["ls-tree", "-r", "--name-only", "-z", candidate],
+            Policy::Inspect,
+        )?;
+        let incoming: std::collections::BTreeSet<&[u8]> = incoming
+            .split(|b| *b == 0)
+            .filter(|p| !p.is_empty())
+            .collect();
+        Ok(ignored
+            .split(|b| *b == 0)
+            .filter(|p| !p.is_empty())
+            .filter(|p| {
+                incoming.contains(*p)
+                    || p.iter()
+                        .enumerate()
+                        .any(|(i, b)| *b == b'/' && incoming.contains(&p[..i]))
+                    || incoming.range(*p..).next().is_some_and(|q| {
+                        q.strip_prefix(*p)
+                            .is_some_and(|rest| rest.starts_with(b"/"))
+                    })
+            })
+            .map(<[u8]>::to_vec)
+            .collect())
+    }
+
     pub(crate) fn checkouts(
         &self,
         repo: &RepoHandle,
@@ -325,8 +448,25 @@ impl GitDriver {
                 let resolved = if fact.bare {
                     None
                 } else {
-                    match self.resolve_repo(&path(&fact.path)?, repo.trusted_main_root())? {
-                        ResolveRepo::Repository(r) => Some(r),
+                    match self.resolve_topology(&path(&fact.path)?, repo.trusted_main_root())? {
+                        ResolveRepo::Repository(mut r) => {
+                            // Same checkout, same operation: reuse stamp-validated facts.
+                            // Other worktrees can have different worktree config.
+                            if let Some(config) = repo.checkout_config.as_ref().filter(|_| r.same_checkout(repo)) {
+                                r.object_format = repo.object_format;
+                                r.layout = repo.layout.clone();
+                                r.checkout_config = Some(std::sync::Mutex::new(
+                                    config.lock()
+                                        .map_err(|_| failure("config-cache-poisoned"))?.clone(),
+                                ));
+                            } else {
+                                r = match self.resolve_repo(&path(&fact.path)?, repo.trusted_main_root())? {
+                                    ResolveRepo::Repository(r) => r,
+                                    _ => return Err(failure("worktree-registration-uncertain")),
+                                };
+                            }
+                            Some(r)
+                        },
                         _ => return Err(failure("worktree-registration-uncertain")),
                     }
                 };
@@ -626,39 +766,9 @@ impl GitDriver {
             // read-tree's dry-run does not consistently reject ignored-file
             // replacement. Preserve ignored content by checking its byte paths
             // against the incoming tree, including file/directory collisions.
-            let ignored = self.checked(
-                target,
-                &[
-                    "ls-files",
-                    "--full-name",
-                    "--others",
-                    "--ignored",
-                    "--exclude-standard",
-                    "-z",
-                ],
-                Policy::Inspect,
-            )?;
-            let incoming = self.checked(
-                target,
-                &["ls-tree", "-r", "--name-only", "-z", next.as_str()],
-                Policy::Inspect,
-            )?;
-            let incoming: std::collections::BTreeSet<&[u8]> = incoming
-                .split(|b| *b == 0)
-                .filter(|p| !p.is_empty())
-                .collect();
-            let collision = ignored
-                .split(|b| *b == 0)
-                .filter(|p| !p.is_empty())
-                .any(|p| {
-                    incoming.contains(p)
-                        || p.iter()
-                            .enumerate()
-                            .any(|(i, b)| *b == b'/' && incoming.contains(&p[..i]))
-                        || incoming.range(p..).next().is_some_and(|q| {
-                            q.strip_prefix(p).is_some_and(|rest| rest.starts_with(b"/"))
-                        })
-                });
+            let collision = !self
+                .ignored_checkout_collisions(target, next.as_str())?
+                .is_empty();
             if collision {
                 let terminal = wal
                     .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
@@ -746,19 +856,7 @@ impl GitDriver {
                 self.publication_call(repo, admin, &args, &[], false, Duration::from_secs(30))?;
             filesystem.checkpoint("after-target-cas").map_err(failure)?;
             let observed = direct(self, repo, name)?;
-            let after = self.checkouts(repo)?;
-            let facts = |rows: &Vec<(WorktreeFact, Option<RepoHandle>)>| {
-                rows.iter()
-                    .map(|(f, _)| (f.path.clone(), f.branch.clone()))
-                    .collect::<Vec<_>>()
-            };
-            if facts(&before) != facts(&after) {
-                return Err(recovery("checkout-switch-recovery-required"));
-            }
-            if !out.success {
-                if observed == *old {
-                    return Err(out.error("ref-write-failed-recovery-required"));
-                }
+            if classify_ref_attempt(out, &observed, old, next, &before, &self.checkouts(repo)?)? {
                 let terminal = wal
                     .append(
                         &attempted,
@@ -769,9 +867,6 @@ impl GitDriver {
                     .map_err(failure)?;
                 release_pin(self, repo, admin, &wal, &terminal)?;
                 return Err(stale("compare-and-swap-stale"));
-            }
-            if observed != *next {
-                return Err(recovery("ref-read-back-recovery-required"));
             }
             if let Some(target) = tree {
                 scope.validate().map_err(failure)?;
@@ -806,7 +901,9 @@ impl GitDriver {
                 }
             }
             let final_checkouts = self.checkouts(repo)?;
-            if facts(&before) != facts(&final_checkouts) || direct(self, repo, name)? != *next {
+            if checkout_facts(&before) != checkout_facts(&final_checkouts)
+                || direct(self, repo, name)? != *next
+            {
                 return Err(recovery("checkout-read-back-recovery-required"));
             }
             sync_refs(repo, name)?;
@@ -926,4 +1023,47 @@ pub(crate) fn branch_in_use(
         }
     }
     Ok(in_use)
+}
+
+impl GitDriver {
+    /// Observe one interrupted ref mutation; never repeat its CAS or checkout.
+    pub fn recover_ref_operation(&self, repo: &RepoHandle, held: Vec<BorrowedHandle<'_>>, writer: &str, id: &str) -> Result<Outcome> {
+        let mut scope = acquire_worktree_admin(repo, held)?;
+        crate::recovery::leaf(&mut scope, repo)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
+        let chain = wal.inspect(id).map_err(failure)?;
+        let i = chain.intent();
+        if !matches!(i.kind, OperationKind::RefUpdate {..} | OperationKind::RefDelete) { return Err(failure("not-ref-operation")); }
+        if i.writer_identity != writer || i.repo_identity != wal.repository_identity()
+            || i.authority_binding != wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root())).map_err(failure)? {
+            return Err(failure("ref-authority-mismatch"));
+        }
+        if let Some(o) = chain.outcome() {
+            release_pin(self, repo, scope.handle("worktree-admin").expect("acquired"), &wal, &chain)?;
+            return Ok(o.clone());
+        }
+        let attempted = chain.records().iter().any(|r| matches!(r.phase, Phase::TargetAttempt {..}));
+        let outcome = if !attempted { Outcome::AbandonedBeforeAttempt } else {
+            if let OperationKind::RefUpdate { worktree: Some(path) } = &i.kind {
+                let target = match self.resolve_repo(Path::new(path), repo.trusted_main_root())? {
+                    ResolveRepo::Repository(r) => r, _ => return Err(recovery("ref-checkout-missing")),
+                };
+                let custody = scope.handle("dispatch-cwd").ok_or_else(|| failure("checkout-custody-required"))?;
+                if custody.path() != custody_lock_path(repo,Path::new(path))? { return Err(failure("checkout-custody-mismatch")); }
+                if !self.status(&target,Untracked::All,None,1)?.entries.is_empty() {
+                    return Err(recovery("ref-checkout-recovery-required"));
+                }
+            }
+            if wal.native_lock_present(i).map_err(failure)? {
+                return Err(recovery("ref-checkout-or-native-state-recovery-required"));
+            }
+            let name = RefName::parse(&i.resource_set[0]).map_err(failure)?;
+            let observed = tip(&direct(self, repo, &name)?);
+            if observed == i.next { Outcome::Success { observed, attribution: wal::Attribution::EffectObservedOnly } }
+            else { return Err(recovery("ref-effect-unknown")); }
+        };
+        let terminal = wal.append(&chain, Phase::Outcome(outcome.clone())).map_err(failure)?;
+        release_pin(self, repo, scope.handle("worktree-admin").expect("acquired"), &wal, &terminal)?;
+        Ok(outcome)
+    }
 }

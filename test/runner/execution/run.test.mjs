@@ -8,7 +8,8 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 
-import { runUnit, recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
+import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
+import { recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -442,17 +443,19 @@ test('mutating gate: refuses an assignment that pins an executor other than the 
   assert.ok(verified.executor, 'fixture must produce a real binding');
   const pinned = {
     ...baseAssignment,
-    binding: { executor: verified.executor, tier: verified.tier, posture: verified.posture },
+    binding: { executor: verified.executor, pool: verified.pool, tier: verified.tier, posture: verified.posture },
     policy: { preferExecutor: 'rogue-executor' },
   };
   await assert.rejects(() => run(pinned), /pins executor "rogue-executor"/);
 });
 
-const gateAttempt = (unitRunId, n, executor, candidateIndex, outcome) => ({
+// What bind() records for each fixture executor: its own family is its pool, and its cell's model.
+const gateBinding = (executor) => ({ executor, invocation: 'cli-default', pool: executor === 'test-node' ? 'node' : 'node2', model: 'node-std' });
+const gateAttempt = (unitRunId, n, executor, outcome) => ({
   role: 'producer',
   round: 1,
   assignmentId: n === 0 ? `${unitRunId}/producer/1` : `${unitRunId}/producer/1-fb${n}`,
-  binding: { executor, candidateIndex },
+  binding: gateBinding(executor),
   ...(outcome ? { outcome } : {}),
 });
 
@@ -460,7 +463,7 @@ test('mutating gate: a fallback attempt must follow a provider-limit attempt the
   // Attempt 0 settled as a pass, yet the assignment claims the second candidate.
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
-    attempts: (id) => [gateAttempt(id, 0, 'test-node', 0, 'pass'), gateAttempt(id, 1, 'test-node-2', 1)],
+    attempts: (id) => [gateAttempt(id, 0, 'test-node', 'pass'), gateAttempt(id, 1, 'test-node-2')],
   });
   const forged = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node-2', tier: 'standard', posture: 'workspace-write' } };
   await assert.rejects(() => run(forged), /binding mismatch/);
@@ -469,7 +472,7 @@ test('mutating gate: a fallback attempt must follow a provider-limit attempt the
 test('mutating gate: an assignment the runner never recorded cannot claim a fallback binding', async () => {
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
-    attempts: (id) => [gateAttempt(id, 0, 'test-node', 0, 'provider-limit')],
+    attempts: (id) => [gateAttempt(id, 0, 'test-node', 'provider-limit')],
   });
   const forged = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node-2', tier: 'standard', posture: 'workspace-write' } };
   await assert.rejects(() => run(forged), /binding mismatch/);
@@ -478,7 +481,7 @@ test('mutating gate: an assignment the runner never recorded cannot claim a fall
 test('mutating gate: a recorded fallback attempt cannot be rebound to the candidate that already hit its limit', async () => {
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
-    attempts: (id) => [gateAttempt(id, 0, 'test-node', 0, 'provider-limit'), gateAttempt(id, 1, 'test-node-2', 1)],
+    attempts: (id) => [gateAttempt(id, 0, 'test-node', 'provider-limit'), gateAttempt(id, 1, 'test-node-2')],
   });
   const replay = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node', tier: 'standard', posture: 'workspace-write' } };
   await assert.rejects(() => run(replay), /binding mismatch/);
@@ -486,13 +489,13 @@ test('mutating gate: a recorded fallback attempt cannot be rebound to the candid
 
 test('mutating gate: a producer cannot borrow the fallback attempt of another role or round', async () => {
   const other = (id, role, round) => [
-    { role, round, assignmentId: `${id}/${role}/${round}`, binding: { executor: 'test-node', candidateIndex: 0 }, outcome: 'provider-limit' },
-    { role, round, assignmentId: `${id}/${role}/${round}-fb1`, binding: { executor: 'test-node-2', candidateIndex: 1 } },
+    { role, round, assignmentId: `${id}/${role}/${round}`, binding: gateBinding('test-node'), outcome: 'provider-limit' },
+    { role, round, assignmentId: `${id}/${role}/${round}-fb1`, binding: gateBinding('test-node-2') },
   ];
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
     bindings: (id) => ({
-      'producer/1': [gateAttempt(id, 0, 'test-node', 0, 'pass')],
+      'producer/1': [gateAttempt(id, 0, 'test-node', 'pass')],
       'checker/1': other(id, 'checker', 1),
       'producer/2': other(id, 'producer', 2),
     }),
@@ -547,6 +550,7 @@ function reviewedConfig(repoRoot, executorNames) {
     };
   }
   cfg.runner.executors = executors;
+  for (const name of executorNames) cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   const prefer = executorNames.map((executor) => ({ executor }));
   cfg.runner.capabilities['docs:write'] = { prefer, rigor: 'standard' };
   cfg.runner.capabilities['docs:review'] = { prefer, persona: 'code-reviewer', rigor: 'standard' };

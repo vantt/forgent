@@ -69,7 +69,22 @@ impl FileSystem for OsFileSystem {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct HooksChange {
+    pub old: Option<String>,
+    pub next: Option<String>,
+    pub owner_path: String,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct ConfigChange {
+    /// RepositoryConfig assigns this under repo-config authority. Historical
+    /// chains omit it, preserving their canonical digests.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub config_sequence: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub staging: Option<crate::NativeLockArtifact>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hooks: Option<HooksChange>,
     pub remote: String,
     pub url: String,
     pub refspecs: Vec<String>,
@@ -103,7 +118,12 @@ pub struct SyncIntent {
     pub message: String,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct LandIntent { pub request: crate::LandRequest, pub candidate: crate::LandCandidate }
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
+    Land(Box<LandIntent>),
+    Restore(Box<crate::restore::RestoreIntent>),
     ScopedCommit(Box<ScopedCommitIntent>),
     Sync(Box<SyncIntent>),
     PublicationCas,
@@ -156,6 +176,7 @@ pub struct Intent {
     pub expected: Tip,
     pub next: Tip,
 }
+fn is_false(value: &bool) -> bool { !value }
 /// Strings are validated against Intent.objectFormat before use, including on
 /// reads; serde is never a way around Oid/RefName validation.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -174,6 +195,8 @@ pub enum Attribution {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase", deny_unknown_fields)]
 pub enum Outcome {
+    Restore { state: String },
+    Land { checkout: String, #[serde(default, rename = "observedOnly", skip_serializing_if = "is_false")] observed_only: bool },
     Commit {
         observed: String,
         contract_violation: bool,
@@ -215,6 +238,10 @@ pub enum Outcome {
     deny_unknown_fields
 )]
 pub enum Phase {
+    NativeLockOwned(crate::NativeLockArtifact),
+    RestoreAcknowledged,
+    RestoreApplied { snapshot: String },
+    LandVerified { evidence: crate::LandEvidence, #[serde(default, skip_serializing_if = "Option::is_none")] checkout: Option<String> },
     Intent(Intent),
     Prepared,
     SyncState {
@@ -355,6 +382,33 @@ impl Intent {
             || self.resource_set.is_empty()
         {
             return Err(corrupt("intent binding"));
+        }
+        if let OperationKind::Restore(p) = &self.kind {
+            if !Path::new(&p.worktree).is_absolute() || !checkout_resource_valid(&self.resource_set, &p.worktree)
+                || RefName::parse(&p.reference).is_err() || !digest_valid(&p.snapshot)
+                || canonical_digest(&p.request)? != self.request_digest
+                || self.expected != Tip::Oid(p.request.expected_head.clone()) || self.next != Tip::Oid(p.request.target.clone()) {
+                return Err(corrupt("restore binding"));
+            }
+            Oid::parse(&p.request.expected_head, self.object_format).map_err(|_|corrupt("restore head"))?;
+            Oid::parse(&p.request.target, self.object_format).map_err(|_|corrupt("restore target"))?;
+            return Ok(());
+        }
+        if let OperationKind::Land(payload) = &self.kind {
+            let c = &payload.candidate;
+            let r = &payload.request;
+            if !r.destination.starts_with("refs/heads/") || RefName::parse(&r.destination).is_err()
+                || self.resource_set.first() != Some(&r.destination)
+                || self.resource_set.len() != 2
+                || !checkout_resource_valid(&self.resource_set[1..], &c.worktree.to_string_lossy())
+                || !Path::new(&c.worktree).is_absolute()
+                || c.source != r.source || c.target != r.target
+                || self.expected != Tip::Oid(r.target.clone()) || self.next != Tip::Oid(c.candidate.clone())
+                || canonical_digest(&c.tree)? != c.tree_digest {
+                return Err(corrupt("land binding"));
+            }
+            for oid in [&r.source, &r.target, &c.candidate, &c.tree] { Oid::parse(oid,self.object_format).map_err(|_|corrupt("land oid"))?; }
+            return Ok(());
         }
         if let OperationKind::ScopedCommit(payload) = &self.kind {
             let ScopedCommitIntent {
@@ -506,9 +560,10 @@ impl Intent {
                 old_config_digest,
                 ..
             } = change.as_ref();
-            if remote.is_empty()
-                || url.is_empty()
-                || refspecs.is_empty()
+            if change.config_sequence == Some(0)
+                || (change.hooks.is_none() && (remote.is_empty() || url.is_empty() || refspecs.is_empty()))
+                || change.hooks.as_ref().is_some_and(|h| !Path::new(&h.owner_path).is_absolute() || h.next.as_ref().is_some_and(|n| n != &h.owner_path) || (h.next.is_none() && h.old.as_ref() != Some(&h.owner_path)))
+                || change.staging.as_ref().is_some_and(|a| !a.valid() || Path::new(&a.path).file_name().and_then(|s| s.to_str()) != Some("config.lock"))
                 || !digest_valid(old_config_digest)
                 || self.resource_set != ["config:local"]
                 || self.expected != Tip::Absent
@@ -658,6 +713,17 @@ impl Chain {
             }
         })
     }
+    pub(crate) fn config_sequence(&self) -> Option<u64> {
+        match &self.intent().kind {
+            OperationKind::ConfigChange(c) => c.config_sequence,
+            _ => None,
+        }
+    }
+    pub fn last_state(&self) -> &Phase {
+        &self.records.iter().rev()
+            .find(|r| !matches!(r.phase, Phase::NativeLockOwned(_)))
+            .expect("intent").phase
+    }
     pub fn last(&self) -> &Record {
         self.records.last().expect("validated nonempty chain")
     }
@@ -695,12 +761,24 @@ fn checkout_resource_valid(resources: &[String], worktree: &str) -> bool {
                 .is_some_and(|p| Path::new(p).is_absolute())
 }
 fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
+    let already_owned = records.iter().any(|r| matches!(r.phase, Phase::NativeLockOwned(_)));
+    // Ownership evidence is durable metadata, not an operation-state transition.
+    let states: Vec<_> = records.iter().filter(|r| !matches!(r.phase, Phase::NativeLockOwned(_))).cloned().collect();
+    let records = states.as_slice();
     let i = match &records[0].phase {
         Phase::Intent(i) => i,
         _ => return Err(corrupt("intent")),
     };
     let prev = &records.last().ok_or_else(|| corrupt("empty"))?.phase;
+    if let Phase::NativeLockOwned(artifact) = phase {
+        let filename = match i.kind { OperationKind::ConfigChange(_) => "config.lock", OperationKind::Land(_) | OperationKind::ScopedCommit(_) | OperationKind::Sync(_) | OperationKind::Restore(_) => "index.lock", _ => return Err(corrupt("native lock operation kind")) };
+        if already_owned || Path::new(&artifact.path).file_name().and_then(|s| s.to_str()) != Some(filename) || records.iter().any(|r| matches!(r.phase, Phase::Outcome(_))) || !artifact.valid() {
+            return Err(corrupt("native lock ownership binding"));
+        }
+        return Ok(());
+    }
     let valid = match (prev, phase) {
+        (Phase::TargetAttempt { .. }, Phase::RestoreApplied { snapshot }) => matches!(i.kind, OperationKind::Restore(_)) && digest_valid(snapshot),
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::ConfigApproved)) => {
             matches!(i.kind, OperationKind::ConfigChange(_))
         }
@@ -718,8 +796,12 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             i.kind,
             OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
         ),
+        (Phase::Prepared, Phase::LandVerified { evidence, .. }) => {
+            matches!(&i.kind, OperationKind::Land(p) if evidence.source == p.candidate.source && evidence.target == p.candidate.target && evidence.candidate == p.candidate.candidate && evidence.tree_digest == p.candidate.tree_digest && !evidence.evidence_digest.is_empty())
+        }
+        (Phase::LandVerified { .. }, Phase::TargetAttempt { prior_target_attempt: None, expected, next }) => matches!(i.kind,OperationKind::Land(_)) && expected == &i.expected && next == &i.next,
         (Phase::Intent(_), Phase::Prepared) => true,
-        (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::AbandonedBeforeAttempt)) => {
+        (Phase::Intent(_) | Phase::Prepared | Phase::LandVerified { .. }, Phase::Outcome(Outcome::AbandonedBeforeAttempt)) => {
             true
         }
         (
@@ -736,7 +818,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 expected,
                 next,
             },
-        ) => expected == &i.expected && next == &i.next,
+        ) => !matches!(i.kind,OperationKind::Land(_)) && expected == &i.expected && next == &i.next,
         (
             Phase::TargetAttempt { .. },
             Phase::SyncState {
@@ -760,9 +842,11 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             matches!(i.kind, OperationKind::Sync(_)) && Oid::parse(tree, i.object_format).is_ok()
         }
         (
-            Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. },
+            Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. } | Phase::RestoreApplied { .. },
             Phase::Outcome(o),
         ) => match o {
+            Outcome::Restore { state } => matches!(i.kind, OperationKind::Restore(_)) && ["restored", "effectObservedOnly", "recoveryRequired"].contains(&state.as_str()),
+            Outcome::Land { checkout, .. } => matches!(i.kind, OperationKind::Land(_)) && ["reconciled","pending","pendingStoreCollision","notApplicable","recoveryRequired"].contains(&checkout.as_str()),
             Outcome::Commit { observed, .. } => {
                 matches!(
                     i.kind,
@@ -797,6 +881,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                     OperationKind::PublicationCas
                         | OperationKind::RefUpdate { .. }
                         | OperationKind::RefDelete
+                        | OperationKind::Land(_)
                 ) || details.len() > 1024
                     || (*acknowledged && *unknown)
                 {
@@ -830,6 +915,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                     OperationKind::PublicationCas
                         | OperationKind::RefUpdate { .. }
                         | OperationKind::RefDelete
+                        | OperationKind::Land(_)
                 )
             }
             Outcome::Superseded {
@@ -852,6 +938,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             },
         ) => expected == i.candidate(),
         (Phase::PinReleaseAttempt { .. }, Phase::PinReleased) => true,
+        (Phase::Outcome(_), Phase::RestoreAcknowledged) => matches!(i.kind, OperationKind::Restore(_)),
         _ => false,
     };
     if valid {
@@ -1057,6 +1144,122 @@ impl<F: FileSystem> Wal<F> {
             fs: fsys,
             identity,
         })
+    }
+    /// Seven-day orphan retention is housekeeping, never effect attribution.
+    /// Referenced and malformed evidence is never aged out.
+    fn prune_restore_orphans(&self, dir: &Directory) -> WalResult<()> {
+        let retained = self.retained(100_000)?;
+        let mut referenced = std::collections::BTreeSet::new();
+        for chain in &retained {
+            if let OperationKind::Restore(p) = &chain.intent().kind {
+                referenced.insert(p.snapshot.clone());
+            }
+            for record in chain.records() {
+                if let Phase::RestoreApplied { snapshot } = &record.phase {
+                    referenced.insert(snapshot.clone());
+                }
+            }
+        }
+        for entry in fs::read_dir(dir.path())? {
+            let entry = entry?;
+            let name = entry.file_name().to_string_lossy().into_owned();
+            let metadata = fs::symlink_metadata(entry.path())?;
+            if !metadata.is_file()
+                || referenced.contains(&name)
+                || !metadata
+                    .modified()?
+                    .elapsed()
+                    .is_ok_and(|age| age.as_secs() >= 7 * 24 * 60 * 60)
+            {
+                continue;
+            }
+            let removable = if digest_valid(&name) {
+                self.read_restore_snapshot::<serde_json::Value>(&name)
+                    .is_ok()
+            } else {
+                is_durable_temporary(&name)
+            };
+            if removable {
+                fs::remove_file(entry.path())?;
+            }
+        }
+        dir.file.sync_all()?;
+        Ok(())
+    }
+    pub(crate) fn store_restore_snapshot<T: Serialize>(&self, value: &T) -> WalResult<String> {
+        let bytes = serde_json::to_vec(value).map_err(|_| corrupt("snapshot serialize"))?;
+        if bytes.len() > 128 * 1024 * 1024 {
+            return Err(corrupt("restore snapshot capacity"));
+        }
+        let digest = canonical_digest(value)?;
+        let git = self
+            .common
+            .child("fgos", false, &self.fs)?
+            .child("git", false, &self.fs)?;
+        let dir = git.child("restore-snapshots", true, &self.fs)?;
+        self.prune_restore_orphans(&dir)?;
+        install_ordered(
+            &dir.path(),
+            &digest,
+            &bytes,
+            &FaultAdapter(&self.fs),
+            None,
+            &mut || Ok(()),
+            &[],
+        )
+        .map_err(|e| WalError::Io(e.source))?;
+        self.fs.checkpoint("restore-snapshot-durable")?;
+        let _: serde_json::Value = self.read_restore_snapshot(&digest)?;
+        Ok(digest)
+    }
+    pub(crate) fn release_restore_snapshots(&self, digests: &[String]) -> WalResult<()> {
+        let retained = self.retained(100_000)?;
+        let dir = self
+            .common
+            .child("fgos", false, &self.fs)?
+            .child("git", false, &self.fs)?
+            .child("restore-snapshots", false, &self.fs)?;
+        for digest in digests {
+            if !digest_valid(digest) {
+                return Err(corrupt("snapshot digest"));
+            }
+            let used = retained.iter().any(|chain| {
+                if matches!(chain.last_state(), Phase::RestoreAcknowledged) {
+                    return false;
+                }
+                matches!(&chain.intent().kind, OperationKind::Restore(p) if &p.snapshot == digest)
+                    || chain.records.iter().any(|r| {
+                        matches!(&r.phase, Phase::RestoreApplied { snapshot } if snapshot == digest)
+                    })
+            });
+            if !used {
+                match fs::remove_file(dir.path().join(digest)) {
+                    Ok(()) => self.fs.checkpoint("restore-snapshot-released")?,
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+                    Err(e) => return Err(e.into()),
+                }
+            }
+        }
+        fs::File::open(dir.path())?.sync_all()?;
+        Ok(())
+    }
+    pub(crate) fn read_restore_snapshot<T: serde::de::DeserializeOwned>(
+        &self,
+        digest: &str,
+    ) -> WalResult<T> {
+        if !digest_valid(digest) {
+            return Err(corrupt("snapshot digest"));
+        }
+        let dir = self
+            .common
+            .child("fgos", false, &self.fs)?
+            .child("git", false, &self.fs)?
+            .child("restore-snapshots", false, &self.fs)?;
+        let value: serde_json::Value = read_json(&dir.path().join(digest), 128 * 1024 * 1024)?;
+        if canonical_digest(&value)? != digest {
+            return Err(corrupt("snapshot digest mismatch"));
+        }
+        serde_json::from_value(value).map_err(|_| corrupt("snapshot shape"))
     }
     pub fn repository_identity(&self) -> &str {
         &self.identity
@@ -1285,7 +1488,7 @@ impl<F: FileSystem> Wal<F> {
         later_id: &str,
         admission: &dyn AuthorityAdmission,
     ) -> WalResult<Chain> {
-        if !matches!(old.last().phase, Phase::TargetAttempt { .. })
+        if !matches!(old.last_state(), Phase::TargetAttempt { .. })
             || old.last().operation_id == later_id
         {
             return Err(WalError::RecoveryRequired);
@@ -1378,6 +1581,7 @@ fn compaction_suffix(dir: &Directory, id: &str) -> WalResult<Vec<Record>> {
         !matches!(
             r.phase,
             Phase::PinReleased
+                | Phase::RestoreAcknowledged
                 | Phase::Outcome(Outcome::Worktree { .. })
                 | Phase::Outcome(Outcome::Transfer { .. })
                 | Phase::Outcome(Outcome::ConfigApproved)
@@ -1499,7 +1703,7 @@ impl<F: FileSystem> Wal<F> {
         }
         let target = reader.read_ref(&i.resource_set[0])?;
         let pin = reader.read_ref(&format!("refs/fgos/git-operations/{id}/candidate"))?;
-        if matches!(c.last().phase, Phase::Intent(_)) {
+        if matches!(c.last_state(), Phase::Intent(_)) {
             return Ok(Recovery::Unprepared);
         }
         if !reader.candidate_intact(i)? {
@@ -1516,7 +1720,7 @@ impl<F: FileSystem> Wal<F> {
         }
         if target == ObservedRef::Direct(i.expected.clone())
             && pin == ObservedRef::Direct(i.candidate().clone())
-            && matches!(c.last().phase, Phase::Prepared)
+            && matches!(c.last_state(), Phase::Prepared)
         {
             return Ok(Recovery::FirstAttemptEligible);
         }
@@ -1630,6 +1834,8 @@ mod ledger_hex_vec {
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
+        Outcome::Restore { state } => vec!["z".into(), state.clone()],
+        Outcome::Land { checkout, observed_only } => vec!["d".into(), checkout.clone(), observed_only.to_string()],
         Outcome::Commit {
             observed,
             contract_violation,
@@ -1692,6 +1898,8 @@ fn valid_compact_outcome(o: &[String]) -> bool {
             || Oid::parse(s, ObjectFormat::Sha256).is_ok()
     };
     match o.first().map(String::as_str) {
+        Some("z") => o.len() == 2 && ["restored", "effectObservedOnly", "recoveryRequired"].contains(&o[1].as_str()),
+        Some("d") => (o.len() == 2 || (o.len() == 3 && ["true", "false"].contains(&o[2].as_str()))) && ["reconciled","pending","pendingStoreCollision","notApplicable","recoveryRequired"].contains(&o[1].as_str()),
         Some("k") => o.len() == 3 && tip(&o[1]) && matches!(o[2].as_str(), "true" | "false"),
         Some("r") => o.len() == 2 && !o[1].is_empty(),
         Some("w") => o.len() == 2 && matches!(o[1].as_str(), "true" | "false"),
@@ -1730,6 +1938,7 @@ impl CompactReceipt {
             }
         };
         Ok(match r[0].as_str() {
+            "z" => Outcome::Restore { state: r[1].clone() },
             "k" => Outcome::Commit {
                 observed: r[1].clone(),
                 contract_violation: r[2] == "true",
@@ -1737,6 +1946,7 @@ impl CompactReceipt {
             "r" => Outcome::CommitRejected {
                 cause: r[1].clone(),
             },
+            "d" => Outcome::Land { checkout: r[1].clone(), observed_only: r.get(2).is_some_and(|s| s == "true") },
             "w" => Outcome::Worktree {
                 completed: r[1] == "true",
                 details: vec![],
@@ -1776,6 +1986,9 @@ impl CompactReceipt {
     }
 }
 fn binding_digest(i: &Intent) -> WalResult<String> {
+    if matches!(i.kind, OperationKind::Land(_)) {
+        return canonical_digest(&("land", &i.repo_identity, i.resource_set.first(), &i.authority_binding, &i.writer_identity, &i.expected, &i.next, i.object_format));
+    }
     canonical_digest(&(
         &i.repo_identity,
         &i.resource_set,
@@ -1896,11 +2109,36 @@ impl<F: FileSystem> Wal<F> {
         reader: &dyn RecoveryReader,
         authority: &dyn PublicationAuthority,
     ) -> WalResult<CompactReceipt> {
+        self.compact_inner(chain, reader, authority, false)
+    }
+    /// Explicit acknowledgement releases Restore evidence through the normal ledger.
+    pub(crate) fn compact_restore_ack(
+        &self,
+        chain: &Chain,
+        reader: &dyn RecoveryReader,
+        authority: &dyn PublicationAuthority,
+    ) -> WalResult<CompactReceipt> {
+        if !matches!(chain.intent().kind, OperationKind::Restore(_))
+            || !matches!(chain.last_state(), Phase::RestoreAcknowledged)
+        {
+            return Err(WalError::RecoveryRequired);
+        }
+        self.compact_inner(chain, reader, authority, true)
+    }
+    fn compact_inner(
+        &self,
+        chain: &Chain,
+        reader: &dyn RecoveryReader,
+        authority: &dyn PublicationAuthority,
+        restore_ack: bool,
+    ) -> WalResult<CompactReceipt> {
         authority.validate_publication_borrow(chain.intent())?;
         let id = &chain.last().operation_id;
         let actual = self.inspect(id)?;
         if actual.last().digest != chain.last().digest
-            || !(matches!(actual.last().phase, Phase::PinReleased)
+            // Restore releases its binding only after durable caller acknowledgement.
+            || (matches!(actual.intent().kind, OperationKind::Restore(_)) && !restore_ack)
+            || !(matches!(actual.last_state(), Phase::PinReleased)
                 || (actual.intent().kind != OperationKind::PublicationCas
                     && actual.outcome().is_some()))
             || reader.read_ref(&format!("refs/fgos/git-operations/{id}/candidate"))?
@@ -1923,7 +2161,7 @@ impl<F: FileSystem> Wal<F> {
         }
         let i = actual.intent();
         let mut c = CompactReceipt {
-            v: if matches!(&i.kind, OperationKind::Sync(p) if p.reference.is_some()) {
+            v: if matches!(i.kind, OperationKind::Land(_)) || matches!(&i.kind, OperationKind::Sync(p) if p.reference.is_some()) {
                 3
             } else {
                 2
@@ -1936,6 +2174,7 @@ impl<F: FileSystem> Wal<F> {
             receipt: compact_outcome(actual.outcome().ok_or(WalError::RecoveryRequired)?),
             reference: match &i.kind {
                 OperationKind::Sync(p) => p.reference.clone(),
+                OperationKind::Land(p) => Some(p.request.destination.clone()),
                 _ => None,
             },
             digest: String::new(),
@@ -2047,6 +2286,12 @@ impl<F: FileSystem> Wal<F> {
             }
         }
         Ok(false)
+    }
+    /// Call only under repo-config authority. ConfigChange provenance chains
+    /// remain retained, so sequence allocation and provenance share WAL truth.
+    pub(crate) fn next_config_sequence(&self) -> WalResult<u64> {
+        self.retained(100_000)?.iter().filter_map(Chain::config_sequence)
+            .max().unwrap_or(0).checked_add(1).ok_or(WalError::RecoveryRequired)
     }
     /// Admission never traverses historical ledger entries. A directory without
     /// record zero is not an Intent and cannot block an unrelated operation.
@@ -2649,7 +2894,7 @@ mod tests {
                 state,
                 Recovery::FirstAttemptEligible | Recovery::RecoveryRequired
             ));
-            if matches!(c.last().phase, Phase::TargetAttempt { .. }) {
+            if matches!(c.last_state(), Phase::TargetAttempt { .. }) {
                 assert_eq!(state, Recovery::RecoveryRequired);
             }
         }
@@ -3037,7 +3282,7 @@ mod tests {
             );
             assert_eq!(reopened.active(100).unwrap().len(), usize::from(installed));
             match reopened.inspect("one") {
-                Ok(c) => assert!(matches!(c.last().phase, Phase::Intent(_))),
+                Ok(c) => assert!(matches!(c.last_state(), Phase::Intent(_))),
                 Err(WalError::Corrupt(_)) => (),
                 other => panic!("unexpected recovery: {other:?}"),
             }

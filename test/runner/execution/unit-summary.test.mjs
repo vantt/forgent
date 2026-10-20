@@ -38,7 +38,7 @@ test('complete summary uses owner workflow/outcome and only exposes measurement 
   result(dir, 'synthesizer', '1', '01', { agentClaim: {} });
   const summary = buildUnitSummary(dir);
   assert.deepEqual(summary.contract, { id: 'unit-summary', version: 2 });
-  assert.deepEqual(summary.workflow, workflow);
+  assert.deepEqual(summary.workflow, { caseId: 'wf-synthetic', activity: 'step', reservationId: null }, 'a record from before cases reads as the same link, without a reservation');
   assert.equal(summary.startedAt, startedAt);
   assert.equal(summary.settledAt, settledAt);
   assert.equal(summary.outcome, 'pass');
@@ -131,7 +131,7 @@ test('backfill uses explicit owner completion for legacy refusal, dry-runs and r
   const summary = JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8'));
   assert.equal(summary.outcome, 'policy-refusal');
   assert.equal(summary.settledAt, settledAt);
-  assert.deepEqual(summary.workflow, { runId: 'wf-synthetic', stepId: 'step', unitId: 'question' });
+  assert.deepEqual(summary.workflow, { caseId: 'wf-synthetic', activity: 'step', reservationId: null });
   assert.equal(summary.derivation.seq, 4);
   const before = fs.statSync(path.join(dir, 'unit-summary.json')).mtimeMs;
   assert.equal(backfillUnitSummaries({ repoRoot: root }).unchanged, 1);

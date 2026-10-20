@@ -47,14 +47,15 @@ export {
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { bind } from '../execution/bind.mjs';
-import { credentialFaultFamilies } from '../execution/account-rotation.mjs';
+import { walkStateOf } from '../execution/account-rotation.mjs';
+import { legacyStateKey } from './llm-accounts.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, withDefaultExecutor } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 import { executeExecutorCli, withRunDirReadAccess } from './cli.mjs';
 import { mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-identity.mjs';
-import { resolveExecutorEnv, workerBaseEnv } from './adapters.mjs';
+import { resolveExecutorEnv, workerBaseEnv, caseContextEnv, CASE_ID_ENV, CASE_RESERVATION_ENV } from './adapters.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolveTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
@@ -194,6 +195,18 @@ function launchCandidateClis(cfg, executorId, pinnedInvocationId) {
   }
   const keys = invocations.length > 0 ? invocations.map(storeKeyOf) : [storeKeyOf(entry)];
   return [...new Set(keys.filter(Boolean))];
+}
+
+/**
+ * The login store a launch of `executorId` declares: that of the pinned invocation, else of the first
+ * `cli` invocation. Null when the invocation declares none, so a launch that reads no store leases any
+ * account of its pool.
+ */
+function declaredStoreCli(cfg, executorId, pinnedInvocationId) {
+  const entry = cfg?.executors?.[executorId] ?? cfg?.executor;
+  const invocations = Array.isArray(entry?.invocations) ? entry.invocations.filter((inv) => inv?.via === 'cli') : [];
+  const invocation = pinnedInvocationId ? invocations.find((inv) => inv.id === pinnedInvocationId) : invocations[0];
+  return invocation ? (credentialStoreOf({ ...invocation, command: invocation.command ?? entry.command })?.use ?? null) : null;
 }
 
 function resolveProviderFamilyForExecutor(entry, executorId) {
@@ -461,10 +474,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
         runnerConfig: unitRecord.configSnapshot?.runner || opts.runnerConfig,
         session: opts.session || {},
       },
-      {
-        skipCandidateIndex: fallbackSkipIndex(unitRecord, asgn),
-        excludeFamilies: [...credentialFaultFamilies(unitRecord, { boundBefore: attemptBoundAt(unitRecord, asgn) })],
-      },
+      walkStateOf(unitRecord, { role: seatRoleOf(asgn), round: asgn.round, assignmentId: asgn.assignmentId }),
     );
 
     if (recomputed.refused) {
@@ -484,11 +494,12 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
     }
     if (
       recomputed.executor !== asgnBinding.executor ||
+      (recomputed.pool ?? null) !== (asgnBinding.pool ?? null) ||
       recomputed.tier !== asgnBinding.tier ||
       recomputed.posture !== asgnBinding.posture
     ) {
       throw new RunnerConfigError(
-        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" binding mismatch: recomputed { executor: "${recomputed.executor}", tier: "${recomputed.tier}", posture: "${recomputed.posture}" } does not match assignment { executor: "${asgnBinding.executor}", tier: "${asgnBinding.tier}", posture: "${asgnBinding.posture}" } -- refused`,
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" binding mismatch: recomputed { executor: "${recomputed.executor}", pool: "${recomputed.pool ?? ''}", tier: "${recomputed.tier}", posture: "${recomputed.posture}" } does not match assignment { executor: "${asgnBinding.executor}", pool: "${asgnBinding.pool ?? ''}", tier: "${asgnBinding.tier}", posture: "${asgnBinding.posture}" } -- refused`,
       );
     }
     const pinnedExecutor = asgn.policy?.preferExecutor ?? opts.cliOverride?.preferExecutor;
@@ -589,15 +600,18 @@ const TERMINAL_CLIS = new Set(['claude', 'codex', 'agy', 'pi', 'omp']);
  * needs to open the brief, and -- for codex, whose shell commands run under a shared daemon that does not
  * inherit the pane's environment -- the attempt's writer id as an explicit setting.
  */
-function terminalAgentArgs({ resolvedCmd, prompt, model, runDir, writerId }) {
+export function terminalAgentArgs({ resolvedCmd, prompt, model, runDir, writerId, caseContext = null }) {
   const args = withRunDirReadAccess({
     adapter: 'herdr-spawn',
     interactiveMode: resolvedCmd.interactiveMode,
     args: agentArgsWithoutPrompt({ argsTemplate: resolvedCmd.argsTemplate, args: resolvedCmd.args, prompt, model }),
     runDir,
   });
+  // The case the attempt was admitted into travels beside the writer id: a codex shell command does not
+  // get the pane's environment, so the nested `fgos` call would otherwise carry no case at all.
+  const settings = [`FGOS_SESSION_ID="${writerId}"`, ...(caseContext ? [`${CASE_ID_ENV}="${caseContext.caseId}"`, `${CASE_RESERVATION_ENV}="${caseContext.reservationId}"`] : [])];
   return commandCli(resolvedCmd.command) === 'codex'
-    ? [...args, '-c', `shell_environment_policy.set={FGOS_SESSION_ID="${writerId}"}`]
+    ? [...args, '-c', `shell_environment_policy.set={${settings.join(',')}}`]
     : args;
 }
 
@@ -1119,7 +1133,6 @@ function attemptProviderCapacityFallback({
         provider,
         assignmentId: effectiveAssignment.assignmentId,
         runId,
-        seed: `${effectiveAssignment.assignmentId}:${runId}:fallback:${candidateId}`,
         runtimeDir: providerCapacityRuntimeDir,
         runIsDead: providerCapacityRunIsDead,
         isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
@@ -1153,43 +1166,10 @@ function attemptProviderCapacityFallback({
   };
 }
 
-/**
- * Where a provider-limit fallback attempt resumes its candidate walk, read from the attempt
- * chain the runner persisted in unit.json -- never from the assignment, which a caller could
- * forge, and only from the assignment's own role/round chain. An attempt only skips candidates when the attempt right before it, for the same
- * role/round, stopped on a provider limit; the skip is that attempt's own candidate index.
- * Anything else (first attempt, unknown assignment, earlier attempt not limited) binds from
- * the start of the pool, exactly as before.
- */
 // The seat a unit-run assignment fills: a unit running a Work step operation stamps the
 // operation's role on the assignment and keeps the seat's own name in provenance.
 function seatRoleOf(asgn) {
   return asgn.provenance?.kind === 'unit-run' ? (asgn.provenance.role ?? asgn.role) : asgn.role;
-}
-
-function fallbackSkipIndex(unitRecord, asgn) {
-  const attempts = unitRecord.bindings?.[`${seatRoleOf(asgn)}/${asgn.round}`];
-  if (!Array.isArray(attempts)) return -1;
-  const at = attempts.findIndex((attempt) => attempt?.assignmentId === asgn.assignmentId);
-  return skipIndexOfAttempt(attempts, at);
-}
-
-// When the runner bound this attempt, from its own persisted record; null when it recorded none.
-function attemptBoundAt(unitRecord, asgn) {
-  const attempts = unitRecord.bindings?.[`${seatRoleOf(asgn)}/${asgn.round}`];
-  const bound = Date.parse(attempts?.find((attempt) => attempt?.assignmentId === asgn.assignmentId)?.boundAt);
-  return Number.isFinite(bound) ? bound : -Infinity;
-}
-
-// A retry on another account of the same candidate (recorded as an account rotation) resumes the
-// walk exactly where the attempt it retries did, so the candidate bind() verifies is the same one.
-function skipIndexOfAttempt(attempts, at) {
-  if (at <= 0) return -1;
-  const previous = attempts[at - 1];
-  if (previous?.outcome !== 'provider-limit') return -1;
-  if (attempts[at]?.fallbackFrom?.kind === 'account-rotation') return skipIndexOfAttempt(attempts, at - 1);
-  const index = previous?.binding?.candidateIndex;
-  return Number.isInteger(index) && index >= 0 ? index : -1;
 }
 
 /**
@@ -1604,8 +1584,15 @@ export async function executeAssignment(assignment, opts = {}) {
 
   // M6: normalized ('openai' ≡ 'openai-codex') so leases, quarantine, and
   // the fault classifier all key the same provider inventory bucket
-  // regardless of which spelling a config or resolved command happened to use.
-  const providerCapacityProvider = normalizeProviderFamily(effectivePolicy.providerModel || deriveProviderFamily(cfg.executors?.[resolvedExecutorId] ?? cfg.executor));
+  // regardless of which spelling a config or resolved command happened to use. A seat bound to a
+  // pool leases from that pool (`bound.pool`, passed as `cliOverride.pool`); the pool named after the
+  // family keeps the family's key.
+  const boundPool = opts.cliOverride?.pool && opts.cliOverride.preferExecutor === resolvedExecutorId ? opts.cliOverride.pool : null;
+  const providerCapacityProvider = boundPool
+    ? legacyStateKey(boundPool)
+    : normalizeProviderFamily(effectivePolicy.providerModel || deriveProviderFamily(cfg.executors?.[resolvedExecutorId] ?? cfg.executor));
+  // The login store the launch reads: only an account that holds one for it is leased.
+  const leaseCli = declaredStoreCli(cfg, resolvedExecutorId, hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : null);
   // H8 (resume re-acquire): control only reaches this point on a resumed
   // Run when reconcile already proved there is no live or settled worker
   // to reattach to (both cases return earlier, well above this line) --
@@ -1650,12 +1637,10 @@ export async function executeAssignment(assignment, opts = {}) {
         provider: providerCapacityProvider,
         assignmentId: effectiveAssignment.assignmentId,
         runId,
-        seed: `${effectiveAssignment.assignmentId}:${runId}`,
         runtimeDir: opts.providerCapacityRuntimeDir,
         runIsDead: opts.providerCapacityRunIsDead,
         isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
-        // A pinned invocation names its CLI now: only an account with a login store for it is leased.
-        cli: hasExplicitInvocationPin ? (launchCandidateClis(cfg, resolvedExecutorId, opts.cliOverride.preferInvocation)[0] ?? null) : null,
+        cli: leaseCli,
       });
     } catch (err) {
       providerCapacitySelection = {
@@ -2261,6 +2246,8 @@ export async function executeAssignment(assignment, opts = {}) {
           // source; neither pins anything for the unsubstituted
           invocationId: (hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : undefined) ?? fallbackInvocationId,
         });
+        // Admitted into a case: the worker's own environment names it, from this admission and no other.
+        if (opts.caseContext) resolvedCmd = { ...resolvedCmd, env: { ...resolvedCmd.env, ...caseContextEnv(opts.caseContext) } };
         launchModelCheck = resolvedCmd.modelCheck;
         launchReasoningEffort = resolvedCmd.reasoningEffort;
       } catch (err) {
@@ -2275,7 +2262,7 @@ export async function executeAssignment(assignment, opts = {}) {
       const attemptIdentity = { writerId: attemptWriterId, parentWriterId };
       const terminalSocket = terminalMode ? terminalSocketPath(launchCommandId) : null;
       const attemptArgs = terminalMode
-        ? terminalAgentArgs({ resolvedCmd, prompt, model: effectivePolicy.model, runDir: path.resolve(runDir), writerId: attemptWriterId })
+        ? terminalAgentArgs({ resolvedCmd, prompt, model: effectivePolicy.model, runDir: path.resolve(runDir), writerId: attemptWriterId, caseContext: opts.caseContext ?? null })
         : resolvedCmd.args;
 
       // 5. Prepare Confinement For Launch via Confinement Authority

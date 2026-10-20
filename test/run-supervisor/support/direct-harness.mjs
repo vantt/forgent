@@ -64,6 +64,7 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
     runner: {
       defaultExecutor: 'noisy',
       rigorToTier: { standard: 'standard' },
+      modelPolicies: { noisy: { standard: 'noisy-model' } },
       timeoutMs,
       executors: {
         noisy: {

@@ -105,7 +105,7 @@ Node synchronous `runBorrowed` accepts a positive `spec.maxOutputBytes` per capt
 
 Unix uses the existing `run_borrowed` spawn door and explicit slot-3 mapping, environment annotation, git auto-gc/maintenance disabling, driver preparation and release rule. It introduces no additional containment backend or suspended-start barrier. Predecessor handling stays unchanged: Linux borrows declare no new predecessor record and clean up the borrowed child's process group and descendants; macOS uses the child's process group. Git Publication disables hooks in its own driver before calling this port, as Git spec §10 rule 4a requires.
 
-Exceeding either byte ceiling returns `borrow-output-limit: stdout|stderr`; reaching the deadline returns `borrow-deadline`. On either refusal, or an I/O failure (`borrow-io-failed`), the root is killed, waited without reaping, the existing borrow domain's leftovers are ended, and the root is reaped before returning. The handle remains owned by the caller throughout. Remaining output is drained after normal root exit and leftover cleanup. As with `run_borrowed`, failure to end leftovers takes precedence and returns `borrow-leftover-not-killed`; this is never a successful empty-domain claim. Windows refuses this new form with `borrow-io-unsupported` before any child is started; its existing job-backed `run_borrowed` is unchanged.
+Exceeding either byte ceiling returns `borrow-output-limit: stdout|stderr`; reaching the deadline returns `borrow-deadline: terminated|killed-after-grace` (`BorrowError::Deadline { termination }`). On either refusal, or an I/O failure (`borrow-io-failed`), SIGTERM is sent to the child group while the root remains unreaped; the handle's internal `terminate_grace_ms` field (beside `kill_wait_ms`, default 3000 ms, no new config key) bounds the grace. If the root exits during grace the deadline outcome is `terminated`; otherwise SIGKILL yields `killed-after-grace`. The root is then waited without reaping, the existing borrow domain's leftovers are ended, and the root is reaped before returning. The handle remains owned by the caller throughout. Remaining output is drained after normal root exit and leftover cleanup. As with `run_borrowed`, failure to end leftovers takes precedence and returns `borrow-leftover-not-killed`; this is never a successful empty-domain claim. Windows refuses this new form with `borrow-io-unsupported` before any child is started; its existing job-backed `run_borrowed` is unchanged.
 
 2026-10-18: The Rust `validate(&Handle)` non-spawning entry and every `run_borrowed` family call validate the opaque acquired exclusive handle against the current lock resource using the existing file identity/borrower checks before spawning, refusing a replaced resource as `lock-resource-replaced` while keeping the descriptor private.
 
@@ -405,3 +405,10 @@ Until Git phase 03 owns removal/recovery, preserve the refused checkout and use 
 | dispatch cwd lock, resume guard, reconcile | [runner.md](../../specs/runner.md) |
 | plan | [plan.md](../../../plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md) |
 | design and evidence | [design r6](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |
+
+Git recovery reuses the existing `recovery` registry entry (rank 80, run scope)
+with `runDir=<common>/fgos/git`, resolving to
+`<common>/fgos/git/locks/recovery.lock`. This is one registry entry shared with
+dispatch recovery, not a new lock kind. Git takes it after its resource authority;
+Publication retains event-seal authority without acquiring this leaf, and
+ConfigChange retains repo-config 80 without a peer-rank leaf.

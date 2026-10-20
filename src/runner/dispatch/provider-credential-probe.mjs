@@ -17,25 +17,12 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { matchAuthFailureLine } from './provider-auth-failure.mjs';
-import { accountCredentialSources, credentialSourceForCli } from './provider-capacity.mjs';
+import { accountCredentialSources, credentialSourceForCli, expandCredentialHome } from './provider-capacity.mjs';
 
 const PROMPT = 'Reply with the single word OK.';
 const OUTPUT_LIMIT = 16 * 1024;
 const QUOTA_PATTERN = /usage limit|quota|rate limit/i;
 export const DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS = 90 * 1000;
-
-/**
- * An account's credential home as an absolute path: a leading `~`, `${HOME}` or `$HOME` is the user's home
- * directory. Null when the value is empty, not a string, or not absolute once expanded.
- */
-export function expandCredentialHome(home) {
-  if (typeof home !== 'string' || !home.trim()) return null;
-  const expanded = home
-    .replace(/^\$\{HOME\}(?=\/|$)/, os.homedir())
-    .replace(/^\$HOME(?=\/|$)/, os.homedir())
-    .replace(/^~(?=\/|$)/, os.homedir());
-  return path.isAbsolute(expanded) ? expanded : null;
-}
 
 /**
  * Make a call end on its own even when its runner dies: it runs detached, and the account lock stays held

@@ -1,5 +1,7 @@
 # Phase 00: facts, prior art, baseline (no code)
 
+**Status: done (2026-10-19).** Findings: [phase lead report](../reports/phase-lead-261019-2323-model-pool-b1-p00-p02.md), section "Phase 00 facts".
+
 ## Context
 
 - [plan.md](plan.md) design D1-D8; [problem report](../reports/problem-261017-0022-model-tier-selection-misfit.md) 5.2, 5.3.

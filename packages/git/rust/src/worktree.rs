@@ -46,7 +46,11 @@ fn pid_named_by(reason: &str) -> Option<u32> {
 fn lock_names_live_process(lock: &Path) -> bool {
     use fgos_process::facts::{boot_ticks_now, observe, Observed};
     use fgos_process::ProcId;
-    let Some(pid) = fs::read_to_string(lock).ok().as_deref().and_then(pid_named_by) else {
+    let Some(pid) = fs::read_to_string(lock)
+        .ok()
+        .as_deref()
+        .and_then(pid_named_by)
+    else {
         return false;
     };
     let Observed::Live { start_time } = observe(ProcId(pid)) else {
@@ -809,6 +813,19 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<()> {
+        self.remove_land_candidate(repo, held, path, proof, writer, id, None)
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn remove_land_candidate(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        path: &Path,
+        proof: &WorktreeDelivery,
+        writer: &str,
+        id: &str,
+        discarded_land: Option<&str>,
+    ) -> Result<()> {
         let scope = self.worktree_scope(repo, held)?;
         let path = canonical_destination(path)?;
         let wal = Wal::open(repo).map_err(failure)?;
@@ -876,6 +893,17 @@ impl GitDriver {
         self.worktree_not_live(&path, &mut warned)?;
         self.worktree_custody(repo, &scope, &path)?;
         self.worktree_clean(repo, &path)?;
+        let discarded = if let Some(land_id) = discarded_land {
+            let land = wal.inspect(land_id).map_err(failure)?;
+            matches!(&land.intent().kind, OperationKind::Land(p) if p.candidate.worktree == path && p.candidate.candidate == handle.tip.as_str())
+                && land.intent().writer_identity == writer
+                && matches!(
+                    land.outcome(),
+                    Some(Outcome::AbandonedBeforeAttempt | Outcome::Loss { .. })
+                )
+        } else {
+            false
+        };
         if proof.evidence_digest.len() != 64
             || !proof.evidence_digest.bytes().all(|b| b.is_ascii_hexdigit())
             || proof.expected_tip != handle.tip
@@ -892,9 +920,10 @@ impl GitDriver {
             ],
             Policy::Inspect,
         )?;
-        if !reachable
-            .split(|b| *b == b'\n')
-            .any(|name| name.starts_with(b"refs/") && !name.starts_with(b"refs/fgos/"))
+        if !discarded
+            && !reachable
+                .split(|b| *b == b'\n')
+                .any(|name| name.starts_with(b"refs/") && !name.starts_with(b"refs/fgos/"))
         {
             return Err(failure("worktree-delivery-unreachable"));
         }
@@ -1292,7 +1321,8 @@ impl GitDriver {
         if held.iter().any(|h| h.as_ref().name() == "dispatch-cwd") {
             return Err(failure("worktree-repair-custody-not-allowed"));
         }
-        let scope = self.worktree_scope(repo, held)?;
+        let mut scope = self.worktree_scope(repo, held)?;
+        crate::recovery::leaf(&mut scope, repo)?;
         self.repair_worktree_locked(repo, &scope, id)
     }
     fn repair_worktree_locked(

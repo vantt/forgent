@@ -999,3 +999,16 @@ fn dispatch_cwd_lock_name(dir: &std::path::Path) -> String {
         birth
     )
 }
+
+#[test]
+fn non_event_transfer_accepts_main_checkout_loan_without_worktree_admin() {
+    let f = Fixture::new("files");
+    let remote = f.remote();
+    let main = match acquire(&Resource::new("main-checkout", f.path.join(".fgos/locks/main-checkout.lock")), Mode::Ex, Wait::Try, 2000) {
+        Acquire::Acquired(h) => h, e => panic!("{e:?}"),
+    };
+    let mappings = [RefMapping { source: RefName::parse("refs/heads/trunk").unwrap(), destination: RefName::parse("refs/heads/shared").unwrap() }];
+    f.driver.push_refs(&f.repo, vec![BorrowedHandle::new(&main).unwrap()], &remote, &mappings, "fixture", "main-loan-push").unwrap();
+    assert_eq!(git(Path::new(&remote.pinned_url), &["rev-parse", "refs/heads/shared"]), f.second.as_str());
+    assert!(!f.path.join(".fgos/locks/worktree-admin.lock").exists());
+}

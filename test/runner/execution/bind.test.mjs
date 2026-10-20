@@ -462,26 +462,22 @@ test('nextCandidate: walks the prefer pool in order, never revisits a candidate,
   const ctx = { runnerConfig, session: {} };
 
   const first = bind(ask, ctx);
-  assert.equal(first.candidateIndex, 0);
+  assert.equal(first.invocation, 'claude-cli');
   const second = nextCandidate(first, ask, ctx);
-  assert.equal(second.candidateIndex, 1);
+  assert.equal(second.invocation, 'claude-herdr');
   assert.equal(second.executor, 'claude');
-  const third = nextCandidate(second, ask, ctx);
-  assert.equal(third.candidateIndex, 2);
+  const third = nextCandidate(second, ask, ctx, 'provider-limit', { tried: [first, second] });
+  assert.equal(third.invocation, 'codex-cli');
   assert.equal(third.executor, 'codex');
   assert.equal(third.provenance.fallbackFrom.executor, 'claude');
-  const none = nextCandidate(third, ask, ctx);
+  const none = nextCandidate(third, ask, ctx, 'provider-limit', { tried: [first, second, third] });
   assert.ok(none.refused, 'no candidate is left, so nothing is guessed');
-});
-
-test('nextCandidate: a binding that did not come from a prefer pool has no next candidate', () => {
-  const none = nextCandidate({ executor: 'lead', candidateIndex: -1 }, { unit: { capability: 'code:implement' }, role: 'producer' }, { runnerConfig: createMockRunnerConfig(), session: {} });
-  assert.equal(none.refused.reason, 'no-candidate');
 });
 
 function twoInvocationConfig(extraCapabilities = {}) {
   return {
     rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    modelPolicies: { claude: { nano: 'duo-s', standard: 'duo-m', advanced: 'duo-m', flagship: 'duo-l', frontier: 'duo-l' } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'duo' }] }, ...extraCapabilities },
     executors: {
       duo: {
@@ -659,7 +655,7 @@ const preferAsk = (unit, extra = {}) => ({ unit: { id: 'u1', capability: 'code:i
 test('bind prefer: a unit-preferred executor is chosen ahead of the capability pool and says so', () => {
   const result = bind(preferAsk({ prefer: ['gemini-cli'] }), { runnerConfig: createMockRunnerConfig(), session: {} });
   assert.equal(result.executor, 'gemini-cli');
-  assert.equal(result.candidateIndex, 0);
+  assert.equal(result.pool, 'gemini');
   assert.equal(result.provenance.executor.source, 'unit-prefer');
   assert.equal(result.provenance.invocation.source, 'unit-prefer');
 });
@@ -669,7 +665,6 @@ test('bind prefer: a filtered unit candidate falls to the capability pool, whose
   runnerConfig.governance = { disallowedProviders: ['gemini'] };
   const result = bind(preferAsk({ prefer: ['gemini-cli'] }), { runnerConfig, session: {} });
   assert.equal(result.executor, 'claude');
-  assert.equal(result.candidateIndex, 1);
   assert.equal(result.provenance.executor.source, 'capability:code:implement');
 });
 
@@ -698,7 +693,6 @@ test('bind prefer: an executor that is not registered is skipped like a filter, 
   const runnerConfig = createMockRunnerConfig();
   const skipped = bind(preferAsk({ prefer: ['nope'] }), { runnerConfig, session: {} });
   assert.equal(skipped.executor, 'claude');
-  assert.equal(skipped.candidateIndex, 1);
 
   delete runnerConfig.capabilities['code:implement'].prefer;
   delete runnerConfig.capabilities.implement;
@@ -720,10 +714,12 @@ test('bind prefer: duplicates of a unit candidate are dropped from the capabilit
   const ask = preferAsk({ prefer: [{ executor: 'codex', invocation: 'codex-cli' }] }, { unit: { id: 'u1', capability: 'code:implement', writes: ['src/a.js'], prefer: [{ executor: 'codex', invocation: 'codex-cli' }] } });
   const ctx = { runnerConfig, session: {} };
   const walked = [];
+  const tried = [];
   let bound = bind(ask, ctx);
   while (!bound.refused) {
     walked.push([bound.executor, bound.provenance.executor.source]);
-    bound = nextCandidate(bound, ask, ctx);
+    tried.push(bound);
+    bound = nextCandidate(bound, ask, ctx, 'provider-limit', { tried: [...tried] });
   }
   assert.deepEqual(walked, [
     ['codex', 'unit-prefer'],
@@ -750,7 +746,7 @@ test('bind prefer: a unit without prefer binds exactly as before', () => {
   const result = bind(ask, ctx);
   assert.deepEqual(bind(withEmpty, ctx), result);
   assert.equal(result.executor, 'claude');
-  assert.equal(result.candidateIndex, 0);
+  assert.equal(result.pool, 'claude');
   assert.deepEqual(result.provenance.executor, { value: 'claude', source: 'capability:code:implement' });
   assert.deepEqual(result.provenance.invocation, { value: 'claude-herdr', source: 'capability:code:implement' });
 });

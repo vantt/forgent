@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add `fgos worktree remove <path> --delivered-to <ref>`: removes a worktree through the Worktree port, which refuses a dirty checkout, one a process stands in, preserved worker state, or a tip not contained in the delivery target (branch name, full ref or object id). No force flag; the delivery statement is recorded as the operation's evidence digest.
+
+- Git typed commit and recovery reads ignore user signature/display settings; suite subprocess census no longer requires strace.
+
+- Git typed operations batch storage and commit-header reads, reuse operation-local checkout facts and index evidence, and expose paired per-phase Git/holder-lock census diagnostics.
+
+- Git hooks ownership excludes included config files; interrupted native-lock exchanges resume automatically using the recorded guard identity. GitHub merge diagnostics retain pre-connect failures and stop polling terminal PRs, and restore extraction preserves missing worktree registrations as exclusions.
+
+- Git recovery preserves live Publication and non-event transfer lock contracts, releases terminal ref pins, tolerates prunable extraction registrations, and atomically guards Linux native-lock quarantine; GitHub merge timeouts query server state before a later request.
+
+- Git deadline cleanup now gives children three seconds to terminate cooperatively; unowned native index locks refuse with `native-index-lock-unowned` and a read-only holder report plus the retained-lock runbook.
+
+- Git Recovery reconciles ConfigChange under repo-config authority; hooks configuration preserves inherited values and removes only owned local settings. Native quarantine detects inode substitution after rename.
+
+- SafeRestore extraction refuses sibling worktrees and the state root, binds creation to a directory descriptor, and recognizes tracked case-only aliases. Add a dormant partial Recovery facade, a GitHub timeout/query contract test, and paired typed-operation E3 budget rows.
+
+- Git adds dormant native index-lock inspection/quarantine and owned hooks configuration APIs, with exact inode/value guards and WAL recovery; existing setup and mutation callers remain on their current paths.
+
+- Git Land can recover an observed candidate after later destination commits without touching checkout/index; unrelated main merge/bisect state no longer blocks prepare/publish or terminal receipt replay.
+
+- SafeRestore refuses untracked/ignored collisions unless exact replacement paths are authorized, captures only local bytes, preserves incoming executable modes and intent-to-add, and exposes snapshot extraction and acknowledgement-gated cleanup. Unreadable snapshots no longer permanently block a checkout.
+
+- Git Land recovery blocks unreconciled predecessor effects, tolerates index stat refresh, preserves ignored store collisions and permits acknowledged cleanup of abandoned/lost candidates.
+
+- Add dormant SafeRestore preview/apply/recover ports with durable binary/index/untracked/mode snapshots, verified checkout custody, local delta reapplication and observe-only crash recovery.
+
+- Git Land preserves unrelated staged changes, closes abandoned prepares at admission, and reports attempted retries and CAS failures consistently with recovery.
+
+- Add dormant Land recovery through the existing Rust/addon/Node port, observe-only CAS recovery, recorded checkout fingerprints, acknowledgement-gated cleanup and compacted receipt replay.
+
+- Add dormant Git Land prepare/publish ports with immutable candidates, consumer verification binding, own-file checkout protection, one-shot CAS and operation-id receipt replay; production callers remain unchanged.
+
+- The coordination driver doctrine (`core/skills/_shared/coordination-driver.md`, loaded by `fgos-advise` and the other coordination facades) now teaches the case model: observe with `fgos workflow status <caseId>`, choose an activity and route yourself, dispatch with `--case` and `--activity` on every run (read-only included), treat a refusal as an answer, ask a person only for the listed triggers, close with `fgos workflow close`. It no longer tells a driver to run `fgos workflow operations` on a run.
+
+- Provider accounts of one pool are now taken in the order the config declares them, no longer by fewest leases or oldest use: the first account takes every lease until it is quarantined or disabled, then the next. A pool declared in `runner.llmAccounts` now supplies its own accounts to the lease (a `codex` store as a Codex home, any other store with the login files its invocations declare); a pool it does not declare keeps reading `runner.providers`. An account id of digits only is refused, since such a key would sort ahead of the others. `runner.tierFallback` (tier to ordered list of families) is checked by the new doctor row `tier-fallback`.
+
+- A seat that fails on a provider limit or a dead login now walks the tier it runs at: first the remaining models of its family's cell for that tier (each `model@pool` entry is served by its own pool and its own accounts), then the families `runner.tierFallback.<tier>` lists, limited to the families the capability's `prefer` names and never leaving the tier. A pool no enabled account of can run (no account holding the CLI's login store) is not a candidate, and a dead login excludes that pool only, not the family's other pools. The leading family of a seat still follows `prefer`. `fgos run --account` and `fgos workflow start --account` now take `pool/account` (for example `openai/work`); a bare account id is refused with the form to write. A tier with no model for an out-of-process agent seat's family now refuses with `tier-cell-missing`, naming `runner.modelPolicies.<family>.<tier>`; `executor.model` and the `default` model no longer stand in for a missing cell. `fgos dispatch explain` prints the candidates in order (with why one is out), the walk, and the accounts of each pool on it in lease order. A unit record written before this change restarts its walk at the primary.
+
+- `fgos doctor` row `mutating-assignment-binding-snapshot` now recomputes a fallback attempt with the seat's earlier bindings, the way the write gate does, so it no longer reports a binding mismatch for every attempt after the first; a binding that differs from its walk still fails. The messages of `model-policy-pools` and `llm-accounts-vs-legacy` now say that the walk skips a pool with no usable account and that the lease reads `runner.llmAccounts` for a pool it declares.
+- Git checkout operations revalidate config file stamps before each child and refuse post-hook promisor changes while retaining the reduced preflight exec count.
+
+- Git: reuse config and storage-format checks within each ScopedCommit/Sync call, recheck after hooks, and retain per-child topology and custody validation.
+- A Unit that writes is no longer run without asking whether a Workflow case owns its worktree. `runUnit` takes the admission port from its caller (the Execution Core owns the interface, the Workflow implements it, every entry point injects it): a writing Unit without the port is refused as `case-admission-port-missing`, a standalone writing run goes on only into a worktree no case binds, and a Unit that names a case is admitted before custody and the unit directory, linked in `unit.json` as `{ caseId, activity, reservationId }` (older records still read), held to a seat-launch ceiling (planned seats times the frame's fallback allowance; a provider limit keeps `fallbackExhausted`, a reviewed run that cannot start its next round ends at its last evaluation), rechecked at the write gate (`consent-stale` commits nothing) and settled once. The Playbook proposer, `fgos run`, the Work dispatch, operation-choice and fan-out paths all inject the real port; the Work paths get `unbound` and behave as before.
+
+- `fgos run --case <id> --activity <id> [--route should|may-instead|unlisted] [--reason <text>]` and `fgos workflow start --case <parentId>` name the case a run belongs to. Every signal a call gives (the reference, the case variables its door set, the binding of the worktree it writes) must name one open case: `authority-context-conflict` and `authority-context-invalid` (unknown, malformed, closed: never standalone), `bound-worktree-requires-case-authority` for a writing run into a bound worktree that names no case, `playbook-case-admits-via-proposer-only` for a call from outside a Playbook case's proposer, and `nested-write-from-confined-worker` for a writing dispatch from inside a confined worker. Workers no longer inherit `FGOS_CASE_ID`/`FGOS_CASE_RESERVATION`: the door sets them from the reservation it admitted (codex gets them beside its writer id in injected config). A nested case or `--units` wave is charged to its parent's frame first and given back, exactly once, when it cannot open.
+
+- A Playbook case that ran to a pass now closes itself, by the same rules as `fgos workflow close` (quiet bindings released); a failed, blocked or parked case stays open for `resume` and `answer`, and a conductor case still closes only through `fgos workflow close`.
+
+- A gate approval can be given again for content that changed after it was approved. The digest of an edited report is now the digest of the bytes that lie there (it used to become unknown), so the gate asks again, the re-approval is bound to the new digest, and the next Unit is handed the revision a person approved instead of being refused as `report-changed-after-settle`; an edit no approval covers is still refused.
+
 - `fgos doctor` row `git-worktree-recovery` no longer fails on a worktree whose `git worktree lock` reason names a process that is still running (pid and start time checked, a reused pid does not count); a lock naming a dead or unparseable owner stays a finding.
 
 - Event Store migration refuses published mirror conflicts before changing the local legacy ref, restores pre-commit filesystem failures, and computes dry-run identities through Rust and the read-only Git port.

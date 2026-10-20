@@ -52,7 +52,7 @@ impl GitDriver {
                 return Err(failure("cutover-description-mismatch"));
             }
             if chain.outcome().is_some()
-                || !matches!(chain.last().phase, Phase::TargetAttempt { .. })
+                || !matches!(*chain.last_state(), Phase::TargetAttempt { .. })
             {
                 return Err(failure("cutover-grant-spent-or-unprepared"));
             }

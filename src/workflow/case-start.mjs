@@ -19,11 +19,15 @@ import { digestContextRefs, digestText } from './ref-digests.mjs';
 import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
 import { RunnerConfigError, assertReasoningEffort, parseRunTimeout, assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
 import { providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
+import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
+import { parseAccountPin } from '../runner/execution/account-pin.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
 import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
 import { assertWriteChains, gitOut } from './unit-handoff.mjs';
 import { RIGOR_ORDER } from './case-projection.mjs';
 import { bindWorktree } from './case-bindings.mjs';
+import { nestedStartRefusal } from './case-admission-port.mjs';
+import { chargeNestedCase, refundNestedCase } from './case-frame.mjs';
 
 const FRAME_COUNT_KEYS = Object.freeze(['dispatches', 'mutatingDispatches', 'fallbackPerSeat', 'deviationsBeforeAsk', 'seatLaunchesPerDispatch']);
 
@@ -73,7 +77,7 @@ export function resolveFrame(guide, flags) {
  *
  * @returns {{ opened: boolean }}
  */
-export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = workflow.guide, frame, request, hold, worktreePath, legacy = false }) {
+export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = workflow.guide, frame, request, hold, worktreePath, legacy = false, parent = null }) {
   const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
   if (events.some((e) => e.type === 'case.opened')) return { opened: false };
   const append = (event) => appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId, event, hold });
@@ -86,6 +90,7 @@ export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = wo
       frame,
       requestDigest: digestText(request ?? ''),
       openedAt: new Date().toISOString(),
+      ...(parent ? { parent: { caseId: parent.parentCaseId, reservationId: parent.reservationId } } : {}),
       ...(legacy ? { legacy: true } : {}),
     },
   });
@@ -239,6 +244,27 @@ export async function preflightWorkflowSeats(params = {}) {
 }
 
 /**
+ * What a nested case or wave spends of its parent's frame: the dispatches and writing dispatches its own
+ * frame grants, or, with no frame to say, one dispatch per Unit it declares (writing ones counted apart).
+ */
+function nestedCountersOf(workflow, frame) {
+  const units = workflow.steps.flatMap((step) => step.units ?? []);
+  const writing = units.filter((u) => (u.template?.writes ?? []).length > 0).length;
+  return {
+    dispatches: Number.isInteger(frame?.dispatches) ? frame.dispatches : units.length,
+    mutatingDispatches: Number.isInteger(frame?.mutatingDispatches) ? frame.mutatingDispatches : writing,
+  };
+}
+
+/**
+ * Give a nested case's charge back when its child failed to open, unless it did open: a case that opened
+ * keeps what it spent. Called by the start verbs after they release the child's `advance`.
+ */
+export function refundIfNotOpened({ mainRoot, parent, opened }) {
+  if (parent && !opened) refundNestedCase({ mainRoot, ...parent });
+}
+
+/**
  * Resolve the Workflow definition and record a new run, without advancing it. The run exists
  * in the store (status `running`, nothing started) as soon as this returns, so its id can be
  * handed to a caller before any step executes.
@@ -249,27 +275,41 @@ export function prepareWorkflowRun(params) {
   const frame = resolveFrame(workflow.guide, params.frame);
   const configSnapshot = snapshotRunnerConfig(mainRoot);
   if (account !== null) {
-    const inventory = providerAccountInventory(configSnapshot.runner);
-    const exists = Object.values(inventory).some(
-      (entry) => entry?.accounts && Object.hasOwn(entry.accounts, account),
-    );
-    if (!exists) {
-      throw new RunnerConfigError(`account "${account}" is not configured in runner.providers.*.accounts`);
+    const pin = parseAccountPin(account);
+    if (pin.refused) throw new RunnerConfigError(`--account: ${pin.refused.detail}`);
+    const accounts = providerAccountInventory(configSnapshot.runner)[legacyStateKey(pin.pool)]?.accounts;
+    if (!accounts || !Object.hasOwn(accounts, pin.id)) {
+      throw new RunnerConfigError(`account "${account}" is not configured: pool "${pin.pool}" has no account "${pin.id}" in runner.llmAccounts`);
     }
   }
-  const { workflowRunId, runDir } = createWorkflowRun({
-    repoRoot: mainRoot,
-    workflowId,
-    workflow,
-    configSnapshot,
-    request: params.request,
-    stanceOptions: normalizeStanceOptions(params.stanceOptions),
-    contextRefs,
-    seats,
-    effort,
-    timeoutMs,
-    account,
-  });
+  // A case or wave opened under a parent case is charged to the parent's frame first, in the parent's own
+  // short `advance` section, released before the child exists; a child that cannot open gives it back.
+  let parent = null;
+  if (params.parentCase) {
+    const refused = nestedStartRefusal({ repoRoot: mainRoot, parentCaseId: params.parentCase, env: params.env });
+    if (refused) throw new RunnerConfigError(`workflow start --case ${params.parentCase} refused ${refused.code}: ${refused.condition}`, { code: refused.code });
+    parent = chargeNestedCase({ mainRoot, parentCaseId: params.parentCase, counters: nestedCountersOf(workflow, frame), childRef: workflowId });
+  }
+  let created;
+  try {
+    created = createWorkflowRun({
+      repoRoot: mainRoot,
+      workflowId,
+      workflow,
+      configSnapshot,
+      request: params.request,
+      stanceOptions: normalizeStanceOptions(params.stanceOptions),
+      contextRefs,
+      seats,
+      effort,
+      timeoutMs,
+      account,
+    });
+  } catch (err) {
+    if (parent) refundNestedCase({ mainRoot, ...parent });
+    throw err;
+  }
+  const { workflowRunId, runDir } = created;
 
-  return { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request: params.request ?? null };
+  return { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request: params.request ?? null, parent };
 }

@@ -390,6 +390,27 @@ pub fn locked_fds(dev: u64, ino: u64, pids: Option<&[ProcId]>) -> io::Result<Vec
     Ok(out)
 }
 
+/// Visible open-file users. Reuses the same proc enumeration and inode
+/// matching as locked_fds, without requiring a kernel advisory lock record.
+pub fn file_users(dev: u64, ino: u64) -> Option<Vec<facts::FileUser>> {
+    use std::os::unix::fs::MetadataExt;
+    let mut users = Vec::new();
+    for pid in proc_pids() {
+        let Some(identity) = Linux.identity_of(pid) else { continue; };
+        let base = PathBuf::from(format!("/proc/{pid}"));
+        let Ok(entries) = fs::read_dir(base.join("fd")) else { continue; };
+        let found = entries.flatten().any(|entry| {
+            fs::metadata(entry.path()).is_ok_and(|m| (m.dev(), m.ino()) == (dev, ino))
+        });
+        if !found { continue; }
+        let exe = fs::read_link(base.join("exe")).ok();
+        if Linux.identity_of(pid).as_ref() == Some(&identity) {
+            users.push(facts::FileUser { identity, exe });
+        }
+    }
+    Some(users)
+}
+
 /// Compare open descriptions without keeping a duplicate alive.
 pub fn kcmp_same_file(pid_a: ProcId, fd_a: FdSlot, pid_b: ProcId, fd_b: FdSlot) -> io::Result<bool> {
     // SAFETY: KCMP_FILE (0) compares descriptor identities and changes nothing.

@@ -1,5 +1,7 @@
 # Phase 01: `runner.tierFallback` contract, validator, doctor check
 
+**Status: done (2026-10-19).** See the [phase lead report](../reports/phase-lead-261019-2323-model-pool-b1-p00-p02.md).
+
 ## Context
 
 - [plan.md](plan.md) D8, owner decisions 1 and 2. Parallel with phase 02 (disjoint files).

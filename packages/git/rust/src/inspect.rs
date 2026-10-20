@@ -576,7 +576,7 @@ impl GitDriver {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum PathFingerprint {
     Missing,
@@ -658,7 +658,7 @@ impl GitDriver {
 
 #[cfg(unix)]
 #[allow(clippy::unnecessary_cast)] // libc mode/dev/ino widths differ across Unix targets.
-fn fingerprint(
+pub(crate) fn fingerprint(
     root: &std::path::Path,
     path: &[u8],
     remaining: &mut u64,
@@ -792,7 +792,7 @@ fn fingerprint(
     Err(refused("invalid-literal-path"))
 }
 #[cfg(not(unix))]
-fn fingerprint(
+pub(crate) fn fingerprint(
     _root: &std::path::Path,
     _path: &[u8],
     _remaining: &mut u64,

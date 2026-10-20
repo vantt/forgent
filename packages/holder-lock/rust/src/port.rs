@@ -178,6 +178,8 @@ pub struct Handle {
     resource: Resource,
     pub(crate) mode: Mode,
     pub(crate) kill_wait_ms: u64,
+    /// Cooperative termination grace before forced child cleanup.
+    pub(crate) terminate_grace_ms: u64,
     /// Lagged per-spawn scan floor and latest successful proof start.
     /// Release alone decides whether any description copy remains.
     #[cfg_attr(not(unix), allow(dead_code))]
@@ -278,6 +280,7 @@ impl<'a> BorrowedHandle<'a> {
             resource: owner.resource.clone(),
             mode: owner.mode,
             kill_wait_ms: owner.kill_wait_ms,
+            terminate_grace_ms: owner.terminate_grace_ms,
             since: std::sync::Mutex::new(*owner.since.lock().map_err(|_| {
                 BorrowError::InvalidSpec("lock-history-poisoned".into())
             })?),
@@ -338,6 +341,7 @@ impl BorrowedHandle<'static> {
             resource,
             mode: Mode::Ex,
             kill_wait_ms,
+            terminate_grace_ms: 3000,
             since: std::sync::Mutex::new((floor, floor)),
         };
         let loan = Self {
@@ -516,6 +520,24 @@ pub struct BorrowIoOutcome {
     pub stderr: Vec<u8>,
 }
 
+/// Result of a bounded cooperative child termination.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Termination {
+    /// The root exited during the SIGTERM grace.
+    Terminated,
+    /// The root needed SIGKILL after the grace.
+    KilledAfterGrace,
+}
+impl Termination {
+    /// Stable diagnostic name.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Terminated => "terminated",
+            Self::KilledAfterGrace => "killed-after-grace",
+        }
+    }
+}
+
 /// Why [`run_borrowed`] failed.
 #[derive(Debug)]
 pub enum BorrowError {
@@ -526,7 +548,10 @@ pub enum BorrowError {
     /// A captured stream exceeded its byte ceiling; cleanup has completed.
     OutputLimit(&'static str),
     /// Execution deadline expired; cleanup has completed.
-    Deadline,
+    Deadline {
+        /// Whether the child honored termination before the grace expired.
+        termination: Termination,
+    },
     /// Reading or writing explicit I/O failed; cleanup has completed.
     Io(io::Error),
     /// The handle is shared, or the spec has no program.
@@ -559,7 +584,7 @@ impl std::fmt::Display for BorrowError {
             BorrowError::ResourceReplaced => write!(f, "lock-resource-replaced"),
             BorrowError::IoUnsupported => write!(f, "borrow-io-unsupported: explicit I/O requires Unix"),
             BorrowError::OutputLimit(stream) => write!(f, "borrow-output-limit: {stream}"),
-            BorrowError::Deadline => write!(f, "borrow-deadline"),
+            BorrowError::Deadline { termination } => write!(f, "borrow-deadline: {}", termination.as_str()),
             BorrowError::Io(err) => write!(f, "borrow-io-failed: {err}"),
             BorrowError::InvalidSpec(why) => write!(f, "borrow-spec-invalid: {why}"),
             BorrowError::Spawn(err) => write!(f, "borrow-spawn-failed: {err}"),
@@ -737,7 +762,7 @@ fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64
             return Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) };
         }
         locked.keep();
-        return Acquire::Acquired(Handle { protected_roots: vec![], file: Some(file), resource: resource.clone(), mode, kill_wait_ms, since: std::sync::Mutex::new((opened_after, opened_after)) });
+        return Acquire::Acquired(Handle { protected_roots: vec![], file: Some(file), resource: resource.clone(), mode, kill_wait_ms, terminate_grace_ms: 3000, since: std::sync::Mutex::new((opened_after, opened_after)) });
     }
 }
 
@@ -964,7 +989,7 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> R
     let mut err = Vec::new();
     // No reader/writer thread can outlive this scope. All three parent pipe
     // ends are nonblocking, so a child that ignores stdin cannot hide a deadline.
-    let transfer = (|| -> Result<(), BorrowError> {
+    let mut transfer = (|| -> Result<(), BorrowError> {
         nonblocking(input.as_ref().expect("piped stdin"))?;
         nonblocking(&stdout)?;
         nonblocking(&stderr)?;
@@ -975,7 +1000,7 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> R
         let exit_fd = exit_descriptor(pid);
         loop {
             if Instant::now() >= io.deadline {
-                return Err(BorrowError::Deadline);
+                return Err(BorrowError::Deadline { termination: Termination::KilledAfterGrace });
             }
             if out_open {
                 out_open = capture_available(&mut stdout, &mut out, io.stdout_limit, "stdout")?;
@@ -1029,7 +1054,26 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> R
     drop(input);
     if transfer.is_err() {
         // The root remains our unreaped child, so its identity cannot be reused.
-        let _ = child.kill();
+        // prepare_borrow makes the root its group leader. Retain the root
+        // unreaped throughout grace and drain, pinning the process group id.
+        // SIGTERM also lets children remove their own exclusively-created files.
+        unsafe { libc::killpg(pid as libc::pid_t, libc::SIGTERM); }
+        let until = Instant::now() + Duration::from_millis(handle.terminate_grace_ms);
+        let terminated = loop {
+            match child_exited_unreaped(pid, true) {
+                Ok(true) => break true,
+                Ok(false) if Instant::now() < until => std::thread::sleep(Duration::from_millis(2)),
+                _ => break false,
+            }
+        };
+        if !terminated {
+            let _ = child.kill();
+        }
+        if matches!(transfer, Err(BorrowError::Deadline { .. })) {
+            transfer = Err(BorrowError::Deadline {
+                termination: if terminated { Termination::Terminated } else { Termination::KilledAfterGrace },
+            });
+        }
     }
     // Every path after spawn uses the original release rule, including I/O
     // setup/read/write failures. Keep the root unreaped during leftover cleanup.

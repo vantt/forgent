@@ -3,6 +3,11 @@
 //! Publication uses caller-held opaque holder-lock authority, hardened borrowed
 //! children and a file WAL. There is no public raw-argv escape hatch.
 mod driver;
+mod recovery;
+mod restore;
+pub use restore::{RestoreRequest, RestorePreview, RestoreResult};
+mod land;
+pub use land::{LandRequest, LandFile, LandEvidence, LandCandidate, LandSession};
 mod inspect;
 mod refs;
 mod worktree;
@@ -86,8 +91,10 @@ impl std::fmt::Display for InvalidInput {
 impl std::error::Error for InvalidInput {}
 
 /// Only the validated driver may construct a repository handle.
-#[derive(Debug)]
 pub struct RepoHandle {
+    // Present only on an operation-local checkout handle; inner None fences
+    // all later commands if the post-hook refresh fails.
+    checkout_config: Option<std::sync::Mutex<Option<driver::ConfigCache>>>,
     common_dir: PathBuf,
     trusted_main_root: PathBuf,
     object_format: ObjectFormat,
@@ -95,7 +102,25 @@ pub struct RepoHandle {
     work_tree: Option<PathBuf>,
     layout: RepoLayout,
 }
+// Effective config can contain credentials; never include it in diagnostics.
+impl std::fmt::Debug for RepoHandle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RepoHandle")
+            .field("common_dir", &self.common_dir)
+            .field("trusted_main_root", &self.trusted_main_root)
+            .field("object_format", &self.object_format)
+            .field("git_dir", &self.git_dir)
+            .field("work_tree", &self.work_tree)
+            .field("layout", &self.layout)
+            .finish_non_exhaustive()
+    }
+}
 impl RepoHandle {
+    pub(crate) fn same_checkout(&self, other: &Self) -> bool {
+        self.git_dir == other.git_dir
+            && self.common_dir == other.common_dir
+            && self.work_tree == other.work_tree
+    }
     pub fn layout(&self) -> &RepoLayout {
         &self.layout
     }
@@ -405,6 +430,8 @@ pub trait Inspect {
     fn resolve_repo(&self, path: &std::path::Path) -> Result<ResolveRepo>;
 }
 pub trait RepositoryConfig {
+    fn ensure_hooks(&self, repo: &RepoHandle, owned_path: &std::path::Path, operation_id: &str) -> Result<HooksReport>;
+    fn remove_owned_hooks_config(&self, repo: &RepoHandle, owned_path: &std::path::Path, operation_id: &str) -> Result<HooksReport>;
     fn ensure_fetch_mapping(
         &self,
         repo: &RepoHandle,
@@ -537,3 +564,7 @@ mod sync;
 pub use sync::{has_conflict_markers, SyncResult};
 
 mod grant;
+
+mod native_lock;
+pub use native_lock::{NativeLockArtifact, NativeLockReport};
+pub use repository_config::HooksReport;

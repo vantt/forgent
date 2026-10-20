@@ -1,5 +1,7 @@
 # Phase 02: pool-keyed lease, `llmAccounts` as source, declared account order
 
+**Status: done (2026-10-19).** See the [phase lead report](../reports/phase-lead-261019-2323-model-pool-b1-p00-p02.md).
+
 ## Context
 
 - [plan.md](plan.md) D4, D5; owner decisions 3 and 4; wave-0 answers 6 and 7.

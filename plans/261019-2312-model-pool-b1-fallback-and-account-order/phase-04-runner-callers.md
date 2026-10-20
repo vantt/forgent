@@ -1,5 +1,7 @@
 # Phase 04: move every caller of the changed contracts
 
+Status: done. Every caller of the changed contracts moved; lands with phase 03; report: [phase-lead-261020-0121-model-pool-b1-p03-p04.md](../reports/phase-lead-261020-0121-model-pool-b1-p03-p04.md).
+
 Starts after phase 03 is ready and AGENT-WF 07-08 are on main (phase 00 fact 1); branch cut after them. Lands with phase 03.
 
 ## Context

@@ -7,6 +7,7 @@ use std::{
     process::Command,
     sync::atomic::{AtomicU64, Ordering},
 };
+include!("support/signing.rs");
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 fn git(root: &Path, args: &[&str]) -> String {
     let out = Command::new("git")
@@ -489,9 +490,10 @@ fn admission_abandons_pre_attempt_commit_and_sync_without_blocking_fresh_ids() {
     }
 }
 #[test]
-fn explicit_recovery_observes_commit_or_closes_unknown_without_replaying() {
+fn explicit_recovery_observes_signed_commit_or_closes_unknown_without_replaying() {
     for committed in [false, true] {
         let f = Fixture::new();
+        enable_signing(&f.tree, &f.temp);
         interrupted(&f, "interrupted", 2, false);
         if committed {
             git(&f.tree, &["commit", "-qm", "interrupted"]);
@@ -516,10 +518,12 @@ fn recovery_preserves_attempt_while_native_index_lock_exists() {
     interrupted(&f, "interrupted", 2, false);
     let gitdir = git(&f.tree, &["rev-parse", "--absolute-git-dir"]);
     fs::write(Path::new(&gitdir).join("index.lock"), "native residue").unwrap();
-    assert!(f
-        .driver
+    let error = f.driver
         .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
-        .is_err());
+        .unwrap_err();
+    assert!(error.cause.starts_with("native-index-lock-unowned:"));
+    assert!(error.cause.contains("repairNativeIndexLock"));
+    assert!(error.cause.contains("§11"));
     assert!(wal::Wal::open(&f.repo)
         .unwrap()
         .inspect("interrupted")
@@ -1164,4 +1168,28 @@ fn sync_terminal_replay_ignores_live_branch_and_detached_head() {
             );
         }
     }
+}
+
+#[test]
+fn sync_native_index_lock_refusal_names_inspection_and_preserves_bytes() {
+    let f = Fixture::new();
+    interrupted(&f, "interrupted", 2, true);
+    let gitdir = git(&f.tree, &["rev-parse", "--absolute-git-dir"]);
+    let path = Path::new(&gitdir).join("index.lock");
+    fs::write(&path, b"external sync lock").unwrap();
+    let error = f.driver.inspect_sync(&f.repo, f.held(), "fixture", "interrupted").unwrap_err();
+    assert!(error.cause.starts_with("native-index-lock-unowned:"));
+    assert!(error.cause.contains("repairNativeIndexLock"));
+    assert!(error.cause.contains("§11"));
+    assert_eq!(fs::read(&path).unwrap(), b"external sync lock");
+    assert!(wal::Wal::open(&f.repo).unwrap().inspect("interrupted").unwrap().outcome().is_none());
+}
+
+#[test]
+fn scoped_commit_ignores_signature_and_display_config() {
+    let f = Fixture::new();
+    enable_signing(&f.tree, &f.temp);
+    fresh_commit(&f, "signed");
+    assert!(git(&f.tree, &["cat-file", "-p", "HEAD"]).contains("gpgsig -----BEGIN SSH SIGNATURE-----"));
+    assert!(git(&f.tree, &["show", "-s", "--format=%H"]).contains("Good "));
 }

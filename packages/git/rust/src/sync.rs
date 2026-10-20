@@ -53,6 +53,8 @@ impl GitDriver {
         if message.is_empty() || message.contains('\0') || message.len() > 1024 * 1024 {
             return Err(failure("invalid-commit-message"));
         }
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         let wal = Wal::open(repo).map_err(failure)?;
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
@@ -149,7 +151,7 @@ impl GitDriver {
             Ok(chain) => chain,
             Err(error) => {
                 let pending = wal.inspect(id).map_err(failure)?;
-                if matches!(pending.last().phase, Phase::Intent(_) | Phase::Prepared) {
+                if matches!(*pending.last_state(), Phase::Intent(_) | Phase::Prepared) {
                     let terminal = wal
                         .append(&pending, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                         .map_err(failure)?;
@@ -317,7 +319,10 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<SyncResult> {
-        let scope = scope(repo, held)?;
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
+        let mut scope = scope(repo, held)?;
+        crate::recovery::leaf(&mut scope, repo)?;
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
         self.continue_sync_scoped(repo, &scope, &wal, writer, id, false)
     }
@@ -328,6 +333,8 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<SyncResult> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
         self.continue_sync_scoped(repo, &scope, &wal, writer, id, true)
@@ -498,7 +505,7 @@ impl GitDriver {
         }
         // A commit may have moved HEAD and then died before its receipt.
         // Never infer a safe retry from HEAD equality (including ABA).
-        if let Phase::SyncCommitAttempt { .. } = &chain.last().phase {
+        if let Phase::SyncCommitAttempt { .. } = chain.last_state() {
             let current_reference =
                 self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
             let reference = payload
@@ -511,7 +518,8 @@ impl GitDriver {
             fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
             match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                _ => return Err(recovery("sync-index-lock-present")),
+                Ok(_) => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
+                Err(e) => return Err(failure(e)),
             }
             let reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
             let outcome = if let Some((observed, contract_violation)) =
@@ -543,14 +551,15 @@ impl GitDriver {
         }
         if merge.is_none() {
             fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
-            if matches!(chain.last().phase, Phase::TargetAttempt { .. })
+            if matches!(chain.last_state(), Phase::TargetAttempt { .. })
                 && &now == head
                 && self.staged(repo, scope)?.is_empty()
                 && self.unmerged(repo, scope)?.is_empty()
             {
                 match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
                     Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                    _ => return Err(recovery("sync-index-lock-present")),
+                    Ok(_) => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
+                    Err(e) => return Err(failure(e)),
                 }
                 let terminal = wal
                     .append(
@@ -564,7 +573,7 @@ impl GitDriver {
                 receipt.warnings = self.compact_checkout_warning(repo, scope, wal, &terminal);
                 return Ok(receipt);
             }
-            if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
+            if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
                 let terminal = wal
                     .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                     .map_err(failure)?;
@@ -591,7 +600,7 @@ impl GitDriver {
         if merge.as_ref() != Some(target) || &now != head {
             return Err(failure("foreign-merge-head"));
         }
-        let conflicts = match &chain.last().phase {
+        let conflicts = match chain.last_state() {
             Phase::SyncState { conflicts, .. } => conflicts.clone(),
             Phase::TargetAttempt { .. } if !finish => {
                 return Ok(info(
@@ -632,7 +641,7 @@ impl GitDriver {
             staged,
             index_digest,
             ..
-        } = &chain.last().phase
+        } = chain.last_state()
         else {
             return Err(recovery("sync-state-recovery-required"));
         };
@@ -758,6 +767,8 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<SyncResult> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
         let state = self.continue_sync_scoped(repo, &scope, &wal, writer, id, false)?;

@@ -113,6 +113,7 @@ import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn, readBeacon } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 import { createWorktreeUseCase } from '../src/verbs/worktree/create.mjs';
+import { removeWorktreeUseCase } from '../src/verbs/worktree/remove.mjs';
 import { resolveStateRoot as worktreeStateRoot } from '../src/holder-lock/state-root.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
@@ -2303,7 +2304,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // --effort <level>: every unit of the run asks for this reasoning effort (kept for resume).
           effort: flags.effort === undefined ? undefined : requireField(flags.effort, '--effort requires a level (low, medium, high, max)'),
           timeout: flags.timeout === undefined ? undefined : requireField(flags.timeout, '--timeout requires a duration, e.g. 90m or 5400s'),
-          account: flags.account === undefined ? undefined : requireField(flags.account, '--account requires an account id (an entry of providers.<provider>.accounts in ~/.fgos/config.json)'),
+          account: flags.account === undefined ? undefined : requireField(flags.account, '--account requires pool/account (an account of a pool in runner.llmAccounts of ~/.fgos/config.json, for example openai/work)'),
           request: typeof flags.request === 'string' ? flags.request : undefined,
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           contextRefs: flags['context-ref'],
@@ -2313,6 +2314,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
             return [key.trim(), value.join('=').trim()];
           })),
           seats: flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|'),
+          // --case <parentCaseId>: open this case or wave under a conductor case, charged to its frame.
+          parentCase: flags.case === undefined ? undefined : requireField(flags.case, '--case requires the id of the parent case'),
           repoRoot: flags.dir,
           worktree: flags.worktree,
         };
@@ -2877,12 +2880,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           if (ov.timeoutMs === undefined) ov.timeoutMs = timeoutMs;
         }
       }
-      // `--account <id>` pins the provider account the same way: an `account` key on every override
+      // `--account <pool/account>` pins the account the same way: an `account` key on every override
       // that does not name one. runUnit checks it against each seat's bound executor before the unit
       // run exists; a resumed run keeps the account its bindings already carry.
       if (flags.account !== undefined) {
         if (resumeUnitRunId) throw new StoreError('validation', '--account cannot change a resumed unit run: it keeps the account its seats were bound to');
-        const account = requireField(flags.account, '--account requires an account id (an entry of providers.<provider>.accounts in ~/.fgos/config.json)');
+        const account = requireField(flags.account, '--account requires pool/account (an account of a pool in runner.llmAccounts of ~/.fgos/config.json, for example openai/work)');
         if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({ origin: 'human-cli' });
         for (const ov of overrides) {
           if (ov.account === undefined) ov.account = account;
@@ -2898,9 +2901,35 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         isLinkedWorktree: () => resolveGitRoots(worktree ? path.resolve(worktree) : process.cwd()).isLinkedWorktree,
       });
 
+      // `--case <id> --activity <id>` names the case this run is an activity of: it is admitted into that
+      // case (entry, MUST rules, write overlap, frame) before anything exists. Without them the run is
+      // standalone, and a writing one goes on only into a worktree no case owns.
+      const caseFlagsGiven = ['case', 'activity', 'route', 'reason'].filter((f) => flags[f] !== undefined);
+      let caseRef;
+      if (caseFlagsGiven.length > 0) {
+        if (resumeUnitRunId) throw new StoreError('validation', '--case cannot change a resumed unit run: it keeps the case it was admitted into');
+        const caseId = requireField(flags.case, `--${caseFlagsGiven.find((f) => f !== 'case') ?? 'case'} needs --case <caseId>: ${caseFlagsGiven.join(', ')} only apply to a run that names a case`);
+        const activity = requireField(flags.activity, '--case needs --activity <id>: the activity of the case\'s guide this run is');
+        if (flags.route !== undefined && !['should', 'may-instead', 'unlisted'].includes(flags.route)) {
+          throw new StoreError('validation', '--route must be should, may-instead or unlisted');
+        }
+        caseRef = {
+          caseId,
+          activity,
+          ...(flags.route !== undefined ? { route: flags.route } : {}),
+          ...(flags.reason !== undefined ? { reason: requireField(flags.reason, '--reason requires text') } : {}),
+        };
+      }
+      // The Workflow's port, injected here so the Execution Core never imports the Workflow: a writing
+      // run goes on only into a worktree no case owns.
+      const { createCaseAdmissionPort } = await import('../src/workflow/case-admission-port.mjs');
+      const portRoot = repoRoot ? path.resolve(repoRoot) : (() => { try { return resolveGitRoots(process.cwd()).mainCheckoutRoot; } catch { return null; } })();
+
       return attachDirWarning(await runUnit({
         unitPath,
         unitData,
+        ...(portRoot ? { caseAdmission: createCaseAdmissionPort({ repoRoot: portRoot }) } : {}),
+        ...(caseRef ? { caseRef } : {}),
         pattern,
         stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
         overrides,
@@ -3794,7 +3823,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'worktree': {
-      const sub = requireField(positional[0], 'worktree requires create <path>');
+      const sub = requireField(positional[0], 'worktree requires a sub-verb: create <path> | remove <path> --delivered-to <ref>');
       if (sub === 'create') {
         if (positional.length !== 2) throw new Error('usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');
         const cwd = process.cwd();
@@ -3804,6 +3833,16 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return createWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
           path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),
           detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),
+        });
+      }
+      if (sub === 'remove') {
+        if (positional.length !== 2) throw new Error('usage: fgos worktree remove <path> --delivered-to <ref> [--json]');
+        const cwd = process.cwd();
+        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
+        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
+        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);
+        return removeWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
+          path: positional[1], deliveredTo: requireField(flags['delivered-to'], 'worktree remove requires --delivered-to <ref>'),
         });
       }
       throw new Error(`unknown worktree sub-verb: ${sub}`);
