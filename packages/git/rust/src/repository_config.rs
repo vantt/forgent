@@ -33,6 +33,7 @@ fn error(cause: impl std::fmt::Display) -> OperationError {
         exit_code: None,
         signal: None,
         stderr: vec![],
+        detail: None,
     }
 }
 struct Authority<'a> {
@@ -684,6 +685,9 @@ impl GitDriver {
         let mut latest = None;
         let mut ambiguous = false;
         for entry in scan.entries {
+            // scan includes the terminal ledger; those operation directories
+            // have already been removed. Config ownership chains stay retained.
+            if wal.compacted(&entry.operation_id).map_err(error)?.is_some() { continue; }
             let chain = wal.inspect(&entry.operation_id).map_err(error)?;
             if matches!(
                 chain.outcome(),
@@ -834,5 +838,33 @@ impl GitDriver {
             .ok_or_else(|| error("invalid-hooks-operation"))?;
         self.recover_config_change(repo, id, change)?;
         self.inspect_hooks(repo, std::path::Path::new(&h.owner_path))
+    }
+}
+
+impl GitDriver {
+    /// G-062: only RepositoryConfig-owned guard provenance permits diagnostic
+    /// replay. Preserve the original commit stderr, never the replay's output.
+    pub(crate) fn checkout_commit_failure(
+        &self,
+        repo: &RepoHandle,
+        scope: &fgos_holder_lock::LockScope<'_>,
+        out: crate::driver::Output,
+    ) -> Result<OperationError> {
+        let diagnostic = (|| -> Result<&str> {
+            if let Some(path) = self.hooks_value(repo)? {
+                let report = self.inspect_hooks(repo, &repo.trusted_main_root().join(&path))?;
+                if report.status == "owned" && report.provenance.is_some() && !report.enforcement_missing {
+                    let replay = self.checkout_call(repo, scope, &["hook", "run", "pre-commit"], &[], true)?;
+                    if !replay.success { return Ok("hook-refused"); }
+                }
+            }
+            Ok("commit-rejected")
+        })();
+        let cause = diagnostic.map_err(|mut error| {
+            error.stderr = out.stderr.clone();
+            error.exit_code = out.code;
+            error
+        })?;
+        Ok(out.error(cause))
     }
 }

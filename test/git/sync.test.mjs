@@ -62,7 +62,7 @@ test('Sync refuses foreign staged resolver paths and retains their bytes',()=>{
 test('Sync preserves a rejecting hook cause and never reports its open merge as not started',()=>{
  const f=fixture();try {
  const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\necho original-sync-rejection >&2\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
- assert.throws(()=>f.port.start({operationId:'rejected',target:f.target,message:'sync'},f.held),/hook-rejected/);
+ assert.throws(()=>f.port.start({operationId:'rejected',target:f.target,message:'sync'},f.held),/commit-rejected/);
  assert.equal(execFileSync('git',['-C',f.linked,'rev-parse','MERGE_HEAD'],{encoding:'utf8'}).trim(),f.target);
  assert.equal(f.port.inspect({operationId:'rejected'},f.held).state,'rejected-open');
  assert.equal(fs.readFileSync(path.join(f.linked,'incoming'),'utf8'),'target\n');
@@ -78,7 +78,7 @@ test('Sync preserves a rejecting hook cause and never reports its open merge as 
 test('a recreated worktree does not inherit a rejected Sync from the dead checkout',()=>{
  const f=fixture();try {
   const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
-  assert.throws(()=>f.port.start({operationId:'dead-sync',target:f.target,message:'sync'},f.held),/hook-rejected/);
+  assert.throws(()=>f.port.start({operationId:'dead-sync',target:f.target,message:'sync'},f.held),/commit-rejected/);
   const old=JSON.parse(fs.readFileSync(path.join(f.repo,'.git/fgos/git/operations/dead-sync/00000000.json'),'utf8'));
   assert.match(old.phase.data.resourceSet[0],/:custody:/);
   f.held[0].release();f.git('worktree','remove','--force',f.linked);f.git('worktree','add',f.linked,'producer');

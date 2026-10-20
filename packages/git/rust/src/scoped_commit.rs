@@ -20,12 +20,47 @@ pub struct CutoverGrant {
     pub legacy_ref_oid: String,
     pub seal_digest: String,
 }
+// WORK-lane deletion: remove at Event Store cutover with the Work adapter.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct LegacyEventLayout {
+    pub exact_paths: Vec<String>,
+}
+impl LegacyEventLayout {
+    pub(crate) fn validate(&self, repo: &RepoHandle) -> Result<()> {
+        if root(repo)? != repo.trusted_main_root() || self.exact_paths.is_empty() {
+            return Err(failure("legacy-events-main-required"));
+        }
+        let mut seen = BTreeSet::new();
+        for p in &self.exact_paths {
+            let shard = p.strip_prefix(".fgos/events/").is_some_and(|name| {
+                let name = name.strip_prefix("archive/").unwrap_or(name);
+                !name.is_empty() && !name.contains('/') && name.ends_with(".jsonl")
+            });
+            if !seen.insert(p) || !(p == ".fgos/events.jsonl" || p == ".fgos/porting/events.jsonl" || shard)
+                || crate::fgos_scope_literal(p).is_err() {
+                return Err(failure("invalid-legacy-event-path"));
+            }
+        }
+        Ok(())
+    }
+}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CommitRequest {
     pub writes: Vec<String>,
     pub message: String,
     pub cutover_grant: Option<CutoverGrant>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub legacy_events: Option<LegacyEventLayout>,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CheckpointRequest {
+    pub files: Vec<String>,
+    pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub legacy_events: Option<LegacyEventLayout>,
 }
 /// Capture before producer launch. Keep this value for commit-only retry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -506,6 +541,7 @@ impl GitDriver {
             }
             return compact.outcome().map_err(failure);
         }
+        if !wal.known_id(id).map_err(failure)? { return Ok(Outcome::AbandonedBeforeAttempt); }
         let chain = wal.inspect(id).map_err(failure)?;
         let OperationKind::ScopedCommit(payload) = &chain.intent().kind else {
             return Err(failure("not-scoped-commit-operation"));
@@ -700,22 +736,61 @@ impl GitDriver {
             scope,
             &["ls-files", "--others", "--exclude-standard", "-z"],
         )?)?);
+        // Git reports an untracked embedded repository with a trailing slash;
+        // its index entry is the directory's literal name (a gitlink).
+        for p in &mut result { if p.ends_with('/') { p.pop(); } }
         result.sort();
         result.dedup();
         Ok(result)
+    }
+    pub fn checkout_state(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+    ) -> Result<serde_json::Value> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
+        let scope = scope(repo, held)?;
+        Ok(
+            serde_json::json!({"head": self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])?,
+            "mergeHead": self.merge_head(repo, &scope)?, "unmerged": self.unmerged(repo, &scope)?, "staged": self.staged(repo, &scope)?,
+            "changed": self.dirty_paths(repo, &scope)?}),
+        )
     }
     pub fn preflight_commit(
         &self,
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,
     ) -> Result<CommitBaseline> {
+        self.preflight_commit_for_sync(repo, held, None)
+    }
+    pub fn preflight_commit_for_sync(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        sync: Option<(&str, &str)>,
+    ) -> Result<CommitBaseline> {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let scope = scope(repo, held)?;
-        if self.merge_head(repo, &scope)?.is_some() {
+        let mut own = BTreeSet::new();
+        if let Some((writer, id)) = sync {
+            let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
+            let state = self.continue_sync_scoped(repo, &scope, &wal, writer, id, false)?;
+            if state.state == "in-progress" || state.state == "rejected-open" {
+                own.extend(state.resolver_grant);
+                let chain = wal.inspect(id).map_err(failure)?;
+                for record in chain.records() {
+                    if let Phase::SyncState { staged, .. } = &record.phase {
+                        own.extend(staged.iter().cloned());
+                    }
+                }
+            }
+        }
+        if self.merge_head(repo, &scope)?.is_some() && own.is_empty() {
             return Err(failure("foreign-merge-head"));
         }
-        if !self.staged(repo, &scope)?.is_empty() {
+        if self.staged(repo, &scope)?.iter().any(|p| !own.contains(p)) {
             return Err(failure("foreign-staged-index"));
         }
         let head = self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])?;
@@ -723,6 +798,7 @@ impl GitDriver {
         let dirty = self
             .dirty_paths(repo, &scope)?
             .into_iter()
+            .filter(|p| !own.contains(p))
             .map(|p| Ok((p.clone(), content_digest(root(repo)?, &p)?)))
             .collect::<Result<_>>()?;
         Ok(CommitBaseline {
@@ -944,6 +1020,10 @@ impl GitDriver {
                 selected.push(path);
             }
         }
+        if let Some(layout) = &request.legacy_events {
+            layout.validate(repo)?;
+            selected.extend(layout.exact_paths.iter().filter(|p| dirty_paths.contains(p) && !excluded.contains(p)).cloned());
+        }
         if let Some(grant) = &request.cutover_grant {
             if root(repo)? != repo.trusted_main_root() {
                 return Err(failure("cutover-main-required"));
@@ -974,7 +1054,7 @@ impl GitDriver {
         selected.sort();
         selected.dedup();
         for path in &selected {
-            crate::fgos_scope_literal(path).map_err(|_| failure("unscopable-commit-path"))?;
+            crate::literal_repo_path(path)?;
         }
         if selected.is_empty() {
             let kind = OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
@@ -1062,9 +1142,12 @@ impl GitDriver {
                 .filter(|p| !p.contains('*') && !checkout.join(p).is_dir())
                 .cloned(),
         );
+        // A gitlink owns the index entry, never the nested repository's bytes.
+        // Git add/reset do not mutate its checkout; rollback must not remove it.
+        let gitlinks: BTreeSet<_> = saved_paths.iter().filter(|p| checkout.join(p).is_dir() && checkout.join(p).join(".git").exists()).cloned().collect();
         let snapshot = saved_paths
             .into_iter()
-            .filter(|p| !skipped.contains(p))
+            .filter(|p| !skipped.contains(p) && !gitlinks.contains(p))
             .map(|p| {
                 let saved = if tracked.contains(&p) && !dirty.contains(&p) {
                     let metadata = fs::symlink_metadata(root(repo)?.join(&p)).map_err(failure)?;
@@ -1245,7 +1328,8 @@ impl GitDriver {
                         ],
                     )?)?)
             {
-                if fgos_write_scope::matches(p.as_bytes(), &writes).map_err(failure)? {
+                let p = p.strip_suffix('/').unwrap_or(&p).to_owned();
+                if !gitlinks.contains(&p) && fgos_write_scope::matches(p.as_bytes(), &writes).map_err(failure)? {
                     restore.entry(p).or_insert(SavedPath::Absent);
                 }
             }
@@ -1323,22 +1407,25 @@ impl GitDriver {
         }
         Ok(())
     }
-    /// Main-only non-event tracked payload. Event files never enter this adapter.
+    /// Main-only tracked checkpoint; WORK removes explicit legacy-event support at cutover.
     pub fn checkpoint_tracked_files(
         &self,
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,
-        files: Vec<String>,
-        message: String,
+        request: CheckpointRequest,
         writer: &str,
         id: &str,
     ) -> Result<CommitResult> {
+        let CheckpointRequest {files, message, legacy_events} = request;
         if root(repo)? != repo.trusted_main_root()
-            || files
-                .iter()
-                .any(|p| p == ".fgos" || p.starts_with(".fgos/"))
+            || files.iter().any(|p| (p == ".fgos" || p.starts_with(".fgos/"))
+                && !legacy_events.as_ref().is_some_and(|l| l.exact_paths.contains(p)))
         {
             return Err(failure("checkpoint-non-event-main-required"));
+        }
+        if let Some(layout) = &legacy_events {
+            layout.validate(repo)?;
+            if layout.exact_paths.iter().any(|p| !files.contains(p)) { return Err(failure("invalid-legacy-event-path")); }
         }
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
@@ -1368,6 +1455,7 @@ impl GitDriver {
                 writes: files,
                 message,
                 cutover_grant: None,
+                legacy_events,
             },
             writer,
             id,

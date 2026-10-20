@@ -32,6 +32,9 @@ impl GitSync {
             ResolveRepo::Repository(r) => r,
             _ => return Err(error("not-a-repository")),
         };
+        if std::fs::canonicalize(&trusted_main).map_err(error)? != repo.trusted_main_root() {
+            return Err(error("untrusted-worktree: explicit main checkout required"));
+        }
         Ok(Self {
             driver,
             repo,
@@ -53,6 +56,7 @@ impl GitSync {
                 id
             ),
             "inspect" => self.driver.inspect_sync(&self.repo, held, &self.writer, id),
+            "continue" if args.get("nextOperationId").and_then(Value::as_str).is_some() => self.driver.retry_sync_commit(&self.repo, held, &self.writer, id, text(&args, "nextOperationId")?),
             "continue" => self
                 .driver
                 .continue_sync(&self.repo, held, &self.writer, id),

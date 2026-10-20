@@ -423,7 +423,7 @@ impl Intent {
                 return Err(corrupt("scoped commit binding"));
             }
             for path in paths {
-                if crate::fgos_scope_literal(path).is_err() {
+                if crate::literal_repo_path(path).is_err() {
                     return Err(corrupt("scoped commit path"));
                 }
             }
@@ -833,10 +833,8 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 && clean_modes.iter().all(|(p, mode)| {
                     staged.contains(p) && !conflicts.contains(p) && *mode <= 0o177777
                 })
-                && conflicts
-                    .iter()
-                    .chain(staged)
-                    .all(|p| crate::fgos_scope_literal(p).is_ok())
+                && conflicts.iter().all(|p| crate::fgos_scope_literal(p).is_ok())
+                && staged.iter().all(|p| crate::literal_repo_path(p).is_ok())
         }
         (Phase::SyncState { .. }, Phase::SyncCommitAttempt { tree }) => {
             matches!(i.kind, OperationKind::Sync(_)) && Oid::parse(tree, i.object_format).is_ok()

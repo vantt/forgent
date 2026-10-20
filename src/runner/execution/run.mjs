@@ -4,7 +4,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { resolveWriterIdentity } from '../../util/session-identity.mjs';
+import { createGitInspect } from '../../git/inspect.mjs';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
 import {
@@ -43,7 +44,7 @@ import { readCancelWaitMs } from '../../run-supervisor/gate-kill-grace.mjs';
 import { listGenerations } from '../dispatch/run-lock.mjs';
 import { acquireUnitControl } from './unit-control.mjs';
 import { currentAttemptOf, lastAttempts } from './unit-state.mjs';
-import { createLockScope } from '../../holder-lock/index.mjs';
+import { createLockScope, resolveStateRoot } from '../../holder-lock/index.mjs';
 import { defaultConfinementTempRoots } from '../dispatch/confinement/backend-registry.mjs';
 
 /** Write `file` atomically so a reader never sees half a record. */
@@ -111,48 +112,15 @@ export function detectHerdrPresent(env = process.env) {
  * Resolve git main checkout root and worktree path without importing worktree.mjs.
  */
 export function resolveGitRoots(cwd = process.cwd()) {
-  let toplevel;
   try {
-    toplevel = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-      cwd,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    }).trim();
-  } catch (err) {
-    throw new RunnerConfigError(`fgos run must run inside a git repository (cwd: ${cwd}): ${err.message}`);
+    const result = createGitInspect({stateRoot:resolveStateRoot({fgosDir:path.join(cwd,'.fgos')}).stateRoot,
+      repoPath:cwd,trustedMain:cwd}).resolveRepo();
+    if (result.notARepository || !result.worktreeRoot) throw new Error('not a working repository');
+    return {worktreeRoot:result.worktreeRoot,mainCheckoutRoot:result.trustedMainRoot,
+      isLinkedWorktree:result.worktreeRoot !== result.trustedMainRoot};
+  } catch (error) {
+    throw new RunnerConfigError(`fgos run must run inside a git repository (cwd: ${cwd}): ${error.message}`);
   }
-
-  let gitCommonDir;
-  try {
-    gitCommonDir = execFileSync('git', ['rev-parse', '--git-common-dir'], {
-      cwd: toplevel,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    }).trim();
-  } catch {
-    gitCommonDir = '.git';
-  }
-
-  const resolvedCommon = path.resolve(toplevel, gitCommonDir);
-  const mainCheckoutRoot = path.dirname(resolvedCommon);
-
-  let realWorktree, realMain;
-  try {
-    realWorktree = fs.realpathSync(toplevel);
-  } catch {
-    realWorktree = path.resolve(toplevel);
-  }
-  try {
-    realMain = fs.realpathSync(mainCheckoutRoot);
-  } catch {
-    realMain = path.resolve(mainCheckoutRoot);
-  }
-
-  return {
-    worktreeRoot: realWorktree,
-    mainCheckoutRoot: realMain,
-    isLinkedWorktree: realWorktree !== realMain,
-  };
 }
 
 /**
@@ -183,6 +151,7 @@ export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
  */
 function commitPending(attempt, worktree, mainRoot, custody) {
   const commit = attempt?.commit;
+  if (attempt?.commitOperation?.state === 'pending') return true;
   if (commit?.status !== 'failed') return false;
   return !(commit.reason === 'committed-set-mismatch' && commit.sha && commitOnBranch(worktree, commit.sha, mainRoot, custody));
 }
@@ -559,7 +528,7 @@ async function runUnitBody(options, scope) {
       throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": ${who} holds lock at "${cwdHolder.lockPath}"`);
     }
     assertNoStrayCommit(unitRunId, unitRecord, mainRoot);
-    assertSyncResumable(unitRunId, unitRecord, mainRoot);
+
     assertPinnedAccountsUsable(lastAttempts(unitRecord).filter((a) => a.outcome !== 'pass').map((a) => a.binding ?? {}), {
       runnerConfig: unitRecord.configSnapshot?.runner,
       runtimeDir: options.providerCapacityRuntimeDir,
@@ -714,6 +683,8 @@ async function runUnitBody(options, scope) {
     scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), unitRecord.worktree);
   }
 
+  if (unit.writes.length > 0 || unitRecord.sync) unitRecord.gitWriter ??= resolveWriterIdentity(path.join(mainRoot, '.fgos')).id;
+  if (options.resumeUnitRunId) assertSyncResumable(unitRunId, unitRecord, mainRoot, scope.custody);
   scope.unitRecord = unitRecord;
   const seatLaunchCeiling = unitRecord.seatLaunchCeiling ?? null;
   const unitDir = path.join(assignmentsDir, unitRunId);
@@ -939,12 +910,22 @@ async function runUnitBody(options, scope) {
 
     const writeScope = effectiveWriteScope(unitRecord);
     // A merge a sync left open for this round is concluded first (unit-sync.mjs), then the rest.
+    let nativeBaseline = recorded[0]?.nativeBaseline;
+    if (!readOnly && recorded.length > 0 && !nativeBaseline) return {outcome:'policy-refusal',role,round,
+      refused:{reason:'native-baseline-missing',detail:'this writing attempt has no native pre-producer baseline; start a new Unit run'}};
     const commitWork = (summarySource, runResult, excludePaths) => {
-      const commit = commitRoundWithSync(unitRecord, mainRoot, () => commitUnitWork({
+      const operationId = crypto.randomUUID();
+      const attempt = unitRecord.bindings[key]?.at(-1);
+      const commit = commitRoundWithSync(unitRecord, mainRoot, (merge) => commitUnitWork({
         worktree: unitRecord.worktree,
         // The gitdir and hooks come from the main checkout, never from the worker-writable worktree.
         repoRoot: mainRoot,
         custody: scope.custody,
+        writer: unitRecord.gitWriter,
+        baseline: nativeBaseline && (unitRecord.sync?.commit?.sha ?? unitRecord.sync?.nativeHead) ? { ...nativeBaseline, head: unitRecord.sync.commit?.sha ?? unitRecord.sync.nativeHead } : nativeBaseline,
+        operationId,
+        resumeOperation: attempt?.commitOperation?.state === 'pending' ? attempt.commitOperation : undefined,
+        onPrepared: prepared => { attempt.commitOperation = {...prepared,state:'pending'}; persistUnitRecord(); },
         unitId: summarySource.id,
         summary: runResult?.agentClaim?.summary,
         objective: summarySource.objective,
@@ -953,6 +934,7 @@ async function runUnitBody(options, scope) {
         excludePaths,
         needsWrites: runResult?.agentClaim?.needsWrites,
       }), excludePaths, scope.custody);
+      if (attempt?.commitOperation && (commit.status !== 'failed' || ['commit-rejected','hook-refused'].includes(commit.nativeCause) || commit.reason === 'committed-set-mismatch')) attempt.commitOperation.state = 'settled';
       persistUnitRecord();
       return commit;
     };
@@ -970,7 +952,7 @@ async function runUnitBody(options, scope) {
     // never spawn the agent a second time.
     const lastRecorded = recorded[recorded.length - 1];
     if (!readOnly && commitPending(lastRecorded, unitRecord.worktree, mainRoot, scope.custody)) {
-      const refusal = preflightRefusal(role, round, preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, scope: writeScope, sync: unitRecord.sync }));
+      const refusal = lastRecorded.commitOperation?.state === 'pending' ? null : preflightRefusal(role, round, preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, writer: unitRecord.gitWriter, scope: writeScope, sync: unitRecord.sync }));
       if (refusal) return refusal;
       assertNotCancelled();
       const prior = readUnitRunHistory(unitDir).find((h) => h.role === role && (h.round ?? 1) === round);
@@ -1023,10 +1005,11 @@ async function runUnitBody(options, scope) {
     // runner never commits them. A resumed attempt keeps what its first launch saw.
     let preExistingInScope = [];
     if (!readOnly) {
-      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, scope: writeScope, sync: unitRecord.sync });
+      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, writer: unitRecord.gitWriter, scope: writeScope, sync: unitRecord.sync });
       const refusal = preflightRefusal(role, round, preflight);
       if (refusal) return refusal;
       preExistingInScope = recorded[0]?.preExistingInScope ?? preflight.preExistingInScope;
+      nativeBaseline = recorded[0]?.nativeBaseline ?? preflight.baseline;
     }
 
     // Out-of-process dispatch, with provider-limit failover: when the agent stops on a provider
@@ -1065,7 +1048,7 @@ async function runUnitBody(options, scope) {
           transport: bound.transport,
           invocation: bound.invocation,
           fallbackFrom: bound.provenance?.fallbackFrom ?? null,
-          ...(readOnly ? {} : { preExistingInScope }),
+          ...(readOnly ? {} : { preExistingInScope, nativeBaseline }),
           boundAt: new Date().toISOString(),
         });
         persistUnitRecord();

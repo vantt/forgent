@@ -21,6 +21,7 @@ fn err(cause: impl Into<String>) -> OperationError {
         exit_code: None,
         signal: None,
         stderr: vec![],
+        detail: None,
     }
 }
 fn werr(e: WalError) -> OperationError {

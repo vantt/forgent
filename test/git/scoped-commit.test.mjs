@@ -178,13 +178,16 @@ test('baseline-dirty paths changed by the producer are excluded with an explicit
   assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'after producer');
  }finally{f.close();}
 });
-for(const name of ['literal*star','control\tname','control\nname']) test(`unsupported literal path ${JSON.stringify(name)} refuses before staging or WAL intent`,()=>{
+for(const name of ['literal*star','control\tname','control\nname']) test(`E6 retargeted: literal path ${JSON.stringify(name)} commits and replays losslessly`,()=>{
  const f=fixture();try {
   const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,name),'producer');
-  assert.throws(()=>f.port.commit({operationId:'invalid-path',baseline,request:{writes:['**'],message:'refuse literal',cutoverGrant:null}},f.held),/unscopable-commit-path/);
+  const args={operationId:'literal-path',baseline,request:{writes:['**'],message:'literal path',cutoverGrant:null}};
+  const result=f.port.commit(args,f.held);
+  assert.equal(result.status,'committed');assert.deepEqual(result.files,[name]);
+  assert.deepEqual(f.port.commit(args,f.held).files,[name]);
   assert.equal(execFileSync('git',['-C',f.linked,'diff','--cached','--name-only'],{encoding:'utf8'}),'');
-  assert.equal(fs.existsSync(path.join(f.repo,'.git/fgos/git/operations/invalid-path')),false);
   assert.equal(fs.readFileSync(path.join(f.linked,name),'utf8'),'producer');
+  assert.deepEqual(execFileSync('git',['-C',f.linked,'show','--format=','--name-only','-z','HEAD']).toString().split('\0').filter(Boolean),[name]);
  }finally{f.close();}
 });
 

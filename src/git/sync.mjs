@@ -1,5 +1,5 @@
 // Typed transport; Rust owns every effect and authority check.
-import { hotLockDepth } from '../state/hot-lock.mjs';
+import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { loadNativeAddon, withNativeLocks } from './native.mjs';
 export function createGitSync(options, loaderOptions) {
   const outside = () => { if (hotLockDepth() > 0) throw new Error('exec-under-hot-lock: Git Sync'); };

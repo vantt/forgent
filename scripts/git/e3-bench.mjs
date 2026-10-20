@@ -15,7 +15,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { performance } from 'node:perf_hooks';
 
 const SELF = fileURLToPath(import.meta.url);
@@ -277,7 +277,15 @@ async function scopedCensusWorker(args) {
 // branch topology, disk and custody. Fixture setup is outside every sample.
 async function typedOperationRows(root, state, index, loader, samples, observer = {begin() {}, end() {}}) {
   const { acquireSync, createLockScope } = await import('../../src/holder-lock/index.mjs');
-  const { commitUnitWork } = await import('../../src/runner/execution/commit-unit-work.mjs');
+  // Preserve E3's old-core control after its production retirement. This
+  // immutable history fixture is materialized only inside the experiment root;
+  // it is never a production import or a second shipped writer.
+  const baselinePath = 'src/runner/execution/commit-unit-work.mjs';
+  const baseline = git(['-C', CHECKOUT, 'show', `512e8cd2a68300848bf13859d46872f7fbe94951:${baselinePath}`]);
+  const baselineFile = path.join(root, 'legacy-unit-commit-baseline.mjs');
+  fs.writeFileSync(baselineFile, baseline.replace(/from '([^']+)'/g, (all, specifier) =>
+    specifier.startsWith('.') ? `from '${pathToFileURL(path.resolve(CHECKOUT, path.dirname(baselinePath), specifier)).href}'` : all));
+  const { commitUnitWork } = await import(pathToFileURL(baselineFile).href);
   const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
   const make = label => {
     const repo = path.join(root, label); git(['init', '-q', '--initial-branch=main', repo]);

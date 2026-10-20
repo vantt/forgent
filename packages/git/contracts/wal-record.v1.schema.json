@@ -505,8 +505,11 @@
                             "paths": {
                               "type": "array",
                               "items": {
-                                "type": "string"
-                              }
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^(?!/)(?![\\s\\S]*\\u0000)[\\s\\S]+$"
+                              },
+                              "description": "Exact UTF-8 literal repository paths, encoded as JSON strings. JSON escaping round-trips star, tab, newline and other control characters; NUL is refused. Not write-scope declarations."
                             },
                             "tree": {
                               "type": "string",

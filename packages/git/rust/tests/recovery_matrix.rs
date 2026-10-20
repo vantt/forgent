@@ -140,6 +140,7 @@ fn recovery_matrix_child() {
                         writes: vec!["b".into()],
                         message: "matrix".into(),
                         cutover_grant: None,
+                        legacy_events: None,
                     },
                     WRITER,
                     ID,

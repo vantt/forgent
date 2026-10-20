@@ -51,8 +51,9 @@ impl GitInspect {
         };
         match method.as_str() {
             "resolveRepo" => Ok(
-                json!({"commonDir":repo.common_dir(),"gitDir":repo.git_dir(),"trustedMainRoot":repo.trusted_main_root(),"objectFormat":repo.object_format()}),
+                json!({"commonDir":repo.common_dir(),"gitDir":repo.git_dir(),"worktreeRoot":repo.work_tree(),"trustedMainRoot":repo.trusted_main_root(),"objectFormat":repo.object_format()}),
             ),
+            "resolveCommit" => Ok(json!(self.driver.resolve_commit_ref(&repo, text(&args, "name")?).map_err(operation)?)),
             "resolveRef" => {
                 let name = RefName::parse(text(&args, "name")?).map_err(error)?;
                 Ok(
@@ -137,7 +138,8 @@ impl GitInspect {
                 .snapshot_writes(
                     &repo,
                     &paths()?,
-                    serde_json::from_value(args["maxBytes"].clone()).map_err(error)?
+                    args["maxBytes"].as_f64().filter(|n| n.is_finite() && *n >= 0.0 && n.fract() == 0.0 && *n <= 9_007_199_254_740_991.0)
+                        .ok_or_else(|| error("byte budget must be a safe unsigned integer"))? as u64
                 )
                 .map_err(operation)?)),
             _ => Err(error("unknown-inspect-method")),

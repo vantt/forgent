@@ -444,7 +444,8 @@ async function warnOnConventionViolations(committingToplevel) {
 }
 
 // The config value only selects an operation. Rust proves the lock, WAL and index.
-function cutoverGrantAllows(committingToplevel) {
+// WORK removes legacy-event declarations from the native grant check at Event Store cutover.
+function scopedGrantAllows(committingToplevel) {
   try {
     const operation = execFileSync('git', ['config', '--get', 'fgos.operationId'], { cwd: committingToplevel, encoding: 'utf8' }).trim();
     if (!operation) return false;
@@ -466,7 +467,7 @@ async function main() {
   }
 
   const fgosDeletions = stagedFgosDeletions(committingToplevel);
-  if (fgosDeletions.length > 0 && !cutoverGrantAllows(committingToplevel)) {
+  if (fgosDeletions.length > 0 && !scopedGrantAllows(committingToplevel)) {
     refuse(`commit refused: this commit stages a deletion under ".fgos/" (${fgosDeletions.join(', ')}) -- .fgos/ is fgOS's own runner state and must never be committed as deleted. A linked worktree never keeps a working-tree copy of .fgos/ by design (ADR0020); if you ran "git add -A" here, unstage these paths first (e.g. "git restore --staged .fgos").`);
     return;
   }

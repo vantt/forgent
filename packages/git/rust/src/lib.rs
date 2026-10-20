@@ -127,6 +127,7 @@ impl RepoHandle {
     pub fn git_dir(&self) -> &std::path::Path {
         &self.git_dir
     }
+    pub fn work_tree(&self) -> Option<&std::path::Path> { self.work_tree.as_deref() }
     pub fn common_dir(&self) -> &std::path::Path {
         &self.common_dir
     }
@@ -256,8 +257,9 @@ pub struct OperationError {
     pub receipt: Option<Box<Receipt>>,
     pub exit_code: Option<i32>,
     pub signal: Option<i32>,
-    /// Driver must bound and redact before constructing this value.
+    /// Bounded original stderr; hook-bearing commits retain it verbatim (G-062).
     pub stderr: Vec<u8>,
+    pub detail: Option<Box<serde_json::Value>>,
 }
 pub type Result<T> = std::result::Result<T, OperationError>;
 
@@ -542,13 +544,23 @@ pub fn require_lock_scope_platform() -> Result<()> {
             exit_code: None,
             signal: None,
             stderr: vec![],
+        detail: None,
         });
     }
     Ok(())
 }
 
 mod scoped_commit;
-pub use scoped_commit::{CommitBaseline, CommitRequest, CommitResult, CutoverGrant};
+pub use scoped_commit::{CheckpointRequest, CommitBaseline, CommitRequest, CommitResult, CutoverGrant, LegacyEventLayout};
+/// Literal Git path, independent of the declaration grammar. JSON strings
+/// round-trip UTF-8, including star, tab and newline; staging uses NUL input.
+pub(crate) fn literal_repo_path(path: &str) -> Result<()> {
+    if path.is_empty() || path.starts_with('/') || path.contains('\0')
+        || path.split('/').any(|p| p.is_empty() || p == "." || p == "..") {
+        return Err(refs::failure("invalid-literal-path"));
+    }
+    Ok(())
+}
 /// Exact scope spelling suitable for literal path staging or a resolver grant.
 pub(crate) fn fgos_scope_literal(path: &str) -> Result<()> {
     if fgos_write_scope::canonicalize(path).map_err(refs::failure)? != path

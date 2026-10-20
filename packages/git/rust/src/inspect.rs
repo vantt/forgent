@@ -18,6 +18,7 @@ fn refused(cause: &str) -> OperationError {
         exit_code: None,
         signal: None,
         stderr: vec![],
+        detail: None,
     }
 }
 fn oid(repo: &RepoHandle, bytes: &[u8]) -> Result<Oid> {
@@ -605,7 +606,7 @@ impl GitDriver {
         previous_paths: &[Vec<u8>],
         max_bytes: u64,
     ) -> Result<WritesSnapshot> {
-        if max_bytes == 0 || previous_paths.len() > 4096 {
+        if max_bytes == 0 || previous_paths.iter().map(|p| p.len() + 1).sum::<usize>() > crate::driver::PATH_LIMIT {
             return Err(refused("invalid-snapshot-bounds"));
         }
         let head = match self.resolve_head(repo)? {
@@ -618,7 +619,7 @@ impl GitDriver {
         loop {
             let page = self.status(repo, Untracked::All, cursor, 4096)?;
             paths.extend(page.entries.into_iter().map(|e| e.path));
-            if paths.len() > 4096 {
+            if paths.iter().map(|p| p.len() + 1).sum::<usize>() > crate::driver::PATH_LIMIT {
                 return Err(refused("snapshot-path-limit"));
             }
             if page.complete {
@@ -798,4 +799,17 @@ pub(crate) fn fingerprint(
     _remaining: &mut u64,
 ) -> Result<PathFingerprint> {
     Err(refused("snapshot-platform-unsupported"))
+}
+
+impl GitDriver {
+    pub fn resolve_commit_ref(&self, repo: &RepoHandle, name: &str) -> Result<Option<Oid>> {
+        if name.is_empty() || name.contains('\0') { return Err(refused("invalid-ref-name")); }
+        let revision = format!("{name}^{{commit}}");
+        self.require_floor()?;
+        self.preflight(repo)?;
+        let out = self.invoke(Some(repo), repo.trusted_main_root(), &["rev-parse", "-q", "--verify", "--end-of-options", &revision], Policy::Inspect, None, true, 4096, std::time::Duration::from_secs(30))?;
+        if out.success {
+            Ok(Some(Oid::parse(std::str::from_utf8(&out.stdout).map_err(|_|refused("invalid-oid"))?.trim_end_matches('\n'), repo.object_format()).map_err(|_|refused("invalid-oid"))?))
+        } else if out.code == Some(1) { Ok(None) } else { Err(out.error("ref-resolution-failed")) }
+    }
 }

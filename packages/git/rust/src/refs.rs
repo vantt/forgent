@@ -23,6 +23,7 @@ pub(crate) fn failure(cause: impl std::fmt::Display) -> OperationError {
         exit_code: None,
         signal: None,
         stderr: vec![],
+        detail: None,
     }
 }
 pub(crate) fn classified(code: ResultCode, cause: impl std::fmt::Display) -> OperationError {
@@ -300,24 +301,28 @@ pub(crate) fn install_pin(
     } else {
         64
     });
-    let pinned = driver.publication_call(
-        repo,
-        admin,
-        &[
-            "-c",
-            "core.fsync=all",
-            "update-ref",
-            "--no-deref",
-            pin.as_str(),
-            candidate.as_str(),
-            &zero,
-        ],
-        &[],
-        false,
-        Duration::from_secs(30),
-    )?;
-    if !pinned.success || direct(driver, repo, &pin)? != ExpectedTip::Oid(candidate.clone()) {
-        return Err(recovery("pin-recovery-required"));
+    // A durable intent can outlive pin installation but precede Prepared.
+    // Reuse only the exact candidate; a different/symbolic pin still refuses.
+    if direct(driver, repo, &pin)? != ExpectedTip::Oid(candidate.clone()) {
+        let pinned = driver.publication_call(
+            repo,
+            admin,
+            &[
+                "-c",
+                "core.fsync=all",
+                "update-ref",
+                "--no-deref",
+                pin.as_str(),
+                candidate.as_str(),
+                &zero,
+            ],
+            &[],
+            false,
+            Duration::from_secs(30),
+        )?;
+        if !pinned.success || direct(driver, repo, &pin)? != ExpectedTip::Oid(candidate.clone()) {
+            return Err(recovery("pin-recovery-required"));
+        }
     }
     sync_refs(repo, &pin)?;
     let objects = repo.common_dir().join("objects");

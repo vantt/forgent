@@ -10,7 +10,7 @@ use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{mpsc, Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
-const PATH_LIMIT: usize = 64 * 1024 * 1024;
+pub(crate) const PATH_LIMIT: usize = 64 * 1024 * 1024;
 const DIFF_LIMIT: usize = 50 * 1024 * 1024;
 const STDERR_LIMIT: usize = 64 * 1024;
 static SERIAL: AtomicU64 = AtomicU64::new(0);
@@ -135,6 +135,7 @@ fn refusal(cause: impl Into<String>) -> OperationError {
         exit_code: None,
         signal: None,
         stderr: Vec::new(),
+        detail: None,
     }
 }
 fn io(error: std::io::Error) -> OperationError {
@@ -525,7 +526,10 @@ impl GitDriver {
             input,
         );
         if hooks {
-            self.refresh_checkout_facts(repo)?;
+            if let Err(mut error) = self.refresh_checkout_facts(repo) {
+                if let Ok(original) = &out { error.stderr = original.stderr.clone(); }
+                return Err(error);
+            }
         }
         out
     }

@@ -8,8 +8,25 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { changedPaths, commitOnBranch, commitUnitWork, gitContext } from '../../../src/runner/execution/commit-unit-work.mjs';
+import { changedPaths, commitOnBranch, commitUnitWork as nativeCommitUnitWork, preflightUnitWorktree, gitContext } from '../../../src/runner/execution/commit-unit-work.mjs';
 
+import { acquireSync, createLockScope } from '../../../src/holder-lock/index.mjs';
+import { createGitRepositoryConfig } from '../../../src/git/index.mjs';
+const baselines = new Map(), custody = new Map();
+function commitUnitWork(args) {
+  return nativeCommitUnitWork({ baseline: baselines.get(args.worktree), custody: custody.get(args.worktree), ...args });
+}
+function fixtureAuthority(main, tree = main) {
+  fs.appendFileSync(path.join(main, '.git/info/exclude'), '\n.fgos/\n');
+  const fence = path.join(main, '.fgos/locks/activation.lock');
+  fs.mkdirSync(fence, { recursive: true });
+  fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));
+  if (main !== tree) {
+    const lease = acquireSync(createLockScope(), 'dispatch-cwd', { fgosDir: path.join(main, '.fgos'), cwd: tree });
+    assert.equal(lease.result, 'acquired'); custody.set(tree, lease.handle);
+  }
+  baselines.set(tree, preflightUnitWorktree({ worktree: tree, repoRoot: main, custody: custody.get(tree), scope: ['**'] }).baseline);
+}
 function git(cwd, ...args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 }
@@ -24,6 +41,7 @@ function makeRepo(files = { 'README.md': 'hi\n' }) {
   for (const [rel, content] of Object.entries(files)) write(dir, rel, content);
   git(dir, 'add', '-A');
   git(dir, 'commit', '-qm', 'init');
+  fixtureAuthority(dir);
   return dir;
 }
 
@@ -42,7 +60,7 @@ function withRepo(files, fn) {
   try { return fn(dir); } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 }
 
-test('a. a staged path outside the scope is refused and the index is left untouched', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: a. a staged path outside the scope is refused and the index is left untouched', () => withRepo(undefined, (dir) => {
   write(dir, 'other/a.txt');
   git(dir, 'add', 'other/a.txt');
   write(dir, 'docs/x.md');
@@ -55,7 +73,7 @@ test('a. a staged path outside the scope is refused and the index is left untouc
   assert.equal(head(dir), before);
 }));
 
-test('b. a staged path inside the scope is refused too: the runner stages only what it chose', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: b. a staged path inside the scope is refused too: the runner stages only what it chose', () => withRepo(undefined, (dir) => {
   write(dir, 'docs/x.md');
   git(dir, 'add', 'docs/x.md');
   const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['docs'] });
@@ -64,7 +82,7 @@ test('b. a staged path inside the scope is refused too: the runner stages only w
   assert.deepEqual(staged(dir), ['docs/x.md']);
 }));
 
-test('c. a dirty path outside the scope is reported only when the agent changed it', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: c. a dirty path outside the scope is reported only when the agent changed it', () => withRepo(undefined, (dir) => {
   write(dir, 'docs/x.md');
   write(dir, 'src/a.mjs');
   write(dir, 'src/b.mjs');
@@ -76,7 +94,7 @@ test('c. a dirty path outside the scope is reported only when the agent changed 
   assert.match(git(dir, 'status', '--porcelain'), /\?\? src\//, 'out-of-scope files stay in the worktree, uncommitted');
 }));
 
-test('d. a deleted file inside the scope is committed as a deletion', () => withRepo({ 'docs/old.md': 'o\n', 'src/keep.mjs': 'k\n' }, (dir) => {
+test('E6 retargeted: d. a deleted file inside the scope is committed as a deletion', () => withRepo({ 'docs/old.md': 'o\n', 'src/keep.mjs': 'k\n' }, (dir) => {
   fs.rmSync(path.join(dir, 'docs/old.md'));
   fs.rmSync(path.join(dir, 'src/keep.mjs'));
   const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['docs'], changedFiles: [] });
@@ -86,7 +104,7 @@ test('d. a deleted file inside the scope is committed as a deletion', () => with
   assert.match(git(dir, 'status', '--porcelain'), /^ D src\/keep\.mjs/m, 'the out-of-scope deletion is left unstaged');
 }));
 
-test('e. a rename across the scope boundary is judged as one deletion and one addition', () => withRepo({ 'src/moved.mjs': 'm\n'.repeat(20) }, (dir) => {
+test('E6 retargeted: e. a rename across the scope boundary is judged as one deletion and one addition', () => withRepo({ 'src/moved.mjs': 'm\n'.repeat(20) }, (dir) => {
   fs.mkdirSync(path.join(dir, 'docs'), { recursive: true });
   fs.renameSync(path.join(dir, 'src/moved.mjs'), path.join(dir, 'docs/moved.mjs'));
   const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['docs'], changedFiles: ['src/moved.mjs', 'docs/moved.mjs'] });
@@ -97,7 +115,7 @@ test('e. a rename across the scope boundary is judged as one deletion and one ad
   assert.ok(git(dir, 'ls-files', 'src/moved.mjs').trim(), 'the source half stays tracked: its deletion was out of scope');
 }));
 
-test('f. a directory entry covers everything beneath it and nothing beside it', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: f. a directory entry covers everything beneath it and nothing beside it', () => withRepo(undefined, (dir) => {
   write(dir, 'docs/a/b/c.md');
   write(dir, 'docs-old/x.md');
   const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['docs'], changedFiles: ['docs/a/b/c.md', 'docs-old/x.md'] });
@@ -105,7 +123,7 @@ test('f. a directory entry covers everything beneath it and nothing beside it', 
   assert.deepEqual(r.outOfScope, ['docs-old/x.md']);
 }));
 
-test('g. odd path names are staged literally, never as git pathspec magic', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: g. odd path names are staged literally, never as git pathspec magic', () => withRepo(undefined, (dir) => {
   const names = ['app/[slug]/page.tsx', 'app/*star.md', 'app/with space.md', 'app/new\nline.md', 'app/tab\tq"uote.md', 'app/café.md', 'app/é.md'];
   for (const name of names) write(dir, name);
   write(dir, 'app/s/page.tsx'); // `[slug]` read as a character class would match `app/s`
@@ -116,7 +134,7 @@ test('g. odd path names are staged literally, never as git pathspec magic', () =
   assert.match(git(dir, 'status', '--porcelain', '-z', '--untracked-files=all'), /app\/s\/page\.tsx/);
 }));
 
-test('h. .fgos is never committed, even under a bare ** scope', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: h. .fgos is never committed, even under a bare ** scope', () => withRepo(undefined, (dir) => {
   write(dir, '.fgos/x');
   write(dir, 'a.txt');
   const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['**'], changedFiles: ['.fgos/x', 'a.txt'] });
@@ -125,7 +143,7 @@ test('h. .fgos is never committed, even under a bare ** scope', () => withRepo(u
   assert.deepEqual(committed(dir), ['a.txt']);
 }));
 
-test('i. a pre-commit hook that adds a file is caught after the commit', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: i. a pre-commit hook that adds a file is caught after the commit', () => withRepo(undefined, (dir) => {
   fs.mkdirSync(path.join(dir, '.hooks'));
   fs.writeFileSync(path.join(dir, '.hooks/pre-commit'), '#!/bin/sh\necho sneaky > sneaky.txt\ngit add sneaky.txt\n', { mode: 0o755 });
   git(dir, 'config', 'core.hooksPath', '.hooks');
@@ -138,7 +156,7 @@ test('i. a pre-commit hook that adds a file is caught after the commit', () => w
   assert.deepEqual(r.missing, []);
 }));
 
-test('j. subject: a conventional first line is kept, anything else gets chore(<unitId>)', () => {
+test('E6 retargeted: j. subject: a conventional first line is kept, anything else gets chore(<unitId>)', () => {
   const cases = [
     ['feat(runner): add the thing\nbody', 'feat(runner): add the thing'],
     ['fix!: break it', 'fix!: break it'],
@@ -163,7 +181,7 @@ test('j. subject: a conventional first line is kept, anything else gets chore(<u
   });
 });
 
-test('j2. subject: without a summary the first line of the objective names the change', () => {
+test('E6 retargeted: j2. subject: without a summary the first line of the objective names the change', () => {
   const cases = [
     [{ objective: 'Write the docs for the lane\nmore detail' }, 'chore(u1): Write the docs for the lane'],
     [{ objective: '# Task: refresh the guide' }, 'chore(u1): Task: refresh the guide'],
@@ -182,7 +200,7 @@ test('j2. subject: without a summary the first line of the objective names the c
   }
 });
 
-test('j3. subject: a long line is cut at a sentence, else a word, never with a trailing or stray ellipsis', () => {
+test('E6 retargeted: j3. subject: a long line is cut at a sentence, else a word, never with a trailing or stray ellipsis', () => {
   const sentence = 'docs(rununit): Wrote the lane guide. Created the scoped file list for every lane in the plan and checked each link twice before the release';
   const words = `chore(u1): ${'Created the scoped file list for every lane '.repeat(4)}`;
   const stray = 'docs(rununit): ... Created the scoped ...';
@@ -202,7 +220,7 @@ test('j3. subject: a long line is cut at a sentence, else a word, never with a t
   }
 });
 
-test('k. two thousand files commit in one go', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: k. two thousand files commit in one go', () => withRepo(undefined, (dir) => {
   for (let i = 0; i < 2000; i += 1) write(dir, `docs/many/f-${i}.md`, `${i}\n`);
   const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['docs'] });
   assert.equal(r.status, 'committed', r.error);
@@ -210,7 +228,7 @@ test('k. two thousand files commit in one go', () => withRepo(undefined, (dir) =
   assert.equal(committed(dir).length, 2000);
 }));
 
-test('l. scope ** keeps the old behaviour: every change outside .fgos is committed', () => withRepo({ 'gone.txt': 'g\n' }, (dir) => {
+test('E6 retargeted: l. scope ** keeps the old behaviour: every change outside .fgos is committed', () => withRepo({ 'gone.txt': 'g\n' }, (dir) => {
   write(dir, 'a/b.txt');
   write(dir, 'c.txt');
   fs.rmSync(path.join(dir, 'gone.txt'));
@@ -220,8 +238,9 @@ test('l. scope ** keeps the old behaviour: every change outside .fgos is committ
   assert.deepEqual(r.outOfScope, []);
 }));
 
-test('m. excludePaths are never committed and are echoed as preExistingInScope', () => withRepo({ 'docs/wip.md': 'old\n' }, (dir) => {
+test('E6 retargeted: m. excludePaths are never committed and are echoed as preExistingInScope', () => withRepo({ 'docs/wip.md': 'old\n' }, (dir) => {
   write(dir, 'docs/wip.md', 'half-written by a person\n');
+  baselines.set(dir, preflightUnitWorktree({ worktree: dir, repoRoot: dir, scope: ['docs'] }).baseline);
   write(dir, 'docs/new.md');
   const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['docs'], changedFiles: [], excludePaths: ['docs/wip.md'] });
   assert.deepEqual(r.files, ['docs/new.md']);
@@ -229,7 +248,7 @@ test('m. excludePaths are never committed and are echoed as preExistingInScope',
   assert.match(git(dir, 'status', '--porcelain'), /^ M docs\/wip\.md/m);
 }));
 
-test('nothing in scope is no-changes, and still names what changed out of scope', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: nothing in scope is no-changes, and still names what changed out of scope', () => withRepo(undefined, (dir) => {
   write(dir, 'src/a.mjs');
   const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['docs'], changedFiles: ['src/a.mjs'], needsWrites: ['src'] });
   assert.equal(r.status, 'no-changes');
@@ -237,11 +256,11 @@ test('nothing in scope is no-changes, and still names what changed out of scope'
   assert.deepEqual(r.needsWrites, ['src']);
 }));
 
-test('a missing scope is a caller bug, not "commit everything"', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: a missing scope is a caller bug, not "commit everything"', () => withRepo(undefined, (dir) => {
   assert.throws(() => commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's' }), /scope/);
 }));
 
-test('a commit a hook rejects takes back what the runner staged, so the next try is not refused as foreign', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: a commit a hook rejects takes back what the runner staged, so the next try is not refused as foreign', () => withRepo(undefined, (dir) => {
   const hooks = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-commit-unit-hooks-'));
   fs.writeFileSync(path.join(hooks, 'pre-commit'), '#!/bin/sh\nexit 1\n', { mode: 0o755 });
   git(dir, 'config', 'core.hooksPath', hooks);
@@ -255,11 +274,12 @@ test('a commit a hook rejects takes back what the runner staged, so the next try
   assert.equal(commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['**'] }).status, 'committed');
 }));
 
-test('a submodule with only dirty content is not a change to commit, and does not block the rest', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: a submodule with only dirty content is not a change to commit, and does not block the rest', () => withRepo(undefined, (dir) => {
   const sub = makeRepo({ 'inner.txt': 'i\n' });
   try {
     git(dir, '-c', 'protocol.file.allow=always', 'submodule', 'add', '-q', sub, 'sm');
     git(dir, 'commit', '-qm', 'add submodule');
+    baselines.set(dir, preflightUnitWorktree({worktree:dir,repoRoot:dir,scope:['**']}).baseline);
     fs.writeFileSync(path.join(dir, 'sm', 'inner.txt'), 'dirty\n');
     write(dir, 'top.txt');
     const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['**'] });
@@ -270,7 +290,7 @@ test('a submodule with only dirty content is not a change to commit, and does no
   }
 }));
 
-test('an untracked nested repository is staged under its own name, as add -A always did', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: an untracked nested repository is staged under its own name, as add -A always did', () => withRepo(undefined, (dir) => {
   const nested = path.join(dir, 'nested');
   fs.mkdirSync(nested);
   git(nested, 'init', '-q', '-b', 'main');
@@ -282,7 +302,7 @@ test('an untracked nested repository is staged under its own name, as add -A alw
   assert.deepEqual(committed(dir), ['nested']);
 }));
 
-test('an intent-to-add rename in the worktree column yields both halves, not a garbled path', () => withRepo({ 'old.txt': 'o\n'.repeat(20) }, (dir) => {
+test('E6 retargeted: an intent-to-add rename in the worktree column yields both halves, not a garbled path', () => withRepo({ 'old.txt': 'o\n'.repeat(20) }, (dir) => {
   fs.renameSync(path.join(dir, 'old.txt'), path.join(dir, 'new.txt'));
   git(dir, 'add', '-N', 'new.txt');
   assert.deepEqual(changedPaths(gitContext({ worktree: dir, repoRoot: dir })).sort(), ['new.txt', 'old.txt']);
@@ -294,7 +314,9 @@ function withLinkedWorktree(fn) {
   const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-commit-unit-wt-'));
   fs.rmSync(wt, { recursive: true });
   git(main, 'worktree', 'add', '-q', '-b', 'unit', wt);
+  fixtureAuthority(main, wt);
   try { return fn({ main, wt }); } finally {
+    custody.get(wt)?.release();
     fs.rmSync(wt, { recursive: true, force: true });
     fs.rmSync(main, { recursive: true, force: true });
   }
@@ -308,7 +330,7 @@ function fakeRepoWithFsmonitor(dir, marker) {
   return fake;
 }
 
-test('a .git pointer the worker rewrote is ignored when repoRoot names the trusted repository', () => withLinkedWorktree(({ main, wt }) => {
+test('E6 retargeted: a .git pointer the worker rewrote is ignored when repoRoot names the trusted repository', () => withLinkedWorktree(({ main, wt }) => {
   const marker = path.join(os.tmpdir(), `fgos-pwned-${process.pid}-${Date.now()}`);
   const fake = fakeRepoWithFsmonitor(wt, marker);
   fs.writeFileSync(path.join(wt, '.git'), `gitdir: ${fake}\n`);
@@ -322,7 +344,7 @@ test('a .git pointer the worker rewrote is ignored when repoRoot names the trust
   fs.rmSync(marker, { force: true });
 }));
 
-test('a relative hooksPath runs the main checkout copy of the hook, never the worktree copy', () => withLinkedWorktree(({ main, wt }) => {
+test('E6 retargeted: a relative hooksPath runs the main checkout copy of the hook, never the worktree copy', () => withLinkedWorktree(({ main, wt }) => {
   const marker = path.join(os.tmpdir(), `fgos-hook-${process.pid}-${Date.now()}`);
   fs.mkdirSync(path.join(main, '.githooks'));
   fs.writeFileSync(path.join(main, '.githooks/pre-commit'), `#!/bin/sh\necho trusted >> ${marker}\n`, { mode: 0o755 });
@@ -336,14 +358,14 @@ test('a relative hooksPath runs the main checkout copy of the hook, never the wo
   fs.rmSync(marker, { force: true });
 }));
 
-test('a worktree that is not a worktree of repoRoot is refused, not committed somewhere else', () => withLinkedWorktree(({ main }) => withRepo(undefined, (stranger) => {
+test('E6 retargeted: a worktree that is not a worktree of repoRoot is refused, not committed somewhere else', () => withLinkedWorktree(({ main }) => withRepo(undefined, (stranger) => {
   write(stranger, 'docs/x.md');
   const r = commitUnitWork({ worktree: stranger, repoRoot: main, unitId: 'u1', summary: 's', scope: ['docs'] });
   assert.equal(r.status, 'failed');
   assert.equal(r.reason, 'untrusted-worktree');
 })));
 
-test('GIT_DIR, GIT_WORK_TREE and GIT_INDEX_FILE inherited by the runner do not redirect the commit', () => withRepo(undefined, (dir) => withRepo(undefined, (other) => {
+test('E6 retargeted: GIT_DIR, GIT_WORK_TREE and GIT_INDEX_FILE inherited by the runner do not redirect the commit', () => withRepo(undefined, (dir) => withRepo(undefined, (other) => {
   write(dir, 'a.txt');
   const saved = { GIT_DIR: process.env.GIT_DIR, GIT_WORK_TREE: process.env.GIT_WORK_TREE, GIT_INDEX_FILE: process.env.GIT_INDEX_FILE };
   const otherHead = head(other);
@@ -360,7 +382,7 @@ test('GIT_DIR, GIT_WORK_TREE and GIT_INDEX_FILE inherited by the runner do not r
   assert.deepEqual(committed(dir), ['a.txt']);
 })));
 
-test('a linked worktree passed as repoRoot is refused: the trusted root must be the main checkout', () => withLinkedWorktree(({ main, wt }) => {
+test('E6 retargeted: a linked worktree passed as repoRoot is refused: the trusted root must be the main checkout', () => withLinkedWorktree(({ main, wt }) => {
   write(wt, 'docs/x.md');
   const mainBefore = git(main, 'rev-parse', 'main').trim();
   const r = commitUnitWork({ worktree: wt, repoRoot: wt, unitId: 'u1', summary: 's', scope: ['docs'] });
@@ -369,15 +391,15 @@ test('a linked worktree passed as repoRoot is refused: the trusted root must be 
   assert.equal(git(main, 'rev-parse', 'main').trim(), mainBefore, 'main did not move');
 }));
 
-test('a missing repoRoot is a caller bug: the gitdir is never taken from the worktree', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: a missing repoRoot is a caller bug: the gitdir is never taken from the worktree', () => withRepo(undefined, (dir) => {
   assert.throws(() => commitUnitWork({ worktree: dir, unitId: 'u1', summary: 's', scope: ['**'] }), /repoRoot/);
 }));
 
-test('commitOnBranch fails closed on a worktree it cannot trust', () => withLinkedWorktree(({ main }) => withRepo(undefined, (stranger) => {
+test('E6 retargeted: commitOnBranch fails closed on a worktree it cannot trust', () => withLinkedWorktree(({ main }) => withRepo(undefined, (stranger) => {
   assert.throws(() => commitOnBranch(stranger, head(stranger), main), /not a working tree/);
 })));
 
-test('author identity and global config variables still reach the runner commit', () => withRepo(undefined, (dir) => {
+test('E6 retargeted: author identity and global config variables still reach the runner commit', () => withRepo(undefined, (dir) => {
   write(dir, 'a.txt');
   const saved = process.env.GIT_AUTHOR_NAME;
   process.env.GIT_AUTHOR_NAME = 'Env Author';
@@ -389,7 +411,7 @@ test('author identity and global config variables still reach the runner commit'
   assert.equal(git(dir, 'log', '-1', '--format=%an').trim(), 'Env Author');
 }));
 
-test('a pre-commit hook refusing a sync merge commit is reported hook-refused with its own words', async () => {
+test('E6 retargeted: a pre-commit hook refusing a sync merge commit is reported hook-refused with its own words', async () => {
   const { startSyncMerge } = await import('../../../src/runner/execution/commit-unit-work.mjs');
   withRepo({ 'README.md': 'base\n' }, (repoRoot) => {
     const linked = path.join(repoRoot, 'linked');
@@ -398,8 +420,11 @@ test('a pre-commit hook refusing a sync merge commit is reported hook-refused wi
     const target=head(repoRoot);
     const hooks=path.join(repoRoot,'hooks');fs.mkdirSync(hooks);
     fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\necho original-refusal >&2\nexit 1\n',{mode:0o755});
-    git(repoRoot,'config','core.hooksPath',hooks);
-    const result=startSyncMerge({worktree:linked,repoRoot,ref:'main',sha:target});
+    git(repoRoot,'config','--unset','core.hooksPath');
+    createGitRepositoryConfig({stateRoot:process.env.FGOS_STATE_ROOT,repoPath:repoRoot,trustedMain:repoRoot}).ensureHooks({ownedPath:hooks,operationId:'owned-test-hook'});
+    fixtureAuthority(repoRoot, linked);
+    const result=startSyncMerge({worktree:linked,repoRoot,ref:'main',sha:target,custody:custody.get(linked)});
+    custody.get(linked).release();
     assert.equal(result.reason,'hook-refused');assert.match(result.error,/original-refusal/);
   });
 });

@@ -6,7 +6,7 @@
 
 **Status:** in progress on `git/p07-switch`; board owner decision 2026-10-20 11:34 (Asia/Saigon): foundation layers first, Work later. Phase 07 does not wait for the Event Store Work cutover.
 
-**Unit 1 checkpoint:** re-plan/census complete; Unit-core switch blocked by incompatible legacy/native literal-path assertions. See [lead report](../reports/phase-lead-261020-1140-git-p07-u1-census-commit-core.md). Other disjoint lanes can advance; no production caller has switched.
+**Unit 2 checkpoint:** the owner resolved Unit 1's four blockers. The Unit commit/sync adapters now call native ScopedCommit/Sync; raw Git bodies are removed. Native support preserves literal selected filenames, declared legacy event checkpoints/archives, owned-only diagnostic replay, recorded baselines/operation ids, custody-backed continuation and clean-start abort timing. See [Unit 2 report](../reports/phase-lead-261020-1150-git-p07-u2-commit-core-switch.md). This is an integration-branch change, not phase-07 acceptance or permission to land. The remaining families, shared matcher/definition switch and phase-08 proof gates remain open.
 
 ## Context
 
@@ -67,7 +67,7 @@ Use the clearly named Work-side `src/state/legacy-event-git-adapter.mjs`; it tra
 | `merge.mjs` post-CAS event changes | Separate declared ScopedCommit / Checkpoint operation under main authority after Land; never an unjournaled re-stage |
 | `events-compaction.mjs` commits | ScopedCommit with exact old/new paths after Work verifies its candidate; Work retains archive/guard policy |
 
-**Implementation prerequisite found in unit 1:** current `checkpointTrackedFiles` refuses every `.fgos/` path (`checkpoint-non-event-main-required`), and normal ScopedCommit/write-scope excludes state payload. Extend the typed port contract for the owner-authorized declared legacy-event duty before wiring this adapter; a thin Node adapter cannot bypass that refusal. This is planned behavior, not an implemented adapter.
+**Unit 2 port prerequisite implemented:** the existing ScopedCommit/Checkpoint request accepts typed `legacyEvents: {exactPaths}` for the retired event layout only, under main 50. The temporary Work adapter and the existing native hook grant-check door use that declaration; ordinary `.fgos` payloads remain excluded/refused. Work-event/Land owners still wire their callers; Land has no implicit sweep. WORK removes the adapter, declaration and grant branch together at Event Store cutover.
 
 Legacy tracked event files, writer shards, truncation guard and `merge=union` remain until WORK cuts over. WORK owns deletion of this adapter and every legacy event duty in that same cutover. This is a temporary consumer of typed ports, never a second Git core. E6 event assertions are **kept/retargeted**, not retired before that cutover.
 

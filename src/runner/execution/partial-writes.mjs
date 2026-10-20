@@ -8,42 +8,25 @@
 // is not run again by itself.
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/**.
 
-import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { createGitInspect } from '../../git/inspect.mjs';
+import { resolveStateRoot } from '../../holder-lock/index.mjs';
 
-import { changedPaths, gitContext } from './commit-unit-work.mjs';
-import { sha256FileSync } from '../dispatch/proof-helpers.mjs';
-
-const inStore = (p) => p === '.fgos' || p.startsWith('.fgos/');
-
-/**
- * A path's content: its sha256 (streamed), `link:<target>` for a symlink, null when it does not
- * exist, or `unreadable:<size>:<mtime>` when it cannot be read (still compared, never a crash).
- */
-function contentOf(file) {
-  let stat;
-  try { stat = fs.lstatSync(file); } catch { return null; }
-  if (stat.isSymbolicLink()) return `link:${fs.readlinkSync(file)}`;
-  if (!stat.isFile()) return `type:${stat.mode & fs.constants.S_IFMT}`;
-  try { return sha256FileSync(file); } catch { return `unreadable:${stat.size}:${stat.mtimeMs}`; }
-}
-
-/**
- * What the worktree holds now: HEAD and the content of every changed path (staged, unstaged and
- * untracked, a rename as its two halves). Paths git ignores are not seen.
- *
- * @returns {{ head: string|null, files: Record<string, string|null> }}
- */
-export function worktreeSnapshot({ worktree, repoRoot }) {
-  const ctx = gitContext({ worktree, repoRoot });
-  let head = null;
-  try {
-    head = execFileSync('git', [...ctx.prefix, 'rev-parse', '--verify', '-q', 'HEAD'], { cwd: ctx.cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || null;
-  } catch { /* an unborn branch has no HEAD */ }
+/** Typed snapshot translation; byte parsing and fingerprints belong to Git. */
+export function worktreeSnapshot({ worktree, repoRoot, loaderOptions }) {
+  const port = createGitInspect({ stateRoot: resolveStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot,
+    repoPath: worktree, trustedMain: repoRoot }, loaderOptions);
+  const snapshot = port.snapshotWrites({ paths: [], maxBytes: Number.MAX_SAFE_INTEGER });
   const files = {};
-  for (const p of changedPaths(ctx).filter((p) => !inStore(p)).sort()) files[p] = contentOf(path.join(ctx.cwd, p));
-  return { head, files };
+  for (const entry of snapshot.files) {
+    const p = new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(entry.path));
+    if (p === '.fgos' || p.startsWith('.fgos/')) continue;
+    const f = entry.fingerprint;
+    files[p] = f.kind === 'missing' ? null : f.kind === 'file' ? f.sha256
+      : f.kind === 'link' ? `link:${Buffer.from(f.target).toString('utf8')}`
+      : f.kind === 'type' ? `type:${f.mode}` : `unreadable:${f.size}:${f.mtime}`;
+  }
+  return { head: snapshot.head, files };
 }
 
 /**

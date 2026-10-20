@@ -112,6 +112,7 @@ fn literal_scoped_commit_real_hook_and_replay() {
         writes: vec!["[literal]".into()],
         message: "consumer message\n\nbody\n".into(),
         cutover_grant: None,
+        legacy_events: None,
     };
     let result = f
         .driver
@@ -148,6 +149,7 @@ fn hook_tree_tampering_reports_real_effect() {
         writes: vec!["a".into()],
         message: "commit".into(),
         cutover_grant: None,
+        legacy_events: None,
     };
     let result = f
         .driver
@@ -219,6 +221,7 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
         writes: vec!["a".into()],
         message: "noop".into(),
         cutover_grant: None,
+        legacy_events: None,
     };
     assert_eq!(
         f.driver
@@ -247,8 +250,11 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
         .checkpoint_tracked_files(
             &main,
             vec![],
-            vec![".fgos/events.jsonl".into()],
-            "refuse".into(),
+            CheckpointRequest {
+                files: vec![".fgos/events.jsonl".into()],
+                message: "refuse".into(),
+                legacy_events: None
+            },
             "fixture",
             "bad-checkpoint"
         )
@@ -258,8 +264,11 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
         .checkpoint_tracked_files(
             &main,
             vec![],
-            vec!["a".into()],
-            "consumer checkpoint".into(),
+            CheckpointRequest {
+                files: vec!["a".into()],
+                message: "consumer checkpoint".into(),
+                legacy_events: None,
+            },
             "fixture",
             "checkpoint",
         )
@@ -306,6 +315,7 @@ fn baseline_only_cutover_commits_the_event_fence() {
                 legacy_ref_oid: legacy,
                 seal_digest: format!("{:x}", Sha256::digest(b"sealed\n")),
             }),
+            legacy_events: None,
         };
         let result = f
             .driver
@@ -352,6 +362,7 @@ fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: b
         writes: vec!["a".into()],
         message: "interrupted".into(),
         cutover_grant: None,
+        legacy_events: None,
     };
     fs::write(f.tree.join("a"), "interrupted producer").unwrap();
     git(&f.tree, &["add", "a"]);
@@ -431,6 +442,7 @@ fn fresh_commit(f: &Fixture, id: &str) {
         writes: vec!["fresh".into()],
         message: "fresh".into(),
         cutover_grant: None,
+        legacy_events: None,
     };
     assert_eq!(
         f.driver
@@ -464,6 +476,7 @@ fn admission_abandons_pre_attempt_commit_and_sync_without_blocking_fresh_ids() {
                 writes: vec!["fresh".into()],
                 message: "fresh".into(),
                 cutover_grant: None,
+                legacy_events: None,
             };
             assert_eq!(
                 f.driver
@@ -518,7 +531,8 @@ fn recovery_preserves_attempt_while_native_index_lock_exists() {
     interrupted(&f, "interrupted", 2, false);
     let gitdir = git(&f.tree, &["rev-parse", "--absolute-git-dir"]);
     fs::write(Path::new(&gitdir).join("index.lock"), "native residue").unwrap();
-    let error = f.driver
+    let error = f
+        .driver
         .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
         .unwrap_err();
     assert!(error.cause.starts_with("native-index-lock-unowned:"));
@@ -548,6 +562,7 @@ fn terminal_commit_history_is_bounded_and_compacted_receipts_replay() {
             writes: vec!["a".into()],
             message: "bounded".into(),
             cutover_grant: None,
+            legacy_events: None,
         };
         let id = format!("bounded-{n}");
         let result = f
@@ -746,6 +761,7 @@ fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
                     writes: vec!["fresh".into()],
                     message: "fresh".into(),
                     cutover_grant: None,
+                    legacy_events: None,
                 },
                 "fixture",
                 "new-checkout",
@@ -1010,6 +1026,7 @@ fn lifecycle_attempts_exclude_commit_and_sync() {
                     writes: vec!["a".into()],
                     message: "new".into(),
                     cutover_grant: None,
+                    legacy_events: None,
                 },
                 "fixture",
                 "new",
@@ -1177,12 +1194,20 @@ fn sync_native_index_lock_refusal_names_inspection_and_preserves_bytes() {
     let gitdir = git(&f.tree, &["rev-parse", "--absolute-git-dir"]);
     let path = Path::new(&gitdir).join("index.lock");
     fs::write(&path, b"external sync lock").unwrap();
-    let error = f.driver.inspect_sync(&f.repo, f.held(), "fixture", "interrupted").unwrap_err();
+    let error = f
+        .driver
+        .inspect_sync(&f.repo, f.held(), "fixture", "interrupted")
+        .unwrap_err();
     assert!(error.cause.starts_with("native-index-lock-unowned:"));
     assert!(error.cause.contains("repairNativeIndexLock"));
     assert!(error.cause.contains("§11"));
     assert_eq!(fs::read(&path).unwrap(), b"external sync lock");
-    assert!(wal::Wal::open(&f.repo).unwrap().inspect("interrupted").unwrap().outcome().is_none());
+    assert!(wal::Wal::open(&f.repo)
+        .unwrap()
+        .inspect("interrupted")
+        .unwrap()
+        .outcome()
+        .is_none());
 }
 
 #[test]
@@ -1190,6 +1215,103 @@ fn scoped_commit_ignores_signature_and_display_config() {
     let f = Fixture::new();
     enable_signing(&f.tree, &f.temp);
     fresh_commit(&f, "signed");
-    assert!(git(&f.tree, &["cat-file", "-p", "HEAD"]).contains("gpgsig -----BEGIN SSH SIGNATURE-----"));
+    assert!(
+        git(&f.tree, &["cat-file", "-p", "HEAD"]).contains("gpgsig -----BEGIN SSH SIGNATURE-----")
+    );
     assert!(git(&f.tree, &["show", "-s", "--format=%H"]).contains("Good "));
+}
+
+#[test]
+fn sync_observed_rejection_retry_recovers_each_pre_commit_interruption() {
+    use std::os::unix::fs::PermissionsExt;
+    use wal::*;
+    struct Held<'a>(&'a Handle);
+    impl PublicationAuthority for Held<'_> {
+        fn validate_publication_borrow(&self, _: &Intent) -> WalResult<()> {
+            fgos_holder_lock::validate(self.0).map_err(|_| WalError::PublicationBorrowUnavailable)
+        }
+    }
+    for phase in 0..4 {
+        let f = Fixture::new();
+        fs::write(f.main.join("a"), "target\n").unwrap();
+        git(&f.main, &["commit", "-qam", "target"]);
+        let target = Oid::parse(
+            &git(&f.main, &["rev-parse", "HEAD"]),
+            f.repo.object_format(),
+        )
+        .unwrap();
+        fs::write(f.tree.join("a"), "source\n").unwrap();
+        git(&f.tree, &["commit", "-qam", "source"]);
+        f.driver
+            .start_sync(&f.repo, f.held(), &target, "sync", "fixture", "prior")
+            .unwrap();
+        fs::write(f.tree.join("a"), "resolved\n").unwrap();
+        let hooks = f.main.join("hooks");
+        fs::create_dir(&hooks).unwrap();
+        let hook = hooks.join("pre-commit");
+        fs::write(&hook, "#!/bin/sh\necho original >&2\nexit 1\n").unwrap();
+        fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
+        git(
+            &f.main,
+            &["config", "core.hooksPath", hooks.to_str().unwrap()],
+        );
+        let refusal = f
+            .driver
+            .continue_sync(&f.repo, f.held(), "fixture", "prior")
+            .unwrap_err();
+        assert_eq!(refusal.cause, "commit-rejected");
+        assert_eq!(refusal.stderr, b"original\n");
+        let wal = Wal::open(&f.repo).unwrap();
+        let prior = wal.inspect("prior").unwrap();
+        let mut next = match wal
+            .begin(
+                "next",
+                prior.intent().clone(),
+                &Held(f.lease.as_ref().unwrap()),
+            )
+            .unwrap()
+        {
+            Begin::Created(c) => c,
+            _ => panic!(),
+        };
+        if phase >= 1 {
+            git(
+                &f.main,
+                &[
+                    "update-ref",
+                    "refs/fgos/git-operations/next/candidate",
+                    target.as_str(),
+                ],
+            );
+        }
+        if phase >= 2 {
+            next = wal.append(&next, Phase::Prepared).unwrap();
+        }
+        if phase >= 3 {
+            wal.append(
+                &next,
+                Phase::TargetAttempt {
+                    prior_target_attempt: None,
+                    expected: next.intent().expected.clone(),
+                    next: next.intent().next.clone(),
+                },
+            )
+            .unwrap();
+        }
+        fs::write(&hook, "#!/bin/sh\nexit 0\n").unwrap();
+        let result = f
+            .driver
+            .retry_sync_commit(&f.repo, f.held(), "fixture", "prior", "next")
+            .unwrap();
+        assert_eq!(result.state, "done");
+        assert_eq!(git(&f.tree, &["show", "HEAD:a"]), "resolved");
+        let again = f
+            .driver
+            .retry_sync_commit(&f.repo, f.held(), "fixture", "prior", "next")
+            .unwrap();
+        assert_eq!(again.commit.unwrap().oid, result.commit.unwrap().oid);
+        assert!(
+            matches!(wal.inspect("prior").unwrap().outcome(),Some(Outcome::CommitRejected {cause}) if cause == "commit-rejected")
+        );
+    }
 }

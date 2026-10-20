@@ -18,6 +18,9 @@ pub struct SyncResult {
     pub target: String,
     pub resolver_grant: Vec<String>,
     pub commit: Option<CommitResult>,
+    pub staged: Vec<String>,
+    pub unexpected: Vec<String>,
+    pub missing: Vec<String>,
 }
 fn info(
     id: &str,
@@ -29,6 +32,7 @@ fn info(
 ) -> SyncResult {
     SyncResult {
         warnings: vec![],
+        staged: vec![], unexpected: vec![], missing: vec![],
         operation_id: id.into(),
         head: head.into(),
         target: target.into(),
@@ -92,8 +96,11 @@ impl GitDriver {
         if self.merge_head(repo, &scope)?.is_some() {
             return Err(failure("foreign-merge-head"));
         }
-        if !self.staged(repo, &scope)?.is_empty() {
-            return Err(failure("foreign-staged-index"));
+        let staged_before = self.staged(repo, &scope)?;
+        if !staged_before.is_empty() {
+            let mut error = failure("foreign-staged-index");
+            error.detail = Some(Box::new(serde_json::json!({"stagedPaths": staged_before})));
+            return Err(error);
         }
         let resolved = self.checkout_text(
             repo,
@@ -260,7 +267,7 @@ impl GitDriver {
                         .into_iter()
                         .filter(|(p, _)| staged.contains(p) && !conflicts.contains(p))
                         .collect(),
-                    staged,
+                    staged: staged.clone(),
                 },
             )
             .map_err(failure)?;
@@ -276,6 +283,7 @@ impl GitDriver {
                 None,
             ))
         }?;
+        receipt.staged = staged;
         receipt.warnings.extend(admission_warnings);
         Ok(receipt)
     }
@@ -339,7 +347,137 @@ impl GitDriver {
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
         self.continue_sync_scoped(repo, &scope, &wal, writer, id, true)
     }
-    fn continue_sync_scoped(
+    /// Explicit commit-only retry of an observed rejection uses a new WAL id.
+    /// Never replay an unknown attempt or merge again over resolver bytes.
+    pub fn retry_sync_commit(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        writer: &str,
+        id: &str,
+        next_id: &str,
+    ) -> Result<SyncResult> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
+        let scope = scope(repo, held)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
+        let prior_compact = wal.compacted(id).map_err(failure)?;
+        let prior_chain = if prior_compact.is_none() {
+            Some(wal.inspect(id).map_err(failure)?)
+        } else {
+            None
+        };
+        let prior_request = prior_compact
+            .as_ref()
+            .map(|p| p.request.as_str())
+            .unwrap_or_else(|| {
+                prior_chain
+                    .as_ref()
+                    .unwrap()
+                    .intent()
+                    .request_digest
+                    .as_str()
+            });
+        if let Some(next) = wal.compacted(next_id).map_err(failure)? {
+            if next.request != prior_request {
+                return Err(failure("operation-id-reused"));
+            }
+            return self.continue_sync_scoped(repo, &scope, &wal, writer, next_id, true);
+        }
+        if wal.known_id(next_id).map_err(failure)? {
+            let next = wal.inspect(next_id).map_err(failure)?;
+            if next.intent().request_digest != prior_request {
+                return Err(failure("operation-id-reused"));
+            }
+            if !matches!(
+                next.last_state(),
+                Phase::Intent(_) | Phase::Prepared | Phase::TargetAttempt { .. }
+            ) {
+                return self
+                    .continue_sync_scoped(repo, &scope, &wal, writer, next_id, true)
+                    .map_err(|mut e| {
+                        e.operation_id = Some(next_id.into());
+                        e
+                    });
+            }
+        }
+        let state = self.continue_sync_scoped(repo, &scope, &wal, writer, id, false)?;
+        if state.state != "rejected-open" {
+            return Err(failure("sync-observed-rejection-required"));
+        }
+        let prior = prior_chain.ok_or_else(|| failure("sync-observed-rejection-required"))?;
+        if !matches!(prior.outcome(), Some(Outcome::CommitRejected { cause }) if ["commit-rejected", "hook-refused", "hook-rejected"].contains(&cause.as_str()))
+        {
+            return Err(recovery("sync-commit-effect-unknown"));
+        }
+        let recorded = prior
+            .records()
+            .iter()
+            .find_map(|r| match &r.phase {
+                state @ Phase::SyncState { .. } => Some(state.clone()),
+                _ => None,
+            })
+            .ok_or_else(|| recovery("sync-state-recovery-required"))?;
+        let authority = Authority {
+            scope: &scope,
+            binding: binding(handle(&scope, repo)?)?,
+        };
+        let mut next = if wal.known_id(next_id).map_err(failure)? {
+            let next = wal.inspect(next_id).map_err(failure)?;
+            if next.intent() != prior.intent() {
+                return Err(failure("operation-id-reused"));
+            }
+            if !matches!(
+                next.last_state(),
+                Phase::Intent(_) | Phase::Prepared | Phase::TargetAttempt { .. }
+            ) {
+                return self
+                    .continue_sync_scoped(repo, &scope, &wal, writer, next_id, true)
+                    .map_err(|mut e| {
+                        e.operation_id = Some(next_id.into());
+                        e
+                    });
+            }
+            next
+        } else {
+            match wal
+                .begin(next_id, prior.intent().clone(), &authority)
+                .map_err(failure)?
+            {
+                Begin::Created(c) => c,
+                _ => return Err(recovery("sync-recovery-required")),
+            }
+        };
+        if matches!(next.last_state(), Phase::Intent(_)) {
+            crate::refs::install_pin(
+                self,
+                repo,
+                handle(&scope, repo)?,
+                next_id,
+                &Oid::parse(&state.target, repo.object_format()).map_err(failure)?,
+            )?;
+            next = wal.append(&next, Phase::Prepared).map_err(failure)?;
+        }
+        if matches!(next.last_state(), Phase::Prepared) {
+            next = wal
+                .append(
+                    &next,
+                    Phase::TargetAttempt {
+                        prior_target_attempt: None,
+                        expected: next.intent().expected.clone(),
+                        next: next.intent().next.clone(),
+                    },
+                )
+                .map_err(failure)?;
+        }
+        next = wal.append(&next, recorded).map_err(failure)?;
+        self.finish_sync(repo, &scope, &wal, &next)
+            .map_err(|mut e| {
+                e.operation_id = Some(next_id.into());
+                e
+            })
+    }
+    pub(crate) fn continue_sync_scoped(
         &self,
         repo: &RepoHandle,
         scope: &LockScope<'_>,
@@ -377,6 +515,7 @@ impl GitDriver {
             }
             let state = match &outcome {
                 Outcome::Commit { .. } => "done",
+                Outcome::CommitRejected { cause } if cause == "merged-outside" => "done",
                 Outcome::CommitRejected { cause } => cause.as_str(),
                 Outcome::AbandonedBeforeAttempt => "not-started",
                 _ => "lost",
@@ -479,7 +618,7 @@ impl GitDriver {
                 // A rejected commit can leave our merge open. A terminal
                 // refusal is not evidence that no checkout effect remains.
                 if let Some(Outcome::CommitRejected { cause }) = chain.outcome() {
-                    if (cause == "hook-rejected" || cause == "sync-commit-effect-unknown")
+                    if (["hook-rejected", "hook-refused", "commit-rejected", "sync-commit-effect-unknown"].contains(&cause.as_str()))
                         && merge.as_ref() == Some(target)
                         && &now == head
                     {
@@ -497,6 +636,7 @@ impl GitDriver {
                 return Err(recovery("sync-rejected-merge-recovery-required"));
             }
             let state = match chain.outcome() {
+                Some(Outcome::CommitRejected { cause }) if cause == "merged-outside" => "done",
                 Some(Outcome::CommitRejected { cause }) => cause.as_str(),
                 Some(Outcome::AbandonedBeforeAttempt) => "not-started",
                 _ => "lost",
@@ -586,7 +726,16 @@ impl GitDriver {
                 &Oid::parse(target, repo.object_format()).map_err(failure)?,
                 &Oid::parse(&now, repo.object_format()).map_err(failure)?,
             )? {
-                return Ok(info(id, head, target, "done", vec![], None));
+                let terminal = wal.append(&chain, Phase::Outcome(Outcome::CommitRejected {cause:"merged-outside".into()})).map_err(failure)?;
+                let mut receipt = info(id, head, target, "done", vec![], None);
+                receipt.warnings = self.compact_checkout_warning(repo, scope, wal, &terminal);
+                return Ok(receipt);
+            }
+            if &now == head {
+                let terminal = wal.append(&chain, Phase::Outcome(Outcome::CommitRejected {cause:"conflict-aborted".into()})).map_err(failure)?;
+                let mut receipt = info(id, head, target, "not-started", vec![], None);
+                receipt.warnings = self.compact_checkout_warning(repo, scope, wal, &terminal);
+                return Ok(receipt);
             }
             return Ok(info(
                 id,
@@ -617,7 +766,9 @@ impl GitDriver {
         if finish {
             self.finish_sync(repo, scope, wal, &chain)
         } else {
-            Ok(info(id, head, target, "in-progress", conflicts, None))
+            let mut receipt = info(id, head, target, "in-progress", conflicts, None);
+            receipt.staged = self.staged(repo, scope)?;
+            Ok(receipt)
         }
     }
     fn finish_sync(
@@ -646,21 +797,27 @@ impl GitDriver {
             return Err(recovery("sync-state-recovery-required"));
         };
         if self.sync_index_digest(repo, scope, conflicts)? != *index_digest {
-            return Err(failure("sync-index-changed"));
+            let mut error = failure("sync-index-changed");
+            let unexpected: Vec<_> = self.staged(repo, scope)?.into_iter().filter(|p| !staged.contains(p) && !conflicts.contains(p)).collect();
+            error.detail = Some(Box::new(serde_json::json!({"unexpected":unexpected})));
+            return Err(error);
         }
+        let mut marked = vec![];
         for p in conflicts {
             let path = root(repo)?.join(p);
             match fs::symlink_metadata(&path) {
                 Ok(m) if m.is_file() => {
-                    let bytes = fs::read(path).map_err(failure)?;
-                    if has_conflict_markers(&bytes) {
-                        return Err(failure(format!("conflict-markers: {p}")));
-                    }
+                    if has_conflict_markers(&fs::read(path).map_err(failure)?) { marked.push(p.clone()); }
                 }
                 Ok(_) => (),
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
                 Err(e) => return Err(failure(e)),
             }
+        }
+        if !marked.is_empty() {
+            let mut error = failure("conflict-markers");
+            error.detail = Some(Box::new(serde_json::json!({"paths": marked})));
+            return Err(error);
         }
         let mut allowed = staged.clone();
         allowed.extend(conflicts.clone());
@@ -673,13 +830,19 @@ impl GitDriver {
         {
             return Err(failure("foreign-staged-index"));
         }
+        let before = self.staged(repo, scope)?;
         self.stage_paths(repo, scope, &["add", "-A"], conflicts)?;
         if !self.unmerged(repo, scope)?.is_empty() {
             return Err(failure("staged-set-mismatch"));
         }
         let actual_staged = self.staged(repo, scope)?;
-        if actual_staged.iter().any(|p| !allowed.contains(p)) {
-            return Err(failure("staged-set-mismatch"));
+        let unexpected: Vec<_> = actual_staged.iter().filter(|p| !allowed.contains(p)).cloned().collect();
+        if !unexpected.is_empty() {
+            let own: Vec<_> = unexpected.iter().filter(|p| !before.contains(p)).cloned().collect();
+            self.stage_paths(repo, scope, &["reset", "-q", "HEAD"], &own)?;
+            let mut error = failure("staged-set-mismatch");
+            error.detail = Some(Box::new(serde_json::json!({"unexpected": unexpected})));
+            return Err(error);
         }
         let tree = self.checkout_text(repo, scope, &["write-tree"])?;
         let attempted = wal
@@ -703,14 +866,10 @@ impl GitDriver {
         let observed = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
         if &observed == head {
             if !out.success {
-                wal.append(
-                    &attempted,
-                    Phase::Outcome(Outcome::CommitRejected {
-                        cause: "hook-rejected".into(),
-                    }),
-                )
-                .map_err(failure)?;
-                return Err(out.error("hook-rejected"));
+                let error = self.checkout_commit_failure(repo, scope, out)?;
+                wal.append(&attempted, Phase::Outcome(Outcome::CommitRejected { cause: error.cause.clone() }))
+                    .map_err(failure)?;
+                return Err(error);
             }
             return Err(recovery("sync-commit-effect-unknown"));
         }
@@ -758,6 +917,9 @@ impl GitDriver {
             }),
         );
         receipt.warnings = warnings;
+        receipt.staged = actual_staged.clone();
+        receipt.unexpected = receipt.commit.as_ref().unwrap().files.iter().filter(|p| !actual_staged.contains(p)).cloned().collect();
+        receipt.missing = actual_staged.iter().filter(|p| !receipt.commit.as_ref().unwrap().files.contains(p)).cloned().collect();
         Ok(receipt)
     }
     pub fn abort_sync(
