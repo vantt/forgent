@@ -38,9 +38,11 @@ impl StepsOutcome {
 
 /// Run the envelope's steps in order, skipping those that already have a receipt.
 ///
-/// A builtin item (`release-slot`) is run by the runner itself after every
-/// process step, whether those succeeded or not: it decides from their outcome
-/// whether the terminal slot closes or stays for a person.
+/// A builtin item (`release-slot`) is run by the runner itself, and only once
+/// every process step has its receipt: it decides from the settled facts
+/// whether the terminal slot closes or stays for a person. While a process
+/// step is still pending (it failed or asked for a retry) the builtin records
+/// nothing, so the pass that completes that step decides with the full facts.
 pub fn run_steps(envelope: &Value, run_dir: &Path) -> StepsOutcome {
     let attempt_id = envelope["attemptId"].as_str().unwrap_or_default();
     let items = envelope["steps"].as_array().map(Vec::as_slice).unwrap_or_default();
@@ -72,16 +74,16 @@ pub fn run_steps(envelope: &Value, run_dir: &Path) -> StepsOutcome {
         }
     }
 
-    // A step that asked for a retry may pass next time; deciding the slot now would fix it as "kept".
-    let retrying = matches!(failure, Some(StepsOutcome::Retry { .. }));
+    // A pending step may pass next time; deciding the slot now would fix it as "kept" for good,
+    // since a receipted step never runs again.
     let earlier_done = failure.is_none();
-    for step in items.iter().filter(|step| is_builtin(step) && !retrying) {
+    for step in items.iter().filter(|step| is_builtin(step) && earlier_done) {
         let step_id = step_id_of(step);
         if has_receipt(&step_id) {
             continue;
         }
         let result = match step_id.as_str() {
-            "release-slot" => release_slot(envelope, run_dir, earlier_done),
+            "release-slot" => release_slot(envelope, run_dir),
             other => Err(StepFailure::Failed(format!("unknown builtin step {other}"))),
         };
         let failed = match result {
@@ -89,7 +91,6 @@ pub fn run_steps(envelope: &Value, run_dir: &Path) -> StepsOutcome {
             Err(failed) => Some(failed),
         };
         if let Some(failed) = failed {
-            // An earlier step's failure is the one that is reported first.
             failure.get_or_insert(match failed {
                 StepFailure::Retry(reason) => StepsOutcome::Retry { step_id, reason },
                 StepFailure::Failed(reason) => StepsOutcome::Failed { step_id, reason },
@@ -101,11 +102,11 @@ pub fn run_steps(envelope: &Value, run_dir: &Path) -> StepsOutcome {
 
 /// The `release-slot` builtin: `terminal-control.release(key, close | retain)`.
 /// `kept-unknown` leaves the step without a receipt, so adopt tries again.
-fn release_slot(envelope: &Value, run_dir: &Path, earlier_steps_done: bool) -> Result<Option<Value>, StepFailure> {
+fn release_slot(envelope: &Value, run_dir: &Path) -> Result<Option<Value>, StepFailure> {
     use crate::terminal_slot::{disposition_for, release, retain_window, Backend, ReleaseFailure};
     let key = envelope["slot"]["key"].as_str().ok_or_else(|| StepFailure::Failed("release-slot needs envelope.slot.key".into()))?;
     let receipt: Option<Value> = std::fs::read_to_string(run_dir.join("receipt.json")).ok().and_then(|text| serde_json::from_str(&text).ok());
-    let disposition = disposition_for(receipt.as_ref(), earlier_steps_done);
+    let disposition = disposition_for(receipt.as_ref());
     match release(&Backend::from_env(run_dir), key, disposition, retain_window(envelope)) {
         Ok(detail) => Ok(Some(detail)),
         Err(ReleaseFailure::Retry(reason)) => Err(StepFailure::Retry(reason)),

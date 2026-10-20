@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Close settled run panes when the gate proves the worker ended and stdout/stderr are captured, including cancellation and non-zero exits; retain crash diagnostics and uncertain attempts. A settlement step that has not completed yet no longer fixes the pane as retained: the pass that completes it decides. `npm run fgos:dev` keeps its staged host while a detached run supervisor still runs from it.
+
 - Reduce dormant Event Store read overhead through validated retained views and current-command Git fact reuse; verify only new active-log tails, preserve append durability, and fix concurrent store benchmark cursors with explicit outside-read timings.
 
 - Keep Event Store retired-path enforcement dormant until the tracked cutover fence; preserve append root durability, tolerate partial maintenance headers, and expose an absent local origin as `null`. Dormant door checks tolerate unrelated Work edits.

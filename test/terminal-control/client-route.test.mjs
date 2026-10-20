@@ -49,8 +49,11 @@ test('capabilities reports the driver and the live server incarnation', () => {
   assert.equal(result.serverIncarnation.pid, process.pid);
 });
 
+// Only the shell is in the pane's foreground, so a close is provably safe.
+const shellForeground = { env: { ...herdrEnv, FAKE_HERDR_FOREGROUND: 'shell' } };
+
 test('every operation of the port answers through the route', () => {
-  const tc = client();
+  const tc = client(shellForeground);
   const display = { label: 'client-route', role: 'worker' };
 
   const slot = tc.allocate({ key: 'k-one', groupKey: 'g-one', display });
@@ -79,6 +82,19 @@ test('every operation of the port answers through the route', () => {
   assert.deepEqual(tc.release({ key: 'k-attached', disposition: 'retain', until: null }), { result: 'released', disposition: 'retain' });
   assert.deepEqual(tc.release({ key: 'k-one', disposition: 'close' }), { result: 'released', disposition: 'close' });
   assert.ok(calls().some((c) => c.startsWith('pane close')), 'the allocated pane was closed');
+});
+
+test('a close is refused while a foreign process holds the foreground, and goes through once only the shell is left', () => {
+  const display = { label: 'foreign', role: 'worker' };
+  const slot = client().allocate({ key: 'k-foreign', groupKey: 'g-foreign', display });
+  assert.equal(slot.result, 'slot');
+  const closesBefore = calls().filter((c) => c.startsWith('pane close')).length;
+  const kept = client().release({ key: 'k-foreign', disposition: 'close' });
+  assert.equal(kept.result, 'kept-unknown');
+  assert.match(kept.reason, /foreground/);
+  assert.equal(calls().filter((c) => c.startsWith('pane close')).length, closesBefore, 'the pane stays');
+  assert.deepEqual(client(shellForeground).release({ key: 'k-foreign', disposition: 'close' }), { result: 'released', disposition: 'close' });
+  assert.equal(calls().filter((c) => c.startsWith('pane close')).length, closesBefore + 1);
 });
 
 test('launch keeps the slot after a request and never launches into it twice', () => {

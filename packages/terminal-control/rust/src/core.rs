@@ -587,6 +587,9 @@ impl<'a> Core<'a> {
             (Origin::Attached, _) => ReleaseMarkerOutcome::Unlinked,
             (Origin::Allocated, Disposition::Retain) => ReleaseMarkerOutcome::Retained,
             (Origin::Allocated, Disposition::Close) => {
+                if !self.foreground_is_owned(&store, &record) {
+                    return Ok(ReleaseOutcome::KeptUnknown { reason: "foreground is not provably the launched process or shell; kept".into() });
+                }
                 self.need("pane.close")?;
                 match self.driver.pane_close(&record.pane_id, &incarnation) {
                     Ok(CloseOutcome::Closed | CloseOutcome::AlreadyGone) => ReleaseMarkerOutcome::Closed,
@@ -624,6 +627,14 @@ impl<'a> Core<'a> {
         Ok(findings)
     }
 
+    /// The same foreground guard applies to immediate and expired-retention closes.
+    fn foreground_is_owned(&self, store: &Store, record: &AllocationRecord) -> bool {
+        if !self.has("process.info") { return false; }
+        let Ok(info) = self.driver.process_info(&record.pane_id) else { return false };
+        let Ok(launched) = store.read_marker::<LaunchedMarker>(&record.key, MarkerKind::Launched) else { return false };
+        info.foreground.iter().all(|p| p.pid == info.shell_pid || launched.as_ref().is_some_and(|l| l.identity.pid == p.pid))
+    }
+
     fn scan_stale(&self, id: &str, findings: &mut Vec<Finding>) {
         let Some(old) = Store::existing(&self.config.state_root, self.driver.name(), id) else { return };
         for key in old.record_keys().unwrap_or_default() {
@@ -650,8 +661,6 @@ impl<'a> Core<'a> {
             Err(_) => return findings.push(note(FindingKind::Unknown, "pane liveness unreadable; kept")),
             Ok(PaneLiveness::Live) => {}
         }
-        let info = if self.has("process.info") { self.driver.process_info(&record.pane_id).ok() } else { None };
-
         if let Some(marker) = released {
             // Retained: closable only past `until`, same incarnation (store is
             // this incarnation's), and no foreign foreground process.
@@ -659,14 +668,7 @@ impl<'a> Core<'a> {
             if self.now() <= until {
                 return;
             }
-            let launched = store.read_marker::<LaunchedMarker>(key, MarkerKind::Launched).ok().flatten();
-            let foreign = match (&info, &launched) {
-                (None, _) => true,
-                (Some(info), launched) => info.foreground.iter().any(|p| {
-                    p.pid != info.shell_pid && launched.as_ref().is_none_or(|l| l.identity.pid != p.pid)
-                }),
-            };
-            if foreign {
+            if !self.foreground_is_owned(store, record) {
                 return findings.push(note(FindingKind::Unknown, "retain expired but the foreground is not provably the launched process; kept"));
             }
             let detail = match self.close_unrecorded(&record.pane_id, incarnation) {
@@ -682,6 +684,7 @@ impl<'a> Core<'a> {
             }
             return;
         }
+        let info = if self.has("process.info") { self.driver.process_info(&record.pane_id).ok() } else { None };
         let age = self.now().saturating_sub(record.allocated_at);
         if record.origin == Origin::Allocated
             && age >= older_than_ms.max(self.config.allocation_grace_ms)

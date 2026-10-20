@@ -102,7 +102,8 @@ test('5 allocates and 2 closes of one group reach herdr one at a time', async ()
   const tc = createTerminalControl({
     hostBin: HOST_BIN,
     herdrBin: FAKE_HERDR,
-    env: { FAKE_HERDR_LOG: log, FAKE_HERDR_SOCKET: sock, HERDR_SOCKET_PATH: sock },
+    // Only the shell is in each pane's foreground, so the closes are provably safe.
+    env: { FAKE_HERDR_LOG: log, FAKE_HERDR_SOCKET: sock, HERDR_SOCKET_PATH: sock, FAKE_HERDR_FOREGROUND: 'shell' },
   });
   try {
     const display = { label: 'real-queue' };
