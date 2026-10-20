@@ -39,6 +39,36 @@ Thêm: từ vựng chéo nhau (`prefer` theo executor, `tierFallback` theo họ,
 
 Một ghế có đúng một role; một role ngồi ở nhiều ghế, nhiều nhóm. Một ghế có tối đa một persona (gắn theo ghế, không theo role; có thể bị khoá). **Model** (họ, tier, account) không phải lớp thứ tư mà là lựa chọn cho tổ hợp (ghế, role, persona) trong khuôn capability của nhóm; Seat Binding là nơi tính lựa chọn đó. Role và persona vẫn do Workflow quyết.
 
+
+#### 3.0.1 Role gốc và hai chỗ dọn (owner 12:33)
+
+- Role do pattern sinh, mang hành vi mặc định (vị trí trong pattern, câu giao việc chuẩn, quyền ghi hay chỉ đọc, luật khác họ). Persona và ghế mở rộng không giới hạn theo domain, framework, use case.
+- **Bỏ role `panelist`:** "panel" là hình dạng nhóm (nhiều người), không phải vai. Thành viên panel làm đúng việc của `producer`, chỉ là nhiều người song song. Panel = N ghế role `producer` + một ghế `synthesizer`. Role gốc còn **4**: `producer`, `synthesizer`, `reviewer`, `red-team`.
+- **Tên role cố định:** preset không đổi tên role (`advisor` của `consult`, `researcher` của `research-fan-out` chuyển thành persona).
+- **Ghế tách khỏi role:** ghế có tên riêng trong unit (`s1`, `system-lens`…), role và persona là thuộc tính của ghế. Khai tường minh trong workflow, ví dụ:
+
+```yaml
+- id: shape-proposals
+  template:
+    capability: architecture:shape
+    pattern: panel
+    seats:
+      - { seat: system,      role: producer,    persona: system-lens }
+      - { seat: alternative, role: producer,    persona: alternative-lens }
+      - { seat: constraint,  role: producer,    persona: constraint-lens }
+      - { seat: synthesis,   role: synthesizer }
+```
+
+  Runner config chọn model theo `roles.<role>`, `personas.<persona>` (nếu owner chọn câu 7) và `capabilities.<cap>.seats.<seat>`.
+- **Role mới chỉ đến cùng pattern mới.** Ứng viên duy nhất thấy được: pattern `debate` (hai bên biện hộ + `judge` chọn một, khác `synthesizer` là gộp) cho Dialectical Inquiry đúng bài bản. Six Hats, Delphi, nominal group không cần role mới (mũ, chuyên gia, người bỏ phiếu là persona; vòng là bước workflow; điều phối là phiên lead).
+- **Một ghế qua nhiều vòng giữ cùng model** (Delphi `sameSeat`): Seat Binding ghim model của ghế theo tên ghế trong case.
+
+#### 3.0.2 Nạp persona tại chỗ (owner 12:33)
+
+Đã có một cửa nạp persona (`src/runner/agent-definitions.mjs`), ba tầng, tầng trên thay cả file tầng dưới: workspace `fgos/agents/<name>.yaml` → domain `domains/<domain>/agents/` → core `core/agents/`. Thiếu tầng **workflow/use case**: một framework (Six Hats) khai persona ngay cạnh workflow của nó, không phải chép lên chỗ chung. Đề xuất: thêm tầng workflow (khối `personas:` trong file workflow, hoặc thư mục `agents/` cạnh nó), thứ tự workspace → workflow → domain → core (khách hàng vẫn đè được). Persona của domain chỉ thấy trong domain đó (hôm nay mọi domain chung một không gian tên).
+
+Convention **không** nạp persona: nó chỉ sinh, phân giải, kiểm tên và đường dẫn. Convention có thể sở hữu luật đường dẫn và tên file persona (`<name>.yaml`, nơi đặt ở mỗi tầng); việc đọc, thứ tự ưu tiên và ghim nội dung vẫn ở `agent-definitions` (một cửa, mở rộng thêm tầng).
+
 ### 3.1 Authority (một câu)
 
 **Seat Binding là authority duy nhất trả lời: "ghế này chạy ai (họ, invocation, model), ở tier nào, bằng account nào, và khi hỏng thì sang đâu" — kèm lý do cho từng phần.** Không component nào khác tự tính tier, model, thứ tự họ, thứ tự account hay bước dự phòng.
@@ -179,6 +209,10 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 
 7. **Persona có được ảnh hưởng model không?** Ví dụ persona "kiến trúc sư hệ thống" luôn kéo tier lên flagship. Bản này chưa cho: model chỉ theo capability, role và ghế. Cho thì thêm một lớp vào 5.1 (giữa role và ghế), persona khai `tier`/`families`.
 8. **Các mục chuyển từ MP-B1 06 (owner 11:56):** tier hội đồng kiến trúc (tổng hợp frontier, còn lại flagship, một ghế phản biện frontier), red-team → xai, trần `advanced`/`maxTier` theo capability — config mẫu 5.2 đã thể hiện; làm cùng đợt chuyển đổi mục 8.
+
+9. **Bỏ role `panelist`, panel = N `producer` + `synthesizer`; ghế khai tường minh (3.0.1):** đồng ý?
+10. **Tầng persona theo workflow/use case (3.0.2):** khối `personas:` trong file workflow hay thư mục `agents/` cạnh workflow? Persona domain chỉ thấy trong domain?
+11. **Pattern `debate` + role `judge`:** làm cùng Seat Binding hay để backlog?
 
 ## Phụ lục: phát hiện thêm khi chứng minh MP-B1 (2026-10-20 11:15)
 
