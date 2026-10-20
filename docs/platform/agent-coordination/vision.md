@@ -271,6 +271,38 @@ The foundation claim must be proved by at least:
 If those consumers require separate execution cores, the foundation boundary
 has not been found yet.
 
+### V-013: The Agent Mailbox Is A Narrow Delivery Component, Not A General Mailbox
+
+Accepted by the owner on 2026-10-20. V-011 stays as written.
+
+V-011 says the first foundation does not require a general mailbox and that a
+new persisted entity needs a distinct authority, recovery need, or invariant.
+This decision records one exception that is not a general mailbox: a component
+that places a message into the context of a live agent session on one machine,
+with an honest receipt, and that keeps text from another agent from ever being
+treated as the user's.
+
+It claims two of V-011's three tests and makes no claim for the third:
+
+1. Distinct authority: only this component decides whether, when and how a
+   message enters a live agent's context.
+2. Invariant: a message from another agent is peer input, never user input, and
+   never carries permission.
+3. Recovery need: not claimed. Nothing in the first slice outlives its machine's
+   local record.
+
+Bounds, so the exception cannot grow by accident: no free chat, threads or
+broadcast by agents; no scheduler, durable queue or daemon; no permission
+decisions; no reaching into the subagents or teammates of a CLI; the first slice
+serves sessions in a terminal on one machine for Claude Code, Codex and agy.
+
+Later parts are not covered and stay open to be added: acknowledgement and
+expiry, persistence in the Event Store, delivery between machines, the pi and
+omp adapters, durable sessions and headless workers. Each needs its own argument
+under V-011's three tests, recovery need above all, and its own owner decision.
+The design and its later parts are in
+`docs/platform/agent-mailbox/spec.md`.
+
 ## Foundation Responsibilities
 
 The foundation owns:
@@ -375,7 +407,7 @@ The Vision fixes direction but intentionally does not decide:
 10. whether and how an AdhocTask may be promoted to child Work.
 
 These belong in proposals, ADRs, architecture, and contracts beneath this
-Vision. They must be answered without reopening V-001 through V-012 implicitly.
+Vision. They must be answered without reopening V-001 through V-013 implicitly.
 
 ## Reading Down From The Vision
 

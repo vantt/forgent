@@ -17,7 +17,7 @@ summary replacement.
 ## Accepted Decisions
 
 The [Agent Coordination Foundation Vision](../vision.md) records accepted
-direction decisions V-001 through V-012 above the specific ADRs below.
+direction decisions V-001 through V-013 above the specific ADRs below.
 
 1. [ADR-001: Work Owns Delivery Lifecycle](ADR-001-work-lifecycle-authority.md)
 2. [ADR-002: Preserve Stage Primary Operation Compatibility](ADR-002-stage-operation-compatibility.md)
