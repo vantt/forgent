@@ -85,9 +85,8 @@ frozen, the same words `fgos-coding-driving` uses; Work itself carries no
   against; checking a work branch out there instead of letting the driver's
   claim step (`fgos pick <id>` + `EnterWorktree`) isolate it mixes that
   branch's tree with whatever else is in flight elsewhere in the backlog.
-- **Never run a raw `git reset --hard` on the main checkout without a full
-  `git status` first** (tsk-3au: `docs/history/main-checkout-destructive-
-  git-safety-net/CONTEXT.md`) — checking only the files you meant to touch
+- **Never run a raw `git reset --hard` on the main checkout** (tsk-3au:
+  `docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md`) — checking only the files you meant to touch
   can silently discard another in-flight session's uncommitted work, with
   no stash/reflog/blob to recover it. Use `fgos main-checkout-reset --sha
   <sha> [--confirm]` instead — it shows the full whole-repo status and

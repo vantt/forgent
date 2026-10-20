@@ -6,8 +6,9 @@ preference: the session engine refuses `mutation: "mutating"` whenever
 `--cwd` resolves to the main checkout (`session-engine.mjs`
 `assertMutatingDispatchAllowed`, Mutation Rule condition 3), and a worker that
 lands in the wrong directory writes into someone else's tree. The Lead opens
-the worktree as a plain git operation before any request, verifies it, and
-removes it after the merge. No request field expresses any of this.
+the worktree with `fgos worktree create` before any request, verifies it, and
+removes it with `fgos worktree remove` after the merge. No request field
+expresses any of this.
 
 Substitute `<prefix>` with the calling skill's own prefix (`code-change` for
 a single-cell change, `<track>` for a plan-mode cell) and `<slug>` with the
@@ -25,9 +26,9 @@ if [ -e "$wt" ]; then
   echo "refuse: $wt already exists — inspect with 'git worktree list', remove or pick a new slug" >&2; exit 1
 fi
 if git -C "$main" show-ref --verify --quiet "refs/heads/$branch"; then
-  git -C "$main" worktree add "$wt" "$branch"           # reuse the branch, fresh directory
+  fgos worktree create "$wt" --branch "$branch" --base "$branch"   # reuse the branch, fresh directory
 else
-  git -C "$main" worktree add "$wt" -b "$branch" "$base"
+  fgos worktree create "$wt" --branch "$branch" --base "$base"
 fi
 [ -f "$wt/package-lock.json" ] && npm ci --prefix "$wt" --silent   # workers run the real test command here
 ```
@@ -37,8 +38,11 @@ directory `../<prefix>-<slug>` (the prefix keeps it from colliding with a
 sibling checkout such as `../forgentX`), branch `<prefix>--<slug>` (the
 double dash is what `fgos coordination chain <prefix>` groups on). Reusing an
 existing branch with a fresh directory is the same retry-without-collision
-rule `src/runner/worktree.mjs` applies to `fgw/<id>` branches. Record `$base`
-— it is the merge target and belongs in the close rationale.
+rule `src/runner/worktree.mjs` applies to `fgw/<id>` branches; `fgos worktree
+create` reuses an existing branch only when its tip equals `--base`, and
+refuses a branch that is checked out elsewhere. Record `$base` — it is the
+merge target, the `--delivered-to` ref at close, and belongs in the close
+rationale.
 
 ## Verify before every dispatch
 
@@ -69,10 +73,12 @@ coordination request:
 
 ```sh
 git -C "$main" merge --no-ff "$branch"
-git -C "$main" worktree remove "$wt"          # from the main checkout, never from inside $wt
-git -C "$main" branch -d "$branch"            # only after the merge; keep it if the cell is deferred
+fgos worktree remove "$wt" --delivered-to "$base"   # from the main checkout, never from inside $wt
+git -C "$main" branch -d "$branch"                  # only after the merge; keep it if the cell is deferred
 ```
 
-If `worktree remove` refuses because the tree is dirty, read the dirt first —
-an uncommitted worker file is evidence, not noise — then `--force` only once
-it is recorded.
+`fgos worktree remove` has no force flag: it refuses a dirty checkout, a live
+process in the worktree, preserved worker state, or a tip that `$base` does
+not contain. On a refusal, read the reported reason first — an uncommitted
+worker file is evidence, not noise — record it, resolve the cause (land the
+missing commit, stop the process), and run the same remove again.

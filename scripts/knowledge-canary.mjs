@@ -4,7 +4,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execSync, execFileSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
+import { sandboxGit } from './lib/sandbox-git.mjs';
 import { rebuild } from '../src/state/store.mjs';
 
 export function runKnowledgeCanary(repoRoot) {
@@ -21,6 +22,9 @@ export function runKnowledgeCanary(repoRoot) {
   // finds the real binary unconditionally, independent of both the
   // caller's cwd and the sandbox repoRoot.
   const fgosBin = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'bin', 'fgos.mjs');
+  if (fs.realpathSync(repoRoot) === fs.realpathSync(path.dirname(path.dirname(fgosBin)))) {
+    throw new Error('knowledge-canary: repoRoot must be a disposable sandbox repository, not this checkout');
+  }
 
   // 1. Topic register
   execSync(`node "${fgosBin}" topic register t1 --purpose-slug worktree-reclaim --purpose-title "Worktree Reclaim"`, { cwd: repoRoot });
@@ -33,11 +37,11 @@ export function runKnowledgeCanary(repoRoot) {
   const fullPath = path.join(repoRoot, docPath);
   fs.mkdirSync(path.dirname(fullPath), { recursive: true });
   fs.writeFileSync(fullPath, `---\nframework: diataxis\nmode: how-to\n---\n# Worktree Reclaim Guide\n`, 'utf8');
-  // execFileSync (argv array, no shell) -- docPath is a fixed literal here,
-  // but this is the same shell-interpolation shape flagged in
-  // knowledge-migration.mjs's own git mv/git add, kept consistent.
-  execFileSync('git', ['add', docPath], { cwd: repoRoot, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'docs(canary): write guide'], { cwd: repoRoot, stdio: 'ignore' });
+  // The sandbox repository's own commit, through the named sandbox door
+  // (argv array, no shell; refused outside repoRoot).
+  const git = sandboxGit(repoRoot);
+  git(['add', docPath], { cwd: repoRoot });
+  git(['commit', '-m', 'docs(canary): write guide'], { cwd: repoRoot });
 
   // 4. Attest
   const attestOut = execSync(`node "${fgosBin}" knowledge attest --doc-path ${docPath} --capture-id canary-capture`, { cwd: repoRoot, encoding: 'utf8' });

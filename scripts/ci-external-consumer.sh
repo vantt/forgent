@@ -135,7 +135,8 @@ if [ ! -x "$FGCTL_BIN" ]; then
   exit 1
 fi
 
-# Fresh git init temp project
+# Fresh git init temp project. Named sandbox class (Git spec §13, external-consumer CI):
+# the only repository this script's git touches is the one it creates here under $TMP_BASE.
 TEMP_PROJECT="$TMP_BASE/project"
 mkdir -p "$TEMP_PROJECT"
 

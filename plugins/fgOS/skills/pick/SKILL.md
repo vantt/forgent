@@ -109,8 +109,7 @@ state or touches git worktrees directly — every write goes through the
    at the printed path rather than hand-checking-out the branch in this
    one.
 
-   **Never run a raw `git reset --hard` on the main checkout without a
-   full `git status` first** — a
+   **Never run a raw `git reset --hard` on the main checkout** — a
    session that checks only the files it meant to touch, not the whole
    tree, can silently discard another in-flight session's uncommitted work
    with no stash/reflog/blob to recover it (the main checkout is shared

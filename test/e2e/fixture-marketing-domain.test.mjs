@@ -39,6 +39,7 @@
 
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -60,13 +61,7 @@ function mkTempDir(prefix) {
 // initTempRepo.
 function initTempRepo() {
   const repoRoot = mkTempDir('fgos-fixture-marketing-e2e-repo-');
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
-  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
-  execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: repoRoot });
-  return repoRoot;
+  return initFixtureRepo(repoRoot, { branch: 'main', message: 'root commit', ignore: '.fgos/locks/\n' });
 }
 
 function fgos(cwd, args) {

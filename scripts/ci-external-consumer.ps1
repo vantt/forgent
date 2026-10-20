@@ -75,6 +75,8 @@ function Start-AssetServer([string]$Dir, [string]$Name) {
     Fail "starting the local release server for $Name"
 }
 
+# Named sandbox class (Git spec §13, external-consumer CI): git here touches only the
+# fresh repository this function creates under $tmpBase.
 function New-Project([string]$Name) {
     $dir = Join-Path $tmpBase $Name
     New-Item -ItemType Directory -Path $dir | Out-Null

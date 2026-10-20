@@ -17,6 +17,7 @@ import crypto from 'node:crypto';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { performance } from 'node:perf_hooks';
+import { gitVersion, sandboxGit } from '../lib/sandbox-git.mjs';
 
 const SELF = fileURLToPath(import.meta.url);
 const CHECKOUT = path.resolve(path.dirname(SELF), '../..');
@@ -40,7 +41,11 @@ function options(argv) {
   for (let i = 0; i < argv.length; i++) if (argv[i].startsWith('--')) out[argv[i].slice(2)] = argv[i + 1]?.startsWith('--') || argv[i + 1] === undefined ? true : argv[++i];
   return out;
 }
-function git(args, opts = {}) { return execFileSync('git', args, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], ...opts }).trim(); }
+// Every fixture repository lives under the mode's fresh root; Git reaches it only through the named
+// sandbox door, bound once the root exists. The checkout itself is read through Inspect.
+let git = () => { throw new Error('e3-bench: sandbox root not bound'); };
+const bindSandbox = (root) => { git = sandboxGit(root); return root; };
+const checkoutInspect = ({ index, loader }, state) => index.createGitInspect({ stateRoot: state, repoPath: CHECKOUT, trustedMain: CHECKOUT }, loader);
 function privateDir(dir) { fs.mkdirSync(dir, { recursive: true, mode: 0o700 }); fs.chmodSync(dir, 0o700); return fs.realpathSync(dir); }
 
 /** A bare repository the Publication port accepts: event-seal dir and the activation fence. */
@@ -133,6 +138,7 @@ async function idle() {
 async function census(args) {
   const { index, loader } = await loaders(args.descriptor);
   const mark = (label) => { try { fs.accessSync(`/nonexistent-e3-marker/${label}`); } catch {} };
+  bindSandbox(args.root);
   const local = args.repo, remote = args.remote;
   const port = index.createGitPublication({ stateRoot: args.state, repoPath: local, trustedMain: local, reference: 'refs/fgos/events/e3-census', writer: WRITER }, loader);
   const grant = { name: 'origin', pinnedUrl: remote };
@@ -148,7 +154,7 @@ async function census(args) {
     tip = next;
     mark(`push-objects-${r}-begin`); port.pushRefs({ remote: 'origin', refs: [['refs/fgos/events/e3-census', 'refs/fgos/events/e3-census']], remoteGrant: grant }); mark(`push-objects-${r}-end`);
     const seeded = commitFor(port, `census seeded ${r}`, [tip]);
-    execFileSync('git', ['--git-dir', local, 'push', '-q', remote, `${seeded}:refs/seed/census-${r}`]);
+    git(['--git-dir', local, 'push', '-q', remote, `${seeded}:refs/seed/census-${r}`]);
     port.compareAndSwap({ expected: tip, next: seeded, operationId: `census-seeded-${r}` });
     tip = seeded;
     mark(`push-no-objects-${r}-begin`); port.pushRefs({ remote: 'origin', refs: [['refs/fgos/events/e3-census', 'refs/fgos/events/e3-census']], remoteGrant: grant }); mark(`push-no-objects-${r}-end`);
@@ -270,6 +276,7 @@ async function scopedCensusWorker(args) {
       try { fs.accessSync(`/nonexistent-e3-marker/${label}-end`); } catch {}
     },
   };
+  bindSandbox(args.root);
   const { index, loader } = await loaders(args.descriptor);
   const rows = await typedOperationRows(args.root, privateDir(path.join(args.root, 'state')), index, loader, 1, observer);
   process.stdout.write(JSON.stringify({phases, diagnosticTimings:rows}));
@@ -283,7 +290,9 @@ async function typedOperationRows(root, state, index, loader, samples, observer 
   // immutable history fixture is materialized only inside the experiment root;
   // it is never a production import or a second shipped writer.
   const baselinePath = 'src/runner/execution/commit-unit-work.mjs';
-  const baseline = git(['-C', CHECKOUT, 'show', `512e8cd2a68300848bf13859d46872f7fbe94951:${baselinePath}`]);
+  const [found] = checkoutInspect({ index, loader }, state).pathsAtRevision({ revision: '512e8cd2a68300848bf13859d46872f7fbe94951', paths: [[...Buffer.from(baselinePath)]], maxBlobBytes: 1 << 20 });
+  if (found.value.kind !== 'present') throw new Error(`e3-bench: ${baselinePath} at the baseline commit: ${found.value.kind}`);
+  const baseline = Buffer.from(found.value.bytes).toString('utf8');
   const baselineFile = path.join(root, 'legacy-unit-commit-baseline.mjs');
   fs.writeFileSync(baselineFile, baseline.replace(/from '([^']+)'/g, (all, specifier) =>
     specifier.startsWith('.') ? `from '${pathToFileURL(path.resolve(CHECKOUT, path.dirname(baselinePath), specifier)).href}'` : all));
@@ -400,7 +409,7 @@ async function stageAddon(root, addonFile) {
   return descriptorFile;
 }
 
-function environment(root) {
+function environment(root, inspect) {
   const cpu = os.cpus();
   const read = (f) => { try { return fs.readFileSync(f, 'utf8').trim(); } catch { return null; } };
   return {
@@ -408,8 +417,8 @@ function environment(root) {
     kernel: os.release(), memoryGiB: Math.round(os.totalmem() / 2 ** 30),
     filesystem: execFileSync('findmnt', ['-T', root, '-n', '-o', 'SOURCE,FSTYPE,OPTIONS'], { encoding: 'utf8' }).trim(),
     device: read('/sys/block/nvme0n1/device/model'),
-    git: git(['--version']), node: process.version, rustc: execFileSync('rustc', ['--version'], { encoding: 'utf8' }).trim(),
-    loadavg: os.loadavg(), checkoutHead: git(['-C', CHECKOUT, 'rev-parse', 'HEAD']), at: new Date().toISOString(),
+    git: gitVersion(), node: process.version, rustc: execFileSync('rustc', ['--version'], { encoding: 'utf8' }).trim(),
+    loadavg: os.loadavg(), checkoutHead: inspect.resolveCommit({ name: 'HEAD' }), at: new Date().toISOString(),
   };
 }
 
@@ -417,7 +426,7 @@ async function run(args) {
   const samples = Number(args.samples ?? 500);
   const root = args.root ? path.resolve(args.root) : path.join(CHECKOUT, '.fgos/runtime/e3-bench', new Date().toISOString().replace(/[:.]/g, '-'));
   if (fs.existsSync(root)) throw new Error(`root must be fresh: ${root}`);
-  privateDir(root);
+  bindSandbox(privateDir(root));
   const fstype = execFileSync('findmnt', ['-T', root, '-n', '-o', 'FSTYPE'], { encoding: 'utf8' }).trim();
   if (fstype !== 'ext4') throw new Error(`E3 runs on ext4, not ${fstype}`);
   const artifacts = args.addon && args.fixture && args.fgctl ? { addon: args.addon, fixture: args.fixture, fgctl: args.fgctl, host: args.host ?? process.env.FGOS_HOST_BIN } : compileArtifacts();
@@ -425,12 +434,12 @@ async function run(args) {
   process.env.FGOS_HOST_BIN = fs.realpathSync(artifacts.host);
   for (const k of Object.keys(artifacts)) artifacts[k] = fs.realpathSync(artifacts[k]);
   const descriptor = await stageAddon(root, artifacts.addon);
-  const results = { environment: environment(root), artifacts, rows: {} };
+  const state = privateDir(path.join(root, 'state'));
+  const typedLoader = await loaders(descriptor);
+  const results = { environment: environment(root, checkoutInspect(typedLoader, state)), artifacts, rows: {} };
   const say = (row, value) => { results.rows[row] = value; console.error(`${row}: ${JSON.stringify(value)}`); };
   const fixture = (...a) => JSON.parse(execFileSync(artifacts.fixture, a, { encoding: 'utf8', maxBuffer: 64 << 20 }));
-  const state = privateDir(path.join(root, 'state'));
 
-  const typedLoader = await loaders(descriptor);
   const typedRows = await typedOperationRows(root, state, typedLoader.index, typedLoader.loader, Number(args.typedSamples ?? 30));
   say('scopedCommit', typedRows.scopedCommit);
   say('land', typedRows.land);
@@ -497,9 +506,9 @@ async function run(args) {
       commits.push(git(['--git-dir', repo, 'commit-tree', tree, ...(i ? ['-p', commits[i - 1]] : []), '-m', `raw ${i}`], { env: { ...process.env, GIT_AUTHOR_NAME: 'E3', GIT_AUTHOR_EMAIL: 'e3@fgos.invalid', GIT_COMMITTER_NAME: 'E3', GIT_COMMITTER_EMAIL: 'e3@fgos.invalid' } }));
     }
     say('rawSpawnBaseline', {
-      hashObjectWrite: raw(200, () => execFileSync('git', ['--git-dir', repo, 'hash-object', '-w', '--stdin'], { input: crypto.randomBytes(1024) })),
-      revParse: raw(200, () => execFileSync('git', ['--git-dir', repo, 'rev-parse', '--git-dir'])),
-      updateRefCas: raw(200, (i) => execFileSync('git', ['--git-dir', repo, 'update-ref', '--no-deref', 'refs/fgos/events/raw', commits[i + 1], i ? commits[i] : '0'.repeat(40)])),
+      hashObjectWrite: raw(200, () => git(['--git-dir', repo, 'hash-object', '-w', '--stdin'], { input: crypto.randomBytes(1024) })),
+      revParse: raw(200, () => git(['--git-dir', repo, 'rev-parse', '--git-dir'])),
+      updateRefCas: raw(200, (i) => git(['--git-dir', repo, 'update-ref', '--no-deref', 'refs/fgos/events/raw', commits[i + 1], i ? commits[i] : '0'.repeat(40)])),
     });
   }
 
@@ -609,7 +618,7 @@ async function run(args) {
     const remote = fs.realpathSync((git(['init', '-q', '--bare', path.join(root, 'census-remote.git')]), path.join(root, 'census-remote.git')));
     git(['--git-dir', local, 'remote', 'add', 'origin', remote]);
     const log = path.join(root, 'census.strace');
-    execFileSync('strace', ['-f', '-qq', '-e', 'trace=execve,access,faccessat,faccessat2,fsync,fdatasync', '-o', log, process.execPath, SELF, 'census', '--descriptor', descriptor, '--state', state, '--repo', local, '--remote', remote], { stdio: 'inherit' });
+    execFileSync('strace', ['-f', '-qq', '-e', 'trace=execve,access,faccessat,faccessat2,fsync,fdatasync', '-o', log, process.execPath, SELF, 'census', '--descriptor', descriptor, '--state', state, '--root', root, '--repo', local, '--remote', remote], { stdio: 'inherit' });
     const counts = {};
     let open = null;
     for (const line of fs.readFileSync(log, 'utf8').split('\n')) {
@@ -761,7 +770,7 @@ const args = options(rest);
 async function rollbackOnly(args) {
   const root = path.resolve(args.root);
   if (fs.existsSync(root)) throw new Error(`root must be fresh: ${root}`);
-  privateDir(root);
+  bindSandbox(privateDir(root));
   const descriptor = await stageAddon(root, fs.realpathSync(args.addon));
   const { index, loader } = await loaders(descriptor);
   console.log(JSON.stringify(await rollback(root, fs.realpathSync(args.fgctl), descriptor, index, loader)));
