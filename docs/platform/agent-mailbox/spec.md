@@ -171,7 +171,7 @@ An **address** is an entry in a small registry that is part of the record snapsh
 | `to_generation` | the generation of the recipient's address at the moment of `send`, set by the component, never by the caller |
 | `reply_to` | id of the message this one answers. **Derived by the component** (section 5.4); a value supplied by the caller is only a hint and is refused unless that message was offered to the sender |
 | `depth` | chain depth, stored at append time so pruning an ancestor never changes it |
-| `wake` | boolean, default `false`. `true` means "reach an idle session and drain at its next Stop". Subject to section 5.3 |
+| `wake` | boolean, default `false`. The sender's permission, not a claim about the recipient's state and not a mark of urgency: `true` means "if the recipient is idle, you may start a new turn on it so it reads this". The component checks the recipient's state at `send` and the receipt reports what happened (woken through a named channel with an expected delay; recipient busy, so it sees the message at its next checkpoint whatever `wake` says; or state unknown, so nobody is woken). A busy recipient is never interrupted and `wake` does not make a message arrive sooner. Subject to section 5.3 |
 | `kind` | `message` (a recipient may reply) or `notice` (machine-made, from the system address; never replied to, never counted by the loop guard, never wakes) |
 | `body` | plain text, size capped (section 5.3), immutable once written and stored apart from the snapshot (section 6.4). Content longer than the cap is sent as a path or link the receiver reads with its own authority |
 | `recorded_at` | time stamped by the recording process. All windows, TTLs and queue ages use it. There is no sender time in this slice |
