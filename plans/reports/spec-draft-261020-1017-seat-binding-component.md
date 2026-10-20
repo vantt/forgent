@@ -219,7 +219,26 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 - Câu 1 (bỏ `rigorToTier`): 12:05 "không phản đối", 12:10 xác nhận rigor chỉ còn quyết số checker và khác họ; tier khai trực tiếp.
 - Câu 9 (bỏ role `panelist`, panel = N `producer` + `synthesizer`, ghế khai tường minh): 12:38 đồng ý.
 - Câu 11 (pattern `debate` + role `judge`): 12:37 **làm ngay** (trước Seat Binding).
-- Còn mở: 2, 3, 4, 5, 6, 7, 10.
+- 12:48: role **`judge`** thêm (pattern `debate`) → role gốc là 5: `producer`, `synthesizer`, `reviewer`, `red-team`, `judge`.
+- Câu 2: **không** có `roles` global; taste theo role đúng theo domain → brainstorm phạm vi (mục R bên dưới).
+- Câu 4: **Rust** ngay (luật thiết kế 4; component chưa có, viết Node rồi port là làm hai lần). Theo khuôn Convention/Session Identity: crate + route nội bộ + facade Node mỏng cho `bind()`.
+- Câu 5: có hội đồng kiến trúc soát trước khi duyệt.
+- Câu 7: có — persona, nếu ghế có, **phải** được truyền vào Seat Binding và được khai taste model.
+- Câu 10: nghĩ thêm. Hướng owner: domain (vd marketing) cung cấp một **bộ persona chung**; persona để **file riêng** (dễ thay, dễ cập nhật) thay vì khối trong file workflow.
+- Còn mở: 3, 6, 10 (chi tiết), R.
+
+### R. Brainstorm: phạm vi của taste theo role (owner 12:48: global không hợp)
+
+Vấn đề: "red-team → xai" hợp với review code và phản biện kiến trúc, nhưng ở marketing red-team có thể cần họ khác; một khoá `roles` global ép mọi domain một ý.
+
+| Phương án | Khai ở đâu | Lợi | Giá |
+|---|---|---|---|
+| R1 role trong nhóm capability | `capabilities."code:*".roles.red-team`, `capabilities."marketing:*".roles.red-team` | dùng lại lớp nhóm `"<domain>:*"` đã có trong 5.1; không thêm khoá cấp cao; đọc config thấy ngay domain nào chọn gì | lặp nếu nhiều domain cùng ý |
+| R2 role trong config của domain | `domains/<d>/` (file domain) | domain tự mang taste, đi cùng persona và workflow của nó | thêm một nguồn config ngoài `.fgos/config.json`; project muốn đè phải có lớp đè |
+| R3 role trong từng capability | `capabilities.<cap>.roles.<role>` | chính xác nhất | lặp nhiều |
+| R4 global + đè theo domain | `roles` global làm mặc định, R1 đè | ít dòng | chính là thứ owner thấy không hợp: mặc định global vẫn rò sang domain không khai |
+
+Đề xuất: **R1** (và R3 khi cần chính xác, cùng một hình dạng khoá `roles` bên trong capability hoặc nhóm). Không có `roles` cấp runner. Thứ tự lớp 5.1 thành: người > ghế > persona > role trong capability > role trong nhóm domain > capability > nhóm domain > mặc định. Câu cho owner: R1 có đủ không, hay domain cần mang taste theo gói (R2) khi đóng gói domain cho project khác?
 
 ## Phụ lục: phát hiện thêm khi chứng minh MP-B1 (2026-10-20 11:15)
 
