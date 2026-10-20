@@ -307,6 +307,9 @@ fn addon_admission_names_missing_payload_or_capability_and_preserves_activation(
         .success());
     let state = root.join("state");
     fs::create_dir_all(&state).unwrap();
+    // The Git driver refuses a state root that is group or world writable, whatever the umask.
+    use std::os::unix::fs::PermissionsExt;
+    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
     let good = root.join("good");
     candidate(&good, false);
     success(controller(&ws, &state, "init", &good));
