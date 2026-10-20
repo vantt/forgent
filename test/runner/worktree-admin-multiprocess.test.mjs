@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { createLockScope, probe } from '../../src/holder-lock/index.mjs';
 import { withMainCheckout, addWorktree, addWorktreeSync } from '../../src/runner/repo-locks.mjs';
 import { createClaimWorktree, createWorktree, removeWorktree } from '../../src/runner/worktree.mjs';
-import { createWorkflowWorktree } from '../../src/workflow/integrate.mjs';
+import { createWorkflowWorktree } from '../../src/workflow/unit-handoff.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
 

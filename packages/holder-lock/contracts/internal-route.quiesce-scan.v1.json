@@ -6,13 +6,14 @@
     "required": ["--protocol 1"],
     "optional": [
       { "flag": "--root <path>", "repeatable": true, "meaning": "workspace root (main checkout) to scan for; at least one required" },
+      { "flag": "--dir <path>", "repeatable": true, "meaning": "a linked worktree of the single --root, as the caller's Git listing names it; with more than one --root it is a usage error" },
       { "flag": "--exclude-pid N", "repeatable": true, "meaning": "pids that are not counted (the caller and its own ancestors)" }
     ]
   },
   "scan": {
     "linux": [
       "/proc/*/environ carrying FGOS_STATE_ROOT or a path under a given root",
-      "/proc/*/cwd inside the root or inside any of its linked worktrees (git worktree list --porcelain)",
+      "/proc/*/cwd inside the root or inside any --dir the caller listed; the route never runs Git",
       "/proc/*/cmdline naming a fgOS payload (a staged release, bin/fgos.mjs, fgos-runner, fgos-gateway) or --cwd of a given root"
     ],
     "otherPlatforms": "result unavailable: a person confirms that no fgOS process is left",

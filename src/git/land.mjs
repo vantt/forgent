@@ -1,5 +1,5 @@
 // Dormant transport. Keep the native session alive across consumer verification.
-import { hotLockDepth } from '../state/hot-lock.mjs';
+import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { loadNativeAddon, withNativeLocks } from './native.mjs';
 
 const lockUnavailable = (err) => {

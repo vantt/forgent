@@ -316,7 +316,6 @@
     "src/workflow/case-start.mjs": "use-case",
     "src/workflow/case-verbs.mjs": "use-case",
     "src/setup/workflow-case-checks.mjs": "infra",
-    "src/workflow/integrate.mjs": "infra",
     "src/workflow/units-source.mjs": "infra",
     "src/workflow/runner.mjs": "use-case",
     "src/workflow/index.mjs": "use-case",

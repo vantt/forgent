@@ -23,7 +23,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-import { uninstallGitHooks } from '../../src/setup/git-hooks.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
+import { installGitHooks, uninstallGitHooks } from '../../src/setup/git-hooks.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -41,16 +42,14 @@ function run(cwd, args, extraEnv = {}) {
 }
 
 function initGitRepo(cwd) {
-  execFileSync('git', ['init', '-q'], { cwd });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
+  initFixtureRepo(cwd);
 }
 
 // --- unit: uninstallGitHooks (mirrors installGitHooks's own fill-only test
 // style in test/setup/git-hooks.test.mjs, if/when that file exists — written
 // standalone here since none did at the time of this item). ---
 
-test('uninstallGitHooks unwires and deletes .githooks/pre-commit + the now-empty dir when hooksPath is exactly .githooks', () => {
+test('uninstallGitHooks preserves a relative hook setting without ownership provenance', () => {
   const cwd = mkTemp('uninstall-hooks-owned-');
   initGitRepo(cwd);
   fs.mkdirSync(path.join(cwd, '.githooks'));
@@ -59,19 +58,19 @@ test('uninstallGitHooks unwires and deletes .githooks/pre-commit + the now-empty
 
   const result = uninstallGitHooks(cwd);
 
-  assert.deepEqual(result, { unwired: true, skippedExisting: null });
-  assert.throws(() => execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }));
-  assert.equal(fs.existsSync(path.join(cwd, '.githooks', 'pre-commit')), false);
-  assert.equal(fs.existsSync(path.join(cwd, '.githooks')), false);
+  assert.deepEqual(result, { unwired: false, skippedExisting: '.githooks' });
+  assert.equal(execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim(), '.githooks');
+  assert.equal(fs.existsSync(path.join(cwd, '.githooks', 'pre-commit')), true);
+  assert.equal(fs.existsSync(path.join(cwd, '.githooks')), true);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('uninstallGitHooks unwires an absolute core.hooksPath resolving to repoRoot/.githooks, same as the relative form', () => {
+test('uninstallGitHooks removes its journaled hook setting and the now-empty directory', () => {
   const cwd = mkTemp('uninstall-hooks-absolute-');
   initGitRepo(cwd);
   fs.mkdirSync(path.join(cwd, '.githooks'));
   fs.writeFileSync(path.join(cwd, '.githooks', 'pre-commit'), '#!/bin/sh\nexit 0\n');
-  execFileSync('git', ['config', 'core.hooksPath', path.join(cwd, '.githooks')], { cwd });
+  assert.deepEqual(installGitHooks(cwd), { wired: true, skippedExisting: null });
 
   const result = uninstallGitHooks(cwd);
 
@@ -106,4 +105,20 @@ test('uninstallGitHooks is a no-op when hooksPath was never set', () => {
 
   assert.deepEqual(result, { unwired: false, skippedExisting: null });
   fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('uninstallGitHooks preserves tracked hook bytes after removing owned configuration', () => {
+  const cwd = mkTemp('uninstall-hooks-tracked-');
+  try {
+    initGitRepo(cwd);
+    fs.mkdirSync(path.join(cwd, '.githooks'));
+    const hook = path.join(cwd, '.githooks/pre-commit');
+    fs.writeFileSync(hook, '#!/bin/sh\nexit 0\n');
+    execFileSync('git', ['add', '.githooks/pre-commit'], { cwd });
+    execFileSync('git', ['commit', '-qm', 'track hook'], { cwd });
+    assert.equal(installGitHooks(cwd).wired, true);
+    assert.deepEqual(uninstallGitHooks(cwd), { unwired: true, skippedExisting: null });
+    assert.equal(fs.readFileSync(hook, 'utf8'), '#!/bin/sh\nexit 0\n');
+    assert.equal(execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' }).trim(), '');
+  } finally { fs.rmSync(cwd, { recursive: true, force: true }); }
 });

@@ -310,7 +310,7 @@ test('Git repo-config is a rank 80 leaf and Node leaves the held controller path
     const old = join(dir, '.fgos/locks/activation.lock');
     fs.mkdirSync(dirname(old), { recursive: true });
     fs.writeFileSync(old, 'held inode');
-    const options = { fgosDir: join(dir, '.fgos'), workspaceRoot: dir, stateRoot: join(dir, 'state'), owners: ['4.4'] };
+    const options = { fgosDir: join(dir, '.fgos'), workspaceRoot: dir, worktrees: [], branches: [], stateRoot: join(dir, 'state'), owners: ['4.4'] };
     assert.equal(placeFences(options).ok, true);
     assert.equal(fs.readFileSync(old, 'utf8'), 'held inode');
     const status = fenceStatus(options);

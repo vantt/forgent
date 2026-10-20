@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { checkStopped, placeFences, fenceStatus, fenceCutover, ownPidChain } from '../../src/holder-lock/fences.mjs';
+import { workspaceListing } from '../../src/setup/holder-lock-checks.mjs';
 
 // The machine-scope install lock is fenced under the state root: keep it in a scratch directory, never the real one.
 process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fences-state-'));
@@ -160,12 +161,12 @@ test('a blocker found before placement means nothing is placed', async () => {
   const ws = makeWorkspace('blocked-cutover');
   const payload = await startPayload(ws);
   try {
-    const result = fenceCutover({ workspaces: [ws.root], fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, hostBin: HOST_BIN });
+    const result = fenceCutover({ workspaces: [ws.root], fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, hostBin: HOST_BIN });
     assert.equal(result.status, 'blocked');
     assert.ok(blockerPids(result.before).includes(payload.pid));
     assert.equal(result.fences, null);
     assert.equal(result.after, null);
-    const status = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
+    const status = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir });
     assert.equal(status.complete, false);
     assert.equal(status.targets.filter((target) => target.fenced).length, 0);
   } finally {
@@ -179,7 +180,7 @@ test('a process that starts after the first scan is seen by the scan after place
   assert.equal(first.status, 'clean', JSON.stringify(first.blockers));
   const payload = await startPayload(ws);
   try {
-    const placed = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
+    const placed = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir });
     assert.equal(placed.ok, true, JSON.stringify(placed));
     const second = scan(ws);
     assert.equal(second.status, 'blocked');
@@ -195,7 +196,7 @@ test('a clean workspace is fenced and scanned clean again by the whole cutover s
   const startedAt = Date.now();
   let result;
   do {
-    result = fenceCutover({ workspaces: [ws.root], fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, hostBin: HOST_BIN, excludePids: foreignPids() });
+    result = fenceCutover({ workspaces: [ws.root], fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, hostBin: HOST_BIN, excludePids: foreignPids() });
     for (const placed of result.fences?.placed ?? []) placedPaths.add(placed);
     if (result.status === 'placed') break;
     // Another session's process starting between the probe and a scan:
@@ -210,7 +211,7 @@ test('a clean workspace is fenced and scanned clean again by the whole cutover s
   assert.equal(result.fences.ok, true);
   assert.ok(placedPaths.size > 0);
   assert.equal(result.after.status, 'clean');
-  assert.equal(fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir }).complete, true);
+  assert.equal(fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir }).complete, true);
 });
 
 test('a pid the caller declares as its own is not counted, every other matching pid is', async () => {
@@ -223,5 +224,25 @@ test('a pid the caller declares as its own is not counted, every other matching 
     assert.ok(blockerPids(counted).includes(payload.pid), JSON.stringify(counted.blockers));
   } finally {
     await stopPayload(payload);
+  }
+});
+
+test('a process working in a linked worktree blocks only when the caller lists that worktree', async () => {
+  const ws = makeWorkspace('linked-dir');
+  const linked = path.join(scratch, 'linked-dir-checkout');
+  fs.mkdirSync(linked);
+  const sleeper = spawn('sleep', ['30'], { cwd: linked, stdio: 'ignore' });
+  children.add(sleeper);
+  try {
+    const excludePids = foreignPids();
+    const unlisted = checkStopped({ workspaces: [ws.root], hostBin: HOST_BIN, excludePids });
+    assert.ok(!blockerPids(unlisted).includes(sleeper.pid), JSON.stringify(unlisted.blockers));
+    const listed = checkStopped({ workspaces: [{ root: ws.root, worktrees: [linked] }], hostBin: HOST_BIN, excludePids });
+    const found = listed.blockers.find((blocker) => blocker.pid === sleeper.pid);
+    assert.ok(found, `pid ${sleeper.pid} among ${JSON.stringify(listed.blockers)}`);
+    assert.equal(found.matched, 'cwd');
+    assert.equal(found.workspace, path.resolve(ws.root));
+  } finally {
+    await stopPayload(sleeper);
   }
 });

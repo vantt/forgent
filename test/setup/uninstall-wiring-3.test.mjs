@@ -3,6 +3,7 @@
 // full `fgos setup` first, ~17s apiece — kept apart so no single file
 // carries two of them and crosses the ~30s per-file ceiling.
 import '../helpers/process-tmp-root.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -28,9 +29,7 @@ function run(cwd, args, extraEnv = {}) {
 }
 
 function initGitRepo(cwd) {
-  execFileSync('git', ['init', '-q'], { cwd });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
+  initFixtureRepo(cwd);
 }
 
 test('uninstall --yes unwires hooks, reports (never deletes) the shell-rc source line, and leaves .fgos/config.json byte-identical', { skip: process.platform === 'win32' }, () => {

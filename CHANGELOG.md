@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Workflow integration merges through Land and skips work the target already has.
+
+- `fgos uninstall` leaves a `core.hooksPath` that fgOS did not record setting.
+
+- The quiesce scan takes `--dir` for each linked worktree.
+
 - Commands that make many Git reads reuse the repository's checked config and storage format across them within one process, re-reading only when a config file changes: `approve --no-wait` refusing a held merge slot went from about 0.7 s to 0.4 s (79 to 21 Git processes) and `doctor --json` from about 3.8 s to 2.4 s (332 to 62).
 
 - `npm test` now prepares the release fgos, fgctl and native addon it tests against (incremental), so the suite is green on a fresh machine, not only in CI.

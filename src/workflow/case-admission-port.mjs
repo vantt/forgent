@@ -20,16 +20,13 @@ import { applySettle, drainCaseInbox, writeReservationFile, writeSettlePending }
 import { projectCase, receiptsFromResults } from './case-projection.mjs';
 import { admitProposal, newReservationId, recheckReservation } from './case-admission.mjs';
 import { bindWorktree, ensureBindingsSentinel, readBinding } from './case-bindings.mjs';
-import { gitOut, playbookSubjectDigests } from './unit-handoff.mjs';
+import { workflowCheckout, playbookSubjectDigests } from './unit-handoff.mjs';
 import { CASE_ID_ENV, CASE_RESERVATION_ENV, currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
 import { bindingsDir } from './case-bindings.mjs';
 
 const caseDirOf = (mainRoot, caseId) => path.join(mainRoot, '.fgos', 'workflow-runs', caseId);
 
-const worktreeFacts = (worktree) => ({
-  commonDir: gitOut(worktree, ['rev-parse', '--git-common-dir'])?.trim() ?? null,
-  ref: gitOut(worktree, ['rev-parse', '--abbrev-ref', 'HEAD'])?.trim() ?? null,
-});
+const worktreeFacts = workflowCheckout;
 
 /** Read the ledger, once more when an append by another process is caught half-written. */
 function readEvents(mainRoot, caseId) {

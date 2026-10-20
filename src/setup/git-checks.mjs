@@ -54,6 +54,11 @@ export function checkGit(cwd, kind, loaderOptions) {
     if (kind === 'git-transport-config' && /repository-config-untrusted: credential\.helper/.test(err.message)) return { passed: false, message: `${err.message}; ${transportRemedy}` };
     return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel until M10' : err.message }; }
 }
+/** The Git binary fgos-git runs and its floor verdict; Git is only ever spawned by the driver. */
+export function gitFloor(cwd, loaderOptions) {
+  const { root, stateRoot, native } = context(cwd, loaderOptions);
+  return native.inspectGit(stateRoot, cwd, root).floor;
+}
 function initializeWal(cwd) {
   const { root, remote, stateRoot, native } = context(cwd);
   const before = native.inspectGit(stateRoot, cwd, root, remote);
