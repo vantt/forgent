@@ -9,6 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
+import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 
 export const FAKE_HERDR = path.resolve('packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py');
 const AGENT = path.resolve('test/run-supervisor/fixtures/terminal-agent.mjs');
@@ -66,7 +67,9 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
   const herdrDir = path.join(scratch, 'herdr-files');
   const agentDir = path.join(outside, 'agent');
   const stateRoot = path.join(scratch, 'state');
-  for (const dir of [repoDir, herdrDir, agentDir, stateRoot]) fs.mkdirSync(dir, { recursive: true });
+  for (const dir of [repoDir, herdrDir, agentDir]) fs.mkdirSync(dir, { recursive: true });
+  // The Git driver refuses a state root that is group or world writable, whatever the caller's umask.
+  fs.mkdirSync(stateRoot, { recursive: true, mode: 0o700 });
   const git = (...args) => execFileSync('git', args, { cwd: repoDir, stdio: 'ignore' });
   git('init', '-b', 'main');
   git('config', 'user.name', 'Terminal Test');
@@ -74,6 +77,7 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
   fs.writeFileSync(path.join(repoDir, 'README.md'), '# Terminal\n');
   git('add', 'README.md');
   git('commit', '-m', 'init');
+  activateGitFixture(repoDir);
 
   // The supervisor reaches herdr through `FGOS_HERDR_BIN` and nothing else of this environment, so the
   // fake's own directory is baked into a wrapper instead of travelling as a variable.

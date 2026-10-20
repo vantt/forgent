@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
+import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 
 export const BIN_FGOS = path.resolve('bin/fgos.mjs');
 const AGENT = path.resolve('test/run-supervisor/fixtures/direct-agent.mjs');
@@ -59,7 +60,7 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
   fs.writeFileSync(path.join(repoDir, 'README.md'), '# Direct\n');
   git(repoDir, 'add', 'README.md');
   git(repoDir, 'commit', '-m', 'init');
-  fs.mkdirSync(path.join(repoDir, '.fgos'), { recursive: true });
+  activateGitFixture(repoDir);
   fs.writeFileSync(path.join(repoDir, '.fgos', 'config.json'), JSON.stringify({
     runner: {
       defaultExecutor: 'noisy',
