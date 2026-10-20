@@ -15,7 +15,8 @@ const linuxOnly = process.platform !== 'linux' && 'reads /proc';
 function stagedRun(base, name) {
   const dir = path.join(base, name);
   fs.mkdirSync(dir, { recursive: true });
-  const host = path.join(dir, 'host');
+  // Keep the name `sleep`: a coreutils multi-call binary dispatches on argv[0].
+  const host = path.join(dir, 'sleep');
   fs.copyFileSync(fs.realpathSync('/bin/sleep'), host);
   fs.chmodSync(host, 0o755);
   return { dir, host };
