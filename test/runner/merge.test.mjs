@@ -2373,3 +2373,19 @@ test('abortMergeIfPossible throws MergeError with category merge-fail when merge
     (err) => err instanceof MergeError && err.category === 'merge-fail',
   );
 });
+
+test('the subtree clean gate ignores dirty siblings and still blocks its own local paths', () => {
+  const repoRoot = initRepo();
+  const subtree = path.join(repoRoot, 'project');
+  fs.mkdirSync(subtree);
+  fs.writeFileSync(path.join(subtree, 'own.txt'), 'base\n');
+  git(repoRoot, ['add', 'project/own.txt']);
+  git(repoRoot, ['commit', '-qm', 'subtree']);
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'dirty sibling\n');
+  assert.equal(isWorkingTreeClean(subtree, null, { scope: 'subtree' }), true);
+  assert.equal(isWorkingTreeClean(subtree), false);
+  fs.writeFileSync(path.join(subtree, 'own.txt'), 'dirty own path\n');
+  assert.equal(isWorkingTreeClean(subtree, null, { scope: 'subtree' }), false);
+  assert.equal(fs.readFileSync(path.join(repoRoot, 'seed.txt'), 'utf8'), 'dirty sibling\n');
+  assert.equal(fs.readFileSync(path.join(subtree, 'own.txt'), 'utf8'), 'dirty own path\n');
+});

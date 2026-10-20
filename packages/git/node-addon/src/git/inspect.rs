@@ -114,6 +114,11 @@ impl GitInspect {
                     .status(&repo, untracked, cursor()?, max()?)
                     .map_err(operation)?))
             }
+            "diffText" => {
+                let bound: usize = serde_json::from_value(args.get("maxBytes").cloned().unwrap_or(json!(50 * 1024 * 1024))).map_err(error)?;
+                let bytes = self.driver.diff_text(&repo, &oid("before")?, &oid("after")?, bound).map_err(operation)?;
+                Ok(json!(String::from_utf8_lossy(&bytes)))
+            }
             "diff" => Ok(json!(self
                 .driver
                 .diff(&repo, &oid("before")?, &oid("after")?, cursor()?, max()?)

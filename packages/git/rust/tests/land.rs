@@ -478,3 +478,48 @@ fn recovery_candidate_parent_check_ignores_signature_display() {
     let receipt = f.driver.recover_land(&f.repo, vec![], "fixture", "signed").unwrap();
     assert!(matches!(receipt.checkout, Checkout::Pending));
 }
+
+#[test]
+fn current_target_is_pinned_after_destination_acquisition_and_replays_after_cleanup() {
+    let f = Fixture::new();
+    fs::write(f.main.join("b"), "sibling\n").unwrap();
+    git(&f.main, &["commit", "-qam", "sibling"]);
+    let target = git(&f.main, &["rev-parse", "HEAD"]);
+    let mut request = f.request.clone();
+    request.target.clear();
+    let mut session = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "current").unwrap();
+    let candidate = session.candidate().unwrap().clone();
+    assert_eq!(candidate.target, target);
+    assert_eq!(git(&candidate.worktree, &["show", "-s", "--format=%P"]), format!("{} {}", target, request.source));
+    assert_eq!(fs::read_to_string(candidate.worktree.join("b")).unwrap(), "sibling\n");
+    let verification = evidence(&session);
+    let receipt = f.driver.publish_land(&f.repo, &mut session, &verification).unwrap();
+    drop(session);
+    assert!(f.driver.acknowledge_land(&f.repo, "fixture", "current", "durable-consumer-ack").unwrap().is_empty());
+    assert!(!candidate.worktree.exists());
+    git(&f.main, &["update-ref", "refs/heads/trunk", &f.request.target]);
+    let replay = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "current").unwrap();
+    assert_eq!(serde_json::to_value(replay.receipt().unwrap()).unwrap(), serde_json::to_value(receipt).unwrap());
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
+    let mut changed = request.clone();
+    changed.message = "different request".into();
+    assert_eq!(f.driver.prepare_land(&f.repo, vec![], &changed, "fixture", "current").err().unwrap().cause, "operation-id-reused");
+}
+
+#[test]
+fn declared_resolution_bytes_are_frozen_before_consumer_verification() {
+    let f = Fixture::new();
+    fs::write(f.main.join("a"), "target disagrees\n").unwrap();
+    git(&f.main, &["commit", "-qam", "target disagreement"]);
+    let mut request = f.request.clone();
+    request.target = git(&f.main, &["rev-parse", "HEAD"]);
+    request.files = vec![LandFile { path: "a".into(), bytes: Some(b"consumer resolution\n".to_vec()) }];
+    let mut session = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "resolved").unwrap();
+    let candidate = session.candidate().unwrap();
+    assert_eq!(fs::read_to_string(candidate.worktree.join("a")).unwrap(), "consumer resolution\n");
+    assert_eq!(git(&candidate.worktree, &["diff", "--name-only", "--diff-filter=U"]), "");
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), request.target);
+    let verification = evidence(&session);
+    f.driver.publish_land(&f.repo, &mut session, &verification).unwrap();
+    assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "consumer resolution\n");
+}

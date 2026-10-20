@@ -13,6 +13,8 @@ use std::{collections::BTreeMap, path::PathBuf};
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct LandRequest {
     pub source: String,
+    /// Omitted target pins the destination under slot 20. Persisted intents always contain an OID.
+    #[serde(default)]
     pub target: String,
     pub destination: String,
     pub message: String,
@@ -265,6 +267,31 @@ impl GitDriver {
         id: &str,
         filesystem: &F,
     ) -> Result<LandSession> {
+        self.prepare_land_with_wait(repo, held_locks, req, writer, id, filesystem, 0)
+    }
+    /// Wait only for resource acquisition; never retry candidate construction or publication.
+    pub fn prepare_land_wait(
+        &self,
+        repo: &RepoHandle,
+        held_locks: Vec<BorrowedHandle<'_>>,
+        req: &LandRequest,
+        writer: &str,
+        id: &str,
+        wait_ms: u64,
+    ) -> Result<LandSession> {
+        self.prepare_land_with_wait(repo, held_locks, req, writer, id, &wal::OsFileSystem, wait_ms)
+    }
+    #[allow(clippy::too_many_arguments)]
+    fn prepare_land_with_wait<F: wal::FileSystem>(
+        &self,
+        repo: &RepoHandle,
+        held_locks: Vec<BorrowedHandle<'_>>,
+        req: &LandRequest,
+        writer: &str,
+        id: &str,
+        filesystem: &F,
+        wait_ms: u64,
+    ) -> Result<LandSession> {
         require_lock_scope_platform()?;
         let caller = LockScope::seeded(held_locks).map_err(failure)?;
         if caller
@@ -293,9 +320,11 @@ impl GitDriver {
             return Err(failure("land-main-handle-required"));
         }
         let source = Oid::parse(&req.source, repo.object_format()).map_err(failure)?;
-        let target = Oid::parse(&req.target, repo.object_format()).map_err(failure)?;
-        if source == target {
-            return Err(failure("land-identical-tips"));
+        if !req.target.is_empty() {
+            let target = Oid::parse(&req.target, repo.object_format()).map_err(failure)?;
+            if source == target {
+                return Err(failure("land-identical-tips"));
+            }
         }
         if let Some(p) = &req.subtree {
             crate::fgos_scope_literal(p)?;
@@ -321,6 +350,7 @@ impl GitDriver {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
+        let request_digest = wal::canonical_digest(&(req, writer)).map_err(failure)?;
         let mut session = LandSession {
             slot,
             candidate: None,
@@ -329,7 +359,7 @@ impl GitDriver {
             id: id.into(),
         };
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
-            if compact.request != wal::canonical_digest(&(req, writer)).map_err(failure)? {
+            if compact.request != request_digest {
                 return Err(failure("operation-id-reused"));
             }
             let intent = compact_land_intent(&wal, &compact, repo, writer)?;
@@ -348,7 +378,9 @@ impl GitDriver {
             let OperationKind::Land(payload) = &chain.intent().kind else {
                 return Err(failure("operation-id-reused"));
             };
-            if payload.request != *req || chain.intent().writer_identity != writer {
+            if chain.intent().request_digest != request_digest
+                || chain.intent().writer_identity != writer
+            {
                 return Err(failure("operation-id-reused"));
             }
             session.candidate = Some(payload.candidate.clone());
@@ -359,9 +391,23 @@ impl GitDriver {
         }
         session
             .slot
-            .acquire("merge-slot", &p, Wait::Ms(0))
+            .acquire("merge-slot", &p, Wait::Ms(wait_ms))
             .map_err(failure)?;
-        if crate::refs::direct(self, repo, &destination)? != ExpectedTip::Oid(target.clone()) {
+        let observed = crate::refs::direct(self, repo, &destination)?;
+        let mut pinned_request = req.clone();
+        if pinned_request.target.is_empty() {
+            pinned_request.target = match &observed {
+                ExpectedTip::Oid(oid) => oid.as_str().into(),
+                ExpectedTip::Absent => return Err(failure("land-target-absent")),
+            };
+        }
+        let req = &pinned_request;
+        session.request = req.clone();
+        let target = Oid::parse(&req.target, repo.object_format()).map_err(failure)?;
+        if source == target {
+            return Err(failure("land-identical-tips"));
+        }
+        if observed != ExpectedTip::Oid(target.clone()) {
             return Err(crate::refs::stale("land-target-changed"));
         }
         for oid in [&source, &target] {
@@ -485,10 +531,35 @@ impl GitDriver {
             self.refresh_checkout_facts(&candidate_repo)?;
             let merged = merged?;
             if !merged.success {
-                if candidate_repo.git_dir().join("MERGE_HEAD").exists() {
-                    self.land_text(&candidate_repo, &session.slot, &["merge", "--abort"], &[])?;
+                let has_merge = candidate_repo.git_dir().join("MERGE_HEAD").exists();
+                let unresolved = self.land_call(
+                    &candidate_repo,
+                    &session.slot,
+                    &[
+                        "diff",
+                        "--name-only",
+                        "--no-relative",
+                        "--diff-filter=U",
+                        "-z",
+                    ],
+                    &[],
+                )?;
+                // Only exact consumer-declared bytes may resolve a conflicted path.
+                // Git does not interpret decision rows, event files or either side.
+                let covered = has_merge
+                    && unresolved.success
+                    && !unresolved.stdout.is_empty()
+                    && unresolved
+                        .stdout
+                        .split(|b| *b == 0)
+                        .filter(|p| !p.is_empty())
+                        .all(|p| req.files.iter().any(|f| f.path.as_bytes() == p));
+                if !covered {
+                    if has_merge {
+                        self.land_text(&candidate_repo, &session.slot, &["merge", "--abort"], &[])?;
+                    }
+                    return Err(merged.error("land-conflict-aborted"));
                 }
-                return Err(merged.error("land-conflict-aborted"));
             }
             // Consumer transformations are literal bytes; no business-state interpretation.
             for file in &req.files {
@@ -569,7 +640,7 @@ impl GitDriver {
                 wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))
                     .map_err(failure)?;
             let intent = Intent {
-                request_digest: wal::canonical_digest(&(req, writer)).map_err(failure)?,
+                request_digest,
                 kind,
                 repo_identity: wal.repository_identity().into(),
                 resource_set: resources,

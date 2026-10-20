@@ -32,6 +32,12 @@ test('Inspect marshals real byte paths, explicit absence, reads, pages and snaps
     assert.deepEqual(port.ancestry({ ancestor: second, descendant: first }), { answer: 'no' });
     assert.deepEqual(port.compareContent({ before: first, after: second }), { equal: false });
     assert.deepEqual(port.diff({ before: first, after: second }).entries[0].path, bytes('new'));
+    assert.equal(port.diffText({ before: first, after: second }), execFileSync('git', ['-C', repoPath, 'diff', '--no-relative', '--no-ext-diff', '--no-textconv', first, second, '--'], { encoding: 'utf8' }));
+    assert.throws(() => port.diffText({ before: first, after: second, maxBytes: 16 }), /git-output-limit/);
+    assert.throws(() => port.diffText({ before: first, after: second, maxBytes: 0 }), /invalid-diff-bound/);
+    git('config', 'diff.external', 'false');
+    assert.throws(() => port.diffText({ before: first, after: second }), /repository-config-untrusted/);
+    git('config', '--unset', 'diff.external');
     assert.equal(port.lastPathCommitTime({files: ['new']}), Number(git('log', '-1', '--format=%ct', '--', 'new')));
     assert.equal(port.lastPathCommitTime({files: ['absent']}), null);
     assert.throws(() => port.lastPathCommitTime({files: ['../outside']}), /invalid-literal-path/);

@@ -44,11 +44,11 @@ import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, withMergeEphemeralWorktree } from './worktree.mjs';
+import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, withMergeEphemeralWorktree, inspectGit, resolveRefSha } from './worktree.mjs';
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
-import { nulPaths, statusPaths, nameStatusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
+import { nulPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
@@ -77,36 +77,18 @@ export class MergeError extends Error {
 // reachable from a plain non-git dir (tsk-56t D2's read-verb warning) —
 // no caller's behavior changes, since none relied on the live leak.
 //
-// maxBuffer (tsk-648): optional, default undefined — Node's own 1 MiB
-// default applies exactly as before when omitted, so every existing call
-// site (none of which passes it) stays byte-identical. Only reviewDiff's
-// two full-diff calls below pass an explicit, larger value: a full `git
-// diff` (unlike every `--name-only` call in this file) can exceed 1 MiB
-// once a branch is hundreds of commits stale, which throws ENOBUFS.
-//
-// env (tsk-70l): optional, default undefined — every existing call site
-// (none of which passes it) stays byte-identical when omitted. When
-// given, merged onto a COPY of this process's own `process.env` and
-// passed only to this one child process — never a `process.env`
-// assignment, so it can never leak into any other subprocess this
-// session spawns later. Only the `git commit` call below passes it.
-function git(repoRoot, args, { maxBuffer, env } = {}) {
+function git(repoRoot, args, { maxBuffer } = {}) {
   return execFileSync('git', args, {
     cwd: repoRoot,
     encoding: 'utf8',
     shell: false,
     stdio: ['ignore', 'pipe', 'pipe'],
     ...(maxBuffer === undefined ? {} : { maxBuffer }),
-    ...(env === undefined ? {} : { env: { ...process.env, ...env } }),
   });
 }
 
-// reviewDiff's own ceiling for a full (non-`--name-only`) diff — generous
-// on purpose: a local git subprocess call isn't memory-constrained the way
-// a network payload is, and a text diff this large from a normal repo is
-// already an outlier. Callers can still override it via opts.maxBuffer
-// (e.g. a test proving the ENOBUFS-diagnosis path deterministically,
-// without needing an actually-hundreds-of-commits-stale diff).
+// Review patches retain the existing 50 MiB ceiling and caller override.
+// Inspect enforces the bound before returning patch text to Node.
 const DIFF_MAX_BUFFER = 50 * 1024 * 1024;
 
 // tsk-648: raised once a diff still overflows maxBuffer above — names the
@@ -118,7 +100,9 @@ const DIFF_MAX_BUFFER = 50 * 1024 * 1024;
 // pre-formatted description (e.g. `diff for branch "${branch}"` or
 // `pull-door diff for range "${range}"`) — this helper never reformats it.
 function diffFailureMessage(label, err) {
-  if (err.code === 'ENOBUFS') {
+  let cause;
+  try { cause = JSON.parse(err.message).cause; } catch { /* native diagnostic is optional */ }
+  if (err.code === 'ENOBUFS' || cause === 'git-output-limit') {
     return (
       `${label} exceeds the ${DIFF_MAX_BUFFER}-byte diff limit — ` +
       'the branch is likely very stale relative to its merge target (many commits behind); ' +
@@ -128,8 +112,7 @@ function diffFailureMessage(label, err) {
   return `computing ${label} failed: ${err.message}`;
 }
 
-/** Whether one path `git status` reports (read by `statusPaths`: byte for
- * byte, a rename or copy as both halves) is ignorable by the clean-tree
+/** Whether one path Git Inspect reports (a rename or copy as both halves) is ignorable by the clean-tree
  * gate: it sits inside `.fgos/`, or outside `ownFileSet` when one is given.
  *
  * `git status --porcelain` always reports paths relative to the real git
@@ -203,12 +186,21 @@ export function buildOwnFileSet(committedDiffPaths, footprint) {
  * `isIgnorableStatusPath` — omitted (`null`, the default), every existing
  * caller keeps today's exact whole-tree-blocks-on-anything behavior. */
 export function isWorkingTreeClean(repoRoot, ownFileSet = null, { scope = 'whole-repo' } = {}) {
-  // Only the newline goes: a subdirectory name may itself start or end with a space.
-  const prefix = git(repoRoot, ['rev-parse', '--show-prefix']).replace(/\n$/, '');
-  // Untracked files one by one: a collapsed `dir/` would never match an own path inside it.
-  const statusArgs = ['status', '--porcelain=v1', '-z', '--untracked-files=all', ...(scope === 'subtree' ? ['--', '.'] : [])];
-  return statusPaths(git(repoRoot, statusArgs, { maxBuffer: GIT_LIST_MAX_BUFFER }))
-    .every((p) => isIgnorableStatusPath(p, prefix, ownFileSet));
+  const port = inspectGit(repoRoot);
+  const facts = port.resolveRepo();
+  const relative = path.relative(fs.realpathSync(facts.worktreeRoot), fs.realpathSync(repoRoot)).replaceAll('\\', '/');
+  const prefix = relative ? `${relative}/` : '';
+  let cursor;
+  do {
+    const page = port.status({ untracked: 'all', maxEntries: 4096, cursor });
+    for (const entry of page.entries) {
+      const file = Buffer.from(entry.path).toString('utf8');
+      if (scope === 'subtree' && prefix && !file.startsWith(prefix)) continue;
+      if (!isIgnorableStatusPath(file, prefix, ownFileSet)) return false;
+    }
+    cursor = page.nextCursor;
+  } while (cursor);
+  return true;
 }
 
 /**
@@ -268,7 +260,10 @@ export function reviewDiff(repoRoot, item, opts = {}) {
     const branch = branchNameFor(item.id);
     let diff;
     try {
-      diff = git(repoRoot, ['diff', `${trunk}...${branch}`], { maxBuffer });
+      const port = inspectGit(repoRoot);
+      const after = resolveRefSha(repoRoot, branch);
+      const before = port.compareCommits({ left: resolveRefSha(repoRoot, trunk), right: after }).mergeBase;
+      diff = port.diffText({ before, after, maxBytes: maxBuffer });
     } catch (err) {
       throw new MergeError(diffFailureMessage(`diff for branch "${branch}"`, err), { branch });
     }
@@ -281,8 +276,11 @@ export function reviewDiff(repoRoot, item, opts = {}) {
     let diff;
     let commitCount;
     try {
-      diff = git(repoRoot, ['diff', range], { maxBuffer });
-      commitCount = parseInt(git(repoRoot, ['rev-list', '--count', range]).trim(), 10) || 0;
+      const port = inspectGit(repoRoot);
+      const before = resolveRefSha(repoRoot, headAtTake);
+      const after = resolveRefSha(repoRoot, headAtReturn);
+      diff = port.diffText({ before, after, maxBytes: maxBuffer });
+      commitCount = port.compareCommits({ left: before, right: after }).right;
     } catch (err) {
       throw new MergeError(diffFailureMessage(`pull-door diff for range "${range}"`, err), { range });
     }
@@ -379,13 +377,21 @@ export function changedFiles(repoRoot, item, opts = {}) {
     return [];
   }
   const branch = branchNameFor(item.id);
-  let out;
   try {
-    out = git(repoRoot, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${trunk}...${branch}`], { maxBuffer: GIT_LIST_MAX_BUFFER });
+    const port = inspectGit(repoRoot);
+    const after = resolveRefSha(repoRoot, branch);
+    const before = port.compareCommits({ left: resolveRefSha(repoRoot, trunk), right: after }).mergeBase;
+    const files = [];
+    let cursor;
+    do {
+      const page = port.diff({ before, after, maxEntries: 4096, cursor });
+      files.push(...page.entries.map(entry => Buffer.from(entry.path).toString('utf8')));
+      cursor = page.nextCursor;
+    } while (cursor);
+    return files;
   } catch (err) {
     throw new MergeError(`computing changed files for branch "${branch}" failed: ${err.message}`, { branch });
   }
-  return nulPaths(out);
 }
 
 // DECISION-ID COLLISION AUTO-RESOLVE (tsk-3mv-1, CONTEXT.md D1a): a
@@ -819,12 +825,8 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
 // wording is locale/git-version dependent, `is-ancestor` is not).
 function isAlreadyMerged(repoRoot, branch, ref) {
   try {
-    git(repoRoot, ['merge-base', '--is-ancestor', branch, ref]);
-    return true;
+    return inspectGit(repoRoot).ancestry({ ancestor: resolveRefSha(repoRoot, branch), descendant: resolveRefSha(repoRoot, ref) }).answer === 'yes';
   } catch (err) {
-    if (err.status === 1) {
-      return false;
-    }
     throw new MergeError(`checking whether "${branch}" is already merged into ${ref} failed: ${err.message}`, { branch });
   }
 }
@@ -859,7 +861,7 @@ function mergedTreeAlreadyVerified(repoRoot, item, branch) {
   if (typeof item.branchHeadAtReturn !== 'string' || !item.branchHeadAtReturn) return false;
   let branchTip;
   try {
-    branchTip = git(repoRoot, ['rev-parse', branch]).trim();
+    branchTip = resolveRefSha(repoRoot, branch);
   } catch {
     return false;
   }
@@ -867,10 +869,22 @@ function mergedTreeAlreadyVerified(repoRoot, item, branch) {
   if (isAlreadyMerged(repoRoot, 'HEAD', branch)) return true;
 
   try {
-    const mergeBase = git(repoRoot, ['merge-base', branch, 'HEAD']).trim();
+    const port = inspectGit(repoRoot);
+    const head = resolveRefSha(repoRoot, 'HEAD');
+    const mergeBase = port.compareCommits({ left: branchTip, right: head }).mergeBase;
     if (!mergeBase) return false;
-    const introducedPaths = nameStatusPaths(git(repoRoot, ['diff', '--name-status', '--no-relative', '-z', `${mergeBase}..${item.branchHeadAtReturn}`], { maxBuffer: GIT_LIST_MAX_BUFFER }));
-    const mainAdvancedPaths = nameStatusPaths(git(repoRoot, ['diff', '--name-status', '--no-relative', '-z', `${mergeBase}..HEAD`], { maxBuffer: GIT_LIST_MAX_BUFFER }));
+    const pathsSinceBase = (after) => {
+      const paths = new Set();
+      let cursor;
+      do {
+        const page = port.diff({ before: mergeBase, after, maxEntries: 4096, cursor });
+        for (const entry of page.entries) paths.add(Buffer.from(entry.path).toString('utf8'));
+        cursor = page.nextCursor;
+      } while (cursor);
+      return paths;
+    };
+    const introducedPaths = pathsSinceBase(branchTip);
+    const mainAdvancedPaths = pathsSinceBase(head);
     for (const path of introducedPaths) {
       if (mainAdvancedPaths.has(path)) {
         return false;

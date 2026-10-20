@@ -322,6 +322,21 @@ impl GitDriver {
         }
         page(entries, &bytes, cursor, max)
     }
+    /// Bounded patch bytes for review consumers. Never runs external diff/textconv.
+    pub fn diff_text(&self, repo: &RepoHandle, before: &Oid, after: &Oid, max_bytes: usize) -> Result<Vec<u8>> {
+        if max_bytes == 0 || max_bytes > 50 * 1024 * 1024 {
+            return Err(refused("invalid-diff-bound"));
+        }
+        self.require_commit(repo, before)?;
+        self.require_commit(repo, after)?;
+        let output = self.invoke(
+            Some(repo), repo.trusted_main_root(),
+            &["diff", "--no-relative", "--no-ext-diff", "--no-textconv", before.as_str(), after.as_str(), "--"],
+            Policy::Inspect, None, true, max_bytes, Duration::from_secs(30),
+        )?;
+        if !output.success { return Err(output.error("diff-read-failed")); }
+        Ok(output.stdout)
+    }
     fn require_commit(&self, repo: &RepoHandle, value: &Oid) -> Result<()> {
         Oid::parse(value.as_str(), repo.object_format())
             .map_err(|_| refused("object-format-mismatch"))?;

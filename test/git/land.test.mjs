@@ -3,7 +3,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { fixture, evidence } from './land-fixture.mjs';
 import { createGitLand } from '../../src/git/land.mjs';
@@ -211,4 +212,107 @@ test('Land refuses an ephemeral checkout as its repository handle before creatin
       assert.equal(execFileSync('git', ['-C', ephemeral, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), f.request.target);
     } finally { p.close(); }
   } finally { f.close(); }
+});
+
+test('prepare pins the current destination after source catchup and replay retains that binding', () => {
+  const f = fixture();
+  try {
+    // Catchup's target was the original request.target; a sibling lands before prepare.
+    fs.writeFileSync(path.join(f.repo, 'b'), 'sibling landed\n');
+    f.git('commit', '-qam', 'sibling');
+    const currentTarget = f.git('rev-parse', 'HEAD');
+    const { target: _catchupTarget, ...request } = f.request;
+    const p = f.port();
+    const { candidate: c } = p.prepare({ operationId: 'current-target', request });
+    assert.equal(c.target, currentTarget);
+    assert.equal(fs.readFileSync(path.join(c.worktree, 'b'), 'utf8'), 'sibling landed\n');
+    assert.equal(fs.readFileSync(path.join(c.worktree, 'a'), 'utf8'), 'incoming\n');
+    assert.deepEqual(execFileSync('git', ['-C', c.worktree, 'show', '-s', '--format=%P'], { encoding: 'utf8' }).trim().split(' '), [currentTarget, request.source]);
+    const receipt = p.publish(evidence(c));
+    p.close();
+    f.git('update-ref', request.destination, f.request.target);
+    assert.deepEqual(f.port().prepare({ operationId: 'current-target', request }).receipt, receipt);
+    assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
+    assert.throws(() => f.port().prepare({ operationId: 'current-target', request: { ...request, message: 'different request' } }), /operation-id-reused/);
+  } finally { f.close(); }
+});
+
+test('declared candidate bytes resolve only the exact covered conflicts before verification', () => {
+  const f = fixture();
+  try {
+    fs.writeFileSync(path.join(f.repo, 'a'), 'target disagreement\n');
+    f.git('commit', '-qam', 'divergent target');
+    const request = { ...f.request, target: f.git('rev-parse', 'HEAD'), files: [{ path: 'a', bytes: [...Buffer.from('consumer resolved\n')] }] };
+    const p = f.port();
+    const { candidate: c } = p.prepare({ operationId: 'declared-resolution', request });
+    assert.equal(fs.readFileSync(path.join(c.worktree, 'a'), 'utf8'), 'consumer resolved\n');
+    assert.equal(execFileSync('git', ['-C', c.worktree, 'diff', '--name-only', '--diff-filter=U'], { encoding: 'utf8' }), '');
+    assert.equal(fs.existsSync(path.join(f.repo, '.git/MERGE_HEAD')), false);
+    assert.equal(f.git('rev-parse', 'HEAD'), request.target);
+    assert.equal(f.git('rev-parse', 'source'), request.source);
+    assert.equal(p.publish(evidence(c)).localEffect.publishedOid, c.candidate);
+  } finally { f.close(); }
+});
+
+test('an uncovered conflict is aborted even when another path has declared resolution bytes', () => {
+  const f = fixture();
+  try {
+    fs.writeFileSync(path.join(f.repo, 'a'), 'target disagreement\n');
+    f.git('commit', '-qam', 'divergent target');
+    const request = { ...f.request, target: f.git('rev-parse', 'HEAD'), files: [{ path: 'b', bytes: [...Buffer.from('unrelated declaration\n')] }] };
+    assert.throws(() => f.port().prepare({ operationId: 'uncovered-resolution', request }), /land-conflict-aborted/);
+    assert.equal(f.git('rev-parse', 'HEAD'), request.target);
+    assert.equal(fs.readFileSync(path.join(f.repo, 'a'), 'utf8'), 'target disagreement\n');
+    assert.equal(fs.readFileSync(path.join(f.repo, 'b'), 'utf8'), 'base\n');
+    assert.equal(f.git('rev-parse', 'source'), request.source);
+  } finally { f.close(); }
+});
+
+
+test('prepare waits only for its own full destination slot and pins the target after admission', async () => {
+  const f = fixture();
+  const holderModule = pathToFileURL(path.resolve('src/holder-lock/index.mjs')).href;
+  const script = String.raw`
+    import { acquireSync, createLockScope } from ${JSON.stringify(holderModule)};
+    import { execFileSync } from 'node:child_process';
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const repo = process.argv[1];
+    const acquired = acquireSync(createLockScope('land-wait-holder'), 'merge-slot', {
+      fgosDir: path.join(repo, '.fgos'), ref: encodeURIComponent('refs/heads/trunk'),
+    });
+    if (acquired.result !== 'acquired') throw new Error('holder admission failed');
+    process.stdout.write('held\n');
+    process.stdin.once('data', () => setTimeout(() => {
+      try {
+        fs.writeFileSync(path.join(repo, 'b'), 'landed during admission\n');
+        execFileSync('git', ['commit', '-qam', 'sibling under destination slot'], { cwd: repo, stdio: 'pipe' });
+      } finally { acquired.handle.release(); process.stdin.destroy(); }
+    }, 500));
+  `;
+  const child = spawn(process.execPath, ['--input-type=module', '-e', script, f.repo], { stdio: ['pipe', 'pipe', 'pipe'] });
+  let errors = '';
+  child.stderr.on('data', data => { errors += data; });
+  const exited = new Promise(resolve => child.once('exit', (code, signal) => resolve({ code, signal })));
+  try {
+    await new Promise((resolve, reject) => {
+      child.stdout.once('data', data => data.toString().includes('held') ? resolve() : reject(new Error(data.toString())));
+      child.once('error', reject);
+      child.once('exit', code => reject(new Error(`holder exited ${code}: ${errors}`)));
+    });
+    const { target: _oldTarget, ...request } = f.request;
+    assert.throws(() => f.port().prepare({ operationId: 'no-wait-held', request }), /lock-acquire-unavailable/);
+    child.stdin.write('release after commit');
+    const p = f.port();
+    const { candidate: c } = p.prepare({ operationId: 'wait-for-target', request, waitMs: 5000 });
+    assert.equal(c.target, f.git('rev-parse', 'HEAD'));
+    assert.notEqual(c.target, f.request.target);
+    assert.equal(fs.readFileSync(path.join(c.worktree, 'b'), 'utf8'), 'landed during admission\n');
+    assert.equal(fs.readFileSync(path.join(c.worktree, 'a'), 'utf8'), 'incoming\n');
+    assert.equal((await exited).code, 0, errors);
+  } finally {
+    if (child.exitCode === null) child.kill('SIGKILL');
+    await exited;
+    f.close();
+  }
 });

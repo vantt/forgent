@@ -52,14 +52,19 @@ impl GitLand {
                 .ok_or_else(|| error("missing request"))?,
         )
         .map_err(error)?;
+        let wait_ms = match args.get("waitMs") {
+            None => 0,
+            Some(value) => value.as_u64().ok_or_else(|| error("invalid land waitMs"))?,
+        };
         let session = self
             .driver
-            .prepare_land(
+            .prepare_land_wait(
                 &self.repo,
                 consume(loans)?,
                 &request,
                 &self.writer,
                 text(&args, "operationId")?,
+                wait_ms,
             )
             .map_err(operation)?;
         let result = json!({"candidate":session.candidate(),"receipt":session.receipt()});
