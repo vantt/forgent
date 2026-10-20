@@ -5,15 +5,10 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { branchNameFor, checkoutPathForBranch } from './worktree.mjs';
 import { STALE_DOING_DEFAULTS } from '../state/graph-metrics.mjs';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
-
-function git(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
-}
 
 /**
  * D4: `max(last commit time on the claim's fgw/<id> branch, newest mtime
@@ -34,11 +29,12 @@ export function lastActivityAt(repoRoot, id) {
 
   let commitTs;
   try {
-    const raw = git(repoRoot, ['log', '-1', '--format=%ct', branch]).trim();
-    const seconds = Number.parseInt(raw, 10);
-    if (Number.isFinite(seconds)) commitTs = seconds * 1000;
+    const inspect = createGitInspect(gitPortOptions(repoRoot));
+    const ref = inspect.resolveRef({ name: `refs/heads/${branch}` });
+    if (ref.kind !== 'direct') return null; // branch doesn't exist -- nothing to measure at all
+    commitTs = inspect.commitTime({ revision: ref.oid }) * 1000;
   } catch {
-    return null; // branch doesn't exist -- nothing to measure at all
+    return null;
   }
 
   let worktreePath;

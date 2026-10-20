@@ -68,6 +68,28 @@ pub struct DiffScope<'a> {
     pub prefix: Option<&'a str>,
     pub renames: bool,
 }
+/// The two sides a `diff` compares: two pinned objects, or a commit or the
+/// index against the checkout's live state.
+#[derive(Debug, Clone, Copy)]
+pub enum DiffSides<'a> {
+    /// `before` and `after`, each a commit or a tree (`diff_text`: commits).
+    Objects(&'a Oid, &'a Oid),
+    /// A commit against the index (staged changes).
+    IndexAgainst(&'a Oid),
+    /// A commit against the work tree (staged and unstaged changes).
+    WorktreeAgainst(&'a Oid),
+    /// The index against the work tree (unstaged changes).
+    WorktreeAgainstIndex,
+}
+#[derive(Debug, Clone, Copy, Default)]
+pub enum Submodules {
+    /// Git's own reporting, as configured.
+    #[default]
+    Configured,
+    /// `--ignore-submodules=dirty`: a submodule's own dirt is left out; a
+    /// moved submodule commit is still reported.
+    IgnoreDirty,
+}
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MergeTreeFact {
@@ -90,6 +112,23 @@ fn literal_prefix(raw: &str) -> Result<&str> {
         return Err(refused("invalid-literal-path"));
     }
     Ok(prefix)
+}
+/// Bounded canonical repository-relative paths, used under `--literal-pathspecs`.
+fn literal_paths(files: &[String]) -> Result<()> {
+    if files.len() > 4096
+        || files.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
+        || files.iter().any(|p| p.contains('*') || p.chars().any(char::is_control)
+            || fgos_write_scope::canonicalize(p).as_deref() != Ok(p.as_str()))
+    {
+        return Err(refused("invalid-literal-path"));
+    }
+    Ok(())
+}
+fn count(bytes: &[u8]) -> Result<u64> {
+    std::str::from_utf8(bytes)
+        .ok()
+        .and_then(|text| text.trim_end_matches('\n').parse().ok())
+        .ok_or_else(|| refused("invalid-count"))
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -173,13 +212,10 @@ impl GitDriver {
     }
     /// Work's existing fallback timing read, with bounded literal paths.
     pub fn last_path_commit_time(&self, repo: &RepoHandle, files: &[String]) -> Result<Option<i64>> {
-        if files.is_empty() || files.len() > 4096
-            || files.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
-            || files.iter().any(|p| p.contains('*') || p.chars().any(char::is_control)
-                || fgos_write_scope::canonicalize(p).as_deref() != Ok(p.as_str()))
-        {
+        if files.is_empty() {
             return Err(refused("invalid-literal-path"));
         }
+        literal_paths(files)?;
         let mut args = vec!["--literal-pathspecs", "log", "-1", "--format=%ct", "--"];
         args.extend(files.iter().map(String::as_str));
         let raw = self.checked(repo, &args, Policy::Inspect)?;
@@ -256,6 +292,7 @@ impl GitDriver {
         &self,
         repo: &RepoHandle,
         untracked: Untracked,
+        submodules: Submodules,
         cursor: Option<InspectCursor>,
         max: usize,
     ) -> Result<InspectPage<StatusEntry>> {
@@ -264,18 +301,18 @@ impl GitDriver {
             Untracked::Normal => "--untracked-files=normal",
             Untracked::All => "--untracked-files=all",
         };
-        let bytes = self.checked(
-            repo,
-            &[
-                "status",
-                "--porcelain=v2",
-                "-z",
-                "--no-renames",
-                untracked,
-                "--ignored=no",
-            ],
-            Policy::Inspect,
-        )?;
+        let mut args = vec![
+            "status",
+            "--porcelain=v2",
+            "-z",
+            "--no-renames",
+            untracked,
+            "--ignored=no",
+        ];
+        if let Submodules::IgnoreDirty = submodules {
+            args.push("--ignore-submodules=dirty");
+        }
+        let bytes = self.checked(repo, &args, Policy::Inspect)?;
         let mut entries = vec![];
         for record in records(&bytes)? {
             let entry = match record.first() {
@@ -311,20 +348,44 @@ impl GitDriver {
         }
         page(entries, &bytes, cursor, max)
     }
-    /// Changes between two pinned commits or trees. Renames are disabled
-    /// unless the scope asks for them, so both paths of a move appear
-    /// independently. No cwd-relative or text conversion rules.
+    /// The `diff` arguments naming `sides`, after each pinned object is
+    /// checked to be a commit (or, unless `commits_only`, a tree).
+    fn diff_sides<'a>(
+        &self,
+        repo: &RepoHandle,
+        sides: DiffSides<'a>,
+        commits_only: bool,
+    ) -> Result<Vec<&'a str>> {
+        let require = |value: &Oid| if commits_only { self.require_commit(repo, value) } else { self.require_tree_ish(repo, value) };
+        Ok(match sides {
+            DiffSides::Objects(before, after) => {
+                require(before)?;
+                require(after)?;
+                vec![before.as_str(), after.as_str()]
+            }
+            DiffSides::IndexAgainst(before) => {
+                self.require_commit(repo, before)?;
+                vec!["--cached", before.as_str()]
+            }
+            DiffSides::WorktreeAgainst(before) => {
+                self.require_commit(repo, before)?;
+                vec![before.as_str()]
+            }
+            DiffSides::WorktreeAgainstIndex => vec![],
+        })
+    }
+    /// Changes between the two sides. Renames are disabled unless the scope
+    /// asks for them, so both paths of a move appear independently. No
+    /// cwd-relative or text conversion rules.
     pub fn diff(
         &self,
         repo: &RepoHandle,
-        before: &Oid,
-        after: &Oid,
+        sides: DiffSides<'_>,
         scope: &DiffScope<'_>,
         cursor: Option<InspectCursor>,
         max: usize,
     ) -> Result<InspectPage<DiffEntry>> {
-        self.require_tree_ish(repo, before)?;
-        self.require_tree_ish(repo, after)?;
+        let sides = self.diff_sides(repo, sides, false)?;
         let pathspec = scope
             .prefix
             .map(|p| literal_prefix(p).map(|p| format!(":(literal){p}")))
@@ -337,10 +398,9 @@ impl GitDriver {
             "--no-ext-diff",
             "--no-textconv",
             "-z",
-            before.as_str(),
-            after.as_str(),
-            "--",
         ];
+        args.extend(sides);
+        args.push("--");
         args.extend(pathspec.as_deref());
         let bytes = self.checked(repo, &args, Policy::Inspect)?;
         let fields = records(&bytes)?;
@@ -367,16 +427,30 @@ impl GitDriver {
         }
         page(entries, &bytes, cursor, max)
     }
-    /// Bounded patch bytes for review consumers. Never runs external diff/textconv.
-    pub fn diff_text(&self, repo: &RepoHandle, before: &Oid, after: &Oid, max_bytes: usize) -> Result<Vec<u8>> {
-        if max_bytes == 0 || max_bytes > 50 * 1024 * 1024 {
+    /// Bounded patch bytes for review consumers, optionally limited to literal
+    /// paths and to `context` lines around each change. Never runs external
+    /// diff/textconv.
+    pub fn diff_text(
+        &self,
+        repo: &RepoHandle,
+        sides: DiffSides<'_>,
+        paths: &[String],
+        context: Option<u32>,
+        max_bytes: usize,
+    ) -> Result<Vec<u8>> {
+        if max_bytes == 0 || max_bytes > 50 * 1024 * 1024 || context.is_some_and(|n| n > 1_000_000) {
             return Err(refused("invalid-diff-bound"));
         }
-        self.require_commit(repo, before)?;
-        self.require_commit(repo, after)?;
+        literal_paths(paths)?;
+        let unified = context.map(|n| format!("--unified={n}"));
+        let mut args = vec!["--literal-pathspecs", "diff", "--no-relative", "--no-ext-diff", "--no-textconv"];
+        args.extend(unified.as_deref());
+        args.extend(self.diff_sides(repo, sides, true)?);
+        args.push("--");
+        args.extend(paths.iter().map(String::as_str));
         let output = self.invoke(
             Some(repo), repo.trusted_main_root(),
-            &["diff", "--no-relative", "--no-ext-diff", "--no-textconv", before.as_str(), after.as_str(), "--"],
+            &args,
             Policy::Inspect, None, true, max_bytes, Duration::from_secs(30),
         )?;
         if !output.success { return Err(output.error("diff-read-failed")); }
@@ -702,7 +776,7 @@ impl GitDriver {
             previous_paths.iter().cloned().collect();
         let mut cursor = None;
         loop {
-            let page = self.status(repo, Untracked::All, cursor, 4096)?;
+            let page = self.status(repo, Untracked::All, Submodules::Configured, cursor, 4096)?;
             paths.extend(page.entries.into_iter().map(|e| e.path));
             if paths.iter().map(|p| p.len() + 1).sum::<usize>() > crate::driver::PATH_LIMIT {
                 return Err(refused("snapshot-path-limit"));
@@ -1154,5 +1228,56 @@ impl GitDriver {
             .find(|line| !line.is_empty())
             .map(|line| oid(repo, line))
             .transpose()
+    }
+}
+
+/// Commit counts, times and the index listing for reporting consumers.
+impl GitDriver {
+    /// A commit's committer time, in seconds since the epoch.
+    pub fn commit_time(&self, repo: &RepoHandle, commit: &Oid) -> Result<i64> {
+        self.require_commit(repo, commit)?;
+        let raw = self.checked(repo, &["log", "-1", "--format=%ct", commit.as_str(), "--"], Policy::Inspect)?;
+        std::str::from_utf8(&raw)
+            .ok()
+            .and_then(|text| text.trim_end_matches('\n').parse().ok())
+            .ok_or_else(|| refused("invalid-commit-time"))
+    }
+    /// How many commits `include` reaches that `exclude`, when given, does not.
+    pub fn count_commits(&self, repo: &RepoHandle, include: &Oid, exclude: Option<&Oid>) -> Result<u64> {
+        self.require_commit(repo, include)?;
+        let range = match exclude {
+            Some(exclude) => {
+                self.require_commit(repo, exclude)?;
+                format!("{}..{}", exclude.as_str(), include.as_str())
+            }
+            None => include.as_str().to_owned(),
+        };
+        count(&self.checked(repo, &["rev-list", "--count", &range, "--"], Policy::Inspect)?)
+    }
+    /// How many non-merge commits of `head` have no patch-equivalent commit
+    /// on `upstream` (`rev-list --cherry-pick --right-only --no-merges`).
+    pub fn unmatched_commit_count(&self, repo: &RepoHandle, upstream: &Oid, head: &Oid) -> Result<u64> {
+        self.require_commit(repo, upstream)?;
+        self.require_commit(repo, head)?;
+        let range = format!("{}...{}", upstream.as_str(), head.as_str());
+        count(&self.checked(
+            repo,
+            &["rev-list", "--count", "--cherry-pick", "--right-only", "--no-merges", &range, "--"],
+            Policy::Inspect,
+        )?)
+    }
+    /// The paths the index tracks, repository-relative bytes in index order.
+    pub fn tracked_paths(
+        &self,
+        repo: &RepoHandle,
+        cursor: Option<InspectCursor>,
+        max: usize,
+    ) -> Result<InspectPage<Vec<u8>>> {
+        let bytes = self.checked(repo, &["ls-files", "-z", "--cached", "--full-name"], Policy::Inspect)?;
+        let entries = records(&bytes)?
+            .into_iter()
+            .map(|path| if path.is_empty() { Err(refused("invalid-ls-files-protocol")) } else { Ok(path.to_vec()) })
+            .collect::<Result<Vec<_>>>()?;
+        page(entries, &bytes, cursor, max)
     }
 }

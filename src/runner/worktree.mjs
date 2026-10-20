@@ -310,33 +310,6 @@ export function branchExists(repoRoot, branch) {
 }
 
 /**
- * Parse `git worktree list --porcelain` output and return the checkout
- * path currently registered for `branch` (as `refs/heads/<branch>`), or
- * `null` if the branch is not checked out anywhere. Porcelain records are
- * blank-line-separated stanzas, each starting with a `worktree <path>`
- * line followed by a `branch refs/heads/<name>` line (or `detached`).
- *
- * Exported (tsk-3gx-1): `promote-preflight.mjs` reuses this exact parse to
- * judge whether a member branch is currently checked out elsewhere before
- * a retarget — same "one implementation of this check" discipline
- * `branchExists` above already documents for its own callers.
- */
-export function findCheckoutPath(porcelainOutput, branch) {
-  const ref = `refs/heads/${branch}`;
-  let currentPath = null;
-  for (const line of porcelainOutput.split('\n')) {
-    if (line.startsWith('worktree ')) {
-      currentPath = line.slice('worktree '.length).trim();
-    } else if (line.startsWith('branch ')) {
-      if (line.slice('branch '.length).trim() === ref) return realpathOrSelf(currentPath);
-    } else if (line === '') {
-      currentPath = null;
-    }
-  }
-  return null;
-}
-
-/**
  * True when `worktreePath` has any uncommitted change other than the
  * `.fgos` removal `createWorktree` itself always performs right after
  * checkout (ADR0020) — that path is this module's own known artifact,
@@ -722,7 +695,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
 /**
  * The checkout of `branch` a claim may reattach to instead of standing up a
  * new one, or `null` when there is none to reattach to. Deliberately
- * stricter than `findCheckoutPath` alone, on two counts:
+ * stricter than `checkoutPathForBranch` alone, on two counts:
  *
  * - the registration must still exist on disk. `git worktree list` reports
  *   a path whose directory was deleted out from under it until someone

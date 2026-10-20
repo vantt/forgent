@@ -50,7 +50,7 @@ import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-h
 import { withMainCheckout } from './repo-locks.mjs';
 import { DEFAULT_LOCK_WAIT_MS } from './lock-wait.mjs';
 import { checkpointMainFgos, prepareMainFgosCheckpoint } from './main-fgos-checkpoint.mjs';
-import { LockScope, acquireSync, createLockScope, lockHolders } from '../holder-lock/index.mjs';
+import { LockScope, acquireSync, createLockScope, lockHolders, probe } from '../holder-lock/index.mjs';
 import { createGitLand } from '../git/land.mjs';
 import { createGitRecovery } from '../git/recovery.mjs';
 import { gitPortOptions } from '../git/inspect.mjs';
@@ -1133,6 +1133,15 @@ export async function landRunnerItem(repoRoot, item, {
 } = {}) {
   const destination = `refs/heads/${target}`;
   const fgosDir = path.join(repoRoot, '.fgos');
+  const mergeSlot = ['merge-slot', { fgosDir, ref: encodeURIComponent(destination) }, `merge slot of "${destination}"`];
+  const lockHeld = ([lock, params, label]) => {
+    const holders = lockHolders(lock, params).pids ?? [];
+    return new MergeError(`cannot merge "${branch}" into "${target}": ${label} is held by another process${holders.length ? ` (pid ${holders.join(', ')})` : ''}.`, {
+      branch, targetRef: target, code: 'lock-held', holders, lock,
+    });
+  };
+  // No-wait refuses a held slot before any read; Land's own try stays the decision.
+  if (lockWaitMs === 0 && probe(mergeSlot[0], mergeSlot[1]).result === 'held') throw lockHeld(mergeSlot);
   // Only a destination the main checkout holds involves its index at all.
   const onMain = checkedOutRef(repoRoot) === destination;
   if (onMain && mergeHeadExists(repoRoot)) return { outcome: 'merge-blocked-other-item', branch };
@@ -1254,13 +1263,7 @@ export async function landRunnerItem(repoRoot, item, {
     }
     if (typeof cause === 'string' && cause.startsWith('lock-acquire-unavailable')) {
       // Land waits for its own full-ref slot at prepare and for main at publish.
-      const [lock, params, label] = phase === 'prepare'
-        ? ['merge-slot', { fgosDir, ref: encodeURIComponent(destination) }, `merge slot of "${destination}"`]
-        : ['main-checkout', { fgosDir }, 'main checkout (land)'];
-      const holders = lockHolders(lock, params).pids ?? [];
-      throw new MergeError(`cannot merge "${branch}" into "${target}": ${label} is held by another process${holders.length ? ` (pid ${holders.join(', ')})` : ''}.`, {
-        branch, targetRef: target, code: 'lock-held', holders, lock,
-      });
+      throw lockHeld(phase === 'prepare' ? mergeSlot : ['main-checkout', { fgosDir }, 'main checkout (land)']);
     }
     // Preserve Land's stale result, including operation identity and recovery
     // evidence. Never re-run verification or CAS against a different target.

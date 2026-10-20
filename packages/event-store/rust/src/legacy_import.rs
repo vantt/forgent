@@ -561,7 +561,7 @@ pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> R
     let mut cursor = None;
     loop {
         let page = driver
-            .status(repo, Untracked::All, cursor, 4096)
+            .status(repo, Untracked::All, Submodules::Configured, cursor, 4096)
             .map_err(git_error)?;
         for e in page.entries {
             let p = std::str::from_utf8(&e.path).map_err(|_| invalid("status path UTF8"))?;

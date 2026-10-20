@@ -13,7 +13,6 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
       loadNativeAddon({ descriptor: { manifest: value, releaseRoot: cwd } });
       const hostBin = path.join(cwd, value.entries.fgos);
       if (!fs.existsSync(hostBin)) throw new Error('staged host missing');
-      if (env.FGOS_HOST_BIN && !fs.readFileSync(env.FGOS_HOST_BIN).equals(fs.readFileSync(hostBin))) throw new Error('staged host changed');
       env.FGOS_HOST_BIN = hostBin;
       env.FGOS_ACTIVE_MANIFEST_PATH = manifest;
       return { manifest, hostBin, addon: path.join(cwd, value.components.nativeAddon.path) };

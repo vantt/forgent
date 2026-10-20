@@ -24,9 +24,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { REPO_ROOT } from './run-tests.mjs';
+import { inspectRepo } from './lib/git-ports.mjs';
 
 export const RESPONSIBILITIES = Object.freeze([
   'direct-business-proof',
@@ -280,14 +280,22 @@ export function checkAdmission(changedLines, baseline = []) {
   return violations;
 }
 
+/** The zero-context patch of the work tree against `baseRef`, limited to `files`, read through Git Inspect. */
+function worktreePatch(files, { baseRef, cwd }) {
+  const inspect = inspectRepo(cwd);
+  const before = inspect.resolveCommit({ name: baseRef });
+  if (typeof before !== 'string') throw new Error(`unknown revision ${baseRef}`);
+  return inspect.diffText({ before, worktree: true, paths: files, context: 0 });
+}
+
 /**
- * Builds `{ file, line, text, prevText }` rows for every added line in
- * `git diff <baseRef> -- <scope>` restricted to onboarded files. Only
+ * Builds `{ file, line, text, prevText }` rows for every added line in the
+ * work tree's diff against `baseRef`, restricted to onboarded files. Only
  * additions are checked (never pre-existing debt).
  */
-export function addedLinesFromGitDiff(scopeFiles, { baseRef = 'HEAD', exec = execFileSync, cwd = REPO_ROOT } = {}) {
+export function addedLinesFromGitDiff(scopeFiles, { baseRef = 'HEAD', cwd = REPO_ROOT, readPatch = worktreePatch } = {}) {
   if (scopeFiles.length === 0) return [];
-  const raw = exec('git', ['diff', '--unified=0', baseRef, '--', ...scopeFiles], { cwd, encoding: 'utf8' });
+  const raw = readPatch(scopeFiles, { baseRef, cwd });
   const rows = [];
   let currentFile = null;
   let nextLine = null;

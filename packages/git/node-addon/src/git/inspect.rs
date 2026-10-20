@@ -49,6 +49,28 @@ impl GitInspect {
         let paths = || -> Result<Vec<Vec<u8>>> {
             serde_json::from_value(args.get("paths").cloned().unwrap_or(json!([]))).map_err(error)
         };
+        let flag = |key: &str| -> Result<bool> {
+            args.get(key)
+                .filter(|v| !v.is_null())
+                .map(|v| v.as_bool().ok_or_else(|| error(format!("expected {key} boolean"))))
+                .transpose()
+                .map(|v| v.unwrap_or(false))
+        };
+        let optional_oid = |key: &str| -> Result<Option<Oid>> {
+            args.get(key).filter(|v| !v.is_null()).map(|_| oid(key)).transpose()
+        };
+        // `before` + `after`: two objects; `before` + `index` or `worktree`:
+        // a commit against the checkout; `index` + `worktree`: unstaged.
+        let (before, after) = (optional_oid("before")?, optional_oid("after")?);
+        let sides = || -> Result<DiffSides<'_>> {
+            match (before.as_ref(), after.as_ref(), flag("index")?, flag("worktree")?) {
+                (Some(b), Some(a), false, false) => Ok(DiffSides::Objects(b, a)),
+                (Some(b), None, true, false) => Ok(DiffSides::IndexAgainst(b)),
+                (Some(b), None, false, true) => Ok(DiffSides::WorktreeAgainst(b)),
+                (None, None, true, true) => Ok(DiffSides::WorktreeAgainstIndex),
+                _ => Err(error("diff sides: before+after, before+index, before+worktree or index+worktree")),
+            }
+        };
         match method.as_str() {
             "lastPathCommitTime" => {
                 let files: Vec<String> = serde_json::from_value(args["files"].clone()).map_err(error)?;
@@ -109,14 +131,21 @@ impl GitInspect {
                     "all" => Untracked::All,
                     _ => return Err(error("explicit untracked mode required")),
                 };
+                let submodules = match args.get("ignoreSubmodules").filter(|v| !v.is_null()).map(|v| v.as_str()) {
+                    None => Submodules::Configured,
+                    Some(Some("dirty")) => Submodules::IgnoreDirty,
+                    _ => return Err(error("ignoreSubmodules: only \"dirty\"")),
+                };
                 Ok(json!(self
                     .driver
-                    .status(&repo, untracked, cursor()?, max()?)
+                    .status(&repo, untracked, submodules, cursor()?, max()?)
                     .map_err(operation)?))
             }
             "diffText" => {
                 let bound: usize = serde_json::from_value(args.get("maxBytes").cloned().unwrap_or(json!(50 * 1024 * 1024))).map_err(error)?;
-                let bytes = self.driver.diff_text(&repo, &oid("before")?, &oid("after")?, bound).map_err(operation)?;
+                let files: Vec<String> = serde_json::from_value(args.get("paths").cloned().unwrap_or(json!([]))).map_err(error)?;
+                let context: Option<u32> = serde_json::from_value(args.get("context").cloned().unwrap_or(Value::Null)).map_err(error)?;
+                let bytes = self.driver.diff_text(&repo, sides()?, &files, context, bound).map_err(operation)?;
                 Ok(json!(String::from_utf8_lossy(&bytes)))
             }
             "diff" => {
@@ -129,7 +158,7 @@ impl GitInspect {
                     .unwrap_or(false);
                 Ok(json!(self
                     .driver
-                    .diff(&repo, &oid("before")?, &oid("after")?, &DiffScope { prefix, renames }, cursor()?, max()?)
+                    .diff(&repo, sides()?, &DiffScope { prefix, renames }, cursor()?, max()?)
                     .map_err(operation)?))
             }
             "mergeTree" => Ok(json!(self
@@ -159,6 +188,17 @@ impl GitInspect {
                 .driver
                 .attributes(&repo, &oid("revision")?, text(&args, "attribute")?, &paths()?)
                 .map_err(operation)?)),
+            "commitTime" => Ok(json!(self.driver.commit_time(&repo, &oid("revision")?).map_err(operation)?)),
+            "countCommits" => Ok(json!(self
+                .driver
+                .count_commits(&repo, &oid("include")?, optional_oid("exclude")?.as_ref())
+                .map_err(operation)?)),
+            "unmatchedCommitCount" => Ok(json!(self
+                .driver
+                .unmatched_commit_count(&repo, &oid("upstream")?, &oid("head")?)
+                .map_err(operation)?)),
+            "trackedPaths" => Ok(json!(self.driver.tracked_paths(&repo, cursor()?, max()?).map_err(operation)?)),
+            "remoteUrl" => Ok(json!(self.driver.remote_url(&repo, text(&args, "remote")?).map_err(operation)?)),
             "firstAncestryMerge" => Ok(json!(self
                 .driver
                 .first_ancestry_merge(&repo, &oid("ancestor")?, &oid("descendant")?)

@@ -111,7 +111,7 @@ test('preflightRetarget: unsafe with reason merge-conflict when both branches ed
   const result = preflightRetarget(repoRoot, 'member-a', 'root-x');
   assert.equal(result.safe, false);
   assert.equal(result.reason, 'merge-conflict');
-  assert.match(result.detail, /<<<<<<</);
+  assert.match(result.detail, /conflicts in: seed\.txt$/);
 });
 
 test('preflightRetarget: never mutates repo state (no new commits, branches, or worktrees left behind)', () => {

@@ -7,6 +7,7 @@ import { createRequire } from 'node:module';
 import { OWN_PAYLOAD_ROOT, releasePayloadManifest } from '../run-supervisor/payload-root.mjs';
 const require = createRequire(import.meta.url);
 let handover;
+const verified = new Map();
 /** A native port error as its typed fields (`cause`, `stderr` bytes, ...);
  * an error that is not one keeps its message as the cause. */
 export function nativeError(error) {
@@ -38,7 +39,13 @@ export function loadNativeAddon({ hostBin = process.env.FGOS_HOST_BIN, descripto
     const root = fs.realpathSync(found.releaseRoot);
     const file = fs.realpathSync(path.join(root, entry.path));
     if (!file.startsWith(`${root}${path.sep}`)) throw unavailable('addon escaped release');
-    if (createHash('sha256').update(fs.readFileSync(file)).digest('hex') !== entry.digest) throw unavailable('digest mismatch');
+    // Hash once per process per file identity; any stat change verifies again.
+    const stat = fs.statSync(file, { bigint: true });
+    const identity = `${entry.digest}:${stat.dev}:${stat.ino}:${stat.size}:${stat.mtimeNs}`;
+    if (verified.get(file) !== identity) {
+      if (createHash('sha256').update(fs.readFileSync(file)).digest('hex') !== entry.digest) throw unavailable('digest mismatch');
+      verified.set(file, identity);
+    }
     const addon = require(file);
     const helper = found.manifest.entries?.fgos;
     if (typeof helper === 'string' && helper && !path.isAbsolute(helper) && !helper.split(/[\\/]/).includes('..')) {

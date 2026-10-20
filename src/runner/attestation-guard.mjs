@@ -9,12 +9,8 @@
 // (in-session dispatch path).
 
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { readEvents } from '../state/event-log.mjs';
-
-function gitAt(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
-}
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 
 /**
  * Check dispatch attestation for a work item.
@@ -59,17 +55,24 @@ export function checkDispatchAttestation(dir, repoRoot, id, branch) {
   }
 
   // Check 2: actual branch tip must be a descendant of recorded baseCommit
+  let inspect;
   let branchHead;
   try {
-    branchHead = gitAt(repoRoot, ['rev-parse', branch]).trim();
-  } catch (err) {
-    // If branch doesn't exist or can't be read, let caller handle branch existence
-    return { ok: true, skipped: true };
-  }
-
-  try {
-    gitAt(repoRoot, ['merge-base', '--is-ancestor', baseCommit, branchHead]);
+    inspect = createGitInspect(gitPortOptions(repoRoot));
+    branchHead = inspect.resolveCommit({ name: branch });
   } catch {
+    branchHead = null;
+  }
+  // If branch doesn't exist or can't be read, let caller handle branch existence
+  if (typeof branchHead !== 'string') return { ok: true, skipped: true };
+
+  let descends = false;
+  try {
+    descends = inspect.ancestry({ ancestor: baseCommit, descendant: branchHead }).answer === 'yes';
+  } catch {
+    // An unreadable or foreign baseCommit cannot prove descent.
+  }
+  if (!descends) {
     return {
       ok: false,
       reason: 'attestation-mismatch',

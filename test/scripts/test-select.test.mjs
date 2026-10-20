@@ -6,8 +6,6 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
-  parseNameStatusZ,
-  parsePathListZ,
   collectChangedPaths,
   validateManifest,
   buildManifestIndex,
@@ -38,46 +36,6 @@ function commit(root, message = 'commit') {
   execFileSync('git', ['add', '-A'], { cwd: root });
   execFileSync('git', ['commit', '-q', '-m', message], { cwd: root });
 }
-
-// -- parseNameStatusZ / parsePathListZ -----------------------------------
-
-test('parseNameStatusZ parses ordinary M/A/D rows', () => {
-  const raw = 'M\0a.mjs\0A\0b.mjs\0D\0c.mjs\0';
-  assert.deepEqual(parseNameStatusZ(raw), [
-    { status: 'M', path: 'a.mjs' },
-    { status: 'A', path: 'b.mjs' },
-    { status: 'D', path: 'c.mjs' },
-  ]);
-});
-
-test('parseNameStatusZ parses a rename row (3 NUL-separated fields) with both old and new path', () => {
-  const raw = 'R100\0old.mjs\0new.mjs\0';
-  assert.deepEqual(parseNameStatusZ(raw), [{ status: 'R100', oldPath: 'old.mjs', path: 'new.mjs' }]);
-});
-
-test('parseNameStatusZ handles a path containing a space and a backslash correctly (the whole point of -z)', () => {
-  const raw = 'M\0a path\\with stuff.mjs\0';
-  assert.deepEqual(parseNameStatusZ(raw), [{ status: 'M', path: 'a path\\with stuff.mjs' }]);
-});
-
-test('parseNameStatusZ returns [] for empty input', () => {
-  assert.deepEqual(parseNameStatusZ(''), []);
-});
-
-test('parsePathListZ tags every entry as untracked-shaped status A', () => {
-  assert.deepEqual(parsePathListZ('a.mjs\0b.mjs\0'), [
-    { status: 'A', path: 'a.mjs' },
-    { status: 'A', path: 'b.mjs' },
-  ]);
-});
-
-test('parsePathListZ excludes the bare node_modules/target worktree-symlink entries (P05 finding): a real repo change alongside them is still reported', () => {
-  assert.deepEqual(parsePathListZ('node_modules\0target\0src/real.mjs\0'), [{ status: 'A', path: 'src/real.mjs' }]);
-});
-
-test('parsePathListZ does NOT exclude a real untracked path that merely CONTAINS "node_modules" as a substring (exact bare-name match only)', () => {
-  assert.deepEqual(parsePathListZ('vendor/node_modules-shim.mjs\0'), [{ status: 'A', path: 'vendor/node_modules-shim.mjs' }]);
-});
 
 // -- collectChangedPaths: real git integration ---------------------------
 
@@ -183,6 +141,32 @@ test('a plain delete (no rename) is reported with status D and no renamedTo', ()
   assert.equal(result.changes.length, 1);
   assert.equal(result.changes[0].status, 'D');
   assert.equal(result.changes[0].renamedTo, undefined);
+});
+
+test('untracked node_modules/target worktree symlinks are not reported (P05 finding); a real untracked path, even one containing "node_modules", still is', () => {
+  const root = tmpRepo();
+  write(root, 'seed.mjs');
+  commit(root, 'seed');
+  fs.symlinkSync(os.tmpdir(), path.join(root, 'node_modules'));
+  fs.symlinkSync(os.tmpdir(), path.join(root, 'target'));
+  write(root, 'src/real.mjs');
+  write(root, 'vendor/node_modules-shim.mjs');
+
+  const result = collectChangedPaths({ cwd: root, base: 'main' });
+  assert.deepEqual(result.changes.map((c) => [c.path, c.source]).sort(), [['src/real.mjs', 'untracked'], ['vendor/node_modules-shim.mjs', 'untracked']]);
+});
+
+test('a staged rename yields both halves under source "staged"', () => {
+  const root = tmpRepo();
+  write(root, 'src/old-name.mjs', 'x'.repeat(200) + '\n');
+  commit(root, 'seed');
+  execFileSync('git', ['mv', 'src/old-name.mjs', 'src/new-name.mjs'], { cwd: root });
+
+  const result = collectChangedPaths({ cwd: root, base: 'main' });
+  assert.deepEqual(result.changes.map((c) => [c.path, c.status, c.source, c.renamedTo ?? c.renamedFrom]), [
+    ['src/old-name.mjs', 'D', 'staged', 'src/new-name.mjs'],
+    ['src/new-name.mjs', 'R', 'staged', 'src/old-name.mjs'],
+  ]);
 });
 
 test('missing/invalid base returns an { error }, never throws', () => {

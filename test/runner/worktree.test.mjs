@@ -486,7 +486,7 @@ test('createVerifyCheckout checks out a root branch at its real current tip, and
 test('tsk-4yv: verifying an already-landed leaf removes the detached checkout it registered when dependency provisioning fails -- never leaks an unreclaimed detached checkout', async () => {
   // Finding 7: this is specifically the DETACHED case (the verification
   // checkout landRunnerItem stands up for a target no checkout holds) --
-  // reclaimOrphanedCheckout/findCheckoutPath are both branch-keyed and skip
+  // reclaimOrphanedCheckout/checkoutPathForBranch are both branch-keyed and skip
   // a `detached` worktree stanza entirely, so nothing else in the codebase
   // would ever reclaim a leaked detached checkout. A repeated npm registry
   // flake during approve would accumulate full checkouts under tmp

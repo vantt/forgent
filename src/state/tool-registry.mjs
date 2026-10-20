@@ -22,7 +22,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
 /** The full kind domain (repository-harness's own set, minus 'http' — 0 real
@@ -163,7 +163,7 @@ function commandExistsOnPath(name) {
 // `meta.json` (written inside its scanTarget) already records the commit
 // it last indexed, so comparing that against the repo's real HEAD costs
 // nothing new to read. Missing/malformed meta.json, no `lastCommit`, or a
-// failing `git rev-parse` (repoRoot not a git repo, or no commits yet) all
+// HEAD that does not resolve (repoRoot not a git repo, or no commits yet) all
 // degrade to "not stale" — same never-throws, never-a-false-positive
 // contract `probeTool` already carries for the rest of this function.
 function isIndexStale(scanPath, repoRoot) {
@@ -177,11 +177,11 @@ function isIndexStale(scanPath, repoRoot) {
   if (!lastCommit) return false;
   let head;
   try {
-    head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+    head = createGitInspect(gitPortOptions(repoRoot)).resolveCommit({ name: 'HEAD' });
   } catch {
     return false;
   }
-  return head !== lastCommit;
+  return typeof head === 'string' && head !== lastCommit;
 }
 
 /**

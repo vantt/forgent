@@ -6,12 +6,8 @@
 // real commit) is `tsk-3gx-2`'s job, and only ever runs after this module
 // returns `{ safe: true }` for a given member.
 
-import { execFileSync } from 'node:child_process';
-import { branchExists, branchNameFor, checkoutPathForBranch, compareCommits, isCheckoutDirty } from './worktree.mjs';
-
-function git(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
-}
+import { branchExists, branchNameFor, checkoutPathForBranch, inspectGit, isCheckoutDirty, resolveRefSha } from './worktree.mjs';
+import { inspectPath } from '../util/git-paths.mjs';
 
 /**
  * D3(ii): true when `branch` is checked out in some worktree of `repoRoot`
@@ -35,20 +31,14 @@ function checkoutActivity(repoRoot, branch) {
 }
 
 /**
- * D3(i): true when merging `branch` into `target` would conflict. Uses the
- * classic 3-arg `git merge-tree <merge-base> <target> <branch>` (this
- * repo's git is 2.34 — predates the 2.38 `--write-tree` mode) — that form
- * never touches the working tree, the index, or `MERGE_HEAD`; it only
- * prints the would-be merge result. Empirically confirmed on this git
- * version: a real conflict embeds `<<<<<<<`/`=======`/`>>>>>>>` markers in
- * the diff hunk; a clean auto-merge never does, regardless of whether
- * files changed on both sides.
+ * D3(i): true when merging `branch` into `target` would conflict. Git
+ * Inspect's `mergeTree` never touches the working tree, the index, or
+ * `MERGE_HEAD`; it names the paths a real merge would leave conflicted.
  */
 function mergeConflictRisk(repoRoot, branch, target) {
-  const { mergeBase } = compareCommits(repoRoot, target, branch);
-  const output = git(repoRoot, ['merge-tree', mergeBase, target, branch]);
-  const hasConflict = output.includes('<<<<<<<');
-  return { hasConflict, detail: hasConflict ? output : null };
+  const { conflictedPaths } = inspectGit(repoRoot).mergeTree({ target: resolveRefSha(repoRoot, target), source: resolveRefSha(repoRoot, branch) });
+  const hasConflict = conflictedPaths.length > 0;
+  return { hasConflict, detail: hasConflict ? `merging "${branch}" into "${target}" conflicts in: ${conflictedPaths.map(inspectPath).join(', ')}` : null };
 }
 
 /**

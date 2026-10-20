@@ -30,21 +30,19 @@ import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DEFAULT_TEST_ROOT = path.join(REPO_ROOT, 'test');
-/** Fingerprint every input of the two foundations so a direct test never reuses stale bytes. */
+/** Fingerprint every input of the staged addon and host (every Cargo workspace member) so a direct test never reuses stale bytes. */
 export function gitAddonSourceDigest(cwd = REPO_ROOT) {
   const hash = createHash('sha256');
   const files = ['Cargo.toml', 'Cargo.lock'];
-  for (const component of ['git', 'event-store', 'holder-lock', 'process', 'durable-file', 'canonical-json']) {
-    const base = path.join('packages', component);
-    const walk = (relative) => {
-      for (const entry of fs.readdirSync(path.join(cwd, relative), { withFileTypes: true })) {
-        const file = path.join(relative, entry.name);
-        if (entry.isDirectory()) walk(file);
-        else if (/\.(rs|toml|json)$/.test(entry.name)) files.push(file);
-      }
-    };
-    walk(base);
-  }
+  const workspace = fs.readFileSync(path.join(cwd, 'Cargo.toml'), 'utf8').match(/^members\s*=\s*\[([^\]]*)\]/m)[1];
+  const walk = (relative) => {
+    for (const entry of fs.readdirSync(path.join(cwd, relative), { withFileTypes: true })) {
+      const file = path.join(relative, entry.name);
+      if (entry.isDirectory()) walk(file);
+      else if (/\.(rs|toml|json)$/.test(entry.name)) files.push(file);
+    }
+  };
+  for (const member of new Set([...workspace.matchAll(/"([^"]+)"/g)].map(m => m[1]))) walk(member);
   for (const file of files.sort()) hash.update(file).update('\0').update(fs.readFileSync(path.join(cwd, file)));
   return hash.digest('hex');
 }
@@ -69,7 +67,8 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
     fs.renameSync(temporaryAddon, addon);
   }
   const record = nativeAddonComponent(addon, path.relative(cwd, addon), cwd);
-  const sourceHost = env.FGOS_HOST_BIN || ensureHostBin(env, cwd);
+  // Never an inherited FGOS_HOST_BIN: a release host predates this checkout's sources.
+  const sourceHost = ensureHostBin({ ...env, FGOS_HOST_BIN: '' }, cwd);
   const hostBin = path.join(addonDir, process.platform === 'win32' ? 'fgos.exe' : 'fgos');
   const hostBytes = fs.readFileSync(sourceHost);
   if (!fs.existsSync(hostBin) || !fs.readFileSync(hostBin).equals(hostBytes)) {

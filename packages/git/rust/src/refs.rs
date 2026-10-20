@@ -655,7 +655,7 @@ impl GitDriver {
                 }
             }
             if !self
-                .status(target, Untracked::All, None, 1)?
+                .status(target, Untracked::All, Submodules::Configured, None, 1)?
                 .entries
                 .is_empty()
             {
@@ -819,7 +819,7 @@ impl GitDriver {
             scope.validate().map_err(failure)?;
             if let Some(target) = tree {
                 if !self
-                    .status(target, Untracked::All, None, 1)?
+                    .status(target, Untracked::All, Submodules::Configured, None, 1)?
                     .entries
                     .is_empty()
                 {
@@ -898,7 +898,7 @@ impl GitDriver {
                     return Err(result.error("checkout-recovery-required"));
                 }
                 if !self
-                    .status(target, Untracked::All, None, 1)?
+                    .status(target, Untracked::All, Submodules::Configured, None, 1)?
                     .entries
                     .is_empty()
                 {
@@ -1087,7 +1087,7 @@ impl GitDriver {
                 };
                 let custody = scope.handle("dispatch-cwd").ok_or_else(|| failure("checkout-custody-required"))?;
                 if custody.path() != custody_lock_path(repo,Path::new(path))? { return Err(failure("checkout-custody-mismatch")); }
-                if !self.status(&target,Untracked::All,None,1)?.entries.is_empty() {
+                if !self.status(&target,Untracked::All,Submodules::Configured,None,1)?.entries.is_empty() {
                     return Err(recovery("ref-checkout-recovery-required"));
                 }
             }

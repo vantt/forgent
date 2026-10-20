@@ -9,10 +9,9 @@ use crate::scorecard::{
     CommitsSection, ComplexitySection, LocBreakdown, Scorecard,
 };
 use crate::sources::invocation_faults::InvocationFaultsSource;
-use crate::sources::repo::{count_commits_in_range, count_lines_of_code};
+use crate::sources::repo::{count_commits_in_range, count_lines_of_code, tracked_files};
 use serde_json::json;
 use std::path::Path;
-use std::process::Command;
 
 pub fn dispatch_harness(
     req: &ObserveRequest,
@@ -180,52 +179,42 @@ fn compute_complexity(root: &Path) -> ComplexitySection {
 }
 
 fn compute_loc_breakdown(root: &Path) -> LocBreakdown {
-    // Collect git tracked files
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(root)
-        .args(["ls-files", ":/"])
-        .output();
-
     let mut loc = LocBreakdown::default();
 
-    if let Ok(out) = output {
-        if out.status.success() {
-            let files_text = String::from_utf8_lossy(&out.stdout);
-            for rel_path in files_text.lines() {
-                let full_path = root.join(rel_path);
-                if !full_path.is_file() {
-                    continue;
-                }
-                // Only count code files (js, mjs, ts, rs)
-                let ext = full_path.extension().and_then(|s| s.to_str()).unwrap_or("");
-                if !matches!(ext, "js" | "mjs" | "ts" | "rs") {
-                    continue;
-                }
+    if let Ok((top, files)) = tracked_files(root) {
+        for rel_path in files.iter().map(String::as_str) {
+            let full_path = top.join(rel_path);
+            if !full_path.is_file() {
+                continue;
+            }
+            // Only count code files (js, mjs, ts, rs)
+            let ext = full_path.extension().and_then(|s| s.to_str()).unwrap_or("");
+            if !matches!(ext, "js" | "mjs" | "ts" | "rs") {
+                continue;
+            }
 
-                let line_count = std::fs::read_to_string(&full_path)
-                    .map(|content| content.lines().count() as u64)
-                    .unwrap_or(0);
+            let line_count = std::fs::read_to_string(&full_path)
+                .map(|content| content.lines().count() as u64)
+                .unwrap_or(0);
 
-                loc.total += line_count;
+            loc.total += line_count;
 
-                if rel_path.starts_with("test/")
-                    || rel_path.contains("/test")
-                    || rel_path.ends_with(".test.mjs")
-                    || rel_path.ends_with(".test.js")
-                {
-                    loc.tests += line_count;
-                } else if rel_path.starts_with("src/runner/") {
-                    loc.runner += line_count;
-                } else if rel_path.starts_with("packages/") {
-                    loc.packages += line_count;
-                } else if rel_path.starts_with("apps/") {
-                    loc.apps += line_count;
-                } else if rel_path.starts_with("herdr-dashboard/") {
-                    loc.herdr_plugin += line_count;
-                } else {
-                    loc.other += line_count;
-                }
+            if rel_path.starts_with("test/")
+                || rel_path.contains("/test")
+                || rel_path.ends_with(".test.mjs")
+                || rel_path.ends_with(".test.js")
+            {
+                loc.tests += line_count;
+            } else if rel_path.starts_with("src/runner/") {
+                loc.runner += line_count;
+            } else if rel_path.starts_with("packages/") {
+                loc.packages += line_count;
+            } else if rel_path.starts_with("apps/") {
+                loc.apps += line_count;
+            } else if rel_path.starts_with("herdr-dashboard/") {
+                loc.herdr_plugin += line_count;
+            } else {
+                loc.other += line_count;
             }
         }
     }

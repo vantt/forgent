@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
-import {ensureHostBin, ensureGitAddon as buildAddon} from '../../scripts/run-tests.mjs';
+import {ensureHostBin, ensureGitAddon as buildAddon, gitAddonSourceDigest} from '../../scripts/run-tests.mjs';
 import {pathToFileURL} from 'node:url';
 import {ensureGitAddon, root} from '../helpers/git-addon.mjs';
 import {buildRustDistribution, nativeAddonLibraryName, nativeAddonComponent, computeArtifactDigest, gitCapabilitiesForHost} from '../../scripts/build-rust-distribution.mjs';
@@ -68,6 +68,7 @@ test('addon test builder respects Cargo target/home and defaults to the normal o
     fs.copyFileSync(path.join(root, 'Cargo.lock'), path.join(repo, 'Cargo.lock'));
     // Source fingerprints use the actual source tree; symlinks are only test inputs.
     fs.symlinkSync(path.join(root, 'packages'), path.join(repo, 'packages'), 'dir');
+    fs.symlinkSync(path.join(root, 'apps'), path.join(repo, 'apps'), 'dir');
     const builder = path.join(temp, 'cargo');
     fs.writeFileSync(builder, `#!${process.execPath}
 const fs = require('node:fs'), path = require('node:path');
@@ -75,11 +76,15 @@ fs.writeFileSync(process.env.CARGO_ENV_RECORD, JSON.stringify({target:process.en
 const output=path.join(process.env.CARGO_TARGET_DIR, 'debug');
 fs.mkdirSync(output,{recursive:true});
 fs.copyFileSync(process.env.ADDON_TEST_BYTES,path.join(output,${JSON.stringify(nativeAddonLibraryName())}));
+fs.copyFileSync(process.env.HOST_TEST_BYTES,path.join(output,'fgos'));
 `, {mode: 0o755});
+    // A release host inherited from the session must never be staged.
+    const inherited = path.join(temp, 'release-fgos');
+    fs.writeFileSync(inherited, '#!/bin/sh\necho release\n', {mode: 0o755});
     for (const custom of [false, true]) {
       const record = path.join(temp, `env-${custom}.json`);
-      const env = {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, CARGO_ENV_RECORD: record, ADDON_TEST_BYTES: built.addon};
-      env.FGOS_HOST_BIN = built.hostBin;
+      const env = {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, CARGO_ENV_RECORD: record, ADDON_TEST_BYTES: built.addon, HOST_TEST_BYTES: built.hostBin};
+      env.FGOS_HOST_BIN = inherited;
       delete env.CARGO_TARGET_DIR;
       delete env.CARGO_HOME;
       if (custom) {
@@ -97,7 +102,7 @@ fs.copyFileSync(process.env.ADDON_TEST_BYTES,path.join(output,${JSON.stringify(n
       const manifest = JSON.parse(fs.readFileSync(result.manifest));
       assert.ok(!manifest.entries.fgos.split(/[\\/]/).includes('..'));
       assert.equal(path.join(repo, manifest.entries.fgos), result.hostBin);
-      assert.deepEqual(fs.readFileSync(result.hostBin), fs.readFileSync(built.hostBin));
+      assert.deepEqual(fs.readFileSync(result.hostBin), fs.readFileSync(built.hostBin), 'the staged host is the one Cargo built from the checkout, never the inherited FGOS_HOST_BIN');
       assert.equal(env.FGOS_HOST_BIN, result.hostBin);
       assert.equal(env.FGOS_ACTIVE_MANIFEST_PATH, result.manifest);
       const original = fs.readFileSync(result.manifest);
@@ -105,6 +110,7 @@ fs.copyFileSync(process.env.ADDON_TEST_BYTES,path.join(output,${JSON.stringify(n
       fs.mkdirSync(sibling);
       for (const file of ['Cargo.toml', 'Cargo.lock']) fs.copyFileSync(path.join(repo, file), path.join(sibling, file));
       fs.symlinkSync(path.join(root, 'packages'), path.join(sibling, 'packages'), 'dir');
+      fs.symlinkSync(path.join(root, 'apps'), path.join(sibling, 'apps'), 'dir');
       fs.symlinkSync(path.join(repo, '.fgos'), path.join(sibling, '.fgos'), 'dir');
       const siblingResult = buildAddon({ ...env }, sibling);
       assert.notEqual(fs.realpathSync(siblingResult.manifest), fs.realpathSync(result.manifest), 'shared .fgos keeps distinct checkout manifests');
@@ -112,6 +118,22 @@ fs.copyFileSync(process.env.ADDON_TEST_BYTES,path.join(output,${JSON.stringify(n
       if (custom) assert.deepEqual(fs.readdirSync(env.CARGO_HOME), ['sentinel']);
     }
   } finally { fs.rmSync(temp, {recursive: true, force: true}); }
+});
+
+test('the staged addon digest covers every workspace member, the host sources included, so a changed host is rebuilt', () => {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-digest-'));
+  try {
+    const write = (file, text) => { fs.mkdirSync(path.dirname(path.join(repo, file)), {recursive: true}); fs.writeFileSync(path.join(repo, file), text); };
+    write('Cargo.toml', '[workspace]\nmembers = [\n    "packages/git/rust",\n    "apps/fgos",\n]\n');
+    write('Cargo.lock', '');
+    write('packages/git/rust/src/lib.rs', '// git\n');
+    write('apps/fgos/src/main.rs', 'fn main() {}\n');
+    const before = gitAddonSourceDigest(repo);
+    write('apps/fgos/README.md', 'not a source\n');
+    assert.equal(gitAddonSourceDigest(repo), before, 'only .rs, .toml and .json files count');
+    write('apps/fgos/src/main.rs', 'fn main() { println!(); }\n');
+    assert.notEqual(gitAddonSourceDigest(repo), before, 'a host source change changes the digest');
+  } finally { fs.rmSync(repo, {recursive: true, force: true}); }
 });
 
 test('development host carries and loads the addon from its per-invocation manifest', {skip: process.platform === 'win32'}, () => {

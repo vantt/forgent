@@ -7,7 +7,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
 import { sha256FileSync } from './proof-helpers.mjs';
 import { RunnerConfigError } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
@@ -38,7 +37,7 @@ import {
   quarantineProviderAccount,
 } from './provider-capacity.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
-import { inspectEntries, inspectPath, statusPaths, GIT_LIST_MAX_BUFFER } from '../../util/git-paths.mjs';
+import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
 import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
 
 /**
@@ -150,21 +149,16 @@ const isStorePath = (filePath) => filePath === '.fgos' || filePath.startsWith('.
 
 /**
  * Read current dirty file paths relative to git root safely, excluding .fgos/ internal files.
- * Read exactly as the runner's commit reads a worktree (commit-unit-work changedPaths, same git
- * arguments and the shared statusPaths parser), so what settlement reports and what the commit
- * judges are one list; dirt inside a submodule is left out.
+ * Byte for byte, a rename as both its halves, an untracked nested repository without its
+ * trailing slash, the way it is staged; dirt inside a submodule is left out.
  */
 export function safeGitStatusFiles(dir) {
   if (!dir) return [];
   try {
-    const output = execFileSync('git', ['status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignore-submodules=dirty'], {
-      cwd: dir,
-      encoding: 'utf8',
-      maxBuffer: GIT_LIST_MAX_BUFFER,
-      shell: false,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    });
-    return statusPaths(output).filter((filePath) => !isStorePath(filePath));
+    const inspect = createGitInspect(gitPortOptions(dir));
+    const paths = inspectEntries((page) => inspect.status({ ...page, untracked: 'all', ignoreSubmodules: 'dirty' }))
+      .map((entry) => inspectPath(entry.path).replace(/\/$/, ''));
+    return [...new Set(paths)].filter((filePath) => filePath && !isStorePath(filePath));
   } catch {
     return [];
   }

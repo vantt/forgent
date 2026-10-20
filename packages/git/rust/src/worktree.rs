@@ -306,7 +306,7 @@ impl GitDriver {
             }
         }
         if !self
-            .status(&target, Untracked::All, None, 1)?
+            .status(&target, Untracked::All, Submodules::Configured, None, 1)?
             .entries
             .is_empty()
         {

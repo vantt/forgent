@@ -14,7 +14,6 @@
 // a stored "last-known-synced-tip" file — avoids a second state-consistency
 // surface next to `events.jsonl`, which is already known fragile under
 // concurrency (tsk-3wq).
-import { execFileSync } from 'node:child_process';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { isResolvedStatus } from './frontier.mjs';
 
@@ -31,12 +30,8 @@ function requireTrunk(fnName, trunk) {
   return trunk;
 }
 
-function git(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
-}
-
-// One Git Inspect port per call over `repoRoot`; every read below but the
-// patch-equivalence count goes through it.
+// One Git Inspect port per call over `repoRoot`; every read below goes
+// through it.
 function inspectRepo(repoRoot) {
   return createGitInspect(gitPortOptions(repoRoot));
 }
@@ -107,11 +102,12 @@ function introducesNothing(inspect, branch, from) {
 // flagged three branches, and two of them (tsk-67g, tsk-3um) turned out to
 // have landed their content by another path already. Reporting those as lost
 // work is exactly the kind of false alarm that teaches people to skip doctor.
-function unmatchedCommitCount(repoRoot, branch, from) {
+function unmatchedCommitCount(inspect, branch, from) {
+  const head = branchTip(inspect, branch);
+  const upstream = branchTip(inspect, from);
+  if (!head || !upstream) return 0;
   try {
-    const out = git(repoRoot, ['rev-list', '--count', '--cherry-pick', '--right-only', '--no-merges', `${from}...${branch}`]).trim();
-    const n = Number.parseInt(out, 10);
-    return Number.isFinite(n) ? n : 0;
+    return inspect.unmatchedCommitCount({ upstream, head });
   } catch {
     // Unreadable refs — report nothing rather than guess a number that would
     // drive a false alarm either way.
@@ -191,7 +187,7 @@ export function driftStatus(repoRoot, view, { trunk } = {}) {
     // silently change what the unattended merge loop acts on. Only
     // `fgos doctor`'s root-drift check reads this.
     const carriesContent = !introducesNothing(inspect, branch, targetBranch)
-      && unmatchedCommitCount(repoRoot, branch, targetBranch) > 0;
+      && unmatchedCommitCount(inspect, branch, targetBranch) > 0;
 
     result[rootId] = {
       branch,
@@ -250,7 +246,7 @@ export function unmergedDeliveries(repoRoot, view, { trunk } = {}) {
     // against its fork point, or every commit it does carry already has a
     // patch-equivalent on trunk. Both are stale refs, pure housekeeping.
     if (introducesNothing(inspect, branch, trunk)) continue;
-    const unmatched = unmatchedCommitCount(repoRoot, branch, trunk);
+    const unmatched = unmatchedCommitCount(inspect, branch, trunk);
     if (unmatched === 0) continue;
 
     // Distinguish the two causes, because they need different fixes. A leaf

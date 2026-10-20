@@ -226,6 +226,11 @@ impl GitDriver {
     }
     /// state_root is a caller-owned trusted directory, not a repository path.
     pub fn new(state_root: &Path) -> Result<Self> {
+        // An absent root is created as setup would create it; an existing one
+        // is only checked, never repaired here.
+        if fs::symlink_metadata(state_root).is_err() {
+            Self::prepare_directories(state_root)?;
+        }
         let state_root = fs::canonicalize(state_root).map_err(io)?;
         trusted_directory(&state_root)?;
         let hooks = state_root.join("git-empty-hooks");
@@ -322,6 +327,16 @@ impl GitDriver {
 
     /// Resolve only from an explicit trusted main checkout (or bare repository).
     /// Linked gitdir authority is read from the main registration, never .git.
+    /// The repository holding `path`, through a driver on this process's
+    /// fgOS state root; `None` outside a repository. Trust is discovered on
+    /// disk from `path` itself, as for a cwd.
+    pub fn open_at(path: &Path) -> Result<Option<(Self, RepoHandle)>> {
+        let driver = Self::new(&fgos_holder_lock::state_root::state_root().0)?;
+        Ok(match driver.resolve_repo(path, path)? {
+            ResolveRepo::Repository(repo) => Some((driver, repo)),
+            ResolveRepo::NotARepository => None,
+        })
+    }
     pub fn resolve_repo(&self, path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
         self.require_floor()?;
         let mut repo = match self.resolve_topology(path, trusted_main)? {
