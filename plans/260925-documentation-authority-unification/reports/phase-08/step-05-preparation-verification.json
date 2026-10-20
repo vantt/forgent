@@ -1,0 +1,137 @@
+{
+  "inputHEAD": "3d599d4498b22842399b0fe59b4e88d1ffcfd0df",
+  "scope": {
+    "changedAndUntrackedPaths": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-65-binding-check.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-65-merge-rebindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-65-ratchet-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-65-ratchet.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-65-step3-deferred-rebinds.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-65-step4-checker.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-65-step4-witness-diagnostic.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-62-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-authoring-batches.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-authoring-request.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-dynamic-carries.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-gateway-file-parity.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-parity-receipt-template.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-population-dynamic.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-population-files.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-population-references.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-population-summary.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-preparation.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-prior-disposition-joins.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proof-tests.log",
+      "scripts/check-legacy-docs-ratchet.exceptions.json"
+    ],
+    "outsideScope": [],
+    "gitWritesPerformed": false,
+    "cliBuildGatewayCargoRun": false,
+    "stateSecretsRead": false,
+    "ledgerChanged": false,
+    "newBytecode": false
+  },
+  "proofs": [
+    {
+      "command": "node scripts/check-legacy-docs-ratchet.mjs",
+      "exit": 0,
+      "log": "step-00-l12-65-ratchet.log",
+      "logSha256": "6cbeaa998a4dbca53e4c04e411d654cc715ca13d8113f9bf80dda70669bb5ab2"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "exit": 0,
+      "tests": 28,
+      "pass": 28,
+      "log": "step-00-l12-65-ratchet-tests.log",
+      "logSha256": "040a7264253e3bfa49fd7f5127c6236dc226587ebb933ffa30a2889ba50e2fae"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-04-check.py",
+      "exit": 1,
+      "slots": 890,
+      "failures": 18,
+      "log": "step-00-l12-65-step4-checker.log",
+      "diagnostic": "step-00-l12-65-step4-witness-diagnostic.json",
+      "logSha256": "984dd3b545373ac6947c294d01bea9672a4409a4021d69c7a50f6c1bd4bb7ffb"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/docs/rul11-anchor-phrase.test.mjs test/docs/decisions-corpus-retired.test.mjs test/setup/instruction-registry.test.mjs test/scripts/check-decision-citation-drift.test.mjs",
+      "exit": 0,
+      "tests": 84,
+      "pass": 84,
+      "log": "step-05-proof-tests.log",
+      "logSha256": "7303060f3670480768468062f86ee8463de45f65d1bf870277a89ab92ce5789c"
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    }
+  ],
+  "frozenB": [
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "expectedGitBlob": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "actualGitBlob": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "sha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "unchangedFromInput": true
+    },
+    {
+      "path": "scripts/doc-inventory-artifact.mjs",
+      "expectedGitBlob": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "actualGitBlob": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "sha256": "13c6868d7529320f20d35a9b769b84189bfcd595ed5361bcc26ca7da2266d166",
+      "unchangedFromInput": true
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "expectedGitBlob": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "actualGitBlob": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "unchangedFromInput": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "expectedGitBlob": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "actualGitBlob": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "sha256": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
+      "unchangedFromInput": true
+    },
+    {
+      "path": "scripts/lib/is-main-module.mjs",
+      "expectedGitBlob": "680570946fa1381474900c9192795514b5b88f48",
+      "actualGitBlob": "680570946fa1381474900c9192795514b5b88f48",
+      "sha256": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
+      "unchangedFromInput": true
+    }
+  ],
+  "populationChecks": {
+    "allFrozenInputHashesMatch": true,
+    "allCensusReferenceOriginIdsAccounted": true,
+    "censusOriginCount": 5207,
+    "exclusionOrigins": 227,
+    "dynamicSites": 39861,
+    "filesOrLocators": 1447,
+    "references": 5311,
+    "admissionParts": 29,
+    "partLimitsVerified": true
+  },
+  "acceptance": "Preparation only. Step 4 replay red retained with diagnosis; no independent review or cutover readiness claimed. Lead owns final-pin reconciliation, sizing, bounded exports and L12-11 real-commit accounting.",
+  "needsWrites": [],
+  "authoredArtifactHashes": {
+    "step-05-parity-receipt-template.json": "7f0175977990009aaf1cea063c08a4815823122d606555486fb901377fe6f69c",
+    "step-05-population-files.jsonl": "da01325a2667d0686ebeea0bc6f6e1ce7e9e04f7f6229082ed141ba24214e86b",
+    "step-05-gateway-file-parity.json": "064fd1a77694d06c538db8bd46aa26544c23151554d747eb51c16a2f80cd9836",
+    "step-05-authoring-request.md": "6aa2c19a2791d71a2cc05a27f379b08a145809a784d1525f87b560154f0b831b",
+    "step-05-population-summary.json": "fdb52dd133653e80b88c9e4527f9589e199ba41d65749f2aac925ef6b0fd8f09",
+    "step-05-dynamic-carries.jsonl": "102c8a6dd1e8b0b250942aaff83a4ba2bcf9a95ff4dc7e6bbdae7cc3ce1b1d90",
+    "step-05-prior-disposition-joins.jsonl": "0a559179c1bed3ffad9aa6c41b6599581e1219d6ca94a9b4475beafea03b24fd",
+    "step-05-preparation.md": "a69dba5f4de125f5ccfb1478c016a388d49e394d4a9c471a3d80109803b6cf2a",
+    "step-05-authoring-batches.json": "189cf36e4711e88b2355cb27e722a7a3710068402c848e7961540763f2c850e9",
+    "step-05-population-references.jsonl": "1895eb68d1f90780c0908eba594a7dce3484d2e134bdca4416ef6cac699da26c",
+    "step-05-population-dynamic.jsonl": "189faef97e5c8b03a7af3f302c31d909501fcad48d4f8cfbb6702e773f7a76fc",
+    "step-05-proof-tests.log": "7303060f3670480768468062f86ee8463de45f65d1bf870277a89ab92ce5789c"
+  }
+}

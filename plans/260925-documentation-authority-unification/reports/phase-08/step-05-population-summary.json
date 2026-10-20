@@ -1,0 +1,284 @@
+{
+  "inputHEAD": "3d599d4498b22842399b0fe59b4e88d1ffcfd0df",
+  "inputs": {
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-census-class4.json": {
+      "sha256": "51c1701eafb40e09329d9c096f1a757c836663757dee8ecc7877e459dafca62c",
+      "bytes": 3593211
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-census-class5.json": {
+      "sha256": "524ef04e9cd4e3f841782b9d9d55402b5f151ad89f7bceca75fa842ac93b01ab",
+      "bytes": 3737958
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-census-class6.json": {
+      "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+      "bytes": 1676362
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-001.jsonl": {
+      "sha256": "24ba907fe73623624c3e218122b37905a29b1db436d08510dce3eb2c9ff8d8f6",
+      "bytes": 263270
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-002.jsonl": {
+      "sha256": "1485d12f7b332207b8cdc5de2662cc2be2bdcb1c62ae097c1378a63cfb36edf6",
+      "bytes": 261381
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-003.jsonl": {
+      "sha256": "ccee87f6d3e83529c6c8dc805a9da0ca02214e020036a69c01592343f7e98576",
+      "bytes": 212187
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-004.jsonl": {
+      "sha256": "b2fc405e8751975df256f67fc90473395bb14d8f7c8f77ec4865050c4430d0c6",
+      "bytes": 197001
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-005.jsonl": {
+      "sha256": "c546c3e1b993b744d34bc3901e3e369a44eaaaaa11c5c3beb6482ad2fa970950",
+      "bytes": 243978
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-006.jsonl": {
+      "sha256": "4f7b8d84db037d678cca418e794b45a5a22777f21c88fb2185264d9d64ee614a",
+      "bytes": 195184
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-007.jsonl": {
+      "sha256": "f888a3be1c062281bbe29237821c5aa9d98c3cd25566a607afd9ac227d38cb38",
+      "bytes": 29511
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-008.jsonl": {
+      "sha256": "669a1a73bf247d0decbc19377992fc38f3f98f8b930e139c11f157b7d3a11e14",
+      "bytes": 151312
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl": {
+      "sha256": "b5e24f379832e11c2a78c30d4f51c4c86e28ffc72a4b07fa4dc9922d27163595",
+      "bytes": 329124
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl": {
+      "sha256": "c2306c0d9e0e01f5202313fd580a3af773b4bfde18488479d34552c40c68c806",
+      "bytes": 223059
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl": {
+      "sha256": "c27e0513b52272cf6c48a673ad1a47bb16b9f7c45de89c73c44b0276ef868d7a",
+      "bytes": 17988
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl": {
+      "sha256": "e07b42465c04a96889e6164809b04e4c8c8d9dad97ed8f74d3dddd36d65574e6",
+      "bytes": 174907
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-013.jsonl": {
+      "sha256": "f032dbc1ca03c1207def1f01310897ff4f750f8fa036011371a59ca663ef4dbc",
+      "bytes": 7979
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-014.jsonl": {
+      "sha256": "465cb2fe5d6f7a756b7fb403f4328ef275c1ae41d12f848bdad8be95482f49a3",
+      "bytes": 3716
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-015.jsonl": {
+      "sha256": "c030b71e0e61c5ee7087faacbf665cc334732c93183b6f0a0208fcceacdf8868",
+      "bytes": 65069
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-016.jsonl": {
+      "sha256": "8e53590ff7ac458efbb05db09c3da93b1fba6bd25c091ea088a31105a1fd64a0",
+      "bytes": 11350
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl": {
+      "sha256": "7cea00369d345590c5d553c87b3ceb01830156dd1184cc0b4f4dd3fe0d0e4d46",
+      "bytes": 11743
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-018.jsonl": {
+      "sha256": "be8adcd27f4bafd90546f15e3c0b25a8a99f30ec1fca284c579d9aaca730132f",
+      "bytes": 50071
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-019.jsonl": {
+      "sha256": "ab2c310c1b9a3a782f38708ca5f0f97adb7e18ec09687d9984e356b3c2ca56df",
+      "bytes": 67527
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-020.jsonl": {
+      "sha256": "634d48697b13d07a54f997ad70efb6cddd1ed15aa84684bc55c911215efdbd83",
+      "bytes": 37418
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-021.jsonl": {
+      "sha256": "2f5397e9cbf25b92564f9f833b709fd129e36f87d710a0cf1cc210d24be19aaf",
+      "bytes": 3619
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-022.jsonl": {
+      "sha256": "b2e978ba1068058e01e70ad0bc28bd0104f54751cae3939896597a8cfe0a6bfe",
+      "bytes": 44127
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl": {
+      "sha256": "3aefeffb37b1998f3562fdea144f977a4731d5b8d9cd711a87f2df1cfc7cd4a5",
+      "bytes": 135144
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl": {
+      "sha256": "f2019c8c639cb0bd084ceff6818331585d707a905bad6290d8e5e59fb79318ae",
+      "bytes": 98732
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl": {
+      "sha256": "e3261e5a51433859c5a708fd4f44163508d5071b1f4fffa0e601a95cf79a42a3",
+      "bytes": 155737
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl": {
+      "sha256": "7ce1e1492a1cb49d7d6f08c30ead076acb9f6c3f3dd0d6f9878d25347544f20e",
+      "bytes": 281961
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl": {
+      "sha256": "d730d2a10aa4ea25306e150dc0e10c4fe8a4ed4cb9eb79f934af15cc4d7c829e",
+      "bytes": 88749
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-028.jsonl": {
+      "sha256": "2f462c2d4f995f5a783848f8ef036869b3b7a490904bc0f6f9723a542ce5c076",
+      "bytes": 10424
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-029.jsonl": {
+      "sha256": "33b2d4275c3cf88c14fe9a41c25fb7a68cf31efaf843d97ded9a80da4d58c5a4",
+      "bytes": 38568
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl": {
+      "sha256": "18c7ea325e63013486aea44715ed2343d1a6709fcba76eba63e7be86a70ca780",
+      "bytes": 449125
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-031.jsonl": {
+      "sha256": "d8ee868a7739ae2e8f35d64a70d2f8b09f10e01f825346efa96478386651a726",
+      "bytes": 91522
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-032.jsonl": {
+      "sha256": "224c53823833a7009147b78d8156cdf7f30cb3b999167703c0da815d2799dd8f",
+      "bytes": 12317
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl": {
+      "sha256": "1913641afd8abaf6c1cbced610c90d8344fae66e2c2a3e87b43d544b17db4b7c",
+      "bytes": 21528
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-dynamic-unresolved.json": {
+      "sha256": "3f7b71b8db9047803f801c77df24e0cb3c4c8f9a2f1b5bfb4862a9dd7e701ac6",
+      "bytes": 12566
+    },
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-dynamic-unresolved.json": {
+      "sha256": "ac7f5e377f7fb0ae12982e894a586bb6fbb6641e0adc8fad92648e4b2f0d033e",
+      "bytes": 86366
+    }
+  },
+  "sourceClassCounts": {
+    "4": {
+      "dynamicConstructions": 3542,
+      "dynamicFiles": 176,
+      "edgeFiles": 122,
+      "edges": 3334,
+      "files": 225
+    },
+    "5": {
+      "dynamicConstructions": 25339,
+      "dynamicFiles": 696,
+      "edgeFiles": 149,
+      "edges": 1379,
+      "files": 712
+    },
+    "6": {
+      "dynamicConstructions": 10980,
+      "dynamicFiles": 468,
+      "edgeFiles": 118,
+      "edges": 494,
+      "files": 490
+    }
+  },
+  "deduplication": "literal identity=(file, physical spans, matched expression); class origins retained. Exclusions join inventory/id/file, unjoined entries retained. Dynamic identity=(file, first six call-site columns); role hints/origins retained. File union includes zero-literal-hit dynamic-only files, all carry files, and explicit owner carries. Classes and seam routing are advisory, not semantic acceptance. Historical dynamic carry rows retained separately without alias-based coalescing.",
+  "files": 1447,
+  "references": 5311,
+  "rawStepFourExclusions": 227,
+  "exclusionsAccounted": 227,
+  "dynamicSites": 39861,
+  "dynamicCarryRows": 201,
+  "seams": [
+    {
+      "seam": "gateway-contract",
+      "primaryFiles": 2,
+      "filesIncludingCrossSeamSites": 2,
+      "references": 40,
+      "excludedJoins": 18,
+      "dynamicSupersetSites": 129,
+      "untracedWriterOrDefaultHints": 62,
+      "legacyDynamicCarries": 1,
+      "blockingRule": "Every untraced site in this seam needs trace/reject-as-unrelated evidence before the dependent rewrite. Role hints do not waive sites; writers/defaults get mandatory destination/alias proof. No other seam is blocked solely by this queue."
+    },
+    {
+      "seam": "cli-help-messages",
+      "primaryFiles": 2,
+      "filesIncludingCrossSeamSites": 3,
+      "references": 31,
+      "excludedJoins": 35,
+      "dynamicSupersetSites": 70,
+      "untracedWriterOrDefaultHints": 24,
+      "legacyDynamicCarries": 0,
+      "blockingRule": "Every untraced site in this seam needs trace/reject-as-unrelated evidence before the dependent rewrite. Role hints do not waive sites; writers/defaults get mandatory destination/alias proof. No other seam is blocked solely by this queue."
+    },
+    {
+      "seam": "setup-doctor-roots",
+      "primaryFiles": 26,
+      "filesIncludingCrossSeamSites": 26,
+      "references": 69,
+      "excludedJoins": 0,
+      "dynamicSupersetSites": 1818,
+      "untracedWriterOrDefaultHints": 688,
+      "legacyDynamicCarries": 7,
+      "blockingRule": "Every untraced site in this seam needs trace/reject-as-unrelated evidence before the dependent rewrite. Role hints do not waive sites; writers/defaults get mandatory destination/alias proof. No other seam is blocked solely by this queue."
+    },
+    {
+      "seam": "generators-projections",
+      "primaryFiles": 227,
+      "filesIncludingCrossSeamSites": 227,
+      "references": 368,
+      "excludedJoins": 59,
+      "dynamicSupersetSites": 3622,
+      "untracedWriterOrDefaultHints": 1475,
+      "legacyDynamicCarries": 137,
+      "blockingRule": "Every untraced site in this seam needs trace/reject-as-unrelated evidence before the dependent rewrite. Role hints do not waive sites; writers/defaults get mandatory destination/alias proof. No other seam is blocked solely by this queue."
+    },
+    {
+      "seam": "real-file-tests-goldens",
+      "primaryFiles": 704,
+      "filesIncludingCrossSeamSites": 704,
+      "references": 1203,
+      "excludedJoins": 0,
+      "dynamicSupersetSites": 25007,
+      "untracedWriterOrDefaultHints": 0,
+      "legacyDynamicCarries": 3,
+      "blockingRule": "Every untraced site in this seam needs trace/reject-as-unrelated evidence before the dependent rewrite. Role hints do not waive sites; writers/defaults get mandatory destination/alias proof. No other seam is blocked solely by this queue."
+    },
+    {
+      "seam": "ui-spec-compiler",
+      "primaryFiles": 25,
+      "filesIncludingCrossSeamSites": 25,
+      "references": 33,
+      "excludedJoins": 0,
+      "dynamicSupersetSites": 381,
+      "untracedWriterOrDefaultHints": 114,
+      "legacyDynamicCarries": 21,
+      "blockingRule": "Every untraced site in this seam needs trace/reject-as-unrelated evidence before the dependent rewrite. Role hints do not waive sites; writers/defaults get mandatory destination/alias proof. No other seam is blocked solely by this queue."
+    },
+    {
+      "seam": "citation-ratchet-roots",
+      "primaryFiles": 10,
+      "filesIncludingCrossSeamSites": 10,
+      "references": 1280,
+      "excludedJoins": 2,
+      "dynamicSupersetSites": 468,
+      "untracedWriterOrDefaultHints": 55,
+      "legacyDynamicCarries": 7,
+      "blockingRule": "Every untraced site in this seam needs trace/reject-as-unrelated evidence before the dependent rewrite. Role hints do not waive sites; writers/defaults get mandatory destination/alias proof. No other seam is blocked solely by this queue."
+    },
+    {
+      "seam": "runtime-defaults-dynamic",
+      "primaryFiles": 451,
+      "filesIncludingCrossSeamSites": 451,
+      "references": 2287,
+      "excludedJoins": 113,
+      "dynamicSupersetSites": 8366,
+      "untracedWriterOrDefaultHints": 4033,
+      "legacyDynamicCarries": 25,
+      "blockingRule": "Every untraced site in this seam needs trace/reject-as-unrelated evidence before the dependent rewrite. Role hints do not waive sites; writers/defaults get mandatory destination/alias proof. No other seam is blocked solely by this queue."
+    }
+  ],
+  "admissionParts": 29,
+  "notClaimed": [
+    "live state/external writer target population",
+    "all superset calls are behavioral dependencies",
+    "cutover-ready or independent acceptance",
+    "implementation parity beyond gateway file comparison"
+  ]
+}

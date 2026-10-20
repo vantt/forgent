@@ -1,0 +1,496 @@
+{
+  "inputHEAD": "3d599d4498b22842399b0fe59b4e88d1ffcfd0df",
+  "checkerExit": 1,
+  "failureCount": 18,
+  "witnessMismatches": [
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+      "file": "AGENTS.md",
+      "edgeId": "instructions-006",
+      "legacyPath": "docs/decisions/index.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 22,
+          "actual": 23
+        },
+        "historyCommitsSha256": {
+          "recorded": "2a0bdc6404b93d6aeafe1193f421fbae70c70097e7bfe723a4d3f5ffa2bf8956",
+          "actual": "de424727803d2d4c39801d570f43e54ff7c1aaed6d81a216712d0618f6e42dc0"
+        },
+        "historySample": {
+          "recorded": [
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8",
+            "f5974ff0d99bd3a1ff0a95a03c43861a48978368"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
+      "file": "bin/fgos.mjs",
+      "edgeId": "class6-l-000095",
+      "legacyPath": "docs/decisions/index.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 22,
+          "actual": 23
+        },
+        "historyCommitsSha256": {
+          "recorded": "2a0bdc6404b93d6aeafe1193f421fbae70c70097e7bfe723a4d3f5ffa2bf8956",
+          "actual": "de424727803d2d4c39801d570f43e54ff7c1aaed6d81a216712d0618f6e42dc0"
+        },
+        "historySample": {
+          "recorded": [
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8",
+            "f5974ff0d99bd3a1ff0a95a03c43861a48978368"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
+      "file": "bin/fgos.mjs",
+      "edgeId": "class6-l-000097",
+      "legacyPath": "docs/decisions/index.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 22,
+          "actual": 23
+        },
+        "historyCommitsSha256": {
+          "recorded": "2a0bdc6404b93d6aeafe1193f421fbae70c70097e7bfe723a4d3f5ffa2bf8956",
+          "actual": "de424727803d2d4c39801d570f43e54ff7c1aaed6d81a216712d0618f6e42dc0"
+        },
+        "historySample": {
+          "recorded": [
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8",
+            "f5974ff0d99bd3a1ff0a95a03c43861a48978368"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-015.jsonl",
+      "file": "src/intake/plan.mjs",
+      "edgeId": "class6-l-000244",
+      "legacyPath": "docs/decisions",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 77,
+          "actual": 78
+        },
+        "historyCommitsSha256": {
+          "recorded": "e917be66344f89341f38351b32cb960e3e7a114a7e36a4391466bf9adfcf1ade",
+          "actual": "d63f059a32be8f31b80be4ed27f370295b98bccbf0c23103145e94ed8fd61ab2"
+        },
+        "historySample": {
+          "recorded": [
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8",
+            "f5974ff0d99bd3a1ff0a95a03c43861a48978368"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+      "file": "CHANGELOG.md",
+      "edgeId": null,
+      "legacyPath": "docs/decisions/index.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 22,
+          "actual": 23
+        },
+        "historyCommitsSha256": {
+          "recorded": "2a0bdc6404b93d6aeafe1193f421fbae70c70097e7bfe723a4d3f5ffa2bf8956",
+          "actual": "de424727803d2d4c39801d570f43e54ff7c1aaed6d81a216712d0618f6e42dc0"
+        },
+        "historySample": {
+          "recorded": [
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8",
+            "f5974ff0d99bd3a1ff0a95a03c43861a48978368"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-021.jsonl",
+      "file": "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs",
+      "edgeId": "class6-l-000204",
+      "legacyPath": "docs/decisions/",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 77,
+          "actual": 78
+        },
+        "historyCommitsSha256": {
+          "recorded": "e917be66344f89341f38351b32cb960e3e7a114a7e36a4391466bf9adfcf1ade",
+          "actual": "d63f059a32be8f31b80be4ed27f370295b98bccbf0c23103145e94ed8fd61ab2"
+        },
+        "historySample": {
+          "recorded": [
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8",
+            "f5974ff0d99bd3a1ff0a95a03c43861a48978368"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+      "file": "src/runner/dispatch/config.mjs",
+      "edgeId": "class6-l-000261",
+      "legacyPath": "docs/specs/runner.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 361,
+          "actual": 362
+        },
+        "historyCommitsSha256": {
+          "recorded": "edabc17fc02562ac166860225bc7d780c65904a26090cc9d43f40bb09ad1ad68",
+          "actual": "776ed88d73822664ad5ef308f6cc1281b8683110a778aa0b47f7daa6269e10d9"
+        },
+        "historySample": {
+          "recorded": [
+            "964d2837d0c7e4e972c8499afd545e8f80e71dd7",
+            "bf56bdf1b43266cb37bd4244875be1402b435de6"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "964d2837d0c7e4e972c8499afd545e8f80e71dd7"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+      "file": "src/runner/merge.mjs",
+      "edgeId": "class6-l-000305",
+      "legacyPath": "docs/decisions/index.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 22,
+          "actual": 23
+        },
+        "historyCommitsSha256": {
+          "recorded": "2a0bdc6404b93d6aeafe1193f421fbae70c70097e7bfe723a4d3f5ffa2bf8956",
+          "actual": "de424727803d2d4c39801d570f43e54ff7c1aaed6d81a216712d0618f6e42dc0"
+        },
+        "historySample": {
+          "recorded": [
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8",
+            "f5974ff0d99bd3a1ff0a95a03c43861a48978368"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+      "file": "src/runner/merge.mjs",
+      "edgeId": "class6-l-000306",
+      "legacyPath": "docs/decisions/index.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 22,
+          "actual": 23
+        },
+        "historyCommitsSha256": {
+          "recorded": "2a0bdc6404b93d6aeafe1193f421fbae70c70097e7bfe723a4d3f5ffa2bf8956",
+          "actual": "de424727803d2d4c39801d570f43e54ff7c1aaed6d81a216712d0618f6e42dc0"
+        },
+        "historySample": {
+          "recorded": [
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8",
+            "f5974ff0d99bd3a1ff0a95a03c43861a48978368"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+      "file": "src/runner/merge.mjs",
+      "edgeId": "class6-l-000308",
+      "legacyPath": "docs/decisions/index.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 22,
+          "actual": 23
+        },
+        "historyCommitsSha256": {
+          "recorded": "2a0bdc6404b93d6aeafe1193f421fbae70c70097e7bfe723a4d3f5ffa2bf8956",
+          "actual": "de424727803d2d4c39801d570f43e54ff7c1aaed6d81a216712d0618f6e42dc0"
+        },
+        "historySample": {
+          "recorded": [
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8",
+            "f5974ff0d99bd3a1ff0a95a03c43861a48978368"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl",
+      "file": "src/state/store.mjs",
+      "edgeId": "class6-l-000462",
+      "legacyPath": "docs/decisions/index.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 22,
+          "actual": 23
+        },
+        "historyCommitsSha256": {
+          "recorded": "2a0bdc6404b93d6aeafe1193f421fbae70c70097e7bfe723a4d3f5ffa2bf8956",
+          "actual": "de424727803d2d4c39801d570f43e54ff7c1aaed6d81a216712d0618f6e42dc0"
+        },
+        "historySample": {
+          "recorded": [
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8",
+            "f5974ff0d99bd3a1ff0a95a03c43861a48978368"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "8b810140f9bac9a51c14a67d0c1681fe873b6bf8"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
+      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "edgeId": null,
+      "legacyPath": "docs/specs/workflow.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 7,
+          "actual": 8
+        },
+        "historyCommitsSha256": {
+          "recorded": "66a201deff51d077e75bb6053732acde90cc2d20c1da98a5ae441a4b301515a3",
+          "actual": "4da1b1f05bbf84a4e31aa2ee1f997adeb1a074235c21e6c0b77ad2861d135f53"
+        },
+        "historySample": {
+          "recorded": [
+            "4a07c6bb865b66e4b85b893e0a0a683d6aae4537",
+            "a94115474f9ebfc9551849def2880b9c3c50a103"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "4a07c6bb865b66e4b85b893e0a0a683d6aae4537"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
+      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "edgeId": null,
+      "legacyPath": "docs/specs/runner.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 361,
+          "actual": 362
+        },
+        "historyCommitsSha256": {
+          "recorded": "edabc17fc02562ac166860225bc7d780c65904a26090cc9d43f40bb09ad1ad68",
+          "actual": "776ed88d73822664ad5ef308f6cc1281b8683110a778aa0b47f7daa6269e10d9"
+        },
+        "historySample": {
+          "recorded": [
+            "964d2837d0c7e4e972c8499afd545e8f80e71dd7",
+            "bf56bdf1b43266cb37bd4244875be1402b435de6"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "964d2837d0c7e4e972c8499afd545e8f80e71dd7"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
+      "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+      "edgeId": null,
+      "legacyPath": "docs/specs/runner.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 361,
+          "actual": 362
+        },
+        "historyCommitsSha256": {
+          "recorded": "edabc17fc02562ac166860225bc7d780c65904a26090cc9d43f40bb09ad1ad68",
+          "actual": "776ed88d73822664ad5ef308f6cc1281b8683110a778aa0b47f7daa6269e10d9"
+        },
+        "historySample": {
+          "recorded": [
+            "964d2837d0c7e4e972c8499afd545e8f80e71dd7",
+            "bf56bdf1b43266cb37bd4244875be1402b435de6"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "964d2837d0c7e4e972c8499afd545e8f80e71dd7"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
+      "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+      "edgeId": null,
+      "legacyPath": "docs/specs/runner.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 361,
+          "actual": 362
+        },
+        "historyCommitsSha256": {
+          "recorded": "edabc17fc02562ac166860225bc7d780c65904a26090cc9d43f40bb09ad1ad68",
+          "actual": "776ed88d73822664ad5ef308f6cc1281b8683110a778aa0b47f7daa6269e10d9"
+        },
+        "historySample": {
+          "recorded": [
+            "964d2837d0c7e4e972c8499afd545e8f80e71dd7",
+            "bf56bdf1b43266cb37bd4244875be1402b435de6"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "964d2837d0c7e4e972c8499afd545e8f80e71dd7"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
+      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "edgeId": null,
+      "legacyPath": "docs/specs/workflow.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 7,
+          "actual": 8
+        },
+        "historyCommitsSha256": {
+          "recorded": "66a201deff51d077e75bb6053732acde90cc2d20c1da98a5ae441a4b301515a3",
+          "actual": "4da1b1f05bbf84a4e31aa2ee1f997adeb1a074235c21e6c0b77ad2861d135f53"
+        },
+        "historySample": {
+          "recorded": [
+            "4a07c6bb865b66e4b85b893e0a0a683d6aae4537",
+            "a94115474f9ebfc9551849def2880b9c3c50a103"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "4a07c6bb865b66e4b85b893e0a0a683d6aae4537"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
+      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "edgeId": null,
+      "legacyPath": "docs/specs/runner.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 361,
+          "actual": 362
+        },
+        "historyCommitsSha256": {
+          "recorded": "edabc17fc02562ac166860225bc7d780c65904a26090cc9d43f40bb09ad1ad68",
+          "actual": "776ed88d73822664ad5ef308f6cc1281b8683110a778aa0b47f7daa6269e10d9"
+        },
+        "historySample": {
+          "recorded": [
+            "964d2837d0c7e4e972c8499afd545e8f80e71dd7",
+            "bf56bdf1b43266cb37bd4244875be1402b435de6"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "964d2837d0c7e4e972c8499afd545e8f80e71dd7"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
+      "file": "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md",
+      "edgeId": null,
+      "legacyPath": "docs/specs/workflow.md",
+      "changedFields": {
+        "historyCommitCount": {
+          "recorded": 7,
+          "actual": 8
+        },
+        "historyCommitsSha256": {
+          "recorded": "66a201deff51d077e75bb6053732acde90cc2d20c1da98a5ae441a4b301515a3",
+          "actual": "4da1b1f05bbf84a4e31aa2ee1f997adeb1a074235c21e6c0b77ad2861d135f53"
+        },
+        "historySample": {
+          "recorded": [
+            "4a07c6bb865b66e4b85b893e0a0a683d6aae4537",
+            "a94115474f9ebfc9551849def2880b9c3c50a103"
+          ],
+          "actual": [
+            "e0e52312a6d243130598fae7dc3b71a2c5897926",
+            "4a07c6bb865b66e4b85b893e0a0a683d6aae4537"
+          ]
+        }
+      },
+      "treeAndStateEqual": true
+    }
+  ],
+  "allTreeAndStateEqual": true,
+  "cause": "Unchanged existence() runs git log --all independently of its pinned tree. Historical commit count/digest/sample are ref-sensitive; these recorded witnesses differ in the present ref universe. No consumer or Step 4 record has been modified. No green acceptance claimed.",
+  "nextAction": "Lead independently reconcile current all-ref history witnesses at Step 7 final pin or authorize a records-only refresh with review; checker/gates/baselines remain unchanged."
+}

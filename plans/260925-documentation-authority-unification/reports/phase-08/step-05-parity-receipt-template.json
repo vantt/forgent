@@ -1,0 +1,251 @@
+{
+  "kind": "TEMPLATE ONLY — no acceptance, no passing proof implied",
+  "version": 1,
+  "receipt": {
+    "id": "<seam-id + bounded family>",
+    "seam": "<one of seamTemplates>",
+    "inputCommit": "<full commit>",
+    "currentInputs": [
+      {
+        "path": "<file/export>",
+        "sha256": "<hash>",
+        "bytes": "<int>",
+        "mode": "<git mode>",
+        "provenance": "<source/fixture/export pin>"
+      }
+    ],
+    "candidateInputs": [],
+    "comparison": {
+      "currentOutputSet": [],
+      "candidateOutputSet": [],
+      "normalization": "<explicit and justified; raw hashes remain>",
+      "comparedFields": [],
+      "intentionalDeltas": [],
+      "unexpectedDeltas": []
+    },
+    "proofs": [
+      {
+        "command": "<existing exact target or missing>",
+        "owningBehavior": "<plain description>",
+        "exit": null,
+        "logPath": null,
+        "logSha256": null,
+        "status": "not-run"
+      }
+    ],
+    "blockedBy": [],
+    "readiness": "pending",
+    "review": {
+      "status": "pending",
+      "reviewer": null,
+      "report": null
+    }
+  },
+  "fileRecord": {
+    "file": "<repo-relative>",
+    "authorInputCommit": "<full pin>",
+    "sourceSha256": "<digest>",
+    "sourceMode": "<git mode>",
+    "censusOrigins": [],
+    "priorRecordRefs": [],
+    "seamIds": [],
+    "wholeFileRead": false,
+    "references": [
+      {
+        "inventory": "<inventory path>",
+        "edgeId": "<original id>",
+        "inputCommit": "<original pin>",
+        "slotKey": null,
+        "sourceSpans": [],
+        "matchedExpression": "<complete reference>",
+        "passage": "<full context>",
+        "role": "untraced",
+        "disposition": "parked",
+        "reason": "<own passage evidence>",
+        "target": null,
+        "anchor": null,
+        "timing": "phase9",
+        "diffHunk": null,
+        "blockedCategory": "step5-parity",
+        "blockedReason": "<specific missing proof>",
+        "dependency": "<own seam blocker>",
+        "dependencyCategory": "step5-parity",
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": null,
+          "destinationIsAlias": null,
+          "evidence": null
+        }
+      }
+    ],
+    "dynamicTraces": [
+      {
+        "originalTuple": [],
+        "inventoryOrigins": [],
+        "caller": "<symbol/call-chain>",
+        "inputs": [],
+        "role": "untraced",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "blockedSeams": []
+      }
+    ],
+    "diff": null,
+    "coCutPaths": [],
+    "receiptIds": [],
+    "protectedPins": {},
+    "parked": [],
+    "review": {
+      "status": "pending"
+    }
+  },
+  "cutoverPatch": {
+    "inputCommit": "<pin>",
+    "file": "<owner path>",
+    "sourceSha256": "<hash>",
+    "mode": "<git mode>",
+    "symbolOrPassage": "<actual owner>",
+    "oldText": "<complete text>",
+    "newText": "<complete replacement>",
+    "sourceSpans": [],
+    "diff": "<applicable unified diff>",
+    "expectedAfterSha256": "<hash>",
+    "targetOwner": "<conserved claim holder>",
+    "claimAnchorProof": {},
+    "receiptId": "<reviewed receipt>",
+    "coCutPaths": [],
+    "expectedOutputSets": [],
+    "testTargets": [],
+    "intentionalBehaviorDeltas": [],
+    "prerequisites": [],
+    "order": "<atomic packet ordering>",
+    "rollbackDiff": "<exact reverse patch>",
+    "timing": "phase9",
+    "readiness": "pending"
+  },
+  "seamTemplates": {
+    "gateway-contract": {
+      "requiredComparisons": [
+        "raw response bytes",
+        "parsed whole OpenAPI",
+        "method/path/operationId sets",
+        "schema keys and bodies",
+        "200 application/yaml",
+        "500 JSON ErrorEnvelope on missing/unreadable/invalid UTF-8",
+        "path-dependent diagnostic delta",
+        "no-token access",
+        "fresh read",
+        "MCP search/error parity"
+      ],
+      "current": null,
+      "candidate": null,
+      "existingProofTargets": "See per-seam table in step-05-authoring-request.md; missing remains missing",
+      "missingProofs": [],
+      "readiness": "pending"
+    },
+    "cli-help-messages": {
+      "requiredComparisons": [
+        "exact stdout/stderr strings",
+        "JSON help values/schema",
+        "selectors/exits",
+        "all runtime-emitted/refusal messages",
+        "explicit diagnostic path deltas"
+      ],
+      "current": null,
+      "candidate": null,
+      "existingProofTargets": "See per-seam table in step-05-authoring-request.md; missing remains missing",
+      "missingProofs": [],
+      "readiness": "pending"
+    },
+    "setup-doctor-roots": {
+      "requiredComparisons": [
+        "manifest owner/path sets",
+        "scan roots/file sets",
+        "check ids/severity/findings/fix intent",
+        "missing/empty-root/containment behavior",
+        "state-backed alias/currentPath/sourceCaptureIds populations"
+      ],
+      "current": null,
+      "candidate": null,
+      "existingProofTargets": "See per-seam table in step-05-authoring-request.md; missing remains missing",
+      "missingProofs": [],
+      "readiness": "pending"
+    },
+    "generators-projections": {
+      "requiredComparisons": [
+        "input source-state/export provenance",
+        "sorted output path/mode/bytes/hash sets",
+        "parsed docId/alias/sourceCaptureIds/authoritative_for sets",
+        "source data legacy strings",
+        "effective-set/managed-block consistency",
+        "second-run determinism",
+        "empty-state overwrite refusal"
+      ],
+      "current": null,
+      "candidate": null,
+      "existingProofTargets": "See per-seam table in step-05-authoring-request.md; missing remains missing",
+      "missingProofs": [],
+      "readiness": "pending"
+    },
+    "real-file-tests-goldens": {
+      "requiredComparisons": [
+        "exact conserved claim/assertion mapping",
+        "real-file read set",
+        "whole worker prompt bytes",
+        "golden/source co-edit",
+        "immutable fixture mode/hash/origin"
+      ],
+      "current": null,
+      "candidate": null,
+      "existingProofTargets": "See per-seam table in step-05-authoring-request.md; missing remains missing",
+      "missingProofs": [],
+      "readiness": "pending"
+    },
+    "ui-spec-compiler": {
+      "requiredComparisons": [
+        "explicit root versus cwd discovery",
+        "10-level discovery bound",
+        "config/schema/surface roots",
+        "validation failure status/messages",
+        "extract/validate/build output sets",
+        "wireframe runtime proof"
+      ],
+      "current": null,
+      "candidate": null,
+      "existingProofTargets": "See per-seam table in step-05-authoring-request.md; missing remains missing",
+      "missingProofs": [],
+      "readiness": "pending"
+    },
+    "citation-ratchet-roots": {
+      "requiredComparisons": [
+        "default flags and documented command",
+        "exact recursive and wide scanned file sets",
+        "finding tuple/category/exit sets",
+        "post-deletion coverage",
+        "unchanged baselines"
+      ],
+      "current": null,
+      "candidate": null,
+      "existingProofTargets": "See per-seam table in step-05-authoring-request.md; missing remains missing",
+      "missingProofs": [],
+      "readiness": "pending"
+    },
+    "runtime-defaults-dynamic": {
+      "requiredComparisons": [
+        "every admitted caller-input-target construction",
+        "reader/writer/default roles",
+        "lookup-only aliases",
+        "concrete destination set or bounded rule",
+        "same bounded export provenance",
+        "read/write output set/mode/hash and refusal/error parity"
+      ],
+      "current": null,
+      "candidate": null,
+      "existingProofTargets": "See per-seam table in step-05-authoring-request.md; missing remains missing",
+      "missingProofs": [],
+      "readiness": "pending"
+    }
+  }
+}

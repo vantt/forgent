@@ -1,0 +1,295 @@
+{
+  "source": "YAML.parse; sorted operation method/path/id and components.schemas keys; canonical full parsed object and schema hashes",
+  "snapshots": [
+    {
+      "path": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "bytes": 34956,
+      "sha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "openapi": "3.1.0",
+      "info": {
+        "title": "fgOS Gateway API",
+        "version": "1.0.0",
+        "description": "HTTP+JSON surface of the fgOS interface daemon (tsk-7l9, decision 0014\n\"Kien truc giao tiep nguoi <-> fgOS\", model 3: core-library + thin\nadapters). Written before the daemon is implemented, per this\ncontract's own action: a stable spec for D9's future MCP search tool\nand any client (web dashboard, desktop) to build against, not\nreverse-engineered documentation of routes that already exist.\n\nScope, locked by 0014:\n  - The daemon is a CONSUMER of fgOS core, never a co-writer. Every\n    write in this API is a thin wrapper over `spawn fgos <verb>`\n    (CTR001/CTR002 one-door-write); every read is a wrapper over\n    `fgos list` / `fgos rollup` / `fgos show` plus the `data_hash`\n    cheap-poll field already on every envelope. This gateway invents\n    no new write path into `.fgos/`.\n  - The daemon becomes the one control-plane that can drive BOTH\n    interactive session workflows (what herdr/TUI panes do today via\n    `fgos session start/end`) and the headless runner\n    (`fgos-runner --once`) — see `/v1/sessions` and `/v1/runner/tick`.\n  - The attention/push channel (STR48, contract CTR008, status\n    `idea`) is explicitly OUT of scope for v1 — 0014 point 6 keeps it\n    a separate subsystem with its own delivery-semantics record.\n    Clients poll `data_hash` on read endpoints until CTR008 lands.\n  - Identity here is ATTRIBUTION, not authentication (same non-goal\n    CTR001 already states for the CLI's own `writer` field): every\n    route below other than `/contract` itself requires the shared\n    per-machine bearer token (D4, `securitySchemes.bearerAuth`) — that\n    token gates ACCESS to the gateway, not per-caller IDENTITY. Who a\n    caller claims to be beyond holding that one shared token is STR38,\n    explicitly out of scope of 0014 itself.\n\nEnvelope reuse: every successful response body is the SAME `fgos.v1`\nenvelope (CTR001) the CLI already emits on stdout — `{contract,\ngenerated_at, data_hash, data}` — carried unmodified inside the HTTP\nbody. This mirrors the precedent `fgos-runner.mjs` already set\n(str46-io-contract D6): reuse CTR001's envelope as the version token\nacross a new transport rather than minting a second, parallel one.\nHTTP status code + this envelope's `contract` field together answer\n\"did the call succeed\"; never branch on message text (docs/io-contract.md).\n",
+        "contact": {
+          "name": "fgOS",
+          "url": "https://github.com"
+        },
+        "x-decisions": [
+          "docs/decisions/0011-version-tuong-minh-cho-moi-contract.md",
+          "docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md"
+        ],
+        "x-specs": [
+          "docs/io-contract.md",
+          "docs/specs/work-state.md",
+          "docs/specs/runner.md"
+        ]
+      },
+      "operations": [
+        {
+          "path": "/contract",
+          "method": "get",
+          "operationId": "getContract"
+        },
+        {
+          "path": "/graph",
+          "method": "get",
+          "operationId": "workGraph"
+        },
+        {
+          "path": "/ready",
+          "method": "get",
+          "operationId": "listReady"
+        },
+        {
+          "path": "/rollup/{id}",
+          "method": "get",
+          "operationId": "rollupWork"
+        },
+        {
+          "path": "/runner/tick",
+          "method": "post",
+          "operationId": "runnerTick"
+        },
+        {
+          "path": "/sessions/{sessionId}/slots",
+          "method": "get",
+          "operationId": "sessionSlots"
+        },
+        {
+          "path": "/sessions/{sessionId}",
+          "method": "delete",
+          "operationId": "endSession"
+        },
+        {
+          "path": "/sessions",
+          "method": "post",
+          "operationId": "startSession"
+        },
+        {
+          "path": "/state/digest",
+          "method": "get",
+          "operationId": "stateDigest"
+        },
+        {
+          "path": "/work/{id}/answer",
+          "method": "post",
+          "operationId": "answerWork"
+        },
+        {
+          "path": "/work/{id}/approve",
+          "method": "post",
+          "operationId": "approveWork"
+        },
+        {
+          "path": "/work/{id}/ask",
+          "method": "post",
+          "operationId": "askWork"
+        },
+        {
+          "path": "/work/{id}/docs",
+          "method": "get",
+          "operationId": "getWorkDocs"
+        },
+        {
+          "path": "/work/{id}/move",
+          "method": "post",
+          "operationId": "moveWork"
+        },
+        {
+          "path": "/work/{id}/reject",
+          "method": "post",
+          "operationId": "rejectWork"
+        },
+        {
+          "path": "/work/{id}/return",
+          "method": "post",
+          "operationId": "returnWork"
+        },
+        {
+          "path": "/work/{id}/take",
+          "method": "post",
+          "operationId": "takeWork"
+        },
+        {
+          "path": "/work/{id}",
+          "method": "get",
+          "operationId": "showWork"
+        },
+        {
+          "path": "/work/{id}",
+          "method": "patch",
+          "operationId": "editWork"
+        },
+        {
+          "path": "/work",
+          "method": "get",
+          "operationId": "listWork"
+        },
+        {
+          "path": "/work",
+          "method": "post",
+          "operationId": "submitWork"
+        }
+      ],
+      "schemas": [
+        "EditableWorkFields",
+        "Envelope",
+        "ErrorEnvelope",
+        "Page",
+        "Session",
+        "WorkDetail",
+        "WorkItem"
+      ],
+      "parsedSha256": "374aa774575e11e714893d333591e7637d1c3a4b647475f7fc9845a74eb3af6c",
+      "schemaSha256": "d09e7807528172d193e669214ee393955a4ec2f8e50111c1869a511516206941"
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "bytes": 34956,
+      "sha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "openapi": "3.1.0",
+      "info": {
+        "title": "fgOS Gateway API",
+        "version": "1.0.0",
+        "description": "HTTP+JSON surface of the fgOS interface daemon (tsk-7l9, decision 0014\n\"Kien truc giao tiep nguoi <-> fgOS\", model 3: core-library + thin\nadapters). Written before the daemon is implemented, per this\ncontract's own action: a stable spec for D9's future MCP search tool\nand any client (web dashboard, desktop) to build against, not\nreverse-engineered documentation of routes that already exist.\n\nScope, locked by 0014:\n  - The daemon is a CONSUMER of fgOS core, never a co-writer. Every\n    write in this API is a thin wrapper over `spawn fgos <verb>`\n    (CTR001/CTR002 one-door-write); every read is a wrapper over\n    `fgos list` / `fgos rollup` / `fgos show` plus the `data_hash`\n    cheap-poll field already on every envelope. This gateway invents\n    no new write path into `.fgos/`.\n  - The daemon becomes the one control-plane that can drive BOTH\n    interactive session workflows (what herdr/TUI panes do today via\n    `fgos session start/end`) and the headless runner\n    (`fgos-runner --once`) — see `/v1/sessions` and `/v1/runner/tick`.\n  - The attention/push channel (STR48, contract CTR008, status\n    `idea`) is explicitly OUT of scope for v1 — 0014 point 6 keeps it\n    a separate subsystem with its own delivery-semantics record.\n    Clients poll `data_hash` on read endpoints until CTR008 lands.\n  - Identity here is ATTRIBUTION, not authentication (same non-goal\n    CTR001 already states for the CLI's own `writer` field): every\n    route below other than `/contract` itself requires the shared\n    per-machine bearer token (D4, `securitySchemes.bearerAuth`) — that\n    token gates ACCESS to the gateway, not per-caller IDENTITY. Who a\n    caller claims to be beyond holding that one shared token is STR38,\n    explicitly out of scope of 0014 itself.\n\nEnvelope reuse: every successful response body is the SAME `fgos.v1`\nenvelope (CTR001) the CLI already emits on stdout — `{contract,\ngenerated_at, data_hash, data}` — carried unmodified inside the HTTP\nbody. This mirrors the precedent `fgos-runner.mjs` already set\n(str46-io-contract D6): reuse CTR001's envelope as the version token\nacross a new transport rather than minting a second, parallel one.\nHTTP status code + this envelope's `contract` field together answer\n\"did the call succeed\"; never branch on message text (docs/io-contract.md).\n",
+        "contact": {
+          "name": "fgOS",
+          "url": "https://github.com"
+        },
+        "x-decisions": [
+          "docs/decisions/0011-version-tuong-minh-cho-moi-contract.md",
+          "docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md"
+        ],
+        "x-specs": [
+          "docs/io-contract.md",
+          "docs/specs/work-state.md",
+          "docs/specs/runner.md"
+        ]
+      },
+      "operations": [
+        {
+          "path": "/contract",
+          "method": "get",
+          "operationId": "getContract"
+        },
+        {
+          "path": "/graph",
+          "method": "get",
+          "operationId": "workGraph"
+        },
+        {
+          "path": "/ready",
+          "method": "get",
+          "operationId": "listReady"
+        },
+        {
+          "path": "/rollup/{id}",
+          "method": "get",
+          "operationId": "rollupWork"
+        },
+        {
+          "path": "/runner/tick",
+          "method": "post",
+          "operationId": "runnerTick"
+        },
+        {
+          "path": "/sessions/{sessionId}/slots",
+          "method": "get",
+          "operationId": "sessionSlots"
+        },
+        {
+          "path": "/sessions/{sessionId}",
+          "method": "delete",
+          "operationId": "endSession"
+        },
+        {
+          "path": "/sessions",
+          "method": "post",
+          "operationId": "startSession"
+        },
+        {
+          "path": "/state/digest",
+          "method": "get",
+          "operationId": "stateDigest"
+        },
+        {
+          "path": "/work/{id}/answer",
+          "method": "post",
+          "operationId": "answerWork"
+        },
+        {
+          "path": "/work/{id}/approve",
+          "method": "post",
+          "operationId": "approveWork"
+        },
+        {
+          "path": "/work/{id}/ask",
+          "method": "post",
+          "operationId": "askWork"
+        },
+        {
+          "path": "/work/{id}/docs",
+          "method": "get",
+          "operationId": "getWorkDocs"
+        },
+        {
+          "path": "/work/{id}/move",
+          "method": "post",
+          "operationId": "moveWork"
+        },
+        {
+          "path": "/work/{id}/reject",
+          "method": "post",
+          "operationId": "rejectWork"
+        },
+        {
+          "path": "/work/{id}/return",
+          "method": "post",
+          "operationId": "returnWork"
+        },
+        {
+          "path": "/work/{id}/take",
+          "method": "post",
+          "operationId": "takeWork"
+        },
+        {
+          "path": "/work/{id}",
+          "method": "get",
+          "operationId": "showWork"
+        },
+        {
+          "path": "/work/{id}",
+          "method": "patch",
+          "operationId": "editWork"
+        },
+        {
+          "path": "/work",
+          "method": "get",
+          "operationId": "listWork"
+        },
+        {
+          "path": "/work",
+          "method": "post",
+          "operationId": "submitWork"
+        }
+      ],
+      "schemas": [
+        "EditableWorkFields",
+        "Envelope",
+        "ErrorEnvelope",
+        "Page",
+        "Session",
+        "WorkDetail",
+        "WorkItem"
+      ],
+      "parsedSha256": "374aa774575e11e714893d333591e7637d1c3a4b647475f7fc9845a74eb3af6c",
+      "schemaSha256": "d09e7807528172d193e669214ee393955a4ec2f8e50111c1869a511516206941"
+    }
+  ],
+  "bytesEqual": true,
+  "operationsEqual": true,
+  "schemaNamesEqual": true,
+  "schemaBodiesEqual": true,
+  "parsedEqual": true,
+  "liveHttpProof": "not run; static handler inspection only; no gateway/cargo authorized"
+}

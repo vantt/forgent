@@ -40,60 +40,151 @@
   ],
   "files": 275,
   "consumerFiles": 331,
-  "edges": 933,
+  "edges": 890,
   "dispositions": {
-    "preserve": 655,
-    "patch": 61,
-    "render-join": 173,
-    "parked": 44
+    "preserve": 609,
+    "patch": 59,
+    "render-join": 177,
+    "parked": 45
   },
-  "failureCount": 0,
-  "failures": [],
+  "failureCount": 18,
+  "failures": [
+    {
+      "file": "AGENTS.md",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "src/intake/plan.mjs",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "CHANGELOG.md",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "src/runner/dispatch/config.mjs",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "src/state/store.mjs",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    },
+    {
+      "file": "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md",
+      "check": "preserved-tree-history",
+      "detail": "preserved path tree/history witness differs"
+    }
+  ],
   "openLeadRulingEdges": [],
   "checkerSha256": "f82220d82e6b9f3c6a92b5276e0dbe086bcaf296a91ceb99f5e8c6644b02301f",
   "reusedStep3Sha256": "20bbeca2b0b104df357de506e479062b589e6faa31164a80761deddc31578b2b",
   "recordFileHashes": {
-    "step04-001.jsonl": "03107a51a14666d3f413641237442cef8dcc2efebb574dfdd7d9aba4de43b4eb",
-    "step04-002.jsonl": "e0fc1ba4a5f3ee2caf35a1ebc23c7c35b7b4764e45bd014837829b261589dc4d",
+    "step04-001.jsonl": "24ba907fe73623624c3e218122b37905a29b1db436d08510dce3eb2c9ff8d8f6",
+    "step04-002.jsonl": "1485d12f7b332207b8cdc5de2662cc2be2bdcb1c62ae097c1378a63cfb36edf6",
     "step04-003.jsonl": "ccee87f6d3e83529c6c8dc805a9da0ca02214e020036a69c01592343f7e98576",
     "step04-004.jsonl": "b2fc405e8751975df256f67fc90473395bb14d8f7c8f77ec4865050c4430d0c6",
     "step04-005.jsonl": "c546c3e1b993b744d34bc3901e3e369a44eaaaaa11c5c3beb6482ad2fa970950",
     "step04-006.jsonl": "4f7b8d84db037d678cca418e794b45a5a22777f21c88fb2185264d9d64ee614a",
     "step04-007.jsonl": "f888a3be1c062281bbe29237821c5aa9d98c3cd25566a607afd9ac227d38cb38",
     "step04-008.jsonl": "669a1a73bf247d0decbc19377992fc38f3f98f8b930e139c11f157b7d3a11e14",
-    "step04-009.jsonl": "059d5a56f13f6ef44b498dcc2e9aa6cbc174da3e5423e4e41ea3c0a19d4d06bd",
-    "step04-010.jsonl": "0bd8fc6d4fbe474faa0f67df0d6ae44a4f6b7dc90a0ee24a73c98cca893f55f5",
-    "step04-011.jsonl": "a327a0bc33f9a02099b443cd4da49e89e50ea3364e19dfec6e5f1e677d862da5",
-    "step04-012.jsonl": "a8876aadc5119d1a8e4f77a1b7efd5ffe235484a3802d7469a85d1ada67d8a6e",
-    "step04-013.jsonl": "449151704ee85044d37c37b7546e0feaf7d54a8e3273a79772e1cc67d7db1fea",
+    "step04-009.jsonl": "b5e24f379832e11c2a78c30d4f51c4c86e28ffc72a4b07fa4dc9922d27163595",
+    "step04-010.jsonl": "c2306c0d9e0e01f5202313fd580a3af773b4bfde18488479d34552c40c68c806",
+    "step04-011.jsonl": "c27e0513b52272cf6c48a673ad1a47bb16b9f7c45de89c73c44b0276ef868d7a",
+    "step04-012.jsonl": "e07b42465c04a96889e6164809b04e4c8c8d9dad97ed8f74d3dddd36d65574e6",
+    "step04-013.jsonl": "f032dbc1ca03c1207def1f01310897ff4f750f8fa036011371a59ca663ef4dbc",
     "step04-014.jsonl": "465cb2fe5d6f7a756b7fb403f4328ef275c1ae41d12f848bdad8be95482f49a3",
-    "step04-015.jsonl": "59ef097ff2df60d6b6103b7e10cc4dbc0df0a46676a19eba2c5372e189c2cbc9",
-    "step04-016.jsonl": "f31d53aafdda1e1306225adb1d0d04c0608eddc0b0648a7dcaaaf21cc08ce962",
-    "step04-017.jsonl": "555f73c88f816f5fb36e333a3bdbede0219970d356a0140ffc63a2df242a19d8",
+    "step04-015.jsonl": "c030b71e0e61c5ee7087faacbf665cc334732c93183b6f0a0208fcceacdf8868",
+    "step04-016.jsonl": "8e53590ff7ac458efbb05db09c3da93b1fba6bd25c091ea088a31105a1fd64a0",
+    "step04-017.jsonl": "7cea00369d345590c5d553c87b3ceb01830156dd1184cc0b4f4dd3fe0d0e4d46",
     "step04-018.jsonl": "be8adcd27f4bafd90546f15e3c0b25a8a99f30ec1fca284c579d9aaca730132f",
-    "step04-019.jsonl": "68f7c5b5c149400349e75f7870afc38d1c0576cdaab4fbd7aff0b44cb3744981",
+    "step04-019.jsonl": "ab2c310c1b9a3a782f38708ca5f0f97adb7e18ec09687d9984e356b3c2ca56df",
     "step04-020.jsonl": "634d48697b13d07a54f997ad70efb6cddd1ed15aa84684bc55c911215efdbd83",
     "step04-021.jsonl": "2f5397e9cbf25b92564f9f833b709fd129e36f87d710a0cf1cc210d24be19aaf",
-    "step04-022.jsonl": "f54dc988602965bcb2c0b872d1962325bc54861232d065fee2fa277d5b8c6fe7",
-    "step04-023.jsonl": "d05365bed16fb24c8bfedc789157d61d72e0ea6c8e2345659522da4dd0808f6d",
-    "step04-024.jsonl": "994d5c22d4ec8bc508a77c9760012f901123242ab94025b427cab983f4aad1ac",
-    "step04-025.jsonl": "7c6ba7afbc51a25427fec445f668811fb80a178cf157538671f9b18eee426046",
-    "step04-026.jsonl": "08f082e25fdc5e7436beb5e4cdcc57d4b6a905010bff0aae358f07156ed21bb3",
-    "step04-027.jsonl": "c1b8cc05b11f8aae6fb3264a43cc42fcf0d7291e2106da81d3c37108f27a1182",
-    "step04-028.jsonl": "27911bd463e75dbc142fce878feb17910fde2d7ea4407a6624dbca8968e1d426",
-    "step04-029.jsonl": "51b14980faa2f1c815e836ef9a93f00b82f85cf63196827251ff8136cf2afdb2",
-    "step04-030.jsonl": "0d42f8803d8b9a26f2c902033279fab1ae4acea33b13c78b27f74377e117534e",
-    "step04-031.jsonl": "9eb0f6c80aa02dffad91ccffa40b94fd72d90b68c73194c788f60eeee1d91f32",
+    "step04-022.jsonl": "b2e978ba1068058e01e70ad0bc28bd0104f54751cae3939896597a8cfe0a6bfe",
+    "step04-023.jsonl": "3aefeffb37b1998f3562fdea144f977a4731d5b8d9cd711a87f2df1cfc7cd4a5",
+    "step04-024.jsonl": "f2019c8c639cb0bd084ceff6818331585d707a905bad6290d8e5e59fb79318ae",
+    "step04-025.jsonl": "e3261e5a51433859c5a708fd4f44163508d5071b1f4fffa0e601a95cf79a42a3",
+    "step04-026.jsonl": "7ce1e1492a1cb49d7d6f08c30ead076acb9f6c3f3dd0d6f9878d25347544f20e",
+    "step04-027.jsonl": "d730d2a10aa4ea25306e150dc0e10c4fe8a4ed4cb9eb79f934af15cc4d7c829e",
+    "step04-028.jsonl": "2f462c2d4f995f5a783848f8ef036869b3b7a490904bc0f6f9723a542ce5c076",
+    "step04-029.jsonl": "33b2d4275c3cf88c14fe9a41c25fb7a68cf31efaf843d97ded9a80da4d58c5a4",
+    "step04-030.jsonl": "18c7ea325e63013486aea44715ed2343d1a6709fcba76eba63e7be86a70ca780",
+    "step04-031.jsonl": "d8ee868a7739ae2e8f35d64a70d2f8b09f10e01f825346efa96478386651a726",
     "step04-032.jsonl": "224c53823833a7009147b78d8156cdf7f30cb3b999167703c0da815d2799dd8f",
-    "step04-033.jsonl": "d17eed09e7b14a85240a49715cd80a98769ff1596a1276f33e1e8534c0e4c006"
+    "step04-033.jsonl": "1913641afd8abaf6c1cbced610c90d8344fae66e2c2a3e87b43d544b17db4b7c"
   },
   "dependencyHashes": {
     "step-03-check.py": "20bbeca2b0b104df357de506e479062b589e6faa31164a80761deddc31578b2b",
     "step-03-resolve.py": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
     "step-04-l12-60-lib.py": "14475e4e285b36926c8be4cff2f40eab1812fa771a809cd521e4370c0130783c",
     "step-04-l12-62-lib.py": "039cafac128b2c72f7a6f8d49678ecbe09ede7c5103fd7405dd03b369469dca4",
-    "step-04-population.json": "734d47d421274d5742e019ba0aebc5975155cf136b0c5f3cf695cfa5541f558a",
-    "step-04-batches.json": "be8e07c6e61afaf2d0cff060fafaf6e61e87b9349b53ac3f8caf06c252bc5e5b",
+    "step-04-population.json": "b76d8d0ee1e2ed4298d7ba44650934c6623f3117a74c4f950207c6d319308c9d",
+    "step-04-batches.json": "097661886ec83f69987fe92d6c51470b6af577d80c4a05473d447cf8f6e1c192",
     "step-04-source-render-provenance.json": "062a56597aa26b7ac11565faeb604e0f772d0783f7709efc56490b90383bc688"
   }
 }

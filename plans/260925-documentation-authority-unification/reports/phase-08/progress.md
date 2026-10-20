@@ -946,3 +946,21 @@ Final full checker **0 failures / 0 open Lead-ruling slots**, probes **20/20**, 
 ONE wave 4 request: **2 outcome-changed files / 4 parts**, maxima **29 slots / 337,409 bytes**, outputs `review-a38-step-04-wave4-p01.md`–`p04.md`. Record-text-only changes are mechanically verified; all prior review reports stay untouched. Lead owns independent review, one Step 0 binding re-acceptance and actual runner-commit accounting. Step 3/A34/A47/workflow carry, Step 5 parity and Phase 9 application retain their owners. No full npm/cargo or installed/generator acceptance, CLI, git mutation, state/secrets access, consumer write or Step 3 edit. Preview stays with Lead's authorized environment. needsWrites empty.
 
 Final scope receipt passes: current checker/probe/record hashes agree, four review payloads equal current selected records and stay within bounds, protected checker/resolver/census artifacts unchanged, zero out-of-scope paths or bytecode outputs. `step-04-wave4-scope-verification.json` and `step-04-wave4-verification.json` complete the handback; needsWrites is empty.
+
+
+### L12-65 / Step 5 preparation — started 2026-10-20
+
+Input: local-main merge `3d599d449`; Steps 3/4 closed by L12-56/L12-64. Accounting the merge and refreshing the stale Step 4 checker receipt before preparing behavioral seam populations, parity templates and review sizing. Preparation only; no consumer, code, gate or frozen baseline changes.
+
+
+### L12-65 / Step 5 preparation — author handback (2026-10-20)
+
+Merge `3d599d449` accounted: eight main commits / three changed docs, one reading-map exception refreshed, ratchet clean / 28 tests pass. Two direct Step 0 bindings and both full extractors checked by content/ancestry; no rebind needed, no drift; five Step 3 physical overlap records deferred once to Step 7. No ledger or target-file edit. Full provenance: `step-00-l12-65-{merge-rebindings,binding-check,step3-deferred-rebinds}.json`.
+
+Refreshed stale Step 4 result now has 890 slots (609/59/177/45), but actual checker exits 1 with 18 tree/history witness mismatches. Every pinned tree/state field matches; differing fields are unpinned all-ref history. Recorded full diagnostic rather than refreshing settled witnesses or changing checker; Lead/Step 7 reconciliation remains outstanding. L12-64 historical acceptance is retained as historical, no new green claim.
+
+Step 5 packet: 1,447 file/carry records / 5,311 references / all 227 Step 4 exclusion origins / 39,861 dynamic sites / 201 inherited carry rows, eight seams. Population and prior-disposition joins preserve original ids/pins. Gateway file hashes and complete parsed OpenAPI match: 34,956 bytes, 21 operations, 7 schemas. HTTP/MCP parity template records exact diagnostic path delta and missing runtime proof; no process launched. Requested current-root proof suite passes 84/84.
+
+`step-05-authoring-request.md` defines eight seam batches, per-file dispositions, per-seam receipt + exact Phase 9 patch schema, real existing owning tests and missing proofs, 29 admission parts with measured summary bytes, mandatory full behavioral deep reads, pilot-based review re-sizing and local parks. No implementation or review started. Step 6 evidence tooling, 6b lease and Step 7 assembly remain separate; preserve A34/A45/A47/workflow/GAP carries.
+
+Lead next: review accounting/preparation, reconcile ref-sensitive witness replay, supply bounded state/inventory exports where needed, size admission/author/reviewer budget and dispatch bounded records-only Step 5 authoring. At the real runner commit, ordinary L12-11 separate manifest pair accounting is still owed; this worker cannot pre-account an unknown commit. No full-suite/cargo, build, installed parity, generator determinism, authority flip or Phase 9 readiness is claimed. Final scope/pins/proof receipts are in `step-05-preparation-verification.json`; needsWrites empty. Markdown preview remains in Lead custody as in prior report-only turns.

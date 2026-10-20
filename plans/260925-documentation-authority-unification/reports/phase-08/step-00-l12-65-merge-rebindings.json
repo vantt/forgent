@@ -1,0 +1,135 @@
+{
+  "inputHEAD": "3d599d4498b22842399b0fe59b4e88d1ffcfd0df",
+  "prior": "763568157eabc0becb63e049906cb7e1141d3848",
+  "merge": "3d599d4498b22842399b0fe59b4e88d1ffcfd0df",
+  "main": "49f415d3b0a633e25b4fdec0a8cb494bb84477bf",
+  "base": "71888fdf54a3767d7de3ec545b4820a54d0d16b9",
+  "mainCommits": 8,
+  "changedPaths": [
+    "docs/platform/README.md",
+    "docs/platform/agent-mailbox/spec.md",
+    "docs/specs/reading-map.md"
+  ],
+  "mainPathCommits": {
+    "docs/platform/README.md": [
+      "597e46e4199c32c3e62173b823b8b9e2472c9096 docs(mailbox): apply the second panel's amendments and the owner's answers to the draft spec"
+    ],
+    "docs/platform/agent-mailbox/spec.md": [
+      "597e46e4199c32c3e62173b823b8b9e2472c9096 docs(mailbox): apply the second panel's amendments and the owner's answers to the draft spec"
+    ],
+    "docs/specs/reading-map.md": [
+      "597e46e4199c32c3e62173b823b8b9e2472c9096 docs(mailbox): apply the second panel's amendments and the owner's answers to the draft spec"
+    ]
+  },
+  "extractorsAgree": true,
+  "checkedBindings": [
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-portal-classifications.json",
+      "keys": [
+        "registryGaps",
+        0
+      ],
+      "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+      "targetOwner": "docs/platform/README.md",
+      "oldPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 70,
+        "endLine": 76,
+        "textDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+        "sample": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance",
+        "identityFingerprint": "0d9bb72bf5a706d30fbae5a95c7ece65f96721f3fcd81594e7562d000a6208a5",
+        "ancestry": [
+          "Platform Documentation",
+          "3. Decision Surface"
+        ],
+        "text": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |"
+      },
+      "currentPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 70,
+        "endLine": 76,
+        "textDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+        "sample": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance",
+        "identityFingerprint": "0d9bb72bf5a706d30fbae5a95c7ece65f96721f3fcd81594e7562d000a6208a5",
+        "ancestry": [
+          "Platform Documentation",
+          "3. Decision Surface"
+        ],
+        "text": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |"
+      },
+      "mainPathCommits": [
+        "597e46e4199c32c3e62173b823b8b9e2472c9096 docs(mailbox): apply the second panel's amendments and the owner's answers to the draft spec"
+      ]
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+      "keys": [
+        "registryGaps",
+        6
+      ],
+      "claimId": "claim_8f3435494fd3ab6edecb312621fd044d",
+      "targetOwner": "docs/platform/README.md",
+      "oldPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 30,
+        "endLine": 37,
+        "textDigest": "9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24",
+        "sample": "| Target doc | Role | Current source during migration |\n|---|---|---|\n| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](",
+        "identityFingerprint": "d409eaa04d1cb9c9d10bd44060a68a74b3017c77c97bc1c795be9d8292dd48f2",
+        "ancestry": [
+          "Platform Documentation",
+          "1. Platform-wide Anchors"
+        ],
+        "text": "| Target doc | Role | Current source during migration |\n|---|---|---|\n| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](../platform-foundations.md), [../work-item-lifecycle-vision.md](../work-item-lifecycle-vision.md), design discussions |\n| [intent-preservation-ledger.md](intent-preservation-ledger.md) | Whole-platform preserved intent across simplified implementation slices | Documentation-system discussion, [../architect/agent-coordination/intent-preservation-ledger.md](../architect/agent-coordination/intent-preservation-ledger.md) |\n| [platform-foundations.md](platform-foundations.md) | Platform laws and durable constraints | [../platform-foundations.md](../platform-foundations.md), [../specs/platform-foundations.md](../specs/platform-foundations.md) |\n| [architecture-map.md](architecture-map.md) | Whole-system architecture map | [../architecture-map.md](../architecture-map.md) |\n| [component-boundary.md](component-boundary.md) | Layers, parent/child components, responsibilities, authority boundaries | [../architect/component-boundary/](../architect/component-boundary/) |\n| [../contracts/](../contracts/) | Cross-area contracts during migration | [../routing-handoff-contract.md](../routing-handoff-contract.md), [../contracts/](../contracts/) |"
+      },
+      "currentPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 30,
+        "endLine": 37,
+        "textDigest": "9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24",
+        "sample": "| Target doc | Role | Current source during migration |\n|---|---|---|\n| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](",
+        "identityFingerprint": "d409eaa04d1cb9c9d10bd44060a68a74b3017c77c97bc1c795be9d8292dd48f2",
+        "ancestry": [
+          "Platform Documentation",
+          "1. Platform-wide Anchors"
+        ],
+        "text": "| Target doc | Role | Current source during migration |\n|---|---|---|\n| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](../platform-foundations.md), [../work-item-lifecycle-vision.md](../work-item-lifecycle-vision.md), design discussions |\n| [intent-preservation-ledger.md](intent-preservation-ledger.md) | Whole-platform preserved intent across simplified implementation slices | Documentation-system discussion, [../architect/agent-coordination/intent-preservation-ledger.md](../architect/agent-coordination/intent-preservation-ledger.md) |\n| [platform-foundations.md](platform-foundations.md) | Platform laws and durable constraints | [../platform-foundations.md](../platform-foundations.md), [../specs/platform-foundations.md](../specs/platform-foundations.md) |\n| [architecture-map.md](architecture-map.md) | Whole-system architecture map | [../architecture-map.md](../architecture-map.md) |\n| [component-boundary.md](component-boundary.md) | Layers, parent/child components, responsibilities, authority boundaries | [../architect/component-boundary/](../architect/component-boundary/) |\n| [../contracts/](../contracts/) | Cross-area contracts during migration | [../routing-handoff-contract.md](../routing-handoff-contract.md), [../contracts/](../contracts/) |"
+      },
+      "mainPathCommits": [
+        "597e46e4199c32c3e62173b823b8b9e2472c9096 docs(mailbox): apply the second panel's amendments and the owner's answers to the draft spec"
+      ]
+    }
+  ],
+  "successorGroupMemberChecks": [],
+  "entries": [],
+  "parked": [],
+  "needsWrites": [],
+  "counts": {
+    "directChecked": 2,
+    "groupMembersChecked": 0,
+    "changedBindings": 0,
+    "pendingReview": 0
+  },
+  "phase9ConservationUnionAdditions": [
+    "docs/platform/README.md",
+    "docs/platform/agent-mailbox/spec.md",
+    "docs/specs/reading-map.md"
+  ],
+  "acceptance": "Author binding verification only; independent changed-binding review and real runner commit L12-11 accounting remain owed."
+}
