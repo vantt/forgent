@@ -226,12 +226,17 @@
         "units": [
           {
             "unit": "dialectical-critique",
-            "pattern": "reviewed",
+            "pattern": "debate",
             "blind": false,
             "roles": [
               [
-                "producer",
-                "reviewer"
+                "antithesis",
+                "judge",
+                "thesis"
+              ],
+              [
+                "antithesis",
+                "thesis"
               ]
             ],
             "outcome": "pass",

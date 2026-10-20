@@ -16,7 +16,13 @@ import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.help
 seedFileLocalBwrapRegistry();
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const runnerConfig = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'config.json'), 'utf8')).runner;
+// The project config names the pools its tier cells use; the account inventory that pays for
+// them lives in the machine-global config, so the test declares the one pool the cells name.
+const committed = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'config.json'), 'utf8')).runner;
+const runnerConfig = {
+  ...committed,
+  llmAccounts: { ...committed.llmAccounts, openrouter: { openrouter: { credentialStore: { pi: '/home/test/.pi/accounts/openrouter' } } } },
+};
 const executors = runnerConfig.executors;
 
 // claude keeps its login in files the sandbox may read; codex, pi and agy write a state

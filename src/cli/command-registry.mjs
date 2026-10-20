@@ -1368,7 +1368,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'run',
     invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] [--input <a>,<b>] [--verify "<cmd>"] [--sync <ref>] | --sync <ref> --writes <a>,<b> | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <pool/account>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
-    description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`. Also "record" for inline producer turns.',
+    description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel, debate); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`. Also "record" for inline producer turns.',
     parameters: {
       type: 'object',
       positional: ['prompt'],
@@ -1384,7 +1384,7 @@ export const COMMAND_REGISTRY = [
         verify: { type: 'string', description: 'One-liner: shell command run in the worktree after each producing round of a reviewed run (Unit field verify); a non-zero exit, or running past runner.timeoutMs, is a failed verify. Without one, nothing is verified and the result says so.' },
         sync: { type: 'string', description: 'One-liner: a ref (branch, tag or commit) the runner merges into the worktree\'s branch before the worker runs (Unit field syncBase); needs --writes. Without a prompt: a sync-only Unit, no worker unless the merge conflicts. Conflicted paths join the write scope and the brief; the runner commits the merge, never the worker.' },
         unit: { type: 'string', description: 'Path to unit YAML/JSON file or "-" for stdin.' },
-        pattern: { type: 'string', description: 'Pattern name or preset (solo, reviewed, panel, code-change).' },
+        pattern: { type: 'string', description: 'Pattern name or preset (solo, reviewed, panel, debate, code-change).' },
         override: { type: 'string', description: 'JSON-encoded array or object of overrides.' },
         effort: { type: 'string', description: 'Reasoning effort for this run (low, medium, high, max), rendered into the provider CLI\'s own flag; a level the bound executor does not declare refuses the binding.' },
         timeout: { type: 'string', description: 'Time each seat of this run may take instead of runner.timeoutMs: a whole number and a unit (ms, s, m, h), e.g. 90m or 5400s, from 1m to 4h (same as "timeoutMs" in --override, or a Unit\'s own timeoutMs, which it overrides). Kept in unit.json for resume; not with --resume.' },
