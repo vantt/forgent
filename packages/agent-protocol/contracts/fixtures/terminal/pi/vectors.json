@@ -153,7 +153,7 @@
       "expect": {
         "outcome": "delivered",
         "sentTexts": 1,
-        "minEnters": 2
+        "minEnters": 1
       },
       "message": "# Brief 1\n\n## Your task\nline 0\nline 1\nline 2\nline 3\nline 4\nline 5\nline 6\nline 7\nline 8\nline 9\nline 10\nline 11\nline 12\nline 13\nline 14\nline 15\nline 16\nline 17\nline 18\nline 19\nline 20\nline 21\nline 22\nline 23\nline 24\nline 25\nline 26\nline 27\nline 28\nline 29\nline 30\nline 31\nline 32\nline 33\nline 34\nline 35\nline 36\nline 37\nline 38\nline 39",
       "source": "chip wording as this CLI folds a long paste"
@@ -202,8 +202,8 @@
       "expect": {
         "outcome": "delivery-unknown",
         "sentTexts": 1,
-        "minEnters": 2,
-        "maxEnters": 7
+        "minEnters": 1,
+        "maxEnters": 6
       },
       "message": "Reply with the single word ok. Do not use any tools.",
       "source": "real screen after a turn that finished before the first look; with no composer rule the short echoed brief sits in the bottom lines and reads as an unsent draft, so Enter is offered a bounded number of times and the outcome stays unknown"
@@ -474,6 +474,34 @@
       },
       "message": "Reply with the single word ok. Do not use any tools.",
       "source": "real working screen recorded 2026-10-18 from pi on herdr (state working, rule working_border)"
+    },
+    {
+      "name": "brief-goes-in-one-prompt-door-send-that-submits-itself",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          },
+          {
+            "at": 100,
+            "inspection": {
+              "state": "working",
+              "visibleWorking": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivered",
+        "sentTexts": 1,
+        "submitSends": 1,
+        "maxEnters": 0
+      },
+      "message": "Read the brief file and do the task.",
+      "source": "the typed path takes 7 to 25 s for a 4 KB brief and can lose its final Enter; the prompt door does not"
     }
   ]
 }

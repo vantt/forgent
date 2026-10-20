@@ -532,7 +532,7 @@ Giữ nguyên ý và phát biểu của 0061; vế "code đơn giản hơn" mang
 
 - 0061 — quyết định bị supersede.
 
-### 0072 — Một bằng chứng: mỗi hành vi có đúng một bằng chứng chính; gỡ cơ chế thì gỡ test của nó
+### 0073 — Một bằng chứng: mỗi hành vi có đúng một bằng chứng chính; gỡ cơ chế thì gỡ test của nó
 
 #### Bối cảnh
 

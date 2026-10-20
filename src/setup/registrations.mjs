@@ -1480,7 +1480,7 @@ registerCheck({
 
 registerCheck({
   id: 'executor-skills-installed',
-  description: 'every skill an executor declares in supports.skills exists in that runtime\'s skill directory of the main checkout; fails naming the missing path',
+  description: 'every skill an executor declares in supports.skills exists in the skill directory of each CLI the executor invokes, in the main checkout; fails naming the missing path',
   check: (cwd) => checkExecutorSkillsInstalled(cwd),
 });
 

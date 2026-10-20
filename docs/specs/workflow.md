@@ -352,7 +352,7 @@ Retrospective đọc route/deviation event → agent đề xuất diff guide kè
 | `fgos workflow status` / `resume` trên conductor case | `running` khi còn reservation sống; không gợi ý resume; `resume` chỉ nhặt file gate-answer |
 | `fgos workflow operations` / `status` | `operations` thay bằng `status` là projection; thêm `close` (F6) |
 
-**Không đổi tại hai cửa:** vẫn là hai cửa thi hành duy nhất; `bind()` là bên duy nhất chọn ai/model/persona; `writes` + commit do harness; approve door là authority merge; policy confinement phía đọc không đổi; flag không bị spec khoá.
+**Không đổi tại hai cửa:** vẫn là hai cửa thi hành duy nhất; `bind()` là bên duy nhất chọn ai/model/persona; (hợp đồng đích: [seat-binding.md](seat-binding.md) thành authority chọn ghế agent và workflow khai `seats:` tường minh cùng `tier` khuyến nghị; code đổi cùng plan của nó, D-ADR0072 (Seat Binding: one authority for agent seat choice)); `writes` + commit do harness; approve door là authority merge; policy confinement phía đọc không đổi; flag không bị spec khoá.
 
 ## 9. Kích thước rework — thông tin, không phải plan
 

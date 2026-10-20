@@ -145,7 +145,7 @@
       "expect": {
         "outcome": "delivered",
         "sentTexts": 1,
-        "minEnters": 2
+        "minEnters": 1
       },
       "message": "Reply with the single word ok. Do not use any tools.",
       "source": "real omp composer with its attachment chip"
@@ -194,8 +194,8 @@
       "expect": {
         "outcome": "delivery-unknown",
         "sentTexts": 1,
-        "minEnters": 2,
-        "maxEnters": 7
+        "minEnters": 1,
+        "maxEnters": 6
       },
       "message": "Reply with the single word ok. Do not use any tools.",
       "source": "real screen after a turn that finished before the first look; with no composer rule the short echoed brief sits in the bottom lines and reads as an unsent draft, so Enter is offered a bounded number of times and the outcome stays unknown"
@@ -438,6 +438,34 @@
       },
       "message": "Reply with the single word ok. Do not use any tools.",
       "source": "real working screen recorded 2026-10-18 from omp on herdr; herdr's detector has no rule for omp and says idle, the `⎋ Working…` footer is what shows work"
+    },
+    {
+      "name": "brief-goes-in-one-prompt-door-send-that-submits-itself",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          },
+          {
+            "at": 100,
+            "inspection": {
+              "state": "working",
+              "visibleWorking": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivered",
+        "sentTexts": 1,
+        "submitSends": 1,
+        "maxEnters": 0
+      },
+      "message": "Read the brief file and do the task.",
+      "source": "the typed path takes 7 to 25 s for a 4 KB brief and can lose its final Enter; the prompt door does not"
     }
   ]
 }
