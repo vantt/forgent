@@ -165,7 +165,8 @@ function requireRoles(patternName, declared, expected) {
  * The ordered seats a unit's pattern fills.
  *
  * - solo: one producer seat, `producer`, unless one seat is declared.
- * - reviewed: `producer`, then one checker seat per checker name (seat id = the name).
+ * - reviewed: `producer`, then one checker seat per checker name (seat id = the name unless the unit declares
+ *   its seats; declared checker roles must match the required checkers exactly).
  * - panel: the declared seats; producers are the members, one synthesizer.
  * - debate: the declared seats; two producer sides, then one judge.
  *
@@ -185,15 +186,34 @@ export function resolveSeats({ pattern, unit, runnerConfig }) {
       return [Object.freeze({ seat: 'producer', role: 'producer', posture: posture({ readOnly, writer: true, inlineAllowed: true }) })];
     }
     case 'reviewed': {
-      if (declared) throw new SeatResolutionError('a reviewed unit takes its seats from checkersByRigor and minCheckers; it declares none', 'seat-multiplicity');
-      return [
-        Object.freeze({ seat: 'producer', role: 'producer', posture: posture({ readOnly, writer: true, inlineAllowed: true }) }),
-        ...checkerSeatsOf(unit, runnerConfig, params).map((name) => Object.freeze({
-          seat: name,
-          role: CHECKER_SEATS[name].role,
-          posture: posture({ readOnly: true, forceOutOfProcess: true, verdict: CHECKER_SEATS[name].verdict }),
-        })),
-      ];
+      const required = checkerSeatsOf(unit, runnerConfig, params);
+      const checkerPosture = (name) => posture({ readOnly: true, forceOutOfProcess: true, verdict: CHECKER_SEATS[name].verdict });
+      const producerPosture = posture({ readOnly, writer: true, inlineAllowed: true });
+      if (!declared) {
+        return [
+          Object.freeze({ seat: 'producer', role: 'producer', posture: producerPosture }),
+          ...required.map((name) => Object.freeze({ seat: name, role: CHECKER_SEATS[name].role, posture: checkerPosture(name) })),
+        ];
+      }
+      // Declared seats name the producer and one seat per checker the unit needs; the roles must match
+      // what checkersByRigor[effective rigor] plus minCheckers require, no role missing and none extra.
+      const producers = declared.filter((d) => d.role === 'producer');
+      if (producers.length !== 1) throw new SeatResolutionError(`a reviewed unit declares exactly one seat with role "producer", has ${producers.length}`, 'seat-multiplicity');
+      const wanted = required.map((name) => CHECKER_SEATS[name].role);
+      const have = declared.filter((d) => d.role !== 'producer').map((d) => d.role);
+      const missing = wanted.filter((role) => { const i = have.indexOf(role); if (i < 0) return true; have.splice(i, 1); return false; });
+      if (missing.length > 0 || have.length > 0) {
+        throw new SeatResolutionError(`a reviewed unit's checker seats must be exactly [${wanted.join(', ')}] (checkersByRigor for its effective rigor plus minCheckers)${missing.length ? `; missing [${missing.join(', ')}]` : ''}${have.length ? `; extra [${have.join(', ')}]` : ''}`, 'seat-multiplicity');
+      }
+      // Each declared checker seat takes the first still-unassigned required checker of its role, which
+      // fixes its posture (`tester` is a reviewer-role seat whose result is not a verdict).
+      const unassigned = [...required];
+      return declared.map((d) => {
+        if (d.role === 'producer') return withDeclared(d, { seat: d.seat, role: d.role, posture: producerPosture });
+        const at = unassigned.findIndex((name) => CHECKER_SEATS[name].role === d.role);
+        const [name] = unassigned.splice(at, 1);
+        return withDeclared(d, { seat: d.seat, role: d.role, posture: checkerPosture(name) });
+      });
     }
     case 'panel': {
       if (!declared) throw new SeatResolutionError('a panel unit must declare its seats: producers as members and one synthesizer', 'seats-required');

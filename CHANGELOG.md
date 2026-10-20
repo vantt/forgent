@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A panel or debate unit must now declare its `seats:` (ids, roles, optional persona), and `workflow start --seats` re-seats generic member seats; a reviewed unit may declare its seats too, if its checker roles match what its rigor requires. Resuming a unit run recorded before seat binding is refused with `record-predates-seat-binding` (it stays readable in summaries, history and metrics).
+
 - `npm run fgos:dev` now makes Node clients (identity, repository access, run supervisor, terminal control) use the working-tree host it staged, not the activated release's host. Resuming a unit run whose `unit.json` carries a `seatSchema` from a newer release is refused with `record-from-newer-release`; reading such a record still works.
 
 - A pi or omp seat in a herdr pane now gets its brief through the agent prompt door (one send that types and submits), as codex does. The raw typed brief took 7 to 25 s and sometimes lost its final Enter, and a seat stopped mid-typing could leave the rest of the brief in the pane's shell. The supervisor also re-reads its stop state before every send into the pane.

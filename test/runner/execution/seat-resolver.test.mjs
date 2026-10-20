@@ -93,7 +93,24 @@ test('panel members carry the panel posture; a reviewed unit refuses declared se
   );
   assert.equal(seats[2].posture.stance, false);
   assert.deepEqual(seats.map(seatKind), ['panelist', 'panelist', 'synthesizer']);
-  assert.throws(() => resolveSeats({ pattern: 'reviewed', unit: { ...unit, seats: [{ seat: 'a', role: 'producer' }] }, runnerConfig: {} }), /declares none/);
+  
+  const reviewedUnit = (seats, extra = {}) => ({ ...unit, ...extra, seats });
+  const high = { rigor: 'high' };
+  const declaredOk = resolveSeats({ pattern: 'reviewed', runnerConfig: {}, unit: reviewedUnit([
+    { seat: 'author', role: 'producer' }, { seat: 'security', role: 'red-team' }, { seat: 'quality', role: 'reviewer' },
+  ], high) });
+  assert.deepEqual(declaredOk.map((s) => [s.seat, s.role, s.posture.verdict]), [['author', 'producer', false], ['security', 'red-team', true], ['quality', 'reviewer', true]]);
+  // A tester is a reviewer-role seat whose result is no verdict: declared seats take their posture from the required checker.
+  const withTester = resolveSeats({ pattern: { pattern: 'reviewed', params: { minCheckers: ['tester'] } }, runnerConfig: {}, unit: reviewedUnit([
+    { seat: 'p', role: 'producer' }, { seat: 'r1', role: 'reviewer' }, { seat: 'r2', role: 'reviewer' },
+  ]) });
+  assert.deepEqual(withTester.map((s) => s.posture.verdict), [false, true, false]);
+  const refuse = (seats, extra, re) => assert.throws(() => resolveSeats({ pattern: 'reviewed', runnerConfig: {}, unit: reviewedUnit(seats, extra) }), re);
+  refuse([{ seat: 'p', role: 'producer' }], high, /missing \[reviewer, red-team\]/);
+  refuse([{ seat: 'p', role: 'producer' }, { seat: 'r', role: 'reviewer' }, { seat: 'j', role: 'judge' }], {}, /extra \[judge\]/);
+  refuse([{ seat: 'p', role: 'producer' }, { seat: 'r', role: 'reviewer' }, { seat: 'x', role: 'red-team' }], {}, /extra \[red-team\]/);
+  refuse([{ seat: 'r', role: 'reviewer' }], {}, /exactly one seat with role "producer"/);
+  refuse([{ seat: '../p', role: 'producer' }, { seat: 'r', role: 'reviewer' }], {}, /seat/);
 });
 
 test('admission counts launches from the same seats the run binds', () => {

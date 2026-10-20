@@ -25,7 +25,7 @@ Branch `worktree-agent-ada3fbf1ebfc8faab`, merged with `seat-binding-wave` at a1
 ## Deviations and open points
 
 - `loop.mjs:1608` and `work-dispatch.mjs workRigorFor` compute item/operation rigor that is an input to the unit, not capability rigor; left as inputs.
-- Reviewed units refuse declared seats (they take seats from `checkersByRigor` / `minCheckers`); spec 7.1 "unless declared" for reviewed is not implemented (nothing needs it).
+- A reviewed unit may declare its seats; checker roles must match checkersByRigor[effective rigor] plus minCheckers exactly, else it is refused by name.
 - Behaviour change by design: reviewed checker count now follows effective rigor (unit and capability), not unit rigor alone.
 - `seats[].tier` is validated and stored; nothing reads it until phase 06.
 - Global release door: a copy of the payload needs `packages/convention/contracts/convention.rules.v1.json` only when a seat is named (lazy), already in `package.json` `files`.
