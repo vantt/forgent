@@ -1,0 +1,25 @@
+{
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "closedBatch": 1,
+  "files": [
+    "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+    "test/runner/prompt-templates.test.mjs"
+  ],
+  "referenceIds": [
+    "reference-003777",
+    "reference-003778",
+    "reference-003779",
+    "reference-004561",
+    "reference-004562",
+    "reference-004563",
+    "reference-004564",
+    "reference-004565",
+    "reference-004566",
+    "reference-004567"
+  ],
+  "dynamicIds": [
+    "dynamic-029245",
+    "dynamic-029246"
+  ],
+  "atomicUnitId": "prompt-skill-pointer-atomic"
+}

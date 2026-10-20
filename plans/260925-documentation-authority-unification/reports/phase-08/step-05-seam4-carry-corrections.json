@@ -1869,12 +1869,12 @@
         "parked"
       ],
       "to": [
-        "REJECT",
+        "ADMIT",
         "preserve"
       ],
       "ruling": "L12-72",
-      "subsequentRuling": "L12-74",
-      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand \"join('/')\"."
+      "subsequentRuling": "L12-76",
+      "reason": "L881 relative()+join is one admitted path expression under R16; R14 preserves fixed skill paths."
     },
     {
       "id": "dynamic-015230",

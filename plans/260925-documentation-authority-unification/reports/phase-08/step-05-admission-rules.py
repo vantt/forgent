@@ -165,10 +165,10 @@ def check(rs,context=None):
    if e.get('disposition') in ['preserve','render-join'] and retired(e):
     def successor(e=e):
      note=e.get('successorNote');assert isinstance(note,str) and note
-     path,sep,anchor=note.partition('#');file=ROOT/path;assert file.is_file()
+     path,sep,anchor=note.partition('#');file=ROOT/path;assert source_at(r['authorInputCommit'],path) is not None
      if sep:
       def slug(s):return re.sub(r'\s','-',re.sub(r'[^\w\s-]','',s.lstrip('# ').lower()))
-      headings=[h for h in file.read_text().splitlines() if h.startswith('#') and slug(h)==anchor];assert headings
+      headings=[h for h in source_at(r['authorInputCommit'],path).splitlines() if h.startswith('#') and slug(h)==anchor];assert headings
       text=e.get('matchedExpression') or (e.get('originalTuple') or [None]*5)[4] or ''
       code=re.search(r'docs/decisions/(\d{4})-',text)
       if code and code[1]!='0000':assert any(re.search(r'\b'+code[1]+r'\b',h) for h in headings),'successor heading must own the cited decision id'

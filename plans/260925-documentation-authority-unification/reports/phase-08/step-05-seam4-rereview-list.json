@@ -1123,7 +1123,7 @@
       "file": ".githooks/pre-commit",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "c09b2fab016d5e566dfac33fce71a2ccdbc98a5739bbcc4ff4d99a1875387469",
+      "recordSha256": "450dc1e6efe07dda4f1d33d63452ab870b0e790a67674ebd7586c21da26b588b",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943"
     },
@@ -1131,7 +1131,7 @@
       "file": "bin/fgos.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "0dbd683e51640e9b8a808d27b2da3b4605c43bb1cb64bf07cb26b30ff6f6d3f5",
+      "recordSha256": "1c06f74e0c2b0299e1144547b7140c6f737c48c17f840d7ffbd3704f11b0ccf6",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198"
     },
@@ -1139,7 +1139,7 @@
       "file": "src/cli/command-registry.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "cb67105c6ac7d8036952eef2d4db28ccbe13f31909868a15c43567cb42522c5b",
+      "recordSha256": "5885924ffb34ff669619bb0bc43070af37bbd7e738377275199056b55a09544b",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17"
     },
@@ -1195,7 +1195,7 @@
       "file": "apps/fgos-gateway/src/gateway.rs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "d6d3985896ade6a1bf371751e33843dc5e5b36d99362329711f468602db70ce8",
+      "recordSha256": "43f9f19c35a95765e4de2f6de90575508f305f37059faf27eed423ee35c3f9eb",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6"
     },
@@ -1203,7 +1203,7 @@
       "file": "apps/fgos-gateway/src/mcp.rs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "53767c556db8d8aabfe34540bbad69dc687121c0323309f4118ecfab32e4cbe9",
+      "recordSha256": "63fb73e85dce382b8293e13d621340d6fc2caa53a8a5729d9e09782409c444fb",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3"
     },
@@ -1411,7 +1411,7 @@
       "file": ".agents/skills/distill/scripts/distill.mjs",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "5fe5f9e063de03f2602d7e540e80cebae7773950d8b8027c39bd2584f3b23823",
+      "recordSha256": "bf389f04c5e459ef6afc0aed24b1359b31884457d768b7d6f9d7547ec290426f",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536"
     },
@@ -1603,7 +1603,7 @@
       "file": ".claude/skills/distill/scripts/distill.mjs",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "aad502221d776ceea9147cef0fd12f918da5a4483f5bb9b080b57ca45c6a02c6",
+      "recordSha256": "0a963f98e901000a48e844f0c76a61226f4b6ce009fe0375613091c47c0c71ed",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536"
     },
@@ -1843,7 +1843,7 @@
       "file": "docs/backlog.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "21f5725dda342bc37c043a0efc5eb8ec1b3a74894ab0f7504f7daa51475d9312",
+      "recordSha256": "e9230472c42025ecd4938dff4d267954e4d5861e1b253d5d6b68afbdada5c487",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d"
     },
@@ -2843,7 +2843,7 @@
       "file": "scripts/generate-shipped-path-inventory.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "9ace9cff42f68fa39735e0b594a2c915acd06d3f55aa7008aae532d9ab29e52c",
+      "recordSha256": "197e7e0848e56726cb43e3fc4ac7975104ea8ceb9cc86f4c48c1b9c50b04e93d",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284"
     },
@@ -2907,7 +2907,7 @@
       "file": "scripts/knowledge-classifier.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "b388269d116126de123ba38fa14f88905ecb6447ccd5cd1315ab9d400c2c272a",
+      "recordSha256": "9db68c842c805bffc0128ff5e4d74ecc1b751d4e6faf9d0d1eb5393c14bd7703",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4"
     },
@@ -3371,7 +3371,7 @@
       "file": "src/setup/instruction-registry.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "5c7a36400750f653820888c7ba2f86c9afb15d5a57a49dd5b03270b06b56bab1",
+      "recordSha256": "4db4cc25693121ff268ea6d5b11765d4f880cf7ff77052bc60a349cf1e6e74c8",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697"
     },
@@ -3403,7 +3403,7 @@
       "file": "src/setup/registrations.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "f24ae136149e09ac29017244f9562ce06dc6681514b1446b82604ecf29936d22",
+      "recordSha256": "6fdbe59f9ddf8b1c60db901a563e40c46a6d08e5c79f905dd009dd21957dfe40",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518"
     },
@@ -3427,7 +3427,7 @@
       "file": "src/setup/skill-wrappers.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "060d446a0b82a87b8e44a7c8b2dfb3ef977ba2c6a290114e2fb2ac9e1e94f8b7",
+      "recordSha256": "9e7b0d823e2b7355dc6908fe5f3c618ea9db398974c1b95a1b3abde6e2379b18",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b"
     },

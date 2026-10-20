@@ -1,0 +1,634 @@
+{
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "receipts": [
+    {
+      "id": "real-file-tests-goldens-prompt-batch-1",
+      "seam": "real-file-tests-goldens",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "currentInputs": [
+        {
+          "path": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+          "sha256": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+          "bytes": 5196,
+          "mode": "100644",
+          "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:src/runner/prompt-templates/worker-prompt-skill-pointer.txt"
+        },
+        {
+          "path": "test/runner/prompt-templates.test.mjs",
+          "sha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f",
+          "bytes": 13471,
+          "mode": "100644",
+          "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/runner/prompt-templates.test.mjs"
+        },
+        {
+          "path": "src/runner/prompt-templates.mjs",
+          "sha256": "fd027de3376fbdfe654f2a2b8599a384d88f9b5383a0161b0b9df7bca9de39b9",
+          "bytes": 4611,
+          "mode": "100644",
+          "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:src/runner/prompt-templates.mjs"
+        },
+        {
+          "path": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+          "sha256": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+          "bytes": 10314,
+          "mode": "100644",
+          "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+        }
+      ],
+      "candidateInputs": [
+        {
+          "path": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+          "sha256": "438fba1efc73fc1d2667bbbfb86349b1e10b7a38403a10149b6263ffa284bd40",
+          "bytes": 5322,
+          "mode": "100644",
+          "provenance": "Unapplied Phase 9 full-file candidate; derived from atomicUnit input pin and checked complete forward diff"
+        },
+        {
+          "path": "test/runner/prompt-templates.test.mjs",
+          "sha256": "fdc6535c2608d1a8a1329f87595dcf50b50ea050d56e15a39821150f5ccb7abb",
+          "bytes": 13597,
+          "mode": "100644",
+          "provenance": "Unapplied Phase 9 full-file candidate; derived from atomicUnit input pin and checked complete forward diff"
+        },
+        {
+          "path": "src/runner/prompt-templates.mjs",
+          "sha256": "fd027de3376fbdfe654f2a2b8599a384d88f9b5383a0161b0b9df7bca9de39b9",
+          "bytes": 4611,
+          "mode": "100644",
+          "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:src/runner/prompt-templates.mjs"
+        },
+        {
+          "path": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+          "sha256": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+          "bytes": 10314,
+          "mode": "100644",
+          "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+        }
+      ],
+      "comparison": {
+        "currentOutputSet": [
+          {
+            "path": "rendered-worker-prompt",
+            "sha256": "aab044f5bb29f76a4a9139a9a5a4fec6f1dd0180c2caac89927a4236bf0ab88b",
+            "bytes": 5235
+          }
+        ],
+        "candidateOutputSet": [
+          {
+            "path": "rendered-worker-prompt",
+            "sha256": "a4876832486bc49d691c3ddf16bb9c274deaf9c58425e0117ba9015f15bbc320",
+            "bytes": 5361
+          }
+        ],
+        "normalization": "None. Literal placeholder substitution and JS string escape decoding only; complete rendered bytes remain in atomicUnit.",
+        "comparedFields": [
+          "exact conserved claim/assertion mapping",
+          "real-file read set",
+          "whole worker prompt bytes",
+          "golden/source co-edit",
+          "immutable fixture mode/hash/origin"
+        ],
+        "intentionalDeltas": [
+          {
+            "oldPointer": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "newPointer": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "occurrencesInCompletePrompt": 2,
+            "sourceLines": [
+              31,
+              48
+            ],
+            "goldenLines": [
+              198,
+              215
+            ]
+          }
+        ],
+        "unexpectedDeltas": [],
+        "realFileReadSet": [
+          {
+            "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+            "reader": "src/runner/prompt-templates.mjs::readTemplate",
+            "realDocumentRead": false,
+            "role": "committed text template input"
+          }
+        ],
+        "immutableFixtures": [
+          {
+            "file": "test/runner/prompt-templates.test.mjs",
+            "mode": "100644",
+            "sha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f",
+            "preserved": "widget refs input/expected bytes and skillPath fixture; no external recorded outcome or live document reads"
+          }
+        ]
+      },
+      "proofs": [
+        {
+          "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/runner/prompt-templates.test.mjs",
+          "owningBehavior": "Complete current source/golden prompt equality; current suite only",
+          "status": "pass",
+          "exit": 0,
+          "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch1-prompt-tests.log",
+          "logSha256": "840c4c10c86bf432f5710867619b2dae81ce8977cfc6c3b23d3e8003a4f8f02a"
+        },
+        {
+          "command": "missing",
+          "owningBehavior": "Owning golden suite on the unapplied Phase 9 source/test candidate",
+          "status": "missing",
+          "exit": null,
+          "logPath": null,
+          "logSha256": null
+        }
+      ],
+      "blockedBy": [
+        "Independent semantic review and Phase 9 candidate owning-test execution remain pending."
+      ],
+      "readiness": "pending independent review and Phase 9 execution",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "report": null
+      },
+      "coCutPaths": [
+        "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+        "test/runner/prompt-templates.test.mjs",
+        "CHANGELOG.md"
+      ],
+      "atomicUnit": {
+        "id": "prompt-skill-pointer-atomic",
+        "files": [
+          "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+          "test/runner/prompt-templates.test.mjs"
+        ],
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "substitutions": [
+          [
+            "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+          ]
+        ],
+        "sourcePointerLines": [
+          31,
+          48
+        ],
+        "goldenPointerLines": [
+          198,
+          215
+        ],
+        "fixture": {
+          "title": "Add the widget",
+          "kind": "feature",
+          "description": "(không có)",
+          "feedbackSection": "",
+          "action": "(không có)",
+          "readFirst": "(không có)",
+          "docsRefPointer": "",
+          "refs": "src/widget.mjs, docs/specs/widget.md",
+          "verify": "npm test",
+          "domain": "coding",
+          "skillPath": ".claude/skills/fgos-code-implement/SKILL.md"
+        },
+        "currentPrompt": "# Goal\nAdd the widget (kind: feature)\n\n# Agent skill\nYou are a fgOS agent for domain coding at the executing stage. Before doing\nanything else, read .claude/skills/fgos-code-implement/SKILL.md in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this work item must be done.\n\n# Description\n(không có)\n\n# Directive\n(không có)\n\n# Files to read first\n(không có)\n\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.\n\n# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):\n\n```bash\nnode --input-type=module -e \"\nimport { execFileSync } from 'node:child_process';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nconst id = process.argv[1];\nconst description = process.argv[2];\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\0').filter(Boolean)), description })));\n\" \"<your item id — your current branch name, `git branch --show-current`, with the fgw/ prefix stripped>\" \"<your item's own Description text, verbatim, from the Description section above>\"\n```\n\nIf the result's `required` is `false`, do nothing further. If\n`required` is `true`, you must produce real failing-test-first proof\nbefore reporting `[DONE]` — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\nfor the full recipe: identify the test file(s) covering your change, `git\nstash push --` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), `git stash apply`\n(never `pop`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n`docs/history/<your item id>/iron-law-evidence.md` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting `[DONE]`. Skipping or fabricating this evidence when\n`required` is `true` is not a valid way to finish.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- `[DONE]` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\nnpm test\n\n# Constraints\nNever call `fgos` yourself and never write to `.fgos/` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun `git add`/`git commit` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n```fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n```\n\n`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n",
+        "candidatePrompt": "# Goal\nAdd the widget (kind: feature)\n\n# Agent skill\nYou are a fgOS agent for domain coding at the executing stage. Before doing\nanything else, read .claude/skills/fgos-code-implement/SKILL.md in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this work item must be done.\n\n# Description\n(không có)\n\n# Directive\n(không có)\n\n# Files to read first\n(không có)\n\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.\n\n# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):\n\n```bash\nnode --input-type=module -e \"\nimport { execFileSync } from 'node:child_process';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nconst id = process.argv[1];\nconst description = process.argv[2];\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\0').filter(Boolean)), description })));\n\" \"<your item id — your current branch name, `git branch --show-current`, with the fgw/ prefix stripped>\" \"<your item's own Description text, verbatim, from the Description section above>\"\n```\n\nIf the result's `required` is `false`, do nothing further. If\n`required` is `true`, you must produce real failing-test-first proof\nbefore reporting `[DONE]` — see\n`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\nfor the full recipe: identify the test file(s) covering your change, `git\nstash push --` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), `git stash apply`\n(never `pop`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n`docs/history/<your item id>/iron-law-evidence.md` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting `[DONE]`. Skipping or fabricating this evidence when\n`required` is `true` is not a valid way to finish.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- `[DONE]` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\nnpm test\n\n# Constraints\nNever call `fgos` yourself and never write to `.fgos/` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun `git add`/`git commit` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n```fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n```\n\n`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n",
+        "currentPromptSha256": "aab044f5bb29f76a4a9139a9a5a4fec6f1dd0180c2caac89927a4236bf0ab88b",
+        "candidatePromptSha256": "a4876832486bc49d691c3ddf16bb9c274deaf9c58425e0117ba9015f15bbc320",
+        "currentPromptBytes": 5235,
+        "candidatePromptBytes": 5361,
+        "comparison": "Complete UTF-8 bytes including trailing LF; only the two declared pointer substitutions differ. JS golden backtick/backslash escapes decoded, no path normalization.",
+        "readSet": [
+          {
+            "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+            "reader": "src/runner/prompt-templates.mjs::readTemplate",
+            "realDocumentRead": false,
+            "role": "committed text template input"
+          }
+        ],
+        "claimHolder": {
+          "target": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+          "targetSha256": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+          "historicalSource": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+          "historicalCommit": "d1be82e0c2665fcb38f7660b8590305d944e8b3b",
+          "migrationCommit": "989d0c7fa87ddcbab61b29b4f3e17b6fea6d430d",
+          "historicalSha256": "30ef480aa0a00886c42da6002d306ed5befdd36e9bb4fe53d9a3ffba74fb69cc",
+          "comparison": "Complete narrative byte equality after removing YAML frontmatter only; no prose normalization",
+          "claimLines": {
+            "recipe": [
+              15,
+              65
+            ],
+            "watchOut": [
+              80,
+              120
+            ]
+          },
+          "anchor": null
+        }
+      },
+      "cutoverSpecifications": [
+        {
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+          "sourceSha256": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+          "mode": "100644",
+          "symbolOrPassage": "worker skill-pointer prompt pointers and complete byte-exact expected golden",
+          "oldText": "# Goal\n{title} (kind: {kind})\n\n# Agent skill\nYou are a fgOS agent for domain {domain} at the executing stage. Before doing\nanything else, read {skillPath} in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this work item must be done.\n\n# Description\n{description}\n{feedbackSection}\n# Directive\n{action}\n\n# Files to read first\n{readFirst}\n{docsRefPointer}\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: {refs}.\n\n# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):\n\n```bash\nnode --input-type=module -e \"\nimport { execFileSync } from 'node:child_process';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nconst id = process.argv[1];\nconst description = process.argv[2];\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\0').filter(Boolean)), description })));\n\" \"<your item id — your current branch name, `git branch --show-current`, with the fgw/ prefix stripped>\" \"<your item's own Description text, verbatim, from the Description section above>\"\n```\n\nIf the result's `required` is `false`, do nothing further. If\n`required` is `true`, you must produce real failing-test-first proof\nbefore reporting `[DONE]` — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\nfor the full recipe: identify the test file(s) covering your change, `git\nstash push --` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), `git stash apply`\n(never `pop`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n`docs/history/<your item id>/iron-law-evidence.md` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting `[DONE]`. Skipping or fabricating this evidence when\n`required` is `true` is not a valid way to finish.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- `[DONE]` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\n{verify}\n\n# Constraints\nNever call `fgos` yourself and never write to `.fgos/` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun `git add`/`git commit` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n```fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n```\n\n`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n",
+          "newText": "# Goal\n{title} (kind: {kind})\n\n# Agent skill\nYou are a fgOS agent for domain {domain} at the executing stage. Before doing\nanything else, read {skillPath} in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this work item must be done.\n\n# Description\n{description}\n{feedbackSection}\n# Directive\n{action}\n\n# Files to read first\n{readFirst}\n{docsRefPointer}\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: {refs}.\n\n# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):\n\n```bash\nnode --input-type=module -e \"\nimport { execFileSync } from 'node:child_process';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nconst id = process.argv[1];\nconst description = process.argv[2];\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\0').filter(Boolean)), description })));\n\" \"<your item id — your current branch name, `git branch --show-current`, with the fgw/ prefix stripped>\" \"<your item's own Description text, verbatim, from the Description section above>\"\n```\n\nIf the result's `required` is `false`, do nothing further. If\n`required` is `true`, you must produce real failing-test-first proof\nbefore reporting `[DONE]` — see\n`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\nfor the full recipe: identify the test file(s) covering your change, `git\nstash push --` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), `git stash apply`\n(never `pop`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n`docs/history/<your item id>/iron-law-evidence.md` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting `[DONE]`. Skipping or fabricating this evidence when\n`required` is `true` is not a valid way to finish.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- `[DONE]` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\n{verify}\n\n# Constraints\nNever call `fgos` yourself and never write to `.fgos/` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun `git add`/`git commit` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n```fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n```\n\n`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 76,
+              "columnStart": 2,
+              "line": 31,
+              "text": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+            },
+            {
+              "columnEndExclusive": 76,
+              "columnStart": 2,
+              "line": 48,
+              "text": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+            }
+          ],
+          "diff": "--- a/src/runner/prompt-templates/worker-prompt-skill-pointer.txt\n+++ b/src/runner/prompt-templates/worker-prompt-skill-pointer.txt\n@@ -28,7 +28,7 @@\n — proof a fix was validated against a real failing test before it existed.\n AFTER your implementation is written in this checkout (running this BEFORE\n your edits exist reads an empty diff and gives a false \"not required\" — see\n-`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n+`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n \"Watch out for\" section), classify your own diff (the runner commits later, so\n the changed files come from the working tree, not from a branch diff):\n \n@@ -45,7 +45,7 @@\n If the result's `required` is `false`, do nothing further. If\n `required` is `true`, you must produce real failing-test-first proof\n before reporting `[DONE]` — see\n-`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\n+`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\n for the full recipe: identify the test file(s) covering your change, `git\n stash push --` the IMPLEMENTATION files only (never the test files), run\n the same test command and capture the real failing output (red — paste the\n",
+          "expectedAfterSha256": "438fba1efc73fc1d2667bbbfb86349b1e10b7a38403a10149b6263ffa284bd40",
+          "targetOwner": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+          "claimAnchorProof": {
+            "target": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "targetSha256": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+            "historicalSource": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "historicalCommit": "d1be82e0c2665fcb38f7660b8590305d944e8b3b",
+            "migrationCommit": "989d0c7fa87ddcbab61b29b4f3e17b6fea6d430d",
+            "historicalSha256": "30ef480aa0a00886c42da6002d306ed5befdd36e9bb4fe53d9a3ffba74fb69cc",
+            "comparison": "Complete narrative byte equality after removing YAML frontmatter only; no prose normalization",
+            "claimLines": {
+              "recipe": [
+                15,
+                65
+              ],
+              "watchOut": [
+                80,
+                120
+              ]
+            },
+            "anchor": null
+          },
+          "receiptId": "real-file-tests-goldens-prompt-batch-1",
+          "coCutPaths": [
+            "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+            "test/runner/prompt-templates.test.mjs",
+            "CHANGELOG.md"
+          ],
+          "expectedOutputSets": [
+            {
+              "path": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+              "mode": "100644",
+              "sha256": "438fba1efc73fc1d2667bbbfb86349b1e10b7a38403a10149b6263ffa284bd40",
+              "bytes": 5322
+            },
+            {
+              "path": "test/runner/prompt-templates.test.mjs",
+              "mode": "100644",
+              "sha256": "fdc6535c2608d1a8a1329f87595dcf50b50ea050d56e15a39821150f5ccb7abb",
+              "bytes": 13597
+            }
+          ],
+          "testTargets": [
+            "test/runner/prompt-templates.test.mjs"
+          ],
+          "intentionalBehaviorDeltas": [
+            {
+              "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+              "line": 31,
+              "oldPointer": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "newPointer": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+            },
+            {
+              "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+              "line": 48,
+              "oldPointer": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "newPointer": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+            }
+          ],
+          "prerequisites": [
+            "Independent Option B window review pending",
+            "Step 7 composes identical inherited Step 4 source diff once",
+            "Phase 9 authorized co-cut and Unreleased CHANGELOG.md entry",
+            "Candidate owning test execution still missing; complete static bytes verified here"
+          ],
+          "order": "Apply both file diffs in the same Phase 9 unit, then run the owning whole-golden test; no standalone golden update",
+          "rollbackDiff": "--- a/src/runner/prompt-templates/worker-prompt-skill-pointer.txt\n+++ b/src/runner/prompt-templates/worker-prompt-skill-pointer.txt\n@@ -28,7 +28,7 @@\n — proof a fix was validated against a real failing test before it existed.\n AFTER your implementation is written in this checkout (running this BEFORE\n your edits exist reads an empty diff and gives a false \"not required\" — see\n-`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n+`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n \"Watch out for\" section), classify your own diff (the runner commits later, so\n the changed files come from the working tree, not from a branch diff):\n \n@@ -45,7 +45,7 @@\n If the result's `required` is `false`, do nothing further. If\n `required` is `true`, you must produce real failing-test-first proof\n before reporting `[DONE]` — see\n-`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\n+`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\n for the full recipe: identify the test file(s) covering your change, `git\n stash push --` the IMPLEMENTATION files only (never the test files), run\n the same test command and capture the real failing output (red — paste the\n",
+          "timing": "phase9",
+          "readiness": "pending / cutover-patch-only",
+          "atomicUnit": {
+            "id": "prompt-skill-pointer-atomic",
+            "files": [
+              "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+              "test/runner/prompt-templates.test.mjs"
+            ],
+            "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "substitutions": [
+              [
+                "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+              ]
+            ],
+            "sourcePointerLines": [
+              31,
+              48
+            ],
+            "goldenPointerLines": [
+              198,
+              215
+            ],
+            "fixture": {
+              "title": "Add the widget",
+              "kind": "feature",
+              "description": "(không có)",
+              "feedbackSection": "",
+              "action": "(không có)",
+              "readFirst": "(không có)",
+              "docsRefPointer": "",
+              "refs": "src/widget.mjs, docs/specs/widget.md",
+              "verify": "npm test",
+              "domain": "coding",
+              "skillPath": ".claude/skills/fgos-code-implement/SKILL.md"
+            },
+            "currentPrompt": "# Goal\nAdd the widget (kind: feature)\n\n# Agent skill\nYou are a fgOS agent for domain coding at the executing stage. Before doing\nanything else, read .claude/skills/fgos-code-implement/SKILL.md in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this work item must be done.\n\n# Description\n(không có)\n\n# Directive\n(không có)\n\n# Files to read first\n(không có)\n\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.\n\n# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):\n\n```bash\nnode --input-type=module -e \"\nimport { execFileSync } from 'node:child_process';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nconst id = process.argv[1];\nconst description = process.argv[2];\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\0').filter(Boolean)), description })));\n\" \"<your item id — your current branch name, `git branch --show-current`, with the fgw/ prefix stripped>\" \"<your item's own Description text, verbatim, from the Description section above>\"\n```\n\nIf the result's `required` is `false`, do nothing further. If\n`required` is `true`, you must produce real failing-test-first proof\nbefore reporting `[DONE]` — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\nfor the full recipe: identify the test file(s) covering your change, `git\nstash push --` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), `git stash apply`\n(never `pop`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n`docs/history/<your item id>/iron-law-evidence.md` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting `[DONE]`. Skipping or fabricating this evidence when\n`required` is `true` is not a valid way to finish.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- `[DONE]` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\nnpm test\n\n# Constraints\nNever call `fgos` yourself and never write to `.fgos/` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun `git add`/`git commit` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n```fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n```\n\n`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n",
+            "candidatePrompt": "# Goal\nAdd the widget (kind: feature)\n\n# Agent skill\nYou are a fgOS agent for domain coding at the executing stage. Before doing\nanything else, read .claude/skills/fgos-code-implement/SKILL.md in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this work item must be done.\n\n# Description\n(không có)\n\n# Directive\n(không có)\n\n# Files to read first\n(không có)\n\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.\n\n# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):\n\n```bash\nnode --input-type=module -e \"\nimport { execFileSync } from 'node:child_process';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nconst id = process.argv[1];\nconst description = process.argv[2];\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\0').filter(Boolean)), description })));\n\" \"<your item id — your current branch name, `git branch --show-current`, with the fgw/ prefix stripped>\" \"<your item's own Description text, verbatim, from the Description section above>\"\n```\n\nIf the result's `required` is `false`, do nothing further. If\n`required` is `true`, you must produce real failing-test-first proof\nbefore reporting `[DONE]` — see\n`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\nfor the full recipe: identify the test file(s) covering your change, `git\nstash push --` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), `git stash apply`\n(never `pop`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n`docs/history/<your item id>/iron-law-evidence.md` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting `[DONE]`. Skipping or fabricating this evidence when\n`required` is `true` is not a valid way to finish.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- `[DONE]` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\nnpm test\n\n# Constraints\nNever call `fgos` yourself and never write to `.fgos/` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun `git add`/`git commit` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n```fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n```\n\n`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n",
+            "currentPromptSha256": "aab044f5bb29f76a4a9139a9a5a4fec6f1dd0180c2caac89927a4236bf0ab88b",
+            "candidatePromptSha256": "a4876832486bc49d691c3ddf16bb9c274deaf9c58425e0117ba9015f15bbc320",
+            "currentPromptBytes": 5235,
+            "candidatePromptBytes": 5361,
+            "comparison": "Complete UTF-8 bytes including trailing LF; only the two declared pointer substitutions differ. JS golden backtick/backslash escapes decoded, no path normalization.",
+            "readSet": [
+              {
+                "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+                "reader": "src/runner/prompt-templates.mjs::readTemplate",
+                "realDocumentRead": false,
+                "role": "committed text template input"
+              }
+            ],
+            "claimHolder": {
+              "target": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "targetSha256": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+              "historicalSource": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "historicalCommit": "d1be82e0c2665fcb38f7660b8590305d944e8b3b",
+              "migrationCommit": "989d0c7fa87ddcbab61b29b4f3e17b6fea6d430d",
+              "historicalSha256": "30ef480aa0a00886c42da6002d306ed5befdd36e9bb4fe53d9a3ffba74fb69cc",
+              "comparison": "Complete narrative byte equality after removing YAML frontmatter only; no prose normalization",
+              "claimLines": {
+                "recipe": [
+                  15,
+                  65
+                ],
+                "watchOut": [
+                  80,
+                  120
+                ]
+              },
+              "anchor": null
+            }
+          },
+          "coCutTestGreps": [
+            {
+              "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+              "oldPointer": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+              "needles": [
+                "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                "docs\\/how-to\\/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                "docs\\/how-to\\/produce-failing-test-first-proof-for-an-iron-law-gated-diff\\.md"
+              ],
+              "matches": [
+                {
+                  "file": "test/runner/prompt-templates.test.mjs",
+                  "line": 198,
+                  "text": "\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`'s",
+                  "sourceSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f"
+                },
+                {
+                  "file": "test/runner/prompt-templates.test.mjs",
+                  "line": 215,
+                  "text": "\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`",
+                  "sourceSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "file": "test/runner/prompt-templates.test.mjs",
+          "sourceSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f",
+          "mode": "100644",
+          "symbolOrPassage": "worker skill-pointer prompt pointers and complete byte-exact expected golden",
+          "oldText": "import '../helpers/process-tmp-root.mjs';\nimport { test } from 'node:test';\nimport assert from 'node:assert/strict';\nimport {\n  selectTemplate,\n  loadTemplate,\n  renderTemplate,\n  hashTemplate,\n  TEMPLATE_DIR,\n} from '../../src/runner/prompt-templates.mjs';\n\n// --- selectTemplate: mechanical table lookup, no LLM ---------------------\n\ntest('selectTemplate resolves a coding-domain input to the skill-pointer template, for any kind/tier (mechanical table lookup, keyed on domain)', () => {\n  assert.equal(selectTemplate({ kind: 'feature', tier: 'light', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');\n  assert.equal(selectTemplate({ kind: 'bug', tier: 'heavy', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');\n  assert.equal(selectTemplate({ kind: 'chore', tier: 'standard', domain: undefined }), 'worker-prompt-skill-pointer.txt');\n});\n\ntest('selectTemplate resolves even with no arguments at all — an absent domain folds to \"coding\", which resolves to the skill-pointer template', () => {\n  assert.equal(selectTemplate(), 'worker-prompt-skill-pointer.txt');\n  assert.equal(selectTemplate({}), 'worker-prompt-skill-pointer.txt');\n});\n\ntest('selectTemplate folds an unrecognized domain string to \"coding\" too (same fold as undefined, not a fall-back to the old default)', () => {\n  assert.equal(selectTemplate({ domain: 'made-up-domain' }), 'worker-prompt-skill-pointer.txt');\n});\n\ntest('selectTemplate still resolves a real registered non-coding domain (\"synthetic\") to the default template — the wildcard fallback survives for domains that exist but are not \"coding\"', () => {\n  assert.equal(selectTemplate({ kind: 'feature', tier: 'light', domain: 'synthetic' }), 'worker-prompt-default.txt');\n});\n\n// --- tsk-5mj D1/D6/D7: stage-aware selection (discovery dispatch) --------\n\ntest('selectTemplate resolves a coding-domain, stage:\"discovery\" input to the discovery template instead of the skill-pointer one', () => {\n  assert.equal(selectTemplate({ kind: 'feature', tier: 'standard', domain: 'coding', stage: 'discovery' }), 'worker-prompt-discovery.txt');\n});\n\ntest('selectTemplate omitting stage entirely (every pre-tsk-5mj call site) still resolves to the skill-pointer template, byte-identical to before', () => {\n  assert.equal(selectTemplate({ kind: 'feature', tier: 'standard', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');\n});\n\ntest('selectTemplate with stage:\"discovery\" on a non-coding domain still falls through to that domain\\'s own rule (stage only narrows the coding rule)', () => {\n  assert.equal(selectTemplate({ kind: 'feature', tier: 'standard', domain: 'synthetic', stage: 'discovery' }), 'worker-prompt-default.txt');\n});\n\n// --- loadTemplate / renderTemplate: golden-file render --------------------\n\ntest('loadTemplate reads worker-prompt-default.txt from TEMPLATE_DIR and it contains the eight named placeholders', () => {\n  const raw = loadTemplate('worker-prompt-default.txt');\n  for (const placeholder of [\n    '{title}',\n    '{kind}',\n    '{description}',\n    '{feedbackSection}',\n    '{action}',\n    '{readFirst}',\n    '{refs}',\n    '{verify}',\n  ]) {\n    assert.ok(raw.includes(placeholder), `expected template to include ${placeholder}`);\n  }\n  assert.ok(TEMPLATE_DIR.endsWith('prompt-templates'));\n});\n\ntest('renderTemplate(worker-prompt-default.txt, ...) golden output — no-feedback shape, byte-for-byte', () => {\n  const rendered = renderTemplate('worker-prompt-default.txt', {\n    title: 'Add the widget',\n    kind: 'feature',\n    description: '(không có)',\n    feedbackSection: '',\n    action: '(không có)',\n    readFirst: '(không có)',\n    refs: 'src/widget.mjs, docs/specs/widget.md',\n    verify: 'npm test',\n  });\n\n  const golden = `# Goal\nAdd the widget (kind: feature)\n\n# Description\n(không có)\n\n# Directive\n(không có)\n\n# Files to read first\n(không có)\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- \\`[DONE]\\` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- \\`[BLOCKED] <exactly what's missing or what stopped you>\\` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\nnpm test\n\n# Constraints\nNever call \\`fgos\\` yourself and never write to \\`.fgos/\\` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun \\`git add\\`/\\`git commit\\` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n\\`\\`\\`fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n\\`\\`\\`\n\n\\`title\\` is required; \\`kind\\`/\\`risk\\`/\\`description\\` are optional — pick \\`kind\\`/\\`risk\\` from the domain's own declared vocabulary (\\`classificationVocabulary(domain, field)\\`, \\`src/state/workflow-stage-graphs.mjs\\`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call \\`fgos\\` or touch \\`.fgos/\\`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n`;\n\n  assert.equal(rendered, golden);\n});\n\ntest('renderTemplate golden output — with-feedback shape includes the Human feedback section verbatim', () => {\n  const feedbackSection = '\\n# Human feedback\\nHuman answer (binding decision):\\nCHỐT (a): do X.\\n\\nLatest human rejection/park reason (fix THIS before anything else):\\nMissing test Y.\\n';\n  const rendered = renderTemplate('worker-prompt-default.txt', {\n    title: 'Add the widget',\n    kind: 'feature',\n    description: '(không có)',\n    feedbackSection,\n    refs: '(none)',\n    verify: 'npm test',\n  });\n  assert.match(rendered, /# Human feedback/);\n  assert.match(rendered, /CHỐT \\(a\\): do X\\./);\n  assert.match(rendered, /Missing test Y\\./);\n  // section sits between Description and Worktree boundary, same as before\n  assert.match(rendered, /\\(không có\\)\\n\\n# Human feedback[\\s\\S]*\\n\\n# Worktree boundary/);\n});\n\ntest('renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-feedback shape, byte-for-byte', () => {\n  const rendered = renderTemplate('worker-prompt-skill-pointer.txt', {\n    title: 'Add the widget',\n    kind: 'feature',\n    description: '(không có)',\n    feedbackSection: '',\n    action: '(không có)',\n    readFirst: '(không có)',\n    docsRefPointer: '',\n    refs: 'src/widget.mjs, docs/specs/widget.md',\n    verify: 'npm test',\n    domain: 'coding',\n    skillPath: '.claude/skills/fgos-code-implement/SKILL.md',\n  });\n\n  const golden = `# Goal\nAdd the widget (kind: feature)\n\n# Agent skill\nYou are a fgOS agent for domain coding at the executing stage. Before doing\nanything else, read .claude/skills/fgos-code-implement/SKILL.md in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this work item must be done.\n\n# Description\n(không có)\n\n# Directive\n(không có)\n\n# Files to read first\n(không có)\n\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.\n\n# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(\\`src/evolve/iron-law.mjs\\`'s \\`MODULE_RULES\\`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):\n\n\\`\\`\\`bash\nnode --input-type=module -e \"\nimport { execFileSync } from 'node:child_process';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nconst id = process.argv[1];\nconst description = process.argv[2];\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\\\0').filter(Boolean)), description })));\n\" \"<your item id — your current branch name, \\`git branch --show-current\\`, with the fgw/ prefix stripped>\" \"<your item's own Description text, verbatim, from the Description section above>\"\n\\`\\`\\`\n\nIf the result's \\`required\\` is \\`false\\`, do nothing further. If\n\\`required\\` is \\`true\\`, you must produce real failing-test-first proof\nbefore reporting \\`[DONE]\\` — see\n\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`\nfor the full recipe: identify the test file(s) covering your change, \\`git\nstash push --\\` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), \\`git stash apply\\`\n(never \\`pop\\`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n\\`docs/history/<your item id>/iron-law-evidence.md\\` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting \\`[DONE]\\`. Skipping or fabricating this evidence when\n\\`required\\` is \\`true\\` is not a valid way to finish.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- \\`[DONE]\\` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- \\`[BLOCKED] <exactly what's missing or what stopped you>\\` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\nnpm test\n\n# Constraints\nNever call \\`fgos\\` yourself and never write to \\`.fgos/\\` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun \\`git add\\`/\\`git commit\\` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n\\`\\`\\`fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n\\`\\`\\`\n\n\\`title\\` is required; \\`kind\\`/\\`risk\\`/\\`description\\` are optional — pick \\`kind\\`/\\`risk\\` from the domain's own declared vocabulary (\\`classificationVocabulary(domain, field)\\`, \\`src/state/workflow-stage-graphs.mjs\\`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call \\`fgos\\` or touch \\`.fgos/\\`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n`;\n\n  assert.equal(rendered, golden);\n});\n\n// --- hashTemplate: stable content-identity hash ---------------------------\n\ntest('hashTemplate returns a stable 64-hex-char sha256 digest for the same template across repeated calls', () => {\n  const first = hashTemplate('worker-prompt-default.txt');\n  const second = hashTemplate('worker-prompt-default.txt');\n  assert.equal(first, second);\n  assert.match(first, /^[0-9a-f]{64}$/);\n});\n",
+          "newText": "import '../helpers/process-tmp-root.mjs';\nimport { test } from 'node:test';\nimport assert from 'node:assert/strict';\nimport {\n  selectTemplate,\n  loadTemplate,\n  renderTemplate,\n  hashTemplate,\n  TEMPLATE_DIR,\n} from '../../src/runner/prompt-templates.mjs';\n\n// --- selectTemplate: mechanical table lookup, no LLM ---------------------\n\ntest('selectTemplate resolves a coding-domain input to the skill-pointer template, for any kind/tier (mechanical table lookup, keyed on domain)', () => {\n  assert.equal(selectTemplate({ kind: 'feature', tier: 'light', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');\n  assert.equal(selectTemplate({ kind: 'bug', tier: 'heavy', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');\n  assert.equal(selectTemplate({ kind: 'chore', tier: 'standard', domain: undefined }), 'worker-prompt-skill-pointer.txt');\n});\n\ntest('selectTemplate resolves even with no arguments at all — an absent domain folds to \"coding\", which resolves to the skill-pointer template', () => {\n  assert.equal(selectTemplate(), 'worker-prompt-skill-pointer.txt');\n  assert.equal(selectTemplate({}), 'worker-prompt-skill-pointer.txt');\n});\n\ntest('selectTemplate folds an unrecognized domain string to \"coding\" too (same fold as undefined, not a fall-back to the old default)', () => {\n  assert.equal(selectTemplate({ domain: 'made-up-domain' }), 'worker-prompt-skill-pointer.txt');\n});\n\ntest('selectTemplate still resolves a real registered non-coding domain (\"synthetic\") to the default template — the wildcard fallback survives for domains that exist but are not \"coding\"', () => {\n  assert.equal(selectTemplate({ kind: 'feature', tier: 'light', domain: 'synthetic' }), 'worker-prompt-default.txt');\n});\n\n// --- tsk-5mj D1/D6/D7: stage-aware selection (discovery dispatch) --------\n\ntest('selectTemplate resolves a coding-domain, stage:\"discovery\" input to the discovery template instead of the skill-pointer one', () => {\n  assert.equal(selectTemplate({ kind: 'feature', tier: 'standard', domain: 'coding', stage: 'discovery' }), 'worker-prompt-discovery.txt');\n});\n\ntest('selectTemplate omitting stage entirely (every pre-tsk-5mj call site) still resolves to the skill-pointer template, byte-identical to before', () => {\n  assert.equal(selectTemplate({ kind: 'feature', tier: 'standard', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');\n});\n\ntest('selectTemplate with stage:\"discovery\" on a non-coding domain still falls through to that domain\\'s own rule (stage only narrows the coding rule)', () => {\n  assert.equal(selectTemplate({ kind: 'feature', tier: 'standard', domain: 'synthetic', stage: 'discovery' }), 'worker-prompt-default.txt');\n});\n\n// --- loadTemplate / renderTemplate: golden-file render --------------------\n\ntest('loadTemplate reads worker-prompt-default.txt from TEMPLATE_DIR and it contains the eight named placeholders', () => {\n  const raw = loadTemplate('worker-prompt-default.txt');\n  for (const placeholder of [\n    '{title}',\n    '{kind}',\n    '{description}',\n    '{feedbackSection}',\n    '{action}',\n    '{readFirst}',\n    '{refs}',\n    '{verify}',\n  ]) {\n    assert.ok(raw.includes(placeholder), `expected template to include ${placeholder}`);\n  }\n  assert.ok(TEMPLATE_DIR.endsWith('prompt-templates'));\n});\n\ntest('renderTemplate(worker-prompt-default.txt, ...) golden output — no-feedback shape, byte-for-byte', () => {\n  const rendered = renderTemplate('worker-prompt-default.txt', {\n    title: 'Add the widget',\n    kind: 'feature',\n    description: '(không có)',\n    feedbackSection: '',\n    action: '(không có)',\n    readFirst: '(không có)',\n    refs: 'src/widget.mjs, docs/specs/widget.md',\n    verify: 'npm test',\n  });\n\n  const golden = `# Goal\nAdd the widget (kind: feature)\n\n# Description\n(không có)\n\n# Directive\n(không có)\n\n# Files to read first\n(không có)\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- \\`[DONE]\\` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- \\`[BLOCKED] <exactly what's missing or what stopped you>\\` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\nnpm test\n\n# Constraints\nNever call \\`fgos\\` yourself and never write to \\`.fgos/\\` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun \\`git add\\`/\\`git commit\\` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n\\`\\`\\`fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n\\`\\`\\`\n\n\\`title\\` is required; \\`kind\\`/\\`risk\\`/\\`description\\` are optional — pick \\`kind\\`/\\`risk\\` from the domain's own declared vocabulary (\\`classificationVocabulary(domain, field)\\`, \\`src/state/workflow-stage-graphs.mjs\\`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call \\`fgos\\` or touch \\`.fgos/\\`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n`;\n\n  assert.equal(rendered, golden);\n});\n\ntest('renderTemplate golden output — with-feedback shape includes the Human feedback section verbatim', () => {\n  const feedbackSection = '\\n# Human feedback\\nHuman answer (binding decision):\\nCHỐT (a): do X.\\n\\nLatest human rejection/park reason (fix THIS before anything else):\\nMissing test Y.\\n';\n  const rendered = renderTemplate('worker-prompt-default.txt', {\n    title: 'Add the widget',\n    kind: 'feature',\n    description: '(không có)',\n    feedbackSection,\n    refs: '(none)',\n    verify: 'npm test',\n  });\n  assert.match(rendered, /# Human feedback/);\n  assert.match(rendered, /CHỐT \\(a\\): do X\\./);\n  assert.match(rendered, /Missing test Y\\./);\n  // section sits between Description and Worktree boundary, same as before\n  assert.match(rendered, /\\(không có\\)\\n\\n# Human feedback[\\s\\S]*\\n\\n# Worktree boundary/);\n});\n\ntest('renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-feedback shape, byte-for-byte', () => {\n  const rendered = renderTemplate('worker-prompt-skill-pointer.txt', {\n    title: 'Add the widget',\n    kind: 'feature',\n    description: '(không có)',\n    feedbackSection: '',\n    action: '(không có)',\n    readFirst: '(không có)',\n    docsRefPointer: '',\n    refs: 'src/widget.mjs, docs/specs/widget.md',\n    verify: 'npm test',\n    domain: 'coding',\n    skillPath: '.claude/skills/fgos-code-implement/SKILL.md',\n  });\n\n  const golden = `# Goal\nAdd the widget (kind: feature)\n\n# Agent skill\nYou are a fgOS agent for domain coding at the executing stage. Before doing\nanything else, read .claude/skills/fgos-code-implement/SKILL.md in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this work item must be done.\n\n# Description\n(không có)\n\n# Directive\n(không có)\n\n# Files to read first\n(không có)\n\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.\n\n# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(\\`src/evolve/iron-law.mjs\\`'s \\`MODULE_RULES\\`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n\\`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):\n\n\\`\\`\\`bash\nnode --input-type=module -e \"\nimport { execFileSync } from 'node:child_process';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nconst id = process.argv[1];\nconst description = process.argv[2];\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\\\0').filter(Boolean)), description })));\n\" \"<your item id — your current branch name, \\`git branch --show-current\\`, with the fgw/ prefix stripped>\" \"<your item's own Description text, verbatim, from the Description section above>\"\n\\`\\`\\`\n\nIf the result's \\`required\\` is \\`false\\`, do nothing further. If\n\\`required\\` is \\`true\\`, you must produce real failing-test-first proof\nbefore reporting \\`[DONE]\\` — see\n\\`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`\nfor the full recipe: identify the test file(s) covering your change, \\`git\nstash push --\\` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), \\`git stash apply\\`\n(never \\`pop\\`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n\\`docs/history/<your item id>/iron-law-evidence.md\\` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting \\`[DONE]\\`. Skipping or fabricating this evidence when\n\\`required\\` is \\`true\\` is not a valid way to finish.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- \\`[DONE]\\` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- \\`[BLOCKED] <exactly what's missing or what stopped you>\\` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\nnpm test\n\n# Constraints\nNever call \\`fgos\\` yourself and never write to \\`.fgos/\\` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun \\`git add\\`/\\`git commit\\` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n\\`\\`\\`fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n\\`\\`\\`\n\n\\`title\\` is required; \\`kind\\`/\\`risk\\`/\\`description\\` are optional — pick \\`kind\\`/\\`risk\\` from the domain's own declared vocabulary (\\`classificationVocabulary(domain, field)\\`, \\`src/state/workflow-stage-graphs.mjs\\`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call \\`fgos\\` or touch \\`.fgos/\\`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n`;\n\n  assert.equal(rendered, golden);\n});\n\n// --- hashTemplate: stable content-identity hash ---------------------------\n\ntest('hashTemplate returns a stable 64-hex-char sha256 digest for the same template across repeated calls', () => {\n  const first = hashTemplate('worker-prompt-default.txt');\n  const second = hashTemplate('worker-prompt-default.txt');\n  assert.equal(first, second);\n  assert.match(first, /^[0-9a-f]{64}$/);\n});\n",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 78,
+              "columnStart": 3,
+              "line": 198,
+              "text": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\"
+            },
+            {
+              "columnEndExclusive": 78,
+              "columnStart": 3,
+              "line": 215,
+              "text": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\"
+            }
+          ],
+          "diff": "--- a/test/runner/prompt-templates.test.mjs\n+++ b/test/runner/prompt-templates.test.mjs\n@@ -195,7 +195,7 @@\n — proof a fix was validated against a real failing test before it existed.\n AFTER your implementation is written in this checkout (running this BEFORE\n your edits exist reads an empty diff and gives a false \"not required\" — see\n-\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`'s\n+\\`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`'s\n \"Watch out for\" section), classify your own diff (the runner commits later, so\n the changed files come from the working tree, not from a branch diff):\n \n@@ -212,7 +212,7 @@\n If the result's \\`required\\` is \\`false\\`, do nothing further. If\n \\`required\\` is \\`true\\`, you must produce real failing-test-first proof\n before reporting \\`[DONE]\\` — see\n-\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`\n+\\`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`\n for the full recipe: identify the test file(s) covering your change, \\`git\n stash push --\\` the IMPLEMENTATION files only (never the test files), run\n the same test command and capture the real failing output (red — paste the\n",
+          "expectedAfterSha256": "fdc6535c2608d1a8a1329f87595dcf50b50ea050d56e15a39821150f5ccb7abb",
+          "targetOwner": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+          "claimAnchorProof": {
+            "target": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "targetSha256": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+            "historicalSource": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "historicalCommit": "d1be82e0c2665fcb38f7660b8590305d944e8b3b",
+            "migrationCommit": "989d0c7fa87ddcbab61b29b4f3e17b6fea6d430d",
+            "historicalSha256": "30ef480aa0a00886c42da6002d306ed5befdd36e9bb4fe53d9a3ffba74fb69cc",
+            "comparison": "Complete narrative byte equality after removing YAML frontmatter only; no prose normalization",
+            "claimLines": {
+              "recipe": [
+                15,
+                65
+              ],
+              "watchOut": [
+                80,
+                120
+              ]
+            },
+            "anchor": null
+          },
+          "receiptId": "real-file-tests-goldens-prompt-batch-1",
+          "coCutPaths": [
+            "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+            "test/runner/prompt-templates.test.mjs",
+            "CHANGELOG.md"
+          ],
+          "expectedOutputSets": [
+            {
+              "path": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+              "mode": "100644",
+              "sha256": "438fba1efc73fc1d2667bbbfb86349b1e10b7a38403a10149b6263ffa284bd40",
+              "bytes": 5322
+            },
+            {
+              "path": "test/runner/prompt-templates.test.mjs",
+              "mode": "100644",
+              "sha256": "fdc6535c2608d1a8a1329f87595dcf50b50ea050d56e15a39821150f5ccb7abb",
+              "bytes": 13597
+            }
+          ],
+          "testTargets": [
+            "test/runner/prompt-templates.test.mjs"
+          ],
+          "intentionalBehaviorDeltas": [
+            {
+              "file": "test/runner/prompt-templates.test.mjs",
+              "line": 198,
+              "oldPointer": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\",
+              "newPointer": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\"
+            },
+            {
+              "file": "test/runner/prompt-templates.test.mjs",
+              "line": 215,
+              "oldPointer": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\",
+              "newPointer": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\"
+            }
+          ],
+          "prerequisites": [
+            "Independent Option B window review pending",
+            "Step 7 composes identical inherited Step 4 source diff once",
+            "Phase 9 authorized co-cut and Unreleased CHANGELOG.md entry",
+            "Candidate owning test execution still missing; complete static bytes verified here"
+          ],
+          "order": "Apply both file diffs in the same Phase 9 unit, then run the owning whole-golden test; no standalone golden update",
+          "rollbackDiff": "--- a/test/runner/prompt-templates.test.mjs\n+++ b/test/runner/prompt-templates.test.mjs\n@@ -195,7 +195,7 @@\n — proof a fix was validated against a real failing test before it existed.\n AFTER your implementation is written in this checkout (running this BEFORE\n your edits exist reads an empty diff and gives a false \"not required\" — see\n-\\`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`'s\n+\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`'s\n \"Watch out for\" section), classify your own diff (the runner commits later, so\n the changed files come from the working tree, not from a branch diff):\n \n@@ -212,7 +212,7 @@\n If the result's \\`required\\` is \\`false\\`, do nothing further. If\n \\`required\\` is \\`true\\`, you must produce real failing-test-first proof\n before reporting \\`[DONE]\\` — see\n-\\`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`\n+\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`\n for the full recipe: identify the test file(s) covering your change, \\`git\n stash push --\\` the IMPLEMENTATION files only (never the test files), run\n the same test command and capture the real failing output (red — paste the\n",
+          "timing": "phase9",
+          "readiness": "pending / cutover-patch-only",
+          "atomicUnit": {
+            "id": "prompt-skill-pointer-atomic",
+            "files": [
+              "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+              "test/runner/prompt-templates.test.mjs"
+            ],
+            "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "substitutions": [
+              [
+                "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+              ]
+            ],
+            "sourcePointerLines": [
+              31,
+              48
+            ],
+            "goldenPointerLines": [
+              198,
+              215
+            ],
+            "fixture": {
+              "title": "Add the widget",
+              "kind": "feature",
+              "description": "(không có)",
+              "feedbackSection": "",
+              "action": "(không có)",
+              "readFirst": "(không có)",
+              "docsRefPointer": "",
+              "refs": "src/widget.mjs, docs/specs/widget.md",
+              "verify": "npm test",
+              "domain": "coding",
+              "skillPath": ".claude/skills/fgos-code-implement/SKILL.md"
+            },
+            "currentPrompt": "# Goal\nAdd the widget (kind: feature)\n\n# Agent skill\nYou are a fgOS agent for domain coding at the executing stage. Before doing\nanything else, read .claude/skills/fgos-code-implement/SKILL.md in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this work item must be done.\n\n# Description\n(không có)\n\n# Directive\n(không có)\n\n# Files to read first\n(không có)\n\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.\n\n# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):\n\n```bash\nnode --input-type=module -e \"\nimport { execFileSync } from 'node:child_process';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nconst id = process.argv[1];\nconst description = process.argv[2];\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\0').filter(Boolean)), description })));\n\" \"<your item id — your current branch name, `git branch --show-current`, with the fgw/ prefix stripped>\" \"<your item's own Description text, verbatim, from the Description section above>\"\n```\n\nIf the result's `required` is `false`, do nothing further. If\n`required` is `true`, you must produce real failing-test-first proof\nbefore reporting `[DONE]` — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\nfor the full recipe: identify the test file(s) covering your change, `git\nstash push --` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), `git stash apply`\n(never `pop`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n`docs/history/<your item id>/iron-law-evidence.md` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting `[DONE]`. Skipping or fabricating this evidence when\n`required` is `true` is not a valid way to finish.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- `[DONE]` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\nnpm test\n\n# Constraints\nNever call `fgos` yourself and never write to `.fgos/` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun `git add`/`git commit` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n```fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n```\n\n`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n",
+            "candidatePrompt": "# Goal\nAdd the widget (kind: feature)\n\n# Agent skill\nYou are a fgOS agent for domain coding at the executing stage. Before doing\nanything else, read .claude/skills/fgos-code-implement/SKILL.md in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this work item must be done.\n\n# Description\n(không có)\n\n# Directive\n(không có)\n\n# Files to read first\n(không có)\n\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.\n\n# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):\n\n```bash\nnode --input-type=module -e \"\nimport { execFileSync } from 'node:child_process';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nconst id = process.argv[1];\nconst description = process.argv[2];\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\0').filter(Boolean)), description })));\n\" \"<your item id — your current branch name, `git branch --show-current`, with the fgw/ prefix stripped>\" \"<your item's own Description text, verbatim, from the Description section above>\"\n```\n\nIf the result's `required` is `false`, do nothing further. If\n`required` is `true`, you must produce real failing-test-first proof\nbefore reporting `[DONE]` — see\n`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\nfor the full recipe: identify the test file(s) covering your change, `git\nstash push --` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), `git stash apply`\n(never `pop`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n`docs/history/<your item id>/iron-law-evidence.md` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting `[DONE]`. Skipping or fabricating this evidence when\n`required` is `true` is not a valid way to finish.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- `[DONE]` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\nnpm test\n\n# Constraints\nNever call `fgos` yourself and never write to `.fgos/` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun `git add`/`git commit` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n```fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n```\n\n`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n",
+            "currentPromptSha256": "aab044f5bb29f76a4a9139a9a5a4fec6f1dd0180c2caac89927a4236bf0ab88b",
+            "candidatePromptSha256": "a4876832486bc49d691c3ddf16bb9c274deaf9c58425e0117ba9015f15bbc320",
+            "currentPromptBytes": 5235,
+            "candidatePromptBytes": 5361,
+            "comparison": "Complete UTF-8 bytes including trailing LF; only the two declared pointer substitutions differ. JS golden backtick/backslash escapes decoded, no path normalization.",
+            "readSet": [
+              {
+                "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+                "reader": "src/runner/prompt-templates.mjs::readTemplate",
+                "realDocumentRead": false,
+                "role": "committed text template input"
+              }
+            ],
+            "claimHolder": {
+              "target": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "targetSha256": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+              "historicalSource": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "historicalCommit": "d1be82e0c2665fcb38f7660b8590305d944e8b3b",
+              "migrationCommit": "989d0c7fa87ddcbab61b29b4f3e17b6fea6d430d",
+              "historicalSha256": "30ef480aa0a00886c42da6002d306ed5befdd36e9bb4fe53d9a3ffba74fb69cc",
+              "comparison": "Complete narrative byte equality after removing YAML frontmatter only; no prose normalization",
+              "claimLines": {
+                "recipe": [
+                  15,
+                  65
+                ],
+                "watchOut": [
+                  80,
+                  120
+                ]
+              },
+              "anchor": null
+            }
+          },
+          "coCutTestGreps": [
+            {
+              "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+              "oldPointer": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+              "needles": [
+                "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                "docs\\/how-to\\/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                "docs\\/how-to\\/produce-failing-test-first-proof-for-an-iron-law-gated-diff\\.md"
+              ],
+              "matches": [
+                {
+                  "file": "test/runner/prompt-templates.test.mjs",
+                  "line": 198,
+                  "text": "\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`'s",
+                  "sourceSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f"
+                },
+                {
+                  "file": "test/runner/prompt-templates.test.mjs",
+                  "line": 215,
+                  "text": "\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`",
+                  "sourceSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "coCutTestGreps": [
+        {
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "oldPointer": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "docs\\/how-to\\/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "docs\\/how-to\\/produce-failing-test-first-proof-for-an-iron-law-gated-diff\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/runner/prompt-templates.test.mjs",
+              "line": 198,
+              "text": "\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`'s",
+              "sourceSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f"
+            },
+            {
+              "file": "test/runner/prompt-templates.test.mjs",
+              "line": 215,
+              "text": "\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`",
+              "sourceSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1098,3 +1098,13 @@ Brief acknowledged. Reading authoritative rules and census; merge accounting pre
 ## Seam 5 incomplete handback — 2026-10-21
 
 L12-75 merge accounting complete; ratchet 0 and 28/28. Current prompt parity 5,235 bytes; owning tests 12/12. Pilot probes 44/44 reject; generator probes stop on two baseline failures. Full checker 291 existing records, two backlog-related failures; settled records remain pinned for Step 7. Seam 5 semantic records remain unauthored (704 files / 1,203 references / 25,007 tuples); no review readiness claimed. See step-05-seam5-handback.md and step-05-seam5-verification.json. Measured author elapsed 424.795s.
+
+
+## Seam 5 prompt batch — in progress
+
+R17 checker pin correction and residual closure records authored. Prompt atomic batch: two files, ten literal references, two tuples; eleven admitted, one mechanical label reject, four patches/eight preserves, no parks. Standalone batch checker has zero failures and eleven mutation probes reject. Generator probes are running from a zero-failure baseline, including non-failing HEAD-only drift. Remaining population is conserved in the continuation JSON; no implementation or semantic acceptance is claimed.
+
+
+## Seam 5 prompt batch — closed
+
+Full checker: 293 files / 2,429 references / 5,656 tuples / zero failures. Mutation probes 91/91 reject; HEAD-only drift positive probe passes; current prompt suite 12/12. Eleven residual groups closed. Batch 1: two files, eleven admits, zero judgment rejects, one mechanical reject, zero parks, four patches/eight preserves. Remaining: 702 files / 1,193 references / 25,005 tuples / three carries. Backlog 19 moved spans are non-failing Step 7 drift. Verification and handback are step-05-seam5-batch1-{verification.json,handback.md}; review and Phase 9 execution pending.

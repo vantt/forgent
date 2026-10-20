@@ -1,0 +1,180 @@
+{
+  "kind": "Closed prompt batch author verification; independent review and Phase 9 execution pending",
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "ruling": "L12-76",
+  "fullChecker": {
+    "files": 293,
+    "literalReferences": 2429,
+    "dynamicTuples": 5656,
+    "failureCount": 0
+  },
+  "existingSeams": {
+    "files": 291,
+    "references": 2419,
+    "tuples": 5654,
+    "inputPinsAndOriginalIdentities": "unchanged; step-05-seam5-pin-conservation.json"
+  },
+  "batch1": {
+    "files": 2,
+    "sourceFiles": 2,
+    "generatedFiles": 0,
+    "references": 10,
+    "dynamicTuples": 2,
+    "admitted": 11,
+    "judgmentRejects": 0,
+    "mechanicalRejects": 1,
+    "parks": 0,
+    "patches": 4,
+    "preserves": 8
+  },
+  "residualGroupsClosed": 11,
+  "rejectingProbes": {
+    "passed": 91,
+    "total": 91
+  },
+  "currentPromptTests": {
+    "passed": 12,
+    "failed": 0
+  },
+  "remaining": {
+    "files": 702,
+    "references": 1193,
+    "tuples": 25005,
+    "carries": 3
+  },
+  "headDrift": {
+    "list": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+    "files": 1,
+    "movedSpans": 19,
+    "failing": false,
+    "step7": true
+  },
+  "commands": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-generator-probes.log",
+      "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+      "passed": 34,
+      "total": 34,
+      "positiveHeadOnlyDrift": {
+        "pass": true,
+        "reportedFiles": 253
+      },
+      "logSha256": "be6baada3498e9392aed50f2a1eae7c314e3baf667ac54ad2bbdaec53886bace",
+      "resultSha256": "5651bff363b7311c465c32e7bdfb5db0ad0724759cda11189bed540281e85837"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-pilot-probes.log",
+      "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "passed": 44,
+      "total": 44,
+      "logSha256": "ed5a4641a73331a1c84a2cdcfc76a1f7bc1170db25a5ff214213f49b7cd12c57",
+      "resultSha256": "1c657c27239de46a4712a71565346ea6bf19d8c642900f0867b34eb166ebb63b"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/runner/prompt-templates.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch1-prompt-tests.log",
+      "passed": 12,
+      "failed": 0,
+      "scope": "Current committed prompt/golden only; candidate execution remains missing.",
+      "logSha256": "840c4c10c86bf432f5710867619b2dae81ce8977cfc6c3b23d3e8003a4f8f02a"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch1-probes.log",
+      "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes-result.json",
+      "passed": 13,
+      "total": 13,
+      "logSha256": "81a9f835e359f8b4a4eb01df2fc0d179b7872641a298dbdab918e97ccc3020b7",
+      "resultSha256": "b71b3416580bf68d7743090d15d1756073cef27a1b87008366b3f29999d7ed01"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check.py",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch1-check.log",
+      "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check-result.json",
+      "failures": 0,
+      "logSha256": "c14af533c875d1c4bda558bf2a7adc4dfa593c2ce90b4971cad73b2e1f9be485",
+      "resultSha256": "da6fd88cb88ee8fe46a6dcbfb83cc1cc376760c1933ba1560b78f8699040331f"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py --output step-05-seam5-batch1-full-check.json",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch1-full-check.log",
+      "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch1-full-check.json",
+      "canonicalResult": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+      "failures": 0,
+      "logSha256": "76650965d92a5e8818a01c91fe8c7e36cb01e48ca1235a9ddec2316434dffdab",
+      "resultSha256": "6d39d07969265e7bf53a208fb4a956c7b4ddf078599ffec5dccb8826e9fd954a",
+      "canonicalResultSha256": "6d39d07969265e7bf53a208fb4a956c7b4ddf078599ffec5dccb8826e9fd954a"
+    }
+  ],
+  "intermediateAttempts": [
+    {
+      "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-r17-check.json",
+      "failureCount": 1,
+      "explanation": "Retained unsuccessful intermediate attempt before synchronizing the 015228 carry-correction map. Its s4-carries failure is closed by the final zero-failure run; this file is not current acceptance evidence."
+    }
+  ],
+  "readiness": "Prompt records closed for Lead window packing; not semantic acceptance or execution-ready cutover",
+  "scope": {
+    "allowedPrefix": "plans/260925-documentation-authority-unification/reports/phase-08/",
+    "changedPathsBeforeHandback": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-admission-rules.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-cutover-specs.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-parity-receipts.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-prompt-goldens.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-carry-corrections.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rereview-list.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch-selection.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch1-check.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch1-full-check.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch1-full-check.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch1-probes.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch1-prompt-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-continuation.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-cutover-specs.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-generator-probes.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-parity-receipts.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-pin-conservation.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-r17-check.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-residual-closure.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-review-list.json"
+    ],
+    "outsideScopeWrites": [],
+    "gitWrites": false,
+    "productFilesChanged": false,
+    "sourceGeneratorsRun": false,
+    "servicesStarted": false,
+    "fullNpmOrCargoRun": false,
+    "liveStateOrSecretsRead": false
+  },
+  "ackReceivedAt": "2026-10-20T20:54:34.762634Z",
+  "finishedAt": "2026-10-20T21:12:41.343017Z",
+  "measuredAuthorElapsedSeconds": 1086.58,
+  "independentReviewElapsed": "not claimed",
+  "needsWrites": []
+}

@@ -1,0 +1,16 @@
+{
+  "kind": "Existing Step5 input pin and census identity conservation",
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "existingFiles": 291,
+  "originalReferences": 2419,
+  "originalTuples": 5654,
+  "unchanged": [
+    "authorInputCommit",
+    "sourceSha256",
+    "sourceMode",
+    "wholeFileReadEvidence",
+    "all original ids/origins/spans/expressions/tuples"
+  ],
+  "failures": [],
+  "scope": "Existing seams1-4 only; new prompt batch retains its own ten references/two tuples separately."
+}

@@ -41,21 +41,31 @@
     "s4-receipts": "Complete per-family comparisons and honest missing/not-run proof.",
     "s4-carries": "All 137 original carries and 165 original pilot ids retained without losing tuples.",
     "s4-lexical": "Every whole-file legacy-root occurrence accounted by original ref, prior slot or author-added edge.",
-    "s4-review": "All admitted occurrences and every rejection/changed source slot in bounded hash-bound exact-window parts."
+    "s4-review": "All admitted occurrences and every rejection/changed source slot in bounded hash-bound exact-window parts.",
+    "s5-coverage": "Closed batch retains all original identities and remaining queue/carries exactly once.",
+    "s5-lexical": "Every pinned whole-file docs-root token has its own physical reference span.",
+    "s5-pins": "Every input digest/mode/byte count matches its own immutable git pin.",
+    "s5-spans": "Every literal, passage, operation and full enclosing test callback matches pinned bytes.",
+    "s5-inheritance": "Step4 source slots retain exact identity/disposition and complete prior record hash.",
+    "s5-patches": "Complete source and golden diffs apply and reverse exactly, without additional substitutions.",
+    "s5-atomic": "Source 31/48 and full expected golden 198/215 co-cut; complete rendered bytes equal at both sides.",
+    "s5-receipts": "Source/candidate hashes, full specs and required comparison fields join one honest pending receipt.",
+    "s5-review": "Only admitted/judgment items are window obligations; mechanical rejects remain separately enumerated.",
+    "r19-label-diagnostic": "Only an assert.ok diagnostic label, in a complete census-root-free callback with no traced census constant, can be rejected mechanically."
   },
   "checks": {
     "coverage": 2206,
     "source-pins": 37,
     "passage-outcome": 33,
     "inherited-outcome": 25,
-    "receipts": 404,
+    "receipts": 405,
     "retiring-retained": 149,
     "source-spans": 2166,
-    "parks": 32,
-    "rejections": 1802,
+    "parks": 31,
+    "rejections": 1801,
     "fixture-provenance": 14,
     "pinned-passage": 2017,
-    "dynamic-operand": 240,
+    "dynamic-operand": 241,
     "patches": 37,
     "generated": 37,
     "co-cut-grep": 17,
@@ -67,7 +77,7 @@
     "review": 78,
     "a-passage-agreement": 410,
     "b-real-blocker": 1922,
-    "d-own-operand": 3637,
+    "d-own-operand": 2,
     "s4-coverage": 5910,
     "s4-pins": 254,
     "s4-spans": 5907,
@@ -84,11 +94,21 @@
     "s4-review": 435,
     "c-render-owner": 522,
     "e-retired-successor": 10,
-    "r11-plans-boundary": 135
+    "r11-plans-boundary": 135,
+    "s5-coverage": 14,
+    "s5-pins": 2,
+    "s5-lexical": 2,
+    "s5-spans": 12,
+    "s5-inheritance": 3,
+    "s5-patches": 2,
+    "r19-label-diagnostic": 1,
+    "s5-receipts": 1,
+    "s5-atomic": 1,
+    "s5-review": 1
   },
-  "files": 291,
-  "literalReferences": 2419,
-  "dynamicTuples": 5654,
+  "files": 293,
+  "literalReferences": 2429,
+  "dynamicTuples": 5656,
   "failures": [],
   "failureCount": 0,
   "sourceCensusGrep": [
@@ -3666,6 +3686,277 @@
       "postCensusComment": false
     }
   ],
+  "headDrift": [
+    {
+      "file": "docs/backlog.md",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 66
+      },
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "pinnedHash": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+      "headHash": "8be573e3ac34b85bf6a73fcf989af84f2758daa760dabee00b658dac30f907a0",
+      "movedSpans": [
+        {
+          "id": "author-s4-19c252476bfb8f58",
+          "pinnedSpan": {
+            "line": 72,
+            "columnStart": 80,
+            "columnEndExclusive": 95,
+            "text": "docs/decisions/"
+          },
+          "headMatchingLines": [
+            73,
+            115,
+            124
+          ]
+        },
+        {
+          "id": "author-s4-f02a917bdfe98c52",
+          "pinnedSpan": {
+            "line": 107,
+            "columnStart": 481,
+            "columnEndExclusive": 501,
+            "text": "docs/specs/runner.md"
+          },
+          "headMatchingLines": [
+            108
+          ]
+        },
+        {
+          "id": "author-s4-2e799bbe055b244b",
+          "pinnedSpan": {
+            "line": 114,
+            "columnStart": 321,
+            "columnEndExclusive": 349,
+            "text": "docs/decisions/0000-index.md"
+          },
+          "headMatchingLines": [
+            115
+          ]
+        },
+        {
+          "id": "author-s4-033b8befd0b861df",
+          "pinnedSpan": {
+            "line": 116,
+            "columnStart": 396,
+            "columnEndExclusive": 411,
+            "text": "docs/specs/*.md"
+          },
+          "headMatchingLines": [
+            117
+          ]
+        },
+        {
+          "id": "author-s4-5caf17775c40c6b0",
+          "pinnedSpan": {
+            "line": 116,
+            "columnStart": 443,
+            "columnEndExclusive": 468,
+            "text": "docs/history/*/CONTEXT.md"
+          },
+          "headMatchingLines": [
+            49,
+            117
+          ]
+        },
+        {
+          "id": "author-s4-45dc2cd894385e72",
+          "pinnedSpan": {
+            "line": 118,
+            "columnStart": 224,
+            "columnEndExclusive": 254,
+            "text": "docs/history/dogfood-p25-run1/"
+          },
+          "headMatchingLines": [
+            119
+          ]
+        },
+        {
+          "id": "author-s4-721bff23faa8d622",
+          "pinnedSpan": {
+            "line": 118,
+            "columnStart": 356,
+            "columnEndExclusive": 396,
+            "text": "docs/history/p50-workflow-induct/plan.md"
+          },
+          "headMatchingLines": [
+            119
+          ]
+        },
+        {
+          "id": "author-s4-c9433d21d5c1e93a",
+          "pinnedSpan": {
+            "line": 118,
+            "columnStart": 756,
+            "columnEndExclusive": 799,
+            "text": "docs/history/fgos-sample-testbed/CONTEXT.md"
+          },
+          "headMatchingLines": [
+            119
+          ]
+        },
+        {
+          "id": "author-s4-229e8a5afb1230ae",
+          "pinnedSpan": {
+            "line": 121,
+            "columnStart": 1113,
+            "columnEndExclusive": 1166,
+            "text": "docs/history/str61-chat-context-continuity/CONTEXT.md"
+          },
+          "headMatchingLines": [
+            122
+          ]
+        },
+        {
+          "id": "author-s4-84005ca08befe2c0",
+          "pinnedSpan": {
+            "line": 123,
+            "columnStart": 1728,
+            "columnEndExclusive": 1739,
+            "text": "docs/specs/"
+          },
+          "headMatchingLines": [
+            29,
+            44,
+            108,
+            117,
+            124
+          ]
+        },
+        {
+          "id": "author-s4-09018bba15ce7bfe",
+          "pinnedSpan": {
+            "line": 123,
+            "columnStart": 2502,
+            "columnEndExclusive": 2517,
+            "text": "docs/decisions/"
+          },
+          "headMatchingLines": [
+            73,
+            115,
+            124
+          ]
+        },
+        {
+          "id": "author-s4-06e8be879d39deb1",
+          "pinnedSpan": {
+            "line": 126,
+            "columnStart": 496,
+            "columnEndExclusive": 540,
+            "text": "docs/history/p50-workflow-induct/reports/..."
+          },
+          "headMatchingLines": [
+            127
+          ]
+        },
+        {
+          "id": "author-s4-68c3eab88fa07af7",
+          "pinnedSpan": {
+            "line": 127,
+            "columnStart": 1237,
+            "columnEndExclusive": 1302,
+            "text": "docs/history/p50-workflow-induct/reports/p50-workflow-induct-6.md"
+          },
+          "headMatchingLines": [
+            128
+          ]
+        },
+        {
+          "id": "author-s4-bb81392549cc3486",
+          "pinnedSpan": {
+            "line": 128,
+            "columnStart": 128,
+            "columnEndExclusive": 176,
+            "text": "docs/history/gate-dialogue-continuity/CONTEXT.md"
+          },
+          "headMatchingLines": [
+            44,
+            129
+          ]
+        },
+        {
+          "id": "author-s4-26fc8d2f9269bc9a",
+          "pinnedSpan": {
+            "line": 130,
+            "columnStart": 933,
+            "columnEndExclusive": 943,
+            "text": "docs/specs"
+          },
+          "headMatchingLines": [
+            29,
+            44,
+            108,
+            117,
+            124,
+            131
+          ]
+        },
+        {
+          "id": "author-s4-6f302576938a67b2",
+          "pinnedSpan": {
+            "line": 132,
+            "columnStart": 599,
+            "columnEndExclusive": 663,
+            "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:129-156"
+          },
+          "headMatchingLines": [
+            133
+          ]
+        },
+        {
+          "id": "author-s4-4676c20acaf7573e",
+          "pinnedSpan": {
+            "line": 134,
+            "columnStart": 337,
+            "columnEndExclusive": 401,
+            "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:166-170"
+          },
+          "headMatchingLines": [
+            135
+          ]
+        },
+        {
+          "id": "author-s4-d72e383c7545e538",
+          "pinnedSpan": {
+            "line": 140,
+            "columnStart": 1278,
+            "columnEndExclusive": 1336,
+            "text": "docs/history/worktree-companion-mount-ephemeral/CONTEXT.md"
+          },
+          "headMatchingLines": [
+            141
+          ]
+        },
+        {
+          "id": "author-s4-cdc5db14089ef6ef",
+          "pinnedSpan": {
+            "line": 150,
+            "columnStart": 303,
+            "columnEndExclusive": 316,
+            "text": "docs/history/"
+          },
+          "headMatchingLines": [
+            22,
+            44,
+            49,
+            117,
+            119,
+            122,
+            127,
+            128,
+            129,
+            133,
+            135,
+            141,
+            151
+          ]
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    }
+  ],
   "reviewStatus": "pending; checker success is not semantic acceptance or cutover readiness",
   "extensions": {
     "generators-projections": {
@@ -3718,7 +4009,319 @@
         "r11-plans-boundary": 135
       },
       "failureCount": 0,
-      "failures": []
+      "failures": [],
+      "headDrift": [
+        {
+          "file": "docs/backlog.md",
+          "record": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+            "recordLine": 66
+          },
+          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "pinnedHash": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+          "headHash": "8be573e3ac34b85bf6a73fcf989af84f2758daa760dabee00b658dac30f907a0",
+          "movedSpans": [
+            {
+              "id": "author-s4-19c252476bfb8f58",
+              "pinnedSpan": {
+                "line": 72,
+                "columnStart": 80,
+                "columnEndExclusive": 95,
+                "text": "docs/decisions/"
+              },
+              "headMatchingLines": [
+                73,
+                115,
+                124
+              ]
+            },
+            {
+              "id": "author-s4-f02a917bdfe98c52",
+              "pinnedSpan": {
+                "line": 107,
+                "columnStart": 481,
+                "columnEndExclusive": 501,
+                "text": "docs/specs/runner.md"
+              },
+              "headMatchingLines": [
+                108
+              ]
+            },
+            {
+              "id": "author-s4-2e799bbe055b244b",
+              "pinnedSpan": {
+                "line": 114,
+                "columnStart": 321,
+                "columnEndExclusive": 349,
+                "text": "docs/decisions/0000-index.md"
+              },
+              "headMatchingLines": [
+                115
+              ]
+            },
+            {
+              "id": "author-s4-033b8befd0b861df",
+              "pinnedSpan": {
+                "line": 116,
+                "columnStart": 396,
+                "columnEndExclusive": 411,
+                "text": "docs/specs/*.md"
+              },
+              "headMatchingLines": [
+                117
+              ]
+            },
+            {
+              "id": "author-s4-5caf17775c40c6b0",
+              "pinnedSpan": {
+                "line": 116,
+                "columnStart": 443,
+                "columnEndExclusive": 468,
+                "text": "docs/history/*/CONTEXT.md"
+              },
+              "headMatchingLines": [
+                49,
+                117
+              ]
+            },
+            {
+              "id": "author-s4-45dc2cd894385e72",
+              "pinnedSpan": {
+                "line": 118,
+                "columnStart": 224,
+                "columnEndExclusive": 254,
+                "text": "docs/history/dogfood-p25-run1/"
+              },
+              "headMatchingLines": [
+                119
+              ]
+            },
+            {
+              "id": "author-s4-721bff23faa8d622",
+              "pinnedSpan": {
+                "line": 118,
+                "columnStart": 356,
+                "columnEndExclusive": 396,
+                "text": "docs/history/p50-workflow-induct/plan.md"
+              },
+              "headMatchingLines": [
+                119
+              ]
+            },
+            {
+              "id": "author-s4-c9433d21d5c1e93a",
+              "pinnedSpan": {
+                "line": 118,
+                "columnStart": 756,
+                "columnEndExclusive": 799,
+                "text": "docs/history/fgos-sample-testbed/CONTEXT.md"
+              },
+              "headMatchingLines": [
+                119
+              ]
+            },
+            {
+              "id": "author-s4-229e8a5afb1230ae",
+              "pinnedSpan": {
+                "line": 121,
+                "columnStart": 1113,
+                "columnEndExclusive": 1166,
+                "text": "docs/history/str61-chat-context-continuity/CONTEXT.md"
+              },
+              "headMatchingLines": [
+                122
+              ]
+            },
+            {
+              "id": "author-s4-84005ca08befe2c0",
+              "pinnedSpan": {
+                "line": 123,
+                "columnStart": 1728,
+                "columnEndExclusive": 1739,
+                "text": "docs/specs/"
+              },
+              "headMatchingLines": [
+                29,
+                44,
+                108,
+                117,
+                124
+              ]
+            },
+            {
+              "id": "author-s4-09018bba15ce7bfe",
+              "pinnedSpan": {
+                "line": 123,
+                "columnStart": 2502,
+                "columnEndExclusive": 2517,
+                "text": "docs/decisions/"
+              },
+              "headMatchingLines": [
+                73,
+                115,
+                124
+              ]
+            },
+            {
+              "id": "author-s4-06e8be879d39deb1",
+              "pinnedSpan": {
+                "line": 126,
+                "columnStart": 496,
+                "columnEndExclusive": 540,
+                "text": "docs/history/p50-workflow-induct/reports/..."
+              },
+              "headMatchingLines": [
+                127
+              ]
+            },
+            {
+              "id": "author-s4-68c3eab88fa07af7",
+              "pinnedSpan": {
+                "line": 127,
+                "columnStart": 1237,
+                "columnEndExclusive": 1302,
+                "text": "docs/history/p50-workflow-induct/reports/p50-workflow-induct-6.md"
+              },
+              "headMatchingLines": [
+                128
+              ]
+            },
+            {
+              "id": "author-s4-bb81392549cc3486",
+              "pinnedSpan": {
+                "line": 128,
+                "columnStart": 128,
+                "columnEndExclusive": 176,
+                "text": "docs/history/gate-dialogue-continuity/CONTEXT.md"
+              },
+              "headMatchingLines": [
+                44,
+                129
+              ]
+            },
+            {
+              "id": "author-s4-26fc8d2f9269bc9a",
+              "pinnedSpan": {
+                "line": 130,
+                "columnStart": 933,
+                "columnEndExclusive": 943,
+                "text": "docs/specs"
+              },
+              "headMatchingLines": [
+                29,
+                44,
+                108,
+                117,
+                124,
+                131
+              ]
+            },
+            {
+              "id": "author-s4-6f302576938a67b2",
+              "pinnedSpan": {
+                "line": 132,
+                "columnStart": 599,
+                "columnEndExclusive": 663,
+                "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:129-156"
+              },
+              "headMatchingLines": [
+                133
+              ]
+            },
+            {
+              "id": "author-s4-4676c20acaf7573e",
+              "pinnedSpan": {
+                "line": 134,
+                "columnStart": 337,
+                "columnEndExclusive": 401,
+                "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:166-170"
+              },
+              "headMatchingLines": [
+                135
+              ]
+            },
+            {
+              "id": "author-s4-d72e383c7545e538",
+              "pinnedSpan": {
+                "line": 140,
+                "columnStart": 1278,
+                "columnEndExclusive": 1336,
+                "text": "docs/history/worktree-companion-mount-ephemeral/CONTEXT.md"
+              },
+              "headMatchingLines": [
+                141
+              ]
+            },
+            {
+              "id": "author-s4-cdc5db14089ef6ef",
+              "pinnedSpan": {
+                "line": 150,
+                "columnStart": 303,
+                "columnEndExclusive": 316,
+                "text": "docs/history/"
+              },
+              "headMatchingLines": [
+                22,
+                44,
+                49,
+                117,
+                119,
+                122,
+                127,
+                128,
+                129,
+                133,
+                135,
+                141,
+                151
+              ]
+            }
+          ],
+          "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+          "failing": false
+        }
+      ]
+    },
+    "real-file-tests-goldens": {
+      "kind": "Step5 seam5 closed batch 1; remaining queue unreviewed",
+      "files": 2,
+      "literalReferences": 10,
+      "dynamicTuples": 2,
+      "mechanicalRejects": 1,
+      "rules": {
+        "s5-coverage": "Closed batch retains all original identities and remaining queue/carries exactly once.",
+        "s5-lexical": "Every pinned whole-file docs-root token has its own physical reference span.",
+        "s5-pins": "Every input digest/mode/byte count matches its own immutable git pin.",
+        "s5-spans": "Every literal, passage, operation and full enclosing test callback matches pinned bytes.",
+        "s5-inheritance": "Step4 source slots retain exact identity/disposition and complete prior record hash.",
+        "s5-patches": "Complete source and golden diffs apply and reverse exactly, without additional substitutions.",
+        "s5-atomic": "Source 31/48 and full expected golden 198/215 co-cut; complete rendered bytes equal at both sides.",
+        "s5-receipts": "Source/candidate hashes, full specs and required comparison fields join one honest pending receipt.",
+        "s5-review": "Only admitted/judgment items are window obligations; mechanical rejects remain separately enumerated.",
+        "r19-label-diagnostic": "Only an assert.ok diagnostic label, in a complete census-root-free callback with no traced census constant, can be rejected mechanically.",
+        "a-passage-agreement": "All pairs of overlapping operation intervals on the same line/passage agree in admission and effective disposition; independent adjacent expressions have distinct source intervals.",
+        "b-real-blocker": "R12: no boilerplate dependency shared after quoted operands, paths, IDs and line numbers are normalized; copies join their source passage; serialized state rows use their accepted per-file input dependency.",
+        "c-render-owner": "Every generated source-copy reference/tuple derives its disposition from the exact source owner; a park cites an actually parked source owner.",
+        "d-own-operand": "Each admitted dynamic tuple has its exact document-yielding sub-expression pathOperand in its pinned passage; every rejection names a closed R5 nonDocumentUse category.",
+        "e-retired-successor": "Preserved retired decision citations carry a live successorNote with a real heading anchor.",
+        "r11-plans-boundary": "R11: an operation rooted only in plans/** is rejected as plans-report-artifact; trace pinned declarations and imported constants, not adjacent context."
+      },
+      "checks": {
+        "s5-coverage": 14,
+        "s5-pins": 2,
+        "s5-lexical": 2,
+        "s5-spans": 12,
+        "s5-inheritance": 3,
+        "s5-patches": 2,
+        "r19-label-diagnostic": 1,
+        "s5-receipts": 1,
+        "s5-atomic": 1,
+        "s5-review": 1,
+        "d-own-operand": 2
+      },
+      "failureCount": 0,
+      "failures": [],
+      "headDrift": []
     }
   }
 }

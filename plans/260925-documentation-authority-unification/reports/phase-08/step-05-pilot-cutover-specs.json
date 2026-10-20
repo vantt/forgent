@@ -406,7 +406,7 @@
         "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md"
       ],
       "newText": [
-        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập"
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập"
       ],
       "sourceSpans": [
         {
@@ -416,8 +416,8 @@
           "text": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md"
         }
       ],
-      "diff": "--- a/bin/fgos.mjs\n+++ b/bin/fgos.mjs\n@@ -5105,7 +5105,7 @@\n     if (entry?.requiresExistingStore && !fs.existsSync(dir)) {\n       throw new StoreError(\n         'validation',\n-        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,\n+        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,\n       );\n     }\n     // State/root-resolution investigation: a disconnected-snapshot hazard\n",
-      "expectedAfterSha256": "4247d968a59563503a8152205ef6772b75d9fa23af2ec3afa1cac2722b8f0acb",
+      "diff": "--- a/bin/fgos.mjs\n+++ b/bin/fgos.mjs\n@@ -5105,7 +5105,7 @@\n     if (entry?.requiresExistingStore && !fs.existsSync(dir)) {\n       throw new StoreError(\n         'validation',\n-        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,\n+        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,\n       );\n     }\n     // State/root-resolution investigation: a disconnected-snapshot hazard\n",
+      "expectedAfterSha256": "8ad5af72904fb86f5b597119bab500c98aa15c4c1f396236a2ea06d8cbd0c05e",
       "targetOwner": [
         "docs/platform/runner/decisions/h-36d872fbb0e5.md"
       ],
@@ -425,7 +425,7 @@
         {
           "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
           "targetSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
-          "anchor": "0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+          "anchor": "0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
           "claim": "0020 Chặn fgos khỏi worktree-worker (không khóa, không cô lập): retained narrative states this no-.fgos worker constraint; matches prior Step 3 batch-080 edge maps-j-04927"
         }
       ],
@@ -440,14 +440,14 @@
           "edgeId": "class6-l-000113",
           "line": 5108,
           "currentExpression": "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,",
-          "candidateExpression": "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,",
+          "candidateExpression": "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,",
           "oldPointer": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
-          "newPointer": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+          "newPointer": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
           "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
           "evidence": {
             "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
             "targetSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
-            "anchor": "0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+            "anchor": "0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
             "claim": "0020 Chặn fgos khỏi worktree-worker (không khóa, không cô lập): retained narrative states this no-.fgos worker constraint; matches prior Step 3 batch-080 edge maps-j-04927"
           }
         }
@@ -462,14 +462,14 @@
           "edgeId": "class6-l-000113",
           "line": 5108,
           "currentExpression": "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,",
-          "candidateExpression": "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,",
+          "candidateExpression": "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,",
           "oldPointer": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
-          "newPointer": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+          "newPointer": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
           "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
           "evidence": {
             "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
             "targetSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
-            "anchor": "0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+            "anchor": "0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
             "claim": "0020 Chặn fgos khỏi worktree-worker (không khóa, không cô lập): retained narrative states this no-.fgos worker constraint; matches prior Step 3 batch-080 edge maps-j-04927"
           }
         }
@@ -482,7 +482,7 @@
         "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
       ],
       "order": "Phase 9 atomic consumer cutover; no apply-now action",
-      "rollbackDiff": "--- a/bin/fgos.mjs\n+++ b/bin/fgos.mjs\n@@ -5105,7 +5105,7 @@\n     if (entry?.requiresExistingStore && !fs.existsSync(dir)) {\n       throw new StoreError(\n         'validation',\n-        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,\n+        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,\n       );\n     }\n     // State/root-resolution investigation: a disconnected-snapshot hazard\n",
+      "rollbackDiff": "--- a/bin/fgos.mjs\n+++ b/bin/fgos.mjs\n@@ -5105,7 +5105,7 @@\n     if (entry?.requiresExistingStore && !fs.existsSync(dir)) {\n       throw new StoreError(\n         'validation',\n-        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,\n+        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,\n       );\n     }\n     // State/root-resolution investigation: a disconnected-snapshot hazard\n",
       "timing": "phase9",
       "readiness": "pending / cutover-patch-only; never execution-ready",
       "coCutTestGreps": [

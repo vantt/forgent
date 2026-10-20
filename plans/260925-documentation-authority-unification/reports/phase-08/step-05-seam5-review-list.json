@@ -1,0 +1,63 @@
+{
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "closedBatch": 1,
+  "reviewStatus": "pending Lead pack and independent Option B semantic review",
+  "sourceRecords": [
+    "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+    "test/runner/prompt-templates.test.mjs"
+  ],
+  "generatedRecords": [],
+  "canonicalRecords": [
+    {
+      "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-prompt-goldens.jsonl",
+      "recordSha256": "c309ec6112486e821b50d25d9a867fd324af65916b1863aee61c1ec850f83107",
+      "sourceSha256": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+      "admittedIds": [
+        "reference-003777",
+        "reference-003778",
+        "reference-003779"
+      ],
+      "judgmentCallIds": []
+    },
+    {
+      "file": "test/runner/prompt-templates.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-prompt-goldens.jsonl",
+      "recordSha256": "1628db0e01bb7ffbd2c5799d945fbb78c0b845d04784fd6cbeb63f1ff2b4e854",
+      "sourceSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f",
+      "admittedIds": [
+        "reference-004561",
+        "reference-004562",
+        "reference-004563",
+        "reference-004564",
+        "reference-004565",
+        "reference-004566",
+        "reference-004567",
+        "dynamic-029245"
+      ],
+      "judgmentCallIds": []
+    }
+  ],
+  "mechanicalRejects": [
+    {
+      "file": "test/runner/prompt-templates.test.mjs",
+      "id": "dynamic-029246",
+      "ruleId": "r19-label-diagnostic"
+    }
+  ],
+  "residualReviewFiles": [
+    "bin/fgos.mjs",
+    "src/cli/command-registry.mjs"
+  ],
+  "packingInstructions": {
+    "existingPacker": "step-05-seam4-window-review/pack.py",
+    "recordGlobs": [
+      "step-05-records/tests-prompt-goldens.jsonl"
+    ],
+    "include": "admittedIds plus judgmentCallIds only, ±40 pinned physical lines plus enclosing context where needed; include both full diffs/rollbacks and atomic receipt",
+    "excludeMechanicalIds": [
+      "dynamic-029246"
+    ],
+    "note": "Existing packer hardcodes generators-*.jsonl and includes all tuples: Lead must pass/adapt the record selection and exclude the listed mechanical tuple when packing seam5. No reviewer was launched."
+  }
+}

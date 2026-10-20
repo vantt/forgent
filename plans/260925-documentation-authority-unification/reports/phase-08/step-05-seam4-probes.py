@@ -6,6 +6,17 @@ P=pathlib.Path(__file__).resolve().parent
 sp=importlib.util.spec_from_file_location('s4',P/'step-05-seam4-check.py');m=importlib.util.module_from_spec(sp);sp.loader.exec_module(m)
 BASE=m.load();RECEIPTS=m.read('step-05-seam4-parity-receipts.json')['receipts'];SPECS=m.read('step-05-seam4-cutover-specs.json')['patches'];INDEX=m.read('step-05-seam4-review-index.json')
 baseline=m.check();assert baseline['failureCount']==0,baseline['failures'][:5]
+# R17 positive mutation: only git HEAD is different; immutable pinned evidence stays valid.
+real_pinned=m.m.pinned
+def changed_head(pin,file):
+ text=real_pinned(pin,file)
+ return '// HEAD-only drift\n'+text if pin=='HEAD' else text
+m.m.pinned=changed_head
+try:
+ head_only=m.check()
+ assert head_only['failureCount']==0,head_only['failures']
+ assert head_only['headDrift'], 'HEAD-only drift must be reported, not suppressed'
+finally:m.m.pinned=real_pinned
 probes=[]
 def run(name,rule,mutate=None,override=None,packets=False):
  rs=copy.deepcopy(BASE);rc=copy.deepcopy(RECEIPTS);ss=copy.deepcopy(SPECS);ix=copy.deepcopy(INDEX)
@@ -70,5 +81,5 @@ def templated_block(rs,rc,ss,ix):
 run('R12 rejects operand-swapped blockers in separate passages of one file','b-real-blocker',templated_block)
 run('R11 rejects admission of a plan-only report constant','r11-plans-boundary',lambda rs,rc,ss,ix:item(rs,'dynamic-006605').update(admission='ADMIT',nonDocumentUse=None))
 assert {p['owningRule'] for p in probes}==set(m.RULES)
-out={'kind':'Seam4 rejecting mutation probes','baselineFailures':baseline['failureCount'],'rulesCovered':sorted(m.RULES),'passed':sum(p['pass'] for p in probes),'total':len(probes),'probes':probes,'failures':[p for p in probes if not p['pass']]}
+out={'kind':'Seam4 rejecting mutation probes','baselineFailures':baseline['failureCount'],'headOnlyDrift':{'pass':head_only['failureCount']==0,'reportedFiles':len(head_only['headDrift'])},'rulesCovered':sorted(m.RULES),'passed':sum(p['pass'] for p in probes),'total':len(probes),'probes':probes,'failures':[p for p in probes if not p['pass']]}
 (P/'step-05-seam4-probes-result.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:v for k,v in out.items() if k!='probes'}));sys.exit(bool(out['failures']))

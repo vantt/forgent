@@ -34,14 +34,14 @@
     "source-pins": 37,
     "passage-outcome": 33,
     "inherited-outcome": 25,
-    "receipts": 404,
+    "receipts": 405,
     "retiring-retained": 149,
     "source-spans": 2166,
-    "parks": 32,
-    "rejections": 1802,
+    "parks": 31,
+    "rejections": 1801,
     "fixture-provenance": 14,
     "pinned-passage": 2017,
-    "dynamic-operand": 240,
+    "dynamic-operand": 241,
     "patches": 37,
     "generated": 37,
     "co-cut-grep": 17,
@@ -52,7 +52,7 @@
     "setup": 1,
     "review": 78,
     "a-passage-agreement": 273,
-    "b-real-blocker": 35,
+    "b-real-blocker": 34,
     "d-own-operand": 2017
   },
   "files": 37,
@@ -3635,5 +3635,6 @@
       "postCensusComment": false
     }
   ],
+  "headDrift": [],
   "reviewStatus": "pending; checker success is not semantic acceptance or cutover readiness"
 }

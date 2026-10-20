@@ -1,6 +1,10 @@
 {
   "kind": "Seam4 rejecting mutation probes",
   "baselineFailures": 0,
+  "headOnlyDrift": {
+    "pass": true,
+    "reportedFiles": 253
+  },
   "rulesCovered": [
     "a-passage-agreement",
     "b-real-blocker",

@@ -1,0 +1,259 @@
+{
+  "ruling": "L12-76",
+  "changedFiles": [
+    ".agents/skills/distill/scripts/distill.mjs",
+    ".claude/skills/distill/scripts/distill.mjs",
+    ".githooks/pre-commit",
+    "apps/fgos-gateway/src/gateway.rs",
+    "apps/fgos-gateway/src/mcp.rs",
+    "bin/fgos.mjs",
+    "docs/backlog.md",
+    "scripts/generate-shipped-path-inventory.mjs",
+    "scripts/knowledge-classifier.mjs",
+    "src/cli/command-registry.mjs",
+    "src/setup/instruction-registry.mjs",
+    "src/setup/registrations.mjs",
+    "src/setup/skill-wrappers.mjs"
+  ],
+  "adr0020": {
+    "ownerAnswerLine686": "Phase 9 rendering verification obligation, not a waiver of the githubSlug form",
+    "oldAnchor": "0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+    "newAnchor": "0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+    "headingLine": 102,
+    "oldAfterHash": "4247d968a59563503a8152205ef6772b75d9fa23af2ec3afa1cac2722b8f0acb",
+    "newAfterHash": "8ad5af72904fb86f5b597119bab500c98aa15c4c1f396236a2ea06d8cbd0c05e"
+  },
+  "review": "Disposition/diff changes bin/fgos.mjs and command-registry require Lead review; admission-only preserve/text fixes follow R10.",
+  "checks": [
+    {
+      "residual": "ADR0020 githubSlug form",
+      "ids": [
+        "reference-000228"
+      ],
+      "verified": true,
+      "evidence": {
+        "headingFile": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "headingLine": 102,
+        "slugOwner": "scripts/list-doc-anchors.mjs::githubSlug",
+        "ownerAnswersL686": "Deferred rendering check, not an anchor-form waiver"
+      }
+    },
+    {
+      "residual": "Usage placeholder stays rejected",
+      "ids": [
+        "reference-000277"
+      ],
+      "verified": true,
+      "evidence": {
+        "file": "bin/fgos.mjs",
+        "classification": [
+          "REJECT",
+          "preserve"
+        ]
+      }
+    },
+    {
+      "residual": "Synthetic --doc-path example preserves",
+      "ids": [
+        "reference-003659"
+      ],
+      "verified": true,
+      "evidence": {
+        "passage": "      required: ['id'],\n    },\n    examples: ['fgos compound tsk-3o3 --doc-type how-to --doc-path docs/how-to/example.md'],\n    touchesState: true,\n    requiresExistingStore: true,"
+      }
+    },
+    {
+      "residual": "Quadrant parks cite actual parked generator",
+      "ids": [
+        "reference-003641",
+        "reference-003652",
+        "reference-003653",
+        "author-s4-fix2-4c3ad4d2292e4bcc",
+        "author-s4-fix2-eeb16b2ec8753726",
+        "author-s4-fix2-28be85887d8c6306"
+      ],
+      "verified": true,
+      "evidence": {
+        "dependencyFile": "src/report/enduser-index-generate.mjs",
+        "dependencyId": "dynamic-009788",
+        "sharedDependencyAccepted": "R17/R18 batch brief 0b; same actual alias enumeration dependency"
+      }
+    },
+    {
+      "residual": "Decision-scope dependency",
+      "ids": [
+        "reference-003643",
+        "reference-003666"
+      ],
+      "verified": true,
+      "evidence": {
+        "file": "src/cli/command-registry.mjs",
+        "line": 846,
+        "reason": "src/cli/command-registry.mjs: The decision command scope parameter promises an area slug mapped to docs/specs/<area>.md; the successor holder mapping is not one-to-one (distribution maps to packaging-distribution). Settle decision-scope area-to-holder resolution before changing this parameter help."
+      }
+    },
+    {
+      "residual": "Skill-fragment normalization one admission",
+      "ids": [
+        "dynamic-015227",
+        "dynamic-015228"
+      ],
+      "verified": true,
+      "evidence": {
+        "file": "src/setup/skill-wrappers.mjs",
+        "line": 881
+      }
+    },
+    {
+      "residual": "Render-join reasons name source owner",
+      "ids": [
+        "reference-000038",
+        "reference-000039",
+        "reference-000040",
+        "dynamic-000008",
+        "dynamic-000009",
+        "dynamic-000010",
+        "dynamic-000012",
+        "dynamic-000014",
+        "dynamic-000017",
+        "dynamic-000018",
+        "dynamic-000021",
+        "dynamic-000022",
+        "dynamic-000023",
+        "dynamic-000024",
+        "dynamic-000025",
+        "dynamic-000033",
+        "dynamic-000034",
+        "dynamic-000036",
+        "dynamic-000037",
+        "dynamic-000038",
+        "dynamic-000039",
+        "dynamic-000041",
+        "dynamic-000048",
+        "dynamic-000053",
+        "dynamic-000054",
+        "dynamic-000078",
+        "dynamic-000093",
+        "dynamic-000096",
+        "dynamic-000097",
+        "dynamic-000108",
+        "dynamic-000109",
+        "dynamic-000119",
+        "dynamic-000121",
+        "dynamic-000122",
+        "dynamic-000123",
+        "dynamic-000127",
+        "dynamic-000128",
+        "dynamic-000132",
+        "dynamic-000137",
+        "dynamic-000138",
+        "dynamic-000139",
+        "dynamic-000148",
+        "dynamic-000152",
+        "reference-000101",
+        "reference-000102",
+        "reference-000103",
+        "dynamic-000179",
+        "dynamic-000180",
+        "dynamic-000181",
+        "dynamic-000183",
+        "dynamic-000185",
+        "dynamic-000188",
+        "dynamic-000189",
+        "dynamic-000192",
+        "dynamic-000193",
+        "dynamic-000194",
+        "dynamic-000195",
+        "dynamic-000196",
+        "dynamic-000204",
+        "dynamic-000205",
+        "dynamic-000207",
+        "dynamic-000208",
+        "dynamic-000209",
+        "dynamic-000210",
+        "dynamic-000212",
+        "dynamic-000219",
+        "dynamic-000224",
+        "dynamic-000225",
+        "dynamic-000249",
+        "dynamic-000264",
+        "dynamic-000267",
+        "dynamic-000268",
+        "dynamic-000279",
+        "dynamic-000280",
+        "dynamic-000290",
+        "dynamic-000292",
+        "dynamic-000293",
+        "dynamic-000294",
+        "dynamic-000298",
+        "dynamic-000299",
+        "dynamic-000303",
+        "dynamic-000308",
+        "dynamic-000309",
+        "dynamic-000310",
+        "dynamic-000319",
+        "dynamic-000323"
+      ],
+      "verified": true,
+      "evidence": {
+        "sourceOwner": "core/skills/distill/scripts/distill.mjs",
+        "checkedItems": 86
+      }
+    },
+    {
+      "residual": "Backlog preserves exact Step3 park reasons",
+      "ids": [
+        "author-s4-08912b8301b10321",
+        "author-s4-a20431be6e7a6997"
+      ],
+      "verified": true,
+      "evidence": {
+        "priorRecord": "step-03-records/batch-126.jsonl:2",
+        "quotedBlockers": [
+          "docs/backlog.md: Inherited Step 3 batch-126 maps-j-01280: Phase 9 carry: the complete js-yaml upgrade procedure is at packaging-distribution/spec.md line 723 inside Retained Distribution Source Detail. It is literal carriage and cannot be an executable patch destination; current candidate sections do not carry this integrity/parity/hash procedure. Promote the full upgrade/advisory decision to a live holder before redirecting this live backlog pointer.",
+          "docs/backlog.md: Inherited Step 3 batch-126 maps-j-01282: Description needs rewrite: STR70a locates non-transitioning decision/outcome precedent at legacy lines 647-675; candidate work-state uses state.decisions with engine bookkeeping versus design decisions, and the full two-verb precedent/old line-range correspondence is not established. Reconcile this exact behavioral precedent and locator before redirecting the proposal."
+        ]
+      }
+    },
+    {
+      "residual": "Architecture classifier consequence",
+      "ids": [
+        "reference-003588"
+      ],
+      "verified": true,
+      "evidence": {
+        "blockedReason": "scripts/generate-shipped-path-inventory.mjs: Classifier referenceKind/sourceRole currently classify docs/architect carriers as architecture sources. Phase 9 must replace that prefix classification in the same cut that retires the tree, so those carriers are neither lost nor misclassified; frozen-B lifts only in that cut."
+      }
+    },
+    {
+      "residual": "Complete knowledge-classifier labels",
+      "ids": [
+        "dynamic-008116"
+      ],
+      "verified": true,
+      "evidence": {
+        "originalTupleRetained": [
+          120,
+          9,
+          120,
+          31,
+          "targetDirs = ['how-to'",
+          "config/default-root",
+          true,
+          "reader"
+        ],
+        "completeOperand": "['how-to', 'explanation', 'reference', 'tutorials', 'tutorial', 'decisions']"
+      }
+    },
+    {
+      "residual": "Preserve obligations have no stale when-parked label",
+      "ids": [],
+      "verified": true,
+      "evidence": {
+        "scope": "All current Step5 canonical preserve items, including the new prompt batch"
+      }
+    }
+  ],
+  "verifiedResidualGroups": 11,
+  "unclosed": []
+}

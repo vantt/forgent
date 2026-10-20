@@ -57,13 +57,13 @@ def check(rs=None,receipts=None,specs=None,index=None,check_packets=True):
   def pins(r=r,source=source):
    if not physical:
     assert ';' in f and r['sourceSha256'] is None
-    for c in r['wholeFileReadEvidence']['constituents']:assert sha((ROOT/c['path']).read_bytes())==c['sha256']
+    for c in r['wholeFileReadEvidence']['constituents']:assert sha(m.m.blob(r['authorInputCommit'],c['path']))==c['sha256']
    else:
-    assert sha(source)==r['sourceSha256']==sha((ROOT/f).read_bytes())
-    assert r['sourceMode']==m.m.git('ls-files','-s','--',f).decode().split()[0]
+    assert sha(source)==r['sourceSha256']
+    assert r['sourceMode']==m.m.git('ls-tree',r['authorInputCommit'],'--',f).decode().split()[0]
     assert r['wholeFileReadEvidence']['bytes']==len(source.encode()) and r['wholeFileReadEvidence']['lines']==len(source.splitlines())
    for pr in r['priorRecordRefs']:assert sha((ROOT/pr['recordFile']).read_bytes())==pr['recordSha256']
-   for path,digest in r['protectedPins'].items():assert sha((ROOT/path).read_bytes())==digest
+   for path,digest in r['protectedPins'].items():assert sha(m.m.blob(r['authorInputCommit'],path))==digest
    assert r['review']['status']=='pending'
   test('s4-pins',f,pins)
   for e in r['references']:
@@ -132,20 +132,20 @@ def check(rs=None,receipts=None,specs=None,index=None,check_packets=True):
  def outputs():
   a=out['currentTrackedOutputSet'];assert [x['path'] for x in a]==sorted({x['path'] for x in a});assert out['candidateOutputSet'] is None and out['secondRunOutputSet'] is None
   for e in a:
-   assert sha((ROOT/e['path']).read_bytes())==e['sha256'] and len((ROOT/e['path']).read_bytes())==e['bytes']
-   if e.get('sourceSha256'):assert sha((ROOT/e['source']).read_bytes())==e['sourceSha256']
+   assert sha(m.m.blob(m.input_pin(e,out['inputCommit']),e['path']))==e['sha256'] and len(m.m.blob(m.input_pin(e,out['inputCommit']),e['path']))==e['bytes']
+   if e.get('sourceSha256'):assert sha(m.m.blob(m.input_pin(e,out['inputCommit']),e['source']))==e['sourceSha256']
  test('s4-outputs','static output set',outputs)
  for x in receipts:
   def receipt(x=x):
    assert all(k in x for k in read('step-05-parity-receipt-template.json')['receipt']);assert x['comparison']['comparedFields']==read('step-05-parity-receipt-template.json')['seamTemplates']['generators-projections']['requiredComparisons']
    assert x['comparison']['candidateOutputSet'] is None and 'pending' in x['readiness'] and x['review']['status']=='pending'
-   for i in x['currentInputs']:assert sha((ROOT/i['path']).read_bytes())==i['sha256']
+   for i in x['currentInputs']:assert sha(m.m.blob(m.input_pin(i,x['inputCommit']),i['path']))==i['sha256']
    for i in x['candidateInputs']:
     if byfile.get(i['path'],{}).get('generated'):assert i['sha256'] is None,'uncomputed generated intermediate cannot use current hash as candidate proof'
    assert any(p['status']=='missing' for p in x['proofs'])
    for p in x['proofs']:
     assert p['status'] in ['not-run','missing'] and p['exit'] is None and p['logPath'] is None
-    for target in re.findall(r'test/[\w/.-]+\.mjs',p['command']):assert (ROOT/target).is_file(),'Owning test does not exist: '+target
+    for target in re.findall(r'test/[\w/.-]+\.mjs',p['command']):assert m.m.blob(x['inputCommit'],target) is not None,'Owning test does not exist at input pin: '+target
   test('s4-receipts',x['id'],receipt)
  carry=read('step-05-seam4-inherited-carries.json')
  def carries():
@@ -171,6 +171,6 @@ def check(rs=None,receipts=None,specs=None,index=None,check_packets=True):
   admission.review_obligations(rs,read('step-05-seam4-review-index.json') if index is None else index,test,'s4-review',sha,read)
  shared=admission.check(rs,context=rs+m.load())
  errors.extend(shared['failures']);checks.update(shared['checks'])
- return {'kind':'Step5 seam4 complete record checker; semantic review and cutover proof pending','files':len(rs),'literalReferences':len(allrefs),'dynamicTuples':len(alldyn),'rules':RULES,'checks':dict(checks),'failureCount':len(errors),'failures':errors}
+ return {'kind':'Step5 seam4 complete record checker; semantic review and cutover proof pending','files':len(rs),'literalReferences':len(allrefs),'dynamicTuples':len(alldyn),'rules':RULES,'checks':dict(checks),'failureCount':len(errors),'failures':errors,'headDrift':m.head_drift(rs)}
 if __name__=='__main__':
  out=check();(P/'step-05-seam4-check-result.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False));sys.exit(bool(out['failures']))

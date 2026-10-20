@@ -1,4 +1,6 @@
 """Step 5 full pilot checker: schema/coverage, pins, exact patches, receipts, review sizing.
+R17 validates consumer/source/target bytes at their own git input pins; current
+report/log integrity remains checked on disk because those are newly authored evidence.
 Reuses Step 3's span, bounds, full-file diff and hunk primitives. No consumers
 are mutated. Semantic judgments remain subject to mandatory independent review.
 """
@@ -16,7 +18,7 @@ def read(n):return json.loads((P/n).read_text())
 def rows(n):return [json.loads(l) for l in (P/n).read_text().splitlines()]
 def load():return [r for s in SEAMS for r in rows('step-05-records/'+s+'.jsonl')]
 def candidate(r):
- before=(ROOT/r['file']).read_text();edits={}
+ before=pinned(r['authorInputCommit'],r['file']);edits={}
  for e in r['references']:
   if e['disposition']!='patch':continue
   bounds=m.bounds(before,e['sourceSpans'])
@@ -33,6 +35,35 @@ def candidate(r):
 @lru_cache(None)
 def pinned(pin,file):
  return m.blob(pin,file).decode()
+
+def input_pin(entry,default):
+ provenance=entry.get('provenance','')
+ match=re.match(r'^([0-9a-f]{40}):',provenance)
+ return entry.get('inputCommit') or (match[1] if match else default)
+
+def head_drift(rs):
+ """Non-failing Step 7 queue, comparing immutable pin to git HEAD (never disk)."""
+ drift=[];locators={}
+ for recordfile in sorted((P/'step-05-records').glob('*.jsonl')):
+  for n,line in enumerate(recordfile.read_text().splitlines(),1):
+   locators[json.loads(line)['file']]={'recordFile':str(recordfile.relative_to(ROOT)),'recordLine':n}
+ for r in rs:
+  if not r.get('wholeFileRead'):continue
+  f=r['file'];before=pinned(r['authorInputCommit'],f)
+  try:after=pinned('HEAD',f)
+  except Exception:after=''
+  if sha(before)==sha(after):continue
+  moved=[]
+  for e in r['references']+r['dynamicTraces']+r.get('authorAddedReferences',[]):
+   spans=e.get('sourceSpans',[])
+   if e.get('currentPassage'):
+    c=e['currentPassage'];spans=spans+[{'line':c['startLine'],'text':c['text']}]
+   for span in spans:
+    line=span['line'];text=span['text'];lines=after.splitlines();col=span.get('columnStart',1)-1
+    same=(lines[line-1][col:col+len(text)]==text) if 0<line<=len(lines) and '\n' not in text else '\n'.join(lines[line-1:line-1+len(text.splitlines())])==text
+    if not same:moved.append({'id':e.get('referenceId',e.get('id')),'pinnedSpan':span,'headMatchingLines':[n for n in range(1,len(lines)+1) if '\n'.join(lines[n-1:n-1+len(text.splitlines())]).find(text)>=0]})
+  drift.append({'file':f,'record':locators.get(f,{'file':f}),'inputCommit':r['authorInputCommit'],'pinnedHash':sha(before),'headHash':sha(after),'movedSpans':moved,'dependency':'Step 7 final-pin assembly; L12-58(1), L12-76 R17','failing':False})
+ return drift
 
 def dynamic_operand(d):
  """Syntax gate over the own operation, never over neighbouring doc words.
@@ -151,14 +182,14 @@ def check(rs,receipts=None,index=None,check_packets=True):
  test('coverage','dynamic population',lambda:len(alldyn)==len(set(alldyn)) and set(alldyn)==set(expected_dyn))
  rec={x['id']:x for x in receipts};template=read('step-05-parity-receipt-template.json')
  for r in rs:
-  f=r['file'];before=(ROOT/f).read_text()
+  f=r['file'];before=pinned(r['authorInputCommit'],f)
   def pins():
    assert r['sourceSha256']==sha(before) and r['wholeFileRead'] is True
    assert r['wholeFileReadEvidence']['bytes']==len(before.encode()) and r['wholeFileReadEvidence']['lines']==len(before.splitlines())
-   assert r['sourceMode']==m.git('ls-files','-s','--',f).decode().split()[0]
+   assert r['sourceMode']==m.git('ls-tree',r['authorInputCommit'],'--',f).decode().split()[0]
    assert m.blob(r['authorInputCommit'],f).decode()==before
    for p in r['priorRecordRefs']:assert sha((ROOT/p['recordFile']).read_bytes())==p['recordSha256']
-   for path,digest in r['protectedPins'].items():assert sha((ROOT/path).read_bytes())==digest
+   for path,digest in r['protectedPins'].items():assert sha(m.blob(r['authorInputCommit'],path))==digest
    assert r['review']['status']=='pending'
   test('source-pins',f,pins)
 
@@ -241,7 +272,7 @@ def check(rs,receipts=None,index=None,check_packets=True):
     assert e['passage']=='\n'.join(before.splitlines()[a-1:b])
    test('source-spans',loc,spans)
    if e['admission']=='ADMIT':test('receipts',loc,lambda e=e:e.get('proofCommand') and e.get('parityObligation') and e['receiptId'] in rec)
-   if e['admission']=='REJECT':test('rejections',loc,lambda e=e:e['disposition']=='preserve' and (e['role']=='comment' or e['role']=='usage-placeholder' and e.get('nonDocumentUse')=='caller-data-formatting' and e['matchedExpression']=='docs/quadrant-dir>' and '<docs/quadrant-dir>' in e['passage']) and e['passage'] and repr(e['passage']) in e['reason'] and 'L12-' in e['reason'])
+   if e['admission']=='REJECT':test('rejections',loc,lambda e=e:e['disposition']=='preserve' and (e['role']=='comment' or e['role']=='usage-placeholder' and e.get('nonDocumentUse')=='usage-placeholder' and e['matchedExpression']=='docs/quadrant-dir>' and '<docs/quadrant-dir>' in e['passage']) and e['passage'] and repr(e['passage']) in e['reason'] and 'L12-' in e['reason'])
    if e['disposition']=='parked':test('parks',loc,lambda e=e:e['admission']=='ADMIT' and e['blockedReason'] and e['dependency'] and e['blockedCategory'] and e['dependencyCategory'] and e['timing']=='phase9' and not e['diffHunk'])
    if e['role']=='synthetic-fixture':
     def fixture(e=e):
@@ -252,12 +283,12 @@ def check(rs,receipts=None,index=None,check_packets=True):
    if e['disposition']=='patch':
     def target(e=e):
      w=e['resolverWitness'];assert e['admission']=='ADMIT' and e['timing']=='phase9'
-     assert e['target'] and (ROOT/e['target']).is_file() and sha((ROOT/e['target']).read_bytes())==w['targetSha256']
+     assert e['target'] and sha(m.blob(r['authorInputCommit'],e['target']))==w['targetSha256']
      assert e['target']!='docs/knowledge/decisions-index/decision-record.md'
      assert not e['aliasWriteCheck']['isWriter'] and e['aliasWriteCheck']['destinationIsAlias'] is False
      if w.get('registryPath'):
-      assert sha((ROOT/w['registryPath']).read_bytes())==w['registrySha256']
-      docs=json.loads((ROOT/w['registryPath']).read_text())['docs'];hits=[d for d in docs if w['alias'] in d.get('aliases',[]) and d.get('docLifecycle')!='retired'];assert len(hits)==1 and hits[0]['currentPath']==e['target']
+      assert sha(m.blob(r['authorInputCommit'],w['registryPath']))==w['registrySha256']
+      docs=json.loads(pinned(r['authorInputCommit'],w['registryPath']))['docs'];hits=[d for d in docs if w['alias'] in d.get('aliases',[]) and d.get('docLifecycle')!='retired'];assert len(hits)==1 and hits[0]['currentPath']==e['target']
      if e['anchor']:
       assert any(e['anchor'] in (a['anchor'],a.get('githubSlug')) for a in m.anchors(r['authorInputCommit'],e['target']))
     test('targets',loc,target)
@@ -297,7 +328,7 @@ def check(rs,receipts=None,index=None,check_packets=True):
    assert x['currentInputs'] and x['candidateInputs']
    assert x['comparison']['comparedFields']==template['seamTemplates'][seam]['requiredComparisons']
    assert x['comparison']['normalization'] and 'pending' in x['readiness'] and x['review']['status']=='pending'
-   for f in x['currentInputs']:assert sha((ROOT/f['path']).read_bytes())==f['sha256']
+   for f in x['currentInputs']:assert sha(m.blob(input_pin(f,x['inputCommit']),f['path']))==f['sha256']
    for fld in ['currentOutputSet','candidateOutputSet','intentionalDeltas','unexpectedDeltas']:assert fld in x['comparison']
   test('receipts',loc,receipt)
   for p in x['proofs']:
@@ -326,7 +357,7 @@ def check(rs,receipts=None,index=None,check_packets=True):
   admission.review_obligations(rs,index,test,'review',sha,read)
  shared=admission.check(rs)
  errors.extend(shared['failures']);checks.update(shared['checks'])
- return {'kind':'Step 5 pilot full mechanical checker; semantic independent review pending','rules':RULES,'checks':dict(checks),'files':len(rs),'literalReferences':len(allrefs),'dynamicTuples':len(alldyn),'failures':errors,'failureCount':len(errors),'sourceCensusGrep':sourcegrep,'reviewStatus':'pending; checker success is not semantic acceptance or cutover readiness'}
+ return {'kind':'Step 5 pilot full mechanical checker; semantic independent review pending','rules':RULES,'checks':dict(checks),'files':len(rs),'literalReferences':len(allrefs),'dynamicTuples':len(alldyn),'failures':errors,'failureCount':len(errors),'sourceCensusGrep':sourcegrep,'headDrift':head_drift(rs),'reviewStatus':'pending; checker success is not semantic acceptance or cutover readiness'}
 
 if __name__=='__main__':
  ap=argparse.ArgumentParser();ap.add_argument('--output',default='step-05-full-check-result.json' if (P/'step-05-seam4-review-index.json').exists() else 'step-05-pilot-check-result.json');args=ap.parse_args()
@@ -334,5 +365,11 @@ if __name__=='__main__':
  if (P/'step-05-seam4-review-index.json').exists():
   (P/'step-05-pilot-check-result.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
   extsp=importlib.util.spec_from_file_location('seam4check',P/'step-05-seam4-check.py');ext=importlib.util.module_from_spec(extsp);extsp.loader.exec_module(ext)
-  s4=ext.check();(P/'step-05-seam4-check-result.json').write_text(json.dumps(s4,ensure_ascii=False,indent=2)+'\n');out['extensions']={'generators-projections':s4};out['kind']='Step 5 full authored-seam checker; semantic review and cutover proof pending';out['files']+=s4['files'];out['literalReferences']+=s4['literalReferences'];out['dynamicTuples']+=s4['dynamicTuples'];out['failures']+=s4['failures'];out['failureCount']=len(out['failures']);out['checks'].update(s4['checks']);out['rules'].update(s4['rules'])
+  s4=ext.check();(P/'step-05-seam4-check-result.json').write_text(json.dumps(s4,ensure_ascii=False,indent=2)+'\n');out['extensions']={'generators-projections':s4};out['kind']='Step 5 full authored-seam checker; semantic review and cutover proof pending';out['files']+=s4['files'];out['literalReferences']+=s4['literalReferences'];out['dynamicTuples']+=s4['dynamicTuples'];out['failures']+=s4['failures'];out['failureCount']=len(out['failures']);out['checks'].update(s4['checks']);out['rules'].update(s4['rules']);out['headDrift']+=s4['headDrift']
+ if (P/'step-05-seam5-batch-selection.json').exists():
+  extsp=importlib.util.spec_from_file_location('seam5check',P/'step-05-seam5-check.py');ext=importlib.util.module_from_spec(extsp);extsp.loader.exec_module(ext)
+  s5=ext.check();out.setdefault('extensions',{})['real-file-tests-goldens']=s5
+  for key in ['files','literalReferences','dynamicTuples']:out[key]+=s5[key]
+  out['failures']+=s5['failures'];out['failureCount']=len(out['failures']);out['checks'].update(s5['checks']);out['rules'].update(s5['rules']);out['headDrift']+=s5['headDrift']
+ (P/'step-05-head-drift.json').write_text(json.dumps({'kind':'Non-failing HEAD drift for Step 7 assembly; records remain at their own pins','headCommit':m.git('rev-parse','HEAD').decode().strip(),'entries':out['headDrift']},ensure_ascii=False,indent=2)+'\n')
  (P/args.output).write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False));sys.exit(bool(out['failures']))
