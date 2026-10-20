@@ -198,6 +198,25 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 3. `explain` theo ghế và theo preset; doctor dùng cùng hàm.
 4. Spec: file `docs/specs/seat-binding.md`, dòng mới trong `docs/platform/component-boundary.md`, supersede RUL80/91/98/102/103/106 phần chọn ghế bằng record mới (không sửa tại chỗ).
 
+#### R.3 Gói domain mang tier, project mang families (owner 13:28)
+
+Gói domain không biết project dùng nó có họ nào (account, OpenRouter, họ khai trong config), nên **gói chỉ mang yêu cầu khả chuyển: `tier` và độ độc lập; `families` chỉ do project khai (R1)**. Gói đòi một tier mà project không có ô cho tier đó, hoặc vượt `maxTier` của project → **từ chối có tên**, không tự hạ (tránh chạy model yếu hơn mà không ai biết).
+
+### T. Thang tier: 6 bậc, định nghĩa theo bản chất việc (owner 13:36)
+
+Chia theo việc phân biệt rõ được hay không, không theo việc hôm nay đã có ai dùng. Một họ dùng cùng model cho hai bậc liền nhau là bình thường (điền lặp ô).
+
+| Bậc | Công việc | Câu tự kiểm | Ví dụ |
+|---|---|---|---|
+| nano | máy móc, không cần suy luận | chỉ cần nhận dạng hoặc biến đổi theo mẫu? | phân loại, trích dữ liệu, định dạng, định tuyến, bỏ phiếu |
+| mini | suy luận nhẹ trên đầu vào có sẵn, phạm vi hẹp | đủ thông tin trong tay, chỉ cần hiểu và tóm? | tóm tắt, trả lời từ tài liệu đưa vào, sửa nhỏ theo chỉ dẫn chính xác, soát diff nhỏ |
+| standard | làm theo plan có sẵn, nhiều bước | đã có plan và hướng dẫn chi tiết? | code theo plan, viết test, refactor theo mô tả |
+| advanced | tự tìm cách làm, chưa có lời giải sẵn | phải tự điều tra và quyết cách làm? | debug khó, code phức tạp, việc nhiều file thiếu plan |
+| flagship | phán đoán, thiết kế, phản biện | kết quả là một ý kiến hay thiết kế? | review, phản biện, thiết kế giải pháp, tổng hợp hội đồng |
+| frontier | quyết định đắt giá nhất | quyết định khó đảo ngược, sai thì tốn kém lớn? | chốt kiến trúc, ghế tổng hợp cuối của hội đồng quan trọng |
+
+**Định nghĩa phải nằm ngay cạnh config** (owner). Config là JSON, không có comment. Quyết định: **một nguồn** là hằng số định nghĩa thang trong component Seat Binding (cùng chỗ với từ vựng tier); `fgos setup` sinh khoá `"$comment"` (quy ước của JSON Schema, loader bỏ qua mọi khoá `$comment` ở mọi cấp) ngay cạnh `modelPolicies`, `tierFallback`, `maxTier` từ nguồn đó; doctor báo khi `$comment` lệch nguồn; `fgos dispatch explain` in định nghĩa bậc của ghế. Không chép tay (luật thiết kế 7). Phương án loại: đổi config sang JSONC/YAML (đổi định dạng mọi workspace, quá lớn); khoá dữ liệu `tiers` mang mô tả (hai nguồn sự thật cho một từ vựng cố định).
+
 ## 9. Câu hỏi cho owner
 
 1. **Tách rigor khỏi tier (mục 4):** đồng ý xoá `rigorToTier`, tier khai trực tiếp? Hệ quả cần biết: item Work `risk: heavy` hôm nay tự lên flagship; sau tách nó chỉ thêm checker, tier giữ theo capability.
@@ -228,7 +247,8 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 - 13:17 câu 3: **đồng ý** — chỉ origin người (`human-cli`) được nâng tier; override do agent tạo vượt tier cấu hình → từ chối có tên.
 - 13:17 câu 10: **hỗ trợ cả hai**, persona của domain chỉ thấy trong domain đó: (a) bộ persona chung của domain; (b) workflow đóng gói trong một thư mục riêng thì persona đặt **ngay cạnh** file workflow, không chép vào thư mục `agents/` riêng. Tên theo tiền tố loại: `wf.<name>.<ext>`, `agent.<name>.<ext>` (vd `six-hats/wf.six-hats.yaml`, `six-hats/agent.black-hat.yaml`). Luật tên và nơi đặt này là việc của Convention (sinh/phân giải/kiểm tên + đường dẫn); đọc, thứ tự tầng, ghim nội dung vẫn ở `agent-definitions`. Thứ tự tầng: workspace → thư mục workflow → domain (của chính workflow) → core.
 - 13:26 câu 6: **đồng ý đề xuất**: (a) `shape-proposals` 1 ghế frontier (lens hệ thống), 2 ghế flagship; (b) `explain` hạ xuống flagship; (c) synthesis business/delphi giữ standard; (d) panel ý kiến dẫn bằng họ rẻ (gemini, deepseek, glm); (e) `code:review`/`code:debug` giữ codex rồi claude.
-- Còn mở: R (đã trình bày lại, mục R.2).
+- 13:28 R: gói domain mang tier, không mang families (R.3). 13:36: giữ **6 bậc** tier, định nghĩa ở mục T, đặt ngay cạnh config.
+- Còn mở: xác nhận R1 ngay / R2 sau.
 
 ### R. Brainstorm: phạm vi của taste theo role (owner 12:48: global không hợp)
 
