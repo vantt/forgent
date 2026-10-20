@@ -1,0 +1,113 @@
+{
+  "inputHEAD": "6b3335711454f638780affa907353992dcde82ba",
+  "commands": [
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs",
+      "exit": 0,
+      "result": "996 files; 26 accounted edits; 2 accounted new files"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "exit": 0,
+      "tests": 28,
+      "pass": 28,
+      "fail": 0,
+      "skip": 0
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "script": "ownership.mjs",
+      "exit": 0,
+      "stdout": "{ all: 269, active: 207, sameSource: 205, drift: 0 }\n",
+      "stderr": ""
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "script": "audit-ownership.mjs",
+      "exit": 0,
+      "stdout": "{\n  collisions: 269,\n  newGapGroups: 24,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+      "stderr": ""
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "script": "ownership.mjs",
+      "exit": 0,
+      "stdout": "{ all: 269, active: 207, sameSource: 205, drift: 0 }\n",
+      "stderr": ""
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "script": "audit-ownership.mjs",
+      "exit": 0,
+      "stdout": "{\n  collisions: 269,\n  newGapGroups: 24,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+      "stderr": ""
+    }
+  ],
+  "bindingProcedure": "Both unchanged manifest unitsOf independently agreed on full historical/current passage extraction for all 14 changed documentation files; 316 target bindings checked, 16 content drifts across seven passages in five target files and six decision shards rebound. Full passages and removal of approval fields in journal.",
+  "protectedReproductionManifests": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "b71f9bb546e3abadba96d1c625d1c3355c7de7c6bb67abf69ff2c36913239a46"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "c947bf5963d9d0126371f5c6c67372e1eff4ecd8482f5a4558b1bd0374307eb3"
+    }
+  ],
+  "docsUnchangedFromInput": [
+    "docs/architecture-manifest.json",
+    "docs/backlog.md",
+    "docs/decisions/index.md",
+    "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+    "docs/platform/component-boundary.md",
+    "docs/platform/event-store/spec.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/platform/process/spec.md",
+    "docs/specs/distribution.md",
+    "docs/specs/reading-map.md",
+    "docs/specs/runner.md",
+    "docs/specs/workflow.md"
+  ],
+  "step3CanonicalRecordsDeferred": 6,
+  "limits": [
+    "Independent review not launched or accepted.",
+    "No full npm suite or reproduction checks.mjs run; L12-11 committed-pair accounting is separate and requires real runner commit id.",
+    "No consumer edit; no native identity assigned; no config/state/secrets access or git write.",
+    "Markdown preview left to Lead; no service started."
+  ],
+  "finalStructuralVerification": {
+    "checkedBindings": 316,
+    "reboundRows": 16,
+    "changedExceptions": [
+      "docs/specs/distribution.md",
+      "docs/specs/reading-map.md",
+      "docs/specs/runner.md",
+      "docs/specs/workflow.md"
+    ],
+    "semanticShardDiffsMatchJournal": true,
+    "previousAccountingPreserved": true,
+    "writeScopeVerified": true,
+    "trackedWrites": [
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "scripts/check-legacy-docs-ratchet.exceptions.json"
+    ],
+    "untrackedWrites": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-44-merge-rebindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-44-ratchet-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-44-ratchet.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-44-step3-deferred-rebinds.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-44-verification.json"
+    ],
+    "diffCheckExit": 0,
+    "scratchReplayNote": "Initial scratch structural replay hit Node execFileSync default output buffer on the >1 MB runner shard; rerun with a 32 MB buffer passed. No repository checker or production change."
+  }
+}
