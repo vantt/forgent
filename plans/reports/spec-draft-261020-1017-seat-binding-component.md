@@ -113,7 +113,7 @@ Mỗi thuộc tính của ghế (`tier`, `families`) lấy từ lớp **cụ th�
 2. **Ghế trong capability:** `capabilities.<cap>.seats.<role>`.
 3. **Role toàn hệ thống:** `roles.<role>` (ví dụ `red-team` → xai).
 4. **Capability:** `capabilities.<cap>`.
-5. **Nhóm capability:** `capabilities."<domain>:*"` (gom ~25 danh sách lặp — O14).
+5. **Nhóm capability theo tiền tố:** `capabilities."<prefix>:*"` (gom ~25 danh sách lặp — O14; tiền tố không phải domain).
 6. **Mặc định runner:** `defaults` (tier `standard`, families theo `tierFallback` của tier đó).
 
 Luật khác họ (independence) và spread **luôn** áp sau cùng, như bộ lọc: một role ưu tiên xai nhưng producer đã là xai thì ghế tự sang họ kế, và câu giải thích nói rõ vì sao.
@@ -185,7 +185,7 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 | N6 khác họ | 6 bước 3, rigor đã gộp (sửa O4) |
 | N7–N10, N28 xoay, dự phòng, pin, quarantine | 6 bước 5–6 (giữ nguyên D-ADR0071) |
 | N15 giải thích được | 5.3 |
-| N16, O14 config ngắn | 5.1 lớp 5 (`"<domain>:*"`), 5.2 |
+| N16, O14 config ngắn | 5.1 lớp 5 (`"<prefix>:*"`), 5.2 |
 | N17, D3, D31 một authority | 3 |
 | N18, N35, N36 trần theo capability, quyền override | 5.1 lớp 1, 5.2 `maxTier` capability |
 | N19 đo chi phí | ngoài phạm vi (MP-COST Q2) |
@@ -194,9 +194,11 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 ## 8. Chuyển đổi (L10, một đợt cho mỗi contract)
 
 1. Lõi `bindSeat` + port account trong component; mọi bên gọi chuyển sang; xoá tier/model riêng của `assignment-policy`, `dispatch/cli.mjs`, `assignment.mjs`; xoá walker thứ hai.
-2. Config: `prefer` → `families` (MP-C gộp vào đây), `rigorToTier` xoá, thêm `tier`/`maxTier` capability, `roles`, `seats`, nhóm `"<domain>:*"`, `defaults`. Một lệnh `fgos setup` chuyển config cũ sang mới một lần, in diff; các key mới chỉ ở **project config** cho tới khi mọi release trên máy đọc được (N30, D22).
+2. Config: `prefer` → `families` (MP-C gộp vào đây), `rigorToTier` xoá, thêm `tier`/`maxTier` capability, `roles`, `seats`, nhóm `"<prefix>:*"`, `defaults`. Một lệnh `fgos setup` chuyển config cũ sang mới một lần, in diff; các key mới chỉ ở **project config** cho tới khi mọi release trên máy đọc được (N30, D22).
 3. `explain` theo ghế và theo preset; doctor dùng cùng hàm.
 4. Spec: file `docs/specs/seat-binding.md`, dòng mới trong `docs/platform/component-boundary.md`, supersede RUL80/91/98/102/103/106 phần chọn ghế bằng record mới (không sửa tại chỗ).
+
+**Đính chính (owner 13:55):** tiền tố capability **không phải** domain. Domain thật chỉ có `coding`, `marketing` (`domains/`); tiền tố có 10 nhóm (`code`, `coding`, `architecture`, `business`, `delphi`, `group-cognition`, `nominal-group`, `marketing`, `docs`) cùng 6 capability không tiền tố. `"<prefix>:*"` chỉ là cách viết tắt "mọi capability bắt đầu bằng tiền tố này". Taste theo role gắn vào **capability** vì capability là loại việc của nhóm có ghế (red-team ở `code:review` khác red-team ở `marketing:write`). Không có khoá `domains` trong config; "domain" chỉ là đơn vị đóng gói của R2.
 
 #### R.3 Gói domain mang tier, project mang families (owner 13:28)
 
@@ -224,6 +226,51 @@ Chia theo việc phân biệt rõ được hay không, không theo việc hôm n
 - Cập nhật model mới (openai `gpt-6-luna`, thay `gpt-5.6-sol`, xai `grok-4.7`, điền ô `mini` mọi họ) là một diff config riêng cho owner duyệt, sau khi land Seat Binding.
 
 **Định nghĩa phải nằm ngay cạnh config** (owner). Config là JSON, không có comment. Quyết định: **một nguồn** là hằng số định nghĩa thang trong component Seat Binding (cùng chỗ với từ vựng tier); `fgos setup` sinh khoá `"$comment"` (quy ước của JSON Schema, loader bỏ qua mọi khoá `$comment` ở mọi cấp) ngay cạnh `modelPolicies`, `tierFallback`, `maxTier` từ nguồn đó; doctor báo khi `$comment` lệch nguồn; `fgos dispatch explain` in định nghĩa bậc của ghế. Không chép tay (luật thiết kế 7). Phương án loại: đổi config sang JSONC/YAML (đổi định dạng mọi workspace, quá lớn); khoá dữ liệu `tiers` mang mô tả (hai nguồn sự thật cho một từ vựng cố định).
+
+### W. Workflow và config project: ai khai gì (owner 13:58)
+
+Sự thật hôm nay (`src/workflow/definition.mjs`, `src/runner/execution/patterns/role-tasks.mjs`): mỗi unit khai `capability`, `pattern`, `persona`, `params.roleTasks`, `rigor`; workflow **bị cấm** `executor`, `tier`, `prefer`, `overrides`. Ghế checker (`reviewer`, `red-team`) mang **đúng capability của unit** (`roleUnit` trả `{...unit, objective}`), không mang `code:review`.
+
+Ranh giới giữ nguyên và làm rõ: **workflow nói việc gì, ai ngồi ghế nào, làm gì; config project nói model nào; capability là chỗ nối.**
+
+- **Workflow** khai ghế tường minh: `seats: [{ seat, role, persona?, tier? }]`. `tier` ở đây là **sàn** (yêu cầu tối thiểu, khả chuyển như gói domain R.3); workflow **không** khai `families`.
+- **Config project** khai theo capability của unit: `families`, `tier`, `roles.<role>`, `seats.<seat>`; được chọn tier **bằng hoặc cao hơn** sàn của workflow, không thấp hơn.
+- **Trần** `maxTier` (global, capability) từ project. Sàn > trần → **từ chối có tên**, không tự hạ.
+- Taste theo ghế khoá bởi (capability, tên ghế): hai workflow cùng capability và cùng tên ghế dùng chung taste; muốn khác thì đặt tên ghế khác hoặc capability khác.
+
+Ví dụ workflow:
+
+```yaml
+- id: shape-proposals
+  template:
+    capability: architecture:shape
+    pattern: panel
+    seats:
+      - { seat: system,      role: producer,    persona: system-lens,      tier: frontier }
+      - { seat: alternative, role: producer,    persona: alternative-lens }
+      - { seat: constraint,  role: producer,    persona: constraint-lens }
+      - { seat: synthesis,   role: synthesizer }
+```
+
+Ví dụ config project (một capability, nhiều role; nhóm tiền tố viết gọn):
+
+```json
+"code:*": {
+  "families": ["gemini", "deepseek", "z-ai", "claude"],
+  "roles": {
+    "reviewer": { "families": ["openai", "claude"] },
+    "red-team": { "families": ["xai"] }
+  }
+},
+"code:review": { "families": ["openai", "claude"] },
+"architecture:shape": {
+  "tier": "flagship",
+  "seats": { "system": { "families": ["claude", "openai"] } },
+  "roles": { "synthesizer": { "families": ["claude"] } }
+}
+```
+
+Đọc: mọi unit `code:*` — người viết họ rẻ, người soát codex, người phá xai; unit mà việc chính là review (`code:review`) — người làm review codex. "Ai review code" nằm ở hai chỗ có chủ ý: ghế soát trong mọi unit code (`roles.reviewer`) khác unit lấy review làm việc chính; `explain` in ghế lấy taste từ dòng nào. Luật khác họ vẫn áp sau cùng (red-team xai mà producer xai → họ kế, có lý do).
 
 ## 9. Câu hỏi cho owner
 
@@ -256,7 +303,8 @@ Chia theo việc phân biệt rõ được hay không, không theo việc hôm n
 - 13:17 câu 10: **hỗ trợ cả hai**, persona của domain chỉ thấy trong domain đó: (a) bộ persona chung của domain; (b) workflow đóng gói trong một thư mục riêng thì persona đặt **ngay cạnh** file workflow, không chép vào thư mục `agents/` riêng. Tên theo tiền tố loại: `wf.<name>.<ext>`, `agent.<name>.<ext>` (vd `six-hats/wf.six-hats.yaml`, `six-hats/agent.black-hat.yaml`). Luật tên và nơi đặt này là việc của Convention (sinh/phân giải/kiểm tên + đường dẫn); đọc, thứ tự tầng, ghim nội dung vẫn ở `agent-definitions`. Thứ tự tầng: workspace → thư mục workflow → domain (của chính workflow) → core.
 - 13:26 câu 6: **đồng ý đề xuất**: (a) `shape-proposals` 1 ghế frontier (lens hệ thống), 2 ghế flagship; (b) `explain` hạ xuống flagship; (c) synthesis business/delphi giữ standard; (d) panel ý kiến dẫn bằng họ rẻ (gemini, deepseek, glm); (e) `code:review`/`code:debug` giữ codex rồi claude.
 - 13:28 R: gói domain mang tier, không mang families (R.3). 13:36: giữ **6 bậc** tier, định nghĩa ở mục T, đặt ngay cạnh config.
-- Còn mở: xác nhận R1 ngay / R2 sau.
+- 13:50 R: **R1 và R2 là hai lớp chồng nhau, không loại trừ**: R2 (gói domain, chỉ `tier` + độ độc lập) là mặc định đi theo domain; R1 (config project, `families` + đè `tier`) là quyết định cuối. Thứ tự áp: R1 > R2 > mặc định hệ thống. R1 làm trong đợt Seat Binding; R2 làm khi đóng gói domain cho project khác.
+- Còn mở: không. Bước tiếp: hội đồng kiến trúc soát (câu 5), rồi owner duyệt bản cuối.
 
 ### R. Brainstorm: phạm vi của taste theo role (owner 12:48: global không hợp)
 
@@ -264,18 +312,18 @@ Vấn đề: "red-team → xai" hợp với review code và phản biện kiến
 
 | Phương án | Khai ở đâu | Lợi | Giá |
 |---|---|---|---|
-| R1 role trong nhóm capability | `capabilities."code:*".roles.red-team`, `capabilities."marketing:*".roles.red-team` | dùng lại lớp nhóm `"<domain>:*"` đã có trong 5.1; không thêm khoá cấp cao; đọc config thấy ngay domain nào chọn gì | lặp nếu nhiều domain cùng ý |
+| R1 role trong nhóm capability | `capabilities."code:*".roles.red-team`, `capabilities."marketing:*".roles.red-team` | dùng lại lớp nhóm `"<prefix>:*"` đã có trong 5.1; không thêm khoá cấp cao; đọc config thấy ngay domain nào chọn gì | lặp nếu nhiều domain cùng ý |
 | R2 role trong config của domain | `domains/<d>/` (file domain) | domain tự mang taste, đi cùng persona và workflow của nó | thêm một nguồn config ngoài `.fgos/config.json`; project muốn đè phải có lớp đè |
 | R3 role trong từng capability | `capabilities.<cap>.roles.<role>` | chính xác nhất | lặp nhiều |
 | R4 global + đè theo domain | `roles` global làm mặc định, R1 đè | ít dòng | chính là thứ owner thấy không hợp: mặc định global vẫn rò sang domain không khai |
 
-Đề xuất: **R1** (và R3 khi cần chính xác, cùng một hình dạng khoá `roles` bên trong capability hoặc nhóm). Không có `roles` cấp runner. Thứ tự lớp 5.1 thành: người > ghế > persona > role trong capability > role trong nhóm domain > capability > nhóm domain > mặc định. Câu cho owner: R1 có đủ không, hay domain cần mang taste theo gói (R2) khi đóng gói domain cho project khác?
+Đề xuất: **R1** (và R3 khi cần chính xác, cùng một hình dạng khoá `roles` bên trong capability hoặc nhóm). Không có `roles` cấp runner. Thứ tự lớp 5.1 thành: người > ghế > persona > role trong capability > role trong nhóm tiền tố > capability > nhóm tiền tố > mặc định. Câu cho owner: R1 có đủ không, hay domain cần mang taste theo gói (R2) khi đóng gói domain cho project khác?
 
 #### R.2 Trình bày lại (13:26)
 
 Ví dụ thật: red-team ở code muốn xai (phá mạnh), ở marketing muốn claude (phê bình giọng thương hiệu kỹ), ở kiến trúc muốn xai.
 
-- **R1 — khai trong config của project, theo nhóm capability của domain:** `capabilities."code:*".roles.red-team.families = ["xai"]`, `capabilities."marketing:*".roles.red-team.families = ["claude"]`. Một file, người chủ project thấy hết. Khi đem domain marketing sang project khác, taste không đi theo; project đó chạy mặc định cho tới khi tự khai.
+- **R1 — khai trong config capability của project (capability hoặc nhóm tiền tố):** `capabilities."code:*".roles.red-team.families = ["xai"]`, `capabilities."marketing:*".roles.red-team.families = ["claude"]`. Một file, người chủ project thấy hết. Khi đem domain marketing sang project khác, taste không đi theo; project đó chạy mặc định cho tới khi tự khai.
 - **R2 — domain tự mang taste trong gói của nó** (`domains/marketing/…`), project đè bằng R1. Taste đi theo domain. Nhưng họ model phụ thuộc máy (máy kia không có account xai thì vô nghĩa), nên taste theo **họ** mang theo gói thì yếu; taste theo **tier** và **độ độc lập** (judge cần flagship, phải khác họ) thì mang đi đâu cũng đúng.
 
 Đề xuất: **R1 ngay** (một nguồn, đúng thẩm quyền config project). **R2 sau, khi đóng gói domain cho project khác (mission #1), và chỉ cho khoá khả chuyển (`tier`), không cho `families`.**
