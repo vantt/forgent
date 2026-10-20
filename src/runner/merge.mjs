@@ -482,7 +482,11 @@ export function classifyDecisionIndexCollision(repoRoot) {
   if (paths.length !== 1 || paths[0] !== DECISION_INDEX_PATH) {
     return null;
   }
-  const raw = fs.readFileSync(path.join(repoRoot, DECISION_INDEX_PATH), 'utf8');
+  return classifyDecisionIndexText(fs.readFileSync(path.join(repoRoot, DECISION_INDEX_PATH), 'utf8'));
+}
+
+/** The classification above, over the conflicted index text itself. */
+function classifyDecisionIndexText(raw) {
   const segments = splitConflictSegments(raw);
   const conflicts = segments.filter((s) => s.type === 'conflict');
   if (conflicts.length === 0) {
@@ -576,8 +580,15 @@ export function renumberDecisionFile(repoRoot, oldPath, newId) {
   const newPath = `docs/decisions/${newId}-${slug}.md`;
   git(repoRoot, ['mv', oldPath, newPath]);
   const abs = path.join(repoRoot, newPath);
+  fs.writeFileSync(abs, renumberDecisionText(fs.readFileSync(abs, 'utf8'), oldId, newId));
+  git(repoRoot, ['add', newPath]);
+  return { oldId, newId, oldPath, newPath };
+}
+
+/** A decision doc's own title and heading lines, citing `newId` for `oldId`. */
+function renumberDecisionText(text, oldId, newId) {
   const oldIdRe = new RegExp(`\\b${oldId}\\b`);
-  const lines = fs.readFileSync(abs, 'utf8').split('\n');
+  const lines = text.split('\n');
   let titleFixed = false;
   let headingFixed = false;
   for (let i = 0; i < lines.length; i++) {
@@ -591,9 +602,7 @@ export function renumberDecisionFile(repoRoot, oldPath, newId) {
       headingFixed = true;
     }
   }
-  fs.writeFileSync(abs, lines.join('\n'));
-  git(repoRoot, ['add', newPath]);
-  return { oldId, newId, oldPath, newPath };
+  return lines.join('\n');
 }
 
 /** Rebuild `docs/decisions/0000-index.md`'s conflicted text with every
@@ -604,6 +613,11 @@ export function renumberDecisionFile(repoRoot, oldPath, newId) {
  * `[newId](newPath)` before sorting. Writes the file and stages it; never
  * touches any other path. */
 export function resolveDecisionIndexConflict(repoRoot, classification, idRenames) {
+  fs.writeFileSync(path.join(repoRoot, DECISION_INDEX_PATH), rebuildDecisionIndex(classification, idRenames));
+  git(repoRoot, ['add', DECISION_INDEX_PATH]);
+}
+
+function rebuildDecisionIndex(classification, idRenames) {
   const rewriteRow = (line) => {
     const m = line.match(DECISION_ROW_RE);
     const rename = idRenames.get(m[1]);
@@ -622,9 +636,7 @@ export function resolveDecisionIndexConflict(repoRoot, classification, idRenames
     rows.sort((a, b) => (rowSortKey(a) < rowSortKey(b) ? -1 : 1));
     return rows.join('\n');
   }).join('\n');
-
-  fs.writeFileSync(path.join(repoRoot, DECISION_INDEX_PATH), rebuilt);
-  git(repoRoot, ['add', DECISION_INDEX_PATH]);
+  return rebuilt;
 }
 
 /**
@@ -1590,6 +1602,78 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
 }
 
 
+const isFgosPath = (p) => p === '.fgos' || p.startsWith('.fgos/');
+
+function blobAt(repoRoot, rev, relPath) {
+  try {
+    return execFileSync('git', ['cat-file', 'blob', `${rev}:${relPath}`], { cwd: repoRoot, maxBuffer: GIT_LIST_MAX_BUFFER, stdio: ['ignore', 'pipe', 'ignore'] });
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The trusted-side resolutions a Land candidate of `source` onto `target`
+ * needs, as declared candidate files, read from a read-only
+ * `git merge-tree` of the two exact OIDs: a decision-id collision on the
+ * decision index is renumbered and unioned, a conflict confined to
+ * `merge=union` `.fgos` paths and every `.fgos` path the branch did not
+ * really write keep the target's bytes (ADR0020). Anything else returns the
+ * outcome the merge verbs already report: `conflict`, or
+ * `fgos-write-rejected` with the paths a branch tried to write under `.fgos`.
+ */
+export function declareLandFiles(repoRoot, item, target, source) {
+  let out;
+  let conflicted = false;
+  try {
+    out = execFileSync('git', ['merge-tree', '--write-tree', '-z', '--name-only', '--no-messages', target, source], { cwd: repoRoot, encoding: 'utf8', maxBuffer: GIT_LIST_MAX_BUFFER, stdio: ['ignore', 'pipe', 'pipe'] });
+  } catch (err) {
+    if (err.status !== 1) throw new MergeError(`reading the merge of ${source} onto ${target} failed: ${err.message}`, { stderr: err.stderr ?? null, status: err.status ?? null });
+    out = err.stdout;
+    conflicted = true;
+  }
+  const [tree, ...rest] = String(out).split('\0');
+  const conflictedPaths = conflicted ? [...new Set(rest.filter(Boolean))] : [];
+  const files = new Map();
+  const declare = (relPath, bytes) => files.set(relPath, { path: relPath, bytes: bytes === null ? null : [...bytes] });
+  const isUnion = (relPath) => git(repoRoot, ['check-attr', `--source=${target}`, 'merge', '--', relPath]).trim().endsWith(': union');
+  let selfResolved = false;
+  if (conflictedPaths.length === 1 && conflictedPaths[0] === DECISION_INDEX_PATH) {
+    const classification = classifyDecisionIndexText(blobAt(repoRoot, tree, DECISION_INDEX_PATH)?.toString('utf8') ?? '');
+    if (!classification) return { outcome: 'conflict' };
+    const targetFiles = new Set(nulPaths(git(repoRoot, ['ls-tree', '-r', '--name-only', '-z', target, '--', 'docs/decisions/'])));
+    const sourceFiles = nulPaths(git(repoRoot, ['ls-tree', '-r', '--name-only', '-z', source, '--', 'docs/decisions/']));
+    const idRenames = new Map();
+    let nextId = nextFreeDecisionId(repoRoot, [target, source]);
+    for (const oldId of classification.collidingIds) {
+      const oldPath = sourceFiles.find((f) => f.match(DECISION_FILE_RE)?.[1] === oldId && !targetFiles.has(f));
+      if (!oldPath) return { outcome: 'conflict' };
+      const newPath = `docs/decisions/${nextId}-${oldPath.match(DECISION_FILE_RE)[2]}.md`;
+      declare(oldPath, null);
+      declare(newPath, Buffer.from(renumberDecisionText(blobAt(repoRoot, source, oldPath).toString('utf8'), oldId, nextId)));
+      idRenames.set(oldId, { newId: nextId, newPath });
+      nextId = String(parseInt(nextId, 10) + 1).padStart(4, '0');
+    }
+    declare(DECISION_INDEX_PATH, Buffer.from(rebuildDecisionIndex(classification, idRenames)));
+    selfResolved = true;
+  } else if (conflictedPaths.length > 0) {
+    if (!conflictedPaths.every((p) => isFgosPath(p) && isUnion(p))) return { outcome: 'conflict' };
+    for (const p of conflictedPaths) declare(p, blobAt(repoRoot, target, p));
+  }
+  const takenAt = item.lastAttempt?.branchHeadAtTake ?? item.branchHeadAtTake;
+  const rejected = [];
+  for (const p of nulPaths(git(repoRoot, ['diff-tree', '-r', '--name-only', '--no-renames', '-z', target, tree, '--', '.fgos'], { maxBuffer: GIT_LIST_MAX_BUFFER }))) {
+    if (files.has(p)) continue;
+    const unchangedOnBranch = Boolean(takenAt) && isUnchangedSinceBranchHeadAtTake(repoRoot, source, p, takenAt);
+    const kept = blobAt(repoRoot, target, p);
+    if (kept !== null && (unchangedOnBranch || isUnion(p))) declare(p, kept);
+    else if (kept === null && unchangedOnBranch) declare(p, null);
+    else rejected.push(p);
+  }
+  if (rejected.length > 0) return { outcome: 'fgos-write-rejected', paths: rejected, ...(selfResolved && { selfResolved }) };
+  return { files: [...files.values()], selfResolved };
+}
+
 /** Root publication uses the same native Land transaction as other consumers.
  * The session, rather than a caller-held short-name slot, excludes the target
  * throughout candidate verification. A stale publication is returned once.
@@ -1607,6 +1691,13 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
       throw toMergeLockError(err, { branch });
     }
   }
+  // Trusted-side resolutions are bytes bound to the target they were read
+  // against; only then is that target pinned, otherwise Land pins its own.
+  const pinned = resolveRefSha(repoRoot, targetBranch);
+  const source = resolveRefSha(repoRoot, branch);
+  const declared = declareLandFiles(repoRoot, item, pinned, source);
+  if (declared.outcome) return { ...declared, branch };
+  const { files, selfResolved } = declared;
   const options = gitPortOptions(repoRoot, { mutation: true });
   const port = createGitLand(options);
   const destination = `refs/heads/${targetBranch}`;
@@ -1616,13 +1707,14 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
       operationId,
       waitMs: lockWaitMs,
       request: {
-        source: resolveRefSha(repoRoot, branch),
+        source,
+        ...(files.length > 0 && { target: pinned }),
         destination,
         message: `merge ${branch} into ${targetBranch}`,
         squash: false,
         footprint: ownFileSet ? [...ownFileSet] : null,
         subtree: null,
-        files: [],
+        files,
       },
     });
     if (previous) {
@@ -1644,13 +1736,18 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
         return { outcome: 'verify-fail', branch, check: { passed: false, status: 1, timedOut: false, output: err.message } };
       }
       check = await runGoalCheck(item, candidate.worktree, timeoutMs);
+      if (check.passed) {
+        // The repo-invariant gate runs on the exact tree about to land.
+        const invariant = await runInvariantChecks(readInvariantCheckCommands(repoRoot), candidate.worktree, timeoutMs);
+        if (!invariant.passed) return { outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant), ...(selfResolved && { selfResolved }) };
+      }
     } else {
       check = {
         passed: true, status: 0, timedOut: false, skipped: true,
         output: `verify skipped: the merged tree is identical to ${item.branchHeadAtReturn}, already verified green at return (HEAD is an ancestor of "${branch}" and the branch tip has not moved since)`,
       };
     }
-    if (!check.passed) return { outcome: 'verify-fail', branch, check };
+    if (!check.passed) return { outcome: 'verify-fail', branch, check, ...(selfResolved && { selfResolved }) };
     phase = 'publish';
     const receipt = await port.publish({
       source: candidate.source, target: candidate.target,
@@ -1658,7 +1755,7 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
       evidenceDigest: crypto.createHash('sha256').update(JSON.stringify({ item: item.id, check })).digest('hex'),
     }, { waitMs: lockWaitMs });
     const operation = createGitRecovery(options).inspectOperation({ operationId });
-    return { outcome: 'merged', branch, check, receipt,
+    return { outcome: 'merged', branch, check, receipt, ...(selfResolved && { selfResolved }),
       landSettlement: { repoIdentity: operation.intent.repoIdentity, operationId, settlementKind: 'delivered' } };
   } catch (err) {
     let detail;
@@ -1668,7 +1765,10 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
       const mismatchedPaths = branchContentMismatch(repoRoot, branch, targetBranch);
       if (mismatchedPaths.length) return { outcome: 'verify-fail', branch, check: { passed: false, status: null, output: `integrity check failed: "${branch}" is an ancestor of ${targetBranch} but its own content is not reflected there for: ${mismatchedPaths.join(', ')}` } };
       const check = await runGoalCheck(item, repoRoot, timeoutMs);
-      return { outcome: check.passed ? 'merged' : 'verify-fail', branch, check };
+      if (!check.passed) return { outcome: 'verify-fail', branch, check };
+      const invariant = await runInvariantChecks(readInvariantCheckCommands(repoRoot), repoRoot, timeoutMs);
+      if (!invariant.passed) return { outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant) };
+      return { outcome: 'merged', branch, check };
     }
     if (cause === 'land-conflict-aborted') return { outcome: 'conflict', branch };
     if (cause === 'main-checkout-dirty-mid-merge') return { outcome: cause, branch };

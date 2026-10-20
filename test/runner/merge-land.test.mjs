@@ -122,3 +122,56 @@ test('root verification reuse tolerates a pinned target that advanced only on pa
     assert.deepEqual(f.git('show', '-s', '--format=%P', 'main').split(' '), [target, f.request.source]);
   } finally { f.close(); }
 });
+
+function branchCommit(f, branch, from, files) {
+  f.git('branch', branch, from);
+  const wt = fs.mkdtempSync(path.join(fs.realpathSync(process.env.TMPDIR ?? '/tmp'), 'merge-land-wt-'));
+  fs.rmSync(wt, { recursive: true });
+  f.git('worktree', 'add', '-q', wt, branch);
+  for (const [rel, text] of Object.entries(files)) {
+    fs.mkdirSync(path.dirname(path.join(wt, rel)), { recursive: true });
+    fs.writeFileSync(path.join(wt, rel), text);
+    f.git('-C', wt, 'add', '-f', '--', rel);
+  }
+  f.git('-C', wt, 'commit', '-qm', `${branch} change`);
+  f.git('worktree', 'remove', '--force', wt);
+}
+
+test('a branch that writes under .fgos is refused before Land and leaves the destination unchanged', async () => {
+  const f = rootFixture();
+  try {
+    branchCommit(f, 'stray', 'source', { '.fgos/stray.json': '{}\n' });
+    const before = f.git('rev-parse', 'main');
+    const result = await mergeRootIntoMainCas(f.repo, { id: 'stray', verify: 'true' }, 'stray');
+    assert.deepEqual(result, { outcome: 'fgos-write-rejected', paths: ['.fgos/stray.json'], branch: 'stray' });
+    assert.equal(f.git('rev-parse', 'main'), before);
+    assert.equal(fs.existsSync(path.join(f.repo, '.fgos/runtime/git-candidates')), false);
+  } finally { f.close(); }
+});
+
+test('a decision-id collision on the index is renumbered and unioned as declared candidate bytes', async () => {
+  const f = rootFixture();
+  try {
+    const index = (rows) => `# Decisions\n\n| ID | Title |\n|---|---|\n${rows.join('\n')}\n`;
+    const row = (id, file) => `| [${id}](${file}) | pick |`;
+    const decision = (id) => `---\ntitle: ${id} pick\n---\n# ${id} — pick\n`;
+    fs.mkdirSync(path.join(f.repo, 'docs/decisions'), { recursive: true });
+    fs.writeFileSync(path.join(f.repo, 'docs/decisions/0000-index.md'), index([row('0001', '0001-base.md')]));
+    fs.writeFileSync(path.join(f.repo, 'docs/decisions/0001-base.md'), decision('0001'));
+    f.git('add', 'docs'); f.git('commit', '-qm', 'base decisions');
+    branchCommit(f, 'theirs', 'main', {
+      'docs/decisions/0000-index.md': index([row('0001', '0001-base.md'), row('0002', '0002-theirs.md')]),
+      'docs/decisions/0002-theirs.md': decision('0002'),
+    });
+    fs.writeFileSync(path.join(f.repo, 'docs/decisions/0000-index.md'), index([row('0001', '0001-base.md'), row('0002', '0002-ours.md')]));
+    fs.writeFileSync(path.join(f.repo, 'docs/decisions/0002-ours.md'), decision('0002'));
+    f.git('add', 'docs'); f.git('commit', '-qm', 'ours decision');
+    const result = await mergeRootIntoMainCas(f.repo, { id: 'theirs', verify: 'true' }, 'theirs');
+    assert.equal(result.outcome, 'merged', JSON.stringify(result));
+    assert.equal(result.selfResolved, true);
+    const files = f.git('ls-tree', '-r', '--name-only', 'main', '--', 'docs/decisions/').split('\n');
+    assert.deepEqual(files.sort(), ['docs/decisions/0000-index.md', 'docs/decisions/0001-base.md', 'docs/decisions/0002-ours.md', 'docs/decisions/0003-theirs.md']);
+    assert.equal(f.git('show', 'main:docs/decisions/0000-index.md'), index([row('0001', '0001-base.md'), row('0002', '0002-ours.md'), row('0003', '0003-theirs.md')]).trimEnd());
+    assert.match(f.git('show', 'main:docs/decisions/0003-theirs.md'), /^title: 0003 pick$/m);
+  } finally { f.close(); }
+});

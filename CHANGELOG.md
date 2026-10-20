@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Root-into-main `approve` through Land again refuses a branch that writes under `.fgos/`, self-resolves decision-id collisions on the decision index and `merge=union` `.fgos` conflicts, and runs the repo-invariant checks on the candidate before publishing.
+
 - `approve`/`merge` `--wait` now also bounds Land's wait for the main checkout at publication (previously a fixed 5 s), and a waiting Land no longer stalls its own process, so a release by another holder in the same process is seen.
 
 - Git Land can pin the current destination under its own slot, wait for admission without retrying publication, and freeze exact consumer-declared conflict resolutions before verification. Merge review patches, changed-path lists, ancestry and clean-tree reads now use Git Inspect; the legacy publication callers have not yet been switched.
