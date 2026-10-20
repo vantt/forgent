@@ -3469,3 +3469,9 @@ Superseding this decision needs a new record; do not edit it in place.
 - **Không đóng:** transition read của `runner.providers.*.accounts` (xoá cùng khoá `runner.providers` khi mọi release trên máy đọc `runner.llmAccounts`); `attemptProviderCapacityFallback` là walker thứ hai; cổng ghi chưa nhận `independentOf`/`preferIndependentOf`; trần tier theo capability và theo dõi chi phí chưa xây.
 - **Ranh giới:** No component-boundary change (`bind()` quyết candidate, lease quyết account).
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### Ghi chú 2026-10-20 — Workflow không sở hữu thao tác git nào
+
+- **Sự thật:** Workflow (và runner) không còn đường ghi git riêng. Ký G0 của Git (D-ADR0057, 2026-10-18) bỏ "pure git integration" khỏi hàng Workflow trong `docs/platform/component-boundary.md`; Git phase 07 chuyển integrate, Land, worktree và commit của runner sang các port có kiểu của `fgos-git` (`src/git/`). Workflow chỉ đọc qua Inspect (`notARepository` là câu trả lời có kiểu, không phải lỗi workflow) và gọi Land/ScopedCommit qua port.
+- **Bằng chứng:** `docs/platform/git/spec.md` §1, §13; hàng Workflow của component-boundary ("owns no git mutation of its own"); cổng một-cửa `git-mutation-one-door` (Git spec §12) là bằng chứng máy khi nó báo không còn writer chưa khai.
+- **Ranh giới:** Không đổi component-boundary thêm; ghi chú này chỉ chép lại sự thật đã chốt ở Git spec cho người đọc spec runner.

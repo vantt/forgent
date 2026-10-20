@@ -106,6 +106,28 @@ for (const escaped of [false,true]) for (const main of [false,true]) test(`Scope
   }
 });
 
+// E4 (Git spec §15, §5): the drain proof above holds because its escapees keep the borrowed lock
+// descriptor. A hook child that closes it and leaves the process group is visible only to a
+// driver that answers Empty for the whole domain (bwrap-pidns). Where none does, the operation
+// must not report a plain success: it reports containment-unproven as recovery-required.
+test('ScopedCommit never reports plain success while a setsid hook child without the borrowed descriptor survives',{skip:process.platform!=='linux'},()=>{
+  const f=fixture();let pid;
+  try {
+    const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);const pidFile=path.join(f.temp,'escapee.pid');
+    fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\n( setsid sleep 30 </dev/null >/dev/null 2>&1 3>&- & echo $! > '${pidFile}' ) &\nsleep 0.2\n`,{mode:0o755});
+    f.git('config','core.hooksPath','hooks');
+    const port=createGitScopedCommit({stateRoot:f.temp,repoPath:f.repo,trustedMain:f.repo,writer:'fixture'},loader);
+    const baseline=port.preflight({},[]);fs.writeFileSync(path.join(f.repo,'a'),'escapee producer');
+    let outcome;
+    try { outcome=port.commit({operationId:'escapee',baseline,request:{writes:['a'],message:'escapee',cutoverGrant:null}},[]); }
+    catch(error) { outcome={error:error.message}; }
+    pid=Number(fs.readFileSync(pidFile,'utf8'));
+    let state;try{state=fs.readFileSync(`/proc/${pid}/stat`,'utf8').split(') ').at(-1)[0];}catch{state='absent';}
+    const drained=['Z','X','absent'].includes(state);
+    assert.ok(drained||/containment-unproven/.test(JSON.stringify(outcome)),`escapee ${pid} is ${state} and the operation reported ${JSON.stringify(outcome).slice(0,200)}`);
+  } finally { if(pid)try{process.kill(pid,'SIGKILL');}catch{} f.close(); }
+});
+
 test('rejecting hook restores a producer move, binary bytes, modes, symlinks and the index',()=>{
   const f=fixture();try {
     const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);
