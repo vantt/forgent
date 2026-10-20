@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-10-20T22:09:31.182934+00:00",
+  "elapsedVerificationSeconds": 61.599,
+  "status": "failed",
+  "proofs": [
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+        "--output",
+        "step-05-full-check-result.json"
+      ],
+      "exit": 1,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-initial-full-check.log",
+      "logSha256": "82ae31f3d43dca7c842b5521357ff5b758dc36f0ab8847d94480a3623c07c29c",
+      "sourceSha256": "5346a543f4e23d332a8728b61b00c27f68d9f473f10f399bd644fb671ec42b7f",
+      "resultFresh": false,
+      "previousBatchCountsNotCurrentEvidence": {
+        "files": 324,
+        "literalReferences": 2452,
+        "dynamicTuples": 5790,
+        "failureCount": 0
+      },
+      "previousResultPathNotCurrentEvidence": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+      "previousResultSha256NotCurrentEvidence": "fbef4d4bf34c98adfb03d3942e37a6724399939cc7c27ada08b76bee36c7ad73"
+    }
+  ],
+  "diagnostic": "Initial full checker stopped on duplicate rule keys in the report-local integration. The result file was not refreshed; printed counts came from the prior batch and are not this run evidence. Integration fixed using dictionary unpacking; final verifier checks result freshness."
+}

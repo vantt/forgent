@@ -1,0 +1,181 @@
+{
+  "id": "real-file-tests-goldens-real-read-batch-3",
+  "seam": "real-file-tests-goldens",
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "currentInputs": [
+    {
+      "path": "test/docs/rul104-anchor-phrase.test.mjs",
+      "sha256": "5d107182c353431849e8f2c0d31710b666401b2e0a4d37f66afefcac99bc114d",
+      "bytes": 1781,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/docs/rul104-anchor-phrase.test.mjs"
+    },
+    {
+      "path": "test/helpers/process-tmp-root.mjs",
+      "sha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
+      "bytes": 2600,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/helpers/process-tmp-root.mjs"
+    },
+    {
+      "path": "test/docs/rul104-law.txt",
+      "sha256": "1ed945d736049ba72d48e7057d11d43882e1440345b55402061d159d620edbb5",
+      "bytes": 932,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/docs/rul104-law.txt"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+      "bytes": 29800,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:AGENTS.md"
+    },
+    {
+      "path": "docs/specs/platform-foundations.md",
+      "sha256": "fbab4eff911938b23691f88e6d2e6200cac12fad0314f2d8760959f064cdbaa6",
+      "bytes": 43761,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/specs/platform-foundations.md"
+    }
+  ],
+  "candidateInputs": [
+    {
+      "path": "test/docs/rul104-anchor-phrase.test.mjs",
+      "sha256": "5d107182c353431849e8f2c0d31710b666401b2e0a4d37f66afefcac99bc114d",
+      "bytes": 1781,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/docs/rul104-anchor-phrase.test.mjs"
+    },
+    {
+      "path": "test/helpers/process-tmp-root.mjs",
+      "sha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
+      "bytes": 2600,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/helpers/process-tmp-root.mjs"
+    },
+    {
+      "path": "test/docs/rul104-law.txt",
+      "sha256": "1ed945d736049ba72d48e7057d11d43882e1440345b55402061d159d620edbb5",
+      "bytes": 932,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/docs/rul104-law.txt"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+      "bytes": 29800,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:AGENTS.md"
+    },
+    {
+      "path": "docs/specs/platform-foundations.md",
+      "sha256": "fbab4eff911938b23691f88e6d2e6200cac12fad0314f2d8760959f064cdbaa6",
+      "bytes": 43761,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/specs/platform-foundations.md"
+    }
+  ],
+  "comparison": {
+    "comparedFields": [
+      "exact conserved claim/assertion mapping",
+      "real-file read set",
+      "whole worker prompt bytes",
+      "golden/source co-edit",
+      "immutable fixture mode/hash/origin"
+    ],
+    "currentOutputSet": [
+      {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "source": "pinned legacy input; owning assertions unchanged"
+      }
+    ],
+    "candidateOutputSet": [],
+    "candidateScope": "No patch candidate: unchanged inputs replay current behavior only. Full post-retirement candidate would lose the parked law reader and has not been run.",
+    "unexpectedDeltas": [],
+    "normalization": "None. Complete source/input hashes are raw; locked fixture comparison uses the existing trim() in the unchanged test.",
+    "intentionalDeltas": []
+  },
+  "cutoverSpecifications": [],
+  "coCutPaths": [
+    "test/docs/rul104-anchor-phrase.test.mjs",
+    "docs/specs/platform-foundations.md",
+    "test/docs/rul104-law.txt"
+  ],
+  "coCutTestGreps": [],
+  "proofs": [
+    {
+      "status": "pass",
+      "exit": 0,
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/docs/rul104-anchor-phrase.test.mjs",
+      "cwd": "/tmp/fgos-work/rul104-batch3-pinned",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-current-tests.log",
+      "logSha256": "d04f06fdb6a015c29ead68a34beb8dd946430bfaf86d4c47d4a534d1812efda9",
+      "scope": "2/2 owning tests over exact pinned current inputs; unchanged partial candidate only",
+      "owningBehavior": "2/2 owning tests over exact pinned current inputs; unchanged partial candidate only"
+    },
+    {
+      "status": "missing",
+      "exit": null,
+      "logPath": null,
+      "logSha256": null,
+      "command": "Phase 9 full npm test and cargo test --workspace after retirement",
+      "scope": "Exact RUL104 holder correspondence plus full post-retirement input set",
+      "owningBehavior": "Exact RUL104 holder correspondence plus full post-retirement input set"
+    }
+  ],
+  "blockedBy": [
+    "test/docs/rul104-anchor-phrase.test.mjs: PLATFORM_FOUNDATIONS_SPEC at line 15 feeds the line-26 read and the exact RUL104 Business Rules regex/word-for-word fixture comparison at lines 27-29. The Phase 6 foundation candidate lacks this locked law; carry the complete RUL104 wording into a live holder and prove equality to test/docs/rul104-law.txt before changing that reader (P8-DOC-GAP-02)."
+  ],
+  "readiness": "pending exact RUL104 claim promotion, independent review and Phase 9 full suite",
+  "review": {
+    "status": "pending",
+    "report": null,
+    "reviewer": null
+  },
+  "candidateManifest": {
+    "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "files": [
+      {
+        "path": "test/docs/rul104-anchor-phrase.test.mjs",
+        "sha256": "5d107182c353431849e8f2c0d31710b666401b2e0a4d37f66afefcac99bc114d",
+        "bytes": 1781,
+        "mode": "100644",
+        "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/docs/rul104-anchor-phrase.test.mjs"
+      },
+      {
+        "path": "test/helpers/process-tmp-root.mjs",
+        "sha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
+        "bytes": 2600,
+        "mode": "100644",
+        "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/helpers/process-tmp-root.mjs"
+      },
+      {
+        "path": "test/docs/rul104-law.txt",
+        "sha256": "1ed945d736049ba72d48e7057d11d43882e1440345b55402061d159d620edbb5",
+        "bytes": 932,
+        "mode": "100644",
+        "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/docs/rul104-law.txt"
+      },
+      {
+        "path": "AGENTS.md",
+        "sha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+        "bytes": 29800,
+        "mode": "100644",
+        "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:AGENTS.md"
+      },
+      {
+        "path": "docs/specs/platform-foundations.md",
+        "sha256": "fbab4eff911938b23691f88e6d2e6200cac12fad0314f2d8760959f064cdbaa6",
+        "bytes": 43761,
+        "mode": "100644",
+        "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/specs/platform-foundations.md"
+      }
+    ],
+    "exit": 0,
+    "meaning": "same pinned legacy input replay; no post-retirement output claimed"
+  }
+}

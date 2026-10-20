@@ -1,0 +1,32 @@
+{
+  "command": [
+    "python3",
+    "-B",
+    "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+    "--output",
+    "step-05-full-check-result.json"
+  ],
+  "exit": 0,
+  "resultFresh": true,
+  "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-final-full-check.log",
+  "logSha256": "09bc298c1fc978dfe49d8409306bd9962bfb79bc324fe4318da0595afef28d88",
+  "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+  "resultSha256": "61db4190b6fe8191b16d90f14a2086ccd5ba2f19558b534464bab326d5a411af",
+  "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+  "sourceSha256": "5346a543f4e23d332a8728b61b00c27f68d9f473f10f399bd644fb671ec42b7f",
+  "dependencyHashes": {
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check.py": "34d5ad9960bbdb6e9121988978b0fa7f65fc5519382a0fd41ad7d2a5e80c078d",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-neutral-rules.py": "d7c96a9fd7307206fe4098249a29b781d44158beafda88f83113c0fe3f12e5da",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-judgment-check.py": "31c46cd05ab95fd706b7ac528b776f95f3176647a624829c1635cd0bd98e5895",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-bulk-rules.py": "b10e106669fb9147fb21e5b90c7ff000511fe18d17b603af32b30343ce93ad04",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-judgment-check.py": "ff3ade91c03d6103209f48b40a5b9d6f60ecf44aedb74cd394edcbeba6f5ae7b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-admission-rules.py": "828e9f743630fca72aff50934568e5cade64b944a0b5c6c9c773bbe82e0bd540"
+  },
+  "counts": {
+    "files": 519,
+    "literalReferences": 2502,
+    "dynamicTuples": 8856,
+    "failureCount": 0
+  },
+  "scope": "Final integrated replay after R20 import guards and mechanical-record HEAD drift wiring"
+}

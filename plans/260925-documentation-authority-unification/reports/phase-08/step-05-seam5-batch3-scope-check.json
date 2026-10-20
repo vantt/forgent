@@ -1,0 +1,108 @@
+{
+  "kind": "Records-only scope and immutable earlier consumer-record conservation",
+  "baseCommit": "9ceec7bdc8bd7243220b99e016bd880a00fa176f",
+  "allowedRoot": "plans/260925-documentation-authority-unification/reports/phase-08",
+  "outsideScopeWrites": [],
+  "existingRecordFilesUnchanged": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sha256": "3b0931d75a32dc5e1a73e52356d4dc4aa178261ccd7b3ec1c7223bd03d60e513"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+      "sha256": "1625ec0891ce1a2f739ca90f6ca24ae72fcf5fbdf3253c89a067b11357038a25"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+      "sha256": "ed4437898c811c7758585aef8fc6e8d4071bbd8423557700026ba32da6606a35"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl",
+      "sha256": "347a36417e8b0ae034b09627ed2932d212c29fc23fad1e6d1df6ea2c85284c57"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+      "sha256": "0c3fc4c77dea4d2a23c6c05ee8deea6c3e0099296e5296f3005692d90969fe54"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl",
+      "sha256": "7b581f7649fcaeb9d895cf6771a83c006566800191e8a2ae6e2bbf49d8195cb6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+      "sha256": "baa49123b6ed375b1776473431a07373d8f5192bb326c74d16fb7eee0065b367"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sha256": "779d12e1863b6cd693493b3dd9ba3a49ee55099f337e429924373f9d535a53b1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "sha256": "7ece1cb25d2b5a48c70ad1431672d96c415428291f76a01bb1291e3b519e9a92"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-prompt-goldens.jsonl",
+      "sha256": "6f7aaa44bc6da3619bd9bbb1ba32e6faa9f66691bb04e8fa06738214c78cf423"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
+      "sha256": "31b5f967b62e3455f3eca35281323de8c1d2520ff1be3899e04ed701690d1ff3"
+    }
+  ],
+  "newRecords": [
+    "step-05-records/tests-cutover-neutral.jsonl",
+    "step-05-records/tests-real-file-batch3.jsonl"
+  ],
+  "forbiddenActions": "No fgOS CLI, git writes, code/docs/test/skill/baseline mutation, build, cargo or live state/secrets access. Required outbox acknowledgements/results are the execution-contract exception.",
+  "finalReviewedPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-cutover-move-set.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file-batch3.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-author.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-brief.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-current-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-final-full-check.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-final-full-proof.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-full-check.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-generator-probes.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-handback.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-index.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-initial-full-check.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-initial-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-input.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-judgment-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-judgment-check.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-judgment-receipt.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-measurements.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-pilot-probes.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-pre-refresh-full-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-prior-probes.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-prompt-probes.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-replay-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-replay-tests.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-scope-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-search-evidence.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-syntax-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-triage.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-verify.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-continuation.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-neutral-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-neutral-check.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-neutral-rules.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-neutral-triage.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-review-list.json"
+  ],
+  "finalOutsideScopeWrites": [],
+  "finalCanonicalRecordConservation": "All 11 pre-existing canonical record files match the recorded HEAD hashes.",
+  "inventoryNote": "Initial global git diff/untracked scope inventory passed and git diff --check passed. A redundant final whole-workspace untracked walk stalled; its read-only child was cancelled. Final syntax, JSON, whitespace, canonical-record hashes and explicit report paths were verified with this bounded inventory; no later non-report write occurred."
+}

@@ -1,0 +1,9 @@
+fatal: path 'test/src/runner/coordination/schema.mjs' does not exist in '5eb9dc609f303fc9d54377f866b5e8caf9a5d129'
+fatal: path 'test/src/runner/coordination/schema.mjs' does not exist in '5eb9dc609f303fc9d54377f866b5e8caf9a5d129'
+fatal: path 'test/src/runner/coordination/schema.mjs' does not exist in '5eb9dc609f303fc9d54377f866b5e8caf9a5d129'
+Traceback (most recent call last):
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py", line 371, in <module>
+    s5=ext.check();out.setdefault('extensions',{})['real-file-tests-goldens']=s5
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check.py", line 157, in check
+    return {'kind':'Step5 seam5 closed batches; remaining queue and independent semantic review pending','files':len(rs)+bulkout['files']+jout['files']+nout['files']+j3out['files'],'literalReferences':len(refs)+jout['literalReferences']+nout['literalReferences']+j3out['literalReferences'],'dynamicTuples':len(dyn)+bulkout['dynamicTuples']+jout['dynamicTuples']+nout['dynamicTuples']+j3out['dynamicTuples'],'mechanicalRejects':bulkout['dynamicTuples']+sum(bool(d.get('mechanicalRejection')) for r in rs for d in r['dynamicTraces']),'rules':dict(RULES,**shared['rules'],**bulkout['rules'],**{k:v for k,v in jout['rules'].items() if k not in shared['rules']},**nout['rules'],**j3out['rules']),'checks':dict(counts),'failureCount':len(errors),'failures':errors,'bulkTriage':bulkout,'judgmentBatch':jout,'neutralBatch':nout,'judgmentBatch3':j3out,'headDrift':m.head_drift(rs)+m.head_drift(closed)+jout['headDrift']+j3out['headDrift']}
+TypeError: dict() got multiple values for keyword argument 'a-passage-agreement'

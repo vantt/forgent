@@ -1122,3 +1122,17 @@ All 702 initial files / 25,005 tuples triaged at their immutable pin. R19 proves
 Final full checker: 324 files / 2,452 references / 5,790 tuples / zero failures; 109/109 negative mutations reject, positive HEAD-only drift passes. Current and pinned same-input candidate owning tests each pass 12/12, with reproducible scratch replay. Candidate-only metadata is assessed through the existing explicit-region resolver and L12-30(3); it never independently promotes a holder. The initial missing-directory fixture failure remains visible and the fixture is repaired without assertion changes.
 
 Review list: four judgment sources, no generated files, mechanical closures separate. Continuation: 671 files / 1,170 references / 24,871 tuples / three original carries. Independent review, parked claim/layout correspondence, Step 7 co-cut composition and post-retirement parity remain pending. Final evidence: step-05-seam5-batch2-{verification.json,measurements.json,handback.md}; scope remains records only, runner owns commits, needsWrites: [].
+
+
+## Seam 5 cutover relevance — in progress
+
+Batch 3 acknowledged. Building the committed move set and conservative R20 whole-file proof, retaining R19 outcomes. Records only; no fgOS CLI, git write, product edit or runtime-state access.
+
+
+## Seam 5 cutover relevance — closed records batch
+
+Pinned move set: 1,561 old physical paths plus retiring-prefix/ADR rules. All 671 files triaged; 194 neutral files / 50 references / 3,060 tuples close with 1,401 prior R19 rejects retained. Earlier 29 R19 closures and all 11 existing record files remain unchanged. One RUL104 real-reader judgment file closes for authoring (one exact-law park, no patch); owning current tests and reproducible replay pass 2/2.
+
+Final integrated checker: 519 authored records / 2,502 references / 8,856 tuples / zero failures. All 128/128 negative probes reject; new retained-literal, baseline-restoration and HEAD-only-drift positives pass. Initial duplicate-rule integration failure is retained and corrected; final result freshness and all raw log/result hashes verify.
+
+Review list: five judgment sources; 223 mechanical files separately enumerated. Continuation: 476 files / 1,120 references / 21,805 tuples / three original carries. Conservation: 704 files / 1,203 references / 25,007 tuples. Independent review, missing RUL104 law promotion, Step 7 composition and post-retirement npm/cargo proof remain pending. Records only; runner owns commits, no CLI/git write/product edit/state or secrets access. Final account: step-05-seam5-batch3-handback.md and verification/measurements receipts; needsWrites: [].

@@ -1,0 +1,39 @@
+{
+  "kind": "Final bounded in-memory Python/JSON syntax and authored source/Markdown whitespace validation; no bytecode written",
+  "files": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-author.py",
+      "sha256": "2f2eee1634be0b881cb70ddd67b151a59d8b9abc29fd89137bdf41a49a5971e2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-index.py",
+      "sha256": "f3f7522c4fea4901586d70b6763b9264d3eafa83daea8d971c9c682822e9cd7e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-judgment-check.py",
+      "sha256": "31c46cd05ab95fd706b7ac528b776f95f3176647a624829c1635cd0bd98e5895"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.py",
+      "sha256": "eaed7aa4684604d7c5ed16eec9278b6477cd6ef8addabfb9580484bc9b070138"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-replay-tests.py",
+      "sha256": "1241514aa13293a0d677020840389bb4f0964d189d2a798fcbaa33fd2558dce5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-verify.py",
+      "sha256": "34d31bc8737288e5c099b1760606bab2e2e082d8e810903b831611261663ae47"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check.py",
+      "sha256": "34d5ad9960bbdb6e9121988978b0fa7f65fc5519382a0fd41ad7d2a5e80c078d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-neutral-rules.py",
+      "sha256": "d7c96a9fd7307206fe4098249a29b781d44158beafda88f83113c0fe3f12e5da"
+    }
+  ],
+  "jsonFilesParsed": 19,
+  "failureCount": 0
+}

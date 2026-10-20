@@ -1,12 +1,13 @@
 {
   "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-  "closedBatch": 2,
+  "closedBatch": 3,
   "reviewStatus": "pending Lead pack and independent Option B semantic review",
   "sourceRecords": [
     "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
     "test/runner/prompt-templates.test.mjs",
     "test/docs/decisions-corpus-retired.test.mjs",
-    "test/docs/rul11-anchor-phrase.test.mjs"
+    "test/docs/rul11-anchor-phrase.test.mjs",
+    "test/docs/rul104-anchor-phrase.test.mjs"
   ],
   "generatedRecords": [],
   "canonicalRecords": [
@@ -102,6 +103,24 @@
         "dynamic-018756",
         "author-s5-rul11-anchor-phrase.test.mjs-self-locator"
       ]
+    },
+    {
+      "file": "test/docs/rul104-anchor-phrase.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file-batch3.jsonl",
+      "recordSha256": "18d58633fb437c5c7e945a01519363d89c24ddbfb195cf8228cfd2ab863bc02d",
+      "sourceSha256": "5d107182c353431849e8f2c0d31710b666401b2e0a4d37f66afefcac99bc114d",
+      "admittedIds": [
+        "dynamic-018748",
+        "dynamic-018749"
+      ],
+      "judgmentCallIds": [
+        "dynamic-018746",
+        "dynamic-018747",
+        "dynamic-018750",
+        "dynamic-018751",
+        "author-s5-rul104-self-locator-1",
+        "author-s5-rul104-self-locator-29"
+      ]
     }
   ],
   "mechanicalRejects": [
@@ -115,14 +134,16 @@
     "existingPacker": "step-05-seam4-window-review/pack.py",
     "recordGlobs": [
       "step-05-records/tests-prompt-goldens.jsonl",
-      "step-05-records/tests-real-file.jsonl"
+      "step-05-records/tests-real-file.jsonl",
+      "step-05-records/tests-real-file-batch3.jsonl"
     ],
     "include": "admittedIds plus judgmentCallIds only, ±40 pinned physical lines plus enclosing context where needed; include both full diffs/rollbacks and atomic receipt",
     "excludeMechanicalIds": [
       "dynamic-029246"
     ],
     "note": "Existing packer hardcodes generators-*.jsonl and includes all tuples: Lead must pass/adapt the record selection and exclude the listed mechanical tuple when packing seam5. No reviewer was launched.",
-    "excludeWholeFileMechanicalRecords": "step-05-records/tests-mechanical.jsonl; separately checker-verified"
+    "excludeWholeFileMechanicalRecords": "step-05-records/tests-mechanical.jsonl; separately checker-verified",
+    "mechanicalExclusions": "Exclude tests-mechanical.jsonl and tests-cutover-neutral.jsonl entirely from window review; their complete R19/R20 proofs are checker obligations."
   },
   "mechanicalClosures": [
     {
@@ -361,5 +382,1760 @@
   "mechanicalClosureCounts": {
     "files": 29,
     "tuples": 115
-  }
+  },
+  "neutralClosures": [
+    {
+      "file": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "4f38fceff575b0a7a1557eea794b3b01628fcc2659109526937a1dddd2e3f3d1",
+      "sourceSha256": "9faf11f5d6aede667dc3079c507b3e7872579e78770360a05c4639fb3052d8b3",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 5,
+      "tupleCount": 32
+    },
+    {
+      "file": "test/intake/judge-verify-second-pass-stability.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "b74ac494fc5b9f35e05b5ac9e71fa78e205ad8b4313ef8684c02c61bb6922c99",
+      "sourceSha256": "d9fd1a01e37d19b338a3d2791e76eb912063fd9ee9afac0560f6d15f6b691cc2",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 2,
+      "tupleCount": 3
+    },
+    {
+      "file": "test/intake/plan-verdict-from-plan-md.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "5bc71cec91b8588af45bf574b82cf3598201630a3f09cae9990b35535abb5159",
+      "sourceSha256": "b1631e305d620b1f6707feee1e3135fcd7abbb37c83787eb2f9c137855fe766a",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 7,
+      "tupleCount": 6
+    },
+    {
+      "file": "test/runner/anti-loop.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "9a9333a6481ae24a97ed160bd81f060591798b06b41f29caf67cec6c8886c7fb",
+      "sourceSha256": "5a01846680d41a6942aec2e0d203c87e8a92364238b1aa9b18913712f6666166",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 1,
+      "tupleCount": 2
+    },
+    {
+      "file": "test/runner/assignment-provenance.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "ca6f8be42e2a0265952707eeb1fbd2c6c249e335348d2a8cfa6d13d0db974233",
+      "sourceSha256": "7d5a59f9fcd567204657ae433e853f697b223c39620cc18c7e17c53f87136ce8",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 4,
+      "tupleCount": 7
+    },
+    {
+      "file": "test/runner/enrich-and-validate-contract.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "ef61800a316d83f996cd359b52a96bbbde08c8967d764215e986c1ca1275afff",
+      "sourceSha256": "49854eb00dcead8e185d75a123d36bb9f642acaf500018811d27b8335f71ad07",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 11,
+      "tupleCount": 3
+    },
+    {
+      "file": "test/scripts/check-locked-decisions-heading-drift.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "176b44d81e88eacfe9716fe551d77ef79965ddab34665fc0a950d3ce4c036163",
+      "sourceSha256": "3b0bf35b0cb7b6810c6c11de93f51561a69320ad610d6f591c005b92cd8c90e3",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 8,
+      "tupleCount": 26
+    },
+    {
+      "file": "test/setup/gitignore-docs-history-not-excluded.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "54db703b7d2e7cb181c6644fbbeb2471f86ce77c7731dbc52f1f2274e40252bc",
+      "sourceSha256": "2e3db2632ac0bda1a9f175eb4f22356284e08b22b7536de7984aa61eea71079b",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 8,
+      "tupleCount": 2
+    },
+    {
+      "file": "test/skills/knowledge-canary.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "5985c15ce77386e837fcdac69fb1939d87698ea48a37a69d06280d7fd1b95e77",
+      "sourceSha256": "14786f764893d76715e5767edd28a43b4e2a8da02efa25b487b1a6be7c2c93be",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 2,
+      "tupleCount": 8
+    },
+    {
+      "file": "test/state/discover-verdict-override.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "9b58fad3452f50eaebaf3663cfc9c7fe31fa38989bc1d88c552e2cd67bcebec6",
+      "sourceSha256": "db00ad8dfc723543cdb463ef5a4acf7799374c44bfc8fccd62387302ad03daeb",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 1,
+      "tupleCount": 4
+    },
+    {
+      "file": "test/state/graph-harness.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "5c299ddcc903c5aa3d2784e20862212f4d4d36d5b858ceaa8ecd54405da19edd",
+      "sourceSha256": "4cae0c70bb03b51e3880ca1932b4dd18c8acae9b01a781d27895ab35017dc777",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 1,
+      "tupleCount": 39
+    },
+    {
+      "file": "apps/fgos-gateway/web/src/api/client.test.ts",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "0b6544321b8cf4801ba8b330f1b7f91add1c4520d0d59b8a383fec9be13da3dc",
+      "sourceSha256": "e260075a74aeab7163f4870c77813aa304061c4bfa324f17b9c05a655830ec35",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "apps/fgos-gateway/web/src/screens/NeedsAnswer.test.tsx",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "23e35f5ba52c1fc038b10e3b0b61c89853367f1a3fd6d0b888b57c842882ee5e",
+      "sourceSha256": "40cedf1678cee9a62fb817ce6741048e618b67223497ce405264f060e9e73771",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 6
+    },
+    {
+      "file": "apps/fgos-gateway/web/src/screens/Taskboard.test.tsx",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "0fe5350c6d9aba08a44152e97f5a74f24a3be323db5bd8a548f6549444638110",
+      "sourceSha256": "69883b7649336615af92409592d12ea5f01b816402da2c4894503692dd419afa",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 17
+    },
+    {
+      "file": "apps/fgos/tests/windows_predecessor_stress.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "89872c23ab8b4c79279d099ae9449ac517f6be4d9dc2faf1480bc0be50e5e86f",
+      "sourceSha256": "0bf5b06644fdb212a693fb2a12979c8e3fb1c88800ae96a7494c00434e01c6c0",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 12
+    },
+    {
+      "file": "dogfood-fixture/test/goal-directed-mvp.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "9c97fb558e991ddeb2207a632bdb6567ed628465e156a1f47f58a24bdbf6e372",
+      "sourceSha256": "cc26c51cd639228526acec30a40bf9b6ed830410948b71a77ea991848503f8bc",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 5
+    },
+    {
+      "file": "packages/agent-protocol/contracts/fixtures/terminal/agy/working-mid-turn.txt",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "be212f57405c9ca96566e0c46218ec6d76915fdf6b26500166eb0b31f6f5ea57",
+      "sourceSha256": "bcfcefa5d22e702ed4d6823884e3d472801271cd4719743caa376e8b99773f2c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "packages/agent-protocol/contracts/fixtures/terminal/codex/draft-expanded-composer.txt",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "ef76b0aa79dba41cb3362014bcad3387744e1cd5cc44f9cf636ebc919afe99f2",
+      "sourceSha256": "40025a3c8419bfe5e3156c14513be25827f1ac9a19673b4ab72c2841cf3a05d1",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "packages/agent-protocol/contracts/fixtures/terminal/codex/vectors.json",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "7f59ecf75ffb91ad848eaf7509e9130cefd87ddd09c800516090a710c85a24af",
+      "sourceSha256": "21c3dd2471d797bbb5502a719e096870d7c118b499802f01deabd57c752e433c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 6
+    },
+    {
+      "file": "packages/agent-protocol/contracts/fixtures/terminal/codex/working.txt",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "af4e6103682be41ea9223c7b07a2da47dc15bb9e941228047492bb23b872463c",
+      "sourceSha256": "fe6543ad0e7e0082be45a1d06c0107143a6e6c77e1c26fcc12b82cb17f1ce55d",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "packages/agent-protocol/contracts/fixtures/terminal/omp/working.txt",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "8a780bcc695f948066e6fd61b06d8c3be5a9501744769ef15c003dd8159af1b5",
+      "sourceSha256": "b0dbb8372e2485ab83f11e789a6c867ee840c52391e695ff3e0373124032845e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "packages/agent-protocol/contracts/fixtures/terminal/pi/working.txt",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "9d70772b39443872ec46d18a3998e4bd44c3c04bf75bb372122f384cc0f173d1",
+      "sourceSha256": "32d0e0b072c1745226b0519df6011345bd190e93853929804831c65484b1789d",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "packages/event-store/rust/tests/branch_local_refs.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "2197bd10258297988b4d58369b890834aa2ec7eaaf08a53f4cab08dd43f5f4f1",
+      "sourceSha256": "51dad4f4f7f228c363cf5f7076f61fd5a8528adb31419fed8cb202fce712e862",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 5
+    },
+    {
+      "file": "packages/event-store/rust/tests/cursor_incremental.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "3df66644d76e5af991af8b779c374d3d0904a0c7c99af73c0f545e9335f2a026",
+      "sourceSha256": "9429430246c625debce0c8e221cbe84fdd7d1d0088159ce2d62a80292f158744",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 8
+    },
+    {
+      "file": "packages/event-store/rust/tests/framing_prefixes.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "7fe1090c9bc7d4e5a2c6e192286b8a56811621a4992da8f75c2a96d07d97185d",
+      "sourceSha256": "f55b6b0377994d8f71841d666d3f84eae63f4655d001f0e3fe4e0e1b688f98ff",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "packages/event-store/rust/tests/kill_append.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "16ce4c43c0c7aba23a4915dd0d6edd29111d1ad02faf39e43c76d6d944324ca7",
+      "sourceSha256": "e569f3337c68909f41ac7bc9fcb4963f0d5b724987bb43171fcbfe2910f22c58",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "packages/event-store/rust/tests/order_kahn.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "fb16751da97a7b568ad269571501d2c98105ed7bd3c6a48cbb091b69f07e3937",
+      "sourceSha256": "c2b1004b8772de30aace61b1f8279c2131b1678a3be45f64b15b171c1728b6e1",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 8
+    },
+    {
+      "file": "packages/event-store/rust/tests/p02_review.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "0bc4dc6065e8318429b9f650e91ccd3a8c2aff719b0b38a63dedbca9725e3d19",
+      "sourceSha256": "5a560dd163330beb32cac8881bc37b3cd558471d1aa7ffead138b7b686e23fe3",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "packages/event-store/rust/tests/support/driver.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "19c3b867b5d3b134ae45128223bd3a383a6da63c4fb524837ae167046fcbc370",
+      "sourceSha256": "332409b5aebcf0f0ab5eca2d280c890b8b8100c55f297a89a5fa8c07a8d8b60a",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 5
+    },
+    {
+      "file": "packages/event-store/rust/tests/three_clones.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "3999d72e4d2982e6dfaefb8cdd75e3cfcc5530eb7195404e2fb96973732deace",
+      "sourceSha256": "d518c9d8c893190d17ce67c7554a3e3561c3ff3458651fb480ecd792809c1728",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "packages/event-store/rust/tests/walk_certified.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "e80fbf6ced1ed4df2017be07b74251698966dae26c3e91484bb798b7990adeaf",
+      "sourceSha256": "0ae2d9f7f3fc96b748167c0a3f9b5de4d3ad7a3e57d6a65ced896f93b9a2db55",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "packages/holder-lock/rust/tests/borrow_git.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "a1c30394b59ed9e3a7012a7d04a67856ba04886b89da2678d2db250fd1b898ae",
+      "sourceSha256": "02d95563daa017ec091c0f99e1aac818240328a9e21e8459f7f35e9e7277cb0c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 8
+    },
+    {
+      "file": "packages/holder-lock/rust/tests/borrow_io.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "0b77c6b6bcb7a9392d94edc4fa79d41b2ccde2f01910959af4fe4429fb722ace",
+      "sourceSha256": "efd771fc8479c24d4e202259803bd5b55b22ba223666739ed0708d0a1245c6ba",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 46
+    },
+    {
+      "file": "packages/holder-lock/rust/tests/stress.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "ce2c41e2cff0c875d3facfad6fe2290e104a940fae54acfdd9d0e5f376e719d6",
+      "sourceSha256": "b1e4875e967a853c9247db8ef8f7e31c7f37786ccec4682d377486503fd723df",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 4
+    },
+    {
+      "file": "packages/holder-lock/rust/tests/windows_lockfileex.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "d3dfb67a60895df4143ad88b0edbdb54f0106442a0e3615c9d99f3832a5c986e",
+      "sourceSha256": "79e5688336e2a2968f72a65802e8cd722f2c614334e8494eeb2c2b452bfc4273",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 14
+    },
+    {
+      "file": "packages/observe/rust/tests/fixture_test.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "7c62ee4659a1ee44792fb802f830bc1cb18ca012e3e1fbe8cfa37dd0cbc0ff8a",
+      "sourceSha256": "1eadd8be1d535b05899e299f6a7a3a4d9a718d9311502e881b76a78f30985677",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 6
+    },
+    {
+      "file": "packages/process/rust/tests/containment_spawn_timeout.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "3555c090a2e21ea9ca79819a64abb04ecf34dbb892dc3f851f4f5f03289a1f51",
+      "sourceSha256": "d97c290dd403f9e883ab5c72107cc7abb13b9fc716740623d90b6a9fe6247d16",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 5
+    },
+    {
+      "file": "packages/run-supervisor/rust/tests/adopt_concurrency.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "2d7fcf94e88c90b8f1a8be70fab1f2ce692cf900e45028fd5edeff49a9192106",
+      "sourceSha256": "3b91e8508642d7a18429a0ce1e43569c42a9e9be882eaa99caa325e1e3fb1938",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "packages/run-supervisor/rust/tests/envelope_digest_vectors.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "859f6acd74ac59ca3fa9761b62a116b8d40446ac7648bf8aca9bd326e2ccf857",
+      "sourceSha256": "593eacf90542d07acb74ce2917ece2c9f82e6e63a205045aeb2a022106fee153",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "packages/run-supervisor/rust/tests/gate_orphan.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "e6619d14ce2ce2a22d94077002cde289425c185fc366b28a74c2200a0003c1e6",
+      "sourceSha256": "ee7cb384c3ff2914c8e3c03eab3887ec068218952d29b9a769fa726dd6727519",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 5
+    },
+    {
+      "file": "packages/run-supervisor/rust/tests/supervise_crash.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "236725b0482eb6b67395a1ced8b29362d8408d10cc270861b30cc2eb1cac9ac4",
+      "sourceSha256": "09472ab66bc48120ab81774d7a05fcfaa4ff0bd7a0f0d433226d3113b7044896",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "packages/run-supervisor/rust/tests/supervise_guard.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "8f4552d34e0613aa828cf94c33931a593af4e6d0f385d7e209a2228c9dcdd9f5",
+      "sourceSha256": "238d1180379434a4de3dd38d104d3d618809ccf178bc5535d991c0fc3e226163",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "packages/run-supervisor/rust/tests/supervise_lifecycle.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "bd27d55caeae4b86edb6b4bbecfe171a986d7adab74c0578ab3f85bd853a12f3",
+      "sourceSha256": "f565fb1d727af6f73080519ab303b3b40260c7deeea2d3319cad411c60cfa3ed",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "packages/run-supervisor/rust/tests/support/terminal.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "f1d0111b0b4430e145fe05f164d170718fed32ae713ac1c5b5fc900727239106",
+      "sourceSha256": "c463d2ac0ad1f63e2e0689c9160df2759e53a573f27f8c6b2dee163147b178d1",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 8
+    },
+    {
+      "file": "packages/terminal-control/rust/tests/core_failures.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "c3736b687a70e44fc613710b0f0a879c7cf423622e2d3bf00058e4e9a668dec1",
+      "sourceSha256": "5cacc9d82c3b8e69b988f276c696910591531a59cd72df2cf6acb79b8054044d",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 3
+    },
+    {
+      "file": "packages/terminal-control/rust/tests/core_rules.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "193edf46160373c9c15766e518b7216f046758b654a857ca76cbdffbadbd0d29",
+      "sourceSha256": "d6a67efee12ea914ed47b52168e14710d2e613081120af182e8803edf1e1fce4",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "8d6a9d2c6f7cde39627f242685e6042c3bd77de868054e12d30ff992c6e1ce92",
+      "sourceSha256": "99f68a80b5b4c7d20b515abd06a85af9f5601d24691711feb988d9d98ce36ae1",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "packages/terminal-control/rust/tests/herdr_driver_fixtures.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "2452a9c849c4f3179a34c3766d036d9aed102f8f4885db1d81b37be6bc4b3ff4",
+      "sourceSha256": "833c56ae001bf3b5fd99a11c75ac3b73e8383467c32a6adf3047b36403c5b94e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "packages/terminal-control/rust/tests/herdr_driver_live.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "9bed085418a439cb80e30f975c43483521dbbd1e5c482f088fb6eb38ff0b2740",
+      "sourceSha256": "3d2f2bc0b66db1fb4cccab5098256835782985ed7b901822f85cc6f459503534",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "test/cli/dispatch-inspect.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "41bbb1e30336c75f138c5ced28362c245b18452236ba87e02060db48e8f6895f",
+      "sourceSha256": "ab81c0ecc8fd089c6bf31b1454bf90d3b56b575dd0e25738e3119e5f3f482b53",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 41
+    },
+    {
+      "file": "test/cli/dispatch-operability.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "b20a4374085dbdef7d55aac7db304b1c60ca872f44dc20f851a5cacc380e92d9",
+      "sourceSha256": "8e3005519bf44913b3a6e8d765163ec1517c07baa7e95d1e9b1eff57c10b8864",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 21
+    },
+    {
+      "file": "test/cli/dispatch-reconcile.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "ce255e9691c7a9e3dec5d16ed8a44ce791b8a5d9096a63d88bfb7a6200cd3552",
+      "sourceSha256": "3fe66a1ac671d54de3c20eaa12e2a83d9b0816c19b085fe1e68c9a9d0a679898",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 42
+    },
+    {
+      "file": "test/cli/fgos-gate-approve.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "15f5d08ea347acbf6d9bd5f526a28cfad935461440dd4d0c8283b457a3b3ce31",
+      "sourceSha256": "77a8b51f555408ab84a8703c8f794652b1924264a4b4a2971c759c75e28971a6",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 14
+    },
+    {
+      "file": "test/cli/fgos-help.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "0e8ab0cd8d9324616263ffc9507d44028dbc3f2db59752d278fd01e66bce557d",
+      "sourceSha256": "e84d4883b5f957c6666000f04872f5c1d131f526e5822718115696dddc1ec83a",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 12
+    },
+    {
+      "file": "test/cli/fgos-manifest.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "f7a22a576018db36ae401d170214896b27e58b88bafb951c6f93b869a574c682",
+      "sourceSha256": "310ccd7ccaee430321bca5901763d020eb8fb1dbdd19da5b5434fd7a4bb8e699",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 26
+    },
+    {
+      "file": "test/cli/fgos-merge-next-idle-turn.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "df416a0d7e4ab691ba8783f2f8acf89cc819fa9528eb5bc1f2a54791ea35a70c",
+      "sourceSha256": "8f382cab8443f3bcee470c4911f1f8425577b9f28ce13f54436b2245004ada64",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 3
+    },
+    {
+      "file": "test/cli/fgos-stale-orphaned-runs.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "345f17ced6cc9ab77e1932aa553a6592e2a5e3b7e7ce71d01c2de01714faba5b",
+      "sourceSha256": "2bbf8120760ea3dd8804282728866bffb346571a4594cfdbf2ec3e5652db024f",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 14
+    },
+    {
+      "file": "test/cli/fgos-tool.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "c69c7f5bcec19d4562fae8768072a9fb1c63b88a3ac7b8c9179a791612059845",
+      "sourceSha256": "fc5164577a519c1a196ba15748cf826b2737f4f5a2c3d0ed844fc81fd68e96fb",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 15
+    },
+    {
+      "file": "test/cli/fgos-verb-help-json.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "16eb4a74bbffef4e39d49b08b39bf6604206f301e7f8fbb69dce0c83a266b01b",
+      "sourceSha256": "66f8de334d36c2a9d28d78cc184c70d442a35aa0465a29c3c35568fde047849c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 40
+    },
+    {
+      "file": "test/cli/fgos-workflow.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "bef2f26103c7f321cf8c9d1cd1e7e7dab22be9002ed31d50bf861d74e01d9038",
+      "sourceSha256": "1eab69a0166dcace7567d87da4ed021653e81e8bc71869e8008921bfca667dbb",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 12
+    },
+    {
+      "file": "test/cli/knowledge-deprecation.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "86096fddb5bc50070d3234e71f12967404f6e28053ddc406c87c48a4a425f81d",
+      "sourceSha256": "c186fbefd9ed1d341087ddd8835b4fa2ae6ba94073c562b19d3bbf617db4ce42",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 6
+    },
+    {
+      "file": "test/cli/unknown-flag-rejection.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "57fbe50cce2741c0100b47398dca9f329914ef18d3a18fb0bcd9fc5012932695",
+      "sourceSha256": "0d6c6d58c96d0d00ef26ae38e7ed2bc299ac8990796a4169886358897f7a2e5c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 20
+    },
+    {
+      "file": "test/cli/version-no-git-noise.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "30fccb4f1a03d3aa6aea0fd9336e48c58b65bc738102131ea33324147fab02c6",
+      "sourceSha256": "5044f57c9a5d8d7b61984bed78bd8bb26e0ea6d94d21f551ff8d50ed09e40666",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 6
+    },
+    {
+      "file": "test/config/global-config.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "e3c9c940bad142d567a844d26d13962b526a7b0ad9a644978930080e4989cbbb",
+      "sourceSha256": "311a21f055c47997055bae07186ea746026470e1638f7a83c604e01dcc7829b3",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 41
+    },
+    {
+      "file": "test/config/shared-config-file.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "7f4f1b99b5cba3dd7d39aa7c992c356202025538a94f9f46d90be8e6cfa1f139",
+      "sourceSha256": "4254adcce724a2e29467f8ac29e3fb6041f874cbcddba4de58dfdef5acbd9c3e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 20
+    },
+    {
+      "file": "test/convention/convention-client.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "d29dee5d5f2823575adbdec0c65e54c75e9e87a7f240a04341806844069d30d0",
+      "sourceSha256": "61136e4a1076ea755411ca714fe5d363610389258f462758e55110b27b33b429",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 15
+    },
+    {
+      "file": "test/direct/fgos-read.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "23e02307b172fffef1cbad77e4cf4dd5a07a010d5f77279ad25be9469381f92b",
+      "sourceSha256": "6f98a67380027202c81297bfeff2e33336317460f6cee1309456f9d7bd3574a8",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 73
+    },
+    {
+      "file": "test/docs/agents-doctrine-anchors.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "5b88819da2b8289f328f62020b705daf714bde02c8992e5bef24359af409f41a",
+      "sourceSha256": "abe48c3fd824165d08835d72c8a01b1b8a9d774df3578b795134a52b3e6a8f74",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 5
+    },
+    {
+      "file": "test/e2e/main-checkout-activity-beacon.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "b2f4e9de5240abd019c80e784ca5840ff7e75ba4c2557e46532f322d2898d387",
+      "sourceSha256": "20d04f04886427d2c1beb592a6fd2b1e8bcd5391399eb037c7e17b93fdf96f00",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 17
+    },
+    {
+      "file": "test/event-store/canonical-vectors.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "4f6cf2db36b6e82e56336a8d53e60697728d64514d6f8ca842935bda1d06ad54",
+      "sourceSha256": "ce8b1214103b733866ef44ca55c0279fa42e55cdaafb9065d66f1e3f41931ae2",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 5
+    },
+    {
+      "file": "test/event-store/facade.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "f174855be8bef533c37859eb850d1798b7b335b43559c7bbf381a107cdd3f290",
+      "sourceSha256": "2b63a0f328f28071b3ade3df0999e80daf5c917b29ba309a57df7d78295e64b8",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 23
+    },
+    {
+      "file": "test/event-store/gate-probe.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "db05860433e32cba1f1347005bfd727139c4a1a2601b69145f1d23aa40d99d88",
+      "sourceSha256": "8a2ca2512822f86b9d414787d8e1c5d2ceba41494aa6940e4c7ee3fa9a28fd15",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 13
+    },
+    {
+      "file": "test/event-store/phase07-fixture.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "6c93a3c14d455f50f72cac92376b7734aba4850ebfc20f53fdd947ddd5c6fe9c",
+      "sourceSha256": "a1480242c70665aac851941248d4a1f88b9888c4dd4c9af1dd3146e7c23a568c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 16
+    },
+    {
+      "file": "test/evolve/iron-law.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "7343068ce84ebbf8a08344f8b39e15fcaf7ab61dd641871da3f002381338efcc",
+      "sourceSha256": "b9b2c725e8a36e22819efff43c713ceff3c850bcb4dc897b58009e30a98a0a17",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 10
+    },
+    {
+      "file": "test/git/inspect.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "7e63b54ae985e5c87287ee2ba7d5cf3ecac43bcf2b13170ad88d67c7f470311b",
+      "sourceSha256": "325705fe0781805cb64c7ea74bc8cac43b9e73966c6a6e6b9ea6f6568803c876",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 18
+    },
+    {
+      "file": "test/git/lock-handover.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "883caea883859552be8451ef375161c1471f2390021b517c7022c6a09b57d3a6",
+      "sourceSha256": "7b180c27cce8aa78b535f227bbabb53c8d05638ff32724a301f6418fa0cc607e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 9
+    },
+    {
+      "file": "test/git/refs.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "8a614dd996f77e49d43518e9c26931e6dc3f4f5212eff2f30eb46895701af023",
+      "sourceSha256": "8411fe47852f8d02697eb083129ff05ad78a80924706ee9913e08b693575d655",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 25
+    },
+    {
+      "file": "test/git/remote.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "c24d4febd6815f8b3ebba2eeaf561032f6334cfe28137d8c084aa1a02833953e",
+      "sourceSha256": "e0a2a446490d4d19bc7a628757bfd1382a80d687bf719256ded3ad6310963c79",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 12
+    },
+    {
+      "file": "test/git/worktree-fixture.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "2bfe8bdef0ee42bfaef9c9e70ac98ef836a84900b747fe8744f3cb75563717c8",
+      "sourceSha256": "6d5b053618b4a370c8127a8721e3da99c8c7e9b2da84835411b30103ded7b756",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 13
+    },
+    {
+      "file": "test/helpers/git-addon.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "7b92f45d9c9fddfddfc10a5594b45be384c0eddb5c5bdf2e5018b88fdfc6fdf7",
+      "sourceSha256": "c72c75a36eafb44430ab4384f0ecbd3f02655b667a5bbeeda3c96ff3c1f6450e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 9
+    },
+    {
+      "file": "test/helpers/hold-lock-in-child.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "8f2196cc678135a13246a829d6f29434c332996168bd6d887c090413e1907b3b",
+      "sourceSha256": "85baa9954e1b9c788ace2fd0cb8053487a38c2c9cfd6a573ae3ad4fdddf0171e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 6
+    },
+    {
+      "file": "test/helpers/hold-state-lock-in-child.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "90427cef4247e07bdd13c9b6d24299df69395f3e4502baaf087c50ddbcdee1ac",
+      "sourceSha256": "de651003490365ba51db1a94dc28a29839074bc26d58d8ce7285fcc0ad31a473",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 9
+    },
+    {
+      "file": "test/helpers/js-source-lexer.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "1214012dff6a2430e35c9f3c8fc62c8e9407688a34d310b891f078d74f0e2925",
+      "sourceSha256": "3effa44590fde482bbc593d49fa46fac7f5519198232fe56c704f09508a071a4",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 3
+    },
+    {
+      "file": "test/helpers/process-tmp-root.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "9713659027b9ffa6429ec6137ee5047e8368bef873ea2e02fe90f448cd8bf953",
+      "sourceSha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 6
+    },
+    {
+      "file": "test/helpers/provider-families.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "bab1fac100182992767efecf654d31be5679cea775e93f7328cec4b14a603b89",
+      "sourceSha256": "d166c891a905deb6436e7333ef35f10fa089429e9fb680742897ec141eb09078",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 3
+    },
+    {
+      "file": "test/helpers/terminal-host-harness.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "4841f43a88ee92c0b2eb7339f75df5edeb23bbf1daf79d184810b412aba90bc2",
+      "sourceSha256": "9403b9bb245df1e50342a5d498dbcc968acc281c31965e0748c3e9ef285ee152",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 7
+    },
+    {
+      "file": "test/holder-lock/lock-scope-order.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "a318a78843df8a52dccacf09ac0d7ffbb03ce93473a3a39b3208b5d6497615cd",
+      "sourceSha256": "ef9f3eb12ff5f9ca7bb91bd2e1d9fc2a1ad27877d77a9aaea44db247b5d79328",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 19
+    },
+    {
+      "file": "test/holder-lock/pre-exec-fixture.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "620ea9e7306b1fd9582a865bf70b30353b848768214feb59c441fc8e3e44abcd",
+      "sourceSha256": "d376e0e9a6ec216a2859355ee0f6fa37b6f69a741afa198ab54161d90834bdf1",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "test/holder-lock/windows-borrow.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "f46ad0219c6a285ff5439d562a066205c3c7cb594dded5ff594ef9f2f1bf19f6",
+      "sourceSha256": "f50664b81c78019b0160b1f98e95cbc09203e06df423e06969a32f40c3f67161",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 27
+    },
+    {
+      "file": "test/holder-lock/windows-doctor.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "37bffcde2f53ea6a72a3f8901cc4ebbfb8166204a7395a17e0cc75bb8bc9411e",
+      "sourceSha256": "3c36650fce7c167dc5e35b3cd5f826fcf117737a0c4a6505e8f44f4267daab1e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 13
+    },
+    {
+      "file": "test/holder-lock/windows-facade.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "d9629ad05c1a28060a596e7fdef92ae54863efcac1cbeea84ad5e1bc8c0c6f45",
+      "sourceSha256": "5727a592a399cc7d60adf17772c81f34c016c4683d5545c94e95e7ccd244204c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 40
+    },
+    {
+      "file": "test/holder-lock/windows-hot-lock.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "f412d99f46a545c7cf370e85401b8971a6550f96fe7a458170469e9894f8a732",
+      "sourceSha256": "b26aa797c83f00cd5ce9d5c2ecc20bcda32905b8799b56bf83b2784174efa603",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 27
+    },
+    {
+      "file": "test/intake/classify.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "f8115c631f8adf80848d7b831c82882b28ed6a3af863e59b48f190cabd175ee9",
+      "sourceSha256": "85331bea6ed15733480a5eb079b2715462222c5f8e0acf321ee436f626647a89",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 3
+    },
+    {
+      "file": "test/parity/edit-parity.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "71a664a80c6f5c62307e53579b9d092c1135c77ed3e47bc210372433d0e94624",
+      "sourceSha256": "0c08dc7848f00d5432729ea08b59ebdb5c187842d25c34853840c0ba534d336c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 10
+    },
+    {
+      "file": "test/parity/read-parity.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "514518948880157ff9ea35ce5be1eea4db6170d7f577f2510ecbd598491bced4",
+      "sourceSha256": "aa361f1d8844578acb0c5249c473476b0a8ee6ba2a0cdf9c7bca85e3efbab701",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 42
+    },
+    {
+      "file": "test/parity/step-parity.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "d4670bb6adedfd62b2f6ab15e36b6e378eb2b7c86364b7da00afa0fb05af2e98",
+      "sourceSha256": "45cffe13b722c9b4918a2e4cd1f3ee452e64339edf260be6caaef8b5d275ab6d",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 36
+    },
+    {
+      "file": "test/run-supervisor/fixtures/terminal-controller.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "2d5c0fd8665216ed9085e36d8c3030f0fb1b3dd1c37b0e3802e1a4d5f0ef4838",
+      "sourceSha256": "8dd3dfcbe992ae012ccb6d7e36b3122b01446196d94e235942edefec33925fe6",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 3
+    },
+    {
+      "file": "test/run-supervisor/helpers/envelope-fixture.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "f6c2b844b26f24a69665656968c25492aa8384010128283765ebf148b50eafd8",
+      "sourceSha256": "c82a6aec34cf1a73a8a79a0de73ad3e0e2cd3729ea5b153e8b1822efb7ca0cb2",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "test/run-supervisor/windows-custody.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "3e69448728518c7d40652c5ba22b46cf74facc82fe1e38cc2ff9cc0f74b86a22",
+      "sourceSha256": "e51624d5411a50164bb66e1e3efd4c6f9cd5710cc41d75565da3f529364ac7b0",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 12
+    },
+    {
+      "file": "test/runner/agent-listing.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "518410107772bd9f41a398ad58e96d058892fc971bf5b5f892938ec3f7828280",
+      "sourceSha256": "67fc1bb1ac5b97e3ca5abca11f493f6f636fa1ec3ec2e39a2d6261a3261333c4",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 12
+    },
+    {
+      "file": "test/runner/agent-roster.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "179e5fab8a503f005b33f73e7db38ad4cd8a8b4131d79cae9bcf5a907adf7ee0",
+      "sourceSha256": "01746d66e9fbd79ac6b784aace1df11dd4eb120ee230888f3c0e5b34ae11d34c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 7
+    },
+    {
+      "file": "test/runner/attestation-guard.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "191e36f7078ca35c7612a2a03fe6cbd8fbd14cca30a1c245207d4475a0362e1a",
+      "sourceSha256": "32780ca01f3421db4b8c7cea88273e6d3400d1c4419ca693b58f62610a558258",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 18
+    },
+    {
+      "file": "test/runner/confinement-registry-fixture.helper.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "1fb28d037f280f10a17262647f20f2ecad369613848e9b9610a89de6925ed9bd",
+      "sourceSha256": "70a58960e30b4c4694ab5ed2576d55f03c46052ceea71c3c654271869c881067",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 6
+    },
+    {
+      "file": "test/runner/credential-store.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "a4177788a0629f5acceaa861e6562efaf6218fcd3ded5af9da486f6c90f60a42",
+      "sourceSha256": "c8fcc8f36f674b88cd926076490e1099e5a57346381e92ebd5efd4f9eb4c9ec5",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 9
+    },
+    {
+      "file": "test/runner/dispatch-assignment-id-claim-concurrency.helper.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "8f607dc0aa03e1a2c71d65798357800a23148fbdfd1ac5eae7821b48734fef5a",
+      "sourceSha256": "712f01f63ffbcb262c5d85eec71a3c4dd51f5b9e22d8e13f118c3df3daf36001",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 3
+    },
+    {
+      "file": "test/runner/dispatch-brief.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "ec764472381106876c3d1e1b07e4d68cddd92b11e37270334b8d99b640cc7688",
+      "sourceSha256": "0e162a312e0d11c8232aee6e2c43396d43a30b1d3137172ef1b0c0995b825b88",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 29
+    },
+    {
+      "file": "test/runner/dispatch-config-patterns.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "f5dd37267447e498246d3af46f64066c644e4f448cd760b75fad87227d10bad1",
+      "sourceSha256": "8d4c9e4715da2e401a85132ceca861a95c58fcc6cc501a1cd270d7e4997274d5",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 7
+    },
+    {
+      "file": "test/runner/dispatch-confinement-reaper-fence.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "7fc95f9b8d5c9768d73f0da20499d6c1e7a44d237d81c1beb67b812cefe26576",
+      "sourceSha256": "f5dd6dbfc94b47a9683d5329171d05997ef92bcb314b5e22f88b98d72ff7850f",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 32
+    },
+    {
+      "file": "test/runner/dispatch-operability-production-door.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "6c21863cf7ba865c2e5c8b6017e7da06ede8349de87ea4275b0f8d3aca430096",
+      "sourceSha256": "07dd418f4005959a875e83a77c5a15d88d4acff4eff58fba44b9d4a1193ea127",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 63
+    },
+    {
+      "file": "test/runner/dispatch-policy-baseline-snapshot.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "71c6f3c34781a6d2a429c088dbe7ad812e4f0ebe074a4988e7715a2150de37f9",
+      "sourceSha256": "d992a61e6f5160f88fb5934e32251a5af5e0e395e0af00d2ba2167d0f555ddff",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 14
+    },
+    {
+      "file": "test/runner/dispatch-r9-performance-cache.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "f9197e11979ec5508125c0372c09b4e13f06aab2328a2b8fec01d6eff5e57a91",
+      "sourceSha256": "c000096bda3db4a1343f0b9bf4b5ee4d3164eddccac67e245d5c70ae92049fcd",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 17
+    },
+    {
+      "file": "test/runner/dispatch-recovery.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "7cbbfe14e97cd5306fb150f0d57a99dc3cb5f7d1ea594ec2f5d6367493f587af",
+      "sourceSha256": "01c831d9c225f6180420dfa8739db5847563975935341156f79149bfa9dd3d7b",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "test/runner/dispatch-trust-store.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "7e3dd097b28d1ca126463015875aca90b9dbbddf9b82ecb319e29f180c50b0b3",
+      "sourceSha256": "33f182bc888493a664a4e9882335a4ddad622938f32e7c312c0a9e9148662a0e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 88
+    },
+    {
+      "file": "test/runner/dispatch-visibility-session.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "03c659a865414b49598ade7084938c5193d18de71bf2ec516b81494db9d0d7a6",
+      "sourceSha256": "b3b0f78695bfa6f82b318ce118e4f1531cf99afc0e9fd1e1c1ff62350083929b",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 50
+    },
+    {
+      "file": "test/runner/driver-unit-fixture.helper.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "09e527b61422832ade43357953b1eab9010f4e939700087dcb7b4e65773ba0d5",
+      "sourceSha256": "916f739bd01380d15f138fc42732ae7f42779bf455f11ee6b363e00a12e51363",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "test/runner/execution-contract.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "92cf506f7d43c865a57979435302a22f35fa9a0a0bdb62c373b17efca0d2d583",
+      "sourceSha256": "793da8985c4d5153b4f213af6c5effac359222402ff9f0efcb90a44c55e28870",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 8
+    },
+    {
+      "file": "test/runner/execution/bind.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "fd1c5911459447134c2f190183d9bf6a91000c8edf9f0a0d122f204753f4dbcd",
+      "sourceSha256": "ad1de370f8b4a4ea089978e1bb7c910aec4f83e71eee208fe2ad3667c5f49edb",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 5
+    },
+    {
+      "file": "test/runner/execution/explain.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "da6c57f65e0a0ac2039b57cac07480d90b00c412bbc8922881b453daa614cf1c",
+      "sourceSha256": "1b97a46a1c6ffde822e96b00f150b58aad461258178b843d7df3a961048d798c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 4
+    },
+    {
+      "file": "test/runner/execution/patterns/panel.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "a8cf8f32dcbeba8283fa02908147ea24f9eb8b1cd7a97e8801a5fd60ce36e318",
+      "sourceSha256": "fd9ad0f2d9383761019cda81953744e2a60180908b8f0ad638e91ffdafdc692e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 7
+    },
+    {
+      "file": "test/runner/execution/patterns/presets.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "404d0ac85fc11b250e8746b0bc48901c0ce4bcad08214b86360a16994a43b80d",
+      "sourceSha256": "0faca28cd0531de076ddad07bba7fff7f7185c93ffe1d2cb8091ca86096c20b2",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 3
+    },
+    {
+      "file": "test/runner/execution/patterns/role-tasks.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "40a4886d6ac2bd15f242624a1135e2f2dfc4c29196dd0068759b76a893d3ca0f",
+      "sourceSha256": "943b28a14ef430f2a31640763d3c44dec4c1d6db8e741316a99d445bf5007f2c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "test/runner/execution/unit-summary.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "cd17884c90b13c0c9dfe4c4886f1fb10dcfee6e93da9bca6c17327691c24b554",
+      "sourceSha256": "cb0e116d4455b2f828641a2287ff64f5cf44af1917a214225f8e852ff1c2a939",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 68
+    },
+    {
+      "file": "test/runner/herdr-agent.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "854632f8042fedb12b9ca7a7f9846cbc614dc562ca2715e78228fd08df1f5fcf",
+      "sourceSha256": "0669588de5cfba731b99a18a585a2b67c81078a31f11e7bda33f8066697fb6b2",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 8
+    },
+    {
+      "file": "test/runner/main-checkout-activity.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "1c1c8845b18bcc4abcf5d5ea3ea818180d0e1adf7a9af0d43b44730f2c4ba762",
+      "sourceSha256": "75b0ac2bacc25600aa1768f178a25be9f71ab72637622eee5529ce9a61dc89ac",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 7
+    },
+    {
+      "file": "test/runner/main-checkout-reset-guard.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "4da80edf20ba4c160c07721708ba9e142d2e3eb7bb2de29ce81e9b855ebaf95b",
+      "sourceSha256": "5e87d3d804a290e275aad40ecd06daf60127ae379a710c1e8bd33f73cc10f605",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 6
+    },
+    {
+      "file": "test/runner/promote-engine.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "561676e59703949c3a3dc7ebb1eabe0630bdc61e39321a0f27992b3b43194342",
+      "sourceSha256": "3140e5d7cad8cfbb41051507de95baadcdde14b62a8d1f37e6969b8f12d878c3",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 23
+    },
+    {
+      "file": "test/runner/promote-preflight.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "83869629be3bb8edf1414674baeecb9fc0e8d669ea6f76a73419835fcdae4652",
+      "sourceSha256": "725c1357057f87c0c4acb22caba5f7372e672a7032d5f2675d43be94163299bc",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 17
+    },
+    {
+      "file": "test/runner/provider-account-probe.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "53d15e025fafb3603da6ea35507b307720274c96ade0f9a59722e2eae9fc08ee",
+      "sourceSha256": "1927a13e3462f4715d94191456d7dfdcefc707bd2985ae69f155b92ab4d0460d",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 21
+    },
+    {
+      "file": "test/runner/provider-auth-failure.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "68e74f667bccc0943d3454850ca011a1828c8effeafdfd825d8d613f55f651a5",
+      "sourceSha256": "80145ffdd9df65e861e614abae774974b348a311f15ac8178cc6ebce255b7910",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 15
+    },
+    {
+      "file": "test/runner/recovery.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "dc448849f0ae98ddc6695f205c95919b75e764c152ac54ae089e9a90ea5643af",
+      "sourceSha256": "9b04ba82c132e11d124fbe67c66120a15110b2909918c53c344309087a9ba1f3",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 6
+    },
+    {
+      "file": "test/runner/repo-locks-multiprocess.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "5aab7395d8ba8c18d1a67084b2a914edd9a3997d1ed550a171300cc969af26a2",
+      "sourceSha256": "23f637bfa7e2de0070250331c78329d169a89e163a5d6c99be99b370c431e3ab",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 12
+    },
+    {
+      "file": "test/runner/run-lock-identity.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "d1a74eb10e37f0bb3d301e715a27dce4e28c8156124c42a5e8bc8c07339167cb",
+      "sourceSha256": "9b71717c8164de844de859bd39d253139e4ca2a746ac700fe44969012aa75f67",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 4
+    },
+    {
+      "file": "test/runner/run-outcome.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "64284a6ab94c9ad4dccdf673e92d0daf53f2f7422bdfab6d93efefb4f917019e",
+      "sourceSha256": "e77c9911e68ab9452492b69c84a18e74121246952e22c77976160fa2c22af3f6",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 8
+    },
+    {
+      "file": "test/runner/run-result-confinement-label.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "416a4f3486e0b91ef06e2cbbb3e715e696f56de11874960f61b2b7572032168c",
+      "sourceSha256": "bfb9f679d2cf8360d54865847bd3120b2fbf5661ab123d574280988b1a9b540d",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 7
+    },
+    {
+      "file": "test/runner/run-result-v2.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "69f503b770dfef60094f3834596159c205bf94e6015770779e0df6f3970d028b",
+      "sourceSha256": "0a5f51eb9f17cbe707ddfdd5d6b54b9862b5f1a2c98534efbf3e6e58caff2b51",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 13
+    },
+    {
+      "file": "test/runner/tier-cell.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "ed01f06eabbe4960cbbe353fc7a1d60442ccf21a54d1760e37cab54180169de6",
+      "sourceSha256": "6f9ae6c489990d5e7f64ced1a03392506ba470fcb89acc71f4f0e9e4797a1888",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 9
+    },
+    {
+      "file": "test/runner/usage-parsers.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "3747ee7250abe69efebe4e44cdd83a20bccb7d2e5e37658f9ca8fe4b92a0a0af",
+      "sourceSha256": "efb767d8d5b48ecb1330b7c2fb88b951a75a8a1bfe379251ab9b3d03347a429b",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 11
+    },
+    {
+      "file": "test/runner/worktree-admin-multiprocess.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "c4222c16fcb53ec4c2f7ddb9cf357f5a083adeb0014a9c5e64cf98e06c66d487",
+      "sourceSha256": "c7bfca2078153b63241beb25f0514246ff1ce79ad6d4b454a107c5ee62d73ee3",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 26
+    },
+    {
+      "file": "test/runner/write-queue.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "6fbb1f66ee1ec6b892354a6133f60ad8b87aba1ea4210a428ab2369485a66278",
+      "sourceSha256": "9c466e19d92f91797047f136101ddae36472eea4a14096b636582ded04d11ed4",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 9
+    },
+    {
+      "file": "test/rust-host/command-routes.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "53fb1d004bfa40be3399774efe8f45aecd97b4fc0ce9d724ce3d22e2ec9a0173",
+      "sourceSha256": "9e681fc58a67dbd6dd70324d82a9482d12dffbc0203add8c7300e3577bf1ac9c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 21
+    },
+    {
+      "file": "test/rust-host/fgctl-init-activation.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "96be878f6b3787982794e7eaf20d6a6977e18ff770ae809fd9009f8c637843dd",
+      "sourceSha256": "d044b9cf3021db28b0bf970c3596d98bff0734192dbc08a4954d1c0941bacfd2",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 49
+    },
+    {
+      "file": "test/rust-host/fgctl-init-preflight-tail.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "87f031332c9ff262becfbee476b8c8da13d86d54afd8ebae7fd5574163929a2e",
+      "sourceSha256": "2d91c5c149a5d43dcb196da77200b79215ea5b7453c33eedfb2a89043da99fde",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 93
+    },
+    {
+      "file": "test/rust-host/fgctl-lock-holder.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "1340546899bd30829483a9d0e8fafcf5221e5b9226b6935b54cbb349d933dc6e",
+      "sourceSha256": "0818fd70258d9e12e146dd631b08b5a53a632ca80bf9c0021a174747269e8699",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 3
+    },
+    {
+      "file": "test/rust-host/fixtures/child-process-spy.cjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "0622d0c8329d87f85b340839d28258c4f50b614340eadd0a4eb6c501eece5ce3",
+      "sourceSha256": "9b5cd137af77559990bb74a134ad0a44c950cd0be30ba6c39113761ec2d04cd9",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 2
+    },
+    {
+      "file": "test/rust-host/internal-routes.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "6fb0c98e69f2e3ba750d6a9ac51f120b3405cae0bdb9302ce5c89477a92426e8",
+      "sourceSha256": "09c27814dcb722070a0372c9a7a3a1acc4895c9c360159a943f4dd73583392b4",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 30
+    },
+    {
+      "file": "test/rust-host/observe-store-lock.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "a88457e8c02d27c9e535ce15e27a079f17bc64cd4d62852ae78b4a5724d9e318",
+      "sourceSha256": "00d02909baf3a952dc2dc97c3e4a29c1225406ebdeb5f2e30488d3b6bcb7a017",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 13
+    },
+    {
+      "file": "test/rust-host/release-targets.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "b266e1101cb34209a13f842275cb571a008097886933b2899809391ac74ea0b9",
+      "sourceSha256": "a42c645e7a2651436806a846b84c5337906a10c65bb92d691b5548081399921f",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 10
+    },
+    {
+      "file": "test/scripts/check-decision-codes.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "f004ab21f48eef35796b0855eb262e16db855a4045dc28bfc25392feef12fe6c",
+      "sourceSha256": "94ede69d805f2215911ae7dee88e1a234c9df250d25ff30b66a810df91d028c9",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 17
+    },
+    {
+      "file": "test/scripts/check-decision-supersession.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "138fa88c2f1e7380bb0be7abd702cd52cee6b1e35857e39cec4c961fa47bc510",
+      "sourceSha256": "25dfe723e54b8d8c9e549211e3be6408a337aefc6e1a3bbaf3e3fd59b861d862",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 12
+    },
+    {
+      "file": "test/scripts/decision-question-hook.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "a8b303bb27d2bebd59f191d8f3927ef109c6005398cc540df6e4bc28e3cb1212",
+      "sourceSha256": "39e006e7fc313cc45e37eb9d0e5f08d82e789b0ede1b04334e81062e3cc3ec94",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 11
+    },
+    {
+      "file": "test/scripts/dispatch-decide-hook.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "598d89fe893f4d73cf25171a52a558022ebfa9f815b98f10cf32dd0f6c926555",
+      "sourceSha256": "572ed6d111e5614c0358d5d6c1f70ea477ad6161b3ff580fb41bb7d685b3243e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 14
+    },
+    {
+      "file": "test/scripts/doc-rationale-author.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "aed4d1d94b34534eb531a8ab23aba0480a1da2c477dcdb3bf380a3a68ba2b991",
+      "sourceSha256": "467e40ea65e2f591f6facb70f2dd421db4e6a5a1e464383573bbd3884604b753",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 10
+    },
+    {
+      "file": "test/scripts/doc-rationale-facts.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "3826d8745a6b3c558b559050df0042fc6c7502a550be34832795d4544db708f2",
+      "sourceSha256": "beb7faec92ad3935d3531237094fc9a52032013ebe2a030aa041ca70e04a4f0e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 8
+    },
+    {
+      "file": "test/scripts/doc-rationale-reproduction.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "24473db477dbdb814fe8369741e016dc33f23653eef709dc97db5670245d916d",
+      "sourceSha256": "bc1ef9d3a9eb2326567710dd37d30b765964fce0bfce71f6fdcd67c7ac785646",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 17
+    },
+    {
+      "file": "test/scripts/herdr-cockpit-notify.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "ce1ae9d3045d2dfa867aaa290122e6eecf17204363cd721d6e9c4de5a7e5ce75",
+      "sourceSha256": "54cac7375e4326f5c1ea44701479ad51119538283a84add8b3fd0edc1a91c4dc",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "test/scripts/next-doc-id.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "8d93e41d2fce880e4826c41e4928316d7189f369ba4ace9b0f9fcc3426fbd4d9",
+      "sourceSha256": "1b385ef99bd066bf1ccd9ef1a4d59119f9bbc9754790983dde11a239d4b282a4",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 5
+    },
+    {
+      "file": "test/scripts/prepare-release.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "59cddb7c993fa29b0da26e710a8ab56d27f15bc88c6b15ca584cba4862525d05",
+      "sourceSha256": "c14e0c8668b147c0b7771736bb944a18abb853c99143cdd282e4eba811671d1a",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 27
+    },
+    {
+      "file": "test/scripts/test-ownership-lint.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "901a63ccc3f10596f27f95f1f7ab0a452e79fb8061628ddb14959fb223f2939b",
+      "sourceSha256": "359835108b64a23ffa8402d8e2a3b2ed3b52f63f9504f7e934d0078b8c0c93e3",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 15
+    },
+    {
+      "file": "test/scripts/test-proof-inventory.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "27615e724f60cb239051ccba9692f220f8073da7a89639956040a60d409499c1",
+      "sourceSha256": "24ca8891ee89b39e7951d6cf9477a26c65ac185ecfa61600a2bed56033f8b003",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 7
+    },
+    {
+      "file": "test/scripts/test-select-compare.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "85a658f453b43d9e28bb9f0fc96d6aef07303ed85bb06773241ec31b6aab52f6",
+      "sourceSha256": "3dda7d1ef05ecd4e710649ecbf47f5937cbb91cfb9bcbdd2828d4aa5a5370a5e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 62
+    },
+    {
+      "file": "test/scripts/test-select-mutate.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "3d644d1f23c958758b8bc60099c961d0306980585f7a7860ce41dfa145450957",
+      "sourceSha256": "d8e9266a47b570efc751dea35d1844ee8dc0aa92fc47e1096c163288b80f56a4",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 58
+    },
+    {
+      "file": "test/scripts/test-select-promote-report.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "37c38800b3f4e77786915467be2e3f9214984a2379b157c6f925020f5113196f",
+      "sourceSha256": "175a68da0043954b72e7909185bd963e4855b2b12ba9e456423db2f9bfe69e63",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 7
+    },
+    {
+      "file": "test/scripts/test-select-promote.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "8905ecf54711aca405cb0f6722101a2464a9379ee96671bf1611bbfdbcf65681",
+      "sourceSha256": "0f74220b7b15007fb09d46f176e0ed0a540540e0b0118bdb43918a98a6444376",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 10
+    },
+    {
+      "file": "test/scripts/test-select.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "34faeb528bb24a0eb7175a6ae0419ae06818c14515102bc62d5532458f4d363d",
+      "sourceSha256": "8bdd8c9a4f4aac59f4b4095c3e2d5452c1497b49587ebda70a22197d1d36e6c3",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 146
+    },
+    {
+      "file": "test/scripts/test-timing.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "a25dbe7443860315196b432e9d4f1500720e716693b81626eea59206d37f8639",
+      "sourceSha256": "e4a0b6eef50b1876eda65a92cb601c711e3743a2c399a0792300b057812eb19b",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 20
+    },
+    {
+      "file": "test/scripts/write-test-marker.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "09a452b8284b9aa46b0e6e28013cde6301e88e85c1dda7fd890a2d250016b26f",
+      "sourceSha256": "5d396fae1bbac57ce96e9f6459aabd0323e7886d6100746c1786a1f90e50d84c",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 57
+    },
+    {
+      "file": "test/session-identity/attempt-writer-id.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "b11f586da51df452a15b3da15f1ed2fef83620840a3b9d69eee75e47ba9e2ce7",
+      "sourceSha256": "da521602c4103a8c7f3b394aeae737bf23686bdc67000e0ffb356a6fb972b783",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 7
+    },
+    {
+      "file": "test/setup/config-merge.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "e8bc9f4ea5b18b68e5f7943aa83d87eb304e8ab4bf9806db4ad5be6130c737db",
+      "sourceSha256": "60336980ce4e791a5bf84f5866b928167fcf3851297bfc4de4988d65756d0d8b",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 17
+    },
+    {
+      "file": "test/setup/git-checks.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "9a3c81498778d812ffed5dffecc061fb88d31de4b32f20de7f9db6170fc4be4b",
+      "sourceSha256": "e365fbd041263c75e4281f1d8d9c126809a2859420e871b0f0fb47663f7bb7eb",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 10
+    },
+    {
+      "file": "test/skills/fgos-coding-exploring-root-fix.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "6773df0327eb5d20bf72698f3260dc1a98b147e2a43f9868992bd9c7142563c3",
+      "sourceSha256": "e4d9318a5096c144303becd6547d2d5ab2089f2f8db9ec7c794a075217786925",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 8
+    },
+    {
+      "file": "test/skills/terminal-pane-ownership.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "b2ccc6a8bae78e3a5f4da4c77ee60dda50d1bc4e24ef7790084ed50184f71fc6",
+      "sourceSha256": "f8036be490798429b97b599968268888b94a7c2463b14883d6ae79eb21c96b8f",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 19
+    },
+    {
+      "file": "test/state/cursor.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "1ce748f092fc7044ae52e3c06ac0a5790f0f691772a7a654f2e528f155711317",
+      "sourceSha256": "59b722e955bc417113ee67a2d5541e44ecd46ef6cf5c07ce9aa24fe8b8d6c43d",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "test/state/decision-scope-field.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "af92cfbb5534c90359f9f3a6110ee7da2dd4eef9f5ca6344c7b1bc2fc9057b1f",
+      "sourceSha256": "8c6a75e7e94c75cb2f7da8c6f7137fa82076af5f11894c335fdabcd6c6ff9520",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 11
+    },
+    {
+      "file": "test/state/dep-graph.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "ad835ad79a74c8806303a20985ff7088d7a16e969392f6febdcb17fec975c8ed",
+      "sourceSha256": "cc09044d0906ecf54d261a0be8ca748355ad20987c458ffce3e40b0f02cacee6",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 1
+    },
+    {
+      "file": "test/state/graph-metrics.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "6065de859ffd386b8c14e40a1e0fb7033d5577dec83e680cabb213163013bc2f",
+      "sourceSha256": "d0b77a19e7d60c5dae51e98f4205a6083bdc32051add0645f51fba1bf746ed7d",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 33
+    },
+    {
+      "file": "test/state/hot-lock-guard.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "d84005a9eacb7d9d14f2741614a7bb55c7df9e673b9e64661d2bbee4f27a0aa9",
+      "sourceSha256": "8ea10ecd5a955307e79a6626006c0e89c1cff3d7939b625e6226fdcb33effe29",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 5
+    },
+    {
+      "file": "test/state/hot-lock-host-judge.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "bd00a79ad8067e5172a02d68fca947d3dbc8b9cfb97495a1c964e51888f8bb1e",
+      "sourceSha256": "48500294d86bc2d017cbf876247997f9098aab6b9801b326fa1ba6a7e59e5d04",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 11
+    },
+    {
+      "file": "test/state/hot-lock-tx.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "57625dddc89ab562dff47f0c1e49d514107a3756ed6ae8e82b3955fc599e0069",
+      "sourceSha256": "736cd7bbe773aa454e9944f385486e190d78eb5d710fdf29f7e8d69bc9405974",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 12
+    },
+    {
+      "file": "test/state/identity-before-lock.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "35d7956f5a82f8628c0db85fa3a7ff5ad19f4fc34692004dd19c90cf80f0ade7",
+      "sourceSha256": "534bb5ed3b891547840596c5b80ff786e62e62c1f4fc241516e7c60507f61b5d",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 28
+    },
+    {
+      "file": "test/state/impact.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "3d6ebb9f741ef2fb2eee14869eedc0901ffc2042bd12cf5aa8ecc3a734f11ef2",
+      "sourceSha256": "3f3d0e2943d4efcbb9f6d8313c69372a6900adeef3cde19eaf106a6efc251b5d",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 4
+    },
+    {
+      "file": "test/state/porting.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "9296598f9525b02184f5172754efcf56faf0aa5bd78b036936dd295279bbd511",
+      "sourceSha256": "3070b613276ad7f4a83695625b9c6cd8f9d460bd8556e8cf3f1481724f12cc62",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 5
+    },
+    {
+      "file": "test/state/postland-drift.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "789581cd148d04f863b372796b411d2840f94711d1ae4953aace036e96faea72",
+      "sourceSha256": "a683c39effaefcf9f469c97a0d5d2ccea7e52466bdeca0f71e688bb198a0719a",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 11
+    },
+    {
+      "file": "test/state/replay.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "5044cebf9d020f04049524a704688954ddb34dc43475a110074af0d49dc6279e",
+      "sourceSha256": "ddeb9936440fc6ea65515c5afdfd2d80b110656df5635b7e6f0232a126b5274b",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 122
+    },
+    {
+      "file": "test/state/show-list-move-consistency.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "96a413550867b29d620036e2296f322d7db4f0bce0a8dc121b3cccbe57258ca3",
+      "sourceSha256": "0f8a036692ad12ac1477652f8dab69b499992a2187d2518a939431b318a2c990",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 12
+    },
+    {
+      "file": "test/state/step.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "32e99dca6215f4bba045526ac1f96b8a4daf61e8adc5ef934ab97fa4ba0735df",
+      "sourceSha256": "c51460d1c7e1400201b9b1f932968ca3af3ac627549eaf6d93d98c095860b31b",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 9
+    },
+    {
+      "file": "test/state/worker-slots.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "42b6955b64cd13f5661eb70dc04f77122a69d339186b6519a74391320d9a80eb",
+      "sourceSha256": "5ef95ed0a84974933ddf0917c8fdb13c89248171823f9c4e946fff0bf3b0b678",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 23
+    },
+    {
+      "file": "test/terminal-control/client-route.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "b4c83fe8f43178d2fc904d7bc044e7720715d81e9506777fa00b01e7212a224a",
+      "sourceSha256": "1d72de1295e183d52d88e6fc68172b53966b613a5b44e9dd09870287ca3dc4e7",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 17
+    },
+    {
+      "file": "test/terminal-control/group-queue.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "502ccd6f957a5477859ab546ccda030f319998d2917158b078432ab727100157",
+      "sourceSha256": "07ced501713a785943c3b4c68bad4b2a17b48a196355e902a6319a19f2e28da7",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 19
+    },
+    {
+      "file": "test/test-ownership.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "f9f78b61d49c37d97bcb63a5e619c6f90b40c357f173a3ce5e20fdeff280019f",
+      "sourceSha256": "7aabd8d09fa439faf65946eb96b44a42a3d4e8065cf4acc978e15380ebb47f24",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 34
+    },
+    {
+      "file": "test/util/git-paths.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "7577bf1af417aa55a972f7fdcdac699eb86fd459e565f7ac30a276041ce1e8de",
+      "sourceSha256": "54307ec4b9097a14165657f5244848d8d9694fa5f8203c326dbb9da9f29b6ba1",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 12
+    },
+    {
+      "file": "test/util/host-bin.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "cdb6265e06caad8e452137f8e8abcf7d1df2549417a3202f01a22c3c90468f59",
+      "sourceSha256": "02cb790a5a296436922fffab07d029d0655594237c2552211d5395a97768797e",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 27
+    },
+    {
+      "file": "test/util/yaml.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "045903202f49ea962fde5e725c95bed69467263da7f6c1048086b6d44e44b255",
+      "sourceSha256": "f81ccdd3e8ad909f4ef2eace9fb5109d8227999bdf657f8be51cbe481f659c0a",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 13
+    },
+    {
+      "file": "test/verbs/merge/approve.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "5008bea8294fbe8a760515c03aefb29b3e80e4486060b6fb648989f4ab052392",
+      "sourceSha256": "97b2bdc2397b97869a8b96c04939870792dd79e8516b2fd3cab7b966056b47eb",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 4
+    },
+    {
+      "file": "test/workflow/units-source.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "recordSha256": "34d892d4287d105b4e094ae89a257194af7e16855eed16e7aaafe3db80bc7fdb",
+      "sourceSha256": "487ba08e8e772941fd6bd63178e62fc430805c2b5504334a593f1e9f1498522a",
+      "ruleId": "r20-cutover-neutral-whole-file-v1",
+      "referenceCount": 0,
+      "tupleCount": 4
+    }
+  ],
+  "neutralClosureCounts": {
+    "files": 194,
+    "references": 50,
+    "tuples": 3060
+  },
+  "judgmentFileCount": 5,
+  "combinedMechanicalFileCount": 223
 }

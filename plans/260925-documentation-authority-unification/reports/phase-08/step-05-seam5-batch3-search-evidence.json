@@ -1,0 +1,110 @@
+{
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "roots": [
+    "docs/platform",
+    "docs/knowledge",
+    "docs/reference",
+    "docs/tutorials"
+  ],
+  "queries": [
+    {
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "RUL104",
+        "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "--",
+        "docs/platform",
+        "docs/knowledge",
+        "docs/reference",
+        "docs/tutorials"
+      ],
+      "query": "RUL104",
+      "exit": 0,
+      "stdoutSha256": "ddcbed35570138e323feae41fda4fcf77454d4ee41f3b895f4b70c52e918779c",
+      "matches": [
+        "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/platform/intent-preservation-ledger.md:92:| PF-I022 | A unit whose controller died resumes without a person typing `--resume`: the platform detects the dead controller and exactly one taker continues the unit from its settled attempts. | Owner decision 2026-10-16 (design r6 §16); `docs/specs/runner.md` RUL104; `docs/platform/run-supervisor/spec.md` section 9.1 | deferred-preserved | A unit with a dead controller reads `awaiting-resume`; only an explicit `fgos run --resume <unit>` goes on, through adopt, and the agent never runs twice. | Keep the `unit-control` ledger of the unit (holder proven dead) as the dead-controller evidence and its one-acquirer rule as the single-taker primitive; add no second place that decides who continues a unit. | Dead-controller detection and the single-taker guarantee are both proven on the real lock and supervisor, and the owner asks for unattended continuation. | `packages/run-supervisor/contracts/unit-state.v1.json` (`deferred.automaticResume`) |"
+      ],
+      "hits": [
+        {
+          "file": "docs/platform/intent-preservation-ledger.md",
+          "line": 92,
+          "text": "| PF-I022 | A unit whose controller died resumes without a person typing `--resume`: the platform detects the dead controller and exactly one taker continues the unit from its settled attempts. | Owner decision 2026-10-16 (design r6 §16); `docs/specs/runner.md` RUL104; `docs/platform/run-supervisor/spec.md` section 9.1 | deferred-preserved | A unit with a dead controller reads `awaiting-resume`; only an explicit `fgos run --resume <unit>` goes on, through adopt, and the agent never runs twice. | Keep the `unit-control` ledger of the unit (holder proven dead) as the dead-controller evidence and its one-acquirer rule as the single-taker primitive; add no second place that decides who continues a unit. | Dead-controller detection and the single-taker guarantee are both proven on the real lock and supervisor, and the owner asks for unattended continuation. | `packages/run-supervisor/contracts/unit-state.v1.json` (`deferred.automaticResume`) |",
+          "sourceSha256": "c32388310dcd5e30abc94d0c49718229ab0678196d4c8002c8a1629e16070121",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        }
+      ]
+    },
+    {
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "tốt hơn, không to hơn",
+        "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "--",
+        "docs/platform",
+        "docs/knowledge",
+        "docs/reference",
+        "docs/tutorials"
+      ],
+      "query": "tốt hơn, không to hơn",
+      "exit": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": [],
+      "hits": []
+    },
+    {
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "Khi audit, soát lại hay làm cứng phần đã có",
+        "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "--",
+        "docs/platform",
+        "docs/knowledge",
+        "docs/reference",
+        "docs/tutorials"
+      ],
+      "query": "Khi audit, soát lại hay làm cứng phần đã có",
+      "exit": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": [],
+      "hits": []
+    }
+  ],
+  "aliasLookups": [
+    {
+      "path": "plans/260925-documentation-authority-unification/alias-table.json",
+      "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
+      "matches": []
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
+      "sha256": "2fd4944f0003f38d5048d7d2a623792c6cabc8631a5e0e042f6707331660d1ef",
+      "matches": []
+    },
+    {
+      "path": "docs/doc-registry.json",
+      "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+      "matches": []
+    }
+  ],
+  "oldClaim": {
+    "path": "docs/specs/platform-foundations.md",
+    "sha256": "fbab4eff911938b23691f88e6d2e6200cac12fad0314f2d8760959f064cdbaa6",
+    "pattern": "^- \\*\\*RUL104 \\(tốt hơn, không to hơn\\)\\.\\*\\* (.+)$",
+    "matches": [
+      "Khi audit, soát lại hay làm cứng phần đã có, mỗi thay đổi phải làm thứ đang có tốt hơn — ổn định hơn, nhanh hơn, nhẹ hơn, code đơn giản hơn theo các nguyên tắc clean code và kiến trúc hexagonal (ports và adapters) khi áp dụng được, API, signature và contract rõ ràng, tường minh, dễ dùng và uyển chuyển hơn — trong phạm vi code đang có, không làm nó to ra; không thêm tính năng, lớp hay cơ chế mới; đổi một contract thì chuyển mọi caller và xoá đường cũ trong cùng đợt (L10); một tính năng chỉ được thêm khi thật sự đáng: mọi ý tưởng thêm được gom vào một mục riêng của báo cáo, mỗi ý ghi lý do (vấn đề thật, bằng chứng) và lợi ích, và chỉ làm sau khi owner chọn (ADR0062 (RUL104 thêm clean code và hexagonal theo owner 2026-10-18, supersede ADR0061))."
+    ],
+    "fixturePath": "test/docs/rul104-law.txt",
+    "fixtureSha256": "1ed945d736049ba72d48e7057d11d43882e1440345b55402061d159d620edbb5"
+  },
+  "assessment": "The exact RUL104 locked wording and Business Rules line have no matching claim under any of the four searched roots. The lone RUL104 hit is the runner automatic-resume rule, a distinct area/rule. No holder can preserve this word-for-word assertion yet."
+}

@@ -1,0 +1,23 @@
+{
+  "kind": "R20 cutover-neutral invariant-preserve closures; no semantic admission or window review",
+  "files": 194,
+  "literalReferences": 50,
+  "dynamicTuples": 3060,
+  "triagedFiles": 671,
+  "moveSetSize": 1561,
+  "checks": {
+    "r20-move-set": 1,
+    "r20-coverage": 3,
+    "r20-context": 671,
+    "r20-record": 194
+  },
+  "rules": {
+    "r20-move-set": "Exact pinned Phase 6 alias plus registry move-set derivation",
+    "r20-context": "No moved literal, ancestor/template, traced constant or unresolved path-constant import in passage or whole-file context",
+    "r20-coverage": "Conserved initial queue and all-only proved closures",
+    "r20-record": "Pinned whole-file and original item identities; prior R19 rejects retained; invariant preserve only"
+  },
+  "failureCount": 0,
+  "failures": [],
+  "headDrift": []
+}

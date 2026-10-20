@@ -1,0 +1,103 @@
+{
+  "kind": "Measured batch counts; independent semantic acceptance and post-retirement proof remain pending",
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "initialQueuePin": "9ceec7bdc8bd7243220b99e016bd880a00fa176f",
+  "moveSet": {
+    "finitePaths": 1561,
+    "prefixes": [
+      "docs/specs/",
+      "docs/architect/"
+    ],
+    "retiredDecisionPattern": "docs/decisions/00\\d\\d-[^/]*\\.md",
+    "retiredIndex": "docs/decisions/0000-index.md",
+    "sourceHashes": [
+      {
+        "path": "plans/260925-documentation-authority-unification/alias-table.json",
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
+        "bytes": 295
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "sha256": "2fd4944f0003f38d5048d7d2a623792c6cabc8631a5e0e042f6707331660d1ef",
+        "bytes": 4861800
+      },
+      {
+        "path": "docs/doc-registry.json",
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "bytes": 665762
+      }
+    ]
+  },
+  "triagedFiles": 671,
+  "neutralClosures": {
+    "files": 194,
+    "references": 50,
+    "tuples": 3060,
+    "wholeFileBytes": 1580425,
+    "priorR19RejectsRetained": 1401
+  },
+  "newJudgment": {
+    "files": 1,
+    "references": 0,
+    "tuples": 6,
+    "authorAddedSlots": 2,
+    "admitted": 2,
+    "judgmentRejects": 6,
+    "dispositions": {
+      "preserve": 7,
+      "parked": 1
+    }
+  },
+  "remaining": {
+    "files": 476,
+    "references": 1120,
+    "tuples": 21805,
+    "originalCarries": 3
+  },
+  "conservation": {
+    "files": [
+      704,
+      704
+    ],
+    "references": [
+      1203,
+      1203
+    ],
+    "tuples": [
+      25007,
+      25007
+    ]
+  },
+  "proofLimits": [
+    "R20 dispositions are invariant-preserve mechanical closures, not invented per-item admission verdicts.",
+    "Owning RUL104 tests pass over pinned current inputs only; the exact-law promotion and full post-retirement suite are still owed.",
+    "No independent review, cutover apply, state access, fgos CLI, git write, build or cargo execution."
+  ],
+  "verification": {
+    "status": "pass",
+    "fullAuthoredRecordCount": 519,
+    "literalReferences": 2502,
+    "dynamicTuples": 8856,
+    "failureCount": 0,
+    "negativeProbes": {
+      "passed": 128,
+      "total": 128
+    },
+    "newPositiveProbes": {
+      "retainedFixedDocumentLiteralIsNeutral": true,
+      "baselineRestored": true,
+      "headOnlyDriftIsReportedWithoutFailingPinProof": true
+    },
+    "owningCurrentTests": {
+      "pass": 2,
+      "fail": 0,
+      "skip": 0
+    },
+    "verificationFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-verification.json"
+  },
+  "timestamp": "2026-10-20T22:33:10.395465+00:00",
+  "authorElapsedSecondsAtMeasurement": 2089.776
+}

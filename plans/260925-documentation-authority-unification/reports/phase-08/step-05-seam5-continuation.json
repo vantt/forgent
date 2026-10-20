@@ -53,49 +53,241 @@
         "test/docs/rul11-anchor-phrase.test.mjs"
       ],
       "recordFile": "step-05-records/tests-real-file.jsonl"
-    }
-  ],
-  "remainingFileCount": 671,
-  "remainingFilesInOrder": [
-    {
-      "file": "apps/fgos-gateway/web/src/App.test.tsx",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "36dcbe12fd1175058dcfae826d0b141be00cd48018aba178477754b71c55384e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "36dcbe12fd1175058dcfae826d0b141be00cd48018aba178477754b71c55384e",
-      "currentBytes": 3848,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-000201"
-      ],
-      "dynamicCount": 4
     },
     {
-      "file": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx",
+      "batch": 3,
+      "kind": "R20 invariant-preserve cutover-neutral mechanical closures",
+      "files": [
+        "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx",
+        "test/intake/judge-verify-second-pass-stability.test.mjs",
+        "test/intake/plan-verdict-from-plan-md.test.mjs",
+        "test/runner/anti-loop.test.mjs",
+        "test/runner/assignment-provenance.test.mjs",
+        "test/runner/enrich-and-validate-contract.test.mjs",
+        "test/scripts/check-locked-decisions-heading-drift.test.mjs",
+        "test/setup/gitignore-docs-history-not-excluded.test.mjs",
+        "test/skills/knowledge-canary.test.mjs",
+        "test/state/discover-verdict-override.test.mjs",
+        "test/state/graph-harness.test.mjs",
+        "apps/fgos-gateway/web/src/api/client.test.ts",
+        "apps/fgos-gateway/web/src/screens/NeedsAnswer.test.tsx",
+        "apps/fgos-gateway/web/src/screens/Taskboard.test.tsx",
+        "apps/fgos/tests/windows_predecessor_stress.rs",
+        "dogfood-fixture/test/goal-directed-mvp.test.mjs",
+        "packages/agent-protocol/contracts/fixtures/terminal/agy/working-mid-turn.txt",
+        "packages/agent-protocol/contracts/fixtures/terminal/codex/draft-expanded-composer.txt",
+        "packages/agent-protocol/contracts/fixtures/terminal/codex/vectors.json",
+        "packages/agent-protocol/contracts/fixtures/terminal/codex/working.txt",
+        "packages/agent-protocol/contracts/fixtures/terminal/omp/working.txt",
+        "packages/agent-protocol/contracts/fixtures/terminal/pi/working.txt",
+        "packages/event-store/rust/tests/branch_local_refs.rs",
+        "packages/event-store/rust/tests/cursor_incremental.rs",
+        "packages/event-store/rust/tests/framing_prefixes.rs",
+        "packages/event-store/rust/tests/kill_append.rs",
+        "packages/event-store/rust/tests/order_kahn.rs",
+        "packages/event-store/rust/tests/p02_review.rs",
+        "packages/event-store/rust/tests/support/driver.rs",
+        "packages/event-store/rust/tests/three_clones.rs",
+        "packages/event-store/rust/tests/walk_certified.rs",
+        "packages/holder-lock/rust/tests/borrow_git.rs",
+        "packages/holder-lock/rust/tests/borrow_io.rs",
+        "packages/holder-lock/rust/tests/stress.rs",
+        "packages/holder-lock/rust/tests/windows_lockfileex.rs",
+        "packages/observe/rust/tests/fixture_test.rs",
+        "packages/process/rust/tests/containment_spawn_timeout.rs",
+        "packages/run-supervisor/rust/tests/adopt_concurrency.rs",
+        "packages/run-supervisor/rust/tests/envelope_digest_vectors.rs",
+        "packages/run-supervisor/rust/tests/gate_orphan.rs",
+        "packages/run-supervisor/rust/tests/supervise_crash.rs",
+        "packages/run-supervisor/rust/tests/supervise_guard.rs",
+        "packages/run-supervisor/rust/tests/supervise_lifecycle.rs",
+        "packages/run-supervisor/rust/tests/support/terminal.rs",
+        "packages/terminal-control/rust/tests/core_failures.rs",
+        "packages/terminal-control/rust/tests/core_rules.rs",
+        "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh",
+        "packages/terminal-control/rust/tests/herdr_driver_fixtures.rs",
+        "packages/terminal-control/rust/tests/herdr_driver_live.rs",
+        "test/cli/dispatch-inspect.test.mjs",
+        "test/cli/dispatch-operability.test.mjs",
+        "test/cli/dispatch-reconcile.test.mjs",
+        "test/cli/fgos-gate-approve.test.mjs",
+        "test/cli/fgos-help.test.mjs",
+        "test/cli/fgos-manifest.test.mjs",
+        "test/cli/fgos-merge-next-idle-turn.test.mjs",
+        "test/cli/fgos-stale-orphaned-runs.test.mjs",
+        "test/cli/fgos-tool.test.mjs",
+        "test/cli/fgos-verb-help-json.test.mjs",
+        "test/cli/fgos-workflow.test.mjs",
+        "test/cli/knowledge-deprecation.test.mjs",
+        "test/cli/unknown-flag-rejection.test.mjs",
+        "test/cli/version-no-git-noise.test.mjs",
+        "test/config/global-config.test.mjs",
+        "test/config/shared-config-file.test.mjs",
+        "test/convention/convention-client.test.mjs",
+        "test/direct/fgos-read.test.mjs",
+        "test/docs/agents-doctrine-anchors.test.mjs",
+        "test/e2e/main-checkout-activity-beacon.test.mjs",
+        "test/event-store/canonical-vectors.test.mjs",
+        "test/event-store/facade.test.mjs",
+        "test/event-store/gate-probe.mjs",
+        "test/event-store/phase07-fixture.mjs",
+        "test/evolve/iron-law.test.mjs",
+        "test/git/inspect.test.mjs",
+        "test/git/lock-handover.test.mjs",
+        "test/git/refs.test.mjs",
+        "test/git/remote.test.mjs",
+        "test/git/worktree-fixture.mjs",
+        "test/helpers/git-addon.mjs",
+        "test/helpers/hold-lock-in-child.mjs",
+        "test/helpers/hold-state-lock-in-child.mjs",
+        "test/helpers/js-source-lexer.mjs",
+        "test/helpers/process-tmp-root.mjs",
+        "test/helpers/provider-families.mjs",
+        "test/helpers/terminal-host-harness.mjs",
+        "test/holder-lock/lock-scope-order.test.mjs",
+        "test/holder-lock/pre-exec-fixture.rs",
+        "test/holder-lock/windows-borrow.test.mjs",
+        "test/holder-lock/windows-doctor.test.mjs",
+        "test/holder-lock/windows-facade.test.mjs",
+        "test/holder-lock/windows-hot-lock.test.mjs",
+        "test/intake/classify.test.mjs",
+        "test/parity/edit-parity.test.mjs",
+        "test/parity/read-parity.test.mjs",
+        "test/parity/step-parity.test.mjs",
+        "test/run-supervisor/fixtures/terminal-controller.mjs",
+        "test/run-supervisor/helpers/envelope-fixture.mjs",
+        "test/run-supervisor/windows-custody.test.mjs",
+        "test/runner/agent-listing.test.mjs",
+        "test/runner/agent-roster.test.mjs",
+        "test/runner/attestation-guard.test.mjs",
+        "test/runner/confinement-registry-fixture.helper.mjs",
+        "test/runner/credential-store.test.mjs",
+        "test/runner/dispatch-assignment-id-claim-concurrency.helper.mjs",
+        "test/runner/dispatch-brief.test.mjs",
+        "test/runner/dispatch-config-patterns.test.mjs",
+        "test/runner/dispatch-confinement-reaper-fence.test.mjs",
+        "test/runner/dispatch-operability-production-door.test.mjs",
+        "test/runner/dispatch-policy-baseline-snapshot.test.mjs",
+        "test/runner/dispatch-r9-performance-cache.test.mjs",
+        "test/runner/dispatch-recovery.test.mjs",
+        "test/runner/dispatch-trust-store.test.mjs",
+        "test/runner/dispatch-visibility-session.test.mjs",
+        "test/runner/driver-unit-fixture.helper.mjs",
+        "test/runner/execution-contract.test.mjs",
+        "test/runner/execution/bind.test.mjs",
+        "test/runner/execution/explain.test.mjs",
+        "test/runner/execution/patterns/panel.test.mjs",
+        "test/runner/execution/patterns/presets.test.mjs",
+        "test/runner/execution/patterns/role-tasks.test.mjs",
+        "test/runner/execution/unit-summary.test.mjs",
+        "test/runner/herdr-agent.test.mjs",
+        "test/runner/main-checkout-activity.test.mjs",
+        "test/runner/main-checkout-reset-guard.test.mjs",
+        "test/runner/promote-engine.test.mjs",
+        "test/runner/promote-preflight.test.mjs",
+        "test/runner/provider-account-probe.test.mjs",
+        "test/runner/provider-auth-failure.test.mjs",
+        "test/runner/recovery.test.mjs",
+        "test/runner/repo-locks-multiprocess.test.mjs",
+        "test/runner/run-lock-identity.test.mjs",
+        "test/runner/run-outcome.test.mjs",
+        "test/runner/run-result-confinement-label.test.mjs",
+        "test/runner/run-result-v2.test.mjs",
+        "test/runner/tier-cell.test.mjs",
+        "test/runner/usage-parsers.test.mjs",
+        "test/runner/worktree-admin-multiprocess.test.mjs",
+        "test/runner/write-queue.test.mjs",
+        "test/rust-host/command-routes.test.mjs",
+        "test/rust-host/fgctl-init-activation.test.mjs",
+        "test/rust-host/fgctl-init-preflight-tail.test.mjs",
+        "test/rust-host/fgctl-lock-holder.mjs",
+        "test/rust-host/fixtures/child-process-spy.cjs",
+        "test/rust-host/internal-routes.test.mjs",
+        "test/rust-host/observe-store-lock.test.mjs",
+        "test/rust-host/release-targets.test.mjs",
+        "test/scripts/check-decision-codes.test.mjs",
+        "test/scripts/check-decision-supersession.test.mjs",
+        "test/scripts/decision-question-hook.test.mjs",
+        "test/scripts/dispatch-decide-hook.test.mjs",
+        "test/scripts/doc-rationale-author.test.mjs",
+        "test/scripts/doc-rationale-facts.test.mjs",
+        "test/scripts/doc-rationale-reproduction.test.mjs",
+        "test/scripts/herdr-cockpit-notify.test.mjs",
+        "test/scripts/next-doc-id.test.mjs",
+        "test/scripts/prepare-release.test.mjs",
+        "test/scripts/test-ownership-lint.test.mjs",
+        "test/scripts/test-proof-inventory.test.mjs",
+        "test/scripts/test-select-compare.test.mjs",
+        "test/scripts/test-select-mutate.test.mjs",
+        "test/scripts/test-select-promote-report.test.mjs",
+        "test/scripts/test-select-promote.test.mjs",
+        "test/scripts/test-select.test.mjs",
+        "test/scripts/test-timing.test.mjs",
+        "test/scripts/write-test-marker.test.mjs",
+        "test/session-identity/attempt-writer-id.test.mjs",
+        "test/setup/config-merge.test.mjs",
+        "test/setup/git-checks.test.mjs",
+        "test/skills/fgos-coding-exploring-root-fix.test.mjs",
+        "test/skills/terminal-pane-ownership.test.mjs",
+        "test/state/cursor.test.mjs",
+        "test/state/decision-scope-field.test.mjs",
+        "test/state/dep-graph.test.mjs",
+        "test/state/graph-metrics.test.mjs",
+        "test/state/hot-lock-guard.test.mjs",
+        "test/state/hot-lock-host-judge.test.mjs",
+        "test/state/hot-lock-tx.test.mjs",
+        "test/state/identity-before-lock.test.mjs",
+        "test/state/impact.test.mjs",
+        "test/state/porting.test.mjs",
+        "test/state/postland-drift.test.mjs",
+        "test/state/replay.test.mjs",
+        "test/state/show-list-move-consistency.test.mjs",
+        "test/state/step.test.mjs",
+        "test/state/worker-slots.test.mjs",
+        "test/terminal-control/client-route.test.mjs",
+        "test/terminal-control/group-queue.test.mjs",
+        "test/test-ownership.mjs",
+        "test/util/git-paths.test.mjs",
+        "test/util/host-bin.test.mjs",
+        "test/util/yaml.test.mjs",
+        "test/verbs/merge/approve.test.mjs",
+        "test/workflow/units-source.test.mjs"
+      ],
+      "recordFile": "step-05-records/tests-cutover-neutral.jsonl"
+    },
+    {
+      "batch": 3,
+      "kind": "real-document reader judgments; review pending",
+      "files": [
+        "test/docs/rul104-anchor-phrase.test.mjs"
+      ],
+      "recordFile": "step-05-records/tests-real-file-batch3.jsonl"
+    }
+  ],
+  "remainingFileCount": 476,
+  "remainingFilesInOrder": [
+    {
+      "file": "test/runner/dead-vocabulary-guard.test.mjs",
       "origins": [
-        "step-02l-census-class5.json"
+        "step-02l-census-class5.json",
+        "step-02-dynamic-unresolved.json"
       ],
       "censusDigests": [
-        "9faf11f5d6aede667dc3079c507b3e7872579e78770360a05c4639fb3052d8b3"
+        "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8"
       ],
       "seam": "real-file-tests-goldens",
       "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "9faf11f5d6aede667dc3079c507b3e7872579e78770360a05c4639fb3052d8b3",
-      "currentBytes": 16974,
+      "currentSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+      "currentBytes": 23739,
       "driftFromCensus": false,
       "referenceIds": [
-        "reference-000214",
-        "reference-000217",
-        "reference-000215",
-        "reference-000216",
-        "reference-000213"
+        "reference-004372",
+        "reference-004373",
+        "reference-004371",
+        "reference-004374",
+        "reference-004375"
       ],
-      "dynamicCount": 32
+      "dynamicCount": 77
     },
     {
       "file": "test/architecture.test.mjs",
@@ -114,6 +306,24 @@
         "reference-003949"
       ],
       "dynamicCount": 139
+    },
+    {
+      "file": "apps/fgos-gateway/web/src/App.test.tsx",
+      "origins": [
+        "step-02l-census-class5.json"
+      ],
+      "censusDigests": [
+        "36dcbe12fd1175058dcfae826d0b141be00cd48018aba178477754b71c55384e"
+      ],
+      "seam": "real-file-tests-goldens",
+      "assignment": "mechanical routing for authoring, not a semantic verdict",
+      "currentSha256": "36dcbe12fd1175058dcfae826d0b141be00cd48018aba178477754b71c55384e",
+      "currentBytes": 3848,
+      "driftFromCensus": false,
+      "referenceIds": [
+        "reference-000201"
+      ],
+      "dynamicCount": 4
     },
     {
       "file": "test/cli/fgos-approve-3.test.mjs",
@@ -1087,49 +1297,6 @@
       "dynamicCount": 60
     },
     {
-      "file": "test/intake/judge-verify-second-pass-stability.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "d9fd1a01e37d19b338a3d2791e76eb912063fd9ee9afac0560f6d15f6b691cc2"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "d9fd1a01e37d19b338a3d2791e76eb912063fd9ee9afac0560f6d15f6b691cc2",
-      "currentBytes": 4509,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-004230",
-        "reference-004231"
-      ],
-      "dynamicCount": 3
-    },
-    {
-      "file": "test/intake/plan-verdict-from-plan-md.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "b1631e305d620b1f6707feee1e3135fcd7abbb37c83787eb2f9c137855fe766a"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "b1631e305d620b1f6707feee1e3135fcd7abbb37c83787eb2f9c137855fe766a",
-      "currentBytes": 17024,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-004232",
-        "reference-004233",
-        "reference-004236",
-        "reference-004237",
-        "reference-004234",
-        "reference-004235",
-        "reference-004238"
-      ],
-      "dynamicCount": 6
-    },
-    {
       "file": "test/intake/plan.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -1382,24 +1549,6 @@
       "dynamicCount": 30
     },
     {
-      "file": "test/runner/anti-loop.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "5a01846680d41a6942aec2e0d203c87e8a92364238b1aa9b18913712f6666166"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "5a01846680d41a6942aec2e0d203c87e8a92364238b1aa9b18913712f6666166",
-      "currentBytes": 15703,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-004355"
-      ],
-      "dynamicCount": 2
-    },
-    {
       "file": "test/runner/assignment-dispatch.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -1416,27 +1565,6 @@
         "reference-004356"
       ],
       "dynamicCount": 537
-    },
-    {
-      "file": "test/runner/assignment-provenance.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "7d5a59f9fcd567204657ae433e853f697b223c39620cc18c7e17c53f87136ce8"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "7d5a59f9fcd567204657ae433e853f697b223c39620cc18c7e17c53f87136ce8",
-      "currentBytes": 19668,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-004360",
-        "reference-004357",
-        "reference-004358",
-        "reference-004359"
-      ],
-      "dynamicCount": 7
     },
     {
       "file": "test/runner/assignment.test.mjs",
@@ -1498,29 +1626,6 @@
         "reference-004369"
       ],
       "dynamicCount": 10
-    },
-    {
-      "file": "test/runner/dead-vocabulary-guard.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json",
-        "step-02-dynamic-unresolved.json"
-      ],
-      "censusDigests": [
-        "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
-      "currentBytes": 23739,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-004372",
-        "reference-004373",
-        "reference-004371",
-        "reference-004374",
-        "reference-004375"
-      ],
-      "dynamicCount": 77
     },
     {
       "file": "test/runner/dispatch-confinement-p04.test.mjs",
@@ -1657,34 +1762,6 @@
         "reference-004392"
       ],
       "dynamicCount": 110
-    },
-    {
-      "file": "test/runner/enrich-and-validate-contract.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "49854eb00dcead8e185d75a123d36bb9f642acaf500018811d27b8335f71ad07"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "49854eb00dcead8e185d75a123d36bb9f642acaf500018811d27b8335f71ad07",
-      "currentBytes": 9976,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-004399",
-        "reference-004393",
-        "reference-004395",
-        "reference-004397",
-        "reference-004400",
-        "reference-004402",
-        "reference-004396",
-        "reference-004394",
-        "reference-004398",
-        "reference-004401",
-        "reference-004403"
-      ],
-      "dynamicCount": 3
     },
     {
       "file": "test/runner/loop.test.mjs",
@@ -2187,31 +2264,6 @@
         "reference-004672"
       ],
       "dynamicCount": 79
-    },
-    {
-      "file": "test/scripts/check-locked-decisions-heading-drift.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "3b0bf35b0cb7b6810c6c11de93f51561a69320ad610d6f591c005b92cd8c90e3"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "3b0bf35b0cb7b6810c6c11de93f51561a69320ad610d6f591c005b92cd8c90e3",
-      "currentBytes": 5423,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-004878",
-        "reference-004882",
-        "reference-004879",
-        "reference-004880",
-        "reference-004883",
-        "reference-004885",
-        "reference-004884",
-        "reference-004881"
-      ],
-      "dynamicCount": 26
     },
     {
       "file": "test/scripts/doc-alias-resolver.test.mjs",
@@ -2921,31 +2973,6 @@
       "dynamicCount": 17
     },
     {
-      "file": "test/setup/gitignore-docs-history-not-excluded.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "2e3db2632ac0bda1a9f175eb4f22356284e08b22b7536de7984aa61eea71079b"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "2e3db2632ac0bda1a9f175eb4f22356284e08b22b7536de7984aa61eea71079b",
-      "currentBytes": 1478,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-005185",
-        "reference-005192",
-        "reference-005186",
-        "reference-005190",
-        "reference-005189",
-        "reference-005191",
-        "reference-005187",
-        "reference-005188"
-      ],
-      "dynamicCount": 2
-    },
-    {
       "file": "test/setup/helpers/setup-checks-harness.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -3113,25 +3140,6 @@
       "dynamicCount": 40
     },
     {
-      "file": "test/skills/knowledge-canary.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "14786f764893d76715e5767edd28a43b4e2a8da02efa25b487b1a6be7c2c93be"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "14786f764893d76715e5767edd28a43b4e2a8da02efa25b487b1a6be7c2c93be",
-      "currentBytes": 2155,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-005208",
-        "reference-005207"
-      ],
-      "dynamicCount": 8
-    },
-    {
       "file": "test/state/awaiting.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -3226,24 +3234,6 @@
       "dynamicCount": 24
     },
     {
-      "file": "test/state/discover-verdict-override.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "db00ad8dfc723543cdb463ef5a4acf7799374c44bfc8fccd62387302ad03daeb"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "db00ad8dfc723543cdb463ef5a4acf7799374c44bfc8fccd62387302ad03daeb",
-      "currentBytes": 7090,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-005235"
-      ],
-      "dynamicCount": 4
-    },
-    {
       "file": "test/state/domain-fields.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -3336,24 +3326,6 @@
         "reference-005243"
       ],
       "dynamicCount": 44
-    },
-    {
-      "file": "test/state/graph-harness.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "4cae0c70bb03b51e3880ca1932b4dd18c8acae9b01a781d27895ab35017dc777"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "4cae0c70bb03b51e3880ca1932b4dd18c8acae9b01a781d27895ab35017dc777",
-      "currentBytes": 32324,
-      "driftFromCensus": false,
-      "referenceIds": [
-        "reference-005245"
-      ],
-      "dynamicCount": 39
     },
     {
       "file": "test/state/hot-lock-known-exec-sites.test.mjs",
@@ -3624,54 +3596,6 @@
       "dynamicCount": 8
     },
     {
-      "file": "apps/fgos-gateway/web/src/api/client.test.ts",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "e260075a74aeab7163f4870c77813aa304061c4bfa324f17b9c05a655830ec35"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "e260075a74aeab7163f4870c77813aa304061c4bfa324f17b9c05a655830ec35",
-      "currentBytes": 5867,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
-    },
-    {
-      "file": "apps/fgos-gateway/web/src/screens/NeedsAnswer.test.tsx",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "40cedf1678cee9a62fb817ce6741048e618b67223497ce405264f060e9e73771"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "40cedf1678cee9a62fb817ce6741048e618b67223497ce405264f060e9e73771",
-      "currentBytes": 4776,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 6
-    },
-    {
-      "file": "apps/fgos-gateway/web/src/screens/Taskboard.test.tsx",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "69883b7649336615af92409592d12ea5f01b816402da2c4894503692dd419afa"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "69883b7649336615af92409592d12ea5f01b816402da2c4894503692dd419afa",
-      "currentBytes": 14966,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 17
-    },
-    {
       "file": "apps/fgos/tests/cli_tests.rs",
       "origins": [
         "step-02l-census-class5.json"
@@ -3736,22 +3660,6 @@
       "dynamicCount": 22
     },
     {
-      "file": "apps/fgos/tests/windows_predecessor_stress.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0bf5b06644fdb212a693fb2a12979c8e3fb1c88800ae96a7494c00434e01c6c0"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "0bf5b06644fdb212a693fb2a12979c8e3fb1c88800ae96a7494c00434e01c6c0",
-      "currentBytes": 12215,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 12
-    },
-    {
       "file": "apps/fgos/tests/windows_semantics_probe.rs",
       "origins": [
         "step-02l-census-class5.json"
@@ -3782,118 +3690,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 13
-    },
-    {
-      "file": "dogfood-fixture/test/goal-directed-mvp.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "cc26c51cd639228526acec30a40bf9b6ed830410948b71a77ea991848503f8bc"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "cc26c51cd639228526acec30a40bf9b6ed830410948b71a77ea991848503f8bc",
-      "currentBytes": 2412,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 5
-    },
-    {
-      "file": "packages/agent-protocol/contracts/fixtures/terminal/agy/working-mid-turn.txt",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "bcfcefa5d22e702ed4d6823884e3d472801271cd4719743caa376e8b99773f2c"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "bcfcefa5d22e702ed4d6823884e3d472801271cd4719743caa376e8b99773f2c",
-      "currentBytes": 6097,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
-    },
-    {
-      "file": "packages/agent-protocol/contracts/fixtures/terminal/codex/draft-expanded-composer.txt",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "40025a3c8419bfe5e3156c14513be25827f1ac9a19673b4ab72c2841cf3a05d1"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "40025a3c8419bfe5e3156c14513be25827f1ac9a19673b4ab72c2841cf3a05d1",
-      "currentBytes": 2967,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
-    },
-    {
-      "file": "packages/agent-protocol/contracts/fixtures/terminal/codex/vectors.json",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "21c3dd2471d797bbb5502a719e096870d7c118b499802f01deabd57c752e433c"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "21c3dd2471d797bbb5502a719e096870d7c118b499802f01deabd57c752e433c",
-      "currentBytes": 25602,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 6
-    },
-    {
-      "file": "packages/agent-protocol/contracts/fixtures/terminal/codex/working.txt",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "fe6543ad0e7e0082be45a1d06c0107143a6e6c77e1c26fcc12b82cb17f1ce55d"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "fe6543ad0e7e0082be45a1d06c0107143a6e6c77e1c26fcc12b82cb17f1ce55d",
-      "currentBytes": 3996,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
-    },
-    {
-      "file": "packages/agent-protocol/contracts/fixtures/terminal/omp/working.txt",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "b0dbb8372e2485ab83f11e789a6c867ee840c52391e695ff3e0373124032845e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "b0dbb8372e2485ab83f11e789a6c867ee840c52391e695ff3e0373124032845e",
-      "currentBytes": 4828,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
-    },
-    {
-      "file": "packages/agent-protocol/contracts/fixtures/terminal/pi/working.txt",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "32d0e0b072c1745226b0519df6011345bd190e93853929804831c65484b1789d"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "32d0e0b072c1745226b0519df6011345bd190e93853929804831c65484b1789d",
-      "currentBytes": 4896,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
     },
     {
       "file": "packages/agent-protocol/rust/tests/direct_vectors.rs",
@@ -4072,22 +3868,6 @@
       "dynamicCount": 16
     },
     {
-      "file": "packages/event-store/rust/tests/branch_local_refs.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "51dad4f4f7f228c363cf5f7076f61fd5a8528adb31419fed8cb202fce712e862"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "51dad4f4f7f228c363cf5f7076f61fd5a8528adb31419fed8cb202fce712e862",
-      "currentBytes": 7938,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 5
-    },
-    {
       "file": "packages/event-store/rust/tests/common/mod.rs",
       "origins": [
         "step-02l-census-class5.json"
@@ -4102,54 +3882,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 12
-    },
-    {
-      "file": "packages/event-store/rust/tests/cursor_incremental.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "9429430246c625debce0c8e221cbe84fdd7d1d0088159ce2d62a80292f158744"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "9429430246c625debce0c8e221cbe84fdd7d1d0088159ce2d62a80292f158744",
-      "currentBytes": 16521,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 8
-    },
-    {
-      "file": "packages/event-store/rust/tests/framing_prefixes.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "be275c7421cb24cb3371407f1e059d841cd4d5b3f287b88b87b1502dda1b111e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "f55b6b0377994d8f71841d666d3f84eae63f4655d001f0e3fe4e0e1b688f98ff",
-      "currentBytes": 4425,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 2
-    },
-    {
-      "file": "packages/event-store/rust/tests/kill_append.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "e569f3337c68909f41ac7bc9fcb4963f0d5b724987bb43171fcbfe2910f22c58"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "e569f3337c68909f41ac7bc9fcb4963f0d5b724987bb43171fcbfe2910f22c58",
-      "currentBytes": 11516,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
     },
     {
       "file": "packages/event-store/rust/tests/legacy_reader.rs",
@@ -4182,38 +3914,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 4
-    },
-    {
-      "file": "packages/event-store/rust/tests/order_kahn.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "c2b1004b8772de30aace61b1f8279c2131b1678a3be45f64b15b171c1728b6e1"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "c2b1004b8772de30aace61b1f8279c2131b1678a3be45f64b15b171c1728b6e1",
-      "currentBytes": 6311,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 8
-    },
-    {
-      "file": "packages/event-store/rust/tests/p02_review.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "509b6cda50cde622ec18d8d35dc0f23816dbc3f5bb8129244a83b11a485a1f22"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "5a560dd163330beb32cac8881bc37b3cd558471d1aa7ffead138b7b686e23fe3",
-      "currentBytes": 9488,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 2
     },
     {
       "file": "packages/event-store/rust/tests/reader_review_regressions.rs",
@@ -4344,22 +4044,6 @@
       "dynamicCount": 2
     },
     {
-      "file": "packages/event-store/rust/tests/support/driver.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "332409b5aebcf0f0ab5eca2d280c890b8b8100c55f297a89a5fa8c07a8d8b60a"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "332409b5aebcf0f0ab5eca2d280c890b8b8100c55f297a89a5fa8c07a8d8b60a",
-      "currentBytes": 4277,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 5
-    },
-    {
       "file": "packages/event-store/rust/tests/sync_review.rs",
       "origins": [
         "step-02l-census-class5.json"
@@ -4392,22 +4076,6 @@
       "dynamicCount": 16
     },
     {
-      "file": "packages/event-store/rust/tests/three_clones.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "d518c9d8c893190d17ce67c7554a3e3561c3ff3458651fb480ecd792809c1728"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "d518c9d8c893190d17ce67c7554a3e3561c3ff3458651fb480ecd792809c1728",
-      "currentBytes": 1637,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
-    },
-    {
       "file": "packages/event-store/rust/tests/v_event.rs",
       "origins": [
         "step-02l-census-class5.json"
@@ -4419,22 +4087,6 @@
       "assignment": "mechanical routing for authoring, not a semantic verdict",
       "currentSha256": "e3fd04cb6aa92d33095ce5b0b6899b7cf3532b502dded534336bb910b49b9cb4",
       "currentBytes": 10597,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
-    },
-    {
-      "file": "packages/event-store/rust/tests/walk_certified.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0ae2d9f7f3fc96b748167c0a3f9b5de4d3ad7a3e57d6a65ced896f93b9a2db55"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "0ae2d9f7f3fc96b748167c0a3f9b5de4d3ad7a3e57d6a65ced896f93b9a2db55",
-      "currentBytes": 3553,
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 2
@@ -4536,38 +4188,6 @@
       "dynamicCount": 61
     },
     {
-      "file": "packages/holder-lock/rust/tests/borrow_git.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "02d95563daa017ec091c0f99e1aac818240328a9e21e8459f7f35e9e7277cb0c"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "02d95563daa017ec091c0f99e1aac818240328a9e21e8459f7f35e9e7277cb0c",
-      "currentBytes": 6763,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 8
-    },
-    {
-      "file": "packages/holder-lock/rust/tests/borrow_io.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "a306050eee900ce6c2f94bbe68e89824bb16eecd8bbb4ed95f6a99726322f5c7"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "efd771fc8479c24d4e202259803bd5b55b22ba223666739ed0708d0a1245c6ba",
-      "currentBytes": 35256,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 46
-    },
-    {
       "file": "packages/holder-lock/rust/tests/common/mod.rs",
       "origins": [
         "step-02l-census-class5.json"
@@ -4632,38 +4252,6 @@
       "dynamicCount": 9
     },
     {
-      "file": "packages/holder-lock/rust/tests/stress.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "b1e4875e967a853c9247db8ef8f7e31c7f37786ccec4682d377486503fd723df"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "b1e4875e967a853c9247db8ef8f7e31c7f37786ccec4682d377486503fd723df",
-      "currentBytes": 2976,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 4
-    },
-    {
-      "file": "packages/holder-lock/rust/tests/windows_lockfileex.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "79e5688336e2a2968f72a65802e8cd722f2c614334e8494eeb2c2b452bfc4273"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "79e5688336e2a2968f72a65802e8cd722f2c614334e8494eeb2c2b452bfc4273",
-      "currentBytes": 7376,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 14
-    },
-    {
       "file": "packages/host-runtime/rust/tests/external_process_router_integration.rs",
       "origins": [
         "step-02l-census-class5.json"
@@ -4726,22 +4314,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 101
-    },
-    {
-      "file": "packages/observe/rust/tests/fixture_test.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "1eadd8be1d535b05899e299f6a7a3a4d9a718d9311502e881b76a78f30985677"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "1eadd8be1d535b05899e299f6a7a3a4d9a718d9311502e881b76a78f30985677",
-      "currentBytes": 2500,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 6
     },
     {
       "file": "packages/observe/rust/tests/harness_protocols_test.rs",
@@ -4822,22 +4394,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 9
-    },
-    {
-      "file": "packages/process/rust/tests/containment_spawn_timeout.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "d97c290dd403f9e883ab5c72107cc7abb13b9fc716740623d90b6a9fe6247d16"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "d97c290dd403f9e883ab5c72107cc7abb13b9fc716740623d90b6a9fe6247d16",
-      "currentBytes": 3703,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 5
     },
     {
       "file": "packages/process/rust/tests/containment_windows.rs",
@@ -4968,22 +4524,6 @@
       "dynamicCount": 41
     },
     {
-      "file": "packages/run-supervisor/rust/tests/adopt_concurrency.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "3b91e8508642d7a18429a0ce1e43569c42a9e9be882eaa99caa325e1e3fb1938"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "3b91e8508642d7a18429a0ce1e43569c42a9e9be882eaa99caa325e1e3fb1938",
-      "currentBytes": 2920,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
-    },
-    {
       "file": "packages/run-supervisor/rust/tests/adopt_scan_perf.rs",
       "origins": [
         "step-02l-census-class5.json"
@@ -4998,22 +4538,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 14
-    },
-    {
-      "file": "packages/run-supervisor/rust/tests/envelope_digest_vectors.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "593eacf90542d07acb74ce2917ece2c9f82e6e63a205045aeb2a022106fee153"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "593eacf90542d07acb74ce2917ece2c9f82e6e63a205045aeb2a022106fee153",
-      "currentBytes": 2618,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
     },
     {
       "file": "packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py",
@@ -5078,22 +4602,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 2
-    },
-    {
-      "file": "packages/run-supervisor/rust/tests/gate_orphan.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "ee7cb384c3ff2914c8e3c03eab3887ec068218952d29b9a769fa726dd6727519"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "ee7cb384c3ff2914c8e3c03eab3887ec068218952d29b9a769fa726dd6727519",
-      "currentBytes": 4386,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 5
     },
     {
       "file": "packages/run-supervisor/rust/tests/gate_pid1.rs",
@@ -5224,54 +4732,6 @@
       "dynamicCount": 16
     },
     {
-      "file": "packages/run-supervisor/rust/tests/supervise_crash.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "09472ab66bc48120ab81774d7a05fcfaa4ff0bd7a0f0d433226d3113b7044896"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "09472ab66bc48120ab81774d7a05fcfaa4ff0bd7a0f0d433226d3113b7044896",
-      "currentBytes": 1810,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
-    },
-    {
-      "file": "packages/run-supervisor/rust/tests/supervise_guard.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "238d1180379434a4de3dd38d104d3d618809ccf178bc5535d991c0fc3e226163"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "238d1180379434a4de3dd38d104d3d618809ccf178bc5535d991c0fc3e226163",
-      "currentBytes": 2649,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
-    },
-    {
-      "file": "packages/run-supervisor/rust/tests/supervise_lifecycle.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "f565fb1d727af6f73080519ab303b3b40260c7deeea2d3319cad411c60cfa3ed"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "f565fb1d727af6f73080519ab303b3b40260c7deeea2d3319cad411c60cfa3ed",
-      "currentBytes": 9731,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
-    },
-    {
       "file": "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs",
       "origins": [
         "step-02l-census-class5.json"
@@ -5352,22 +4812,6 @@
       "dynamicCount": 24
     },
     {
-      "file": "packages/run-supervisor/rust/tests/support/terminal.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "c463d2ac0ad1f63e2e0689c9160df2759e53a573f27f8c6b2dee163147b178d1"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "c463d2ac0ad1f63e2e0689c9160df2759e53a573f27f8c6b2dee163147b178d1",
-      "currentBytes": 9728,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 8
-    },
-    {
       "file": "packages/session-identity/rust/tests/golden.rs",
       "origins": [
         "step-02l-census-class5.json"
@@ -5400,54 +4844,6 @@
       "dynamicCount": 10
     },
     {
-      "file": "packages/terminal-control/rust/tests/core_failures.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "791b9663e28bdada5dda6e47c17ed13340365b832c540c16212bedb874a21bc7"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "5cacc9d82c3b8e69b988f276c696910591531a59cd72df2cf6acb79b8054044d",
-      "currentBytes": 13705,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 3
-    },
-    {
-      "file": "packages/terminal-control/rust/tests/core_rules.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "d6a67efee12ea914ed47b52168e14710d2e613081120af182e8803edf1e1fce4"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "d6a67efee12ea914ed47b52168e14710d2e613081120af182e8803edf1e1fce4",
-      "currentBytes": 11152,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
-    },
-    {
-      "file": "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "f7e555c8f026eb0fd67bac93a9932e08797646bc79fb014ac4fd0d1b19426b55"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "99f68a80b5b4c7d20b515abd06a85af9f5601d24691711feb988d9d98ce36ae1",
-      "currentBytes": 3093,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 1
-    },
-    {
       "file": "packages/terminal-control/rust/tests/herdr_driver_fake.rs",
       "origins": [
         "step-02l-census-class5.json"
@@ -5462,38 +4858,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 29
-    },
-    {
-      "file": "packages/terminal-control/rust/tests/herdr_driver_fixtures.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "833c56ae001bf3b5fd99a11c75ac3b73e8383467c32a6adf3047b36403c5b94e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "833c56ae001bf3b5fd99a11c75ac3b73e8383467c32a6adf3047b36403c5b94e",
-      "currentBytes": 5363,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
-    },
-    {
-      "file": "packages/terminal-control/rust/tests/herdr_driver_live.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "3d2f2bc0b66db1fb4cccab5098256835782985ed7b901822f85cc6f459503534"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "3d2f2bc0b66db1fb4cccab5098256835782985ed7b901822f85cc6f459503534",
-      "currentBytes": 1990,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
     },
     {
       "file": "packages/terminal-control/rust/tests/policy_fixtures.rs",
@@ -5558,54 +4922,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 16
-    },
-    {
-      "file": "test/cli/dispatch-inspect.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "ab81c0ecc8fd089c6bf31b1454bf90d3b56b575dd0e25738e3119e5f3f482b53"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "ab81c0ecc8fd089c6bf31b1454bf90d3b56b575dd0e25738e3119e5f3f482b53",
-      "currentBytes": 7860,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 41
-    },
-    {
-      "file": "test/cli/dispatch-operability.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "8e3005519bf44913b3a6e8d765163ec1517c07baa7e95d1e9b1eff57c10b8864"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "8e3005519bf44913b3a6e8d765163ec1517c07baa7e95d1e9b1eff57c10b8864",
-      "currentBytes": 6413,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 21
-    },
-    {
-      "file": "test/cli/dispatch-reconcile.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "3fe66a1ac671d54de3c20eaa12e2a83d9b0816c19b085fe1e68c9a9d0a679898"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "3fe66a1ac671d54de3c20eaa12e2a83d9b0816c19b085fe1e68c9a9d0a679898",
-      "currentBytes": 7085,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 42
     },
     {
       "file": "test/cli/dispatch-retired-doors.test.mjs",
@@ -5768,38 +5084,6 @@
       "dynamicCount": 13
     },
     {
-      "file": "test/cli/fgos-gate-approve.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "77a8b51f555408ab84a8703c8f794652b1924264a4b4a2971c759c75e28971a6"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "77a8b51f555408ab84a8703c8f794652b1924264a4b4a2971c759c75e28971a6",
-      "currentBytes": 7262,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 14
-    },
-    {
-      "file": "test/cli/fgos-help.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "e84d4883b5f957c6666000f04872f5c1d131f526e5822718115696dddc1ec83a"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "e84d4883b5f957c6666000f04872f5c1d131f526e5822718115696dddc1ec83a",
-      "currentBytes": 3878,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 12
-    },
-    {
       "file": "test/cli/fgos-intake-5.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -5846,38 +5130,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 23
-    },
-    {
-      "file": "test/cli/fgos-manifest.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "310ccd7ccaee430321bca5901763d020eb8fb1dbdd19da5b5434fd7a4bb8e699"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "310ccd7ccaee430321bca5901763d020eb8fb1dbdd19da5b5434fd7a4bb8e699",
-      "currentBytes": 13549,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 26
-    },
-    {
-      "file": "test/cli/fgos-merge-next-idle-turn.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "8f382cab8443f3bcee470c4911f1f8425577b9f28ce13f54436b2245004ada64"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "8f382cab8443f3bcee470c4911f1f8425577b9f28ce13f54436b2245004ada64",
-      "currentBytes": 2307,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 3
     },
     {
       "file": "test/cli/fgos-post-merge-3.test.mjs",
@@ -5960,70 +5212,6 @@
       "dynamicCount": 12
     },
     {
-      "file": "test/cli/fgos-stale-orphaned-runs.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "2bbf8120760ea3dd8804282728866bffb346571a4594cfdbf2ec3e5652db024f"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "2bbf8120760ea3dd8804282728866bffb346571a4594cfdbf2ec3e5652db024f",
-      "currentBytes": 4863,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 14
-    },
-    {
-      "file": "test/cli/fgos-tool.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "fc5164577a519c1a196ba15748cf826b2737f4f5a2c3d0ed844fc81fd68e96fb"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "fc5164577a519c1a196ba15748cf826b2737f4f5a2c3d0ed844fc81fd68e96fb",
-      "currentBytes": 11387,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 15
-    },
-    {
-      "file": "test/cli/fgos-verb-help-json.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "66f8de334d36c2a9d28d78cc184c70d442a35aa0465a29c3c35568fde047849c"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "66f8de334d36c2a9d28d78cc184c70d442a35aa0465a29c3c35568fde047849c",
-      "currentBytes": 11273,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 40
-    },
-    {
-      "file": "test/cli/fgos-workflow.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "9e3c523f7b24980fd41063652e98ac45b07baa31e7444702d0abfa827f2d0f31"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "1eab69a0166dcace7567d87da4ed021653e81e8bc71869e8008921bfca667dbb",
-      "currentBytes": 7420,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 12
-    },
-    {
       "file": "test/cli/invocation-fault-log.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -6038,22 +5226,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 18
-    },
-    {
-      "file": "test/cli/knowledge-deprecation.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "c186fbefd9ed1d341087ddd8835b4fa2ae6ba94073c562b19d3bbf617db4ce42"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "c186fbefd9ed1d341087ddd8835b4fa2ae6ba94073c562b19d3bbf617db4ce42",
-      "currentBytes": 1997,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 6
     },
     {
       "file": "test/cli/knowledge-verbs.test.mjs",
@@ -6120,102 +5292,6 @@
       "dynamicCount": 36
     },
     {
-      "file": "test/cli/unknown-flag-rejection.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0d6c6d58c96d0d00ef26ae38e7ed2bc299ac8990796a4169886358897f7a2e5c"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "0d6c6d58c96d0d00ef26ae38e7ed2bc299ac8990796a4169886358897f7a2e5c",
-      "currentBytes": 5011,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 20
-    },
-    {
-      "file": "test/cli/version-no-git-noise.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "5044f57c9a5d8d7b61984bed78bd8bb26e0ea6d94d21f551ff8d50ed09e40666"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "5044f57c9a5d8d7b61984bed78bd8bb26e0ea6d94d21f551ff8d50ed09e40666",
-      "currentBytes": 1651,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 6
-    },
-    {
-      "file": "test/config/global-config.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "311a21f055c47997055bae07186ea746026470e1638f7a83c604e01dcc7829b3"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "311a21f055c47997055bae07186ea746026470e1638f7a83c604e01dcc7829b3",
-      "currentBytes": 6289,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 41
-    },
-    {
-      "file": "test/config/shared-config-file.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "4254adcce724a2e29467f8ac29e3fb6041f874cbcddba4de58dfdef5acbd9c3e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "4254adcce724a2e29467f8ac29e3fb6041f874cbcddba4de58dfdef5acbd9c3e",
-      "currentBytes": 4515,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 20
-    },
-    {
-      "file": "test/convention/convention-client.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "61136e4a1076ea755411ca714fe5d363610389258f462758e55110b27b33b429"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "61136e4a1076ea755411ca714fe5d363610389258f462758e55110b27b33b429",
-      "currentBytes": 2619,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 15
-    },
-    {
-      "file": "test/direct/fgos-read.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "6f98a67380027202c81297bfeff2e33336317460f6cee1309456f9d7bd3574a8"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "6f98a67380027202c81297bfeff2e33336317460f6cee1309456f9d7bd3574a8",
-      "currentBytes": 20466,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 73
-    },
-    {
       "file": "test/direct/merge-gate.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -6248,38 +5324,6 @@
       "dynamicCount": 75
     },
     {
-      "file": "test/docs/agents-doctrine-anchors.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "abe48c3fd824165d08835d72c8a01b1b8a9d774df3578b795134a52b3e6a8f74"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "abe48c3fd824165d08835d72c8a01b1b8a9d774df3578b795134a52b3e6a8f74",
-      "currentBytes": 912,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 5
-    },
-    {
-      "file": "test/docs/rul104-anchor-phrase.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "5d107182c353431849e8f2c0d31710b666401b2e0a4d37f66afefcac99bc114d"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "5d107182c353431849e8f2c0d31710b666401b2e0a4d37f66afefcac99bc114d",
-      "currentBytes": 1781,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 6
-    },
-    {
       "file": "test/docs/run-doors-doctrine.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -6310,22 +5354,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 18
-    },
-    {
-      "file": "test/e2e/main-checkout-activity-beacon.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "20d04f04886427d2c1beb592a6fd2b1e8bcd5391399eb037c7e17b93fdf96f00"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "20d04f04886427d2c1beb592a6fd2b1e8bcd5391399eb037c7e17b93fdf96f00",
-      "currentBytes": 5533,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 17
     },
     {
       "file": "test/e2e/main-checkout-borrow-hook.test.mjs",
@@ -6440,22 +5468,6 @@
       "dynamicCount": 25
     },
     {
-      "file": "test/event-store/canonical-vectors.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "ce8b1214103b733866ef44ca55c0279fa42e55cdaafb9065d66f1e3f41931ae2"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "ce8b1214103b733866ef44ca55c0279fa42e55cdaafb9065d66f1e3f41931ae2",
-      "currentBytes": 1762,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 5
-    },
-    {
       "file": "test/event-store/consumers.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -6488,38 +5500,6 @@
       "dynamicCount": 26
     },
     {
-      "file": "test/event-store/facade.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "7287531a1447f7c1a8146681898128285e95b67bc6d6c8538b579e3b2a6afb61"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "2b63a0f328f28071b3ade3df0999e80daf5c917b29ba309a57df7d78295e64b8",
-      "currentBytes": 10633,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 23
-    },
-    {
-      "file": "test/event-store/gate-probe.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "8a2ca2512822f86b9d414787d8e1c5d2ceba41494aa6940e4c7ee3fa9a28fd15"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "8a2ca2512822f86b9d414787d8e1c5d2ceba41494aa6940e4c7ee3fa9a28fd15",
-      "currentBytes": 2543,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 13
-    },
-    {
       "file": "test/event-store/no-spawn-in-gate.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -6534,22 +5514,6 @@
       "driftFromCensus": true,
       "referenceIds": [],
       "dynamicCount": 4
-    },
-    {
-      "file": "test/event-store/phase07-fixture.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "1eba62de6fadc1e9633dba440323af6fdf1acf5901d9e5be6ce6e845cc7ecc67"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "a1480242c70665aac851941248d4a1f88b9888c4dd4c9af1dd3146e7c23a568c",
-      "currentBytes": 2693,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 16
     },
     {
       "file": "test/event-store/v-spawn-bench.test.mjs",
@@ -6584,22 +5548,6 @@
       "dynamicCount": 30
     },
     {
-      "file": "test/evolve/iron-law.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "b9b2c725e8a36e22819efff43c713ceff3c850bcb4dc897b58009e30a98a0a17"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "b9b2c725e8a36e22819efff43c713ceff3c850bcb4dc897b58009e30a98a0a17",
-      "currentBytes": 11267,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 10
-    },
-    {
       "file": "test/fixtures/usage/codex-cli-nested-tokens-used.stderr.log",
       "origins": [
         "step-02l-census-class5.json"
@@ -6616,38 +5564,6 @@
       "dynamicCount": 5
     },
     {
-      "file": "test/git/inspect.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "521ab19f8ec90506fdd733437e5e011fcdaa625d163db5622050c49e0cfa3d69"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "325705fe0781805cb64c7ea74bc8cac43b9e73966c6a6e6b9ea6f6568803c876",
-      "currentBytes": 4701,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 18
-    },
-    {
-      "file": "test/git/lock-handover.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "b7960210bad4668538fc6865edf8b4c52f8ea9abe6db00376ed19df666d2cfb6"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "7b180c27cce8aa78b535f227bbabb53c8d05638ff32724a301f6418fa0cc607e",
-      "currentBytes": 6275,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 9
-    },
-    {
       "file": "test/git/native-load.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -6662,54 +5578,6 @@
       "driftFromCensus": true,
       "referenceIds": [],
       "dynamicCount": 91
-    },
-    {
-      "file": "test/git/refs.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "395cd3060afd8df3bf80f4b611d033db0820e5900dc2e3b625d04cd9809bf4d1"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "8411fe47852f8d02697eb083129ff05ad78a80924706ee9913e08b693575d655",
-      "currentBytes": 3686,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 25
-    },
-    {
-      "file": "test/git/remote.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "9970a0f2c50f69a3bb1765158c2e83cefec3e6d4c6de336beafb33e74963e8e6"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "e0a2a446490d4d19bc7a628757bfd1382a80d687bf719256ded3ad6310963c79",
-      "currentBytes": 3420,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 12
-    },
-    {
-      "file": "test/git/worktree-fixture.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "373a26c3aeb018d5f96ae5af521c56d3eb8cee371251663529df3cf240c15b4a"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "6d5b053618b4a370c8127a8721e3da99c8c7e9b2da84835411b30103ded7b756",
-      "currentBytes": 1733,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 13
     },
     {
       "file": "test/git/worktree-recovery.test.mjs",
@@ -6808,22 +5676,6 @@
       "dynamicCount": 4
     },
     {
-      "file": "test/helpers/git-addon.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "f5c6629e2e450d37bbdb116f589f798b6f8337dd78ba3708e56f7688b0e817b2"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "c72c75a36eafb44430ab4384f0ecbd3f02655b667a5bbeeda3c96ff3c1f6450e",
-      "currentBytes": 222,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 9
-    },
-    {
       "file": "test/helpers/herdr-pane-model.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -6838,54 +5690,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 2
-    },
-    {
-      "file": "test/helpers/hold-lock-in-child.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "85baa9954e1b9c788ace2fd0cb8053487a38c2c9cfd6a573ae3ad4fdddf0171e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "85baa9954e1b9c788ace2fd0cb8053487a38c2c9cfd6a573ae3ad4fdddf0171e",
-      "currentBytes": 1904,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 6
-    },
-    {
-      "file": "test/helpers/hold-state-lock-in-child.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "de651003490365ba51db1a94dc28a29839074bc26d58d8ce7285fcc0ad31a473"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "de651003490365ba51db1a94dc28a29839074bc26d58d8ce7285fcc0ad31a473",
-      "currentBytes": 2257,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 9
-    },
-    {
-      "file": "test/helpers/js-source-lexer.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "3effa44590fde482bbc593d49fa46fac7f5519198232fe56c704f09508a071a4"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "3effa44590fde482bbc593d49fa46fac7f5519198232fe56c704f09508a071a4",
-      "currentBytes": 5916,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 3
     },
     {
       "file": "test/helpers/js-source-lexer.test.mjs",
@@ -6934,54 +5738,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 11
-    },
-    {
-      "file": "test/helpers/process-tmp-root.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "27aa9bfc252707b915baa9f8c72b573ebb765123a9c5dab5016bd367c7e8134f"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
-      "currentBytes": 2600,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 6
-    },
-    {
-      "file": "test/helpers/provider-families.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "d166c891a905deb6436e7333ef35f10fa089429e9fb680742897ec141eb09078"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "d166c891a905deb6436e7333ef35f10fa089429e9fb680742897ec141eb09078",
-      "currentBytes": 981,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 3
-    },
-    {
-      "file": "test/helpers/terminal-host-harness.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "9403b9bb245df1e50342a5d498dbcc968acc281c31965e0748c3e9ef285ee152"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "9403b9bb245df1e50342a5d498dbcc968acc281c31965e0748c3e9ef285ee152",
-      "currentBytes": 2028,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 7
     },
     {
       "file": "test/helpers/trivial-workflow.mjs",
@@ -7176,22 +5932,6 @@
       "dynamicCount": 9
     },
     {
-      "file": "test/holder-lock/lock-scope-order.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "ef9f3eb12ff5f9ca7bb91bd2e1d9fc2a1ad27877d77a9aaea44db247b5d79328"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "ef9f3eb12ff5f9ca7bb91bd2e1d9fc2a1ad27877d77a9aaea44db247b5d79328",
-      "currentBytes": 5454,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 19
-    },
-    {
       "file": "test/holder-lock/main-checkout-borrow-contract.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -7206,22 +5946,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 6
-    },
-    {
-      "file": "test/holder-lock/pre-exec-fixture.rs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "d376e0e9a6ec216a2859355ee0f6fa37b6f69a741afa198ab54161d90834bdf1"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "d376e0e9a6ec216a2859355ee0f6fa37b6f69a741afa198ab54161d90834bdf1",
-      "currentBytes": 2661,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
     },
     {
       "file": "test/holder-lock/registry-contract.test.mjs",
@@ -7270,70 +5994,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 21
-    },
-    {
-      "file": "test/holder-lock/windows-borrow.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "f50664b81c78019b0160b1f98e95cbc09203e06df423e06969a32f40c3f67161"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "f50664b81c78019b0160b1f98e95cbc09203e06df423e06969a32f40c3f67161",
-      "currentBytes": 7899,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 27
-    },
-    {
-      "file": "test/holder-lock/windows-doctor.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "3c36650fce7c167dc5e35b3cd5f826fcf117737a0c4a6505e8f44f4267daab1e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "3c36650fce7c167dc5e35b3cd5f826fcf117737a0c4a6505e8f44f4267daab1e",
-      "currentBytes": 2708,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 13
-    },
-    {
-      "file": "test/holder-lock/windows-facade.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "5727a592a399cc7d60adf17772c81f34c016c4683d5545c94e95e7ccd244204c"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "5727a592a399cc7d60adf17772c81f34c016c4683d5545c94e95e7ccd244204c",
-      "currentBytes": 10170,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 40
-    },
-    {
-      "file": "test/holder-lock/windows-hot-lock.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "b26aa797c83f00cd5ce9d5c2ecc20bcda32905b8799b56bf83b2784174efa603"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "b26aa797c83f00cd5ce9d5c2ecc20bcda32905b8799b56bf83b2784174efa603",
-      "currentBytes": 6214,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 27
     },
     {
       "file": "test/install-packaging.test.mjs",
@@ -7400,22 +6060,6 @@
       "dynamicCount": 90
     },
     {
-      "file": "test/intake/classify.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "85331bea6ed15733480a5eb079b2715462222c5f8e0acf321ee436f626647a89"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "85331bea6ed15733480a5eb079b2715462222c5f8e0acf321ee436f626647a89",
-      "currentBytes": 7913,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 3
-    },
-    {
       "file": "test/observe/observe-contracts-fixtures.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -7430,54 +6074,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 20
-    },
-    {
-      "file": "test/parity/edit-parity.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0c08dc7848f00d5432729ea08b59ebdb5c187842d25c34853840c0ba534d336c"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "0c08dc7848f00d5432729ea08b59ebdb5c187842d25c34853840c0ba534d336c",
-      "currentBytes": 2226,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 10
-    },
-    {
-      "file": "test/parity/read-parity.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "aa361f1d8844578acb0c5249c473476b0a8ee6ba2a0cdf9c7bca85e3efbab701"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "aa361f1d8844578acb0c5249c473476b0a8ee6ba2a0cdf9c7bca85e3efbab701",
-      "currentBytes": 5848,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 42
-    },
-    {
-      "file": "test/parity/step-parity.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "45cffe13b722c9b4918a2e4cd1f3ee452e64339edf260be6caaef8b5d275ab6d"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "45cffe13b722c9b4918a2e4cd1f3ee452e64339edf260be6caaef8b5d275ab6d",
-      "currentBytes": 8774,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 36
     },
     {
       "file": "test/plugins/terminal-skill-attach.test.mjs",
@@ -7688,38 +6284,6 @@
       "dynamicCount": 5
     },
     {
-      "file": "test/run-supervisor/fixtures/terminal-controller.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "8dd3dfcbe992ae012ccb6d7e36b3122b01446196d94e235942edefec33925fe6"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "8dd3dfcbe992ae012ccb6d7e36b3122b01446196d94e235942edefec33925fe6",
-      "currentBytes": 1558,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 3
-    },
-    {
-      "file": "test/run-supervisor/helpers/envelope-fixture.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "c82a6aec34cf1a73a8a79a0de73ad3e0e2cd3729ea5b153e8b1822efb7ca0cb2"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "c82a6aec34cf1a73a8a79a0de73ad3e0e2cd3729ea5b153e8b1822efb7ca0cb2",
-      "currentBytes": 1434,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
-    },
-    {
       "file": "test/run-supervisor/helpers/kill-on-file.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -7912,22 +6476,6 @@
       "dynamicCount": 57
     },
     {
-      "file": "test/run-supervisor/windows-custody.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "e51624d5411a50164bb66e1e3efd4c6f9cd5710cc41d75565da3f529364ac7b0"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "e51624d5411a50164bb66e1e3efd4c6f9cd5710cc41d75565da3f529364ac7b0",
-      "currentBytes": 3113,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 12
-    },
-    {
       "file": "test/runner/agent-definitions.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -7942,38 +6490,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 40
-    },
-    {
-      "file": "test/runner/agent-listing.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "67fc1bb1ac5b97e3ca5abca11f493f6f636fa1ec3ec2e39a2d6261a3261333c4"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "67fc1bb1ac5b97e3ca5abca11f493f6f636fa1ec3ec2e39a2d6261a3261333c4",
-      "currentBytes": 4813,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 12
-    },
-    {
-      "file": "test/runner/agent-roster.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "01746d66e9fbd79ac6b784aace1df11dd4eb120ee230888f3c0e5b34ae11d34c"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "01746d66e9fbd79ac6b784aace1df11dd4eb120ee230888f3c0e5b34ae11d34c",
-      "currentBytes": 2217,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 7
     },
     {
       "file": "test/runner/assignment-cwd-mutex-concurrency.test.mjs",
@@ -8056,22 +6572,6 @@
       "dynamicCount": 300
     },
     {
-      "file": "test/runner/attestation-guard.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "32780ca01f3421db4b8c7cea88273e6d3400d1c4419ca693b58f62610a558258"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "32780ca01f3421db4b8c7cea88273e6d3400d1c4419ca693b58f62610a558258",
-      "currentBytes": 6184,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 18
-    },
-    {
       "file": "test/runner/claim-capacity-race.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -8136,38 +6636,6 @@
       "dynamicCount": 40
     },
     {
-      "file": "test/runner/confinement-registry-fixture.helper.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "70a58960e30b4c4694ab5ed2576d55f03c46052ceea71c3c654271869c881067"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "70a58960e30b4c4694ab5ed2576d55f03c46052ceea71c3c654271869c881067",
-      "currentBytes": 1516,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 6
-    },
-    {
-      "file": "test/runner/credential-store.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "c8fcc8f36f674b88cd926076490e1099e5a57346381e92ebd5efd4f9eb4c9ec5"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "c8fcc8f36f674b88cd926076490e1099e5a57346381e92ebd5efd4f9eb4c9ec5",
-      "currentBytes": 7209,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 9
-    },
-    {
       "file": "test/runner/custody-lease-commit.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -8200,22 +6668,6 @@
       "dynamicCount": 31
     },
     {
-      "file": "test/runner/dispatch-assignment-id-claim-concurrency.helper.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "712f01f63ffbcb262c5d85eec71a3c4dd51f5b9e22d8e13f118c3df3daf36001"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "712f01f63ffbcb262c5d85eec71a3c4dd51f5b9e22d8e13f118c3df3daf36001",
-      "currentBytes": 2213,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 3
-    },
-    {
       "file": "test/runner/dispatch-assignment-id-claim-concurrency.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -8230,38 +6682,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 19
-    },
-    {
-      "file": "test/runner/dispatch-brief.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0e162a312e0d11c8232aee6e2c43396d43a30b1d3137172ef1b0c0995b825b88"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "0e162a312e0d11c8232aee6e2c43396d43a30b1d3137172ef1b0c0995b825b88",
-      "currentBytes": 8854,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 29
-    },
-    {
-      "file": "test/runner/dispatch-config-patterns.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "8d4c9e4715da2e401a85132ceca861a95c58fcc6cc501a1cd270d7e4997274d5"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "8d4c9e4715da2e401a85132ceca861a95c58fcc6cc501a1cd270d7e4997274d5",
-      "currentBytes": 7657,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 7
     },
     {
       "file": "test/runner/dispatch-confinement-authority.test.mjs",
@@ -8344,22 +6764,6 @@
       "dynamicCount": 26
     },
     {
-      "file": "test/runner/dispatch-confinement-reaper-fence.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "f5dd6dbfc94b47a9683d5329171d05997ef92bcb314b5e22f88b98d72ff7850f"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "f5dd6dbfc94b47a9683d5329171d05997ef92bcb314b5e22f88b98d72ff7850f",
-      "currentBytes": 6555,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 32
-    },
-    {
       "file": "test/runner/dispatch-execute-effort.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -8424,38 +6828,6 @@
       "dynamicCount": 16
     },
     {
-      "file": "test/runner/dispatch-operability-production-door.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "07dd418f4005959a875e83a77c5a15d88d4acff4eff58fba44b9d4a1193ea127"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "07dd418f4005959a875e83a77c5a15d88d4acff4eff58fba44b9d4a1193ea127",
-      "currentBytes": 15252,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 63
-    },
-    {
-      "file": "test/runner/dispatch-policy-baseline-snapshot.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "175f9773178ceb30e6f51d3ec6596f766e98f60fccd6950d47dbab4db1b2c751"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "d992a61e6f5160f88fb5934e32251a5af5e0e395e0af00d2ba2167d0f555ddff",
-      "currentBytes": 35455,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 14
-    },
-    {
       "file": "test/runner/dispatch-production-call-sites.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -8470,22 +6842,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 44
-    },
-    {
-      "file": "test/runner/dispatch-r9-performance-cache.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "c000096bda3db4a1343f0b9bf4b5ee4d3164eddccac67e245d5c70ae92049fcd"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "c000096bda3db4a1343f0b9bf4b5ee4d3164eddccac67e245d5c70ae92049fcd",
-      "currentBytes": 4026,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 17
     },
     {
       "file": "test/runner/dispatch-reconcile-operation.test.mjs",
@@ -8552,22 +6908,6 @@
       "dynamicCount": 51
     },
     {
-      "file": "test/runner/dispatch-recovery.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "01c831d9c225f6180420dfa8739db5847563975935341156f79149bfa9dd3d7b"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "01c831d9c225f6180420dfa8739db5847563975935341156f79149bfa9dd3d7b",
-      "currentBytes": 6643,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
-    },
-    {
       "file": "test/runner/dispatch-run-timeout.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -8616,54 +6956,6 @@
       "dynamicCount": 69
     },
     {
-      "file": "test/runner/dispatch-trust-store.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "33f182bc888493a664a4e9882335a4ddad622938f32e7c312c0a9e9148662a0e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "33f182bc888493a664a4e9882335a4ddad622938f32e7c312c0a9e9148662a0e",
-      "currentBytes": 16634,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 88
-    },
-    {
-      "file": "test/runner/dispatch-visibility-session.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "b3b0f78695bfa6f82b318ce118e4f1531cf99afc0e9fd1e1c1ff62350083929b"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "b3b0f78695bfa6f82b318ce118e4f1531cf99afc0e9fd1e1c1ff62350083929b",
-      "currentBytes": 13839,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 50
-    },
-    {
-      "file": "test/runner/driver-unit-fixture.helper.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "916f739bd01380d15f138fc42732ae7f42779bf455f11ee6b363e00a12e51363"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "916f739bd01380d15f138fc42732ae7f42779bf455f11ee6b363e00a12e51363",
-      "currentBytes": 2532,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
-    },
-    {
       "file": "test/runner/effective-execution-contract.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -8694,22 +6986,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 34
-    },
-    {
-      "file": "test/runner/execution-contract.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "793da8985c4d5153b4f213af6c5effac359222402ff9f0efcb90a44c55e28870"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "793da8985c4d5153b4f213af6c5effac359222402ff9f0efcb90a44c55e28870",
-      "currentBytes": 13886,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 8
     },
     {
       "file": "test/runner/execution/account-pin.test.mjs",
@@ -8760,22 +7036,6 @@
       "dynamicCount": 24
     },
     {
-      "file": "test/runner/execution/bind.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "9248e5f92bb370bf043c4d7fe527a1201f43cc0f7ca759c84a8ead896726fa96"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "ad1de370f8b4a4ea089978e1bb7c910aec4f83e71eee208fe2ad3667c5f49edb",
-      "currentBytes": 45126,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 5
-    },
-    {
       "file": "test/runner/execution/commit-unit-work.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -8790,22 +7050,6 @@
       "driftFromCensus": true,
       "referenceIds": [],
       "dynamicCount": 107
-    },
-    {
-      "file": "test/runner/execution/explain.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0c5e2afedcbe6db35ab5149143f2d97538e54a5f316b7f62f3eb55de2065deb1"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "1b97a46a1c6ffde822e96b00f150b58aad461258178b843d7df3a961048d798c",
-      "currentBytes": 6896,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 4
     },
     {
       "file": "test/runner/execution/handoff-refs.test.mjs",
@@ -8856,38 +7100,6 @@
       "dynamicCount": 6
     },
     {
-      "file": "test/runner/execution/patterns/panel.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "fd9ad0f2d9383761019cda81953744e2a60180908b8f0ad638e91ffdafdc692e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "fd9ad0f2d9383761019cda81953744e2a60180908b8f0ad638e91ffdafdc692e",
-      "currentBytes": 7151,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 7
-    },
-    {
-      "file": "test/runner/execution/patterns/presets.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0faca28cd0531de076ddad07bba7fff7f7185c93ffe1d2cb8091ca86096c20b2"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "0faca28cd0531de076ddad07bba7fff7f7185c93ffe1d2cb8091ca86096c20b2",
-      "currentBytes": 5376,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 3
-    },
-    {
       "file": "test/runner/execution/patterns/reviewed.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -8902,22 +7114,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 10
-    },
-    {
-      "file": "test/runner/execution/patterns/role-tasks.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "943b28a14ef430f2a31640763d3c44dec4c1d6db8e741316a99d445bf5007f2c"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "943b28a14ef430f2a31640763d3c44dec4c1d6db8e741316a99d445bf5007f2c",
-      "currentBytes": 4869,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
     },
     {
       "file": "test/runner/execution/run-herdr.test.mjs",
@@ -9000,22 +7196,6 @@
       "dynamicCount": 310
     },
     {
-      "file": "test/runner/execution/unit-summary.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "71e2f98e209ee08ed6f74e35a5127dfea23be6142836666df0b0cfcf872c5339"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "cb0e116d4455b2f828641a2287ff64f5cf44af1917a214225f8e852ff1c2a939",
-      "currentBytes": 23262,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 68
-    },
-    {
       "file": "test/runner/execution/unit.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -9094,22 +7274,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 12
-    },
-    {
-      "file": "test/runner/herdr-agent.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0669588de5cfba731b99a18a585a2b67c81078a31f11e7bda33f8066697fb6b2"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "0669588de5cfba731b99a18a585a2b67c81078a31f11e7bda33f8066697fb6b2",
-      "currentBytes": 4095,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 8
     },
     {
       "file": "test/runner/herdr-private-home-trust.test.mjs",
@@ -9240,38 +7404,6 @@
       "dynamicCount": 10
     },
     {
-      "file": "test/runner/main-checkout-activity.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "75b0ac2bacc25600aa1768f178a25be9f71ab72637622eee5529ce9a61dc89ac"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "75b0ac2bacc25600aa1768f178a25be9f71ab72637622eee5529ce9a61dc89ac",
-      "currentBytes": 3274,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 7
-    },
-    {
-      "file": "test/runner/main-checkout-reset-guard.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "5e87d3d804a290e275aad40ecd06daf60127ae379a710c1e8bd33f73cc10f605"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "5e87d3d804a290e275aad40ecd06daf60127ae379a710c1e8bd33f73cc10f605",
-      "currentBytes": 2077,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 6
-    },
-    {
       "file": "test/runner/merge-target-slot-multiprocess.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -9320,54 +7452,6 @@
       "dynamicCount": 20
     },
     {
-      "file": "test/runner/promote-engine.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "3140e5d7cad8cfbb41051507de95baadcdde14b62a8d1f37e6969b8f12d878c3"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "3140e5d7cad8cfbb41051507de95baadcdde14b62a8d1f37e6969b8f12d878c3",
-      "currentBytes": 7575,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 23
-    },
-    {
-      "file": "test/runner/promote-preflight.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "725c1357057f87c0c4acb22caba5f7372e672a7032d5f2675d43be94163299bc"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "725c1357057f87c0c4acb22caba5f7372e672a7032d5f2675d43be94163299bc",
-      "currentBytes": 6218,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 17
-    },
-    {
-      "file": "test/runner/provider-account-probe.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "1927a13e3462f4715d94191456d7dfdcefc707bd2985ae69f155b92ab4d0460d"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "1927a13e3462f4715d94191456d7dfdcefc707bd2985ae69f155b92ab4d0460d",
-      "currentBytes": 11960,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 21
-    },
-    {
       "file": "test/runner/provider-adapter.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -9382,22 +7466,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 16
-    },
-    {
-      "file": "test/runner/provider-auth-failure.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "80145ffdd9df65e861e614abae774974b348a311f15ac8178cc6ebce255b7910"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "80145ffdd9df65e861e614abae774974b348a311f15ac8178cc6ebce255b7910",
-      "currentBytes": 6773,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 15
     },
     {
       "file": "test/runner/provider-capacity.test.mjs",
@@ -9480,86 +7548,6 @@
       "dynamicCount": 6
     },
     {
-      "file": "test/runner/recovery.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "9b04ba82c132e11d124fbe67c66120a15110b2909918c53c344309087a9ba1f3"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "9b04ba82c132e11d124fbe67c66120a15110b2909918c53c344309087a9ba1f3",
-      "currentBytes": 5547,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 6
-    },
-    {
-      "file": "test/runner/repo-locks-multiprocess.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "23f637bfa7e2de0070250331c78329d169a89e163a5d6c99be99b370c431e3ab"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "23f637bfa7e2de0070250331c78329d169a89e163a5d6c99be99b370c431e3ab",
-      "currentBytes": 6700,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 12
-    },
-    {
-      "file": "test/runner/run-lock-identity.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "9b71717c8164de844de859bd39d253139e4ca2a746ac700fe44969012aa75f67"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "9b71717c8164de844de859bd39d253139e4ca2a746ac700fe44969012aa75f67",
-      "currentBytes": 5676,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 4
-    },
-    {
-      "file": "test/runner/run-outcome.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "e77c9911e68ab9452492b69c84a18e74121246952e22c77976160fa2c22af3f6"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "e77c9911e68ab9452492b69c84a18e74121246952e22c77976160fa2c22af3f6",
-      "currentBytes": 5217,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 8
-    },
-    {
-      "file": "test/runner/run-result-confinement-label.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "bfb9f679d2cf8360d54865847bd3120b2fbf5661ab123d574280988b1a9b540d"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "bfb9f679d2cf8360d54865847bd3120b2fbf5661ab123d574280988b1a9b540d",
-      "currentBytes": 3427,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 7
-    },
-    {
       "file": "test/runner/run-result-source-scan.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -9574,22 +7562,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 15
-    },
-    {
-      "file": "test/runner/run-result-v2.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0a5f51eb9f17cbe707ddfdd5d6b54b9862b5f1a2c98534efbf3e6e58caff2b51"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "0a5f51eb9f17cbe707ddfdd5d6b54b9862b5f1a2c98534efbf3e6e58caff2b51",
-      "currentBytes": 14580,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 13
     },
     {
       "file": "test/runner/session.test.mjs",
@@ -9608,38 +7580,6 @@
       "dynamicCount": 92
     },
     {
-      "file": "test/runner/tier-cell.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "79477b9e910c84c62896bba0fcce25f74bbede62b4a0dfbf8790e0e3859bfa71"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "6f9ae6c489990d5e7f64ced1a03392506ba470fcb89acc71f4f0e9e4797a1888",
-      "currentBytes": 8529,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 9
-    },
-    {
-      "file": "test/runner/usage-parsers.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "efb767d8d5b48ecb1330b7c2fb88b951a75a8a1bfe379251ab9b3d03347a429b"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "efb767d8d5b48ecb1330b7c2fb88b951a75a8a1bfe379251ab9b3d03347a429b",
-      "currentBytes": 6092,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 11
-    },
-    {
       "file": "test/runner/worker-log.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -9656,38 +7596,6 @@
       "dynamicCount": 26
     },
     {
-      "file": "test/runner/worktree-admin-multiprocess.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "c7bfca2078153b63241beb25f0514246ff1ce79ad6d4b454a107c5ee62d73ee3"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "c7bfca2078153b63241beb25f0514246ff1ce79ad6d4b454a107c5ee62d73ee3",
-      "currentBytes": 7518,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 26
-    },
-    {
-      "file": "test/runner/write-queue.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "9c466e19d92f91797047f136101ddae36472eea4a14096b636582ded04d11ed4"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "9c466e19d92f91797047f136101ddae36472eea4a14096b636582ded04d11ed4",
-      "currentBytes": 7171,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 9
-    },
-    {
       "file": "test/runner/write-scope.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -9702,22 +7610,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 20
-    },
-    {
-      "file": "test/rust-host/command-routes.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "9e681fc58a67dbd6dd70324d82a9482d12dffbc0203add8c7300e3577bf1ac9c"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "9e681fc58a67dbd6dd70324d82a9482d12dffbc0203add8c7300e3577bf1ac9c",
-      "currentBytes": 13918,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 21
     },
     {
       "file": "test/rust-host/dev-host.test.mjs",
@@ -9750,22 +7642,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 60
-    },
-    {
-      "file": "test/rust-host/fgctl-init-activation.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "d044b9cf3021db28b0bf970c3596d98bff0734192dbc08a4954d1c0941bacfd2"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "d044b9cf3021db28b0bf970c3596d98bff0734192dbc08a4954d1c0941bacfd2",
-      "currentBytes": 12129,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 49
     },
     {
       "file": "test/rust-host/fgctl-init-download-sources.test.mjs",
@@ -9816,22 +7692,6 @@
       "dynamicCount": 34
     },
     {
-      "file": "test/rust-host/fgctl-init-preflight-tail.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "2d91c5c149a5d43dcb196da77200b79215ea5b7453c33eedfb2a89043da99fde"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "2d91c5c149a5d43dcb196da77200b79215ea5b7453c33eedfb2a89043da99fde",
-      "currentBytes": 18663,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 93
-    },
-    {
       "file": "test/rust-host/fgctl-init.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -9846,22 +7706,6 @@
       "driftFromCensus": true,
       "referenceIds": [],
       "dynamicCount": 77
-    },
-    {
-      "file": "test/rust-host/fgctl-lock-holder.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0818fd70258d9e12e146dd631b08b5a53a632ca80bf9c0021a174747269e8699"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "0818fd70258d9e12e146dd631b08b5a53a632ca80bf9c0021a174747269e8699",
-      "currentBytes": 1927,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 3
     },
     {
       "file": "test/rust-host/fgctl-stage.test.mjs",
@@ -9894,22 +7738,6 @@
       "driftFromCensus": true,
       "referenceIds": [],
       "dynamicCount": 226
-    },
-    {
-      "file": "test/rust-host/fixtures/child-process-spy.cjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "9b5cd137af77559990bb74a134ad0a44c950cd0be30ba6c39113761ec2d04cd9"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "9b5cd137af77559990bb74a134ad0a44c950cd0be30ba6c39113761ec2d04cd9",
-      "currentBytes": 3684,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 2
     },
     {
       "file": "test/rust-host/generate-vectors.mjs",
@@ -9976,54 +7804,6 @@
       "dynamicCount": 27
     },
     {
-      "file": "test/rust-host/internal-routes.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "09c27814dcb722070a0372c9a7a3a1acc4895c9c360159a943f4dd73583392b4"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "09c27814dcb722070a0372c9a7a3a1acc4895c9c360159a943f4dd73583392b4",
-      "currentBytes": 8110,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 30
-    },
-    {
-      "file": "test/rust-host/observe-store-lock.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "00d02909baf3a952dc2dc97c3e4a29c1225406ebdeb5f2e30488d3b6bcb7a017"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "00d02909baf3a952dc2dc97c3e4a29c1225406ebdeb5f2e30488d3b6bcb7a017",
-      "currentBytes": 2709,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 13
-    },
-    {
-      "file": "test/rust-host/release-targets.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "a42c645e7a2651436806a846b84c5337906a10c65bb92d691b5548081399921f"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "a42c645e7a2651436806a846b84c5337906a10c65bb92d691b5548081399921f",
-      "currentBytes": 4188,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 10
-    },
-    {
       "file": "test/rust-host/release-tree.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -10054,118 +7834,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 14
-    },
-    {
-      "file": "test/scripts/check-decision-codes.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "94ede69d805f2215911ae7dee88e1a234c9df250d25ff30b66a810df91d028c9"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "94ede69d805f2215911ae7dee88e1a234c9df250d25ff30b66a810df91d028c9",
-      "currentBytes": 12053,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 17
-    },
-    {
-      "file": "test/scripts/check-decision-supersession.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "25dfe723e54b8d8c9e549211e3be6408a337aefc6e1a3bbaf3e3fd59b861d862"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "25dfe723e54b8d8c9e549211e3be6408a337aefc6e1a3bbaf3e3fd59b861d862",
-      "currentBytes": 6514,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 12
-    },
-    {
-      "file": "test/scripts/decision-question-hook.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "39e006e7fc313cc45e37eb9d0e5f08d82e789b0ede1b04334e81062e3cc3ec94"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "39e006e7fc313cc45e37eb9d0e5f08d82e789b0ede1b04334e81062e3cc3ec94",
-      "currentBytes": 3666,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 11
-    },
-    {
-      "file": "test/scripts/dispatch-decide-hook.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "572ed6d111e5614c0358d5d6c1f70ea477ad6161b3ff580fb41bb7d685b3243e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "572ed6d111e5614c0358d5d6c1f70ea477ad6161b3ff580fb41bb7d685b3243e",
-      "currentBytes": 6085,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 14
-    },
-    {
-      "file": "test/scripts/doc-rationale-author.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "467e40ea65e2f591f6facb70f2dd421db4e6a5a1e464383573bbd3884604b753"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "467e40ea65e2f591f6facb70f2dd421db4e6a5a1e464383573bbd3884604b753",
-      "currentBytes": 7623,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 10
-    },
-    {
-      "file": "test/scripts/doc-rationale-facts.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "beb7faec92ad3935d3531237094fc9a52032013ebe2a030aa041ca70e04a4f0e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "beb7faec92ad3935d3531237094fc9a52032013ebe2a030aa041ca70e04a4f0e",
-      "currentBytes": 5265,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 8
-    },
-    {
-      "file": "test/scripts/doc-rationale-reproduction.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "bc1ef9d3a9eb2326567710dd37d30b765964fce0bfce71f6fdcd67c7ac785646"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "bc1ef9d3a9eb2326567710dd37d30b765964fce0bfce71f6fdcd67c7ac785646",
-      "currentBytes": 3248,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 17
     },
     {
       "file": "test/scripts/doc-rationale.test.mjs",
@@ -10232,22 +7900,6 @@
       "dynamicCount": 30
     },
     {
-      "file": "test/scripts/herdr-cockpit-notify.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "54cac7375e4326f5c1ea44701479ad51119538283a84add8b3fd0edc1a91c4dc"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "54cac7375e4326f5c1ea44701479ad51119538283a84add8b3fd0edc1a91c4dc",
-      "currentBytes": 3721,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
-    },
-    {
       "file": "test/scripts/install-git-hooks.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -10294,38 +7946,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 16
-    },
-    {
-      "file": "test/scripts/next-doc-id.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "1b385ef99bd066bf1ccd9ef1a4d59119f9bbc9754790983dde11a239d4b282a4"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "1b385ef99bd066bf1ccd9ef1a4d59119f9bbc9754790983dde11a239d4b282a4",
-      "currentBytes": 1911,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 5
-    },
-    {
-      "file": "test/scripts/prepare-release.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "c14e0c8668b147c0b7771736bb944a18abb853c99143cdd282e4eba811671d1a"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "c14e0c8668b147c0b7771736bb944a18abb853c99143cdd282e4eba811671d1a",
-      "currentBytes": 6478,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 27
     },
     {
       "file": "test/scripts/probe-storytelling-material.test.mjs",
@@ -10408,54 +8028,6 @@
       "dynamicCount": 23
     },
     {
-      "file": "test/scripts/test-ownership-lint.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "359835108b64a23ffa8402d8e2a3b2ed3b52f63f9504f7e934d0078b8c0c93e3"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "359835108b64a23ffa8402d8e2a3b2ed3b52f63f9504f7e934d0078b8c0c93e3",
-      "currentBytes": 2832,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 15
-    },
-    {
-      "file": "test/scripts/test-proof-inventory.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "c6f23934671b06ae88996fc799d71df6b1076ff321e09170acdcb9578c65d0dc"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "24ca8891ee89b39e7951d6cf9477a26c65ac185ecfa61600a2bed56033f8b003",
-      "currentBytes": 14439,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 7
-    },
-    {
-      "file": "test/scripts/test-select-compare.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "3dda7d1ef05ecd4e710649ecbf47f5937cbb91cfb9bcbdd2828d4aa5a5370a5e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "3dda7d1ef05ecd4e710649ecbf47f5937cbb91cfb9bcbdd2828d4aa5a5370a5e",
-      "currentBytes": 14070,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 62
-    },
-    {
       "file": "test/scripts/test-select-coverage-map.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -10472,102 +8044,6 @@
       "dynamicCount": 22
     },
     {
-      "file": "test/scripts/test-select-mutate.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "d8e9266a47b570efc751dea35d1844ee8dc0aa92fc47e1096c163288b80f56a4"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "d8e9266a47b570efc751dea35d1844ee8dc0aa92fc47e1096c163288b80f56a4",
-      "currentBytes": 17271,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 58
-    },
-    {
-      "file": "test/scripts/test-select-promote-report.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "175a68da0043954b72e7909185bd963e4855b2b12ba9e456423db2f9bfe69e63"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "175a68da0043954b72e7909185bd963e4855b2b12ba9e456423db2f9bfe69e63",
-      "currentBytes": 3919,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 7
-    },
-    {
-      "file": "test/scripts/test-select-promote.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0f74220b7b15007fb09d46f176e0ed0a540540e0b0118bdb43918a98a6444376"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "0f74220b7b15007fb09d46f176e0ed0a540540e0b0118bdb43918a98a6444376",
-      "currentBytes": 17745,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 10
-    },
-    {
-      "file": "test/scripts/test-select.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "8bdd8c9a4f4aac59f4b4095c3e2d5452c1497b49587ebda70a22197d1d36e6c3"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "8bdd8c9a4f4aac59f4b4095c3e2d5452c1497b49587ebda70a22197d1d36e6c3",
-      "currentBytes": 35155,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 146
-    },
-    {
-      "file": "test/scripts/test-timing.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "e4a0b6eef50b1876eda65a92cb601c711e3743a2c399a0792300b057812eb19b"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "e4a0b6eef50b1876eda65a92cb601c711e3743a2c399a0792300b057812eb19b",
-      "currentBytes": 16987,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 20
-    },
-    {
-      "file": "test/scripts/write-test-marker.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "5d396fae1bbac57ce96e9f6459aabd0323e7886d6100746c1786a1f90e50d84c"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "5d396fae1bbac57ce96e9f6459aabd0323e7886d6100746c1786a1f90e50d84c",
-      "currentBytes": 6955,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 57
-    },
-    {
       "file": "test/scripts/write-wrapper-script.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -10582,22 +8058,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 28
-    },
-    {
-      "file": "test/session-identity/attempt-writer-id.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "da521602c4103a8c7f3b394aeae737bf23686bdc67000e0ffb356a6fb972b783"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "da521602c4103a8c7f3b394aeae737bf23686bdc67000e0ffb356a6fb972b783",
-      "currentBytes": 2664,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 7
     },
     {
       "file": "test/setup/active-release-drift-check.test.mjs",
@@ -10776,22 +8236,6 @@
       "dynamicCount": 30
     },
     {
-      "file": "test/setup/config-merge.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "60336980ce4e791a5bf84f5866b928167fcf3851297bfc4de4988d65756d0d8b"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "60336980ce4e791a5bf84f5866b928167fcf3851297bfc4de4988d65756d0d8b",
-      "currentBytes": 4137,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 17
-    },
-    {
       "file": "test/setup/confinement-doctor-checks.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -10902,22 +8346,6 @@
       "driftFromCensus": true,
       "referenceIds": [],
       "dynamicCount": 9
-    },
-    {
-      "file": "test/setup/git-checks.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "e365fbd041263c75e4281f1d8d9c126809a2859420e871b0f0fb47663f7bb7eb"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "e365fbd041263c75e4281f1d8d9c126809a2859420e871b0f0fb47663f7bb7eb",
-      "currentBytes": 2527,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 10
     },
     {
       "file": "test/setup/holder-lock-checks.test.mjs",
@@ -11192,22 +8620,6 @@
       "dynamicCount": 19
     },
     {
-      "file": "test/skills/fgos-coding-exploring-root-fix.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "e4d9318a5096c144303becd6547d2d5ab2089f2f8db9ec7c794a075217786925"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "e4d9318a5096c144303becd6547d2d5ab2089f2f8db9ec7c794a075217786925",
-      "currentBytes": 2228,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 8
-    },
-    {
       "file": "test/skills/fgos-coding-knowledge.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -11224,22 +8636,6 @@
       "dynamicCount": 15
     },
     {
-      "file": "test/skills/terminal-pane-ownership.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "f8036be490798429b97b599968268888b94a7c2463b14883d6ae79eb21c96b8f"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "f8036be490798429b97b599968268888b94a7c2463b14883d6ae79eb21c96b8f",
-      "currentBytes": 4922,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 19
-    },
-    {
       "file": "test/state/backward-compat.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -11254,54 +8650,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 20
-    },
-    {
-      "file": "test/state/cursor.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "59b722e955bc417113ee67a2d5541e44ecd46ef6cf5c07ce9aa24fe8b8d6c43d"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "59b722e955bc417113ee67a2d5541e44ecd46ef6cf5c07ce9aa24fe8b8d6c43d",
-      "currentBytes": 4567,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
-    },
-    {
-      "file": "test/state/decision-scope-field.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "8c6a75e7e94c75cb2f7da8c6f7137fa82076af5f11894c335fdabcd6c6ff9520"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "8c6a75e7e94c75cb2f7da8c6f7137fa82076af5f11894c335fdabcd6c6ff9520",
-      "currentBytes": 4276,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 11
-    },
-    {
-      "file": "test/state/dep-graph.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "cc09044d0906ecf54d261a0be8ca748355ad20987c458ffce3e40b0f02cacee6"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "cc09044d0906ecf54d261a0be8ca748355ad20987c458ffce3e40b0f02cacee6",
-      "currentBytes": 14294,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 1
     },
     {
       "file": "test/state/domain-registry-compiled.test.mjs",
@@ -11432,54 +8780,6 @@
       "dynamicCount": 11
     },
     {
-      "file": "test/state/graph-metrics.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "d0b77a19e7d60c5dae51e98f4205a6083bdc32051add0645f51fba1bf746ed7d"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "d0b77a19e7d60c5dae51e98f4205a6083bdc32051add0645f51fba1bf746ed7d",
-      "currentBytes": 36803,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 33
-    },
-    {
-      "file": "test/state/hot-lock-guard.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "8ea10ecd5a955307e79a6626006c0e89c1cff3d7939b625e6226fdcb33effe29"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "8ea10ecd5a955307e79a6626006c0e89c1cff3d7939b625e6226fdcb33effe29",
-      "currentBytes": 2780,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 5
-    },
-    {
-      "file": "test/state/hot-lock-host-judge.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "48500294d86bc2d017cbf876247997f9098aab6b9801b326fa1ba6a7e59e5d04"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "48500294d86bc2d017cbf876247997f9098aab6b9801b326fa1ba6a7e59e5d04",
-      "currentBytes": 4702,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 11
-    },
-    {
       "file": "test/state/hot-lock-multiprocess.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -11494,118 +8794,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 36
-    },
-    {
-      "file": "test/state/hot-lock-tx.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "736cd7bbe773aa454e9944f385486e190d78eb5d710fdf29f7e8d69bc9405974"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "736cd7bbe773aa454e9944f385486e190d78eb5d710fdf29f7e8d69bc9405974",
-      "currentBytes": 5475,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 12
-    },
-    {
-      "file": "test/state/identity-before-lock.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "534bb5ed3b891547840596c5b80ff786e62e62c1f4fc241516e7c60507f61b5d"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "534bb5ed3b891547840596c5b80ff786e62e62c1f4fc241516e7c60507f61b5d",
-      "currentBytes": 8456,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 28
-    },
-    {
-      "file": "test/state/impact.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "3f3d0e2943d4efcbb9f6d8313c69372a6900adeef3cde19eaf106a6efc251b5d"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "3f3d0e2943d4efcbb9f6d8313c69372a6900adeef3cde19eaf106a6efc251b5d",
-      "currentBytes": 14302,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 4
-    },
-    {
-      "file": "test/state/porting.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "3070b613276ad7f4a83695625b9c6cd8f9d460bd8556e8cf3f1481724f12cc62"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "3070b613276ad7f4a83695625b9c6cd8f9d460bd8556e8cf3f1481724f12cc62",
-      "currentBytes": 4380,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 5
-    },
-    {
-      "file": "test/state/postland-drift.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "a683c39effaefcf9f469c97a0d5d2ccea7e52466bdeca0f71e688bb198a0719a"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "a683c39effaefcf9f469c97a0d5d2ccea7e52466bdeca0f71e688bb198a0719a",
-      "currentBytes": 6158,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 11
-    },
-    {
-      "file": "test/state/replay.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "ddeb9936440fc6ea65515c5afdfd2d80b110656df5635b7e6f0232a126b5274b"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "ddeb9936440fc6ea65515c5afdfd2d80b110656df5635b7e6f0232a126b5274b",
-      "currentBytes": 77947,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 122
-    },
-    {
-      "file": "test/state/show-list-move-consistency.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "0f8a036692ad12ac1477652f8dab69b499992a2187d2518a939431b318a2c990"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "0f8a036692ad12ac1477652f8dab69b499992a2187d2518a939431b318a2c990",
-      "currentBytes": 6228,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 12
     },
     {
       "file": "test/state/state-cutover.test.mjs",
@@ -11640,22 +8828,6 @@
       "dynamicCount": 7
     },
     {
-      "file": "test/state/step.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "c51460d1c7e1400201b9b1f932968ca3af3ac627549eaf6d93d98c095860b31b"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "c51460d1c7e1400201b9b1f932968ca3af3ac627549eaf6d93d98c095860b31b",
-      "currentBytes": 10448,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 9
-    },
-    {
       "file": "test/state/tool-registry.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -11688,38 +8860,6 @@
       "dynamicCount": 7
     },
     {
-      "file": "test/state/worker-slots.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "5ef95ed0a84974933ddf0917c8fdb13c89248171823f9c4e946fff0bf3b0b678"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "5ef95ed0a84974933ddf0917c8fdb13c89248171823f9c4e946fff0bf3b0b678",
-      "currentBytes": 18206,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 23
-    },
-    {
-      "file": "test/terminal-control/client-route.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "1ac4b0d8a25711076c1a9195fc962676e22eb0fa75c45769c45033121b525ac0"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "1d72de1295e183d52d88e6fc68172b53966b613a5b44e9dd09870287ca3dc4e7",
-      "currentBytes": 8086,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 17
-    },
-    {
       "file": "test/terminal-control/contracts.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -11736,54 +8876,6 @@
       "dynamicCount": 9
     },
     {
-      "file": "test/terminal-control/group-queue.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "2de2f9ea3cb693563c1c9e1a56cea3e46d2c1b95bc7cdeca945fecbf766d74a4"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "07ced501713a785943c3b4c68bad4b2a17b48a196355e902a6319a19f2e28da7",
-      "currentBytes": 7171,
-      "driftFromCensus": true,
-      "referenceIds": [],
-      "dynamicCount": 19
-    },
-    {
-      "file": "test/test-ownership.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "7aabd8d09fa439faf65946eb96b44a42a3d4e8065cf4acc978e15380ebb47f24"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "7aabd8d09fa439faf65946eb96b44a42a3d4e8065cf4acc978e15380ebb47f24",
-      "currentBytes": 10604,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 34
-    },
-    {
-      "file": "test/util/git-paths.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "54307ec4b9097a14165657f5244848d8d9694fa5f8203c326dbb9da9f29b6ba1"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "54307ec4b9097a14165657f5244848d8d9694fa5f8203c326dbb9da9f29b6ba1",
-      "currentBytes": 4447,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 12
-    },
-    {
       "file": "test/util/host-bin-path.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -11798,22 +8890,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 28
-    },
-    {
-      "file": "test/util/host-bin.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "02cb790a5a296436922fffab07d029d0655594237c2552211d5395a97768797e"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "02cb790a5a296436922fffab07d029d0655594237c2552211d5395a97768797e",
-      "currentBytes": 6455,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 27
     },
     {
       "file": "test/util/session-identity.test.mjs",
@@ -11848,22 +8924,6 @@
       "dynamicCount": 2
     },
     {
-      "file": "test/util/yaml.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "f81ccdd3e8ad909f4ef2eace9fb5109d8227999bdf657f8be51cbe481f659c0a"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "f81ccdd3e8ad909f4ef2eace9fb5109d8227999bdf657f8be51cbe481f659c0a",
-      "currentBytes": 7259,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 13
-    },
-    {
       "file": "test/verbs/dispatch-observe.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -11894,22 +8954,6 @@
       "driftFromCensus": false,
       "referenceIds": [],
       "dynamicCount": 112
-    },
-    {
-      "file": "test/verbs/merge/approve.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "97b2bdc2397b97869a8b96c04939870792dd79e8516b2fd3cab7b966056b47eb"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "97b2bdc2397b97869a8b96c04939870792dd79e8516b2fd3cab7b966056b47eb",
-      "currentBytes": 4541,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 4
     },
     {
       "file": "test/verbs/worktree-create.test.mjs",
@@ -12056,22 +9100,6 @@
       "dynamicCount": 85
     },
     {
-      "file": "test/workflow/units-source.test.mjs",
-      "origins": [
-        "step-02l-census-class5.json"
-      ],
-      "censusDigests": [
-        "487ba08e8e772941fd6bd63178e62fc430805c2b5504334a593f1e9f1498522a"
-      ],
-      "seam": "real-file-tests-goldens",
-      "assignment": "mechanical routing for authoring, not a semantic verdict",
-      "currentSha256": "487ba08e8e772941fd6bd63178e62fc430805c2b5504334a593f1e9f1498522a",
-      "currentBytes": 7289,
-      "driftFromCensus": false,
-      "referenceIds": [],
-      "dynamicCount": 4
-    },
-    {
       "file": "test/workflow/workflow-runner.test.mjs",
       "origins": [
         "step-02l-census-class5.json"
@@ -12104,9 +9132,9 @@
       "dynamicCount": 13
     }
   ],
-  "order": "R18: prompt atomic unit closed. Next author the listed verified real-document consumers, then screen remaining literal-bearing and dynamic-only files for real document reads/writes before authoring the rest. The complete ordered tail is a conservative queue, not an admission or a claim that fixture-only files are real readers.",
-  "remainingReferences": 1170,
-  "remainingDynamicTuples": 24871,
+  "order": "R18 priority remains: real-file readers/writers, emitted-string assertions, fixtures. R20 conservatively retains all files with moved literals, ancestor/templates, open path constructors or traced/unresolved path imports. No admission verdict is inferred from this queue.",
+  "remainingReferences": 1120,
+  "remainingDynamicTuples": 21805,
   "dynamicCarries": [
     {
       "inventory": "step-02-dynamic-unresolved.json",
@@ -12151,18 +9179,16 @@
   "needsWrites": [],
   "nextRealDocumentConsumers": [
     {
-      "file": "test/docs/decisions-corpus-retired.test.mjs",
+      "file": "test/runner/dead-vocabulary-guard.test.mjs",
       "evidence": [
-        "NARRATIVE_TARGETS L44-50 under docs/specs and docs/architecture-map.md",
-        "readFileSync at L68, L78-79, L86; AGENTS.md read at L93"
+        "Pinned source docDirs constructs docs/specs and docs/architect/agent-coordination/contracts, recursively reads Markdown; original survey-dead-vocabulary carry and P7-DOC-GAP-05 remain."
       ],
       "reviewedForSchedulingOnly": true
     },
     {
-      "file": "test/docs/rul11-anchor-phrase.test.mjs",
+      "file": "test/architecture.test.mjs",
       "evidence": [
-        "AGENTS_MD and PLATFORM_FOUNDATIONS_SPEC at L17-18",
-        "readFileSync at L24,31,36,43,48"
+        "Module initializer line 24 parses the real docs/architecture-manifest.json; its old path is in the Phase 6 root-authorities move map."
       ],
       "reviewedForSchedulingOnly": true
     }

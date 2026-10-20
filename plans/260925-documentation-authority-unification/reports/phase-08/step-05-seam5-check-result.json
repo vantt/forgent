@@ -1,8 +1,8 @@
 {
   "kind": "Step5 seam5 closed batches; remaining queue and independent semantic review pending",
-  "files": 33,
-  "literalReferences": 33,
-  "dynamicTuples": 136,
+  "files": 228,
+  "literalReferences": 83,
+  "dynamicTuples": 3202,
   "mechanicalRejects": 116,
   "rules": {
     "s5-coverage": "Closed batch retains all original identities and remaining queue/carries exactly once.",
@@ -33,7 +33,16 @@
     "j-search": "Every park carries complete pinned alias and four-root target-search evidence.",
     "j-patches": "Whole-file forward/inverse diffs and complete co-cut greps match only declared pointer deltas.",
     "j-receipts": "No candidate output or proof is claimed; receipt current/candidate input metadata and pending obligations match.",
-    "j-review": "Every admitted or judgment-rejected item is included in the independent review list."
+    "j-review": "Every admitted or judgment-rejected item is included in the independent review list.",
+    "r20-move-set": "Exact pinned Phase 6 alias plus registry move-set derivation",
+    "r20-context": "No moved literal, ancestor/template, traced constant or unresolved path-constant import in passage or whole-file context",
+    "r20-coverage": "Conserved initial queue and all-only proved closures",
+    "r20-record": "Pinned whole-file and original item identities; prior R19 rejects retained; invariant preserve only",
+    "j3-coverage": "Original identities, complete whole-file lexical coverage and exact consuming reads.",
+    "j3-pins": "Immutable mode/hash/bytes and exact passage/operation spans.",
+    "j3-search": "Pinned four-root exact-law searches and alias/registry lineage; unrelated runner RUL104 cannot replace foundations law.",
+    "j3-receipt": "Pinned current proof and unchanged partial candidate; exact-law/post-retirement parity is still missing.",
+    "j3-review": "Both reader admissions and every judgment reject need independent windows."
   },
   "checks": {
     "s5-coverage": 14,
@@ -45,8 +54,8 @@
     "r19-label-diagnostic": 1,
     "s5-receipts": 1,
     "s5-atomic": 1,
-    "s5-review": 2,
-    "d-own-operand": 21,
+    "s5-review": 3,
+    "d-own-operand": 27,
     "r19-triage-coverage": 1,
     "r19-context": 702,
     "r19-tuples": 731,
@@ -60,9 +69,18 @@
     "j-receipts": 1,
     "j-search": 1,
     "j-review": 1,
-    "a-passage-agreement": 5,
-    "b-real-blocker": 8,
-    "e-retired-successor": 2
+    "a-passage-agreement": 6,
+    "b-real-blocker": 9,
+    "e-retired-successor": 2,
+    "r20-move-set": 1,
+    "r20-coverage": 3,
+    "r20-context": 671,
+    "r20-record": 194,
+    "j3-coverage": 2,
+    "j3-pins": 1,
+    "j3-search": 1,
+    "j3-receipt": 1,
+    "j3-review": 1
   },
   "failureCount": 0,
   "failures": [],
@@ -129,6 +147,61 @@
     },
     "failures": [],
     "failureCount": 0,
+    "headDrift": []
+  },
+  "neutralBatch": {
+    "kind": "R20 cutover-neutral invariant-preserve closures; no semantic admission or window review",
+    "files": 194,
+    "literalReferences": 50,
+    "dynamicTuples": 3060,
+    "triagedFiles": 671,
+    "moveSetSize": 1561,
+    "checks": {
+      "r20-move-set": 1,
+      "r20-coverage": 3,
+      "r20-context": 671,
+      "r20-record": 194
+    },
+    "rules": {
+      "r20-move-set": "Exact pinned Phase 6 alias plus registry move-set derivation",
+      "r20-context": "No moved literal, ancestor/template, traced constant or unresolved path-constant import in passage or whole-file context",
+      "r20-coverage": "Conserved initial queue and all-only proved closures",
+      "r20-record": "Pinned whole-file and original item identities; prior R19 rejects retained; invariant preserve only"
+    },
+    "failureCount": 0,
+    "failures": [],
+    "headDrift": []
+  },
+  "judgmentBatch3": {
+    "kind": "RUL104 real-file reader judgments; independent review and law promotion pending",
+    "files": 1,
+    "literalReferences": 0,
+    "dynamicTuples": 6,
+    "rules": {
+      "j3-coverage": "Original identities, complete whole-file lexical coverage and exact consuming reads.",
+      "j3-pins": "Immutable mode/hash/bytes and exact passage/operation spans.",
+      "j3-search": "Pinned four-root exact-law searches and alias/registry lineage; unrelated runner RUL104 cannot replace foundations law.",
+      "j3-receipt": "Pinned current proof and unchanged partial candidate; exact-law/post-retirement parity is still missing.",
+      "j3-review": "Both reader admissions and every judgment reject need independent windows.",
+      "a-passage-agreement": "All pairs of overlapping operation intervals on the same line/passage agree in admission and effective disposition; independent adjacent expressions have distinct source intervals.",
+      "b-real-blocker": "R12: no boilerplate dependency shared after quoted operands, paths, IDs and line numbers are normalized; copies join their source passage; serialized state rows use their accepted per-file input dependency.",
+      "c-render-owner": "Every generated source-copy reference/tuple derives its disposition from the exact source owner; a park cites an actually parked source owner.",
+      "d-own-operand": "Each admitted dynamic tuple has its exact document-yielding sub-expression pathOperand in its pinned passage; every rejection names a closed R5 nonDocumentUse category.",
+      "e-retired-successor": "Preserved retired decision citations carry a live successorNote with a real heading anchor.",
+      "r11-plans-boundary": "R11: an operation rooted only in plans/** is rejected as plans-report-artifact; trace pinned declarations and imported constants, not adjacent context."
+    },
+    "checks": {
+      "j3-coverage": 2,
+      "j3-pins": 1,
+      "j3-search": 1,
+      "j3-receipt": 1,
+      "j3-review": 1,
+      "a-passage-agreement": 1,
+      "d-own-operand": 6,
+      "b-real-blocker": 1
+    },
+    "failureCount": 0,
+    "failures": [],
     "headDrift": []
   },
   "headDrift": []
