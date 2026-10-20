@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- `fgos doctor` check `git-mutation-one-door` reads the release's `packages/git/contracts/mutation-census.v1.json`, which the release build writes from `scripts/git-one-door-scan.mjs`. The check fails when the census lists any `git` or hook spawn outside the fgos-git driver, or was not built from the payload it ships in. `npm test` also fails when product code (`src`, `bin`, `scripts`) starts `git` or a hook while the suite runs, and names the call site. Today the census is not empty: the open sites are listed in the phase 07 unit 20 report.
+- `fgos doctor` check `git-mutation-one-door` reads the release's `packages/git/contracts/mutation-census.v1.json`, which the release build writes from `scripts/git-one-door-scan.mjs`. The check fails when the census lists any `git` or hook spawn outside the fgos-git driver, or was not built from the payload it ships in. `npm test` also fails when product code (`src`, `bin`, `scripts`) starts `git` or a hook while the suite runs, and names the call site.
+  - Commands from operator configuration or from a Work item's declared verify command count as configured binaries, not sites.
+  - Today the census lists 9 sites (from 70). The phase 07 unit 21 report names each open site.
+
+- `fgos main-checkout-reset` resets through the Git SafeRestore port instead of a raw `git reset --hard`.
+  - With `--confirm` it keeps the old HEAD pinned and snapshots the discarded local changes, and its result carries an `operationId` and a `snapshot`.
+  - It also clears a stopped merge, cherry-pick or revert.
+  - The list of commits it would drop no longer shows `--stat` and stops at 50 lines.
+  - An unknown `--sha` is refused before anything runs.
+
+- The gateway and the herdr dashboard find the main checkout through fgos-git instead of running `git rev-parse`.
 
 - `fgos return` verifies a branch in a checkout made and removed through the Worktree port. A checkout that still holds bytes after verify is kept and named instead of force-removed. `fgos preflight`, `resync-worktree`, `compound --doc-path` and `knowledge attest` read Git through Inspect. `resync-worktree` run where no branch is checked out now asks for `--branch`.
 

@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { SANDBOX_DOOR } from './git-spawn-match.mjs';
+import { SANDBOX_DOOR, sandboxNamedPaths } from './git-spawn-match.mjs';
 import { isMainModule } from './is-main-module.mjs';
 
 function realOrPending(value) {
@@ -41,9 +41,7 @@ export function sandboxGit(root, { env = process.env } = {}) {
     return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
   };
   return function git(args, opts = {}) {
-    const base = path.resolve(opts.cwd ?? process.cwd());
-    const repos = args.flatMap((arg, i) => ((arg === '-C' || arg === '--git-dir') && i + 1 < args.length ? [path.resolve(base, args[i + 1])] : []));
-    const checked = [...(opts.cwd === undefined ? [] : [base]), ...repos, ...args.filter((arg) => typeof arg === 'string' && path.isAbsolute(arg))];
+    const checked = sandboxNamedPaths(args, opts.cwd === undefined ? undefined : path.resolve(opts.cwd));
     if (checked.length === 0) throw new Error(`sandbox-git: name the sandbox repository (-C, --git-dir, cwd or an absolute init path) for git ${args.join(' ')}`);
     const outside = checked.filter((value) => !inside(value));
     if (outside.length) throw new Error(`sandbox-git: ${outside.join(', ')} is outside the sandbox root ${realRoot}`);

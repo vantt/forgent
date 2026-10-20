@@ -72,8 +72,8 @@ pub fn parse_settings(raw: Option<&str>) -> OrchestratorSettings {
 
 /// Read `<root>/.fgos/config.json` and return its `herdrOrchestrator`
 /// toggles, fail-closed (see `parse_settings`). `root` is the main fgOS
-/// checkout root the caller already resolved (`fgos::repo_root()`) — never
-/// re-resolved here.
+/// checkout root the caller already resolved (the Git component's
+/// `trusted_main_root`) — never re-resolved here.
 pub fn read_settings(root: &Path) -> OrchestratorSettings {
     let path = root.join(".fgos").join("config.json");
     parse_settings(std::fs::read_to_string(path).ok().as_deref())

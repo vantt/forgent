@@ -21,7 +21,7 @@ import module from 'node:module';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
-import { SANDBOX_DOOR, shellRunsGit } from '../../scripts/lib/git-spawn-match.mjs';
+import { CONSUMER_COMMAND, SANDBOX_DOOR, sandboxNamedPaths, shellRunsGit } from '../../scripts/lib/git-spawn-match.mjs';
 
 export const SPY_LOG_ENV = 'FGOS_GIT_SPAWN_SPY_LOG';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -68,10 +68,8 @@ function productFrame(stack, wrappers) {
 function insideSandbox(root, file, args, options) {
   const real = (p) => { try { return fs.realpathSync(p); } catch { return path.resolve(p); } };
   const sandbox = real(root);
-  const cwd = path.resolve(options?.cwd ?? process.cwd());
-  const named = [cwd];
-  args.forEach((a, i) => { if ((a === '-C' || a === '--git-dir') && args[i + 1]) named.push(path.resolve(cwd, String(args[i + 1]))); });
-  return named.every((p) => { const r = path.relative(sandbox, real(p)); return r === '' || (!r.startsWith('..') && !path.isAbsolute(r)); });
+  const named = sandboxNamedPaths(args.map(String), options?.cwd === undefined ? undefined : path.resolve(String(options.cwd)));
+  return named.length > 0 && named.every((p) => { const r = path.relative(sandbox, real(p)); return r === '' || (!r.startsWith('..') && !path.isAbsolute(r)); });
 }
 
 function record(entry) {
@@ -97,6 +95,7 @@ export function installGitSpawnSpy(cp = childProcess) {
     const stack = new Error().stack;
     const frame = productFrame(stack, wrappers(entry));
     if (!frame) return;
+    if (opts?.[CONSUMER_COMMAND] === true) return; // a consumer's declared command: configured, not a site
     const sandbox = opts?.[SANDBOX_DOOR];
     if (sandbox && insideSandbox(sandbox, file, argv, opts)) return;
     record({ target, frame, file: String(file), args: argv.map(String).slice(0, 12), cwd: opts?.cwd ? String(opts.cwd) : process.cwd(), stack: String(stack).split('\n').slice(2, 10).map((l) => l.trim()) });

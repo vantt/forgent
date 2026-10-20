@@ -1,5 +1,5 @@
 // The one-door gate's owning proof (Git spec §12, V-GATE): the static scan finds a Git spawn in each
-// of the nine shapes a literal `execFile('git', ['<write verb>', ...])` search misses, and doctor's
+// shape a literal `execFile('git', ['<write verb>', ...])` search misses, and doctor's
 // git-mutation-one-door refuses a census that lists a site or was not built from its payload.
 
 import '../helpers/process-tmp-root.mjs';
@@ -25,9 +25,15 @@ const SHAPES = [
   ['hook-replay-and-skill', 'src/replay.mjs', 'hook-spawn', 'a direct hook replay'],
   ['hook-replay-and-skill', 'core/skills/demo/SKILL.md', 'skill', 'skill text telling an agent to run a Git write'],
   ['read-verb-writes', 'bin/status.mjs', 'spawn', 'a read verb (status) that refreshes the index'],
+  // Shapes the resolution must still catch now that it follows argv runners and launchers.
+  ['rust-command-alias', 'packages/demo/rust/src/lib.rs', 'rust', 'Rust Command imported under another name'],
+  ['rust-shell-args', 'packages/demo/rust/src/lib.rs', 'rust', 'a Rust shell with git in its .args(["-c", ...]) script'],
+  ['rust-argv-runner', 'packages/demo/rust/src/lib.rs', 'rust', 'git passed to a Rust argv-running primitive through a struct field'],
+  ['launcher-operand', 'src/plan.mjs', 'wrapper-caller', 'git as the command operand of a timeout launcher'],
+  ['consumer-marker-on-git', 'src/verify.mjs', 'consumer-marker', 'the consumer-command marker on a spawn of git itself'],
 ];
 
-test('the static scan reports a Git spawn in each of the nine shapes a literal search misses', () => {
+test('the static scan reports a Git spawn in each shape a literal search misses', () => {
   for (const [probe, file, family, shape] of SHAPES) {
     const { sites } = scan({ root: path.join(PROBES, probe) });
     assert.ok(sites.some((s) => s.path === file && s.family === family), `${probe}: ${shape} not reported (got ${JSON.stringify(sites)})`);

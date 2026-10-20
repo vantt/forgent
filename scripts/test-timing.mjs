@@ -61,7 +61,9 @@ export function gitHead(cwd = REPO_ROOT, resolveHead = headOf) {
   return resolveHead(cwd);
 }
 
-export function hasGnuTimeV(binary = '/usr/bin/time', exists = fs.existsSync, spawn = spawnSync) {
+const TIME_BINARY = '/usr/bin/time';
+
+export function hasGnuTimeV(binary = TIME_BINARY, exists = fs.existsSync, spawn = spawnSync) {
   if (!exists(binary)) return false;
   const result = spawn(binary, ['-v', 'true'], { encoding: 'utf8' });
   return result.status === 0 && /Maximum resident set size/.test(result.stderr ?? '');
@@ -143,7 +145,7 @@ export function minMax(numbers) {
 // to real file descriptors instead: stdout becomes a retained log
 // artifact, and stderr (GNU time -v's own small ~20-line block) is read
 // back afterward for parsing.
-export function defaultTimedSpawn({ execPath, scriptPath, forwardedArgs, cwd, env, timeBinary, logDir }) {
+export function defaultTimedSpawn({ execPath, scriptPath, forwardedArgs, cwd, env, logDir }) {
   const dir = logDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'test-timing-'));
   fs.mkdirSync(dir, { recursive: true });
   const stdoutPath = path.join(dir, 'stdout.log');
@@ -152,7 +154,7 @@ export function defaultTimedSpawn({ execPath, scriptPath, forwardedArgs, cwd, en
   const stderrFd = fs.openSync(stderrPath, 'w');
   let result;
   try {
-    result = spawnSync(timeBinary, ['-v', execPath, scriptPath, ...forwardedArgs], { cwd, env, stdio: ['ignore', stdoutFd, stderrFd] });
+    result = spawnSync(TIME_BINARY, ['-v', execPath, scriptPath, ...forwardedArgs], { cwd, env, stdio: ['ignore', stdoutFd, stderrFd] });
   } finally {
     fs.closeSync(stdoutFd);
     fs.closeSync(stderrFd);
@@ -174,7 +176,6 @@ export function runOneSample({
   spawn = spawnSync,
   timedSpawn = defaultTimedSpawn,
   hasTime = hasGnuTimeV(),
-  timeBinary = '/usr/bin/time',
   env = process.env,
   checkClean,
   environment = () => gatherEnvironment({ cwd }),
@@ -200,7 +201,6 @@ export function runOneSample({
       forwardedArgs,
       cwd,
       env,
-      timeBinary,
       logDir,
     });
     gnuTime = parseGnuTimeV(result.stderr ?? '');

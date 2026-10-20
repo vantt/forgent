@@ -69,6 +69,28 @@ fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() 
         .status()
         .unwrap()
         .success());
+    // A linked worktree outside the workspace root: only the Git listing the
+    // gate passes to quiesce-scan as --dir makes a process there a member.
+    let linked = root.join("linked");
+    let git = |args: &[&str]| {
+        assert!(Command::new("git")
+            .arg("-C")
+            .arg(&ws)
+            .args(["-c", "user.name=t", "-c", "user.email=t@t"])
+            .args(args)
+            .status()
+            .unwrap()
+            .success())
+    };
+    git(&["commit", "-q", "--allow-empty", "-m", "base"]);
+    git(&[
+        "worktree",
+        "add",
+        "-q",
+        "-b",
+        "linked",
+        linked.to_str().unwrap(),
+    ]);
     let state = root.join("state");
     fs::create_dir(&state).unwrap();
     fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
@@ -87,7 +109,13 @@ fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() 
     if scan["result"] == "unavailable" {
         let out = controller(&ws, &state, "upgrade", &new);
         assert!(!out.status.success());
-        assert!(String::from_utf8_lossy(&out.stderr).contains("git-predecessor-writer-live"));
+        let message = String::from_utf8_lossy(&out.stderr);
+        // The linked worktree listing succeeded; the scan itself refused.
+        assert!(
+            message.contains("git-predecessor-writer-live")
+                && message.contains("process scan unavailable"),
+            "{message}"
+        );
         assert!(!fgos_holder_lock::tombstone::is_tombstone(
             &ws.join(".fgos/locks/activation.lock"),
             "activation",
@@ -132,6 +160,32 @@ fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() 
     let mut writer = Command::new("node")
         .arg(&script)
         .current_dir(&ws)
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let mut ready = String::new();
+    BufReader::new(writer.stdout.take().unwrap())
+        .read_line(&mut ready)
+        .unwrap();
+    assert_eq!(ready.trim(), "ready");
+    let rejected = controller(&ws, &state, "upgrade", &new);
+    writer.kill().unwrap();
+    writer.wait().unwrap();
+    assert!(!rejected.status.success());
+    let message = String::from_utf8_lossy(&rejected.stderr);
+    assert!(
+        message.contains("git-predecessor-writer-live") && message.contains("fgos.mjs"),
+        "{message}"
+    );
+    let script = linked.join("fgos.mjs");
+    fs::write(
+        &script,
+        "console.log('ready'); setInterval(()=>{},10000);\n",
+    )
+    .unwrap();
+    let mut writer = Command::new("node")
+        .arg(&script)
+        .current_dir(&linked)
         .stdout(Stdio::piped())
         .spawn()
         .unwrap();

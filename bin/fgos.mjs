@@ -30,6 +30,7 @@ import path from 'node:path';
 import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { randomUUID } from 'node:crypto';
 import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, OUTCOME_EXIT_CODES, categoryOf, exitCodeForOutcome, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
@@ -106,6 +107,9 @@ import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
 import { withMainCheckout } from '../src/runner/repo-locks.mjs';
+import { gitPortOptions } from '../src/git/inspect.mjs';
+import { nativeError } from '../src/git/native.mjs';
+import { createGitSafeRestore } from '../src/git/restore.mjs';
 import { HolderLockError, createLockScope } from '../src/holder-lock/index.mjs';
 import { collectLockStatus } from '../src/runner/lock-status.mjs';
 import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
@@ -161,16 +165,39 @@ function dataDir(overrideDir) {
   return resolveFgosDir(process.cwd(), { strict: true });
 }
 
-// Residue of the one-door gate, awaiting the owner (unit 20 report): SafeRestore refuses to discard
-// commits or local changes on the main checkout (`restore-discard-requires-producer`), which is this
-// verb's whole purpose, so its `git reset --hard` and the reads that inform it stay raw until the
-// port grants an operator-confirmed main-checkout discard. The census lists this site.
-function rawMainCheckoutGit(cwd, args) {
+// `main-checkout-reset` reads: the commits a reset would drop and the whole-repo status, both through
+// Inspect. Listing is advisory, so it is bounded and degrades instead of failing the verb.
+const RESET_LISTED_COMMITS = 50;
+function describeLostCommits(inspect, commits) {
+  const shown = commits.slice(0, RESET_LISTED_COMMITS);
+  let objects = [];
   try {
-    return execFileSync('git', args, { cwd, encoding: 'utf8', shell: false });
-  } catch (err) {
-    throw new StoreError('validation', `git ${args.join(' ')} failed in "${cwd}": ${err.message}`);
+    objects = inspect.readObjects({ oids: shown, maxBytes: 8 * 1024 * 1024 });
+  } catch (_err) {
+    // Details unavailable: the short ids below still name every listed commit.
   }
+  const lines = shown.map((oid, i) => {
+    const object = objects[i];
+    if (object?.kind !== 'present' || object.objectType !== 'commit') return `${oid.slice(0, 7)} (commit details unavailable)`;
+    const [header, ...body] = Buffer.from(object.bytes).toString('utf8').split('\n\n');
+    const author = /^author (.*) <([^>]*)> \d+ [+-]\d{4}$/m.exec(header);
+    return `${oid.slice(0, 7)} ${author ? `${author[1]} (${author[2]})` : '(unknown author)'}: ${body.join('\n\n').split('\n', 1)[0]}`;
+  });
+  if (commits.length > shown.length) lines.push(`... and ${commits.length - shown.length} more`);
+  return lines.join('\n');
+}
+function renderStatus(inspect) {
+  const lines = [];
+  let cursor;
+  do {
+    const page = inspect.status({ untracked: 'all', maxEntries: 4096, cursor });
+    for (const entry of page.entries) {
+      const xy = entry.untracked ? '??' : entry.ignored ? '!!' : String.fromCharCode(entry.index, entry.worktree).replaceAll('.', ' ');
+      lines.push(`${xy} ${Buffer.from(entry.path).toString('utf8')}`);
+    }
+    cursor = page.nextCursor;
+  } while (cursor);
+  return lines.join('\n');
 }
 
 // `currentHead`/`resolveRefSha` live in src/runner/worktree.mjs (tsk-49i
@@ -4425,39 +4452,44 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
             '`fgos main-checkout-reset --sha <sha> --dir "$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)"`.',
         );
       }
-      const reset = async () => {
+      const reset = async (handle) => {
         const confirmed = Boolean(flags.confirm);
+        const inspect = inspectGit(repoRoot);
+        const target = inspect.resolveCommit({ name: sha });
+        if (!target) throw new StoreError('validation', `main-checkout-reset: "${sha}" does not name a commit in "${repoRoot}"`);
+        const head = inspect.resolveCommit({ name: 'HEAD' });
+        if (!head) throw new StoreError('validation', `main-checkout-reset: "${repoRoot}" has no commit to reset from`);
         const dirty = !isMainTreeClean(repoRoot);
-        let lostCommitCount = 0;
-        let lostCommitsOutput = '';
-        try {
-          const revList = rawMainCheckoutGit(repoRoot, ['rev-list', `${sha}..HEAD`]).trim();
-          if (revList) {
-            const commits = revList.split('\n').filter(Boolean);
-            lostCommitCount = commits.length;
-            if (lostCommitCount > 0) {
-              lostCommitsOutput = rawMainCheckoutGit(repoRoot, ['log', `${sha}..HEAD`, '--format=%h %an (%ae): %s', '--stat']).trim();
-            }
-          }
-        } catch (_err) {
-          // If git rev-list fails (e.g. invalid SHA), reset --hard below will fail with git's error.
-        }
-
+        const lostCommitCount = inspect.countCommits({ include: head, exclude: target });
         try {
           assertSafeMainCheckoutReset({ dirty, confirmed, lostCommitCount, sha });
         } catch (err) {
           let details = `main-checkout-reset: ${err.message}`;
           if (dirty) {
-            const statusOutput = rawMainCheckoutGit(repoRoot, ['status', '--porcelain']).trim();
-            details += `\n\nFull git status (main checkout, whole repo):\n${statusOutput || '(empty)'}`;
+            details += `\n\nFull git status (main checkout, whole repo):\n${renderStatus(inspect) || '(empty)'}`;
           }
           if (lostCommitCount > 0) {
-            details += `\n\nCommits about to be discarded (${lostCommitCount}):\n${lostCommitsOutput || '(none)'}`;
+            const lost = inspect.compareCommits({ left: target, right: head }).commits;
+            details += `\n\nCommits about to be discarded (${lostCommitCount}):\n${describeLostCommits(inspect, lost)}`;
           }
           throw new StoreError('validation', details);
         }
-        rawMainCheckoutGit(repoRoot, ['reset', '--hard', sha]);
-        return { sha, wasDirty: dirty, lostCommitCount, confirmed };
+        // Without --confirm only a clean forward move reaches here: a plain restore, nothing discarded.
+        const options = gitPortOptions(repoRoot, { mutation: true });
+        const operationId = randomUUID();
+        const request = {
+          expectedHead: head,
+          target,
+          reason: `main-checkout-reset --sha ${sha}`,
+          ...(confirmed ? { discardLocalDelta: true, confirmedBy: `fgos main-checkout-reset --confirm (writer ${options.writer})` } : {}),
+        };
+        let restored;
+        try {
+          restored = createGitSafeRestore(options).apply({ operationId, request }, [handle]);
+        } catch (err) {
+          throw new StoreError('validation', `main-checkout-reset: SafeRestore refused to reset "${repoRoot}" to ${sha}: ${nativeError(err).cause}`);
+        }
+        return { sha, wasDirty: dirty, lostCommitCount, confirmed, operationId, snapshot: restored.snapshot };
       };
       try {
         return await withMainCheckout(createLockScope('main-checkout-reset'), 'reset', reset, { fgosDir: dir });

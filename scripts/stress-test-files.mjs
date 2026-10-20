@@ -53,15 +53,12 @@ const burnDir = opts.burner === 'fsync' ? fs.mkdtempSync(path.join(os.tmpdir(), 
 const fsyncLoop = (file) => `const fs = require('node:fs'); const fd = fs.openSync(${JSON.stringify(file)}, 'w');
 const buf = Buffer.alloc(1 << 20, 1); const end = Date.now() + ${budgetMs};
 while (Date.now() < end) { for (let i = 0; i < 4; i += 1) fs.writeSync(fd, buf, 0, buf.length, i * buf.length); fs.fsyncSync(fd); }`;
-const burnerCommand = (i) => {
-  if (opts.burner === 'node') return [process.execPath, ['-e', `const end = Date.now() + ${budgetMs}; while (Date.now() < end) {}`]];
-  if (opts.burner === 'fsync') return [process.execPath, ['-e', fsyncLoop(path.join(burnDir, `burner-${i}`))]];
-  return ['bash', ['-c', `while [ $SECONDS -lt ${Math.ceil(budgetMs / 1000)} ]; do :; done`]];
+const spawnBurner = (i) => {
+  if (opts.burner === 'node') return spawn(process.execPath, ['-e', `const end = Date.now() + ${budgetMs}; while (Date.now() < end) {}`], { stdio: 'ignore' });
+  if (opts.burner === 'fsync') return spawn(process.execPath, ['-e', fsyncLoop(path.join(burnDir, `burner-${i}`))], { stdio: 'ignore' });
+  return spawn('bash', ['-c', `while [ $SECONDS -lt ${Math.ceil(budgetMs / 1000)} ]; do :; done`], { stdio: 'ignore' });
 };
-const burnerProcs = Array.from({ length: burners }, (_, i) => {
-  const [cmd, args] = burnerCommand(i);
-  return spawn(cmd, args, { stdio: 'ignore' });
-});
+const burnerProcs = Array.from({ length: burners }, (_, i) => spawnBurner(i));
 function stopBurners() {
   for (const b of burnerProcs) {
     try { b.kill('SIGKILL'); } catch { /* already gone */ }

@@ -80,6 +80,7 @@ base64 = "0.23"
 herdr-fgos-common = { path = "../../packages/herdr-fgos-common/rust" }
 fgos-host-runtime = { path = "../../packages/host-runtime/rust" }
 fgos-distribution = { path = "../../packages/distribution/rust" }
+fgos-git = { path = "../../packages/git/rust" }
 
 [dev-dependencies]
 tower = { version = "0.4", features = ["util"] }

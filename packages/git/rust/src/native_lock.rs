@@ -563,6 +563,7 @@ mod tests {
             discard_local_delta: false,
             require_clean_baseline: false,
             require_staged_only: false,
+            confirmed_by: None,
         };
         f.driver
             .apply_restore_with_filesystem(

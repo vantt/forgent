@@ -2,6 +2,7 @@
 // Keep the existing real-repository fixture and its platform-safe driver setup.
 include!("support/land.rs");
 use fgos_git::wal::{FileSystem, Outcome, Wal};
+use fgos_holder_lock::{acquire, Acquire, BorrowedHandle, Mode, Resource, Wait};
 use std::os::unix::fs::PermissionsExt;
 use std::sync::Mutex;
 fn request(f: &Fixture, reapply: bool) -> RestoreRequest {
@@ -15,6 +16,7 @@ fn request(f: &Fixture, reapply: bool) -> RestoreRequest {
         discard_local_delta: false,
         require_clean_baseline: false,
         require_staged_only: false,
+        confirmed_by: None,
     }
 }
 fn dirty(f: &Fixture) {
@@ -779,6 +781,7 @@ fn case_only_target_rename_preserves_index_identity() {
         discard_local_delta: false,
         require_clean_baseline: false,
         require_staged_only: false,
+        confirmed_by: None,
     };
     f.driver
         .apply_restore(&f.repo, vec![], &r, "fixture", "case-rename")
@@ -808,8 +811,255 @@ fn case_sensitive_untracked_hardlink_is_not_an_index_alias() {
             discard_local_delta: false,
             require_clean_baseline: false,
             require_staged_only: false,
+            confirmed_by: None,
         };
         let error = f.driver.preview_restore(&f.repo, vec![], &r).unwrap_err();
         assert!(error.cause.contains("untracked-target-collision"));
     }
+}
+
+fn confirmed_discard(expected_head: &str, target: &str, who: Option<&str>) -> RestoreRequest {
+    RestoreRequest {
+        expected_head: expected_head.into(),
+        target: target.into(),
+        reason: "operator-confirmed main discard".into(),
+        reapply_local_delta: false,
+        allowed_replacements: vec![],
+        checkout_baseline: None,
+        discard_local_delta: true,
+        require_clean_baseline: false,
+        require_staged_only: false,
+        confirmed_by: who.map(Into::into),
+    }
+}
+// No earlier test reaches a main-checkout discard: the producer-only refusal and
+// the confirmation-only refusal had no proof before this operator door existed.
+#[test]
+fn main_discard_without_operator_confirmation_and_stray_confirmation_refuse_by_name() {
+    let f = Fixture::new();
+    let head = f.request.target.clone();
+    for who in [None, Some(""), Some("  ")] {
+        let err = f
+            .driver
+            .preview_restore(
+                &f.repo,
+                vec![],
+                &confirmed_discard(&head, &f.request.source, who),
+            )
+            .unwrap_err();
+        assert!(
+            err.cause.contains("restore-discard-requires-producer"),
+            "{}",
+            err.cause
+        );
+    }
+    let mut stray = request(&f, false);
+    stray.confirmed_by = Some("operator".into());
+    let err = f
+        .driver
+        .preview_restore(&f.repo, vec![], &stray)
+        .unwrap_err();
+    assert!(
+        err.cause.contains("restore-confirmation-unexpected"),
+        "{}",
+        err.cause
+    );
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), head);
+}
+// No earlier test proves a linked producer refuses an operator confirmation: the
+// confirmation is meaningful only for a main-checkout discard.
+#[test]
+fn operator_confirmation_on_a_linked_producer_discard_refuses() {
+    let f = Fixture::new();
+    let tree = f.temp.join("producer");
+    git(
+        &f.main,
+        &["worktree", "add", "-q", "--detach", tree.to_str().unwrap()],
+    );
+    let meta = fs::metadata(&tree).unwrap();
+    let birth = {
+        use std::os::unix::fs::MetadataExt;
+        let nanos = meta
+            .created()
+            .unwrap()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        format!("{}-{}-{nanos}", meta.dev(), meta.ino())
+    };
+    let lease = match acquire(
+        &Resource::new(
+            "dispatch-cwd",
+            f.main
+                .join(format!(".fgos/locks/dispatch-cwd--{birth}.lock")),
+        ),
+        Mode::Ex,
+        Wait::Ms(100),
+        5000,
+    ) {
+        Acquire::Acquired(h) => h,
+        other => panic!("{other:?}"),
+    };
+    let repo = match f.driver.resolve_repo(&tree, &f.main).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let held = || vec![BorrowedHandle::new(&lease).unwrap()];
+    let r = confirmed_discard(&f.request.target, &f.request.source, Some("operator"));
+    let err = f.driver.preview_restore(&repo, held(), &r).unwrap_err();
+    assert!(
+        err.cause.contains("restore-confirmation-unexpected"),
+        "{}",
+        err.cause
+    );
+    let plain = RestoreRequest {
+        confirmed_by: None,
+        ..r
+    };
+    f.driver.preview_restore(&repo, held(), &plain).unwrap();
+}
+// No earlier test covers a discard that moves HEAD backward, covers tracked
+// `.fgos` paths, or leaves untracked files in place: producer discards were never
+// exercised on a main checkout.
+#[test]
+fn confirmed_main_discard_resets_backward_pins_old_head_and_snapshots_the_dirty_delta() {
+    let f = Fixture::new();
+    git(&f.main, &["merge", "-q", "--ff-only", "source"]);
+    fs::write(f.main.join(".fgos/store.jsonl"), "one\n").unwrap();
+    git(&f.main, &["add", ".fgos/store.jsonl"]);
+    git(&f.main, &["commit", "-qm", "tracked store"]);
+    let old_head = git(&f.main, &["rev-parse", "HEAD"]);
+    fs::write(f.main.join(".fgos/store.jsonl"), "two\n").unwrap();
+    dirty(&f);
+    let r = confirmed_discard(&old_head, &f.request.target, Some("fixture operator"));
+    let out = f
+        .driver
+        .apply_restore(&f.repo, vec![], &r, "fixture", "main-discard")
+        .unwrap();
+    assert!(out.warnings.is_empty(), "{:?}", out.warnings);
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
+    assert_eq!(fs::read(f.main.join("a")).unwrap(), b"base\n");
+    assert_eq!(fs::read(f.main.join("b")).unwrap(), b"base\n");
+    assert!(!f.main.join(".fgos/store.jsonl").exists());
+    assert_eq!(
+        fs::read(f.main.join("untracked")).unwrap(),
+        b"untracked\0\xff"
+    );
+    assert_eq!(
+        git(
+            &f.main,
+            &[
+                "rev-parse",
+                "refs/fgos/git-operations/main-discard/candidate"
+            ]
+        ),
+        old_head
+    );
+    let saved: serde_json::Value = serde_json::from_slice(
+        &fs::read(
+            f.main
+                .join(".git/fgos/git/restore-snapshots")
+                .join(&out.snapshot),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(
+        saved["paths"]["b"]["File"][0],
+        serde_json::json!(b"working\0binary\xfe\n".to_vec())
+    );
+    assert_eq!(
+        saved["paths"][".fgos/store.jsonl"]["File"][0],
+        serde_json::json!(b"two\n".to_vec())
+    );
+    let destination = f.temp.join("extracted");
+    fs::create_dir(&destination).unwrap();
+    f.driver
+        .extract_restore_path(
+            &f.repo,
+            vec![],
+            "fixture",
+            "main-discard",
+            "b",
+            &destination,
+        )
+        .unwrap();
+    assert_eq!(
+        fs::read(destination.join("b")).unwrap(),
+        b"working\0binary\xfe\n"
+    );
+}
+// No earlier test starts a restore from a stopped merge: the native-state gate
+// refused it outright until a confirmed main discard was allowed to clear it.
+#[test]
+fn confirmed_main_discard_clears_a_stopped_merge_and_retains_its_bytes() {
+    let f = Fixture::new();
+    fs::write(f.main.join("a"), "other\n").unwrap();
+    git(&f.main, &["commit", "-qam", "other"]);
+    let head = git(&f.main, &["rev-parse", "HEAD"]);
+    let merge = std::process::Command::new("git")
+        .arg("-C")
+        .arg(&f.main)
+        .args(["merge", "source"])
+        .output()
+        .unwrap();
+    assert!(
+        !merge.status.success(),
+        "the fixture merge must stop on a conflict"
+    );
+    let merge_head = fs::read(f.main.join(".git/MERGE_HEAD")).unwrap();
+    let merge_msg = fs::read(f.main.join(".git/MERGE_MSG")).unwrap();
+    assert!(!git(&f.main, &["ls-files", "-u"]).is_empty());
+    let unconfirmed = f
+        .driver
+        .preview_restore(
+            &f.repo,
+            vec![],
+            &confirmed_discard(&head, &f.request.target, None),
+        )
+        .unwrap_err();
+    assert!(
+        unconfirmed
+            .cause
+            .contains("restore-discard-requires-producer"),
+        "{}",
+        unconfirmed.cause
+    );
+    let r = confirmed_discard(&head, &f.request.target, Some("fixture operator"));
+    let out = f
+        .driver
+        .apply_restore(&f.repo, vec![], &r, "fixture", "stopped-merge")
+        .unwrap();
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
+    for name in [
+        "MERGE_HEAD",
+        "MERGE_MSG",
+        "MERGE_MODE",
+        "CHERRY_PICK_HEAD",
+        "REVERT_HEAD",
+    ] {
+        assert!(
+            !f.main.join(".git").join(name).exists(),
+            "{name} survived the reset"
+        );
+    }
+    assert!(git(&f.main, &["ls-files", "-u"]).is_empty());
+    assert_eq!(fs::read(f.main.join("a")).unwrap(), b"base\n");
+    let saved: serde_json::Value = serde_json::from_slice(
+        &fs::read(
+            f.main
+                .join(".git/fgos/git/restore-snapshots")
+                .join(&out.snapshot),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(
+        saved["nativeState"]["MERGE_HEAD"]["File"][0],
+        serde_json::json!(merge_head)
+    );
+    assert_eq!(
+        saved["nativeState"]["MERGE_MSG"]["File"][0],
+        serde_json::json!(merge_msg)
+    );
 }

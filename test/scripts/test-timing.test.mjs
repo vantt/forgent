@@ -369,7 +369,6 @@ test('defaultTimedSpawn survives a child that writes well past spawnSync\'s defa
     forwardedArgs: [],
     cwd: dir,
     env: process.env,
-    timeBinary: '/usr/bin/time',
     logDir: dir,
   });
 
