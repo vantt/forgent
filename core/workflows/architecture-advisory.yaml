@@ -35,12 +35,17 @@ steps:
           capability: architecture:shape
           pattern: panel
           blind: true
+          seats:
+            - { seat: system, role: producer, tier: frontier }
+            - { seat: alternative, role: producer }
+            - { seat: constraint, role: producer }
+            - { seat: synthesis, role: synthesizer }
           params:
             roleTasks:
-              panelist-1: 'SYSTEM LENS: Propose a coherent primary architecture grounded in the framed repository evidence, ownership, and boundaries. {objective}'
-              panelist-2: 'ALTERNATIVE LENS: Develop a genuinely different architecture, including a smaller or no-build option when credible; never provide a designated loser. {objective}'
-              panelist-3: 'CONSTRAINT LENS: Test security, production operations, migration, cost, and reversibility; propose a constraint-led design rather than merely endorsing another seat. {objective}'
-          objective: Diverge into system, alternative, and constraint-focused proposals across 3 panelists
+              system: 'SYSTEM LENS: Propose a coherent primary architecture grounded in the framed repository evidence, ownership, and boundaries. {objective}'
+              alternative: 'ALTERNATIVE LENS: Develop a genuinely different architecture, including a smaller or no-build option when credible; never provide a designated loser. {objective}'
+              constraint: 'CONSTRAINT LENS: Test security, production operations, migration, cost, and reversibility; propose a constraint-led design rather than merely endorsing another seat. {objective}'
+          objective: Diverge into system, alternative, and constraint-focused proposals across 3 seats
   - id: critique
     title: Critique & Stress-Test
     dependsOn: [shaping]

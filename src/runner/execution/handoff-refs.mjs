@@ -1,8 +1,8 @@
-// The one hand-off: an earlier role's work reaches a later role as the absolute, read-only path
-// of its report, listed in the later role's context refs.
+// The one hand-off: an earlier seat's work reaches a later seat as the absolute, read-only path
+// of its report, listed in the later seat's context refs.
 //
 // Inside a Unit run the pattern passes the earlier role's record (`reportRefOf`). Across Units a
-// Unit names `unit-run:<unitRunId>/<role>` in its `inputs`; `resolveUnitInputs` turns that into
+// Unit names `unit-run:<unitRunId>/<seat>` in its `inputs`; `resolveUnitInputs` turns that into
 // the path once, when the Unit run is created, and the result is kept in unit.json so a resume or
 // a fallback hands out the same list. The owner's answer to a human gate of a Workflow run travels
 // the same way as `gate-answer:<workflowRunId>/<stepId>`. A blind role cannot read that run state,
@@ -21,6 +21,8 @@ import crypto from 'node:crypto';
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { resolveBlindHiddenRoots, isInsideRoot } from '../dispatch/confinement/resources.mjs';
 import { readUnitRunHistory } from './unit-run-history.mjs';
+import { seatKeyOf } from './legacy-seat-read.mjs';
+import { seatIdProblem } from '../../convention/seat-id.mjs';
 
 const UNIT_RUN_PREFIX = 'unit-run:';
 const GATE_ANSWER_PREFIX = 'gate-answer:';
@@ -59,12 +61,12 @@ function acceptsBytes(accept, actual) {
  * only artifact settlement kept. An inline producer has no settlement: its evidence refs are
  * relative to the Unit run's worktree.
  *
- * @param {{role: string, round: number, runResult?: object}} record role result as returned by runRole / history
+ * @param {{seat: string, round: number, runResult?: object}} record seat result as returned by runRole / history
  * @param {{mainRoot: string, worktree?: string}} where repo-relative artifact paths are relative to `mainRoot`
  * @returns {string}
  */
 export function reportRefOf(record, { mainRoot, worktree = mainRoot, accept }) {
-  const subject = `role "${record?.role}" round ${record?.round}`;
+  const subject = `seat "${seatKeyOf(record)}" round ${record?.round}`;
   const runResult = record?.runResult ?? {};
 
   const settled = Array.isArray(runResult.settleReports) ? runResult.settleReports[0] : null;
@@ -122,16 +124,18 @@ function resolveGateAnswerRef(input, mainRoot) {
 
 function resolveUnitRunRef(input, mainRoot, seat, accept) {
   const [unitRunId, named] = input.slice(UNIT_RUN_PREFIX.length).split('/');
-  const role = seat ?? named;
+  const wanted = seat ?? named;
+  // A seat id becomes a path segment of the run's directory, so only Convention's seat ids reach it.
   const fail = (reason) => new HandoffRefError(input, seat && reason === 'no-such-role' ? 'no-such-seat' : reason);
+  if (seatIdProblem(wanted) === 'invalid-identifier') throw fail('no-such-role');
 
   const assignmentsDir = path.join(mainRoot, '.fgos', 'assignments');
   const unitDir = path.resolve(assignmentsDir, unitRunId);
   if (path.dirname(unitDir) !== assignmentsDir || !fs.existsSync(unitDir)) throw fail('no-such-run');
 
-  // The latest round of the role is the one that counts; the history already keeps only the
+  // The latest round of the seat is the one that counts; the history already keeps only the
   // latest fallback attempt of each round.
-  const rounds = readUnitRunHistory(unitDir).filter((r) => r.role === role);
+  const rounds = readUnitRunHistory(unitDir).filter((r) => r.seat === wanted);
   if (rounds.length === 0) throw fail('no-such-role');
   const latest = rounds.reduce((a, b) => (b.round > a.round ? b : a));
 

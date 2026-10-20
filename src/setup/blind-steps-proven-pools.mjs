@@ -69,9 +69,9 @@ function describeCandidate(runnerConfig, bound) {
 const CONFIG_GAPS = new Set(['tier-cell-missing', 'pool-unusable']);
 
 /** Every executor/invocation a role could bind (a primary or a fallback), in pool order. */
-function candidatesForRole(unit, role, runnerConfig, session) {
+function candidatesForRole(unit, seat, runnerConfig, session) {
   return listCandidates(
-    { unit, role, independentOf: [], overrides: [], blind: true },
+    { unit, seat: seat.seat, role: seat.role, posture: seat.posture, independentOf: [], overrides: [], blind: true },
     { runnerConfig, session: { headless: true, ...session } },
   ).candidates.filter((candidate) => !candidate.out || CONFIG_GAPS.has(candidate.out.reason)).map((candidate) => describeCandidate(runnerConfig, candidate));
 }
@@ -111,15 +111,16 @@ async function evaluateBlindPools(workflows, runnerConfig) {
             capability: template.capability,
             rigor: template.rigor,
             writes: template.writes ?? [],
-            pattern: template.pattern,
+            pattern: template.params ? { pattern: template.pattern, params: template.params } : template.pattern,
+            ...(template.seats ? { seats: template.seats } : {}),
             blind: true,
           };
-          // The pattern decides which roles exist; bind() decides what each could be.
-          const { roles } = await simulateUnitBindings(unit, runnerConfig, { session: SESSIONS[0] });
+          // The pattern decides which seats exist; bind() decides what each could be.
+          const { seats } = await simulateUnitBindings(unit, runnerConfig, { session: SESSIONS[0] });
           const unproven = new Map();
           for (const session of SESSIONS) {
-            for (const { role } of roles) {
-              for (const c of candidatesForRole(unit, role, runnerConfig, session)) {
+            for (const seat of seats) {
+              for (const c of candidatesForRole(unit, seat, runnerConfig, session)) {
                 if (!isProven(c)) unproven.set(`${c.executor}/${c.invocation}`, c);
               }
             }

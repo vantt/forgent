@@ -320,6 +320,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-seat-binding"
+version = "0.2.0"
+dependencies = [
+ "fgos-host-runtime",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "fgos-secrets"
 version = "0.2.0"
 dependencies = [

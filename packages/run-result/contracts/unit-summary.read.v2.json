@@ -51,7 +51,8 @@
         "type": "object",
         "required": ["role", "kind", "round", "final", "attempts"],
         "properties": {
-          "role": {"type": "string", "minLength": 1},
+          "seat": {"type": "string", "minLength": 1, "description": "Optional, additive. The seat id inside the unit run (the name of its directory). Absent on summaries written before seats existed, where `role` carried that name; readers treat a missing seat as equal to role."},
+          "role": {"type": "string", "minLength": 1, "description": "The seat role (producer, synthesizer, reviewer, red-team or judge); on a summary written before seats existed, the role-keyed name of the seat."},
           "kind": {"type": "string", "pattern": "\\S", "description": "Execution-owned semantic seat kind, independent of its role label: panelist, synthesizer, producer, checker, verifier, or unknown when the record does not say which pattern ran. Exactly panelist votes; synthesizer, unknown and every other kind do not vote. Missing or invalid kinds make the summary unusable."},
           "round": {"type": "integer", "minimum": 1},
           "final": {"allOf": [{"$ref": "#/definitions/attempt"}, {"type": "object", "required": ["stance"], "properties": {"stance": {"$ref": "#/definitions/stance"}}}]},

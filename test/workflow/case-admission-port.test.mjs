@@ -76,7 +76,7 @@ test('the ceiling handed to a Unit is its planned seat launches times the frame\
   const run = planned({ frame: { ...FRAME, seatLaunchesPerDispatch: 4 } });
   const port = createCaseAdmissionPort({ repoRoot: run.repoRoot });
   // council-lite is a panel of three plus a synthesizer: four seats, whatever the fallback does.
-  const seats = seatLaunchesOf({ pattern: { pattern: 'panel', params: { members: 3 } }, unit: { id: 'u', writes: [] }, runnerConfig: {} });
+  const seats = seatLaunchesOf({ pattern: 'panel', unit: { id: 'u', writes: [], seats: [{ seat: 'a', role: 'producer' }, { seat: 'b', role: 'producer' }, { seat: 'c', role: 'producer' }, { seat: 'chair', role: 'synthesizer' }] }, runnerConfig: {} });
   assert.equal(seats, 4);
   const answer = port.admit(proposal(run, { seatLaunches: seats, pattern: 'panel' }));
   assert.equal(answer.seatLaunchCeiling, 8, 'four seats, two launches each at most');

@@ -1,0 +1,2931 @@
+{
+  "contract": "seat-binding.golden.v1",
+  "comment": "Each case merges `patch` into `base` (objects merge by key, null deletes a key, anything else replaces) and feeds the result to bind. `expected` is a subset of the BindOutput (arrays match element by element over the expected prefix); `executors` is the full ordered executor list of ranked.candidates; `skippedReasons` is the full ordered list of ranked.skipped reasons; `explainContains` lists substrings of the explain text.",
+  "base": {
+    "protocol": 1,
+    "now": 1000,
+    "ask": {
+      "capability": "architecture:explain",
+      "seat": "producer",
+      "role": "producer",
+      "label": "architecture-advisory / explain"
+    },
+    "config": {
+      "$comment": "ladder text lives in the crate",
+      "defaults": {
+        "tier": "standard"
+      },
+      "maxTier": "flagship",
+      "tierFallback": {
+        "$comment": "walk order",
+        "nano": [
+          "deepseek"
+        ],
+        "mini": [
+          "claude",
+          "deepseek"
+        ],
+        "standard": [
+          "claude",
+          "openai",
+          "gemini",
+          "xai",
+          "deepseek",
+          "z-ai"
+        ],
+        "advanced": [
+          "claude",
+          "openai"
+        ],
+        "flagship": [
+          "claude",
+          "openai",
+          "gemini",
+          "xai"
+        ],
+        "frontier": [
+          "claude"
+        ]
+      },
+      "modelPolicies": {
+        "claude": {
+          "mini": "haiku",
+          "standard": "sonnet",
+          "advanced": "sonnet-high",
+          "flagship": "opus",
+          "frontier": "fable"
+        },
+        "openai": {
+          "standard": "gpt-5.6-terra",
+          "advanced": "gpt-6.1-terra",
+          "flagship": "gpt-6.1-sol"
+        },
+        "gemini": {
+          "standard": "gemini-4-argon-medium",
+          "flagship": "gemini-4-argon-high"
+        },
+        "xai": {
+          "standard": "grok-4.6-fast",
+          "flagship": "grok-4.6"
+        },
+        "deepseek": {
+          "nano": "deepseek-flash",
+          "mini": "deepseek-flash",
+          "standard": "deepseek-v4"
+        },
+        "z-ai": {
+          "standard": "glm-5"
+        }
+      },
+      "capabilities": {
+        "architecture:*": {
+          "tier": "flagship",
+          "rigor": "high",
+          "prefer": [
+            "claude",
+            "openai",
+            "gemini",
+            "xai",
+            "deepseek"
+          ],
+          "roles": {
+            "red-team": {
+              "prefer": [
+                "xai"
+              ]
+            }
+          }
+        },
+        "architecture:shape": {
+          "rigor": "critical",
+          "maxTier": "frontier",
+          "seats": {
+            "system": {
+              "prefer": [
+                "claude",
+                "openai"
+              ]
+            }
+          }
+        },
+        "architecture:critique": {
+          "maxTier": "frontier",
+          "seats": {
+            "producer": {
+              "tier": "frontier"
+            }
+          }
+        },
+        "group-cognition:*": {
+          "prefer": [
+            "claude",
+            "openai",
+            "gemini",
+            "xai",
+            {
+              "executor": "glm",
+              "invocation": "pi-cli-bwrap"
+            }
+          ]
+        },
+        "code:*": {
+          "roles": {
+            "red-team": {
+              "prefer": [
+                "xai"
+              ]
+            }
+          }
+        },
+        "code:review": {
+          "prefer": [
+            {
+              "executor": "openai",
+              "invocation": "codex-cli-bwrap"
+            },
+            {
+              "executor": "claude",
+              "invocation": "claude-cli-bwrap"
+            }
+          ]
+        },
+        "tool:probe": {
+          "prefer": [
+            "gitnexus"
+          ]
+        }
+      }
+    },
+    "launchView": {
+      "executors": {
+        "claude": {
+          "kind": "agent",
+          "family": "claude",
+          "mechanism": "out-of-process",
+          "skills": [],
+          "invocations": [
+            {
+              "id": "claude-cli-bwrap",
+              "cli": "claude",
+              "efforts": [
+                "low",
+                "medium",
+                "high",
+                "max"
+              ],
+              "carriesPosture": true
+            },
+            {
+              "id": "claude-herdr-bwrap",
+              "cli": "claude",
+              "efforts": [
+                "low",
+                "medium",
+                "high",
+                "max"
+              ],
+              "carriesPosture": true
+            }
+          ],
+          "defaultInvocation": "claude-cli-bwrap"
+        },
+        "openai": {
+          "kind": "agent",
+          "family": "openai",
+          "mechanism": "out-of-process",
+          "skills": [],
+          "invocations": [
+            {
+              "id": "codex-cli-bwrap",
+              "cli": "codex",
+              "efforts": [
+                "low",
+                "medium",
+                "high",
+                "max"
+              ],
+              "carriesPosture": true
+            },
+            {
+              "id": "codex-herdr",
+              "cli": "codex",
+              "efforts": [
+                "low",
+                "medium",
+                "high",
+                "max"
+              ],
+              "carriesPosture": true
+            }
+          ],
+          "defaultInvocation": "codex-cli-bwrap"
+        },
+        "gemini": {
+          "kind": "agent",
+          "family": "gemini",
+          "mechanism": "out-of-process",
+          "skills": [],
+          "invocations": [
+            {
+              "id": "gemini-cli",
+              "cli": "gemini",
+              "efforts": [
+                "low",
+                "medium",
+                "high",
+                "max"
+              ],
+              "carriesPosture": true
+            }
+          ],
+          "defaultInvocation": "gemini-cli"
+        },
+        "xai": {
+          "kind": "agent",
+          "family": "xai",
+          "mechanism": "out-of-process",
+          "skills": [],
+          "invocations": [
+            {
+              "id": "grok-cli",
+              "cli": "grok",
+              "efforts": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "carriesPosture": true
+            }
+          ],
+          "defaultInvocation": "grok-cli"
+        },
+        "deepseek": {
+          "kind": "agent",
+          "family": "deepseek",
+          "mechanism": "out-of-process",
+          "skills": [],
+          "invocations": [
+            {
+              "id": "pi-cli-bwrap",
+              "cli": "pi",
+              "efforts": [
+                "low",
+                "medium",
+                "high",
+                "max"
+              ],
+              "carriesPosture": true
+            }
+          ],
+          "defaultInvocation": "pi-cli-bwrap"
+        },
+        "glm": {
+          "kind": "agent",
+          "family": "z-ai",
+          "mechanism": "out-of-process",
+          "skills": [],
+          "invocations": [
+            {
+              "id": "pi-cli-bwrap",
+              "cli": "pi",
+              "efforts": [
+                "low",
+                "medium",
+                "high",
+                "max"
+              ],
+              "carriesPosture": true
+            }
+          ],
+          "defaultInvocation": "pi-cli-bwrap"
+        },
+        "gitnexus": {
+          "kind": "tool",
+          "family": "gitnexus",
+          "mechanism": "in-process",
+          "invocations": [],
+          "defaultInvocation": null
+        }
+      }
+    },
+    "accountView": {
+      "pools": {
+        "claude": [
+          {
+            "id": "main",
+            "clis": [
+              "claude"
+            ],
+            "sticky": true
+          },
+          {
+            "id": "spare",
+            "clis": [
+              "claude"
+            ]
+          }
+        ],
+        "openai": [
+          {
+            "id": "work",
+            "clis": [
+              "codex"
+            ]
+          }
+        ]
+      }
+    },
+    "peers": [],
+    "walk": {}
+  },
+  "cases": [
+    {
+      "name": "explain producer inherits flagship from the prefix and binds claude opus",
+      "patch": {},
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "flagship",
+          "tierSource": "capabilities.\"architecture:*\".tier"
+        },
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "model": "opus",
+              "invocation": "claude-cli-bwrap",
+              "pool": "claude",
+              "account": "main"
+            }
+          ]
+        }
+      },
+      "explainContains": [
+        "claude opus @ flagship",
+        "maxTier: maxTier = flagship (not applied)"
+      ]
+    },
+    {
+      "name": "shape system: the workflow recommendation beats the prefix tier and the cap allows frontier",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "label": "architecture-advisory / shape-proposals",
+          "seat": "system",
+          "role": "producer",
+          "workflow": {
+            "tier": "frontier",
+            "source": "workflow:architecture-advisory/shape-proposals/system"
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "frontier",
+          "tierSource": "workflow:architecture-advisory/shape-proposals/system",
+          "maxTier": {
+            "value": "frontier",
+            "source": "capabilities.\"architecture:shape\".maxTier",
+            "applied": false
+          }
+        },
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "model": "fable"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "shape alternative spreads away from the family a soft peer already uses",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "label": "architecture-advisory / shape-proposals",
+          "seat": "alternative",
+          "role": "producer",
+          "independence": {
+            "soft": [
+              "system"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "system",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai",
+              "model": "gpt-6.1-sol"
+            }
+          ],
+          "movedBy": [
+            "spread"
+          ]
+        }
+      },
+      "explainContains": [
+        "moved by: spread"
+      ]
+    },
+    {
+      "name": "shape constraint spreads to the third family",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "label": "architecture-advisory / shape-proposals",
+          "seat": "constraint",
+          "role": "producer",
+          "independence": {
+            "soft": [
+              "system",
+              "alternative"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "system",
+            "executor": "claude",
+            "family": "claude"
+          },
+          {
+            "seat": "alternative",
+            "executor": "openai",
+            "family": "openai"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "gemini",
+              "model": "gemini-4-argon-high"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "critique producer takes the seat tier key of its capability",
+      "patch": {
+        "ask": {
+          "capability": "architecture:critique",
+          "seat": "producer",
+          "role": "producer",
+          "label": "architecture-advisory / critique"
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "frontier",
+          "tierSource": "capabilities.\"architecture:critique\".seats.producer.tier"
+        },
+        "ranked": {
+          "candidates": [
+            {
+              "model": "fable"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "critique reviewer is hard independent of the producer family",
+      "patch": {
+        "ask": {
+          "capability": "architecture:critique",
+          "seat": "reviewer",
+          "role": "reviewer",
+          "label": "architecture-advisory / critique",
+          "independence": {
+            "hard": [
+              "producer"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "producer",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "flagship"
+        },
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai",
+              "model": "gpt-6.1-sol"
+            }
+          ],
+          "independentOf": [
+            {
+              "seat": "producer",
+              "family": "claude"
+            }
+          ],
+          "movedBy": [
+            "independence"
+          ]
+        }
+      },
+      "explainContains": [
+        "!= producer(claude) ok",
+        "moved by: independence"
+      ]
+    },
+    {
+      "name": "critique red-team takes the role taste from the prefix and is pairwise independent at high rigor",
+      "patch": {
+        "ask": {
+          "capability": "architecture:critique",
+          "seat": "red-team",
+          "role": "red-team",
+          "label": "architecture-advisory / critique",
+          "effectiveRigor": "high",
+          "independence": {
+            "hard": [
+              "producer"
+            ],
+            "hardCheckers": [
+              "reviewer"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "producer",
+            "executor": "claude",
+            "family": "claude"
+          },
+          {
+            "seat": "reviewer",
+            "executor": "openai",
+            "family": "openai"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "preferSource": "capabilities.\"architecture:*\".roles.red-team.prefer"
+        },
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "xai",
+              "model": "grok-4.6"
+            }
+          ],
+          "independentOf": [
+            {
+              "seat": "producer",
+              "family": "claude"
+            },
+            {
+              "seat": "reviewer",
+              "family": "openai"
+            }
+          ]
+        }
+      },
+      "explainContains": [
+        "prefer: capabilities.\"architecture:*\".roles.red-team.prefer = [xai]"
+      ]
+    },
+    {
+      "name": "a checker pair is only soft below high rigor, so a shared family is allowed and recorded",
+      "patch": {
+        "ask": {
+          "capability": "architecture:critique",
+          "seat": "red-team",
+          "role": "red-team",
+          "effectiveRigor": "standard",
+          "independence": {
+            "hard": [
+              "producer"
+            ],
+            "hardCheckers": [
+              "reviewer"
+            ]
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "roles": {
+                "red-team": {
+                  "prefer": [
+                    "openai"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "peers": [
+          {
+            "seat": "producer",
+            "executor": "claude",
+            "family": "claude"
+          },
+          {
+            "seat": "reviewer",
+            "executor": "openai",
+            "family": "openai"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai"
+            }
+          ],
+          "sharedWith": [
+            "reviewer"
+          ],
+          "independentOf": [
+            {
+              "seat": "producer",
+              "family": "claude"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "the same pair at high rigor is hard, so the shared family is refused naming both peers",
+      "patch": {
+        "ask": {
+          "capability": "architecture:critique",
+          "seat": "red-team",
+          "role": "red-team",
+          "effectiveRigor": "high",
+          "independence": {
+            "hard": [
+              "producer"
+            ],
+            "hardCheckers": [
+              "reviewer"
+            ]
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "roles": {
+                "red-team": {
+                  "prefer": [
+                    "openai"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "peers": [
+          {
+            "seat": "producer",
+            "executor": "claude",
+            "family": "claude"
+          },
+          {
+            "seat": "reviewer",
+            "executor": "openai",
+            "family": "openai"
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "independence-unsatisfiable",
+          "peers": [
+            {
+              "seat": "producer",
+              "family": "claude"
+            },
+            {
+              "seat": "reviewer",
+              "family": "openai"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "variant A: a capability tier of standard does not lower a workflow recommendation of frontier",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "label": "architecture-advisory / shape-proposals",
+          "seat": "system",
+          "role": "producer",
+          "workflow": {
+            "tier": "frontier",
+            "source": "workflow:w/u/system"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "tier": "standard"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "frontier"
+        }
+      }
+    },
+    {
+      "name": "variant A: a seat without a recommendation runs the capability default",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "label": "architecture-advisory / shape-proposals",
+          "seat": "alternative",
+          "role": "producer"
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "tier": "standard"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "standard"
+        },
+        "ranked": {
+          "candidates": [
+            {
+              "model": "sonnet"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "variant B: above the global ceiling the tier is lowered, visibly, and the lowering names both lines",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "label": "architecture-advisory / shape-proposals",
+          "seat": "system",
+          "role": "producer",
+          "workflow": {
+            "tier": "frontier",
+            "source": "workflow:architecture-advisory/shape-proposals/system"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:shape": null
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "flagship",
+          "tierSource": "maxTier",
+          "loweredFrom": {
+            "from": "frontier",
+            "fromSource": "workflow:architecture-advisory/shape-proposals/system",
+            "reason": "max-tier-cap"
+          },
+          "maxTier": {
+            "value": "flagship",
+            "source": "maxTier",
+            "applied": true
+          }
+        }
+      },
+      "explainContains": [
+        "tier: flagship (max-tier-cap: maxTier = flagship), lowered from frontier (workflow:architecture-advisory/shape-proposals/system)"
+      ]
+    },
+    {
+      "name": "a capability maxTier above the global value lets the tier pass",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "label": "architecture-advisory / shape-proposals",
+          "seat": "system",
+          "role": "producer",
+          "workflow": {
+            "tier": "frontier",
+            "source": "workflow:w/u/system"
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "frontier",
+          "loweredFrom": null
+        }
+      }
+    },
+    {
+      "name": "variant C: a prefer that names a family without a cell at the capped tier is refused with the line to change",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "label": "architecture-advisory / shape-proposals",
+          "seat": "system",
+          "role": "producer",
+          "workflow": {
+            "tier": "frontier",
+            "source": "workflow:w/u/system"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:shape": {
+              "maxTier": null,
+              "seats": {
+                "system": {
+                  "prefer": [
+                    "deepseek"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "tier-cell-missing",
+          "config": "capabilities.\"architecture:shape\".seats.system.prefer"
+        }
+      },
+      "explainContains": [
+        "change capabilities.\"architecture:shape\".seats.system.prefer or set capabilities.\"architecture:shape\".seats.system.tier"
+      ],
+      "skippedReasons": [
+        "tier-cell-missing"
+      ]
+    },
+    {
+      "name": "a hard pin on a family with no cell at the tier is refused the same way",
+      "patch": {
+        "ask": {
+          "capability": "code:review",
+          "seat": "producer",
+          "role": "producer",
+          "label": "w / u"
+        },
+        "config": {
+          "capabilities": {
+            "code:review": {
+              "tier": "flagship",
+              "prefer": [
+                {
+                  "executor": "deepseek",
+                  "invocation": "pi-cli-bwrap"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "tier-cell-missing"
+        }
+      }
+    },
+    {
+      "name": "a family with no cell is skipped and the next family serves the seat",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer"
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                "deepseek",
+                "claude"
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "tier-cell-missing"
+      ]
+    },
+    {
+      "name": "debate judge is hard independent of both sides",
+      "patch": {
+        "ask": {
+          "capability": "group-cognition:critique",
+          "seat": "judge",
+          "role": "judge",
+          "label": "group-cognition / dialectical-critique",
+          "workflow": {
+            "tier": "flagship",
+            "source": "workflow:group-cognition/dialectical-critique/judge"
+          },
+          "independence": {
+            "hard": [
+              "thesis",
+              "antithesis"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "thesis",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          },
+          {
+            "seat": "antithesis",
+            "role": "producer",
+            "executor": "openai",
+            "family": "openai"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "flagship"
+        },
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "gemini",
+              "model": "gemini-4-argon-high"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "debate judge is refused when gemini and xai lack a flagship cell, naming both sides",
+      "patch": {
+        "ask": {
+          "capability": "group-cognition:critique",
+          "seat": "judge",
+          "role": "judge",
+          "label": "group-cognition / dialectical-critique",
+          "workflow": {
+            "tier": "flagship",
+            "source": "workflow:group-cognition/dialectical-critique/judge"
+          },
+          "independence": {
+            "hard": [
+              "thesis",
+              "antithesis"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "thesis",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          },
+          {
+            "seat": "antithesis",
+            "role": "producer",
+            "executor": "openai",
+            "family": "openai"
+          }
+        ],
+        "config": {
+          "modelPolicies": {
+            "gemini": {
+              "flagship": null
+            },
+            "xai": {
+              "flagship": null
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "independence-unsatisfiable",
+          "peers": [
+            {
+              "seat": "thesis",
+              "family": "claude"
+            },
+            {
+              "seat": "antithesis",
+              "family": "openai"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "debate sides default to standard and spread softly",
+      "patch": {
+        "ask": {
+          "capability": "group-cognition:critique",
+          "seat": "antithesis",
+          "role": "producer",
+          "independence": {
+            "soft": [
+              "thesis"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "thesis",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "standard",
+          "tierSource": "defaults.tier"
+        },
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai",
+              "model": "gpt-5.6-terra"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a global maxTier of standard caps the judge visibly",
+      "patch": {
+        "ask": {
+          "capability": "group-cognition:critique",
+          "seat": "judge",
+          "role": "judge",
+          "label": "group-cognition / dialectical-critique",
+          "workflow": {
+            "tier": "flagship",
+            "source": "workflow:group-cognition/dialectical-critique/judge"
+          },
+          "independence": {
+            "hard": [
+              "thesis",
+              "antithesis"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "thesis",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          },
+          {
+            "seat": "antithesis",
+            "role": "producer",
+            "executor": "openai",
+            "family": "openai"
+          }
+        ],
+        "config": {
+          "maxTier": "standard"
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "standard",
+          "loweredFrom": {
+            "from": "flagship",
+            "reason": "max-tier-cap"
+          }
+        }
+      }
+    },
+    {
+      "name": "seat key beats persona beats role beats workflow beats capability default",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "seat": "system",
+          "role": "red-team",
+          "persona": "system-lens",
+          "workflow": {
+            "tier": "advanced",
+            "source": "workflow:w/u/system"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "tier": "mini",
+              "roles": {
+                "red-team": {
+                  "tier": "nano"
+                }
+              },
+              "personas": {
+                "system-lens": {
+                  "tier": "standard"
+                }
+              },
+              "seats": {
+                "system": {
+                  "tier": "flagship"
+                }
+              }
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "flagship",
+          "tierSource": "capabilities.\"architecture:*\".seats.system.tier"
+        }
+      }
+    },
+    {
+      "name": "persona key beats role key",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "seat": "x",
+          "role": "red-team",
+          "persona": "system-lens"
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "roles": {
+                "red-team": {
+                  "tier": "nano"
+                }
+              },
+              "personas": {
+                "system-lens": {
+                  "tier": "standard"
+                }
+              }
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "standard",
+          "tierSource": "capabilities.\"architecture:*\".personas.system-lens.tier"
+        }
+      }
+    },
+    {
+      "name": "role key beats the workflow recommendation and the recommendation is reported",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "seat": "x",
+          "role": "reviewer",
+          "workflow": {
+            "tier": "frontier",
+            "source": "workflow:w/u/x"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "roles": {
+                "reviewer": {
+                  "tier": "advanced"
+                }
+              }
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "advanced",
+          "recommendation": {
+            "tier": "frontier",
+            "source": "workflow:w/u/x"
+          }
+        }
+      },
+      "explainContains": [
+        "workflow recommends frontier (workflow:w/u/x)"
+      ]
+    },
+    {
+      "name": "the exact capability entry beats the prefix entry for a tier key",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "seat": "x",
+          "role": "producer"
+        },
+        "config": {
+          "capabilities": {
+            "architecture:shape": {
+              "tier": "advanced"
+            },
+            "architecture:*": {
+              "tier": "flagship"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "advanced",
+          "tierSource": "capabilities.\"architecture:shape\".tier"
+        }
+      }
+    },
+    {
+      "name": "a capability without a colon has no prefix line and no bare-verb fallback",
+      "patch": {
+        "ask": {
+          "capability": "review",
+          "seat": "x",
+          "role": "producer"
+        },
+        "config": {
+          "capabilities": {
+            "review": {
+              "prefer": [
+                "openai"
+              ]
+            },
+            "code:review": {
+              "prefer": [
+                "claude"
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true
+      },
+      "executors": [
+        "openai"
+      ]
+    },
+    {
+      "name": "prefer lists replace and are not merged; the seat list wins over the prefix list",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "seat": "system",
+          "role": "producer"
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "preferSource": "capabilities.\"architecture:shape\".seats.system.prefer"
+        }
+      },
+      "executors": [
+        "claude",
+        "openai"
+      ]
+    },
+    {
+      "name": "with no prefer anywhere the tier list is the candidate list",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer"
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "preferSource": "tierFallback.standard"
+        }
+      },
+      "executors": [
+        "claude",
+        "openai",
+        "gemini",
+        "xai",
+        "deepseek",
+        "glm"
+      ]
+    },
+    {
+      "name": "the first role-level prefer is taken from the prefix map entry per key",
+      "patch": {
+        "ask": {
+          "capability": "code:debug",
+          "seat": "x",
+          "role": "red-team"
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "preferSource": "capabilities.\"code:*\".roles.red-team.prefer"
+        }
+      },
+      "executors": [
+        "xai"
+      ]
+    },
+    {
+      "name": "an override at or below the resolved tier is accepted and named override",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "tier": "standard"
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "standard",
+          "tierSource": "override"
+        }
+      }
+    },
+    {
+      "name": "an override above the resolved tier is refused",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "tier": "frontier"
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "tier-escalation-unauthorized"
+        }
+      }
+    },
+    {
+      "name": "an authorized door may raise by override, still under the ceiling",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "raiseAuthorized": true,
+          "override": {
+            "tier": "frontier"
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "flagship",
+          "loweredFrom": {
+            "from": "frontier"
+          }
+        }
+      }
+    },
+    {
+      "name": "a door-chosen capability selector that raises the tier is refused",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "selectors": {
+            "capability": "architecture:explain"
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "tier-escalation-unauthorized"
+        }
+      }
+    },
+    {
+      "name": "a door-chosen persona selector that raises the tier is refused and named",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "selectors": {
+            "persona": "heavy"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "misc:*": {
+              "personas": {
+                "heavy": {
+                  "tier": "frontier"
+                }
+              }
+            },
+            "misc:thing": {
+              "maxTier": "frontier"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "tier-escalation-unauthorized"
+        }
+      }
+    },
+    {
+      "name": "an authorized door lets the selector raise and the tier source names it",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "raiseAuthorized": true,
+          "selectors": {
+            "persona": "heavy"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "misc:*": {
+              "personas": {
+                "heavy": {
+                  "tier": "advanced"
+                }
+              }
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "advanced",
+          "raisedBy": "selector:persona"
+        }
+      },
+      "explainContains": [
+        "raised by selector:persona"
+      ]
+    },
+    {
+      "name": "a selector that does not raise the tier is accepted without authorization",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "x",
+          "role": "producer",
+          "selectors": {
+            "persona": "light"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "personas": {
+                "light": {
+                  "tier": "standard"
+                }
+              }
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "standard"
+        }
+      }
+    },
+    {
+      "name": "acceptDependence is ignored unless the door is authorized",
+      "patch": {
+        "ask": {
+          "capability": "architecture:critique",
+          "seat": "reviewer",
+          "role": "reviewer",
+          "override": {
+            "executor": "claude",
+            "acceptDependence": true
+          },
+          "independence": {
+            "hard": [
+              "producer"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "producer",
+            "executor": "claude",
+            "family": "claude"
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "independence-unsatisfiable"
+        }
+      }
+    },
+    {
+      "name": "acceptDependence is honoured when the door is authorized",
+      "patch": {
+        "ask": {
+          "capability": "architecture:critique",
+          "seat": "reviewer",
+          "role": "reviewer",
+          "raiseAuthorized": true,
+          "override": {
+            "executor": "claude",
+            "acceptDependence": true
+          },
+          "independence": {
+            "hard": [
+              "producer"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "producer",
+            "executor": "claude",
+            "family": "claude"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "source": "override"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a pinned invocation that the executor has binds exactly that invocation",
+      "patch": {
+        "ask": {
+          "capability": "code:review",
+          "seat": "reviewer",
+          "role": "reviewer"
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai",
+              "invocation": "codex-cli-bwrap",
+              "pinned": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a pinned invocation the executor lacks is refused and never swapped for another",
+      "patch": {
+        "ask": {
+          "capability": "code:review",
+          "seat": "reviewer",
+          "role": "reviewer"
+        },
+        "config": {
+          "capabilities": {
+            "code:review": {
+              "prefer": [
+                {
+                  "executor": "openai",
+                  "invocation": "codex-cli-bwrap"
+                }
+              ]
+            }
+          }
+        },
+        "launchView": {
+          "executors": {
+            "openai": {
+              "invocations": [
+                {
+                  "id": "codex-herdr",
+                  "cli": "codex",
+                  "efforts": [
+                    "low",
+                    "medium",
+                    "high",
+                    "max"
+                  ],
+                  "carriesPosture": true
+                }
+              ],
+              "defaultInvocation": "codex-herdr"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "pin-unsatisfiable"
+        }
+      }
+    },
+    {
+      "name": "a lone pin that fails does not stop a second family from serving the seat",
+      "patch": {
+        "ask": {
+          "capability": "code:review",
+          "seat": "reviewer",
+          "role": "reviewer"
+        },
+        "launchView": {
+          "executors": {
+            "openai": {
+              "invocations": [
+                {
+                  "id": "codex-herdr",
+                  "cli": "codex",
+                  "efforts": [
+                    "low",
+                    "medium",
+                    "high",
+                    "max"
+                  ],
+                  "carriesPosture": true
+                }
+              ],
+              "defaultInvocation": "codex-herdr"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "invocation": "claude-cli-bwrap"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "pin-unsatisfiable"
+      ]
+    },
+    {
+      "name": "a run-wide override pin that cannot apply is skipped, not refused",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "executor": "openai",
+            "invocation": "missing-cli",
+            "runWide": true
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "tier-cell-missing",
+        "pin-unsatisfiable"
+      ]
+    },
+    {
+      "name": "the same pin on a seat's own override (not run-wide) is refused",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "executor": "openai",
+            "invocation": "missing-cli"
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "pin-unsatisfiable"
+        }
+      }
+    },
+    {
+      "name": "a cell effort is carried into the candidate and named as the cell's",
+      "patch": {
+        "config": {
+          "modelPolicies": {
+            "claude": {
+              "flagship": [
+                {
+                  "model": "opus",
+                  "effort": "high"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "effort": "high",
+              "effortSource": "cell",
+              "model": "opus"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "an override effort below the cell is refused",
+      "patch": {
+        "config": {
+          "modelPolicies": {
+            "claude": {
+              "flagship": [
+                {
+                  "model": "opus",
+                  "effort": "high"
+                }
+              ]
+            }
+          },
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                "claude"
+              ]
+            }
+          }
+        },
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "effort": "low"
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "effort-below-cell"
+        }
+      }
+    },
+    {
+      "name": "an override effort at or above the cell is accepted",
+      "patch": {
+        "config": {
+          "modelPolicies": {
+            "claude": {
+              "flagship": [
+                {
+                  "model": "opus",
+                  "effort": "high"
+                }
+              ]
+            }
+          }
+        },
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "effort": "max"
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "effort": "max",
+              "effortSource": "override"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a cell with no effort runs on the invocation default and says so",
+      "patch": {},
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "effort": null,
+              "effortSource": "invocation-default"
+            }
+          ]
+        }
+      },
+      "explainContains": [
+        "effort: invocation default"
+      ]
+    },
+    {
+      "name": "an effort the CLI cannot render skips that candidate and the next serves",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "effort": "max"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                "xai",
+                "claude"
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "effort-unsupported"
+      ]
+    },
+    {
+      "name": "an effort the pinned CLI cannot render is refused and lists the rendered levels",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "effort": "max"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                {
+                  "executor": "xai",
+                  "invocation": "grok-cli"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "effort-unsupported",
+          "rendered": [
+            "low",
+            "medium",
+            "high"
+          ]
+        }
+      }
+    },
+    {
+      "name": "effective rigor never changes effort or tier",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "effectiveRigor": "critical"
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "flagship"
+        },
+        "ranked": {
+          "candidates": [
+            {
+              "effort": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "an ask whose candidates are all tool executors is not an agent seat",
+      "patch": {
+        "ask": {
+          "capability": "tool:probe",
+          "seat": "x",
+          "role": "producer"
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "not-an-agent-seat"
+        }
+      }
+    },
+    {
+      "name": "governance rejects a disallowed executor",
+      "patch": {
+        "launchView": {
+          "executors": {
+            "claude": {
+              "disallowed": "provider claude is disallowed"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "tier-cell-missing",
+        "governance"
+      ]
+    },
+    {
+      "name": "a required skill the executor does not declare skips it",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "requiredSkills": [
+            "graphify"
+          ]
+        },
+        "launchView": {
+          "executors": {
+            "openai": {
+              "skills": [
+                "graphify"
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a blind seat is not bound to an in-process candidate",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "posture": {
+            "blind": true
+          }
+        },
+        "launchView": {
+          "executors": {
+            "claude": {
+              "mechanism": "in-process"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "tier-cell-missing",
+        "blind-in-process"
+      ]
+    },
+    {
+      "name": "a forced out-of-process seat leases even when the executor would run in-process",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "reviewer",
+          "role": "reviewer",
+          "posture": {
+            "forceOutOfProcess": true
+          }
+        },
+        "launchView": {
+          "executors": {
+            "claude": {
+              "mechanism": "in-process"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "mechanism": "out-of-process",
+              "pool": "claude"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "an in-process seat needs no cell and no account",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer"
+        },
+        "config": {
+          "modelPolicies": {
+            "claude": {
+              "flagship": null
+            }
+          }
+        },
+        "launchView": {
+          "executors": {
+            "claude": {
+              "mechanism": "in-process"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "model": null,
+              "pool": null,
+              "mechanism": "in-process",
+              "modelSource": "no-model-needed"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "an unregistered executor is skipped by name, and a seat with none registered says so",
+      "patch": {
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                "ghost"
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "unknown-executor",
+          "configured": 1
+        }
+      }
+    },
+    {
+      "name": "nothing configured for the seat is no-candidate with zero configured",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer"
+        },
+        "config": {
+          "tierFallback": {
+            "standard": null
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "no-candidate",
+          "configured": 0
+        }
+      }
+    },
+    {
+      "name": "accounts come back sticky first, then probed, and quarantined or failed ones are out",
+      "patch": {
+        "accountView": {
+          "pools": {
+            "claude": [
+              {
+                "id": "q",
+                "clis": [
+                  "claude"
+                ],
+                "quarantinedUntil": 5000
+              },
+              {
+                "id": "late",
+                "clis": [
+                  "claude"
+                ],
+                "quarantinedUntil": 500
+              },
+              {
+                "id": "bad",
+                "clis": [
+                  "claude"
+                ],
+                "probe": "failed"
+              },
+              {
+                "id": "ok",
+                "clis": [
+                  "claude"
+                ],
+                "probe": "ok"
+              },
+              {
+                "id": "sticky",
+                "clis": [
+                  "claude"
+                ],
+                "sticky": true
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "accounts": [
+                "sticky",
+                "ok",
+                "late"
+              ],
+              "account": "sticky"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a pool where every account is quarantined gives no candidate for that entry",
+      "patch": {
+        "accountView": {
+          "pools": {
+            "claude": [
+              {
+                "id": "main",
+                "clis": [
+                  "claude"
+                ],
+                "quarantinedUntil": 9000
+              },
+              {
+                "id": "spare",
+                "clis": [
+                  "claude"
+                ],
+                "quarantinedUntil": 9000
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "tier-cell-missing",
+        "no-account-available"
+      ]
+    },
+    {
+      "name": "an account without a login store for the invocation's CLI is not usable",
+      "patch": {
+        "accountView": {
+          "pools": {
+            "claude": [
+              {
+                "id": "main",
+                "clis": [
+                  "codex"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "tier-cell-missing",
+        "pool-unusable"
+      ]
+    },
+    {
+      "name": "a pool other than the family's with no account cannot pay for the call",
+      "patch": {
+        "config": {
+          "modelPolicies": {
+            "claude": {
+              "flagship": "opus@shared"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "tier-cell-missing",
+        "pool-unusable"
+      ]
+    },
+    {
+      "name": "two entries of one cell are two candidates in cell order and both pools can serve",
+      "patch": {
+        "config": {
+          "modelPolicies": {
+            "claude": {
+              "flagship": [
+                "opus@claude",
+                {
+                  "model": "opus-alt",
+                  "pool": "claude"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "model": "opus"
+            },
+            {
+              "model": "opus-alt"
+            },
+            {
+              "executor": "openai"
+            },
+            {
+              "executor": "gemini"
+            },
+            {
+              "executor": "xai"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a fault excludes one pool and keeps the other pool of the same family",
+      "patch": {
+        "config": {
+          "modelPolicies": {
+            "claude": {
+              "flagship": [
+                "opus@claude",
+                "opus@claude-b"
+              ]
+            }
+          }
+        },
+        "accountView": {
+          "pools": {
+            "claude-b": [
+              {
+                "id": "b1",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ]
+          }
+        },
+        "walk": {
+          "excludePools": [
+            "claude"
+          ]
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "pool": "claude-b",
+              "account": "b1"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "tier-cell-missing",
+        "pool-excluded"
+      ]
+    },
+    {
+      "name": "an account pin selects its pool's survivors and pins the account",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "account": "claude/spare"
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "accounts": [
+                "spare"
+              ],
+              "account": "spare"
+            }
+          ]
+        }
+      },
+      "executors": [
+        "claude"
+      ]
+    },
+    {
+      "name": "an account pin that names no account of the pool is refused",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "account": "claude/ghost"
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "account-pin-unknown"
+        }
+      }
+    },
+    {
+      "name": "an account pin not written pool/account is refused",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "account": "spare"
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "account-pin-invalid"
+        }
+      }
+    },
+    {
+      "name": "after a failure the walk follows tierFallback within the seat's own list and never revisits",
+      "patch": {
+        "walk": {
+          "tried": [
+            {
+              "executor": "claude",
+              "invocation": "claude-cli-bwrap",
+              "pool": "claude",
+              "model": "opus"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai"
+            },
+            {
+              "executor": "gemini"
+            },
+            {
+              "executor": "xai"
+            }
+          ],
+          "fallbackFamilies": [
+            "gemini",
+            "xai"
+          ]
+        }
+      },
+      "executors": [
+        "openai",
+        "gemini",
+        "xai"
+      ]
+    },
+    {
+      "name": "the walk visits the rest of the failed family's cell entries before the next family",
+      "patch": {
+        "config": {
+          "modelPolicies": {
+            "claude": {
+              "flagship": [
+                "opus",
+                {
+                  "model": "opus-alt"
+                }
+              ]
+            }
+          }
+        },
+        "walk": {
+          "tried": [
+            {
+              "executor": "claude",
+              "invocation": "claude-cli-bwrap",
+              "pool": "claude",
+              "model": "opus"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "model": "opus-alt"
+            },
+            {
+              "executor": "openai"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "the walk never leaves the tier it started at",
+      "patch": {
+        "walk": {
+          "tried": [
+            {
+              "executor": "openai",
+              "invocation": "codex-cli-bwrap",
+              "pool": "openai",
+              "model": "gpt-6.1-sol"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "flagship"
+        }
+      },
+      "executors": [
+        "claude",
+        "gemini",
+        "xai"
+      ]
+    },
+    {
+      "name": "a list narrows the walk and the tier list cannot widen it",
+      "patch": {
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                "claude",
+                "gemini"
+              ]
+            }
+          }
+        },
+        "walk": {
+          "tried": [
+            {
+              "executor": "claude",
+              "invocation": "claude-cli-bwrap",
+              "pool": "claude",
+              "model": "opus"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "gemini"
+            }
+          ]
+        }
+      },
+      "executors": [
+        "gemini"
+      ]
+    },
+    {
+      "name": "with no tier list the walk is the prefer order after the failed candidate",
+      "patch": {
+        "config": {
+          "tierFallback": {
+            "flagship": null
+          },
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                "claude",
+                "gemini",
+                "openai"
+              ]
+            }
+          }
+        },
+        "walk": {
+          "tried": [
+            {
+              "executor": "claude",
+              "invocation": "claude-cli-bwrap",
+              "pool": "claude",
+              "model": "opus"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": true
+      },
+      "executors": [
+        "gemini",
+        "openai"
+      ]
+    },
+    {
+      "name": "when every candidate has been tried the walk ends in a named refusal",
+      "patch": {
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                "claude"
+              ]
+            }
+          }
+        },
+        "walk": {
+          "tried": [
+            {
+              "executor": "claude",
+              "invocation": "claude-cli-bwrap",
+              "pool": "claude",
+              "model": "opus"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "no-candidate"
+        }
+      }
+    },
+    {
+      "name": "a multi-round seat keeps executor and model and may rotate to another account of the same pool",
+      "patch": {
+        "walk": {
+          "continuity": {
+            "executor": "claude",
+            "model": "opus",
+            "pool": "claude",
+            "invocation": "claude-cli-bwrap"
+          },
+          "failedAccounts": [
+            {
+              "pool": "claude",
+              "account": "main"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "model": "opus",
+              "accounts": [
+                "spare"
+              ]
+            }
+          ]
+        }
+      },
+      "executors": [
+        "claude"
+      ]
+    },
+    {
+      "name": "a multi-round seat with no account left in its pool is refused, not moved to another family",
+      "patch": {
+        "walk": {
+          "continuity": {
+            "executor": "claude",
+            "model": "opus",
+            "pool": "claude",
+            "invocation": "claude-cli-bwrap"
+          },
+          "failedAccounts": [
+            {
+              "pool": "claude",
+              "account": "main"
+            },
+            {
+              "pool": "claude",
+              "account": "spare"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "seat-continuity-unavailable"
+        }
+      }
+    },
+    {
+      "name": "a multi-round seat whose kept cell is gone is refused",
+      "patch": {
+        "walk": {
+          "continuity": {
+            "executor": "claude",
+            "model": "retired-model",
+            "pool": "claude"
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "seat-continuity-unavailable"
+        }
+      }
+    },
+    {
+      "name": "an empty prefer list is a config error naming the line",
+      "patch": {
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "prefer": []
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "invalid-config",
+          "config": "capabilities.\"architecture:*\".prefer"
+        }
+      }
+    },
+    {
+      "name": "a role key outside the five is a config error",
+      "patch": {
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "roles": {
+                "panelist": {
+                  "prefer": [
+                    "claude"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "invalid-config"
+        }
+      }
+    },
+    {
+      "name": "a wrong tier name in a cell table is a config error",
+      "patch": {
+        "config": {
+          "modelPolicies": {
+            "claude": {
+              "ultra": "x"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "invalid-config",
+          "config": "modelPolicies.claude.ultra"
+        }
+      }
+    },
+    {
+      "name": "a protocol other than 1 is refused",
+      "patch": {
+        "protocol": 2
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "protocol-mismatch"
+        }
+      }
+    }
+  ]
+}
