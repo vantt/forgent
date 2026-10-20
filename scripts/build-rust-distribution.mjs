@@ -51,6 +51,11 @@ export function hashFile(filePath) {
   return 'sha256:' + crypto.createHash('sha256').update(content).digest('hex');
 }
 
+/** Where `cargo build --release` leaves its artifacts for `repoRoot`: `$CARGO_TARGET_DIR/release`, else `target/release`. */
+export function releaseOutputDir(repoRoot = REPO_ROOT, env = process.env) {
+  return path.resolve(repoRoot, env.CARGO_TARGET_DIR || 'target', 'release');
+}
+
 /** Native library name emitted by Cargo on the selected host. */
 export function nativeAddonLibraryName(platform = process.platform) {
   return platform === 'win32' ? 'fgos_node_addon.dll' : platform === 'darwin' ? 'libfgos_node_addon.dylib' : 'libfgos_node_addon.so';
@@ -290,7 +295,7 @@ export function buildRustDistribution({
     throw new Error(`Refusing to stage release tree inside checkout directory: ${resolvedOut}`);
   }
 
-  const outputDir = path.resolve(resolvedRepo, process.env.CARGO_TARGET_DIR || 'target', 'release');
+  const outputDir = releaseOutputDir(resolvedRepo);
   const releaseBin = releaseBinaryPath(outputDir, 'fgos');
   const addonLibrary = path.join(outputDir, nativeAddonLibraryName());
   if (!fs.existsSync(addonLibrary) || !fs.lstatSync(addonLibrary).isFile()) {
