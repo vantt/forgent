@@ -48,6 +48,11 @@ fn terminal_run_with(name: &str, herdr: &FakeHerdr, agent_script: &str, grace_ms
         e["launch"]["args"] = json!(["-c", script]);
         e["launch"]["briefPath"] = json!(dir.join("brief.md"));
     });
+    // The controller prepares both capture files before handing a terminal attempt over.
+    let envelope = run.json("envelope.json").unwrap();
+    for stream in ["stdout", "stderr"] {
+        fs::write(envelope["launch"]["capture"][stream].as_str().unwrap(), "").unwrap();
+    }
     fs::write(run.path("brief.md"), "Do the thing and write result-1.json.\n").unwrap();
     herdr.allocate(&run.attempt_id);
     run
@@ -119,7 +124,7 @@ fn a_full_lifecycle_launches_briefs_waits_for_the_result_and_closes_the_pane_onc
 }
 
 #[test]
-fn an_attempt_that_cannot_go_on_keeps_the_pane_and_names_why() {
+fn an_attempt_that_cannot_go_on_closes_the_captured_pane_and_names_why() {
     let herdr = FakeHerdr::new("blocked");
     herdr.set_explain(Verdict::Blocked);
     let mut run = terminal_run("tblocked", &herdr, "sleep 600", 3_000);
@@ -135,8 +140,8 @@ fn an_attempt_that_cannot_go_on_keeps_the_pane_and_names_why() {
     assert_eq!(receipt["reason"], "terminal:needs-human");
     assert_eq!(run.json("stop-requested.json").unwrap()["cause"], "cancel");
     let release = run.json("steps/release-slot.json").expect("release-slot receipt");
-    assert_eq!(release["detail"]["disposition"], "retain");
-    assert!(pane_closes(&herdr).is_empty(), "the pane stays for a person");
+    assert_eq!(release["detail"]["disposition"], "close");
+    assert_eq!(pane_closes(&herdr), vec!["pane close fk:p1".to_string()]);
     assert!(run.json("agent-binding.json").is_some(), "the gate did start the agent before the supervisor judged the screen");
 }
 

@@ -1,5 +1,5 @@
 // What `fgos run` does when a seat in a pane stops on the provider's own limit screen: the role moves to the
-// next candidate in a new pane and the stopped pane stays open for the person. The decision to move on is
+// next candidate in a new pane and the stopped pane closes after capture. The decision to move on is
 // the run's (it does not depend on how an agent is launched); these tests prove the terminal attempt path
 // feeds it: the attempt settles as `provider-limit`, the next candidate runs as its own attempt in its own
 // pane, and the mutating gate still commits the fallback's work. A real host, the real door, and a fake
@@ -60,7 +60,7 @@ const unitRecord = (project, answer) => {
 };
 const tabsOpened = (project) => project.callsStarting('tab create');
 
-test('a limit screen moves the role to the next candidate in a new pane and keeps the stopped pane open', { skip: SKIP, timeout: 240_000 }, async () => {
+test('a limit screen moves the role to the next candidate in a new pane and closes the captured stopped pane', { skip: SKIP, timeout: 240_000 }, async () => {
   const project = await newProject('fb2');
   limitOnRuns(project, [1]);
   const run = project.startFgosRun({ executorIds: ['alpha', 'beta'] });
@@ -75,10 +75,10 @@ test('a limit screen moves the role to the next candidate in a new pane and keep
   assert.equal(attempts[1].fallbackFrom.executor, 'alpha');
   assert.equal(attempts[1].binding.transport, 'herdr');
   assert.equal(tabsOpened(project).length, 2, 'the next candidate got a pane of its own');
-  assert.equal(project.callsStarting('pane close').length, 1, 'only the finished attempt closed its pane; the limited one stays for the person');
+  assert.equal(project.callsStarting('pane close').length, 2, 'both stopped attempts close their captured panes');
   const limited = project.attemptDirs().find((dir) => dir.endsWith(path.join('producer', '1', 'runs', '01')));
   assert.ok(limited, project.attemptDirs().join('\n'));
-  assert.equal(readJson(path.join(limited, 'steps', 'release-slot.json')).detail.disposition, 'retain');
+  assert.equal(readJson(path.join(limited, 'steps', 'release-slot.json')).detail.disposition, 'close');
   assert.equal(readJson(path.join(limited, 'result.json')).classification.failure.code, 'provider-limit');
 });
 
@@ -93,7 +93,7 @@ test('a fallback runs along a chain of three candidates, one pane each', { skip:
   assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['beta', 'provider-limit'], ['gamma', 'pass']]);
   assert.deepEqual(attempts.map((a) => a.fallbackFrom?.kind ?? null), [null, 'next-candidate', 'next-candidate']);
   assert.equal(tabsOpened(project).length, 3);
-  assert.equal(project.callsStarting('pane close').length, 1);
+  assert.equal(project.callsStarting('pane close').length, 3);
 });
 
 test('with no candidate left a limit stays a structured provider-limit outcome and opens no second pane', { skip: SKIP, timeout: 240_000 }, async () => {
@@ -109,7 +109,7 @@ test('with no candidate left a limit stays a structured provider-limit outcome a
   assert.equal(last.fallbackExhausted?.from?.executor, 'alpha');
   assert.ok(last.fallbackExhausted?.reason);
   assert.equal(tabsOpened(project).length, 1, 'no second pane is opened');
-  assert.equal(project.callsStarting('pane close').length, 0, 'the stopped pane stays');
+  assert.equal(project.callsStarting('pane close').length, 1, 'the stopped captured pane closes');
 });
 
 test('a writing unit whose first candidate hits a limit is committed through the mutating gate from the fallback', { skip: SKIP, timeout: 300_000 }, async () => {

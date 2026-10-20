@@ -272,3 +272,16 @@ fn the_core_never_launches_into_an_attached_or_released_slot() {
     assert!(core.launch("own", &launch_spec()).is_err());
     assert!(driver.calls("pane.run").is_empty());
 }
+
+#[test]
+fn immediate_close_with_a_foreign_foreground_is_kept_without_a_release_marker() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("close-foreign"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 31337, argv: vec!["vim".into()] }], 31337);
+    assert!(matches!(core.release("a", Disposition::Close, None).unwrap(), ReleaseOutcome::KeptUnknown { .. }));
+    assert!(driver.panes.borrow().contains_key(&slot.pane_id));
+    driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 900, argv: vec!["bash".into()] }], 900);
+    assert!(matches!(core.release("a", Disposition::Close, None).unwrap(), ReleaseOutcome::Released { disposition: Disposition::Close }));
+    assert!(!driver.panes.borrow().contains_key(&slot.pane_id));
+}
