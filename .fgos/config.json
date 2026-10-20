@@ -50,7 +50,18 @@
       },
       "execute": {
         "description": "Compliance-driven work -- value comes from following the plan, changes files, and must pass verification.",
-        "prefer": "claude",
+        "prefer": [
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
+          },
+          "claude"
+        ],
         "serves": {
           "outputKind": "change",
           "mutates": true
@@ -74,6 +85,12 @@
             "executor": "gemini",
             "invocation": "omp-herdr"
           },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
+          },
           "claude"
         ]
       },
@@ -83,6 +100,12 @@
           {
             "executor": "gemini",
             "invocation": "omp-herdr"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
           },
           "claude"
         ],
@@ -98,6 +121,10 @@
           {
             "executor": "openai",
             "invocation": "codex-cli-bwrap"
+          },
+          {
+            "executor": "claude",
+            "invocation": "claude-cli-bwrap"
           }
         ],
         "confinement": {
@@ -112,7 +139,18 @@
       },
       "code:test": {
         "description": "Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
-        "prefer": "claude",
+        "prefer": [
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
+          },
+          "claude"
+        ],
         "serves": {
           "outputKind": "verification",
           "domain": "code"
@@ -124,6 +162,10 @@
           {
             "executor": "openai",
             "invocation": "codex-cli-bwrap"
+          },
+          {
+            "executor": "claude",
+            "invocation": "claude-cli-bwrap"
           }
         ],
         "confinement": {
@@ -137,7 +179,18 @@
       },
       "code:refactor": {
         "description": "Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
-        "prefer": "claude",
+        "prefer": [
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
+          },
+          "claude"
+        ],
         "serves": {
           "outputKind": "change",
           "domain": "code",
@@ -696,6 +749,12 @@
           {
             "executor": "gemini",
             "invocation": "omp-herdr"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
           },
           "claude"
         ],
@@ -1274,7 +1333,42 @@
         ]
       }
     ],
-    "idleTimeoutMs": 5400000
+    "idleTimeoutMs": 5400000,
+    "tierFallback": {
+      "nano": [
+        "gemini",
+        "deepseek",
+        "z-ai",
+        "claude",
+        "openai"
+      ],
+      "standard": [
+        "gemini",
+        "deepseek",
+        "z-ai",
+        "claude",
+        "openai"
+      ],
+      "advanced": [
+        "gemini",
+        "deepseek",
+        "z-ai",
+        "claude",
+        "openai"
+      ],
+      "flagship": [
+        "claude",
+        "openai",
+        "gemini",
+        "xai"
+      ],
+      "frontier": [
+        "claude",
+        "openai",
+        "gemini",
+        "xai"
+      ]
+    }
   },
   "gateBypass": {
     "level": "standard"
