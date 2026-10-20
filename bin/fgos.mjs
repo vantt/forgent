@@ -107,7 +107,7 @@ import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
 import { withMainCheckout } from '../src/runner/repo-locks.mjs';
-import { gitPortOptions } from '../src/git/inspect.mjs';
+import { gitPortOptions, gitWriter } from '../src/git/inspect.mjs';
 import { nativeError } from '../src/git/native.mjs';
 import { createGitSafeRestore } from '../src/git/restore.mjs';
 import { HolderLockError, createLockScope } from '../src/holder-lock/index.mjs';
@@ -3818,7 +3818,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const cwd = process.cwd();
         const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
         const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
-        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);
+        const writer = gitWriter(path.join(repoRoot, '.fgos'));
         return createWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
           path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),
           detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),
@@ -3829,7 +3829,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const cwd = process.cwd();
         const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
         const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
-        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);
+        const writer = gitWriter(path.join(repoRoot, '.fgos'));
         return removeWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
           path: positional[1], deliveredTo: requireField(flags['delivered-to'], 'worktree remove requires --delivered-to <ref>'),
         });

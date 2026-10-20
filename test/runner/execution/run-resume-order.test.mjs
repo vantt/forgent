@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { acquireSync, createLockScope } from './src/holder-lock/index.mjs';
+import { acquireSync, createLockScope, resolveStateRoot } from './src/holder-lock/index.mjs';
 import { createGitSync } from './src/git/index.mjs';
 import { holdLockInChild } from './test/helpers/hold-lock-in-child.mjs';
 import * as sync from './src/runner/execution/unit-sync.mjs';
@@ -47,7 +47,7 @@ try {
   assert.equal(lease.result,'acquired');
   const target = git(main,'rev-parse','HEAD');
   try {
-    const native = createGitSync({stateRoot:process.env.FGOS_STATE_ROOT,repoPath:tree,trustedMain:main,writer:record.gitWriter});
+    const native = createGitSync({stateRoot:resolveStateRoot({fgosDir:path.join(main,'.fgos')}).stateRoot,repoPath:tree,trustedMain:main,writer:record.gitWriter});
     const started = native.start({operationId:'resume-order',target,message:'sync'},[lease.handle]);
     assert.equal(started.state,'conflicted-open');
     record.sync = {ref:'main',sha:target,status:'conflicted',operationId:'resume-order',conflicts:['a'],scopeAdded:['a']};

@@ -107,7 +107,7 @@ export function makeDownloadProject(tag) {
   const home = path.join(root, 'home');
   const state = path.join(root, 'state');
   fs.mkdirSync(home);
-  fs.mkdirSync(state);
+  fs.mkdirSync(state, { mode: 0o700 });
   return { root, proj, home, state };
 }
 

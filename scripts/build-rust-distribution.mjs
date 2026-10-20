@@ -12,6 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { createGitInspect, gitPortOptions } from '../src/git/inspect.mjs';
 import { scan, writeMutationCensus } from './git-one-door-scan.mjs';
 import { repositoryDirs, repositoryFiles } from './lib/git-dir-layout.mjs';
@@ -339,13 +340,16 @@ export function buildRustDistribution({
   const legacyNodeRoot = path.join(resolvedOut, 'libexec', 'legacy-node');
   fs.mkdirSync(legacyNodeRoot, { recursive: true });
 
-  // The addon this build just compiled reads the checkout's file list (no `git` child of our own).
-  const builtAddon = { manifest: { components: { nativeAddon: nativeAddonComponent(addonLibrary, path.basename(addonLibrary), resolvedRepo) } }, releaseRoot: outputDir };
-  const openInspect = () => createGitInspect(gitPortOptions(resolvedRepo), { descriptor: builtAddon });
-  // The one-door census of the product this checkout declares (Git spec §12, V-GATE); doctor's
-  // git-mutation-one-door checks it is empty and was built from the payload it sits in.
-  writeMutationCensus(resolvedRepo, scan({ root: resolvedRepo, openInspect }));
-  const sourceFiles = listLegacyNodeSourceFiles(resolvedRepo, openInspect);
+  // The release manifest owns this single physical copy, outside the Node sources. It is staged
+  // first so the build loads the addon it just compiled through the same `.node` file the release
+  // ships: Node loads a native module by that extension and parses any other name as JavaScript.
+  const stagedAddon = path.join(resolvedOut, ADDON_RELATIVE);
+  fs.mkdirSync(path.dirname(stagedAddon), { recursive: true });
+  fs.copyFileSync(addonLibrary, stagedAddon);
+  fs.chmodSync(stagedAddon, 0o644);
+  const nativeAddon = nativeAddonComponent(stagedAddon, ADDON_RELATIVE, resolvedRepo);
+  // That addon reads the checkout's file list (no `git` child of our own) and writes the census.
+  const sourceFiles = readCheckoutWithAddon(resolvedRepo, resolvedOut);
 
   for (const rel of sourceFiles) {
     const srcFull = path.join(resolvedRepo, rel);
@@ -368,14 +372,6 @@ export function buildRustDistribution({
   // purpose (the checkout's tree holds dev tooling too); without this the staged CLI cannot
   // import them and every verb that does (workflow, setup registrations) fails after install.
   stageProductionDependencies(resolvedRepo, pkg, legacyNodeRoot);
-
-  // The release manifest owns this single physical copy, outside the Node sources.
-  const addonRelative = 'libexec/native/fgos.node';
-  const stagedAddon = path.join(resolvedOut, addonRelative);
-  fs.mkdirSync(path.dirname(stagedAddon), { recursive: true });
-  fs.copyFileSync(addonLibrary, stagedAddon);
-  fs.chmodSync(stagedAddon, 0o644);
-  const nativeAddon = nativeAddonComponent(stagedAddon, addonRelative, resolvedRepo);
 
   // 4. Build files[] descriptor array over the staged tree
   const stagedFiles = [];
@@ -501,8 +497,29 @@ export function buildRustDistribution({
   };
 }
 
+/**
+ * The payload's source files, read with the addon at `descriptor`, after writing the one-door
+ * census of the product this checkout declares (Git spec §12, V-GATE; doctor's
+ * git-mutation-one-door checks it is empty and was built from the payload it sits in). It runs in
+ * a child process: a process loads one addon (Git spec §4), and the caller may already hold its own.
+ */
+function readCheckoutWithAddon(repoRoot, releaseRoot) {
+  const out = execFileSync(process.execPath, [__filename, READ_CHECKOUT, repoRoot, releaseRoot], {
+    encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'inherit'],
+  });
+  return JSON.parse(out);
+}
+const READ_CHECKOUT = '--read-checkout-with-addon';
+const ADDON_RELATIVE = 'libexec/native/fgos.node';
+
 // CLI entry point
-if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+if (process.argv[2] === READ_CHECKOUT && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  const [repoRoot, releaseRoot] = process.argv.slice(3);
+  const nativeAddon = nativeAddonComponent(path.join(releaseRoot, ADDON_RELATIVE), ADDON_RELATIVE, repoRoot);
+  const openInspect = () => createGitInspect(gitPortOptions(repoRoot), { descriptor: { manifest: { components: { nativeAddon } }, releaseRoot } });
+  writeMutationCensus(repoRoot, scan({ root: repoRoot, openInspect }));
+  process.stdout.write(JSON.stringify(listLegacyNodeSourceFiles(repoRoot, openInspect)));
+} else if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const args = process.argv.slice(2);
   let outDir = null;
   let repoRoot = REPO_ROOT;

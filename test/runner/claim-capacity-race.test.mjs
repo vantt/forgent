@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initStore, addWork } from '../../src/state/store.mjs';
@@ -26,6 +27,7 @@ function initRepo() {
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   git('add', 'seed.txt');
   git('commit', '-q', '-m', 'init');
+  activateGitFixture(repoRoot);
   const dir = path.join(repoRoot, '.fgos');
   initStore(dir);
   return { repoRoot, dir, git };
@@ -96,24 +98,27 @@ test('two processes claiming the last worker slot: exactly one wins, the other g
   }
 });
 
-test('a claim holds neither main nor state while git creates the worktree', { skip: HOOK_TEST_SKIP }, async () => {
+test('a claim holds neither main nor state while it creates the worktree', { skip: HOOK_TEST_SKIP }, async () => {
   const { repoRoot, dir } = initRepo();
   addTodo(dir, 'item-a');
-  const marker = path.join(repoRoot, 'checkout-started');
-  const hook = path.join(repoRoot, '.git', 'hooks', 'post-checkout');
-  fs.writeFileSync(hook, `#!/bin/sh\ntouch ${JSON.stringify(marker)}\nsleep 1\n`);
-  fs.chmodSync(hook, 0o755);
 
+  // Holding worktree-admin stops the claim inside its worktree step, after its record is written.
+  // Git runs no repository hook for a worktree it creates, so no hook can mark that point.
+  const holder = await holdLockInChild('worktree-admin', { fgosDir: dir });
   const claimant = claimInChild({ dir, repoRoot, id: 'item-a', isolate: true });
-  await waitFor(() => fs.existsSync(marker), 'git worktree add to start its post-checkout hook');
+  try {
+    await waitFor(() => readClaim(dir, 'item-a'), 'the claim record');
 
-  // The claim is mid `git worktree add`: another session can take main and
-  // write state at once instead of waiting for the checkout to finish.
-  const startedAt = Date.now();
-  await withMainCheckout(createLockScope('probe'), 'probe', () => 'in', { fgosDir: dir, waitMs: 1 });
-  addTodo(dir, 'item-c');
-  assert.ok(Date.now() - startedAt < 800, 'main and state were free while the worktree was being created');
-  assert.ok(readClaim(dir, 'item-a'), 'the claim was already written when the worktree add started');
+    // The claim is in its worktree step: another session can take main and
+    // write state at once instead of waiting for the checkout to finish.
+    const startedAt = Date.now();
+    await withMainCheckout(createLockScope('probe'), 'probe', () => 'in', { fgosDir: dir, waitMs: 1 });
+    addTodo(dir, 'item-c');
+    assert.ok(Date.now() - startedAt < 800, 'main and state were free while the worktree was being created');
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
 
   const result = await claimant.done;
   assert.equal(result.ok, true, JSON.stringify(result));

@@ -18,6 +18,12 @@ export function createGitInspect(options, loaderOptions) {
   return Object.freeze(facade);
 }
 
+/** The writer a Git port records for `fgosDir`'s session: the identity id as text (a `pid`
+ * answer is an integer, every port's writer is a string). */
+export function gitWriter(fgosDir) {
+  return String(resolveWriterIdentity(fgosDir).id);
+}
+
 export function gitPortOptions(repoPath, { mutation = false } = {}) {
   outsideGate();
   const stateRoot = resolveStateRoot({ fgosDir: path.join(repoPath, '.fgos') }).stateRoot;
@@ -26,6 +32,6 @@ export function gitPortOptions(repoPath, { mutation = false } = {}) {
   const facts = createGitInspect(seed).resolveRepo();
   if (facts.notARepository) return seed;
   const options = { ...seed, trustedMain: facts.trustedMainRoot };
-  if (mutation) options.writer = String(resolveWriterIdentity(path.join(facts.trustedMainRoot, '.fgos')).id);
+  if (mutation) options.writer = gitWriter(path.join(facts.trustedMainRoot, '.fgos'));
   return options;
 }

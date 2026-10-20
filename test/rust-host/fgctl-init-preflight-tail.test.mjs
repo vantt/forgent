@@ -309,7 +309,7 @@ test('holder-lock gate: a git that leaves a background gc while it borrows a loc
   // The borrow vectors build their throwaway repository under TMPDIR: pin it so the escaped gc can be looked for.
   const tempTmp = path.join(root, 'tmp');
   try {
-    for (const dir of [tempHome, tempState, tempProj, tempTmp]) fs.mkdirSync(dir);
+    for (const dir of [tempHome, tempState, tempProj, tempTmp]) fs.mkdirSync(dir, { mode: 0o700 });
     execFileSync('git', ['init'], { cwd: tempProj });
 
     const res = runFgctl(['init', '--from', fixture.releaseDir], {
@@ -335,7 +335,7 @@ test('holder-lock gate: init with the real git passes the gate and checks both l
   const tempState = path.join(root, 'state');
   const tempProj = path.join(root, 'proj');
   try {
-    for (const dir of [tempHome, tempState, tempProj]) fs.mkdirSync(dir);
+    for (const dir of [tempHome, tempState, tempProj]) fs.mkdirSync(dir, { mode: 0o700 });
     execFileSync('git', ['init'], { cwd: tempProj });
 
     const res = runFgctl(['init', '--from', fixture.releaseDir], { cwd: tempProj, stateHome: tempState, env: { HOME: tempHome } });

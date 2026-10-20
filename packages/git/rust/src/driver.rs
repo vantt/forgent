@@ -13,6 +13,9 @@ use std::time::{Duration, Instant};
 pub(crate) const PATH_LIMIT: usize = 64 * 1024 * 1024;
 const DIFF_LIMIT: usize = 50 * 1024 * 1024;
 const STDERR_LIMIT: usize = 64 * 1024;
+/// A borrowed run is where commit hooks run, and Git sends their output to stderr: commit children
+/// get the holder-lock ceiling for them (holder-lock spec, run_borrowed: 64 MiB), never a cut.
+const BORROWED_STDERR_LIMIT: usize = 64 * 1024 * 1024;
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 static GIT: OnceLock<Option<PathBuf>> = OnceLock::new();
 // One selected executable and one floor result, including failures, per process.
@@ -1119,14 +1122,15 @@ impl GitDriver {
             || ((policy == Policy::Remote || policy == Policy::HookContext) && loan.is_some())
         {
             let loan = loan.ok_or_else(|| refusal("publication-borrow-required"))?;
-            // `linux-pgroup` cannot prove an escapee that dropped the borrowed
-            // descriptor and left the process group is gone. Where user code
-            // may run, the borrow marks the child's environment and reports
-            // survivors that inherited the mark.
+            // A borrowed run is spawned by holder-lock with the descriptor
+            // mapped, outside any containment domain, whichever driver this
+            // machine selects: its drain cannot prove gone an escapee that
+            // dropped the descriptor and left the process group. Where user
+            // code may run, the borrow marks the child's environment and
+            // reports survivors that inherited the mark.
             // Reading the configuration runs no user code, and it is itself how
             // the check below learns the configuration.
-            let watch = self.containment.guarantee().driver == "linux-pgroup"
-                && args.first() != Some(&"config")
+            let watch = args.first() != Some(&"config")
                 && repo.is_some_and(|r| self.user_code_may_run(r, policy).unwrap_or(true));
             let result = loan.run_borrowed(
                 &fgos_holder_lock::BorrowSpec {
@@ -1139,7 +1143,7 @@ impl GitDriver {
                 &fgos_holder_lock::BorrowIo {
                     stdin: input.to_vec(),
                     stdout_limit: limit,
-                    stderr_limit: STDERR_LIMIT,
+                    stderr_limit: BORROWED_STDERR_LIMIT,
                     deadline: Instant::now()
                         .checked_add(timeout)
                         .ok_or_else(|| refusal("invalid-git-deadline"))?,

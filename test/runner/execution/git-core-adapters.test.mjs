@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { acquireSync, createLockScope } from '../../../src/holder-lock/index.mjs';
+import { acquireSync, createLockScope, resolveStateRoot } from '../../../src/holder-lock/index.mjs';
 import { createGitRepositoryConfig } from '../../../src/git/index.mjs';
 import { preflightUnitWorktree, commitUnitWork } from '../../../src/runner/execution/commit-unit-work.mjs';
 import { runPendingSync, commitRoundWithSync, assertSyncResumable } from '../../../src/runner/execution/unit-sync.mjs';
@@ -31,7 +31,7 @@ function fixture(conflict = false) {
 function hook(f, owned) {
   const hooks=path.join(f.main,'hooks'), count=path.join(f.temp,'count');fs.mkdirSync(hooks);
   fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\necho call >> '${count}'\nprintf '  original refusal\\nsecond line\\n' >&2\nexit 1\n`,{mode:0o755});
-  if(owned) createGitRepositoryConfig({stateRoot:process.env.FGOS_STATE_ROOT,repoPath:f.main,trustedMain:f.main}).ensureHooks({ownedPath:hooks,operationId:'owned-hook'});
+  if(owned) createGitRepositoryConfig({stateRoot:resolveStateRoot({fgosDir:path.join(f.main,'.fgos')}).stateRoot,repoPath:f.main,trustedMain:f.main}).ensureHooks({ownedPath:hooks,operationId:'owned-hook'});
   else f.git(f.main,'config','core.hooksPath',hooks);
   return {count,file:path.join(hooks,'pre-commit')};
 }

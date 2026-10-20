@@ -10,7 +10,7 @@ import { execFileSync } from 'node:child_process';
 
 import { changedPaths, commitOnBranch, commitUnitWork as nativeCommitUnitWork, preflightUnitWorktree, gitContext } from '../../../src/runner/execution/commit-unit-work.mjs';
 
-import { acquireSync, createLockScope } from '../../../src/holder-lock/index.mjs';
+import { acquireSync, createLockScope, resolveStateRoot } from '../../../src/holder-lock/index.mjs';
 import { createGitRepositoryConfig } from '../../../src/git/index.mjs';
 const baselines = new Map(), custody = new Map();
 function commitUnitWork(args) {
@@ -434,7 +434,7 @@ test('a pre-commit hook refusing a sync merge commit is reported hook-refused wi
     const hooks=path.join(repoRoot,'hooks');fs.mkdirSync(hooks);
     fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\necho original-refusal >&2\nexit 1\n',{mode:0o755});
     git(repoRoot,'config','--unset','core.hooksPath');
-    createGitRepositoryConfig({stateRoot:process.env.FGOS_STATE_ROOT,repoPath:repoRoot,trustedMain:repoRoot}).ensureHooks({ownedPath:hooks,operationId:'owned-test-hook'});
+    createGitRepositoryConfig({stateRoot:resolveStateRoot({fgosDir:path.join(repoRoot,'.fgos')}).stateRoot,repoPath:repoRoot,trustedMain:repoRoot}).ensureHooks({ownedPath:hooks,operationId:'owned-test-hook'});
     fixtureAuthority(repoRoot, linked);
     const result=startSyncMerge({worktree:linked,repoRoot,ref:'main',sha:target,custody:custody.get(linked)});
     custody.get(linked).release();

@@ -14,6 +14,7 @@ import { execFileSync } from 'node:child_process';
 
 import { runUnitWithPort as runUnit, prepareActivatedGitFixture } from '../../helpers/run-unit-with-port.mjs';
 import { createGitRepositoryConfig } from '../../../src/git/index.mjs';
+import { resolveStateRoot } from '../../../src/holder-lock/index.mjs';
 import { validateUnit } from '../../../src/runner/execution/unit.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -321,7 +322,7 @@ function refusingHook(repoRoot, message) {
   const hooks = path.join(repoRoot, 'refusing-hooks');
   fs.mkdirSync(hooks, { recursive: true });
   fs.writeFileSync(path.join(hooks, 'pre-commit'), `#!/bin/sh\necho "${message}" >&2\nexit 1\n`, { mode: 0o755 });
-  createGitRepositoryConfig({stateRoot:process.env.FGOS_STATE_ROOT,repoPath:repoRoot,trustedMain:repoRoot}).ensureHooks({ownedPath:hooks,operationId:'owned-refusing-hook'});
+  createGitRepositoryConfig({stateRoot:resolveStateRoot({fgosDir:path.join(repoRoot,'.fgos')}).stateRoot,repoPath:repoRoot,trustedMain:repoRoot}).ensureHooks({ownedPath:hooks,operationId:'owned-refusing-hook'});
   return () => gitIn(repoRoot, 'config', '--unset', 'core.hooksPath');
 }
 

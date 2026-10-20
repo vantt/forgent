@@ -876,7 +876,7 @@ test('download: fgctl upgrade downloads the target release, verifies SHA256SUMS,
 
   try {
     for (const d of [projA, projB, stateA, stateB, homeA, homeB, assets]) {
-      fs.mkdirSync(d, { recursive: true });
+      fs.mkdirSync(d, { recursive: true, mode: 0o700 });
     }
     for (const p of [projA, projB]) {
       execFileSync('git', ['init'], { cwd: p });
@@ -963,7 +963,7 @@ test('holder-lock gate: a git that leaves a background gc while it borrows a loc
   // The borrow vectors build their throwaway repository under TMPDIR: pin it so the escaped gc can be looked for.
   const tmpDir = path.join(root, 'tmp');
   try {
-    fs.mkdirSync(stateHome);
+    fs.mkdirSync(stateHome, { mode: 0o700 });
     fs.mkdirSync(projDir);
     fs.mkdirSync(tmpDir);
     execFileSync('git', ['init'], { cwd: projDir });

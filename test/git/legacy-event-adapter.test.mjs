@@ -7,6 +7,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createGitScopedCommit, createGitRepositoryConfig } from '../../src/git/index.mjs';
 import { checkpointLegacyEventFiles, commitLegacyEventFiles } from '../../src/state/legacy-event-git-adapter.mjs';
+import { resolveStateRoot } from '../../src/holder-lock/index.mjs';
 
 test('temporary Work declaration admits exact legacy events on main only',()=>{
  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'legacy-git-adapter-'));try {
@@ -16,7 +17,7 @@ test('temporary Work declaration admits exact legacy events on main only',()=>{
   for(const p of files){fs.mkdirSync(path.dirname(path.join(temp,p)),{recursive:true});fs.writeFileSync(path.join(temp,p),'base\n');}
   fs.writeFileSync(path.join(temp,'.fgos/config.json'),'config');git('add','.');git('commit','-qm','base');
   const fence=path.join(temp,'.fgos/locks/activation.lock');fs.mkdirSync(fence,{recursive:true});fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));
-  const options={stateRoot:process.env.FGOS_STATE_ROOT,repoPath:temp,trustedMain:temp,writer:'fixture'};
+  const options={stateRoot:resolveStateRoot({fgosDir:path.join(temp,'.fgos')}).stateRoot,repoPath:temp,trustedMain:temp,writer:'fixture'};
   for(const p of files)fs.appendFileSync(path.join(temp,p),'event\n');
   fs.appendFileSync(path.join(temp,'.fgos/config.json'),'keep');
   const result=checkpointLegacyEventFiles(options,{files,message:'chore(work): checkpoint',operationId:'checkpoint'});
@@ -83,7 +84,7 @@ const fs = require('node:fs');
 })();
 `,{mode:0o755});
   git('config','core.hooksPath',hooks);
-  const options = {stateRoot:process.env.FGOS_STATE_ROOT,repoPath:repo,trustedMain:repo,writer:'fixture'};
+  const options = {stateRoot:resolveStateRoot({fgosDir:path.join(repo,'.fgos')}).stateRoot,repoPath:repo,trustedMain:repo,writer:'fixture'};
   const port = createGitScopedCommit(options);
   const event = '.fgos/events.jsonl';
   for (const change of ['add','modify','delete']) {

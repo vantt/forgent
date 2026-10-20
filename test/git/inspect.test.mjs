@@ -67,3 +67,31 @@ test('Inspect marshals real byte paths, explicit absence, reads, pages and snaps
     assert.deepEqual(nonRepo.resolveRepo(), { notARepository: true });
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
+
+// A session with no env id resolves to a process (`source: pid`, an integer id); every Git port's
+// writer is a string, so the door that hands the writer to a port must give text for that answer.
+test('a Git port writer is text when the session identity is a process id', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-git-writer-'));
+  const repoPath = path.join(temp, 'repo'); fs.mkdirSync(repoPath);
+  try {
+    execFileSync('git', ['-C', repoPath, 'init', '-q', '--initial-branch=main']);
+    const env = { ...process.env, FGOS_HOST_BIN: built.hostBin, FGOS_ACTIVE_MANIFEST_PATH: built.manifest, XDG_STATE_HOME: path.join(temp, 'state') };
+    for (const name of ['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'CLAUDE_CODE_SESSION_ID', 'FGOS_STATE_ROOT']) delete env[name];
+    const out = execFileSync(process.execPath, ['--input-type=module', '-'], { cwd: root, env, encoding: 'utf8', input: `
+import path from 'node:path';
+import { gitPortOptions, gitWriter } from './src/git/inspect.mjs';
+import { createGitSync } from './src/git/index.mjs';
+import { resolveWriterIdentity } from './src/util/session-identity.mjs';
+const repo = ${JSON.stringify(repoPath)};
+const identity = resolveWriterIdentity(path.join(repo, '.fgos'));
+const options = gitPortOptions(repo, { mutation: true });
+createGitSync(options);
+console.log(JSON.stringify({ identity, writer: options.writer, door: gitWriter(path.join(repo, '.fgos')) }));
+` });
+    const { identity, writer, door } = JSON.parse(out);
+    assert.equal(identity.source, 'pid');
+    assert.equal(typeof identity.id, 'number');
+    assert.equal(writer, String(identity.id));
+    assert.equal(door, writer);
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});

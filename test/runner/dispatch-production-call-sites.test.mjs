@@ -17,6 +17,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -60,6 +61,7 @@ function fixtureRepo(makeExecutor = () => HERDR_EXECUTOR) {
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: root });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: root });
   execFileSync('git', ['commit', '-q', '--allow-empty', '-m', 'initial'], { cwd: root });
+  activateGitFixture(root);
   // The mock herdr writes its script, wrapper and bookkeeping into the repo
   // root. Those are the harness, not the worker, so they are ignored the way a
   // real repo ignores its own noise -- otherwise the stray-write guard would

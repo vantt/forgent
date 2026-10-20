@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { scan, census, verifyCensus, MUTATION_CENSUS_PATH } from '../../scripts/git-one-door-scan.mjs';
+import { productFrame } from '../helpers/git-spawn-spy.mjs';
 
 const PROBES = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'fixtures', 'git-one-door');
 
@@ -116,4 +117,18 @@ test('doctor refuses a census that lists a site, or whose files do not match the
   write({ ...empty, files: { ...empty.files, 'bin/other.mjs': 'x' } });
   assert.match(verifyCensus(JSON.parse(fs.readFileSync(path.join(root, MUTATION_CENSUS_PATH), 'utf8')), root).message, /digest does not match its own file list/);
   assert.equal(verifyCensus(null, root).passed, false, 'a missing census fails');
+});
+
+// The scan counts each runBorrowed call as its own site; the runtime spy must agree, or every
+// test that borrows a lock to run git is charged to holder-lock (and a product caller would hide).
+test('the spawn spy charges a command run through runBorrowed to the code that called runBorrowed', () => {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+  const stack = (caller) => ['Error',
+    `    at spiedSpawn (file://${root}/test/helpers/git-spawn-spy.mjs:110:20)`,
+    `    at runBorrowed (file://${root}/src/holder-lock/index.mjs:552:13)`,
+    `    at caller (file://${root}/${caller}:7:3)`].join('\n');
+  assert.equal(productFrame(stack('test/e2e/main-checkout-borrow-hook.test.mjs')), null);
+  assert.equal(productFrame(stack('src/runner/goal-check.mjs')), 'src/runner/goal-check.mjs:7');
+  const direct = ['Error', `    at spawnSync (file://${root}/src/holder-lock/index.mjs:300:9)`].join('\n');
+  assert.equal(productFrame(direct), 'src/holder-lock/index.mjs:300', 'holder-lock spawning git itself stays a site');
 });

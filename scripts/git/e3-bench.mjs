@@ -401,16 +401,32 @@ function compileArtifacts() {
   return { addon: path.join(release, 'libfgos_node_addon.so'), fixture: path.join(release, 'examples/e3_fixture'), fgctl: path.join(release, 'fgctl'), host: path.join(release, 'fgos') };
 }
 
-/** Stage the addon as a release-shaped payload and write its loader descriptor. */
-async function stageAddon(root, addonFile) {
+/**
+ * Stage the addon and host the way a dev checkout's manifest names them (the shape `npm test` and
+ * `npm run fgos:dev` use): the typed rows load it through the written descriptor, and product code
+ * that loads the addon on its own (the legacy Land path) finds the same file through
+ * FGOS_HOST_BIN and FGOS_ACTIVE_MANIFEST_PATH, so one process never loads two addons. The staging
+ * sits inside the checkout because that manifest's paths are relative to the payload root; it is
+ * removed when this process exits.
+ */
+async function stageAddon(root, addonFile, hostFile = process.env.FGOS_HOST_BIN) {
+  if (!hostFile) throw new Error('e3-bench: staging the addon needs the built fgos host (--host or FGOS_HOST_BIN)');
   const { nativeAddonComponent } = await import('../build-rust-distribution.mjs');
-  const releaseRoot = privateDir(path.join(root, 'addon-release'));
-  fs.mkdirSync(path.join(releaseRoot, 'native'));
-  const file = path.join(releaseRoot, 'native/fgos.node');
+  const staging = privateDir(path.join(CHECKOUT, '.fgos/runtime/e3-bench', `addon-${process.pid}-${crypto.randomUUID()}`));
+  process.on('exit', () => fs.rmSync(staging, { recursive: true, force: true }));
+  const file = path.join(staging, 'fgos.node');
   fs.copyFileSync(addonFile, file);
-  const manifest = { entries: { fgos: '' }, components: { legacyNode: { root: '.' }, nativeAddon: nativeAddonComponent(file, 'native/fgos.node', CHECKOUT) } };
+  fs.chmodSync(file, 0o644);
+  const host = path.join(staging, 'fgos');
+  fs.copyFileSync(hostFile, host);
+  fs.chmodSync(host, 0o755);
+  const manifest = { entries: { fgos: path.relative(CHECKOUT, host) }, components: { legacyNode: { root: '.' }, nativeAddon: nativeAddonComponent(file, path.relative(CHECKOUT, file), CHECKOUT) } };
+  const manifestFile = path.join(staging, 'native-addon.json');
+  fs.writeFileSync(manifestFile, JSON.stringify(manifest));
+  process.env.FGOS_HOST_BIN = host;
+  process.env.FGOS_ACTIVE_MANIFEST_PATH = manifestFile;
   const descriptorFile = path.join(root, 'addon-descriptor.json');
-  fs.writeFileSync(descriptorFile, JSON.stringify({ manifest, releaseRoot }));
+  fs.writeFileSync(descriptorFile, JSON.stringify({ manifest, releaseRoot: CHECKOUT }));
   return descriptorFile;
 }
 
@@ -768,14 +784,17 @@ async function rollback(root, fgctl, descriptor, index, loader) {
 const at = process.argv.indexOf(SELF);
 const [mode, ...rest] = process.argv.slice(at >= 0 ? at + 1 : 2);
 const args = options(rest);
-/** The rollback row alone: --root <fresh dir> --addon <.node> --fgctl <fgctl>. */
+/** The rollback row alone: --root <fresh dir> --addon <.node> --fgctl <fgctl> [--host <fgos>]. */
 async function rollbackOnly(args) {
   const root = path.resolve(args.root);
   if (fs.existsSync(root)) throw new Error(`root must be fresh: ${root}`);
   bindSandbox(privateDir(root));
-  const descriptor = await stageAddon(root, fs.realpathSync(args.addon));
+  const descriptor = await stageAddon(root, fs.realpathSync(args.addon), args.host ?? process.env.FGOS_HOST_BIN);
   const { index, loader } = await loaders(descriptor);
-  console.log(JSON.stringify(await rollback(root, fs.realpathSync(args.fgctl), descriptor, index, loader)));
+  const row = await rollback(root, fs.realpathSync(args.fgctl), descriptor, index, loader);
+  console.log(JSON.stringify(row));
+  // The owner budget: refused by the C5 door or completed, with no record lost or corrupt.
+  if (row.error || row.lostOrMismatchedReceipts !== 0 || !row.tipMatchesLastReceipt) process.exitCode = 1;
 }
 const modes = { run, rollback: rollbackOnly, 'load-probe': loadProbe, writer, idle, census, 'scoped-census': scopedCensus, 'scoped-census-worker': scopedCensusWorker };
 if (at >= 0) {

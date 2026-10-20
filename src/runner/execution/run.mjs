@@ -4,8 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { resolveWriterIdentity } from '../../util/session-identity.mjs';
-import { createGitInspect } from '../../git/inspect.mjs';
+import { createGitInspect, gitWriter } from '../../git/inspect.mjs';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
 import {
@@ -561,14 +560,14 @@ async function runUnitBody(options, scope) {
     }
 
     unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
-    // Policy wins before seedSync or preflight can touch a native Git port or borrow custody.
-    if (unit.writes.length > 0 && resolveMutatingCwdPosture(worktreePath).reason === 'main-checkout') {
-      throw new RunnerConfigError(`runUnit refused -- cwd "${worktreePath}" resolves to the main checkout ("${mainRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`);
-    }
     // Checked before the unit directory exists: an operation the step does not allow leaves nothing
     // behind. The pattern checked is the one the run will use (see patternName below).
     if (options.declared !== undefined) {
       declaredOp = declaredOperationOf(options.declared, unit, chosenPattern(options, unit), { taskSpecRoot: mainRoot });
+    }
+    // Policy wins before seedSync or preflight can touch a native Git port or borrow custody.
+    if (unit.writes.length > 0 && resolveMutatingCwdPosture(worktreePath).reason === 'main-checkout') {
+      throw new RunnerConfigError(`runUnit refused -- cwd "${worktreePath}" resolves to the main checkout ("${mainRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`);
     }
     const pinInputs = options.declared !== undefined ? checkedPinInputs(options.pinInputs) : [];
     acceptedReports = checkedAcceptedReports(options.acceptedReports);
@@ -687,7 +686,7 @@ async function runUnitBody(options, scope) {
     scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), unitRecord.worktree);
   }
 
-  if (unit.writes.length > 0 || unitRecord.sync) unitRecord.gitWriter ??= resolveWriterIdentity(path.join(mainRoot, '.fgos')).id;
+  if (unit.writes.length > 0 || unitRecord.sync) unitRecord.gitWriter ??= gitWriter(path.join(mainRoot, '.fgos'));
   if (options.resumeUnitRunId) assertSyncResumable(unitRunId, unitRecord, mainRoot, scope.custody);
   scope.unitRecord = unitRecord;
   const seatLaunchCeiling = unitRecord.seatLaunchCeiling ?? null;

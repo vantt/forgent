@@ -8,6 +8,7 @@ import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { execFileSync } from 'node:child_process';
 
 import { initStore, addWork, moveWork, listWork, readRawEvents } from '../../src/state/store.mjs';
@@ -39,6 +40,7 @@ function setup() {
   git(repoRoot, 'commit', '-q', '-m', 'init');
   const dir = path.join(repoRoot, '.fgos');
   initStore(dir);
+  activateGitFixture(repoRoot);
   const scriptDir = fs.realpathSync(makeFixtureDir('fgos-loop-rununit-exec-'));
   const worktreeDir = fs.realpathSync(makeFixtureDir('fgos-loop-rununit-wt-'));
   return { repoRoot, dir, scriptDir, worktreeDir };

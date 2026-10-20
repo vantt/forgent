@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git (branch `git/p07-switch` fixes from the host gate):
+  - A commit hook may print up to 64 MiB again (Git sends hook output to stderr); a borrowed Git run no longer fails at 64 KiB.
+  - A hook or filter child that drops the lock descriptor and leaves its process group now turns a commit, Sync or Land into `containment-unproven` (`recovery-required`) on every machine, also where bwrap can make a PID namespace; before, only machines without it were watched.
+  - The runner commits and syncs when the session has no env id (the writer is then a process id): every Git port now gets the writer as text.
+  - `scripts/build-rust-distribution.mjs` loads the addon it just built from the staged `libexec/native/fgos.node` (Node read the `.so` name as JavaScript) and reads the checkout with it in a child process, since a process holds one addon.
+
 - `fgos doctor` check `git-mutation-one-door` reads the release's `packages/git/contracts/mutation-census.v1.json`, which the release build writes from `scripts/git-one-door-scan.mjs`. The check fails when the census lists any `git` or hook spawn outside the fgos-git driver, or was not built from the payload it ships in. `npm test` also fails when product code (`src`, `bin`, `scripts`) starts `git` or a hook while the suite runs, and names the call site.
   - Commands from operator configuration or from a Work item's declared verify command count as configured binaries, not sites.
   - Executor commands are traced to the runner config files and their defaults. The holder-lock borrow vectors, which run `git` only in a temp repository they create, count as the production sandbox probe; that class now needs the repository's own data flow to a `temp_dir()` path, never `temp_dir()` and `init` merely appearing in the same function.

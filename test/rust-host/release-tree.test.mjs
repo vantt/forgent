@@ -29,6 +29,9 @@ const __dirname = path.dirname(__filename);
 
 const DEPENDENCY_DIR = 'node' + '_modules';
 
+// The pair a host sets for its own Node child; a staged release must not inherit the outer run's.
+const ACTIVE_RELEASE_KEYS = ['FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH'];
+
 test('the staged legacy-node payload carries the vendored YAML parser and any declared production dependencies, and loads them', () => {
   const tempOut = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-deps-'));
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-deps-work-'));
@@ -162,6 +165,8 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
     const doctorEnv = { ...process.env };
     delete doctorEnv.CLAUDE_CODE_SESSION_ID;
     delete doctorEnv.FGOS_HOST_BIN;
+    // The staged release finds its own manifest; the outer run's active-release pair names another payload.
+    for (const key of ACTIVE_RELEASE_KEYS) delete doctorEnv[key];
     const doctor = spawnSync(fgosBin, ['doctor', '--dir', REPO_ROOT], {
       cwd: REPO_ROOT,
       encoding: 'utf8',
@@ -229,6 +234,7 @@ test('R3: Staged release tree runs P02 harness from outside checkout with cleane
     const origPath = process.env.PATH;
     const origNodePath = process.env.NODE_PATH;
     const origHarness = process.env.FGOS_HARNESS_ENTRY;
+    const origActiveRelease = ACTIVE_RELEASE_KEYS.map((key) => [key, process.env[key]]);
 
     try {
       process.env.PATH = cleanPath;
@@ -238,6 +244,7 @@ test('R3: Staged release tree runs P02 harness from outside checkout with cleane
         delete process.env.NODE_PATH;
       }
       process.env.FGOS_HARNESS_ENTRY = `bin:${stagedBinary}`;
+      for (const key of ACTIVE_RELEASE_KEYS) delete process.env[key];
 
       // Generate the coverage-floor cases. `<verb> --help` prints the manifest
       // entry for every route kind, native included, so it is exact bytes.
@@ -284,6 +291,7 @@ test('R3: Staged release tree runs P02 harness from outside checkout with cleane
       } else {
         delete process.env.FGOS_HARNESS_ENTRY;
       }
+      for (const [key, value] of origActiveRelease) if (value !== undefined) process.env[key] = value;
     }
   } finally {
     fs.rmSync(stagedDir, { recursive: true, force: true });

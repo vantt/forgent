@@ -24,6 +24,18 @@ mkdir -p "$WORK"; WORK="$(cd "$WORK" && pwd)"
 cd "$CHECKOUT"
 VERDICTS="$WORK/p-release-verdicts.txt"; : > "$VERDICTS"
 FAILED=0
+# The release-profile host, fgctl and addon the rollback row stages, built as `npm test` builds them.
+RELEASE="${CARGO_TARGET_DIR:-$CHECKOUT/target}/release"
+cargo build --locked --release -p fgos -p fgctl -p fgos-node-addon > "$WORK/release-build.log" 2>&1 \
+  || { echo "release build failed (see $WORK/release-build.log)" >&2; exit 1; }
+# Node rows run with the addon and host `npm test` hands its files (FGOS_HOST_BIN and the dev manifest).
+{ read -r FGOS_HOST_BIN && read -r FGOS_ACTIVE_MANIFEST_PATH; } < <(node --input-type=module -e "
+const { ensureGitAddon } = await import('./scripts/git-addon.mjs');
+const env = { ...process.env, FGOS_HOST_BIN: '' };
+ensureGitAddon(env);
+console.log(env.FGOS_HOST_BIN + '\\n' + env.FGOS_ACTIVE_MANIFEST_PATH);
+" 2>> "$WORK/release-build.log") && [ -x "$FGOS_HOST_BIN" ] || { echo "addon staging failed (see $WORK/release-build.log)" >&2; exit 1; }
+export FGOS_HOST_BIN FGOS_ACTIVE_MANIFEST_PATH
 check() { # name, command...
   local name="$1"; shift
   if "$@" > "$WORK/$name.log" 2>&1; then echo "PASS $name" | tee -a "$VERDICTS"
@@ -40,7 +52,8 @@ check c5-node-doctor-rows  node --test test/setup/git-checks.test.mjs test/distr
 check v-pack-native-load   node --test test/git/native-load.test.mjs
 # Live old process during rollback and forward activation (E3's rollback row, owner budget:
 # refused by the C5 door or completed, zero lost or corrupt records).
-check live-process-rollback node scripts/git/e3-bench.mjs rollback --root "$WORK/rollback"
+check live-process-rollback node scripts/git/e3-bench.mjs rollback --root "$WORK/rollback" \
+  --addon "$RELEASE/libfgos_node_addon.so" --fgctl "$RELEASE/fgctl" --host "$RELEASE/fgos"
 # Stale global npm `fgos merge`: spec §12 needs the protocol bump to refuse it. The old package must
 # speak a different lock protocol than the new host, or nothing refuses its legacy writer.
 if [ -n "$STALE" ]; then

@@ -53,8 +53,10 @@ export function spawnTarget(file, args = [], options = {}, { shell = false } = {
 // The spawn belongs to the code that called child_process: the first frame after the spy's own,
 // past Node internals and past a module that wrapped child_process after the spy (the hot-lock guard
 // does; its wrapper frame is the patch, not the caller). A product function a test drives counts;
-// a test's own spawn function that product code was handed does not.
-function productFrame(stack, wrappers) {
+// a test's own spawn function that product code was handed does not. holder-lock's runBorrowed runs
+// the command its caller names, so, as in the static scan, the caller of runBorrowed owns the spawn.
+const BORROW_DOOR = path.join(ROOT, 'src', 'holder-lock', 'index.mjs');
+export function productFrame(stack, wrappers = new Set()) {
   for (const line of String(stack).split('\n').slice(1)) {
     const fn = /^\s*at (?:async )?([\w$.<>]+)(?: \[as [\w$]+\])? \(/.exec(line)?.[1];
     if (fn && wrappers.has(fn.split('.').pop())) continue;
@@ -62,6 +64,7 @@ function productFrame(stack, wrappers) {
     if (!m || m[1].startsWith('node:')) continue;
     const file = m[1].startsWith('file://') ? fileURLToPath(m[1]) : m[1];
     if (file === SELF) continue;
+    if (file === BORROW_DOOR && fn === 'runBorrowed') continue;
     return PRODUCT.some((dir) => file.startsWith(dir)) ? `${path.relative(ROOT, file)}:${/:(\d+):\d+\)?$/.exec(line.trim())[1]}` : null;
   }
   return null;

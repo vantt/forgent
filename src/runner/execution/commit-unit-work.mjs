@@ -3,10 +3,9 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import { createGitScopedCommit } from '../../git/scoped-commit.mjs';
 import { createGitSync } from '../../git/sync.mjs';
-import { createGitInspect } from '../../git/inspect.mjs';
+import { createGitInspect, gitWriter } from '../../git/inspect.mjs';
 import { nativeError } from '../../git/native.mjs';
 import { resolveStateRoot } from '../../holder-lock/index.mjs';
-import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 import { partitionPaths } from '../dispatch/write-scope.mjs';
 
 const CONVENTIONAL_SUBJECT = /^(feat|fix|docs|refactor|test|chore|perf|build|ci|style|revert)(\([^)]+\))?!?: \S/;
@@ -19,7 +18,7 @@ export function gitContext({ worktree, repoRoot, custody, loaderOptions, writer 
 function options(ctx) {
   const fgosDir = path.join(ctx.repoRoot, '.fgos');
   return { stateRoot: resolveStateRoot({ fgosDir }).stateRoot, repoPath: ctx.worktree,
-    trustedMain: ctx.repoRoot, writer: ctx.writer ?? resolveWriterIdentity(fgosDir).id };
+    trustedMain: ctx.repoRoot, writer: ctx.writer ?? gitWriter(fgosDir) };
 }
 const held = ctx => ctx.custody ? [ctx.custody] : [];
 const scoped = ctx => createGitScopedCommit(options(ctx), ctx.loaderOptions);
