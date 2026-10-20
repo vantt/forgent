@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos worktree create` now provisions the new checkout after the Git port returns: dependency install, then the project's `worktreeSetup.commands`. This repo's setup also copies the untracked `ak-*` skill directories from the main checkout, so a worker in that worktree can use `ak:cook`. The setup no longer builds the Rust workspace in each new worktree (a run that needs a binary builds it with its own Cargo target). `fgos setup` no longer deletes skills other tools installed into `.agents/skills` (only entries fgOS itself assembled are pruned). The claude executor declares `ak:cook` in `supports.skills`, and `fgos doctor` check `executor-skills-installed` fails when a declared skill is missing from the runtime's skill directory. `core/skills/_shared/ak-cook-worker-contract.md` is the brief for an `ak:cook` worker.
+
 - Add `fgos worktree remove <path> --delivered-to <ref>`: removes a worktree through the Worktree port, which refuses a dirty checkout, one a process stands in, preserved worker state, or a tip not contained in the delivery target (branch name, full ref or object id). No force flag; the delivery statement is recorded as the operation's evidence digest.
 
 - Git typed commit and recovery reads ignore user signature/display settings; suite subprocess census no longer requires strace.
