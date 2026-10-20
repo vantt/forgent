@@ -85,8 +85,18 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
       'Must refuse to stage release tree inside the checkout directory'
     );
 
-    // 2. Stage tree into disposable directory
-    const result = buildRustDistribution({ outDir: tempOut, repoRoot: REPO_ROOT });
+    // 2. Stage tree into disposable directory. The build reads the checkout through the host it
+    // just compiled, never an inherited one: a clean checkout outside an activated workspace has
+    // none, so an unusable FGOS_HOST_BIN must not matter.
+    const inheritedHost = process.env.FGOS_HOST_BIN;
+    process.env.FGOS_HOST_BIN = path.join(tempOut, 'no-such-host');
+    let result;
+    try {
+      result = buildRustDistribution({ outDir: tempOut, repoRoot: REPO_ROOT });
+    } finally {
+      if (inheritedHost === undefined) delete process.env.FGOS_HOST_BIN;
+      else process.env.FGOS_HOST_BIN = inheritedHost;
+    }
     assert.ok(result.artifactDigest.startsWith('sha256:'));
     assert.ok(result.fileCount > 500);
 

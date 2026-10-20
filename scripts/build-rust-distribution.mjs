@@ -349,7 +349,7 @@ export function buildRustDistribution({
   fs.chmodSync(stagedAddon, 0o644);
   const nativeAddon = nativeAddonComponent(stagedAddon, ADDON_RELATIVE, resolvedRepo);
   // That addon reads the checkout's file list (no `git` child of our own) and writes the census.
-  const sourceFiles = readCheckoutWithAddon(resolvedRepo, resolvedOut);
+  const sourceFiles = readCheckoutWithAddon(resolvedRepo, resolvedOut, releaseBin);
 
   for (const rel of sourceFiles) {
     const srcFull = path.join(resolvedRepo, rel);
@@ -503,8 +503,11 @@ export function buildRustDistribution({
  * git-mutation-one-door checks it is empty and was built from the payload it sits in). It runs in
  * a child process: a process loads one addon (Git spec §4), and the caller may already hold its own.
  */
-function readCheckoutWithAddon(repoRoot, releaseRoot) {
+function readCheckoutWithAddon(repoRoot, releaseRoot, hostBin) {
   const out = execFileSync(process.execPath, [__filename, READ_CHECKOUT, repoRoot, releaseRoot], {
+    // The host this build just compiled answers the state-root and lock routes at this checkout's
+    // protocol; a clean checkout outside an activated workspace has no other one.
+    env: { ...process.env, FGOS_HOST_BIN: hostBin },
     encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'inherit'],
   });
   return JSON.parse(out);
