@@ -9,7 +9,7 @@ import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
-import { recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
+import { runUnit as coreRunUnit, recordInlineRun, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -122,6 +122,26 @@ test('resolveGitRoots resolves main checkout root and linked worktree', () => {
   assert.equal(fs.realpathSync(roots.mainCheckoutRoot), fs.realpathSync(repoRoot));
   assert.equal(fs.realpathSync(roots.worktreeRoot), fs.realpathSync(worktreeDir));
   assert.equal(roots.isLinkedWorktree, true);
+});
+
+test('outside a repository resolveGitRoots refuses unless the caller is read-only, and a unit that writes is refused there', () => {
+  const dir = fs.realpathSync(makeFixtureDir('fgos-run-norepo-'));
+  assert.throws(() => resolveGitRoots(dir), (err) => err instanceof RunnerConfigError && /must run inside a git repository/.test(err.message));
+  const roots = resolveGitRoots(dir, { allowNoRepository: true });
+  assert.deepEqual(roots, { worktreeRoot: dir, mainCheckoutRoot: dir, isLinkedWorktree: false, notARepository: true });
+  assert.doesNotThrow(() => assertRepositoryForWrites(roots, dir, { writes: false }));
+  assert.throws(() => assertRepositoryForWrites(roots, dir, { writes: true }), (err) => err instanceof RunnerConfigError && /must run inside a git repository/.test(err.message));
+  const { repoRoot } = setupGitRepo();
+  assert.doesNotThrow(() => assertRepositoryForWrites(resolveGitRoots(repoRoot, { allowNoRepository: true }), repoRoot, { writes: true }), 'inside a repository nothing is refused');
+});
+
+test('runUnit refuses a unit that writes in a directory that is no repository, before any unit run exists', async () => {
+  const dir = fs.realpathSync(makeFixtureDir('fgos-run-norepo-write-'));
+  await assert.rejects(
+    () => coreRunUnit({ unitData: { id: 'u-norepo', objective: 'Write a file', capability: 'docs:write', writes: ['docs'] }, cwd: dir, repoRoot: dir }),
+    (err) => err instanceof RunnerConfigError && /must run inside a git repository/.test(err.message),
+  );
+  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'assignments')) && fs.readdirSync(path.join(dir, '.fgos', 'assignments')).some((name) => name.startsWith('unit-run-')), false);
 });
 
 test('snapshotRunnerConfig captures hash and filtered runner config from main checkout', () => {

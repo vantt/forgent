@@ -913,6 +913,7 @@ Added by the proof fold of 2026-10-18 (named items with owners; none reverses Q1
 6. The hook support for the event-file `cutoverGrant` (§7) and the ordering with the Event Store cutover (§12). Owner: Git plan, coordinated with the Event Store cutover plan.
 7. A public fgOS verb that creates a linked worktree through the Worktree port, so shipped skill text (`fgos-run`) stops telling agents to run `git worktree add`. Owner: Git plan, as its first phase after the Publication port.
 8. Whether Workflow runs a read-only workflow in a directory that is not a repository. Git's side is fixed (§1: `notARepository`, never a workflow error); the runner's choice belongs to Workflow and is put to the owner in the fold report.
+   Closed (owner answer to plan Q1, 2026-10-18; built 2026-10-21): a Workflow whose Units declare no `writes` runs in a directory that is not a repository, the directory being its own project root; a Unit with `writes` or a sync ref still needs one and is refused before any unit run exists. Proofs: `test/git/e2e-consumer-noncoding.test.mjs` (the read-only route) and `test/runner/execution/run.test.mjs` (the refusal).
 9. The consumer settlement uniqueness of §9 step 6 (M4). Owner: Work and Event Store, which confirm the mechanism.
 10. The activation door's read contract for unresolved WAL records and the fence for an older `fgctl` (§12 C5). Owner: distribution, with the Git plan; registered before packaging, like the manifest key.
 

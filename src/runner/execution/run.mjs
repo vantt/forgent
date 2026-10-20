@@ -111,15 +111,29 @@ export function detectHerdrPresent(env = process.env) {
 /**
  * Resolve git main checkout root and worktree path without importing worktree.mjs.
  */
-export function resolveGitRoots(cwd = process.cwd()) {
+export function resolveGitRoots(cwd = process.cwd(), { allowNoRepository = false } = {}) {
   try {
     const result = createGitInspect({stateRoot:resolveStateRoot({fgosDir:path.join(cwd,'.fgos')}).stateRoot,
       repoPath:cwd,trustedMain:cwd}).resolveRepo();
+    // A read-only caller may work in a directory that is no repository: Inspect's typed answer is
+    // `notARepository`, and the directory is its own project root.
+    if (result.notARepository && allowNoRepository) {
+      let root = cwd;
+      try { root = fs.realpathSync(cwd); } catch { /* the directory is as given */ }
+      return {worktreeRoot:root,mainCheckoutRoot:root,isLinkedWorktree:false,notARepository:true};
+    }
     if (result.notARepository || !result.worktreeRoot) throw new Error('not a working repository');
     return {worktreeRoot:result.worktreeRoot,mainCheckoutRoot:result.trustedMainRoot,
       isLinkedWorktree:result.worktreeRoot !== result.trustedMainRoot};
   } catch (error) {
     throw new RunnerConfigError(`fgos run must run inside a git repository (cwd: ${cwd}): ${error.message}`);
+  }
+}
+
+/** A unit that writes or syncs needs a repository; a read-only one runs where roots say there is none. */
+export function assertRepositoryForWrites(roots, cwd, { writes = false } = {}) {
+  if (roots?.notARepository && writes) {
+    throw new RunnerConfigError(`fgos run must run inside a git repository (cwd: ${cwd}): not a working repository`);
   }
 }
 
@@ -480,7 +494,7 @@ async function runUnitBody(options, scope) {
   // A directory that is no git checkout still gets its homes reclaimed; the run then refuses as before.
   let roots = null;
   let rootsFailure = null;
-  try { roots = resolveGitRoots(cwd); } catch (err) { rootsFailure = err; }
+  try { roots = resolveGitRoots(cwd, { allowNoRepository: true }); } catch (err) { rootsFailure = err; }
   const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots?.mainCheckoutRoot;
   try {
     sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined });
@@ -519,6 +533,7 @@ async function runUnitBody(options, scope) {
     unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
     assertRecordNotFromNewerRelease(unitRunId, unitRecord);
     unit = validateUnit(unitRecord.unit);
+    assertRepositoryForWrites(roots, cwd, { writes: unit.writes.length > 0 || Boolean(unitRecord.sync) });
     // A writing run is never resumed without the port, and a standalone one only into a free worktree.
     const resumeLink = normalizeWorkflowLink(unitRecord.workflow);
     if (unit.writes.length > 0 || unitRecord.sync) {
@@ -576,6 +591,7 @@ async function runUnitBody(options, scope) {
     }
 
     unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
+    assertRepositoryForWrites(roots, cwd, { writes: unit.writes.length > 0 || Boolean(unit.syncBase) });
     // Checked before the unit directory exists: an operation the step does not allow leaves nothing
     // behind. The pattern checked is the one the run will use (see patternName below).
     if (options.declared !== undefined) {

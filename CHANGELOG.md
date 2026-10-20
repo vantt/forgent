@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - A commit hook may print up to 64 MiB again (Git sends hook output to stderr); a borrowed Git run no longer fails at 64 KiB.
   - A hook or filter child that drops the lock descriptor and leaves its process group now turns a commit, Sync or Land into `containment-unproven` (`recovery-required`) on every machine, also where bwrap can make a PID namespace; before, only machines without it were watched.
   - The runner commits and syncs when the session has no env id (the writer is then a process id): every Git port now gets the writer as text.
+  - A Workflow whose units declare no `writes` (for example `business-discussion`) now runs in a directory that is not a git repository, which becomes its project root; a unit with `writes` or a sync ref is still refused there before any unit run exists.
   - On the npm/GitHub install channel, `fgos init` in a project that `fgctl init` has not activated now refuses with `git-addon-unavailable: addon not shipped on this channel: onboard this project with fgctl init` (it said "until M10") and changes nothing; onboard new projects with `fgctl init`.
   - `scripts/build-rust-distribution.mjs` loads the addon it just built from the staged `libexec/native/fgos.node` (Node read the `.so` name as JavaScript) and reads the checkout with it in a child process, since a process holds one addon.
 

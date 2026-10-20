@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "cad458e877071d608a2fb891257465354420079a6ce3a198edddc5a02a5ae626",
+  "payloadDigest": "36adf2f2c955bc15916bc80c5e400543f64802b64ae9dc66da883c0e3c78ed29",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -770,7 +770,7 @@
     "src/runner/execution/patterns/role-tasks.mjs": "0fe9b6ac4898c658cfc051766a29f848d72b6960b3a1cfd16053e72b703d8ecc",
     "src/runner/execution/patterns/solo.mjs": "d439ed457e517936f2d7f1e2c2ac076876dee2d8b19d8325017047309e45c490",
     "src/runner/execution/role-ledger.mjs": "5b244127187be94fa7175c3bb32feb0fb0e9daf4ef2e3f25030ab2f9b2d0fa14",
-    "src/runner/execution/run.mjs": "94f2079d85f8c959bce83f13d9f2aea7583c69fa9cf32b9ee19bc7ccce9999dd",
+    "src/runner/execution/run.mjs": "85f638763e938ba710e65bb1154d3a31b20986958784a59dcfd8b6daae190f64",
     "src/runner/execution/unit-control.mjs": "7758226c1321bda3cd53e5018c7030b714adf138ba8e3fccbeb8a4f5337f9022",
     "src/runner/execution/unit-run-history.mjs": "ca16c5a4f62b82ad43910874919e0f4603c285c8dafed3e401c35ce32f73c5fb",
     "src/runner/execution/unit-state.mjs": "21bace2f8debba43bc794fda037c62590da3fe644f7cc07a2f3a728548eb5db6",
@@ -925,8 +925,8 @@
     "src/workflow/case-lock.mjs": "0b2c0cd79a19e61e647797d6cad0f7d051acc3ed368385722ec88b8ae1aca9bb",
     "src/workflow/case-projection.mjs": "ffdedea5e3965db7da955edea3bdcb3f275cba64b0cd794d89f552d23dd6c096",
     "src/workflow/case-runtime.mjs": "fc5ba759e5816c9f1962c811e4856d27bd5aadd29b4d9ab46f67ab4c98355364",
-    "src/workflow/case-start.mjs": "4cd437c004512bd92d59ae87c8f57f8b2deb15b3e00e8ccd1db047c12fca94d1",
-    "src/workflow/case-verbs.mjs": "12eea5860a614a7129c0f29e8e2494f7e8f95984dcdcc59b7ab20b47d71264e6",
+    "src/workflow/case-start.mjs": "ad13c549b64df63b606a93caf7ae9828c1f63252fa21558d43d10257e8f1d5bf",
+    "src/workflow/case-verbs.mjs": "ad292230aeefbe7da7ae107e14a6aaf024b0a68317f5f2152a0f0c4f781123d2",
     "src/workflow/checked.mjs": "8167deced120cc0b655b3992de09df0269c6189cc268a70b504f28b5e84439f0",
     "src/workflow/definition.mjs": "fb4db65eb9f655fe676433587274caeba19f3416c1979310fd59e3f41b289a9b",
     "src/workflow/dir-guard.mjs": "2999283b51f2d4e25d7d1428dd37b886b1d2826fa78eb02170328a35ac14ff03",
@@ -2677,14 +2677,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1215,
+      "line": 1231,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1215,
+      "line": 1231,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"

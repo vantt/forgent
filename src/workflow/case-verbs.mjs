@@ -31,7 +31,7 @@ const isConductor = (projection) => projection.kind === 'guide';
 
 function rootsOf(workflowRunId, options, verb) {
   if (!workflowRunId) throw new RunnerConfigError(`${verb} requires workflowRunId`);
-  const roots = resolveGitRoots(options.cwd ?? process.cwd());
+  const roots = resolveGitRoots(options.cwd ?? process.cwd(), { allowNoRepository: true });
   return {
     mainRoot: options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot,
     worktreePath: options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot,

@@ -12,7 +12,7 @@ import { normalizeContextRefs } from './definition.mjs';
 import { loadWorkflow } from './loader.mjs';
 import { createWorkflowRun, appendWorkflowEvent, readWorkflowEvents, projectWorkflowState } from './store.mjs';
 import { translateUnitsToWorkflow } from './units-source.mjs';
-import { snapshotRunnerConfig, resolveGitRoots, detectHerdrPresent } from '../runner/execution/run.mjs';
+import { snapshotRunnerConfig, resolveGitRoots, assertRepositoryForWrites, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } from './seats.mjs';
 import { digestContextRefs, digestText } from './ref-digests.mjs';
@@ -150,7 +150,7 @@ export function detachedResult({ mainRoot, workflowRunId, detached }) {
  */
 function resolveStart(params) {
   const cwd = params.cwd ?? process.cwd();
-  const roots = resolveGitRoots(cwd);
+  const roots = resolveGitRoots(cwd, { allowNoRepository: true });
   const mainRoot = params.repoRoot ? path.resolve(params.repoRoot) : roots.mainCheckoutRoot;
   const worktreePath = params.worktree ? path.resolve(params.worktree) : roots.worktreeRoot;
 
@@ -173,6 +173,8 @@ function resolveStart(params) {
     if (params.seats !== undefined) throw new RunnerConfigError('--seats rebuilds a registered panel preset; it cannot be used with a units file');
     assertWriteChains(workflow);
   }
+  // Only a read-only workflow runs outside a repository: a unit that declares writes still needs one.
+  assertRepositoryForWrites(roots, cwd, { writes: workflow.steps.some((step) => step.units.some((unit) => unit.template.writes?.length)) });
   const effort = params.effort === undefined || params.effort === null ? null : assertReasoningEffort(params.effort);
 
   let timeoutMs = null;
