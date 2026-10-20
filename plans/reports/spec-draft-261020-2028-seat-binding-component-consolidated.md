@@ -212,7 +212,7 @@ Rules:
 - The workflow loader discovers packaged workflows (`<wf>/wf.<wf>.yaml`) besides flat files and attaches `{sourcePath, workflowDir, owningDomain|null}`; `owningDomain` comes from the file's location, never from the capability prefix. Today `src/workflow/loader.mjs:72-98` scans flat files only.
 - `agent-definitions` resolves workspace → `workflowDir` → `owningDomain` → core, accepting `agent.<name>.yaml` beside the workflow; a domain's personas are visible only inside that domain. Today `agentTierDirs` (`agent-definitions.mjs:36-54`) merges every domain into one tier and expects `<name>.yaml`.
 - Convention owns the name and path rules; reading, layer order and pinning stay in `agent-definitions`.
-- The persona is resolved before `bindSeat`; the binding persists the qualified identity (`<layer>:<source>/<name>`) and digest. Taste is looked up by bare persona name under `capabilities.<cap-or-prefix>.personas`. Persona files never carry `prefer`.
+- The persona is resolved before `bindSeat`; the binding persists the qualified identity (`<layer>:<source>/<name>`) and digest. Taste is looked up by bare persona name under `capabilities.<cap-or-prefix>.personas`. Persona files never carry `prefer` or `tier`: a persona is shared across projects, and model choice is the project's (project wins, §2.3). A persona file describes who sits the seat (voice, style, decision boundary, skills, tool scope). Its existing `rigor` field is read by no seat-choice code today and does not affect tier or checker count. Taste for a persona is declared only in project config, `capabilities.<cap-or-prefix>.personas.<name>.{tier, prefer}`, and ranks seat > persona > role (§5.3). (Owner question 21:23.)
 
 ## 6. Seat identity and patterns [G2]
 
