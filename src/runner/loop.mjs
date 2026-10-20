@@ -53,7 +53,6 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import {
   listWork,
   moveWork,
@@ -84,7 +83,7 @@ import { resolveTierModel } from './dispatch.mjs';
 import { spawnWorker, workUnitIdFor } from './work-dispatch.mjs';
 import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
-import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, findCheckoutPath, branchNameFor, createBranchRef } from './worktree.mjs';
+import { checkoutPathForBranch, compareCommits, branchExists, resolveRefSha, deleteBranchRef, resetDispatchWorktree, createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, claimRoot, steerFrontier } from './root-affinity.mjs';
@@ -230,9 +229,6 @@ export function acquireRunnerLock(dir) {
 // path keeps working unchanged.
 export { resolveRepoRoot };
 
-function git(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
-}
 
 /** The line the item's live log carries for a worker run: the Unit run streams nothing back, so
  * the log points at the run's own output files instead. */
@@ -273,7 +269,7 @@ function resumableRun(repoRoot, dir, item, stage) {
     // no such run: the marker is stale
   }
   const checkout = record && fs.existsSync(marker.worktree)
-    ? findCheckoutPath(git(repoRoot, ['worktree', 'list', '--porcelain']), branchNameFor(item.id))
+    ? checkoutPathForBranch(repoRoot, branchNameFor(item.id))
     : null;
   const stands = record?.unit?.id === workUnitIdFor(item, stage)
     && checkout && fs.realpathSync(checkout) === fs.realpathSync(marker.worktree);
@@ -288,18 +284,8 @@ function resumableRun(repoRoot, dir, item, stage) {
  * check's has-a-commit requirement): does `fgw/<id>` exist, and how many
  * commits does it carry beyond its merge-base with HEAD? */
 function branchFacts(repoRoot, branch) {
-  try {
-    execFileSync('git', ['rev-parse', '--verify', '--quiet', `refs/heads/${branch}`], {
-      cwd: repoRoot,
-      encoding: 'utf8',
-      shell: false,
-    });
-  } catch {
-    return { exists: false, aheadCount: 0 };
-  }
-  const mergeBase = git(repoRoot, ['merge-base', 'HEAD', branch]).trim();
-  const aheadCount = parseInt(git(repoRoot, ['rev-list', '--count', `${mergeBase}..${branch}`]).trim(), 10) || 0;
-  return { exists: true, aheadCount };
+  if (!branchExists(repoRoot, branch)) return { exists: false, aheadCount: 0 };
+  return { exists: true, aheadCount: compareCommits(repoRoot, 'HEAD', branch).right };
 }
 
 function tailLines(text, n = 10) {
@@ -479,7 +465,7 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
   const pruned = [];
   const kept = [];
   const childrenByParent = indexChildrenByParent(view.work);
-  for (const { branch, aheadCount } of listLeftovers(repoRoot)) {
+  for (const { branch, aheadCount, tip } of listLeftovers(repoRoot, { includeTip: true })) {
     const branchId = branch.startsWith('fgw/') ? branch.slice('fgw/'.length) : branch;
     const itemStatus = view.work[branchId]?.status;
 
@@ -503,7 +489,7 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
     // holding the worker's uncommitted files (the runner commits only after a
     // round settles). Deleting the branch would fail, and removing that
     // checkout would lose the work, so both stay for a person or a resume.
-    const checkedOut = aheadCount === 0 ? findCheckoutPath(git(repoRoot, ['worktree', 'list', '--porcelain']), branch) : null;
+    const checkedOut = aheadCount === 0 ? checkoutPathForBranch(repoRoot, branch) : null;
     if (checkedOut) {
       log(`fgos-runner: keeping ${branch} (0 commits, but still checked out at ${checkedOut}; a killed round may have left uncommitted work there)`);
       kept.push({ branch, aheadCount, reason: 'checked-out', path: checkedOut });
@@ -511,7 +497,7 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
     }
     if (aheadCount === 0) {
       if (!dryRun) {
-        git(repoRoot, ['branch', '-D', branch]);
+        deleteBranchRef(repoRoot, branch, tip);
         log(`fgos-runner: pruned orphan branch ${branch} (no commits)`);
       }
       pruned.push(branch);
@@ -846,7 +832,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       resume = resumableRun(repoRoot, dir, item);
       if (resume) {
         wt = { path: resume.worktree, branch: branchNameFor(item.id) };
-        if (dispatchBaseline === null) dispatchBaseline = git(repoRoot, ['rev-parse', wt.branch]).trim();
+        if (dispatchBaseline === null) dispatchBaseline = resolveRefSha(repoRoot, wt.branch);
         log(`fgos-runner: resuming unit run ${resume.unitRunId} for "${item.id}" in its kept worktree ${wt.path}`);
       } else if (rootId !== item.id) {
         // Leaf: idempotent — createBranchRef is a no-op if fgw/<rootId>
@@ -865,14 +851,13 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       if (resume) {
         // The kept worktree holds the run's own work: never reset over it.
       } else if (dispatchBaseline === null) {
-        dispatchBaseline = git(repoRoot, ['rev-parse', wt.branch]).trim();
+        dispatchBaseline = resolveRefSha(repoRoot, wt.branch);
       } else {
         // Retry never builds on debris: the reused branch's HEAD is the
         // prior attempt's OWN commit whenever that attempt committed before
         // failing verify, so `reset --hard HEAD` would be a no-op against
         // it. Reset to this item's own dispatch baseline instead.
-        execFileSync('git', ['reset', '--hard', dispatchBaseline], { cwd: wt.path, encoding: 'utf8', shell: false });
-        execFileSync('git', ['clean', '-fdq'], { cwd: wt.path, encoding: 'utf8', shell: false });
+        resetDispatchWorktree(repoRoot, wt.path, dispatchBaseline);
       }
 
       // Human feedback rides into the worker prompt (worker-feedback): the
@@ -927,7 +912,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
           const check = await runGoalCheck(item, wt.path, config.timeoutMs);
           if (check.passed) {
             log(`fgos-runner: review-item for "${item.id}" approved candidate implementation (${facts.aheadCount} commit(s), verify passed) — settling to awaiting-approval`);
-            const branchHead = git(repoRoot, ['rev-parse', '--verify', `refs/heads/${wt.branch}`]).trim();
+            const branchHead = resolveRefSha(repoRoot, wt.branch);
             settleClaim(dir, {
               id: item.id,
               claimId,
@@ -1064,7 +1049,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
           // at settle time (that reads a DIFFERENT actor's claimId if this
           // one was reclaimed as stale in the meantime, and would silently
           // settle their claim instead of failing closed).
-          const branchHead = git(repoRoot, ['rev-parse', '--verify', `refs/heads/${wt.branch}`]).trim();
+          const branchHead = resolveRefSha(repoRoot, wt.branch);
           settleClaim(dir, { id: item.id, claimId, finalStatus: 'awaiting-approval', role: 'runner', branchHeadAtReturn: branchHead });
         });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);

@@ -1,5 +1,5 @@
 // Typed transport only; authority and Git policy remain in Rust.
-import { hotLockDepth } from '../state/hot-lock.mjs';
+import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { loadNativeAddon, withNativeLocks } from './native.mjs';
 function outsideGate() {
   if (hotLockDepth() > 0) throw Object.assign(new Error('exec-under-hot-lock: Git remote'), { code: 'exec-under-hot-lock' });

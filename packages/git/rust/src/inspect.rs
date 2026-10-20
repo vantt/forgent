@@ -813,3 +813,152 @@ impl GitDriver {
         } else if out.code == Some(1) { Ok(None) } else { Err(out.error("ref-resolution-failed")) }
     }
 }
+
+/// Bounded semantic facts used by checkout lifecycle consumers.
+impl GitDriver {
+    pub fn compare_commits(
+        &self,
+        repo: &RepoHandle,
+        left: &Oid,
+        right: &Oid,
+    ) -> Result<serde_json::Value> {
+        let base = self.checked(
+            repo,
+            &["merge-base", left.as_str(), right.as_str()],
+            Policy::Inspect,
+        )?;
+        let counts = self.checked(
+            repo,
+            &[
+                "rev-list",
+                "--left-right",
+                "--count",
+                &format!("{}...{}", left.as_str(), right.as_str()),
+            ],
+            Policy::Inspect,
+        )?;
+        let counts = std::str::from_utf8(&counts)
+            .map_err(|_| refused("invalid-count"))?
+            .split_whitespace()
+            .map(str::parse::<u64>)
+            .collect::<std::result::Result<Vec<_>, _>>()
+            .map_err(|_| refused("invalid-count"))?;
+        let commits = self.checked(
+            repo,
+            &[
+                "rev-list",
+                &format!("{}..{}", left.as_str(), right.as_str()),
+            ],
+            Policy::Inspect,
+        )?;
+        if counts.len() != 2 {
+            return Err(refused("invalid-count"));
+        }
+        let commits = std::str::from_utf8(&commits)
+            .map_err(|_| refused("invalid-object-id"))?
+            .lines()
+            .collect::<Vec<_>>();
+        Ok(
+            serde_json::json!({"mergeBase":std::str::from_utf8(&base).map_err(|_| refused("invalid-object-id"))?.trim(),"left":counts[0],"right":counts[1],"commits":commits}),
+        )
+    }
+    pub fn list_branches(&self, repo: &RepoHandle, prefix: &str) -> Result<Vec<String>> {
+        RefName::parse(prefix.trim_end_matches('/')).map_err(|_| refused("invalid-ref-prefix"))?;
+        if !prefix.starts_with("refs/heads/") {
+            return Err(refused("invalid-ref-prefix"));
+        }
+        let out = self.checked(
+            repo,
+            &["for-each-ref", "--format=%(refname)", prefix],
+            Policy::Inspect,
+        )?;
+        Ok(std::str::from_utf8(&out)
+            .map_err(|_| refused("invalid-ref-name"))?
+            .lines()
+            .map(str::to_owned)
+            .collect())
+    }
+    pub fn checkout_facts(&self, repo: &RepoHandle, revision: &Oid) -> Result<serde_json::Value> {
+        let reflog = self.checked(
+            repo,
+            &["reflog", "show", "HEAD", "-n", "1", "--format=%H"],
+            Policy::Inspect,
+        )?;
+        let delta = self.checked(
+            repo,
+            &[
+                "diff",
+                "--name-only",
+                "-z",
+                "--no-relative",
+                "--no-ext-diff",
+                "--no-textconv",
+                revision.as_str(),
+                "--",
+                ":!.fgos",
+            ],
+            Policy::Inspect,
+        )?;
+        let staged = self.checked(
+            repo,
+            &[
+                "diff",
+                "--cached",
+                "--binary",
+                "--no-ext-diff",
+                "--no-textconv",
+                revision.as_str(),
+                "--",
+                ":!.fgos",
+            ],
+            Policy::Inspect,
+        )?;
+        let status = self.checked(
+            repo,
+            &[
+                "status",
+                "--porcelain=v1",
+                "-z",
+                "--untracked-files=all",
+                "--",
+                ":!.fgos",
+            ],
+            Policy::Inspect,
+        )?;
+        Ok(
+            serde_json::json!({"lastSynced":std::str::from_utf8(&reflog).map_err(|_| refused("invalid-object-id"))?.trim(),"delta":delta,"stagedPatch":staged,"status":status,"orphanedPatches":self.restore_patch_paths(repo)?}),
+        )
+    }
+    pub fn remote_tracking(
+        &self,
+        repo: &RepoHandle,
+        branch: &RefName,
+        remote: &str,
+    ) -> Result<serde_json::Value> {
+        let name = branch
+            .as_str()
+            .strip_prefix("refs/heads/")
+            .ok_or_else(|| refused("invalid-branch"))?;
+        let out = self.checked(
+            repo,
+            &[
+                "for-each-ref",
+                "--format=%(refname)%00%(upstream)",
+                branch.as_str(),
+            ],
+            Policy::Inspect,
+        )?;
+        let listing = std::str::from_utf8(&out).map_err(|_| refused("invalid-ref-name"))?;
+        let upstream = listing
+            .lines()
+            .filter_map(|line| line.split_once('\0'))
+            .find(|(reference, _)| *reference == branch.as_str())
+            .map_or("", |(_, upstream)| upstream);
+        let url = if upstream.is_empty() {
+            Some(self.remote_url(repo, remote)?)
+        } else {
+            None
+        };
+        Ok(serde_json::json!({"branch":name,"upstream":upstream,"url":url}))
+    }
+}
