@@ -1,0 +1,42 @@
+{
+  "probe": "new unrelated ref cannot change author-pin history witness",
+  "fixture": "isolated bare fixture sharing read-only original objects; no original ref/index/object mutation; no git write command",
+  "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "newUnrelatedRefTarget": "fd126f0c853f320e476b648fe50ac9b4e2256d6c",
+  "path": "docs/specs/reading-map.md",
+  "before": {
+    "path": "docs/specs/reading-map.md",
+    "state": "tree",
+    "treeMatchCount": 1,
+    "treeMatchesSha256": "b6692a07fdd738bae24639b95f3280c93a64d6fbe5533d94646ecd8157ffb408",
+    "treeSample": [
+      "docs/specs/reading-map.md"
+    ],
+    "historyCommitCount": 147,
+    "historyCommitsSha256": "f92b7f1b6402a128d0116c9f1aaed9a62376c7a819c12d6e6ea01343f954c866",
+    "historySample": [
+      "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+      "f38dfd1d0dcda03e6b09201ffdcaafc29bd9809a"
+    ]
+  },
+  "after": {
+    "path": "docs/specs/reading-map.md",
+    "state": "tree",
+    "treeMatchCount": 1,
+    "treeMatchesSha256": "b6692a07fdd738bae24639b95f3280c93a64d6fbe5533d94646ecd8157ffb408",
+    "treeSample": [
+      "docs/specs/reading-map.md"
+    ],
+    "historyCommitCount": 147,
+    "historyCommitsSha256": "f92b7f1b6402a128d0116c9f1aaed9a62376c7a819c12d6e6ea01343f954c866",
+    "historySample": [
+      "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+      "f38dfd1d0dcda03e6b09201ffdcaafc29bd9809a"
+    ]
+  },
+  "pinnedWitnessUnchanged": true,
+  "legacyAllRefsBeforeCount": 147,
+  "legacyAllRefsAfterCount": 154,
+  "legacyAllRefsChanged": true,
+  "pass": true
+}

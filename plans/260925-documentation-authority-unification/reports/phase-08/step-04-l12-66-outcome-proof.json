@@ -1,0 +1,32 @@
+{
+  "comparedAgainst": "fd126f0c853f320e476b648fe50ac9b4e2256d6c",
+  "comparison": "Every canonical Step 4 record compared in full after removing only historyCommitCount/historyCommitsSha256/historySample from changed preservedPathWitness objects",
+  "changedWitnesses": 266,
+  "changedSourceRecords": 145,
+  "changedRecordFiles": [
+    "step04-003.jsonl",
+    "step04-004.jsonl",
+    "step04-005.jsonl",
+    "step04-006.jsonl",
+    "step04-007.jsonl",
+    "step04-008.jsonl",
+    "step04-009.jsonl",
+    "step04-010.jsonl",
+    "step04-011.jsonl",
+    "step04-012.jsonl",
+    "step04-015.jsonl",
+    "step04-017.jsonl",
+    "step04-018.jsonl",
+    "step04-021.jsonl",
+    "step04-022.jsonl",
+    "step04-023.jsonl",
+    "step04-025.jsonl",
+    "step04-026.jsonl",
+    "step04-027.jsonl",
+    "step04-029.jsonl",
+    "step04-030.jsonl",
+    "step04-033.jsonl"
+  ],
+  "allOtherFieldsIdentical": true,
+  "dispositionsDiffsSpansTargetsReasonsAndTreeStateUnchanged": true
+}

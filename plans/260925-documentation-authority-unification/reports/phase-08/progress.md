@@ -964,3 +964,17 @@ Step 5 packet: 1,447 file/carry records / 5,311 references / all 227 Step 4 excl
 `step-05-authoring-request.md` defines eight seam batches, per-file dispositions, per-seam receipt + exact Phase 9 patch schema, real existing owning tests and missing proofs, 29 admission parts with measured summary bytes, mandatory full behavioral deep reads, pilot-based review re-sizing and local parks. No implementation or review started. Step 6 evidence tooling, 6b lease and Step 7 assembly remain separate; preserve A34/A45/A47/workflow/GAP carries.
 
 Lead next: review accounting/preparation, reconcile ref-sensitive witness replay, supply bounded state/inventory exports where needed, size admission/author/reviewer budget and dispatch bounded records-only Step 5 authoring. At the real runner commit, ordinary L12-11 separate manifest pair accounting is still owed; this worker cannot pre-account an unknown commit. No full-suite/cargo, build, installed parity, generator determinism, authority flip or Phase 9 readiness is claimed. Final scope/pins/proof receipts are in `step-05-preparation-verification.json`; needsWrites empty. Markdown preview remains in Lead custody as in prior report-only turns.
+
+
+### L12-66 — deterministic witness and fd126f0c8 accounting (in progress)
+
+Author turn started: replace mutable all-ref history with pinned author ancestry; refresh witness fields only, probe ref independence, replay Step 4/3, then account merged main and Step 5 population delta. No consumer changes or git writes; runner owns commit.
+
+
+### L12-66 — completed author handback
+
+Deterministic history now follows each record's pinned author ancestry. All 609 preserve witnesses checked; 266 witnesses / 145 source records / 22 files refreshed, **history fields only**, zero state/disposition changes or Lead gaps. Isolated new-ref probe passes; old all-ref history changes while pinned witness stays identical. Step 4 full checker **890 slots / 0 failures / 0 open Lead slots**; existing probes **20/20**. Step 3 already pinned, unchanged full checker **1037 files / 9424 edges / 0 failures / 0 Lead gaps**.
+
+Merge fd126f0c8 (14 main commits): all seven docs accounted; reading-map/runner/workflow digest refreshes and Seat Binding `allowed-new-file` under existing rules. Ratchet 0; serial ratchet/binding/ledger tests **172/172** (ratchet 28/28), citation drift 0, whitespace 0. Step 0 **297 direct + 128 members** checked; **24 direct + 128 member corrections in 16 group records**, all **40 records pending independent review**, 0 post-write drift. Three decision shards changed; source/group identities unchanged. **14 Step 3 overlaps deferred once to Step 7**, no Step 3 record changes.
+
+Step 5 generated-index delta **+1 reference**, queue **1,447 files/carries / 5,312 references / 227 exclusions / 39,861 dynamic sites / 201 old carries / 29 parts**. No production behavioral source changed; new Seat Binding reference is merge-pinned supplemental data, and Phase 9 candidate carry remains required. Updated population/hash/request plus 145 prior-record join digests; no parity acceptance inferred. Full ruling/accounting is in owner-answers L12-66; machine receipts are `step-04-l12-66-*`, `step-03-l12-66-*`, `step-00-l12-66-*`, `step-05-l12-66-population-delta.json`. Runner commit and Lead L12-11 accounting/review remain owed; no reviewers started and no consumer byte changed. needsWrites empty.

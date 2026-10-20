@@ -11,8 +11,8 @@ def existence(pin,path):
  if not p.startswith('docs/'):return compact_existence({'path':p,'state':'external-or-example','treeMatches':[],'historyCommits':[]})
  if re.search(r'[<>*{}$]|\.\.\.',p):return compact_existence({'path':p,'state':'pattern','treeMatches':[],'historyCommits':[]})
  present=[x for x in tree(pin) if x==p or x.startswith(p+'/')]
- # Check all refs too: "never existed" is stronger than absent in pin ancestry.
- history=subprocess.check_output(['git','log','--all','--format=%H','--',p],cwd=ROOT).decode().splitlines()
+ # L12-66: only author-pin ancestry is reproducible; mutable refs are not inputs.
+ history=subprocess.check_output(['git','log','--format=%H',pin,'--',p],cwd=ROOT).decode().splitlines()
  return compact_existence({'path':p,'state':'tree' if present else 'history' if history else 'never-existed','treeMatches':present,'historyCommits':list(dict.fromkeys(history))})
 
 def wrapped_paths(body):

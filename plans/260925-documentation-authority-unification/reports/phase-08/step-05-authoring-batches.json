@@ -1,5 +1,5 @@
 {
-  "inputHEAD": "3d599d4498b22842399b0fe59b4e88d1ffcfd0df",
+  "inputHEAD": "fd126f0c853f320e476b648fe50ac9b4e2256d6c",
   "kind": "preparation; file admission slices only, not independent review acceptance",
   "limits": {
     "records": 60,
@@ -10870,7 +10870,7 @@
         },
         {
           "file": "docs/decisions/index.md",
-          "currentSha256": "d7aa9466db18c7d5b36935003e3396f87e890b2c06d0e8d07f7cfe056977adaa",
+          "currentSha256": "082c2741b963b714a6976882f28bc7e84d48f5138b0f62e4feafb2db7a203200",
           "references": [
             "reference-000386",
             "reference-000330",
@@ -10948,7 +10948,8 @@
             "reference-000355",
             "reference-000377",
             "reference-000362",
-            "reference-000376"
+            "reference-000376",
+            "supplemental-l12-66-decisions-index-seat-binding"
           ],
           "dynamicSites": 2,
           "deepRead": "mandatory behavioral admission / exception; no sample waiver"
@@ -12980,7 +12981,7 @@
           "deepRead": "mandatory behavioral admission / exception; no sample waiver"
         }
       ],
-      "bytes": 53933,
+      "bytes": 53984,
       "part": 22
     },
     {

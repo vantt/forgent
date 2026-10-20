@@ -1,10 +1,10 @@
 # Step 5 behavioral-consumer preparation
 
-Preparation at `3d599d4498b22842399b0fe59b4e88d1ffcfd0df`. Steps 3/4 remain closed under L12-56/L12-64. No consumer edit, authority flip, generator execution, gateway process, cargo or full-suite acceptance. Read the phase file's shared boundaries, Steps 5–7 and review map first; A45, A51, L12-7/14/21–64 govern this packet. Author receipts require Lead-started independent review.
+Preparation refreshed at `fd126f0c853f320e476b648fe50ac9b4e2256d6c` (L12-66); original proof receipts remain at `3d599d4498b22842399b0fe59b4e88d1ffcfd0df`. Steps 3/4 remain closed under L12-56/L12-64. No consumer edit, authority flip, generator execution, gateway process, cargo or full-suite acceptance. Read the phase file's shared boundaries, Steps 5–7 and review map first; A45, A51, L12-7/14/21–64 govern this packet. Author receipts require Lead-started independent review.
 
 ## Population and units
 
-The frozen class 4/5/6 inputs have 3,334 / 1,379 / 494 literal edges, 225 / 712 / 490 file memberships and 3,542 / 25,339 / 10,980 dynamic sites. Union the files, not the class totals: classes overlap. The prepared union contains **1,447 file/carry records, 5,311 distinct literal references, 227 Step 4 exclusions and 39,861 dynamic sites**, plus **201 original dynamic carry rows** (29 Step 2, 172 Step 2b). Carry records include composite/external population locators: the 1,447 is a conservative queue, not a claim that all are concrete readable source files or behavioral dependencies.
+The frozen class 4/5/6 inputs have 3,334 / 1,379 / 494 literal edges, 225 / 712 / 490 file memberships and 3,542 / 25,339 / 10,980 dynamic sites. Union the files, not the class totals: classes overlap. The prepared union contains **1,447 file/carry records, 5,312 distinct literal references, 227 Step 4 exclusions and 39,861 dynamic sites**, plus **201 original dynamic carry rows** (29 Step 2, 172 Step 2b). Carry records include composite/external population locators: the 1,447 is a conservative queue, not a claim that all are concrete readable source files or behavioral dependencies.
 
 | Seam | Primary files/locators | File memberships incl. cross-seam sites | References | Step 4 exclusion joins | Dynamic superset | Writer/default hints | Old dynamic carry rows |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -15,7 +15,7 @@ The frozen class 4/5/6 inputs have 3,334 / 1,379 / 494 literal edges, 225 / 712 
 | real-file-tests-goldens | 704 | 704 | 1203 | 0 | 25007 | 0 | 3 |
 | ui-spec-compiler | 25 | 25 | 33 | 0 | 381 | 114 | 21 |
 | citation-ratchet-roots | 10 | 10 | 1280 | 2 | 468 | 55 | 7 |
-| runtime-defaults-dynamic | 451 | 451 | 2287 | 113 | 8366 | 4033 | 25 |
+| runtime-defaults-dynamic | 451 | 451 | 2288 | 113 | 8366 | 4033 | 25 |
 
 `step-05-population-summary.json` pins each census and all 33 Step 4 record files by bytes/hash. `step-05-population-files.jsonl` enumerates every file, its census hashes, present hash and drift flag; `step-05-population-references.jsonl` enumerates every literal and original id/span, including excluded reasons; `step-05-population-dynamic.jsonl` retains every call-site tuple and its class origin. `step-05-dynamic-carries.jsonl` preserves all old unresolved ids/reasons without declaring that an old question supersedes a later settled Step 3/4 disposition. `step-05-prior-disposition-joins.jsonl` points to each canonical Step 3/4 record, its digest and disposition counts; the original record remains the per-edge authority.
 
@@ -52,3 +52,10 @@ Static source: `gateway.rs:1186–1200` reads the current file fresh on each req
 - Unchanged Step 4 checker: refreshed `step-04-l12-62-check-result.json` reports **890 slots: 609 preserve, 59 patch, 177 render-join, 45 parked**, no open Lead-ruling slots; exit **1**, **18 preserved-tree-history failures**. Diagnostic `step-00-l12-65-step4-witness-diagnostic.json` compares each failed witness: all pinned tree/state fields agree; differing fields come from unpinned `git log --all` history. Keep the real red receipt; no checker or record refresh is silently authorized. Step 7 final assembly/Lead owns witness reconciliation. This does not undo the historical L12-64 acceptance or establish a new green checkpoint.
 
 Templates, actual existing test targets, patch shape and review sizing follow in `step-05-authoring-request.md` and `step-05-parity-receipt-template.json`. Missing proof remains missing. All full-suite, cargo, generator determinism, installed parity, evidence verifier and lease proof are later authorized work. Step 6 manifest/verifier and Step 6b lease remain separate dependencies; Step 7 cannot claim atomic readiness from this packet.
+
+
+## L12-66 merge population delta
+
+Main merge `fd126f0c8` changes no production behavioral source. One existing generated output in the queue changes: `docs/decisions/index.md` gains the D-ADR0072 row and its `docs/specs/seat-binding.md` reference. The supplemental occurrence is pinned to the merge, not added to a frozen census. Queue now: **1,447 file/carry records, 5,312 references (+1), 227 exclusion origins, 39,861 dynamic sites, 201 original dynamic carries, 29 admission parts**. Existing census spans keep their original source pins; generated-index source-state and generator parity still need deep read, including the new row. Seat Binding is approved but not implemented, so it introduces no executable consumer to this merge. Preserve the Phase 9 candidate carry before deleting legacy roots.
+
+`step-05-l12-66-population-delta.json` records all 24 merge paths, the generated-index hash/bytes before and after, the new occurrence and before/after counts. Summary and admission hashes reflect this input; 145 Step 4 prior-record join digests are refreshed for witness-only changes with dispositions unchanged. Gateway current/candidate proof and original suite receipts are historical and are not rerun or upgraded by this data refresh.

@@ -65,3 +65,8 @@ Lead must size the actual trace/review budget before implementation dispatch; th
 - L12-14: `core/workflows/**` classifier repair and shipped-path regeneration remain a separate backlog proposal. `scripts/generate-shipped-path-inventory.mjs` stays at frozen B blob `0f1cd7e1cee308772c0b56c37f3190333039cfb3`. No new classifier, alternate gate, generator, resolver or mechanism is authorized.
 
 Next authorized work is Lead review/re-sizing and a separately bounded records-only Step 5 authoring assignment. This request grants no Phase 9 application, landing, push, deletion or runtime start. Markdown preview remains with Lead's authorized environment, matching the prior report-only turns; no project/state registration was performed here.
+
+
+## L12-66 current input
+
+Use merge pin `fd126f0c853f320e476b648fe50ac9b4e2256d6c`. Queue: **1,447 files/carries, 5,312 references (+1), 227 exclusions, 39,861 dynamic sites, 201 old carries, 29 admission parts**. The changed generated decision index and its new Seat Binding reference require full source-state/generator trace with the other index output; its existing runtime seam is advisory and the owning parity work remains generators/projections. Original census coordinates stay at their recorded pins; relocate actual spans at cutover. No production behavioral source changed in this merge. See `step-05-l12-66-population-delta.json`; prior proof receipts retain their original input, and no current behavior parity or review acceptance is inferred.

@@ -1,0 +1,8 @@
+{
+  "merge": "fd126f0c853f320e476b648fe50ac9b4e2256d6c",
+  "direct": 297,
+  "groupMembers": 128,
+  "remainingDrift": 0,
+  "reopenedAfterAllLedgerWrites": true,
+  "basis": "Both unchanged protected extractors; complete pin-bound units and actual ancestry, not ordinals alone"
+}

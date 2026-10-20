@@ -1,0 +1,52 @@
+[
+  {
+    "command": [
+      "node",
+      "scripts/check-legacy-docs-ratchet.mjs"
+    ],
+    "exit": 0,
+    "elapsedSeconds": 0.718,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-ratchet.log",
+    "sha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319"
+  },
+  {
+    "command": [
+      "node",
+      "--test",
+      "--test-concurrency=1",
+      "test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "test/scripts/doc-binding-repair.test.mjs",
+      "test/scripts/doc-decision-exact.test.mjs",
+      "test/scripts/doc-decision-conservation.test.mjs",
+      "test/scripts/doc-decision-review.test.mjs",
+      "test/scripts/generate-doc-inventory.test.mjs",
+      "test/scripts/doc-corpus-decisions.test.mjs",
+      "test/scripts/doc-decision-mirrors.test.mjs"
+    ],
+    "exit": 0,
+    "elapsedSeconds": 6.964,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-ratchet-binding-tests.log",
+    "sha256": "a806417c34bd0e552d2bad12eaf673f6d7dac91ff59c64a5c59f1138ce3a4c4c"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/check-decision-citation-drift.mjs"
+    ],
+    "exit": 0,
+    "elapsedSeconds": 0.139,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-citation-drift.log",
+    "sha256": "a55a98ef3a961181b729bb169cefd37a7a0d63c12438c58c4f8a40902ec998e8"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsedSeconds": 0.265,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-whitespace.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

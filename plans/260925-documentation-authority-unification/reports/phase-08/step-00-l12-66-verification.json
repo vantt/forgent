@@ -1,0 +1,179 @@
+{
+  "inputHEAD": "fd126f0c853f320e476b648fe50ac9b4e2256d6c",
+  "scope": {
+    "changedAndUntrackedPaths": [
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-binding-check.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-citation-drift.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-light-checks.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-merge-rebindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-post-write-binding-check.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-ratchet-binding-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-ratchet.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-step3-deferred-rebinds.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-verification.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-whitespace.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-l12-66-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-l12-66-check.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-62-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-62-lib.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-62-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-66-check.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-66-existing-probes.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-66-history-source-audit.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-66-outcome-proof.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-66-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-66-ref-probe.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-66-witness-refresh.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-003.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-004.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-005.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-006.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-007.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-008.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-015.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-018.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-021.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-022.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-029.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-authoring-batches.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-authoring-request.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-l12-66-population-delta.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-population-files.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-population-references.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-population-summary.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-preparation.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-prior-disposition-joins.jsonl",
+      "scripts/check-legacy-docs-ratchet.exceptions.json"
+    ],
+    "outsideScope": [],
+    "needsWrites": [],
+    "gitWritesPerformed": false,
+    "cliBuildGatewayCargoRun": false,
+    "stateSecretsRead": false,
+    "newBytecode": false
+  },
+  "proofs": [
+    {
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.718,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-ratchet.log",
+      "sha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/scripts/check-legacy-docs-ratchet.test.mjs",
+        "test/scripts/doc-binding-repair.test.mjs",
+        "test/scripts/doc-decision-exact.test.mjs",
+        "test/scripts/doc-decision-conservation.test.mjs",
+        "test/scripts/doc-decision-review.test.mjs",
+        "test/scripts/generate-doc-inventory.test.mjs",
+        "test/scripts/doc-corpus-decisions.test.mjs",
+        "test/scripts/doc-decision-mirrors.test.mjs"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 6.964,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-ratchet-binding-tests.log",
+      "sha256": "a806417c34bd0e552d2bad12eaf673f6d7dac91ff59c64a5c59f1138ce3a4c4c"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-decision-citation-drift.mjs"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.139,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-citation-drift.log",
+      "sha256": "a55a98ef3a961181b729bb169cefd37a7a0d63c12438c58c4f8a40902ec998e8"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.265,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-whitespace.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "stepFour": {
+    "files": 275,
+    "consumerFiles": 331,
+    "edges": 890,
+    "failureCount": 0,
+    "openLeadRulingEdges": [],
+    "dispositions": {
+      "preserve": 609,
+      "patch": 59,
+      "render-join": 177,
+      "parked": 45
+    }
+  },
+  "stepThree": {
+    "batchCount": 130,
+    "files": 1037,
+    "edges": 9424,
+    "failureCount": 0,
+    "openLeadRulingEdges": []
+  },
+  "outcomeProof": {
+    "comparedAgainst": "fd126f0c853f320e476b648fe50ac9b4e2256d6c",
+    "comparison": "Every canonical Step 4 record compared in full after removing only historyCommitCount/historyCommitsSha256/historySample from changed preservedPathWitness objects",
+    "changedWitnesses": 266,
+    "changedSourceRecords": 145,
+    "changedRecordFiles": [
+      "step04-003.jsonl",
+      "step04-004.jsonl",
+      "step04-005.jsonl",
+      "step04-006.jsonl",
+      "step04-007.jsonl",
+      "step04-008.jsonl",
+      "step04-009.jsonl",
+      "step04-010.jsonl",
+      "step04-011.jsonl",
+      "step04-012.jsonl",
+      "step04-015.jsonl",
+      "step04-017.jsonl",
+      "step04-018.jsonl",
+      "step04-021.jsonl",
+      "step04-022.jsonl",
+      "step04-023.jsonl",
+      "step04-025.jsonl",
+      "step04-026.jsonl",
+      "step04-027.jsonl",
+      "step04-029.jsonl",
+      "step04-030.jsonl",
+      "step04-033.jsonl"
+    ],
+    "allOtherFieldsIdentical": true,
+    "dispositionsDiffsSpansTargetsReasonsAndTreeStateUnchanged": true
+  },
+  "refProbe": "step-04-l12-66-ref-probe.json",
+  "bindingPostWrite": "step-00-l12-66-post-write-binding-check.json",
+  "populationDelta": "step-05-l12-66-population-delta.json",
+  "limits": "Author verification only; no independent review, consumer edits, authority flip, installed parity or pre-accounting of unknown runner commit."
+}

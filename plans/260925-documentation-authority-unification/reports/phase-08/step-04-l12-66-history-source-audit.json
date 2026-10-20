@@ -1,0 +1,22 @@
+{
+  "decision": "L12-66",
+  "queries": [
+    {
+      "file": "step-03-check.py",
+      "symbol": "path_history",
+      "source": "def path_history(commit,path):\n    # Short decision ids denote their historical .md record, not extensionless files.\n    path=re.sub(r':\\d+(?:[-\u2013]\\d+)?$','',path.removeprefix('repo/').split('#')[0]).rstrip('/')\n    if re.fullmatch(r'docs/decisions/\\d{4}',path):path+='*'\n    return git('log','--format=%H',commit,'--',path).decode().splitlines()",
+      "sha256": "20bbeca2b0b104df357de506e479062b589e6faa31164a80761deddc31578b2b",
+      "usesAllRefs": false,
+      "pinnedHistory": true
+    },
+    {
+      "file": "step-04-l12-62-lib.py",
+      "symbol": "existence",
+      "source": "def existence(pin,path):\n p=path.split('#')[0].rstrip('/');p=re.sub(r':\\d+(?:[-\u2013]\\d+)?$','',p)\n if not p.startswith('docs/'):return compact_existence({'path':p,'state':'external-or-example','treeMatches':[],'historyCommits':[]})\n if re.search(r'[<>*{}$]|\\.\\.\\.',p):return compact_existence({'path':p,'state':'pattern','treeMatches':[],'historyCommits':[]})\n present=[x for x in tree(pin) if x==p or x.startswith(p+'/')]\n # L12-66: only author-pin ancestry is reproducible; mutable refs are not inputs.\n history=subprocess.check_output(['git','log','--format=%H',pin,'--',p],cwd=ROOT).decode().splitlines()\n return compact_existence({'path':p,'state':'tree' if present else 'history' if history else 'never-existed','treeMatches':present,'historyCommits':list(dict.fromkeys(history))})",
+      "sha256": "974a43fd1cffd3dc40ec2f1ed6d9fbaf7c84e9066894b9c1a0244c2f94f2ed2b",
+      "usesAllRefs": false,
+      "pinnedHistory": true
+    }
+  ],
+  "stepThreeFixRequired": false
+}
