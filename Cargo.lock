@@ -134,6 +134,7 @@ dependencies = [
  "fgos-process",
  "fgos-run-result",
  "fgos-run-supervisor",
+ "fgos-seat-binding",
  "fgos-session-identity",
  "fgos-terminal-control",
  "fgos-work-state",

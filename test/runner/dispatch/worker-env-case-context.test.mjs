@@ -43,6 +43,12 @@ test('a worker starts with neither case variable of its controller: both are dro
   assert.deepEqual(caseContextEnv({ caseId: 'wf-b', reservationId: 'rsv-b' }), { FGOS_CASE_ID: 'wf-b', FGOS_CASE_RESERVATION: 'rsv-b' });
 });
 
+test('a worker cannot name the host binary of its controller: FGOS_HOST_BIN is dropped and the rest kept', () => {
+  const env = workerBaseEnv({ PATH: '/usr/bin', FGOS_HOST_BIN: '/tmp/other-host/fgos' });
+  assert.equal(env.FGOS_HOST_BIN, undefined);
+  assert.equal(env.PATH, '/usr/bin');
+});
+
 test('a controller carrying case A launches a worker admitted into case B: the worker sees B only; a standalone launch sees none', async () => {
   const tmp = setupRepo();
   const caseB = openCase({ repoRoot: tmp });
