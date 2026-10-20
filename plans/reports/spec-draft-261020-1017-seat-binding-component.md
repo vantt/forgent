@@ -113,7 +113,7 @@ Mỗi thuộc tính của ghế (`tier`, `families`) lấy từ lớp **cụ th�
 2. **Ghế trong capability:** `capabilities.<cap>.seats.<role>`.
 3. **Role toàn hệ thống:** `roles.<role>` (ví dụ `red-team` → xai).
 4. **Capability:** `capabilities.<cap>`.
-5. **Nhóm capability:** `capabilities."<domain>:*"` (gom ~25 danh sách lặp — O14).
+5. **Nhóm capability theo tiền tố:** `capabilities."<prefix>:*"` (gom ~25 danh sách lặp — O14; tiền tố không phải domain).
 6. **Mặc định runner:** `defaults` (tier `standard`, families theo `tierFallback` của tier đó).
 
 Luật khác họ (independence) và spread **luôn** áp sau cùng, như bộ lọc: một role ưu tiên xai nhưng producer đã là xai thì ghế tự sang họ kế, và câu giải thích nói rõ vì sao.
