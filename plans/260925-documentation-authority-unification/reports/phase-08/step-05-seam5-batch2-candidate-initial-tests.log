@@ -1,0 +1,43 @@
+✔ docs/decisions/ contains no hand-authored NNNN-slug.md ADR files (1.772659ms)
+✔ docs/decisions/0000-index.md (the old hand-written index) no longer exists (0.179129ms)
+✖ docs/decisions/ still exists as a directory (D5: "docs/decisions/ giữ lại là thư mục") (0.756012ms)
+✔ every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md "Lịch sử quyết định" section (9.661298ms)
+✔ the real 0032 numbering collision migrated as two distinct sections (both topics preserved, neither silently dropped) (3.693446ms)
+✔ each target spec file carries the "Lịch sử quyết định retired" section heading exactly once (5.090042ms)
+✔ AGENTS.md no longer cites a deleted docs/decisions/NNNN-*.md path for the product priority order (0.323464ms)
+✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line (1.536445ms)
+✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line (0.559596ms)
+✔ the RUL11 line matches the locked law text word-for-word (0.486236ms)
+✔ the RUL11 decision narrative (D-ADR0036) is present in the "Lịch sử quyết định" section (0.451378ms)
+✔ AGENTS.md carries the decision-question template law and points at its shared fragment (0.25028ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 11
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 72.918119
+
+✖ failing tests:
+
+test at test/docs/decisions-corpus-retired.test.mjs:62:1
+✖ docs/decisions/ still exists as a directory (D5: "docs/decisions/ giữ lại là thư mục") (0.756012ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/seam5-batch2-candidate/test/docs/decisions-corpus-retired.test.mjs:63:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

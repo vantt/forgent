@@ -1,0 +1,225 @@
+{
+  "kind": "R19 and real-reader mutation probes; no consumer writes",
+  "baselineFailures": 0,
+  "passed": 18,
+  "total": 18,
+  "probes": [
+    {
+      "name": "No initial triage file can vanish",
+      "owningRule": "r19-triage-coverage",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "r19-triage-coverage",
+          "where": "all 702 initial files",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A mechanical closure cannot omit an original tuple",
+      "owningRule": "r19-tuples",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "r19-tuples",
+          "where": "packages/agent-protocol/contracts/fixtures/terminal/codex/trust-dialog-folder-access.txt",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A closed file cannot claim a different immutable source hash",
+      "owningRule": "r19-pins",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "r19-pins",
+          "where": "packages/agent-protocol/contracts/fixtures/terminal/codex/trust-dialog-folder-access.txt",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "An unrecognized operand cannot borrow a category label",
+      "owningRule": "r19-tuples",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "r19-tuples",
+          "where": "apps/fgctl/tests/git_wal_activation_gate.rs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A file with unresolved operands cannot be closed by a flag",
+      "owningRule": "r19-closure",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "r19-closure",
+          "where": "test/docs/decisions-corpus-retired.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A mechanically rejected tuple whose enclosing operation carries a census-root literal is refused",
+      "owningRule": "r19-tuples",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "r19-tuples",
+          "where": "test/distribution/source-payload.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A traced census-root identifier refuses mechanical rejection",
+      "owningRule": "r19-tuples",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "r19-tuples",
+          "where": "test/distribution/source-payload.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A real read reference cannot disappear",
+      "owningRule": "j-coverage",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "j-coverage",
+          "where": "reference and tuple identity conservation",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A pinned input cannot borrow another digest",
+      "owningRule": "j-pins",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "j-pins",
+          "where": "test/docs/decisions-corpus-retired.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A real read operation must have exact pinned passage text",
+      "owningRule": "j-spans",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "j-spans",
+          "where": "test/docs/decisions-corpus-retired.test.mjs:dynamic-018732",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Document constructions must trace exact real consuming operations",
+      "owningRule": "j-spans",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "j-spans",
+          "where": "test/docs/decisions-corpus-retired.test.mjs:dynamic-018734",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A summary cannot claim the missing locked heading as a conserved target",
+      "owningRule": "j-claims",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "j-claims",
+          "where": "same owning assertions and real missing claim searches",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Whole-file inverse must restore the original reader",
+      "owningRule": "j-patches",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "j-patches",
+          "where": "test/docs/decisions-corpus-retired.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Exact holder heading cannot lose its live-region witness",
+      "owningRule": "j-claims",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "j-claims",
+          "where": "same owning assertions and real missing claim searches",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Candidate outcome cannot claim an extra passing assertion",
+      "owningRule": "j-receipts",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "j-receipts",
+          "where": "same input and honest missing proof",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Missing post-retirement proof cannot claim passing without a log",
+      "owningRule": "j-receipts",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "j-receipts",
+          "where": "same input and honest missing proof",
+          "error": "unsupported operand type(s) for /: 'PosixPath' and 'NoneType'"
+        }
+      ]
+    },
+    {
+      "name": "A missing-claim park cannot omit its source search witness",
+      "owningRule": "j-search",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "j-search",
+          "where": "pinned alias and all-root target search before every park",
+          "error": "'searchWitness'"
+        }
+      ]
+    },
+    {
+      "name": "Judgment rejects remain independent review obligations",
+      "owningRule": "j-review",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "j-review",
+          "where": "all independent semantic obligations",
+          "error": "condition false"
+        }
+      ]
+    }
+  ],
+  "failures": []
+}

@@ -1,0 +1,112 @@
+{
+  "scratchRoot": "/tmp/fgos-work/seam5-batch2-candidate",
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "files": [
+    {
+      "path": "test/docs/decisions-corpus-retired.test.mjs",
+      "sha256": "cb78a7ab492eeb7e08262a81ad0ede7d683a141db2d7677f048a1471a67e191b",
+      "bytes": 5291,
+      "mode": "100644",
+      "provenance": "full-file unapplied candidate"
+    },
+    {
+      "path": "test/docs/rul11-anchor-phrase.test.mjs",
+      "sha256": "7668c7e4940f01ff58234b6c488f7210001f3198c213037c9f78c96514cfa028",
+      "bytes": 3720,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/docs/rul11-anchor-phrase.test.mjs"
+    },
+    {
+      "path": "docs/specs/platform-foundations.md",
+      "sha256": "fbab4eff911938b23691f88e6d2e6200cac12fad0314f2d8760959f064cdbaa6",
+      "bytes": 43761,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/specs/platform-foundations.md"
+    },
+    {
+      "path": "docs/specs/work-state.md",
+      "sha256": "499ec68376dd202ea6c55b1c7db136cc1523605dc7c83bb9d964dded970eb3a8",
+      "bytes": 327843,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/specs/work-state.md"
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "sha256": "68ad617f1a3df8750c5efaccfa2bf31da595ecf4f2b3fc549b5c18ca7202d21d",
+      "bytes": 658958,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/specs/runner.md"
+    },
+    {
+      "path": "docs/architecture-map.md",
+      "sha256": "d70414923eaeaf0dd34c4e260d4c4a8cf0cf58b517f417fb03a0c2b0fe74de9a",
+      "bytes": 54465,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/architecture-map.md"
+    },
+    {
+      "path": "docs/specs/system-overview.md",
+      "sha256": "70cd094041f425dac24ac931eac690bb339b541ddeabd7299efe01b0195468f1",
+      "bytes": 18940,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/specs/system-overview.md"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+      "bytes": 29800,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:AGENTS.md"
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+      "bytes": 182676,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/platform/runner/decisions/h-36d872fbb0e5.md"
+    },
+    {
+      "path": "docs/platform/system-overview/spec.md",
+      "sha256": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+      "bytes": 19993,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/platform/system-overview/spec.md"
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "sha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "bytes": 21729,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/platform/platform-foundations.md"
+    },
+    {
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "sha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+      "bytes": 66707,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/platform/work-state/decisions/retired-decision-history.md"
+    },
+    {
+      "path": "docs/decisions/index.md",
+      "sha256": "082c2741b963b714a6976882f28bc7e84d48f5138b0f62e4feafb2db7a203200",
+      "bytes": 35958,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:docs/decisions/index.md"
+    },
+    {
+      "path": "test/helpers/process-tmp-root.mjs",
+      "sha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
+      "bytes": 2600,
+      "mode": "100644",
+      "provenance": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129:test/helpers/process-tmp-root.mjs"
+    }
+  ],
+  "exit": 0,
+  "scope": "same pinned read set including legacy parked sources; does not simulate deletion or settle parked holder correspondence",
+  "command": [
+    "node",
+    "--test",
+    "test/docs/decisions-corpus-retired.test.mjs",
+    "test/docs/rul11-anchor-phrase.test.mjs"
+  ]
+}

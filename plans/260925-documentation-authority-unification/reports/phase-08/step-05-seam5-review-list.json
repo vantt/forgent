@@ -1,10 +1,12 @@
 {
   "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-  "closedBatch": 1,
+  "closedBatch": 2,
   "reviewStatus": "pending Lead pack and independent Option B semantic review",
   "sourceRecords": [
     "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
-    "test/runner/prompt-templates.test.mjs"
+    "test/runner/prompt-templates.test.mjs",
+    "test/docs/decisions-corpus-retired.test.mjs",
+    "test/docs/rul11-anchor-phrase.test.mjs"
   ],
   "generatedRecords": [],
   "canonicalRecords": [
@@ -36,6 +38,70 @@
         "dynamic-029245"
       ],
       "judgmentCallIds": []
+    },
+    {
+      "file": "test/docs/decisions-corpus-retired.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
+      "recordSha256": "17c2b9ea2f26df024f8e21bf321789727229e01a8f7ca3db5fc10bf7390ed1dc",
+      "sourceSha256": "fd8b2e38773f33f71a6507876a7f5d2cc4bd1b61f9bbd8a4246e7f56a29b18b2",
+      "admittedIds": [
+        "reference-004029",
+        "reference-004030",
+        "reference-004033",
+        "reference-004034",
+        "reference-004035",
+        "reference-004036",
+        "reference-004037",
+        "reference-004039",
+        "reference-004040",
+        "reference-004041",
+        "reference-004042",
+        "reference-004043",
+        "reference-004046",
+        "reference-004047",
+        "reference-004048",
+        "dynamic-018734",
+        "dynamic-018735",
+        "dynamic-018736",
+        "dynamic-018738",
+        "dynamic-018741",
+        "dynamic-018742",
+        "dynamic-018743",
+        "dynamic-018745"
+      ],
+      "judgmentCallIds": [
+        "reference-004028",
+        "reference-004031",
+        "reference-004032",
+        "reference-004038",
+        "reference-004044",
+        "reference-004045",
+        "reference-004049",
+        "dynamic-018732",
+        "dynamic-018733",
+        "dynamic-018737",
+        "dynamic-018739",
+        "dynamic-018740",
+        "dynamic-018744",
+        "author-s5-decisions-corpus-retired.test.mjs-self-locator"
+      ]
+    },
+    {
+      "file": "test/docs/rul11-anchor-phrase.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
+      "recordSha256": "223fa59b3e80efded1acebdbfc00507d7e1e2e3bcb5abfa653833ec0b84547f8",
+      "sourceSha256": "7668c7e4940f01ff58234b6c488f7210001f3198c213037c9f78c96514cfa028",
+      "admittedIds": [
+        "dynamic-018754",
+        "dynamic-018755"
+      ],
+      "judgmentCallIds": [
+        "reference-004050",
+        "dynamic-018752",
+        "dynamic-018753",
+        "dynamic-018756",
+        "author-s5-rul11-anchor-phrase.test.mjs-self-locator"
+      ]
     }
   ],
   "mechanicalRejects": [
@@ -45,19 +111,255 @@
       "ruleId": "r19-label-diagnostic"
     }
   ],
-  "residualReviewFiles": [
-    "bin/fgos.mjs",
-    "src/cli/command-registry.mjs"
-  ],
   "packingInstructions": {
     "existingPacker": "step-05-seam4-window-review/pack.py",
     "recordGlobs": [
-      "step-05-records/tests-prompt-goldens.jsonl"
+      "step-05-records/tests-prompt-goldens.jsonl",
+      "step-05-records/tests-real-file.jsonl"
     ],
     "include": "admittedIds plus judgmentCallIds only, ±40 pinned physical lines plus enclosing context where needed; include both full diffs/rollbacks and atomic receipt",
     "excludeMechanicalIds": [
       "dynamic-029246"
     ],
-    "note": "Existing packer hardcodes generators-*.jsonl and includes all tuples: Lead must pass/adapt the record selection and exclude the listed mechanical tuple when packing seam5. No reviewer was launched."
+    "note": "Existing packer hardcodes generators-*.jsonl and includes all tuples: Lead must pass/adapt the record selection and exclude the listed mechanical tuple when packing seam5. No reviewer was launched.",
+    "excludeWholeFileMechanicalRecords": "step-05-records/tests-mechanical.jsonl; separately checker-verified"
+  },
+  "mechanicalClosures": [
+    {
+      "file": "packages/agent-protocol/contracts/fixtures/terminal/codex/trust-dialog-folder-access.txt",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "87ad1ce715f3e6d7428014241faf110a98dbcf8a1e25de5488e2a435ca888bde",
+      "sourceSha256": "9c2981e6ff4958e16706b1174c2a771dc2c777dcf5e35fd9d194edd0825fa7d6",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 1
+    },
+    {
+      "file": "packages/event-store/rust/tests/vectors.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "4de73716ccaba126b43f69c351d6bb6a8b59d59a97eabd7eb55c31074cfb51fa",
+      "sourceSha256": "aaa5d2f5828aad45706d1bf0ef1a8747d44065d85dd3c22437a7e7d8eb07dd67",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 1
+    },
+    {
+      "file": "packages/holder-lock/rust/tests/multiprocess.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "c4b63dceda375b5463d8544cfff76a54194acfa28c817d7be193d2298794af0c",
+      "sourceSha256": "ef2e45ef48b96993f98363647df577947c9968dc98f5d8688ad177e554c1657a",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 13
+    },
+    {
+      "file": "packages/process/rust/tests/judge_vectors.rs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "6fe9e954273c194f61654aa3b03e50de898ca6d4647f871cff6133975a5d5501",
+      "sourceSha256": "b1633fd4092114d469cba250fbbb8f01724cc5e3a66d85e046b373ed259ef401",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 1
+    },
+    {
+      "file": "test/cli/fgos-decision-kind.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "14bc40a1fa07d97e2bbc5f28bb0c064481ee92f7767b84c390af068f46896e74",
+      "sourceSha256": "b9e5bb2fd259a1c759f6d75f7e54d9fdaddf960a33d093b743ae115ce4bccfac",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 3
+    },
+    {
+      "file": "test/cli/fgos-decision.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "a451ff764e656ca974a6b6ef71e16f5372cbec457b26764d2c618e500cdff758",
+      "sourceSha256": "325f6e9808abd7dc01751f1785fa5d50f97ecdd455361d4954a23315af549105",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 3
+    },
+    {
+      "file": "test/cli/fgos-gateway.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "de285148cc1e369b9f12236021a44cb89f347314e335b089c316f487ffa8b3ab",
+      "sourceSha256": "211fa010a5e33b3e862be19d81159ee80f6e4e29e93b26efbe1cfd5c6f19debf",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 4
+    },
+    {
+      "file": "test/cli/fgos-intake-2.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "65308b357695786f9d13c0dd13a2225547b97a23153ba9b35712b2509c053330",
+      "sourceSha256": "ffce42833ef1987e27d8389808ef7026382f7176db409984542a001d43589221",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 1
+    },
+    {
+      "file": "test/cli/fgos-merge-next-no-config-write.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "30b6b8dcfd0ba40151b8805462eae32ea20000d4a8508480947c831ed71ea38b",
+      "sourceSha256": "96db99376b5d8f7fe3451017c33240c99e022dbd4f75344ae36f58583ff366a0",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 1
+    },
+    {
+      "file": "test/cli/fgos-version.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "e10ad87d2bb1bdcc536cb490d2cf2cd59cd8a0fc27b567e1c6b958e7ce5f0419",
+      "sourceSha256": "9a1c8f73d2e3d067abf77dd17f79e80cfcc3b098f4323fc6c6d97da8b81433b0",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 5
+    },
+    {
+      "file": "test/distribution/source-payload.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "ec07a2fdd9e50496fb42ce73a7e298ab6c0810956e362c57ca78e941f3de8a0e",
+      "sourceSha256": "e68c257afc35057401aa0d5c140e59636916d63a83a4908b948a349b55f57c2f",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 9
+    },
+    {
+      "file": "test/event-store/legacy-order-parity.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "3cd41242bec3cbdb3d1e492b00c41cd4025a5eda0f2c7627e46f0df7c7646b96",
+      "sourceSha256": "a4f4d2b2ebfc6cb39cab6e952e3f7f701eadcd3ab23dd882db305e774f144c48",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 7
+    },
+    {
+      "file": "test/event-store/platform-refusal.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "3815399374d7f830b23b511718a791ecd8929eb84664d80181bebdbda5df1cb2",
+      "sourceSha256": "2ee84fe45c96995ebcb733780d1a60e266318f8f5aa5171dfbb8b049bef9550b",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 1
+    },
+    {
+      "file": "test/fixtures/usage/codex-cli-grep-tokens-used.stderr.log",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "71b363e6a7bfc6d43109066dd33999a6e92fdac67c921ea4ea2ca71dd6774bb6",
+      "sourceSha256": "b2f949dbcbf3c4d9c7325af55f76b4be2ef1fd0a207bd80b03013b6203eedfdf",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 2
+    },
+    {
+      "file": "test/fixtures/usage/codex-cli-normal.stderr.log",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "b424515fdfa2033a288b84cc17bf6d1517b03202c18dafc57cba50edf87da352",
+      "sourceSha256": "2ad9eb3936608e91c4a999b3e9e98e94813c9e8a7df244b7e95c65d1642a0512",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 1
+    },
+    {
+      "file": "test/report/frontmatter.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "200c53e3f73afefa241800023f558c400585b6467d52234629c1a59c34264362",
+      "sourceSha256": "699cbed7c61cf61a6f9f1a604e0c82e5dd3899c7a0fd421ef21ea18801b6be0a",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 2
+    },
+    {
+      "file": "test/run-supervisor/contracts-unit-state.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "c2ff32e315000b5e85f4616380511b609de66b4853cdf819c3eb92b1772702f1",
+      "sourceSha256": "c1223f01fa408b77fb3213ed338d269efff1d7aa73c3b1c0b67758aa60c4dc74",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 4
+    },
+    {
+      "file": "test/runner/agent-result-claim-contract.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "a3e6fde5d93820a10b1083e2fcbb58d002ce260d65406f99d4f67f931133f830",
+      "sourceSha256": "b365e670e8a1282dc1d8c01a4b8b8f89d914b8161d859872fa1cad9b11f236ef",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 4
+    },
+    {
+      "file": "test/runner/assignment-normalizer.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "a6056320d98313278ce9b97e37fef03784df7c65b207b84d15d3eb8ecfce6914",
+      "sourceSha256": "8080bd035092ac548ed2d9061e875bc73d60d439b7e90149d9526f849d402f19",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 8
+    },
+    {
+      "file": "test/runner/dispatch-execute-for-capability.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "5a560626a39ce783a1a9edd729a76f720d761b7dfaef1bdacbf83cdb4b924614",
+      "sourceSha256": "0a6c3ac6be3b7817f0927e2dffde394a6092280e9eeefb42c4d094f04438dfa4",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 14
+    },
+    {
+      "file": "test/runner/herdr-claude-invocations.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "60172efbe92fad4ad6ac616b6b4993e8d19f45c48b4146e0ebeffc37f476a6a4",
+      "sourceSha256": "d8aa01f1350873274f3bda92f1c96ea061d67a526c4b8ab9b2c58243d98e3a48",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 5
+    },
+    {
+      "file": "test/runner/root-affinity.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "0877f19ba618baa28c0258550e04581e66a85038fc297275b464a96241331531",
+      "sourceSha256": "e5115d0c27f976f23be94b7e3e0c8143710a7385a730df957ec003e7abe4d3c6",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 3
+    },
+    {
+      "file": "test/scripts/list-doc-anchors.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "54beacd17e87086248841ff4c8ec4d494ddf7c5580214d2ad352bb278d84c531",
+      "sourceSha256": "ae6581ba5683236d1c453bfafbd10eabd942ce0f712695b05b9ff32cc6e3d870",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 6
+    },
+    {
+      "file": "test/scripts/test-plan-out.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "7d085847f8665d921164505723e3cd101b982629abee44c9cb29e5a62822303f",
+      "sourceSha256": "c9fee95a46dfccf3584f74ff4ef28e0f88abba4663af0fafad7a5b20d3c325ba",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 1
+    },
+    {
+      "file": "test/state/awaiting-context.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "7acfc09119bc6817eaf988538d7716ce25ccf3adb45d1d347d36cfa9dae2d305",
+      "sourceSha256": "3cc3880ea41523b2ecbc091877d269493789bd32e9a42837bfcc4caf0efb4f93",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 1
+    },
+    {
+      "file": "test/state/cleanup-pool.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "e5b4075aca4014252343dbb5e0c9d4a080d72e134ba52f680135bb39a4893945",
+      "sourceSha256": "3ae2cc65ffb5cd6b6a165d1d773738d3a6128bc824895e385f57460417affb4a",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 3
+    },
+    {
+      "file": "test/state/discover-pool.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "be3f97aa37e063f2780d0a996fdcbb5629fe67f5ed2619b483a241617403ee57",
+      "sourceSha256": "bc46107216a3c1d30ebd90cb33f5989d40c1fe90b797955fc33f8717031a4d79",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 1
+    },
+    {
+      "file": "test/state/priority-formula.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "6e7a765c48cac2862d0d0ef299daa89028fd46ca2ccf8d9a1c0a59dc85505bd2",
+      "sourceSha256": "9ad73930af9218769dc92a3fcb892848678d76facee85cc39b6bd6e0d04b2ea3",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 7
+    },
+    {
+      "file": "test/workflow/seat-evidence.test.mjs",
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "recordSha256": "2257e3dc2f0499c8814f15c016472207e0558de93d7ef769872f771d170cc5d7",
+      "sourceSha256": "b2e7cdeb54eb80fc18553c8f26068850ff20272950ded7d12a5b3c959cecb27a",
+      "ruleId": "r19-closed-nondocument-operand-v1",
+      "tupleCount": 3
+    }
+  ],
+  "mechanicalClosureCounts": {
+    "files": 29,
+    "tuples": 115
   }
 }

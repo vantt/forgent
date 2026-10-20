@@ -1,0 +1,46 @@
+{
+  "initialFiles": 702,
+  "initialTuples": 25005,
+  "mechanicallyRejectedTuples": 5562,
+  "mechanicalClosedFiles": 29,
+  "mechanicalClosedTuples": 115,
+  "mechanicalPartialTuples": 5447,
+  "judgmentFilesClosedThisBatch": [
+    "test/docs/decisions-corpus-retired.test.mjs",
+    "test/docs/rul11-anchor-phrase.test.mjs"
+  ],
+  "literalReferences": 23,
+  "originalDynamicTuples": 19,
+  "authorAddedSlots": 2,
+  "admission": {
+    "REJECT": 19,
+    "ADMIT": 25
+  },
+  "dispositions": {
+    "preserve": 32,
+    "patch": 4,
+    "parked": 8
+  },
+  "remaining": {
+    "remainingFileCount": 671,
+    "remainingReferences": 1170,
+    "remainingDynamicTuples": 24871
+  },
+  "originalCarries": 3,
+  "triageBytes": 9177146,
+  "independentReview": "pending; no reviewer dispatched",
+  "cutover": "not applied; Step 7 composition and Phase 9 proof required",
+  "closedSeam5Totals": {
+    "files": 33,
+    "literalReferences": 33,
+    "originalDynamicTuples": 136,
+    "mechanicalRejectsInClosedFiles": 116
+  },
+  "artifactBytes": {
+    "step-05-records/tests-mechanical.jsonl": 139178,
+    "step-05-records/tests-real-file.jsonl": 140805,
+    "step-05-seam5-bulk-triage.jsonl": 9177146,
+    "step-05-seam5-batch2-judgment-receipts.json": 745634,
+    "step-05-seam5-batch2-cutover-specs.json": 369874
+  }
+}

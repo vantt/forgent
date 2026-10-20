@@ -1,0 +1,1734 @@
+{
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "roots": [
+    "docs/platform",
+    "docs/knowledge",
+    "docs/reference",
+    "docs/tutorials"
+  ],
+  "aliasLookups": [
+    {
+      "legacyPath": "docs/specs/platform-foundations.md",
+      "sources": [
+        {
+          "path": "plans/260925-documentation-authority-unification/alias-table.json",
+          "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
+          "matches": []
+        },
+        {
+          "path": "docs/doc-registry.json",
+          "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "matches": []
+        }
+      ]
+    },
+    {
+      "legacyPath": "docs/specs/work-state.md",
+      "sources": [
+        {
+          "path": "plans/260925-documentation-authority-unification/alias-table.json",
+          "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
+          "matches": []
+        },
+        {
+          "path": "docs/doc-registry.json",
+          "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "matches": []
+        }
+      ]
+    },
+    {
+      "legacyPath": "docs/specs/runner.md",
+      "sources": [
+        {
+          "path": "plans/260925-documentation-authority-unification/alias-table.json",
+          "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
+          "matches": []
+        },
+        {
+          "path": "docs/doc-registry.json",
+          "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "matches": []
+        }
+      ]
+    },
+    {
+      "legacyPath": "docs/specs/system-overview.md",
+      "sources": [
+        {
+          "path": "plans/260925-documentation-authority-unification/alias-table.json",
+          "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
+          "matches": []
+        },
+        {
+          "path": "docs/doc-registry.json",
+          "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "matches": []
+        }
+      ]
+    },
+    {
+      "legacyPath": "docs/architecture-map.md",
+      "sources": [
+        {
+          "path": "plans/260925-documentation-authority-unification/alias-table.json",
+          "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
+          "matches": []
+        },
+        {
+          "path": "docs/doc-registry.json",
+          "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "matches": []
+        }
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "id": "foundation-law",
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "RUL11",
+        "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "--",
+        "docs/platform",
+        "docs/knowledge",
+        "docs/reference",
+        "docs/tutorials"
+      ],
+      "query": "RUL11",
+      "regex": false,
+      "exit": 0,
+      "hitCount": 89,
+      "liveHitCount": 79,
+      "stdoutSha256": "5dce7b9f61bbb1ee99a72f239157d8a194a3e22bf2ad049a73c4fbf4bdbec43b",
+      "hits": [
+        {
+          "file": "docs/knowledge/decisions-index/decision-record.md",
+          "line": 22,
+          "text": "| platform-foundations | write D-ADR0036: Khoá RUL11 -- khong phai no nang ma no tum lum. Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên, tên đúng là tùm lum; thấy tùm lum thì gom lại tới khi hết, quy mô không bao giờ là lý do miễn trừ, đích là ranh giới rõ và contract tường minh. Anchor phrase khoá tại AGENTS.md ('## Changing a locked law' kế bên), test/docs/rul11-anchor-phrase.test.mjs assert cả RUL11 (docs/specs/platform-foundations.md) lẫn anchor (AGENTS.md). | Bằng chứng đắt: tsk-2uf-1 (dispatch.mjs 2204 dòng/6 concern rời rạc, suýt thêm --work thành cửa thứ 11) và tsk-38h (bin/fgos.mjs 4201 dòng, GitNexus zero-index Function symbols). RUL9 đòi mỗi rule có anchor phrase được check tự động assert -- RUL11 là RULn đầu tiên mở pattern test loại này, RUL1-RUL10 chưa có (ghi rõ, không mâu thuẫn im lặng với RUL9). Đây là THÊM một luật, không sửa RUL1-RUL10 đã khoá. | 2026-08-18T10:58:44.020Z |",
+          "sourceSha256": "9ab2fcb0c6c101420cb647df75f9c4a34b0fd98eb79b556a3f40fe4c29965515",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/knowledge/decisions-index/decision-record.md",
+          "line": 48,
+          "text": "| work-state | D-ADR0019: Miễn trừ pre-release cho RUL11 -- trong lúc sản phẩm chưa phát hành, migration được phép viết lại tại chỗ cả ba kho .fgos; miễn trừ hết hiệu lực ở v1.0.0 | narrative di dời sang docs/specs/work-state.md (tsk-1lv-4 D5); ADR gốc: docs/decisions/0019-mien-tru-viet-lai-nhat-ky.md (retired) | 2026-08-17T14:15:28.659Z |",
+          "sourceSha256": "9ab2fcb0c6c101420cb647df75f9c4a34b0fd98eb79b556a3f40fe4c29965515",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+          "line": 228,
+          "text": "added content assertions (RUL11 wording, two `not a fixed list` markers,",
+          "sourceSha256": "2a5b3538928a48760ac7d12b69c1ac8f246ad18bb00b15f69c4cdd72655655eb",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+          "line": 127,
+          "text": "(\"doctor's checks never write anything, under any circumstance\") and RUL11",
+          "sourceSha256": "f695c8800bd7892b8f0477413085b0f77101f0647a48d65df1f5130e2c3844fe",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
+          "line": 20,
+          "text": "- **RUL11** (`distribution.md:210`) said \"`doctor --fix` does not exist",
+          "sourceSha256": "a48c79e266545d92f7375c794731d255f9fbd4b4115f37be0dd9b41e4d374c10",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
+          "line": 51,
+          "text": "RUL11's rewrite (D4) states plainly that `--fix` exists, runs a",
+          "sourceSha256": "a48c79e266545d92f7375c794731d255f9fbd4b4115f37be0dd9b41e4d374c10",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
+          "line": 58,
+          "text": "The item's own title only named RUL11, but both RUL9 and RUL11 were",
+          "sourceSha256": "a48c79e266545d92f7375c794731d255f9fbd4b4115f37be0dd9b41e4d374c10",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
+          "line": 63,
+          "text": "> Quyết định này ĐẢO RUL9 + RUL11 (docs/specs/distribution.md:200,210)",
+          "sourceSha256": "a48c79e266545d92f7375c794731d255f9fbd4b4115f37be0dd9b41e4d374c10",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+          "line": 1357,
+          "text": "✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line (1.442559ms)",
+          "sourceSha256": "0c711e50abf24625c70b67c9f5609e573ab914906b4b308696103cccdec0f58c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+          "line": 1358,
+          "text": "✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line (2.104538ms)",
+          "sourceSha256": "0c711e50abf24625c70b67c9f5609e573ab914906b4b308696103cccdec0f58c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+          "line": 1359,
+          "text": "✔ the RUL11 line matches the locked law text word-for-word (0.665276ms)",
+          "sourceSha256": "0c711e50abf24625c70b67c9f5609e573ab914906b4b308696103cccdec0f58c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+          "line": 1360,
+          "text": "✔ the RUL11 decision narrative (D-ADR0036) is present in the \"Lịch sử quyết định\" section (0.536339ms)",
+          "sourceSha256": "0c711e50abf24625c70b67c9f5609e573ab914906b4b308696103cccdec0f58c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+          "line": 1373,
+          "text": "✔ adding \"fixture-marketing\" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive) (0.27045ms)",
+          "sourceSha256": "0c711e50abf24625c70b67c9f5609e573ab914906b4b308696103cccdec0f58c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+          "line": 6896,
+          "text": "✔ an item with no domainFields at all still validates and replays exactly as before (RUL11 zero-migration) (2.923854ms)",
+          "sourceSha256": "0c711e50abf24625c70b67c9f5609e573ab914906b4b308696103cccdec0f58c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+          "line": 1359,
+          "text": "✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line (0.84225ms)",
+          "sourceSha256": "04223f63599492f9e7409a66cf18139e6df5b166b071f0122384c34116883cdf",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+          "line": 1360,
+          "text": "✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line (1.772132ms)",
+          "sourceSha256": "04223f63599492f9e7409a66cf18139e6df5b166b071f0122384c34116883cdf",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+          "line": 1361,
+          "text": "✔ the RUL11 line matches the locked law text word-for-word (0.653241ms)",
+          "sourceSha256": "04223f63599492f9e7409a66cf18139e6df5b166b071f0122384c34116883cdf",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+          "line": 1362,
+          "text": "✔ the RUL11 decision narrative (D-ADR0036) is present in the \"Lịch sử quyết định\" section (0.520401ms)",
+          "sourceSha256": "04223f63599492f9e7409a66cf18139e6df5b166b071f0122384c34116883cdf",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+          "line": 1375,
+          "text": "✔ adding \"fixture-marketing\" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive) (0.291314ms)",
+          "sourceSha256": "04223f63599492f9e7409a66cf18139e6df5b166b071f0122384c34116883cdf",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+          "line": 6944,
+          "text": "✔ an item with no domainFields at all still validates and replays exactly as before (RUL11 zero-migration) (4.797334ms)",
+          "sourceSha256": "04223f63599492f9e7409a66cf18139e6df5b166b071f0122384c34116883cdf",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+          "line": 1359,
+          "text": "✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line (1.251845ms)",
+          "sourceSha256": "01a411d17fe4e6a1dffcd788cc9d8230a617c79dcbab269b79f1ae8dfb801446",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+          "line": 1360,
+          "text": "✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line (2.177084ms)",
+          "sourceSha256": "01a411d17fe4e6a1dffcd788cc9d8230a617c79dcbab269b79f1ae8dfb801446",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+          "line": 1361,
+          "text": "✔ the RUL11 line matches the locked law text word-for-word (0.66289ms)",
+          "sourceSha256": "01a411d17fe4e6a1dffcd788cc9d8230a617c79dcbab269b79f1ae8dfb801446",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+          "line": 1362,
+          "text": "✔ the RUL11 decision narrative (D-ADR0036) is present in the \"Lịch sử quyết định\" section (0.571573ms)",
+          "sourceSha256": "01a411d17fe4e6a1dffcd788cc9d8230a617c79dcbab269b79f1ae8dfb801446",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+          "line": 1375,
+          "text": "✔ adding \"fixture-marketing\" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive) (0.25662ms)",
+          "sourceSha256": "01a411d17fe4e6a1dffcd788cc9d8230a617c79dcbab269b79f1ae8dfb801446",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+          "line": 6943,
+          "text": "✔ an item with no domainFields at all still validates and replays exactly as before (RUL11 zero-migration) (1.979255ms)",
+          "sourceSha256": "01a411d17fe4e6a1dffcd788cc9d8230a617c79dcbab269b79f1ae8dfb801446",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+          "line": 1359,
+          "text": "✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line (1.180618ms)",
+          "sourceSha256": "03a572ab53ee82ad5bdd878c0dc4e6c6d945b222f573675ef3c65526ddd74fae",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+          "line": 1360,
+          "text": "✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line (1.867508ms)",
+          "sourceSha256": "03a572ab53ee82ad5bdd878c0dc4e6c6d945b222f573675ef3c65526ddd74fae",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+          "line": 1361,
+          "text": "✔ the RUL11 line matches the locked law text word-for-word (0.62615ms)",
+          "sourceSha256": "03a572ab53ee82ad5bdd878c0dc4e6c6d945b222f573675ef3c65526ddd74fae",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+          "line": 1362,
+          "text": "✔ the RUL11 decision narrative (D-ADR0036) is present in the \"Lịch sử quyết định\" section (0.47564ms)",
+          "sourceSha256": "03a572ab53ee82ad5bdd878c0dc4e6c6d945b222f573675ef3c65526ddd74fae",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+          "line": 1375,
+          "text": "✔ adding \"fixture-marketing\" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive) (0.315375ms)",
+          "sourceSha256": "03a572ab53ee82ad5bdd878c0dc4e6c6d945b222f573675ef3c65526ddd74fae",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+          "line": 6933,
+          "text": "✔ an item with no domainFields at all still validates and replays exactly as before (RUL11 zero-migration) (3.096884ms)",
+          "sourceSha256": "03a572ab53ee82ad5bdd878c0dc4e6c6d945b222f573675ef3c65526ddd74fae",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+          "line": 1359,
+          "text": "✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line (1.465ms)",
+          "sourceSha256": "df75e8d42b1adffe38cd4396adcb9ae23cb40a8e25c995f8abcba7c9f0ecb766",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+          "line": 1360,
+          "text": "✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line (2.165556ms)",
+          "sourceSha256": "df75e8d42b1adffe38cd4396adcb9ae23cb40a8e25c995f8abcba7c9f0ecb766",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+          "line": 1361,
+          "text": "✔ the RUL11 line matches the locked law text word-for-word (0.706266ms)",
+          "sourceSha256": "df75e8d42b1adffe38cd4396adcb9ae23cb40a8e25c995f8abcba7c9f0ecb766",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+          "line": 1362,
+          "text": "✔ the RUL11 decision narrative (D-ADR0036) is present in the \"Lịch sử quyết định\" section (0.57927ms)",
+          "sourceSha256": "df75e8d42b1adffe38cd4396adcb9ae23cb40a8e25c995f8abcba7c9f0ecb766",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+          "line": 1375,
+          "text": "✔ adding \"fixture-marketing\" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive) (0.250325ms)",
+          "sourceSha256": "df75e8d42b1adffe38cd4396adcb9ae23cb40a8e25c995f8abcba7c9f0ecb766",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+          "line": 6943,
+          "text": "✔ an item with no domainFields at all still validates and replays exactly as before (RUL11 zero-migration) (1.483199ms)",
+          "sourceSha256": "df75e8d42b1adffe38cd4396adcb9ae23cb40a8e25c995f8abcba7c9f0ecb766",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-07-mvp/P02.2.md",
+          "line": 231,
+          "text": "project's own RUL11 anti-duplication stance in AGENTS.md, and to",
+          "sourceSha256": "246cadc88f845faf70ae3dbd09793055d3943c7200c42578b997dbfe0daeb45e",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+          "line": 1312,
+          "text": "✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line (1.463ms)",
+          "sourceSha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+          "line": 1313,
+          "text": "✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line (2.00513ms)",
+          "sourceSha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+          "line": 1314,
+          "text": "✔ the RUL11 line matches the locked law text word-for-word (0.958625ms)",
+          "sourceSha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+          "line": 1315,
+          "text": "✔ the RUL11 decision narrative (D-ADR0036) is present in the \"Lịch sử quyết định\" section (0.776034ms)",
+          "sourceSha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+          "line": 1328,
+          "text": "✔ adding \"fixture-marketing\" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive) (0.301519ms)",
+          "sourceSha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+          "line": 4813,
+          "text": "✔ an item with no domainFields at all still validates and replays exactly as before (RUL11 zero-migration) (3.948221ms)",
+          "sourceSha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
+          "line": 1344,
+          "text": "✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line (2.296543ms)",
+          "sourceSha256": "e36851c448668276e6f5bb5c9a41262fc3c0b27019dffab7083b04db252a840c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
+          "line": 1345,
+          "text": "✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line (3.168223ms)",
+          "sourceSha256": "e36851c448668276e6f5bb5c9a41262fc3c0b27019dffab7083b04db252a840c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
+          "line": 1346,
+          "text": "✔ the RUL11 line matches the locked law text word-for-word (1.093655ms)",
+          "sourceSha256": "e36851c448668276e6f5bb5c9a41262fc3c0b27019dffab7083b04db252a840c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
+          "line": 1347,
+          "text": "✔ the RUL11 decision narrative (D-ADR0036) is present in the \"Lịch sử quyết định\" section (0.941345ms)",
+          "sourceSha256": "e36851c448668276e6f5bb5c9a41262fc3c0b27019dffab7083b04db252a840c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
+          "line": 1360,
+          "text": "✔ adding \"fixture-marketing\" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive) (0.560905ms)",
+          "sourceSha256": "e36851c448668276e6f5bb5c9a41262fc3c0b27019dffab7083b04db252a840c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
+          "line": 5601,
+          "text": "✔ an item with no domainFields at all still validates and replays exactly as before (RUL11 zero-migration) (4.675905ms)",
+          "sourceSha256": "e36851c448668276e6f5bb5c9a41262fc3c0b27019dffab7083b04db252a840c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/git/spec.md",
+          "line": 1122,
+          "text": "| G-187 | Carry §2/3/7 topology, explicit facts | V-TRUST/V-LAND | Một hàm duy nhất lấy gốc theo cấu trúc (so `git-dir` với `common-dir`, kèm `toplevel`), xử lý layout lạ (`--separate-git-dir`, submodule, bare) và có ngưỡng phiên bản git tường minh trong doctor; phân biệt 'không phải repo' với 'git quá cũ'. Mọi bản sao trên bốn ngôn ngữ phải chuyển về hàm này (RUL11: gom tới khi hết). |",
+          "sourceSha256": "3534bfd0d0e80ac8faed63ac9fddf61ccf45376517921ca0da5bf94fe5ff5139",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/packaging-distribution/history/distribution-vision.md",
+          "line": 80,
+          "text": "- **RUL11 (distribution.md) nói `fgos doctor --fix` chưa tồn tại, là",
+          "sourceSha256": "347a50e8030788b2d0852665b0f90600069e8a820ddc14566b0dd57d5cdcb68e",
+          "carriage": true,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/packaging-distribution/history/distribution-vision.md",
+          "line": 83,
+          "text": "  còn hoãn. Khi mảng này được thi công thật, RUL11 phải được sửa/supersede",
+          "sourceSha256": "347a50e8030788b2d0852665b0f90600069e8a820ddc14566b0dd57d5cdcb68e",
+          "carriage": true,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/packaging-distribution/history/distribution-vision.md",
+          "line": 195,
+          "text": "  `docs/specs/distribution.md` (supersede RUL11 + Data Dictionary #7).",
+          "sourceSha256": "347a50e8030788b2d0852665b0f90600069e8a820ddc14566b0dd57d5cdcb68e",
+          "carriage": true,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/packaging-distribution/spec.md",
+          "line": 651,
+          "text": "  rule and RUL11 (doctor --fix exists and is real, runs every registered fix) together (`docs/history/doctor-fix-gate-bypass/",
+          "sourceSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+          "carriage": true,
+          "explicitCarriageDeclaration": [
+            459,
+            "## Retained Distribution Source Detail"
+          ]
+        },
+        {
+          "file": "docs/platform/packaging-distribution/spec.md",
+          "line": 659,
+          "text": "- **RUL11 (doctor --fix exists and is real, runs every registered fix).** `fgos doctor --fix` exists and is real: it runs every fix",
+          "sourceSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+          "carriage": true,
+          "explicitCarriageDeclaration": [
+            459,
+            "## Retained Distribution Source Detail"
+          ]
+        },
+        {
+          "file": "docs/platform/packaging-distribution/spec.md",
+          "line": 669,
+          "text": "  `runFixes()` `doctor --fix` calls per RUL11 (doctor --fix exists and is real, runs every registered fix)), unconditionally and with no",
+          "sourceSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+          "carriage": true,
+          "explicitCarriageDeclaration": [
+            459,
+            "## Retained Distribution Source Detail"
+          ]
+        },
+        {
+          "file": "docs/platform/packaging-distribution/spec.md",
+          "line": 672,
+          "text": "  the same per-entry `{id, changed, message}` shape RUL11 (doctor --fix exists and is real, runs every registered fix) already describes",
+          "sourceSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+          "carriage": true,
+          "explicitCarriageDeclaration": [
+            459,
+            "## Retained Distribution Source Detail"
+          ]
+        },
+        {
+          "file": "docs/platform/packaging-distribution/spec.md",
+          "line": 774,
+          "text": "--fix` now exists for real, per RUL11 (doctor --fix exists and is real, runs every registered fix) above — its own further extension",
+          "sourceSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+          "carriage": true,
+          "explicitCarriageDeclaration": [
+            459,
+            "## Retained Distribution Source Detail"
+          ]
+        },
+        {
+          "file": "docs/platform/platform-foundations.md",
+          "line": 58,
+          "text": "| RUL11 | Tùm lum is not “heavy”; when the system is messy, consolidate boundaries and contracts. | `docs/platform-foundations.md`, `docs/specs/platform-foundations.md` |",
+          "sourceSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+          "carriage": true,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+          "line": 411,
+          "text": "### 5.4 Inventory of duplicate mechanisms (the \"tùm lum\" list, RUL11)",
+          "sourceSha256": "7285d2a7d7ec8da851731f6215760640e31fbb226d869358708b8529a73e67f4",
+          "carriage": true,
+          "explicitCarriageDeclaration": [
+            22,
+            "Added in candidate: Candidate carriage; Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority."
+          ]
+        },
+        {
+          "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "line": 37,
+          "text": "- **RUL11 (thang kiểm chứng).** T0 suite executor-giả mọi commit · T1 dogfood việc thật hằng ngày · T1c canary khai-môi-trường (worker tự báo pwd/git-root/doctrine nó thấy, verify assert từng dòng) định kỳ và sau mỗi đổi harness · T2 máy-trắng (HOME giả + credential tối thiểu) trước release (per f3a16887). Bất biến nền: mỗi agent khởi đầu tại project-root CỦA NÓ — thợ ở xưởng, worker ở git-root của worktree nó đứng.",
+          "sourceSha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "line": 110,
+          "text": " `executors.<id>.for` đổi từ 1 giá trị đơn sang mảng string không rỗng — 1 executor phục vụ nhiều capability cùng lúc; mỗi phần tử phải là 1 tên (hoặc alias) đã khai trong `runner.capabilities` (RUL11 (tùm lum, không phải nặng — gom ranh giới/contract cho rõ) trên \"curated capability catalog\" — xem `docs/reference/forgentx-tool-registry-configuration.md`), thay hẳn enum đóng cũ `EXECUTOR_PURPOSES` (`['judge']`, đã rút). `resolveExecutorIdForPurpose` so khớp bằng `for.includes(purpose)` thay vì `for === purpose`.",
+          "sourceSha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "line": 125,
+          "text": "- **RUL68 ([ĐÃ BỊ THAY phần purpose door bởi RUL90 (the raw dispatch doors are removed), decision 0062 — tầng Assignment có lease/fallback giữ nguyên] 2 tầng dispatch — Assignment door có lease/fallback thật, purpose door không, một cầu MỘT CHIỀU; `execute --for` đã rút; quyết định giữ purpose door độc lập Work item, executor-id-consolidation).** Có 2 tầng dispatch phân biệt, không phải 2 cơ chế ngang hàng: (1) Assignment door (`executeAssignment`, `assignment-policy.mjs`'s `resolveAssignmentDispatchPolicy` — `primaryExecutor` LUÔN phải là executor id đã đăng ký thật, ném lỗi ngay nếu không) — tầng DUY NHẤT có Provider Capacity Rotator lease (RUL65b) và `opPolicy.fallbackExecutors` thật; (2) purpose door (`executeExecutorCli`/`spawnWorker`) — không lease, không fallback, theo THIẾT KẾ chứ không phải thiếu sót (RUL11 (tùm lum, không phải nặng — gom ranh giới/contract cho rõ): không dựng thêm 1 cơ chế lease/fallback song song ở tầng dưới). Cầu nối MỘT CHIỀU: `executeAssignment` tự gọi `executeExecutorCli` làm bước transport CỦA CHÍNH NÓ (sau khi đã có lease/fallback ở tầng trên); purpose door không bao giờ gọi ngược lại tầng Assignment.",
+          "sourceSha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+          "line": 112,
+          "text": "tương thích ngược (RUL11 (tiến hóa schema)). Cơ chế phân giải đầy đủ (thứ tự nguồn, khoá hoạt động cây chính dùng cùng danh tính này): spec Runner RUL49 (compound-learning đổi trục: từ stage sang status retrospective).",
+          "sourceSha256": "a8bb798b7a717c66a41427065d17c4ba261a81c42faf14d0e06895330ef5f68e",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 298,
+          "text": "  1. **RUL11 (tiến hóa schema)** (log bất khả xâm phạm, `work-state.md:703`): một trường",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 308,
+          "text": "  mọi event cũ replay y hệt (RUL11 (tiến hóa schema)).",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 420,
+          "text": "`RUL11 (tiến hóa schema)` (`docs/specs/work-state.md:886`, D-ID `feed7428`) cấm tường minh: \"Nhật ký",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 434,
+          "text": "Ghi nhận một **miễn trừ pre-release** cho `RUL11 (tiến hóa schema)`: trong lúc sản phẩm còn chưa",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 453,
+          "text": "  v1.0.0**. Từ mốc đó, `RUL11 (tiến hóa schema)` áp dụng đầy đủ trở lại không ngoại lệ — không có",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 463,
+          "text": "Vì `RUL11 (tiến hóa schema)` là một luật trong spec chứ không phải một decision record, cách",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 465,
+          "text": "và chính dòng `RUL11 (tiến hóa schema)` trong `docs/specs/work-state.md` được sửa để trích dẫn",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 474,
+          "text": "  tương lai quay lại nghĩa vụ append-không-đè của `RUL11 (tiến hóa schema)` như hôm nay.",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 510,
+          "text": "Migration: dưới miễn trừ pre-release cho RUL11 (tiến hóa schema) đã có tiền lệ (`0019`,",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 121,
+          "text": "nào cho item nào (tương thích ngược, theo luật tiến hóa schema RUL11 (tiến hóa schema)).",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 140,
+          "text": "thích ngược, RUL11 (tiến hóa schema)). `fgos check` in mục friction: đếm theo lớp trên TOÀN BỘ record,",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 169,
+          "text": "ghi settlement mà nó chưa từng có (cùng luật tiến hóa schema RUL11 (tiến hóa schema)).",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 172,
+          "text": "toàn (tương thích ngược, RUL11 (tiến hóa schema)). `fgos check` in mục settlement: đếm theo",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 197,
+          "text": "thích ngược, RUL11 (tiến hóa schema)). `fgos check` in mục học: mỗi item đã đóng một dòng tóm tắt",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 220,
+          "text": "không sinh bản ghi cổng nào (tương thích ngược, cùng khuôn RUL11 (tiến hóa schema)/RUL13 (bản ghi outcome, cộng thêm không đè)).",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 238,
+          "text": "mặt hoàn toàn (tương thích ngược, RUL11 (tiến hóa schema)).",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 426,
+          "text": "ngược, RUL11 (tiến hóa schema)).",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 893,
+          "text": "  ghi đè lại một sự kiện cũ (per RUL11 (tiến hóa schema)).",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 1052,
+          "text": "- **RUL11 (tiến hóa schema).** Nhật ký đã commit bất khả xâm phạm — không bao giờ migration ghi đè; replay tương thích ngược có test khóa (bản ghi di sản thiếu trường nhận default khai báo, fixture nhật ký Phase 1 thật là chuẩn nghiệm thu); mỗi sự kiện mới mang phiên bản schema (per phase-2-routing / feed7428). **Miễn trừ pre-release** (viết lại tại chỗ cho phép trong lúc sản phẩm chưa phát hành, hết hiệu lực ở v1.0.0): xem `0017-mien-tru-viet-lai-nhat-ky`.",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 1053,
+          "text": "- **RUL13 (bản ghi outcome, cộng thêm không đè).** Dự đoán và thực tế của cùng một item là hai sự kiện outcome riêng, gộp theo id ở bản chiếu; nửa đến sau CỘNG THÊM vào nửa đã có, không bao giờ đè mất nửa trước (per phase-3-compound-learning / 1a80b4d3). Đây là một ca cụ thể của luật tiến hóa schema RUL11 (tiến hóa schema): cộng thêm, không migration, log cũ replay nguyên vẹn không sinh outcome nào.",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 1070,
+          "text": "- **RUL30 (`headAtReturn` — đối xứng `headAtTake`, nguồn diff của một đề xuất pull-door).** `return` verify xanh ghi thêm `headAtReturn` (HEAD host repo tại đúng thời điểm đó) lên CÙNG sự kiện settle về `awaiting-approval` (claim mới: `todo→awaiting-approval` hoặc `blocked→awaiting-approval`; không ghi bền vào `doing`) (per pr-lifecycle / 1359ab5e) — cổng duyệt dùng dải `headAtTake→headAtReturn` làm nguồn diff trung thực của một đề xuất pull-door. Vắng mặt cho đề xuất runner (không qua `return`) và cho mọi đề xuất tạo trước feature này (tương thích ngược, RUL11 (tiến hóa schema)).",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "line": 1072,
+          "text": "- **RUL32 (`reason` mới nhất fold lên item, latest-wins — khác khuôn cộng-thêm-không-đè).** Trường `reason` trên một sự kiện `work.move` (reject `awaiting-approval→todo`, hoặc gate-gãy `awaiting-approval→blocked`) được fold thêm lên `item.reason` (Data Dictionary #18) — GHI ĐÈ giá trị cũ mỗi lần (latest-wins), khác hẳn khuôn \"cộng thêm, không đè\" của outcome/friction/settlement/discovery: đây là ngữ cảnh SỐNG cho lần dispatch kế tiếp (worker cần lý do MỚI NHẤT, không phải toàn bộ lịch sử), không phải một chuỗi ghi nhận lịch sử. Item chưa từng bị đỗ/từ chối không mang trường này — vắng mặt hoàn toàn (tương thích ngược, RUL11 (tiến hóa schema)) (per worker-execution STR33 / 396d9d9e).",
+          "sourceSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/reference/codebase-scatter-consolidation-roadmap.md",
+          "line": 2,
+          "text": "authoritative_for: codebase scatter consolidation roadmap, RUL11-ranked file consolidation candidates, what not to consolidate",
+          "sourceSha256": "f125466752a0b962aa33cd783a36eda6bebba241c24cc760159fdef1e77d4ae9",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        }
+      ]
+    },
+    {
+      "id": "foundation-history",
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "### 0036 — Khoá RUL11",
+        "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "--",
+        "docs/platform",
+        "docs/knowledge",
+        "docs/reference",
+        "docs/tutorials"
+      ],
+      "query": "### 0036 — Khoá RUL11",
+      "regex": false,
+      "exit": 1,
+      "hitCount": 0,
+      "liveHitCount": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hits": []
+    },
+    {
+      "id": "foundation-locked-text",
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "Việc trở nặng không vì bản chất nó lớn",
+        "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "--",
+        "docs/platform",
+        "docs/knowledge",
+        "docs/reference",
+        "docs/tutorials"
+      ],
+      "query": "Việc trở nặng không vì bản chất nó lớn",
+      "regex": false,
+      "exit": 0,
+      "hitCount": 1,
+      "liveHitCount": 1,
+      "stdoutSha256": "5e2e4f848b58c8dc7243692f500f2561a30177ab910e2a4439996c8a59be0754",
+      "hits": [
+        {
+          "file": "docs/knowledge/decisions-index/decision-record.md",
+          "line": 22,
+          "text": "| platform-foundations | write D-ADR0036: Khoá RUL11 -- khong phai no nang ma no tum lum. Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên, tên đúng là tùm lum; thấy tùm lum thì gom lại tới khi hết, quy mô không bao giờ là lý do miễn trừ, đích là ranh giới rõ và contract tường minh. Anchor phrase khoá tại AGENTS.md ('## Changing a locked law' kế bên), test/docs/rul11-anchor-phrase.test.mjs assert cả RUL11 (docs/specs/platform-foundations.md) lẫn anchor (AGENTS.md). | Bằng chứng đắt: tsk-2uf-1 (dispatch.mjs 2204 dòng/6 concern rời rạc, suýt thêm --work thành cửa thứ 11) và tsk-38h (bin/fgos.mjs 4201 dòng, GitNexus zero-index Function symbols). RUL9 đòi mỗi rule có anchor phrase được check tự động assert -- RUL11 là RULn đầu tiên mở pattern test loại này, RUL1-RUL10 chưa có (ghi rõ, không mâu thuẫn im lặng với RUL9). Đây là THÊM một luật, không sửa RUL1-RUL10 đã khoá. | 2026-08-18T10:58:44.020Z |",
+          "sourceSha256": "9ab2fcb0c6c101420cb647df75f9c4a34b0fd98eb79b556a3f40fe4c29965515",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        }
+      ]
+    },
+    {
+      "id": "foundation-new-decision",
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "0054",
+        "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "--",
+        "docs/platform",
+        "docs/knowledge",
+        "docs/reference",
+        "docs/tutorials"
+      ],
+      "query": "0054",
+      "regex": false,
+      "exit": 0,
+      "hitCount": 17,
+      "liveHitCount": 17,
+      "stdoutSha256": "b9983216e393ab17bbf2642cd8653d91238e1cc308980b97d0d0924f11a34852",
+      "hits": [
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+          "line": 314,
+          "text": "✔ edit --merge-after rejects a target id that does not exist, exit 4, item unchanged (624.150054ms)",
+          "sourceSha256": "0c711e50abf24625c70b67c9f5609e573ab914906b4b308696103cccdec0f58c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+          "line": 4024,
+          "text": "✔ rejects a respondsTo target that resolves to a contribution from a different session (0.20054ms)",
+          "sourceSha256": "0c711e50abf24625c70b67c9f5609e573ab914906b4b308696103cccdec0f58c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+          "line": 7905,
+          "text": "✔ checkAcceptanceEvidenceTraceable is a no-op when work.acceptance is absent (0.220054ms)",
+          "sourceSha256": "0c711e50abf24625c70b67c9f5609e573ab914906b4b308696103cccdec0f58c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/1-context-investigator-raw.log",
+          "line": 3605,
+          "text": "b8c0054 2026-07-16 fix(daemon): keep lock on orphaned stop + surface spawn/readiness errors (fix-review2-daemon-defects-1)",
+          "sourceSha256": "68387fcb5d8fb57611d7e7c91dbdfe746629cfbeb093c400ec75ea8681510438",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/1-context-investigator-raw.log",
+          "line": 4608,
+          "text": "b8c0054 2026-07-16 fix(daemon): keep lock on orphaned stop + surface spawn/readiness errors (fix-review2-daemon-defects-1)",
+          "sourceSha256": "68387fcb5d8fb57611d7e7c91dbdfe746629cfbeb093c400ec75ea8681510438",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+          "line": 2494,
+          "text": "✔ R2: response before request is structurally unreachable -- provide-consult without a real fromAssignmentId is rejected (62.170054ms)",
+          "sourceSha256": "04223f63599492f9e7409a66cf18139e6df5b166b071f0122384c34116883cdf",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+          "line": 6214,
+          "text": "✔ defaults subagent_type to \"general-purpose\" when tool_input omits it, matching the Agent tool's own default (137.00549ms)",
+          "sourceSha256": "01a411d17fe4e6a1dffcd788cc9d8230a617c79dcbab269b79f1ae8dfb801446",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+          "line": 1971,
+          "text": "✔ compileDispatchPlan and executeAssignment respect cliOverride.preferExecutor without dispatch plan mismatch (Finding P2 fix) (101.700546ms)",
+          "sourceSha256": "03a572ab53ee82ad5bdd878c0dc4e6c6d945b222f573675ef3c65526ddd74fae",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+          "line": 8068,
+          "text": "✔ ps failure after the first successful hop returns the last resolved pid (0.240054ms)",
+          "sourceSha256": "03a572ab53ee82ad5bdd878c0dc4e6c6d945b222f573675ef3c65526ddd74fae",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+          "line": 1522,
+          "text": "✔ generateId retries with a longer suffix on collision, returning a different id (0.200548ms)",
+          "sourceSha256": "df75e8d42b1adffe38cd4396adcb9ae23cb40a8e25c995f8abcba7c9f0ecb766",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+          "line": 6299,
+          "text": "✔ skills is absent from the frontmatter when the source yaml never declares it (backward compatible) (1.005496ms)",
+          "sourceSha256": "df75e8d42b1adffe38cd4396adcb9ae23cb40a8e25c995f8abcba7c9f0ecb766",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+          "line": 6996,
+          "text": "✔ compactColdWriterFiles gate-red: a torn/corrupted write of the candidate baseline is caught, nothing gets archived, and the candidate file itself is removed (23.400542ms)",
+          "sourceSha256": "df75e8d42b1adffe38cd4396adcb9ae23cb40a8e25c995f8abcba7c9f0ecb766",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json",
+          "line": 5,
+          "text": "  \"sha256\": \"2fa3d6bbf005426944057ff21bb49b032fc9ef70b1f66209062db9f870e38810\",",
+          "sourceSha256": "9b8d3478c64d1b94770dfaf360b72ab29ac4945ae0d5a18c1de4779da6ea16b9",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+          "line": 2260,
+          "text": "✔ loadRunnerConfig accepts a config with no \"executors\" block at all — pre-tsk-62v shape, unchanged (1.005418ms)",
+          "sourceSha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+          "line": 5321,
+          "text": "✔ topic.register is create-only - re-registering an existing topicId is refused and does not wipe lineage (4.300548ms)",
+          "sourceSha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
+          "line": 5861,
+          "text": "✔ readGateBypassLevel: malformed JSON fails closed to off (1.005497ms)",
+          "sourceSha256": "e36851c448668276e6f5bb5c9a41262fc3c0b27019dffab7083b04db252a840c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
+          "line": 6281,
+          "text": "✔ rebuildView incrementally folds new events after the snapshot, deep-equal to a fresh full read (5.870054ms)",
+          "sourceSha256": "e36851c448668276e6f5bb5c9a41262fc3c0b27019dffab7083b04db252a840c",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        }
+      ]
+    },
+    {
+      "id": "team-collision",
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "### 0032 — Multi-role Team Harness",
+        "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "--",
+        "docs/platform",
+        "docs/knowledge",
+        "docs/reference",
+        "docs/tutorials"
+      ],
+      "query": "### 0032 — Multi-role Team Harness",
+      "regex": false,
+      "exit": 1,
+      "hitCount": 0,
+      "liveHitCount": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hits": []
+    },
+    {
+      "id": "section-marker",
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "--",
+        "docs/platform",
+        "docs/knowledge",
+        "docs/reference",
+        "docs/tutorials"
+      ],
+      "query": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "regex": false,
+      "exit": 0,
+      "hitCount": 3,
+      "liveHitCount": 2,
+      "stdoutSha256": "ced2cdd50a75c8300e19403de3d12226e977b86580d48607b6f319af80ec82ab",
+      "hits": [
+        {
+          "file": "docs/platform/architecture-map.md",
+          "line": 671,
+          "text": "#### Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "sourceSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+          "carriage": true,
+          "explicitCarriageDeclaration": [
+            80,
+            "## Added in candidate: architecture-map source carriage"
+          ]
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 25,
+          "text": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/system-overview/spec.md",
+          "line": 101,
+          "text": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "sourceSha256": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        }
+      ]
+    },
+    {
+      "id": "all-retired-id-headings",
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-E",
+        "^### (000[1-9]|00[12][0-9]|003[0-3]) ",
+        "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "--",
+        "docs/platform",
+        "docs/knowledge",
+        "docs/reference",
+        "docs/tutorials"
+      ],
+      "query": "^### (000[1-9]|00[12][0-9]|003[0-3]) ",
+      "regex": true,
+      "exit": 0,
+      "hitCount": 59,
+      "liveHitCount": 59,
+      "stdoutSha256": "870e1e3fe78b5b7b062dfcb3db040d14322c7ea21067e0f6be427ed9d79fa733",
+      "hits": [
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 30,
+          "text": "### 0005 — Runner & cô lập worker",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 74,
+          "text": "### 0008 — Routing theo audience của từng interface",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 102,
+          "text": "### 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 211,
+          "text": "### 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 295,
+          "text": "### 0022 — Khảo sát choke-point fgOS (quyết định lặp/lệch xuyên CLI/runner/skill)",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 469,
+          "text": "### 0023 — Thứ tự ưu tiên sản phẩm: ship faster > DoD (result + docs) > hoàn thiện sau ngưỡng",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 511,
+          "text": "### 0025 — Thứ tự ưu tiên sản phẩm (chi tiết hoá 0023), nạp always-loaded qua AGENTS.md",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 583,
+          "text": "### 0026 — Native-First Dispatch Doctrine: launcher/rootTask/capacity",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 757,
+          "text": "### 0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 819,
+          "text": "### 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 921,
+          "text": "### 0030 — Thêm bậc ưu tiên #2 \"Release con người\" vào thứ tự ưu tiên sản phẩm",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 993,
+          "text": "### 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 1095,
+          "text": "### 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "line": 1211,
+          "text": "### 0033 — Capacity cli-spawn-shaped thắng hasLiveTaskAccess, thu hẹp 0026 rule 2",
+          "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/system-overview/spec.md",
+          "line": 106,
+          "text": "### 0016 — Mốc MVP của fgOS",
+          "sourceSha256": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/system-overview/spec.md",
+          "line": 134,
+          "text": "### 0018 — Mốc MVP2 của fgOS",
+          "sourceSha256": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 34,
+          "text": "### 0002 Context",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 41,
+          "text": "### 0002 Decision",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 51,
+          "text": "### 0002 Consequences",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 64,
+          "text": "### 0003 Context",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 70,
+          "text": "### 0003 Decision",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 79,
+          "text": "### 0003 Consequences",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 91,
+          "text": "### 0004 Context",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 101,
+          "text": "### 0004 Decision",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 111,
+          "text": "### 0004 Consequences",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 122,
+          "text": "### 0006 Context",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 131,
+          "text": "### 0006 Decision",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 149,
+          "text": "### 0006 Consequences",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 163,
+          "text": "### 0007 Context",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 169,
+          "text": "### 0007 Decision",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 181,
+          "text": "### 0007 Consequences",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 194,
+          "text": "### 0011 Context",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 213,
+          "text": "### 0011 Decision",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 234,
+          "text": "### 0011 Consequences",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 248,
+          "text": "### 0012 Context",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 271,
+          "text": "### 0012 Decision",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 310,
+          "text": "### 0012 Consequences",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 325,
+          "text": "### 0013 Context",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 340,
+          "text": "### 0013 Decision",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 372,
+          "text": "### 0013 Consequences",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 383,
+          "text": "### 0013 Trust Boundary",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 399,
+          "text": "### 0013 Delivery Guarantee",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 407,
+          "text": "### 0013 Alternatives Considered",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 418,
+          "text": "### 0019 Context",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 432,
+          "text": "### 0019 Decision",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 469,
+          "text": "### 0019 Consequences",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 481,
+          "text": "### 0024 Context",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 501,
+          "text": "### 0024 Decision",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 519,
+          "text": "### 0024 Consequences",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 538,
+          "text": "### 0027 Context",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 586,
+          "text": "### 0027 Decision",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 645,
+          "text": "### 0027 Consumer Audit",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 736,
+          "text": "### 0027 Consequences",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 780,
+          "text": "### 0032 Foundation Architecture",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 795,
+          "text": "### 0032 Handoff",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 817,
+          "text": "### 0032 Declarative Structure",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 886,
+          "text": "### 0032 Implementation Sequence",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 903,
+          "text": "### 0032 Marketing Cockpit Comparison Conclusion",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        },
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "line": 926,
+          "text": "### 0032 Deliberately Deferred Questions",
+          "sourceSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "carriage": false,
+          "explicitCarriageDeclaration": null
+        }
+      ]
+    }
+  ],
+  "assessment": "Full foundations RUL11 Business Rules line + old 0036 heading are not supplied by the summary; work-state retired narrative exists with different 0032 headings/section layout. Live hits naming rules or old paths are citations/partial claims, not substitutes for the exact owning assertions. No assertion weakening permitted.",
+  "liveHolderRechecks": [
+    {
+      "oldPath": "docs/specs/runner.md",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "oldSha256": "68ad617f1a3df8750c5efaccfa2bf31da595ecf4f2b3fc549b5c18ca7202d21d",
+      "targetSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+      "assertionWitnesses": [
+        {
+          "regex": "^## Lịch sử quyết định retired từ docs/decisions/ \\(tsk-1lv-4\\)$",
+          "oldMatches": [
+            "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+          ],
+          "targetMatches": [
+            "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+          ]
+        },
+        {
+          "regex": "^### 0032 — Cổng Iron Law",
+          "oldMatches": [
+            "### 0032 — Cổng Iron Law"
+          ],
+          "targetMatches": [
+            "### 0032 — Cổng Iron Law"
+          ]
+        }
+      ],
+      "targetStatus": "live claim region eligible for Phase 9 patch-only; current source authority unchanged",
+      "liveRegionWitness": [
+        {
+          "line": 25,
+          "text": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "resolverCarriage": false,
+          "explicitCarriageDeclaration": null,
+          "rule": "L12-30(3): candidate decision records are eligible live targets; L12-26/31 use explicit region carriage, not Canonical metadata alone."
+        },
+        {
+          "line": 1095,
+          "text": "### 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+          "resolverCarriage": false,
+          "explicitCarriageDeclaration": null,
+          "rule": "L12-30(3): candidate decision records are eligible live targets; L12-26/31 use explicit region carriage, not Canonical metadata alone."
+        }
+      ]
+    },
+    {
+      "oldPath": "docs/specs/system-overview.md",
+      "target": "docs/platform/system-overview/spec.md",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "oldSha256": "70cd094041f425dac24ac931eac690bb339b541ddeabd7299efe01b0195468f1",
+      "targetSha256": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+      "assertionWitnesses": [
+        {
+          "regex": "^## Lịch sử quyết định retired từ docs/decisions/ \\(tsk-1lv-4\\)$",
+          "oldMatches": [
+            "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+          ],
+          "targetMatches": [
+            "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+          ]
+        },
+        {
+          "regex": "^### 0016 ",
+          "oldMatches": [
+            "### 0016 "
+          ],
+          "targetMatches": [
+            "### 0016 "
+          ]
+        },
+        {
+          "regex": "^### 0018 ",
+          "oldMatches": [
+            "### 0018 "
+          ],
+          "targetMatches": [
+            "### 0018 "
+          ]
+        }
+      ],
+      "targetStatus": "live claim region eligible for Phase 9 patch-only; current source authority unchanged",
+      "liveRegionWitness": [
+        {
+          "line": 101,
+          "text": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "resolverCarriage": false,
+          "explicitCarriageDeclaration": null,
+          "rule": "L12-30(3): candidate decision records are eligible live targets; L12-26/31 use explicit region carriage, not Canonical metadata alone."
+        },
+        {
+          "line": 106,
+          "text": "### 0016 — Mốc MVP của fgOS",
+          "resolverCarriage": false,
+          "explicitCarriageDeclaration": null,
+          "rule": "L12-30(3): candidate decision records are eligible live targets; L12-26/31 use explicit region carriage, not Canonical metadata alone."
+        },
+        {
+          "line": 134,
+          "text": "### 0018 — Mốc MVP2 của fgOS",
+          "resolverCarriage": false,
+          "explicitCarriageDeclaration": null,
+          "rule": "L12-30(3): candidate decision records are eligible live targets; L12-26/31 use explicit region carriage, not Canonical metadata alone."
+        }
+      ]
+    }
+  ]
+}

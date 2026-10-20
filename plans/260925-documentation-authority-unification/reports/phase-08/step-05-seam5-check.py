@@ -8,6 +8,9 @@ P=pathlib.Path(__file__).resolve().parent;ROOT=P.parents[3]
 sp=importlib.util.spec_from_file_location('pilot',P/'step-05-check.py');m=importlib.util.module_from_spec(sp);sp.loader.exec_module(m)
 sp=importlib.util.spec_from_file_location('s4',P/'step-05-seam4-check.py');s4=importlib.util.module_from_spec(sp);sp.loader.exec_module(s4)
 sha=m.sha;read=m.read
+sp=importlib.util.spec_from_file_location('bulk',P/'step-05-seam5-bulk-rules.py');bulk=importlib.util.module_from_spec(sp);sp.loader.exec_module(bulk)
+def extra_records():
+ return bulk.rows('step-05-records/tests-mechanical.jsonl') + (bulk.rows('step-05-records/tests-real-file.jsonl') if (P/'step-05-records/tests-real-file.jsonl').exists() else [])
 RULES={'s5-coverage':'Closed batch retains all original identities and remaining queue/carries exactly once.','s5-lexical':'Every pinned whole-file docs-root token has its own physical reference span.','s5-pins':'Every input digest/mode/byte count matches its own immutable git pin.','s5-spans':'Every literal, passage, operation and full enclosing test callback matches pinned bytes.','s5-inheritance':'Step4 source slots retain exact identity/disposition and complete prior record hash.','s5-patches':'Complete source and golden diffs apply and reverse exactly, without additional substitutions.','s5-atomic':'Source 31/48 and full expected golden 198/215 co-cut; complete rendered bytes equal at both sides.','s5-receipts':'Source/candidate hashes, full specs and required comparison fields join one honest pending receipt.','s5-review':'Only admitted/judgment items are window obligations; mechanical rejects remain separately enumerated.','r19-label-diagnostic':'Only an assert.ok diagnostic label, in a complete census-root-free callback with no traced census constant, can be rejected mechanically.'}
 def load():return m.rows('step-05-records/tests-prompt-goldens.jsonl')
 def enclosing_test(body,line):
@@ -50,7 +53,7 @@ def check(rs=None,receipts=None,specs=None,listing=None,continuation=None):
  refs=[e['referenceId'] for r in rs for e in r['references']];dyn=[e['id'] for r in rs for e in r['dynamicTraces']]
  test('s5-coverage','closed file and item sets',lambda:len(rs)==len(by) and set(by)==set(selection['files']) and len(refs)==len(set(refs)) and set(refs)==set(poprefs)==set(selection['referenceIds']) and len(dyn)==len(set(dyn)) and set(dyn)==set(popdyn)==set(selection['dynamicIds']))
  def remaining():
-  pop={e['file']:e for e in m.rows('step-05-population-files.jsonl') if e['seam']=='real-file-tests-goldens'};q=continuation['remainingFilesInOrder'];assert len(q)==len({e['file'] for e in q})==continuation['remainingFileCount'];assert {e['file'] for e in q}==set(pop)-set(by)
+  pop={e['file']:e for e in m.rows('step-05-population-files.jsonl') if e['seam']=='real-file-tests-goldens'};q=continuation['remainingFilesInOrder'];assert len(q)==len({e['file'] for e in q})==continuation['remainingFileCount'];assert {e['file'] for e in q}==set(pop)-set(by)-{e['file'] for e in extra_records()}
   for e in q:assert e==pop[e['file']]
   assert continuation['remainingReferences']==sum(len(e['referenceIds']) for e in q) and continuation['remainingDynamicTuples']==sum(e['dynamicCount'] for e in q)
   assert continuation['dynamicCarries']==[e for e in m.rows('step-05-dynamic-carries.jsonl') if e['seam']=='real-file-tests-goldens']
@@ -125,7 +128,7 @@ def check(rs=None,receipts=None,specs=None,listing=None,continuation=None):
    assert rc['comparison']['currentOutputSet'][0]['sha256']==sha(cur) and rc['comparison']['candidateOutputSet'][0]['sha256']==sha(cand)
   test('s5-atomic',rc['id'],atomic)
  def review():
-  assert set(listing['sourceRecords'])==set(by) and listing['generatedRecords']==[] and 'pending' in listing['reviewStatus']
+  assert set(listing['sourceRecords'])==set(by)|{e['file'] for e in extra_records() if not e.get('mechanicalClosure')} and listing['generatedRecords']==[] and 'pending' in listing['reviewStatus']
   listed={e['file']:e for e in listing['canonicalRecords']};mechanical=[]
   for r in rs:
    e=listed[r['file']];assert sha(json.dumps(r,ensure_ascii=False,separators=(',',':')))==e['recordSha256'] and r['sourceSha256']==e['sourceSha256']
@@ -134,6 +137,14 @@ def check(rs=None,receipts=None,specs=None,listing=None,continuation=None):
   assert listing['mechanicalRejects']==mechanical
  test('s5-review','closed batch review obligations',review)
  shared=m.admission.check(rs);errors.extend(shared['failures']);counts.update(shared['checks'])
- return {'kind':'Step5 seam5 closed batch 1; remaining queue unreviewed','files':len(rs),'literalReferences':len(refs),'dynamicTuples':len(dyn),'mechanicalRejects':sum(bool(d.get('mechanicalRejection')) for r in rs for d in r['dynamicTraces']),'rules':dict(RULES,**shared['rules']),'checks':dict(counts),'failureCount':len(errors),'failures':errors,'headDrift':m.head_drift(rs)}
+ bulkout=bulk.check();errors.extend(bulkout['failures']);counts.update(bulkout['checks'])
+ sp=importlib.util.spec_from_file_location('judgment',P/'step-05-seam5-judgment-check.py');judgment=importlib.util.module_from_spec(sp);sp.loader.exec_module(judgment)
+ jout=judgment.check();errors.extend(jout['failures']);counts.update(jout['checks'])
+ closed=bulk.rows('step-05-records/tests-mechanical.jsonl')
+ def bulk_listing():
+  expected=[{'file':r['file'],'recordFile':str((P/'step-05-records/tests-mechanical.jsonl').relative_to(ROOT)),'recordSha256':sha(json.dumps(r,ensure_ascii=False,separators=(',',':'))),'sourceSha256':r['sourceSha256'],'ruleId':bulk.RULE,'tupleCount':len(r['dynamicTraces'])} for r in closed]
+  return listing['mechanicalClosures']==expected and listing['mechanicalClosureCounts']=={'files':len(closed),'tuples':sum(len(r['dynamicTraces']) for r in closed)}
+ test('s5-review','mechanical whole-file closures excluded from window review',bulk_listing)
+ return {'kind':'Step5 seam5 closed batches; remaining queue and independent semantic review pending','files':len(rs)+bulkout['files']+jout['files'],'literalReferences':len(refs)+jout['literalReferences'],'dynamicTuples':len(dyn)+bulkout['dynamicTuples']+jout['dynamicTuples'],'mechanicalRejects':bulkout['dynamicTuples']+sum(bool(d.get('mechanicalRejection')) for r in rs for d in r['dynamicTraces']),'rules':dict(RULES,**shared['rules'],**bulkout['rules'],**{k:v for k,v in jout['rules'].items() if k not in shared['rules']}),'checks':dict(counts),'failureCount':len(errors),'failures':errors,'bulkTriage':bulkout,'judgmentBatch':jout,'headDrift':m.head_drift(rs)+m.head_drift(closed)+jout['headDrift']}
 if __name__=='__main__':
  out=check();(P/'step-05-seam5-check-result.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False));sys.exit(bool(out['failures']))

@@ -266,7 +266,7 @@
         {
           "rule": "s4-receipts",
           "where": "generators-decision-index",
-          "error": "Owning test does not exist: test/invented-missing-proof.test.mjs"
+          "error": "Command '['git', '-C', '/home/vantt/projects/forgentX-phase00-documentation-authority-unification', 'show', '95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf:test/invented-missing-proof.test.mjs']' returned non-zero exit status 128."
         }
       ]
     },

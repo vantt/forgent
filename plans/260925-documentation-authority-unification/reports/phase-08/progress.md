@@ -1108,3 +1108,17 @@ R17 checker pin correction and residual closure records authored. Prompt atomic 
 ## Seam 5 prompt batch — closed
 
 Full checker: 293 files / 2,429 references / 5,656 tuples / zero failures. Mutation probes 91/91 reject; HEAD-only drift positive probe passes; current prompt suite 12/12. Eleven residual groups closed. Batch 1: two files, eleven admits, zero judgment rejects, one mechanical reject, zero parks, four patches/eight preserves. Remaining: 702 files / 1,193 references / 25,005 tuples / three carries. Backlog 19 moved spans are non-failing Step 7 drift. Verification and handback are step-05-seam5-batch1-{verification.json,handback.md}; review and Phase 9 execution pending.
+
+
+## Seam 5 bulk triage — in progress
+
+Batch 2 acknowledged. Inspecting all 702 remaining files through pinned git objects; extending R19 only with closed operand categories and independently checked context/constant evidence. Records only; no CLI, git writes or product edits.
+
+
+## Seam 5 bulk triage — closed records batch
+
+All 702 initial files / 25,005 tuples triaged at their immutable pin. R19 proves 5,562 tuple rejects; 29 whole files / 115 tuples close mechanically, with 5,447 proven rejects still inside unclosed files. Two priority real-reader judgment files close: 23 references / 19 tuples / two added slots; 25 admits, 19 judgment rejects, eight parks, four patch records (three actual token edits), 32 preserves. All original nine Step 5 record files remain unchanged.
+
+Final full checker: 324 files / 2,452 references / 5,790 tuples / zero failures; 109/109 negative mutations reject, positive HEAD-only drift passes. Current and pinned same-input candidate owning tests each pass 12/12, with reproducible scratch replay. Candidate-only metadata is assessed through the existing explicit-region resolver and L12-30(3); it never independently promotes a holder. The initial missing-directory fixture failure remains visible and the fixture is repaired without assertion changes.
+
+Review list: four judgment sources, no generated files, mechanical closures separate. Continuation: 671 files / 1,170 references / 24,871 tuples / three original carries. Independent review, parked claim/layout correspondence, Step 7 co-cut composition and post-retirement parity remain pending. Final evidence: step-05-seam5-batch2-{verification.json,measurements.json,handback.md}; scope remains records only, runner owns commits, needsWrites: [].

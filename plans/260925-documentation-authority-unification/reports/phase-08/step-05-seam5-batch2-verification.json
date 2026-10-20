@@ -1,0 +1,156 @@
+{
+  "timestamp": "2026-10-20T21:46:59.463743+00:00",
+  "elapsedVerificationSeconds": 799.395,
+  "status": "pass",
+  "proofs": [
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+        "--output",
+        "step-05-full-check-result.json"
+      ],
+      "exit": 0,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-full-check.log",
+      "logSha256": "6af11949f9680ca051cb6492f2f7a2e7f4a4133eb2acdfa9f3d2a7d2f7e2e481",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-initial-full-check.json",
+      "resultSha256": "93ae2b588e28fe9643e3922164fe26eb4d36cd11eeb5e31a78e6235ca4313d7a",
+      "sourceSha256": "5346a543f4e23d332a8728b61b00c27f68d9f473f10f399bd644fb671ec42b7f",
+      "counts": {
+        "files": 324,
+        "literalReferences": 2452,
+        "dynamicTuples": 5790,
+        "failureCount": 0
+      },
+      "role": "Initial zero-failure baseline; superseded by final full replay after trace metadata and counter correction"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py"
+      ],
+      "exit": 0,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-pilot-probes.log",
+      "logSha256": "ed5a4641a73331a1c84a2cdcfc76a1f7bc1170db25a5ff214213f49b7cd12c57",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "resultSha256": "1c657c27239de46a4712a71565346ea6bf19d8c642900f0867b34eb166ebb63b",
+      "sourceSha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5",
+      "counts": {
+        "passed": 44,
+        "total": 44
+      }
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py"
+      ],
+      "exit": 0,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-generator-probes.log",
+      "logSha256": "be6baada3498e9392aed50f2a1eae7c314e3baf667ac54ad2bbdaec53886bace",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+      "resultSha256": "079f8336d8931ef7c4b08388fea47808ce35723043191d9f5e0c3cb86e7a3662",
+      "sourceSha256": "a19c43384269bb457a4de2ad2f9629d42eab2cec4f849fa0e832056fd0b9c5f5",
+      "counts": {
+        "passed": 34,
+        "total": 34
+      }
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py"
+      ],
+      "exit": 0,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-prompt-probes.log",
+      "logSha256": "81a9f835e359f8b4a4eb01df2fc0d179b7872641a298dbdab918e97ccc3020b7",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes-result.json",
+      "resultSha256": "b71b3416580bf68d7743090d15d1756073cef27a1b87008366b3f29999d7ed01",
+      "sourceSha256": "0daa372358e106547a09b6ab2c59c13d51601552b702a686b3e208571a865928",
+      "counts": {
+        "passed": 13,
+        "total": 13
+      }
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.py"
+      ],
+      "exit": 0,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.log",
+      "logSha256": "90e4e4fb6e58f963c438f5619f78603815013fa36c73d6f85708f62583224cff",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes-result.json",
+      "resultSha256": "eda386a899c7af10acc888cfb895eebb7386be99c9173f7f6d3f018c0666fc4c",
+      "sourceSha256": "a41e9243dd18de7029d909f8e1a009d626eff4c6dab8ebe4c5b87cd4e7abc79e",
+      "counts": {
+        "passed": 18,
+        "total": 18
+      }
+    }
+  ],
+  "finalFullReplay": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "PYTHONDONTWRITEBYTECODE=1",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "--output",
+      "step-05-full-check-result.json"
+    ],
+    "exit": 0,
+    "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-final-full-check.log",
+    "logSha256": "b4371ece3f989004e95cb1b98fac3bd45e47719c41eaca98b80dbc1e2da6df4a",
+    "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+    "resultSha256": "fbef4d4bf34c98adfb03d3942e37a6724399939cc7c27ada08b76bee36c7ad73",
+    "counts": {
+      "files": 324,
+      "literalReferences": 2452,
+      "dynamicTuples": 5790,
+      "failureCount": 0,
+      "closedSeam5MechanicalRejects": 116
+    }
+  },
+  "owningTestReplay": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID PYTHONDONTWRITEBYTECODE=1 python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-replay-tests.py",
+    "exit": 0,
+    "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-replay-tests.log",
+    "logSha256": "6c44933bc52bb992e5bbffab6646e33b2cb4a332ff056caaf54c5917eb50dc7d",
+    "sourceSha256": "e913384ab66048e7f2d0d8e808cba30487149b6fc2e5dd6147bc8fbeeda8f037",
+    "currentPassed": 12,
+    "candidatePassed": 12,
+    "scope": "Pinned same-input reader substitution proof only; parked legacy roots remain."
+  },
+  "probeTotals": {
+    "rejected": 109,
+    "total": 109,
+    "pilot": 44,
+    "generators": 34,
+    "prompt": 13,
+    "batch2": 18,
+    "positiveHeadOnlyDrift": "pass"
+  },
+  "finalInputHashes": {
+    "step-05-records/tests-mechanical.jsonl": "7ece1cb25d2b5a48c70ad1431672d96c415428291f76a01bb1291e3b519e9a92",
+    "step-05-records/tests-real-file.jsonl": "31b5f967b62e3455f3eca35281323de8c1d2520ff1be3899e04ed701690d1ff3",
+    "step-05-seam5-bulk-triage.jsonl": "691dc902257ae25149f8176d24276121bdaafd6a18afece8bce3acd3d060f351",
+    "step-05-seam5-review-list.json": "82e941e3222cd038c442d9e7be7603c1fa9fd8ff3ebcb5b7fd38f9d6b3f9175b",
+    "step-05-seam5-continuation.json": "c536904a3100146f685f5eb62300f51c046d285f2106f893c50d7f30db494ecc",
+    "step-05-seam5-batch2-judgment-receipts.json": "a19b5aad72dfd7a8c4ff783d7e0f7acf4ea5c0ce06531e39d37f416b4355251a",
+    "step-05-seam5-batch2-cutover-specs.json": "872f54939c5cc1371ea05c8166b5bbb77adf08d90650f3ba84f80e8ec261fa35",
+    "step-05-seam5-batch2-search-evidence.json": "67bc34205cf3cdd54b84d8dcc5442de47cf6b9a5714d94128e4b44c23daabba3",
+    "step-05-seam5-check.py": "155bc280f4bbb0b66ee9ac0f701428a3c9ba1a4c76831c156976a56f063ca381",
+    "step-05-seam5-bulk-rules.py": "b10e106669fb9147fb21e5b90c7ff000511fe18d17b603af32b30343ce93ad04",
+    "step-05-seam5-judgment-check.py": "ff3ade91c03d6103209f48b40a5b9d6f60ecf44aedb74cd394edcbeba6f5ae7b",
+    "step-05-seam5-batch2-probes.py": "a41e9243dd18de7029d909f8e1a009d626eff4c6dab8ebe4c5b87cd4e7abc79e"
+  },
+  "finalizedAt": "2026-10-20T21:54:40.878030+00:00"
+}
