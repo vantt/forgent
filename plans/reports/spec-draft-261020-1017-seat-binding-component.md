@@ -256,7 +256,8 @@ Chia theo việc phân biệt rõ được hay không, không theo việc hôm n
 - 13:17 câu 10: **hỗ trợ cả hai**, persona của domain chỉ thấy trong domain đó: (a) bộ persona chung của domain; (b) workflow đóng gói trong một thư mục riêng thì persona đặt **ngay cạnh** file workflow, không chép vào thư mục `agents/` riêng. Tên theo tiền tố loại: `wf.<name>.<ext>`, `agent.<name>.<ext>` (vd `six-hats/wf.six-hats.yaml`, `six-hats/agent.black-hat.yaml`). Luật tên và nơi đặt này là việc của Convention (sinh/phân giải/kiểm tên + đường dẫn); đọc, thứ tự tầng, ghim nội dung vẫn ở `agent-definitions`. Thứ tự tầng: workspace → thư mục workflow → domain (của chính workflow) → core.
 - 13:26 câu 6: **đồng ý đề xuất**: (a) `shape-proposals` 1 ghế frontier (lens hệ thống), 2 ghế flagship; (b) `explain` hạ xuống flagship; (c) synthesis business/delphi giữ standard; (d) panel ý kiến dẫn bằng họ rẻ (gemini, deepseek, glm); (e) `code:review`/`code:debug` giữ codex rồi claude.
 - 13:28 R: gói domain mang tier, không mang families (R.3). 13:36: giữ **6 bậc** tier, định nghĩa ở mục T, đặt ngay cạnh config.
-- Còn mở: xác nhận R1 ngay / R2 sau.
+- 13:50 R: **R1 và R2 là hai lớp chồng nhau, không loại trừ**: R2 (gói domain, chỉ `tier` + độ độc lập) là mặc định đi theo domain; R1 (config project, `families` + đè `tier`) là quyết định cuối. Thứ tự áp: R1 > R2 > mặc định hệ thống. R1 làm trong đợt Seat Binding; R2 làm khi đóng gói domain cho project khác.
+- Còn mở: không. Bước tiếp: hội đồng kiến trúc soát (câu 5), rồi owner duyệt bản cuối.
 
 ### R. Brainstorm: phạm vi của taste theo role (owner 12:48: global không hợp)
 
