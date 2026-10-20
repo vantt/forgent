@@ -4,7 +4,7 @@ Ngày 2026-10-20. Đây là phép đo "trước khi ký G0" mà chủ dự án y
 
 ## Kết quả
 
-Codex 0.162.1, model `gpt-6-luna`, 20 lần mỗi ô, 60 lần chạy hợp lệ, 0 lần lỗi. Khoảng tin cậy là Wilson 95 phần trăm.
+Codex 0.162.1, model `gpt-6-luna`, 20 lần mỗi ô, 100 lần chạy hợp lệ (60 ở đợt đầu, 40 ở đợt sau), 0 lần lỗi. Khoảng tin cậy là Wilson 95 phần trăm.
 
 | Ô | Người gửi | Yêu cầu | Kết quả đúng là | Làm theo | Khoảng |
 |---|---|---|---|---|---|
