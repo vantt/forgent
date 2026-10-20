@@ -22,6 +22,16 @@ def main():
    real=m.blob
    with mock_patch.object(m,'blob',side_effect=lambda pin,path:live.encode() if path==r['file'] else real(pin,path)):
     failures=c.check_record(r,apply=False)
+  elif change['edgeId']=='maps-j-04835':
+   # L12-40 makes the real D5 blockquote captured evidence. Retain this
+   # alias-negative mutation on live prose with identical token columns;
+   # strip only quote prefixes, never disable the captured-evidence check.
+   actual=m.blob(PIN,r['file']).decode();lines=actual.splitlines(keepends=True)
+   live=''.join('  '+line[2:] if line.startswith('> ') else line for line in lines)
+   assert actual!=live and not m.captured_evidence_at(live,edge['sourceSpans'][0]['line'])
+   real=m.blob
+   with mock_patch.object(m,'blob',side_effect=lambda pin,path:live.encode() if path==r['file'] else real(pin,path)):
+    failures=c.check_record(r,apply=False)
   else:failures=c.check_record(r,apply=False)
   names=sorted({f['check'] for f in failures});assert 'renamed-alias-preserve' in names,(change['edgeId'],names)
   cases.append({'edgeId':change['edgeId'],'mutation':'restore original renamed-target preserve including quoted QA case','expected':'renamed-alias-preserve','observed':names,'rejected':True})
@@ -54,5 +64,5 @@ def main():
  bad=copy.deepcopy(rr);edge=next(e for e in bad['edges'] if e['edgeId']=='maps-j-03996');h=next(h for h in m.heading_sections(PIN,edge['target']) if h['githubSlug']==edge['anchor']);assert h['githubSlug']!=h['anchor'];edge['anchor']=h['anchor']
  names=sorted({f['check'] for f in c.check_record(bad,apply=False)});assert 'anchor-from-evidence' in names
  cases.append({'edgeId':'maps-j-03996','mutation':'extractor slug substituted for Markdown GitHub slug','expected':'anchor-from-evidence','observed':names,'rejected':True})
- return {'pin':PIN,'negativeProbes':len(cases),'allRejected':True,'probes':cases,'positiveControls':['current alias patches accepted','missing path without registered alias not rejected by this rule','history file alias spelling exempt','actual declared carriage alias spelling exempt','wrapped replacement conserves every destination character and both source spans','body Related recognized independent of front-matter header'],'historyFixtureAdaptation':'08367/08368 real historical preserves are valid under L12-38(4); inherited alias-negative mutations still run on a source fixture without the actual history declaration. No checker predicate disabled.','limits':'Independent target/description semantic review remains pending.'}
+ return {'pin':PIN,'negativeProbes':len(cases),'allRejected':True,'probes':cases,'positiveControls':['current alias patches accepted','missing path without registered alias not rejected by this rule','history file alias spelling exempt','actual declared carriage alias spelling exempt','wrapped replacement conserves every destination character and both source spans','body Related recognized independent of front-matter header'],'historyFixtureAdaptation':'04835 captured D5 quote is tested as live prose with identical token columns under L12-40; 08367/08368 real historical preserves are valid under L12-38(4); inherited alias-negative mutations still run on a source fixture without the actual history declaration. No checker predicate disabled.','limits':'Independent target/description semantic review remains pending.'}
 if __name__=='__main__':print(json.dumps(main(),ensure_ascii=False,indent=2))

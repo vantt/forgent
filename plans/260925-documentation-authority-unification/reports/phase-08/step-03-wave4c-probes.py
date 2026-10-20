@@ -29,7 +29,10 @@ def main():
   r['edges'][0]['retiresWithTree']=True
  probe('L12-39(2): per-edge retirement is limited to the mixed work-state record',record('maps-j-04163'),invalid_retirement,'per-edge-retirement-eligibility')
  # Positive admitted lead-ruling category and the independent set-closure ceiling.
- lead=next(r for r in rs if any(e.get('blockedCategory')=='lead-ruling' for e in r['edges']))
+ # Current records may have resolved every ruling. Keep the original complete
+ # committed positive park fixture, rather than dropping the category mutation.
+ archived=[json.loads(line) for line in m.blob('c0c64372cbb98f842b8566860f7d786d95a8e57a',str(m.REL/'step-03-records/batch-072.jsonl')).decode().splitlines()]
+ lead=next(r for r in archived if r['file']=='docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md')
  assert not c.check_record(lead,apply=False)
  report=c.all([lead]);assert report['openLeadRulingEdgesBySet'][lead['reviewSet']] and lead['reviewSet'] in report['notClosableSets']
  def invalid_category(r):
@@ -37,8 +40,11 @@ def main():
  probe('L12-39(5): only admitted park categories commit',lead,invalid_category,'dependency-category')
  # A valid historical preserve must stop being exempt if its actual heading is removed.
  r=record('maps-j-04295');body=m.blob(PIN,r['file']).decode();assert m.history_at(body,next(e for e in r['edges'] if e['edgeId']=='maps-j-04295')['sourceSpans'][0]['line'],r['file'])
+ # L12-40 also exempts self-aliases. Exercise the heading mutation in a
+ # distinct live consumer fixture so that independent exemption cannot mask it.
+ r=copy.deepcopy(r);source_file=r['file'];r['file']=record('maps-j-04163')['file']
  original=m.blob
- with unittest.mock.patch.object(m,'blob',side_effect=lambda pin,path:original(pin,path).replace(b'## Document history',b'## Current navigation') if path==r['file'] else original(pin,path)):
+ with unittest.mock.patch.object(m,'blob',side_effect=lambda pin,path:original(pin,source_file).replace(b'## Document history',b'## Current navigation') if path==r['file'] else original(pin,path)):
   names=sorted({x['check'] for x in c.check_record(r,apply=False)});assert 'renamed-alias-preserve' in names;cases.append({'rule':'L12-39(6): history exemption comes from actual heading','expectedCheck':'renamed-alias-preserve','observedChecks':names,'rejected':True})
  r=next(r for r in rs if any('0001-event-log-la-su-that.md' in e['matchedExpression'] and e.get('authorAddedEdge') for e in r['edges']))
  def omit_basename(r):

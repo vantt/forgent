@@ -202,6 +202,18 @@ def reconciled_registry_row(text, line):
 @functools.lru_cache(None)
 def carriage_declarations(text):
     lines=text.splitlines();stack=[];framing=None;whole=None;result={};fence=None
+    # L12-52: a carriage H1 cannot absorb live wrapper metadata when the
+    # wrapper explicitly declares where the source body starts. Fenced source
+    # examples cannot declare that boundary.
+    body_start=None;scan_fence=None
+    carriage_wrapper=bool(lines and re.match(r'^# .*source carriage\b',lines[0],re.I))
+    for i,value in enumerate(lines,1):
+        marker=re.match(r'^(`{3,}|~{3,})',value)
+        if marker:
+            if scan_fence is None:scan_fence=marker[1]
+            elif marker[1][0]==scan_fence[0] and len(marker[1])>=len(scan_fence):scan_fence=None
+        elif carriage_wrapper and scan_fence is None and re.search(r'Original source metadata and text follow|Full source text follows|complete source.*retained verbatim',value,re.I):
+            body_start=i;break
     history_copy=bool(re.search(r'^Purpose: Preserve source material',text[:2500],re.M) and 'Added in candidate: Promotion metadata only' in text[:2500])
     metadata_end=next((i for i,l in enumerate(lines[3:],4) if l.startswith('```')),len(lines))
     purpose=next(((i,l) for i,l in enumerate(lines,1) if l.startswith('Purpose: Preserve source material')),None)
@@ -221,7 +233,7 @@ def carriage_declarations(text):
         if 'This dated successor preserves the complete changed unit' in l:whole=(n,l)
         declarations=[(i,v) for _,i,v in stack if re.search(r'literal snapshot|historical source section|source carriage|retained.*source (?:detail|material)|full source retained',v,re.I)]
         declaration=declarations[-1] if declarations else framing or whole or (purpose if history_copy and n>metadata_end and not any(x.startswith('## Literal Snapshot') for x in lines) else None)
-        result[n]=None if reconciled and re.match(r'^\|.*CTR01[0-3]\b',l) else declaration
+        result[n]=None if (body_start is not None and n<=body_start) or (reconciled and re.match(r'^\|.*CTR01[0-3]\b',l)) else declaration
     return result
 
 def carriage_declaration(text, line):
@@ -492,6 +504,26 @@ def removed_decision_holders(commit, edge, legacy):
         if prefix and any(sw[i:i+len(prefix)]==prefix for i in range(len(sw))):kept.append(holder)
     return tuple(kept)
 
+def removed_decision_successor(commit, file, edge, legacy):
+    """Title collision resolution precedes the same-consumer correspondence waiver."""
+    if edge.get('disposition')!='preserve':return
+    wanted=removed_decision_holders(commit,edge,legacy)
+    notes=[note.rstrip('.') for note in successor_notes(edge['reason'])]
+    match=re.search(r'/decisions/(\d{4})',legacy)
+    all_numeric=decision_narrative_holders(commit,match[1]) if match else ()
+    internal=re.search(r'Non-executable internal-correspondence note:\s*`([^`]+)`',edge['reason'],re.I)
+    for holder in wanted:
+        path,anchor=holder.split('#',1)
+        if path==file and internal:
+            heading=next(h['sample'] for h in heading_sections(commit,path) if h['anchor']==anchor)
+            assert internal[1]==heading, 'internal correspondence must name exact title-matched heading'
+            assert not edge.get('target') and not edge.get('anchor'), 'executable self-link forbidden'
+            assert not re.search(r'!?\[[^\]]*\]\([^)]*\)',edge['reason']), 'internal correspondence must be non-executable'
+        else:
+            assert holder in notes, 'removed decision missing computed narrative-holder successor: '+repr(wanted)
+    assert not any(note in all_numeric and note not in wanted for note in notes), 'removed decision title-collision successor'
+
+
 def make_diff(file,before,after):
     return ''.join(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+file,tofile='b/'+file,n=3)) if before!=after else ''
 
@@ -756,13 +788,7 @@ class Checker:
             check('history-region',lambda e=e:self.declared_history_region(r,e) if 'historyRegion' in e else True)
             check('renamed-alias-preserve',lambda e=e:not self.renamed_alias_holders(r,e))
             check('live-decision-citation-preserve',lambda e=e,inv=inv:not (e.get('disposition')=='preserve' and live_decision_citation(f,before,e,inv['normalizedReference'].split('#')[0])))
-            def narrative_successor(e=e,inv=inv):
-                if e.get('disposition')!='preserve':return
-                wanted=removed_decision_holders(self.commit,e,inv['normalizedReference'])
-                notes=[note.rstrip('.') for note in successor_notes(e['reason'])]
-                all_numeric=decision_narrative_holders(self.commit,re.search(r'/decisions/(\d{4})',inv['normalizedReference'])[1]) if re.search(r'/decisions/(\d{4})',inv['normalizedReference']) else ()
-                assert all(holder in notes for holder in wanted) and not any(note in all_numeric and note not in wanted for note in notes), 'removed decision missing computed narrative-holder successor: '+repr(wanted)
-            check('removed-decision-narrative-successor',narrative_successor)
+            check('removed-decision-narrative-successor',lambda e=e,inv=inv:removed_decision_successor(self.commit,f,e,inv['normalizedReference']))
             check('source-span',lambda e=e:spans_text(before,e['sourceSpans'])==e['matchedExpression'])
             def carriage_facts(e=e):
                 declaration=carriage_declaration(before,e['sourceSpans'][0]['line'])

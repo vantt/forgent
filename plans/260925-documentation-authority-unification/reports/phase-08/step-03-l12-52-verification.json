@@ -1,0 +1,73 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inputHead": "0d1fb3bffcef4fb30ae008e49b845a5d1a2035bb",
+  "result": "pass",
+  "scope": {
+    "changedPaths": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-l12-52-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-l12-52-probe-results.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-l12-52-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-l12-52-verify.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-l12-52-verification.json"
+    ],
+    "allAllowed": true,
+    "unchangedRecordFiles": 121,
+    "recordTreeSha256": "757636571f7d6e2bed60f646b99a72811462279906ea29e080477be20d0d1d4d",
+    "ownerAnswersUnchanged": true,
+    "resolverUnchanged": true,
+    "gitWrites": false,
+    "extraWritesNeeded": []
+  },
+  "proof": {
+    "inheritedNegativeProbes": 193,
+    "newNegativeProbes": 5,
+    "negativeProbesRejected": 198,
+    "newPositiveProbes": 2,
+    "priorFormControls": 2,
+    "batches": 121,
+    "files": 988,
+    "edges": 9030,
+    "failures": 0,
+    "unchangedLocatorAdvisories": 5,
+    "absentConcurrentBatches": [
+      "114",
+      "115",
+      "116",
+      "117",
+      "118",
+      "119",
+      "120",
+      "121",
+      "122"
+    ],
+    "diffCheck": "pass"
+  },
+  "bindings": {
+    "checkerSha256": "ccceb7536cfdf4ef16fc889cac7002c5fd006bfca58dc728193dcd4750b227ac",
+    "probeResultsSha256": "62eb163014522e80c1ed3588fe21aaa2d4b10ea149132808ec13f5f5d6db2419",
+    "fullCheckerResultsSha256": "d71904dbed82a3191e77e471f99b69fb68af13a8d4437a5911a46dfcd06a2b96"
+  },
+  "commands": {
+    "freshProbeReplay": "env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-03-l12-52-verify.py probes",
+    "actualFinalProbeAccounting": "env -u CLAUDE_CODE_SESSION_ID python3 -B /tmp/fgos-work/l12-52/resume-probes.py",
+    "fullChecker": "env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-03-l12-52-verify.py full"
+  },
+  "probeReplay": "Every suite ran in this assignment. Earlier passing results were retained only at matching checker/probe hashes; corrected fixtures were replayed. No record changed and no expected mutation/check was removed. Fresh replay needs no scratch helper.",
+  "diagnostics": [
+    "04835 captured-quote fixture needed a live-source control",
+    "resolved lead-ruling category required its complete original committed positive fixture",
+    "04295 history-boundary control required a distinct consumer to avoid the later self-alias exemption",
+    "form replay was corrected to the original agent-coordination consumer path"
+  ],
+  "priorArt": {
+    "carriageDeclarationsIntroduced": "566ba1c7f",
+    "capturedEvidenceIntroduced": "6eb2a4be6",
+    "leadRulingPositiveFixtureCommit": "c0c64372cbb98f842b8566860f7d786d95a8e57a",
+    "titleResolutionAndSelfSuccessorGuards": "reused unchanged"
+  },
+  "limits": "No batch 114–122 coverage, production/full npm test, independent acceptance, authority flip or accounting/commit claim. Scratch confined to /tmp/fgos-work/l12-52/; MDView unavailable."
+}
