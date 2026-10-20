@@ -78,7 +78,7 @@ Council round 1 found no named consumer yet (question 3). The first slice is the
 | Term | Meaning |
 |---|---|
 | Session | One live agent conversation. It has a stable identity from `docs/platform/session-identity/spec.md` |
-| Address | A name in the mailbox registry that outlives a session and maps to at most one live session at a time (section 5.1). A display name is never the key |
+| Address | A name in the mailbox registry for one live session on this machine, valid for that session's lifetime and released when it ends (section 5.1). Addresses that outlive a session are not part of the first slice (section 15.5). A display name is never the key |
 | Message | An immutable envelope (section 5.1) addressed to exactly one address |
 | Checkpoint | The boundary between two steps of an agent where input may safely be inserted |
 | Drain | A recipient-side claim of its pending messages at a checkpoint, printing their frames |
@@ -143,7 +143,9 @@ The hook command is one line written by the installer, with a guard: it exits at
 
 ### 5.1 Address and envelope
 
-An **address** is a name in a small registry kept with the local record. It maps to at most one live session. The registry keeps, for each address, the native handle of that session (Claude pid and socket, Codex thread id, agy herdr pane). The Codex thread id is available only from a hook payload, so a session whose hook was skipped has no handle and the adapter says `pull`. A session that ends leaves its address; the next session that takes the same name receives only messages recorded after it took the name, so a stale instruction is never replayed into a stranger.
+An **address** is a name in a small registry kept with the local record. It maps to at most one live session. The registry keeps, for each address, the native handle of that session (Claude pid and socket, Codex thread id, agy herdr pane). The Codex thread id is available only from a hook payload, so a session whose hook was skipped has no handle and the adapter says `pull`. A session that ends leaves its address; the next session that takes the same name receives only messages recorded after it took the name, so a stale instruction is never replayed into a stranger. The address does not outlive its session in this slice (durable sessions are recorded as not done in section 15.5).
+
+**What holds an address (provisionally agreed 2026-10-20, pending research A):** a terminal (a herdr pane, a tmux pane or a bare tty) together with the head of the CLI process running in it. A subagent or an in-process teammate inside that CLI is not addressed directly: a message reaches the head, which decides whether to pass it on (section 15.6). Every channel measured so far reaches the head of a CLI in a terminal and none reaches a subagent on its own. The address key also carries the project (the clone's `.fgos` root), because fgOS runs on many projects on one machine; a machine address is not part of this slice (section 15.2).
 
 | Field | Rule |
 |---|---|
@@ -441,11 +443,23 @@ TypeScript extension as in the section 7 table. Needs trust-folder handling, `de
 - Locks and leases across machines: not solved here and not by the Event Store (claims are runtime state per machine).
 - Steer and park events addressed by a running Unit (`unitRunId`) and flushed at the runner's round boundary: council round 1 found this the narrowest part with a clear consumer. It belongs to the runner and Assignment; the envelope, framing and receipt are reusable for it.
 
+### 15.5 Durable sessions (not done; may be done later)
+
+A durable session is one whose identity and conversation outlive the process or terminal that hosts it: `claude --resume` rebuilds the same conversation in a new process, a Codex thread survives its process, and an in-process teammate's mailbox outlives the teammate (research report 261015, section 4). An address would then bind to the conversation, not to the process.
+
+Not done in the first slice because no named consumer needs a message to survive a restart of its recipient, and fgOS has no durable concept to build on: the writer identity is per process, a pane id disappears with its pane, and no name registry exists. The first slice releases an address when its session ends.
+
+Reasons it may be done later, kept so the decision is not rebuilt from nothing: a message to a worker on another machine that restarts (needs a name that survives a restart); a long-lived coordinator resumed over days that still expects its waiting mail; and the council round 2 finding that a successor taking a name must not receive stale instructions, which needs a binding generation. Revisit trigger: a named consumer needs mail to survive a restart of the recipient. Open facts to measure first: whether the CLI's `session_id` stays the same across `--resume`, and what a hook payload carries on a resumed conversation.
+
+### 15.6 Subagents and teammates addressed directly (not done)
+
+Not done: every channel measured reaches the head of a CLI in a terminal. For Claude Code, research report 261015 records that a subagent's outgoing message carries the parent session's address and that replies return to the parent's conversation; in-process teammates have their own file mailboxes (`~/.claude/teams/{team}/inboxes/{name}.json`) with team-scoped names and are not restored after `/resume`. Revisit trigger: a CLI exposes a hook or channel that delivers to one subagent. Open facts to measure: whether a `PostToolUse` hook runs in a subagent's context, and what a socket write does to a session that is busy (the socket and `codex queue` were measured only on an idle session).
+
 ## 16. Open questions for the owner
 
 1. **V-011** (gate G0). Does the narrowed claim of section 2 (delivery authority and the peer-input invariant; no recovery claim) hold, and may V-011 be narrowed to allow this slice? If yes, record the superseding decision; do not edit V-011 in place.
-2. **Address form** (gate G0). Which field of `docs/platform/session-identity/spec.md` is the stable session identity that the registry of section 5.1 maps names onto, and how does a `fgos mailbox send` child process learn the identity of its calling session?
-3. **First consumer.** A herdr coordinator waking a worker session, a runner steering a session, or the owner. Naming one is the condition for starting any part of section 15.
+2. **Address form** (gate G0, research A under way). Provisionally agreed 2026-10-20: a terminal plus the head of the CLI running in it, keyed by project; no machine address, no durable session, no direct subagent address. Still open: which field of `docs/platform/session-identity/spec.md` (writer identity, a herdr pane id, or the CLI's own conversation id) the registry maps names onto, how a `fgos mailbox send` child process learns the identity of its calling session, and the three measurements of sections 15.5 and 15.6.
+3. **First consumer** (research A under way). A herdr coordinator waking a worker session, a runner steering a session, the owner, or the program board's lanes, which exchange handovers by hand today. Naming one is the condition for starting any part of section 15.
 4. Codex `queue` took about 10 s to wake an idle session. Is that the queue or the measurement? (Step S3.)
 5. Should the `fgos doctor` check for a skipped hook be reconsidered? The probe in `agent-hooks.mjs` makes it nearly free; the owner decided on 2026-10-19 not to add it before the component exists.
 6. Which of Claude Code, Codex and agy exposes a human-input hook (step S0)? Without it the budget and the wake rule use the fallback window of section 5.4.
@@ -465,6 +479,8 @@ TypeScript extension as in the section 7 table. Needs trust-folder handling, `de
 | 2026-10-19 | Council round 1: delivery measured and useful, the rest unmeasured and without a named consumer | council | plans/reports/research-261019-1828-mailbox-spec-council-round1.md |
 | 2026-10-19 | Option A: narrow to the delivery slice (Claude Code, Codex, agy; local; no ack, no cross-machine); record the later parts in section 15 | owner | accepted |
 | 2026-10-19 | Council round 2 design changes: drain verb plus a nudge-only port; derived reply link; lazy deadlines; file-per-message record; hook installer table and guard; S1 is Claude end to end | council, applied by the controller | applied in this revision, awaiting owner sign-off with the rest of the spec; plans/reports/research-261019-1834-mailbox-spec-council-round2.md |
+| 2026-10-20 | An address belongs to a terminal plus the head of the CLI in it; a subagent is not addressed directly; one clone per project per machine with many worktrees is assumed (this machine has one clone of the repository and linked worktrees; other machines not seen) | owner | agreed provisionally; research A confirms |
+| 2026-10-20 | Durable sessions are not done in the first slice; recorded in section 15.5 as not done and possibly done later, not removed | owner | accepted |
 
 ## 18. Evidence and limits
 
