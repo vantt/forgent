@@ -23,7 +23,7 @@ import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { parseAccountPin } from '../runner/execution/account-pin.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
 import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
-import { assertWriteChains, gitOut } from './unit-handoff.mjs';
+import { assertWriteChains, workflowCheckout } from './unit-handoff.mjs';
 import { RIGOR_ORDER } from './case-projection.mjs';
 import { bindWorktree } from './case-bindings.mjs';
 import { nestedStartRefusal } from './case-admission-port.mjs';
@@ -100,8 +100,7 @@ export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = wo
       hold,
       caseId: workflowRunId,
       worktree: worktreePath,
-      commonDir: gitOut(worktreePath, ['rev-parse', '--git-common-dir'])?.trim() ?? null,
-      ref: gitOut(worktreePath, ['rev-parse', '--abbrev-ref', 'HEAD'])?.trim() ?? null,
+      ...workflowCheckout(worktreePath),
     });
     if (!bound.ok) {
       append({ type: 'case.closed', payload: { closedAt: new Date().toISOString(), reason: bound.answer } });

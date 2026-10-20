@@ -9,6 +9,8 @@
 // or, when the approval a later step stands on has gone stale, parks the gate again for a new answer.
 
 import crypto from 'node:crypto';
+import { createGitLand } from '../git/land.mjs';
+import { gitPortOptions } from '../git/inspect.mjs';
 
 import {
   appendWorkflowEvent,
@@ -20,16 +22,13 @@ import { drainCaseInbox } from './case-runtime.mjs';
 import { projectCase } from './case-projection.mjs';
 import { openCaseOnLedger, resolveFrame } from './case-start.mjs';
 import {
-  createWorkflowWorktree,
-  mergeWorkflowBranch,
-  resolveIntegrationTarget,
-  cleanupWorkflowWorktree,
-} from './integrate.mjs';
-import {
   approvedReportDigests,
   buildUnitHandoff,
   canResumeUnitRun,
-  gitOut,
+  workflowCommit,
+  createWorkflowWorktree,
+  resolveIntegrationTarget,
+  cleanupWorkflowWorktree,
   outOfScopeWrites,
   playbookSubjectDigests,
   renderGateQuestion,
@@ -211,27 +210,34 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
             stateChanged = true;
             continue;
           }
+          let integrationFailure = null;
           // Collect branches from predecessor units
           for (const depId of step.dependsOn) {
+            if (integrationFailure) break;
             const depStep = workflow.steps.find((s) => s.id === depId);
             if (depStep?.units) {
               for (const u of depStep.units) {
                 const uBranch = state.steps[depId]?.units[u.id]?.branch ?? `wf/${workflowRunId}/${u.id}`;
                 try {
-                  mergeWorkflowBranch({
+                  await mergeWorkflowBranch({
                     repoRoot: mainRoot,
                     sourceBranch: uBranch,
                     targetBranch: integrationTarget,
                     commitMessage: `integrate: merge step ${depId} unit ${u.id}`,
                   });
-                } catch {
-                  // If branch didn't have commits or already merged, ignore
+                } catch (err) {
+                  integrationFailure = `integration of ${uBranch} refused: ${err.message}`;
+                  break;
                 }
               }
             }
           }
 
-          completeStep(step.id);
+          if (integrationFailure) {
+            const failedAt = new Date().toISOString();
+            recordEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'step.fail', payload: { stepId: step.id, outcome: 'findings', reason: integrationFailure, failedAt } } });
+            recordEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'workflow.fail', payload: { outcome: 'findings', stepId: step.id, reason: integrationFailure, failedAt } } });
+          } else completeStep(step.id);
           stateChanged = true;
           continue;
         }
@@ -293,7 +299,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
               uBranch = `wf/${workflowRunId}/${u.id}`;
               // A unit that builds on a writing unit starts on that unit's branch, so it sees its work.
               baseRef = base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD';
-              baseSha = baseRef ? gitOut(mainRoot, ['rev-parse', '--verify', '--quiet', `${baseRef}^{commit}`])?.trim() || null : null;
+              baseSha = baseRef ? workflowCommit(mainRoot, baseRef) : null;
               if (!baseSha) {
                 prepError = base
                   ? `base branch "${baseRef ?? `of unit ${base.unitId}`}" of writing unit ${base.unitId} is gone; it cannot start from the work it builds on`
@@ -406,7 +412,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 const preservedWorktree = unitWorktree;
                 const preservedBranch = uBranch;
                 baseRef ??= base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD';
-                baseSha ??= baseRef ? gitOut(mainRoot, ['rev-parse', '--verify', '--quiet', `${baseRef}^{commit}`])?.trim() || null : null;
+                baseSha ??= baseRef ? workflowCommit(mainRoot, baseRef) : null;
                 if (!baseSha) throw err;
                 uBranch = `wf/${workflowRunId}/${u.id}-recovery-${crypto.randomUUID()}`;
                 unitWorktree = createWorkflowWorktree({ repoRoot: mainRoot, branch: uBranch, baseRef: baseSha }).worktreePath;
@@ -575,4 +581,25 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
   }
 
   return state;
+}
+
+/** Workflow supplies its existing integration policy; Git owns the candidate and publication. */
+export async function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch, commitMessage, squash = false }) {
+  if (!repoRoot || !sourceBranch || !targetBranch) throw new RunnerConfigError('mergeWorkflowBranch requires repoRoot, sourceBranch and targetBranch');
+  const source = workflowCommit(repoRoot, sourceBranch);
+  const target = workflowCommit(repoRoot, targetBranch);
+  if (!source || !target) throw new RunnerConfigError('workflow integration target or source is unknown');
+  const port = createGitLand(gitPortOptions(repoRoot, { mutation: true }));
+  try {
+    const { candidate, receipt: prior } = await port.prepare({ operationId: crypto.randomUUID(), request: {
+      source, target, destination: targetBranch.startsWith('refs/') ? targetBranch : `refs/heads/${targetBranch}`,
+      message: commitMessage ?? `merge: integrate workflow branch ${sourceBranch} into ${targetBranch}`,
+      squash, footprint: null, subtree: null, files: [],
+    } });
+    const receipt = prior ?? await port.publish({ source: candidate.source, target: candidate.target,
+      candidate: candidate.candidate, treeDigest: candidate.treeDigest,
+      evidenceDigest: crypto.createHash('sha256').update(JSON.stringify({ policy: 'workflow integration has no additional verification command', source, target, candidate: candidate.candidate })).digest('hex'),
+    });
+    return { merged: true, sourceBranch, targetBranch, receipt };
+  } finally { port.close(); }
 }

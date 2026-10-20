@@ -1,3 +1,4 @@
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { checkGit, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
@@ -3499,7 +3500,7 @@ function checkReadmeInstallTagExists(cwd) {
   const tag = match[1];
   let existingTags;
   try {
-    existingTags = execFileSync('git', ['tag', '-l', tag], { cwd: mainCheckout, encoding: 'utf8' }).trim();
+    existingTags = createGitInspect(gitPortOptions(mainCheckout)).resolveRef({ name: `refs/tags/${tag}` }).kind === 'absent' ? '' : tag;
   } catch {
     return { passed: true, message: `could not list git tags -- nothing to check for "${tag}"` };
   }
@@ -4105,7 +4106,10 @@ function checkDocCurrentPathMissing(cwd) {
   for (const doc of Object.values(view.docs || {})) {
     if (!isLiveDocLifecycle(doc.docLifecycle)) continue;
     try {
-      execFileSync('git', ['cat-file', '-e', `HEAD:${doc.currentPath}`], { cwd: root, stdio: 'ignore' });
+      const inspect = createGitInspect(gitPortOptions(root));
+      const revision = inspect.resolveCommit({ name: 'HEAD' });
+      const [entry] = inspect.pathsAtRevision({ revision, paths: [[...Buffer.from(doc.currentPath)]], maxBlobBytes: 32 * 1024 * 1024 });
+      if (!entry || ['absent', 'error'].includes(entry.value.kind)) throw new Error('current path absent at HEAD');
     } catch {
       missing.push(`${doc.docId} (${doc.currentPath})`);
     }
@@ -4235,12 +4239,7 @@ registerCheck({ id: 'doc-source-conservation', description: 'source captures con
 
 function getMergeHeadSha(mainCheckout) {
   try {
-    const stdout = execFileSync('git', ['rev-parse', '--verify', 'MERGE_HEAD'], {
-      cwd: mainCheckout,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    });
-    return stdout.trim() || null;
+    return createGitInspect(gitPortOptions(mainCheckout)).resolveCommit({ name: 'MERGE_HEAD' }) || null;
   } catch {
     return null;
   }

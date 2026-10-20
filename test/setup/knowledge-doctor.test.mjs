@@ -1,3 +1,4 @@
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -79,11 +80,7 @@ test('knowledge-doctor - doc-registry-stale check passes when up to date', () =>
 
 function setupGitRepoWithStore() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doctor-git-test-'));
-  execSync('git init', { cwd: tmpDir, stdio: 'ignore' });
-  execSync('git config user.name "Test"', { cwd: tmpDir, stdio: 'ignore' });
-  execSync('git config user.email "test@example.com"', { cwd: tmpDir, stdio: 'ignore' });
-  fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Test\n', 'utf8');
-  execSync('git add README.md && git commit -m "initial commit"', { cwd: tmpDir, stdio: 'ignore' });
+  initFixtureRepo(tmpDir);
   const fgosDir = path.join(tmpDir, '.fgos');
   initStore(fgosDir);
   return { tmpDir, fgosDir };

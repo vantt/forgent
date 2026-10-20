@@ -1,3 +1,4 @@
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 // test/workflow/workflow-runner.test.mjs — Integration tests for Workflow runner & sequencer (P3a)
 
 import '../helpers/process-tmp-root.mjs';
@@ -48,9 +49,7 @@ const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
 function setupTestRepo() {
   const tmp = makeFixtureDir('fgos-wf-test-');
-  execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.name', 'Workflow Test'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.email', 'wf@test.local'], { cwd: tmp, stdio: 'ignore' });
+  initFixtureRepo(tmp, { branch: 'main', ignore: '.fgos/\necho-worker.mjs\n' });
 
   fs.writeFileSync(path.join(tmp, 'README.md'), '# Workflow Test\n');
   execFileSync('git', ['add', 'README.md'], { cwd: tmp, stdio: 'ignore' });
@@ -196,7 +195,7 @@ test('workflow store: append and project state accurately', () => {
   assert.equal(state.steps.s2.answer, 'yes');
 });
 
-test('integrate helpers: create worktree, merge branch, and cleanup', () => {
+test('integrate helpers: create worktree, merge branch, and cleanup', async () => {
   const tmp = setupTestRepo();
   const branchName = 'test-feat-branch';
 
@@ -215,7 +214,7 @@ test('integrate helpers: create worktree, merge branch, and cleanup', () => {
   execFileSync('git', ['commit', '-m', 'add feature'], { cwd: worktreePath, stdio: 'ignore' });
 
   // 2. Merge branch into main
-  const mergeRes = mergeWorkflowBranch({
+  const mergeRes = await mergeWorkflowBranch({
     repoRoot: tmp,
     sourceBranch: branchName,
     targetBranch: 'main',
@@ -1146,7 +1145,7 @@ test('a completed unit keeps the id of the Unit run that produced it', () => {
   assert.equal(unitOf().unitRunId, 'unit-run-123-abcd');
 });
 
-function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
+async function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
   const workflow = validateWorkflow({
     id: 'test/cleanup',
     title: 'Cleanup',
@@ -1183,7 +1182,7 @@ function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
     execFileSync('git', ['-c', 'user.name=T', '-c', 'user.email=t@t.local', 'commit', '-m', id], { cwd: units[id].worktreePath, stdio: 'ignore' });
   };
   commitIn('merged', 'a.txt');
-  mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: units.merged.branch, targetBranch: trunk });
+  await mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: units.merged.branch, targetBranch: trunk });
   commitIn('unmerged', 'b.txt');
   fs.writeFileSync(path.join(units.dirty.worktreePath, 'scratch.txt'), 'uncommitted\n');
   for (const id of ['merged', 'unmerged', 'dirty']) {
@@ -1197,7 +1196,7 @@ function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
 
 test('a finished workflow removes integrated unit worktrees and keeps the others with their paths in the run event', async () => {
   const tmp = setupTestRepo();
-  const { workflowRunId, units } = seedRunWithUnitWorktrees(tmp, { terminal: 'workflow.complete' });
+  const { workflowRunId, units } = await seedRunWithUnitWorktrees(tmp, { terminal: 'workflow.complete' });
 
   const state = await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
 
@@ -1222,7 +1221,7 @@ test('a finished workflow removes integrated unit worktrees and keeps the others
 
 test('a failed workflow cleans up the same way', async () => {
   const tmp = setupTestRepo();
-  const { workflowRunId, units } = seedRunWithUnitWorktrees(tmp, { terminal: 'workflow.fail' });
+  const { workflowRunId, units } = await seedRunWithUnitWorktrees(tmp, { terminal: 'workflow.fail' });
   const state = await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
   assert.equal(state.status, 'failed');
   assert.equal(fs.existsSync(units.merged.worktreePath), false);
@@ -1232,7 +1231,7 @@ test('a failed workflow cleans up the same way', async () => {
 test('a repository whose trunk is "master" still gets its integrated unit worktrees removed', async () => {
   const tmp = setupTestRepo();
   execFileSync('git', ['branch', '-m', 'main', 'master'], { cwd: tmp, stdio: 'ignore' });
-  const { workflowRunId, units } = seedRunWithUnitWorktrees(tmp, { terminal: 'workflow.complete', trunk: 'master' });
+  const { workflowRunId, units } = await seedRunWithUnitWorktrees(tmp, { terminal: 'workflow.complete', trunk: 'master' });
 
   const state = await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
 
@@ -1255,8 +1254,10 @@ test('integration target: declared step target, then origin/HEAD, then the check
   execFileSync('git', ['remote', 'set-head', 'origin', 'develop'], { cwd: tmp, stdio: 'ignore' });
   assert.equal(resolveIntegrationTarget({ repoRoot: tmp, workflow: plain }), 'develop', "remote's default branch wins over the checkout");
 
+  execFileSync('git', ['branch', 'release'], { cwd: tmp, stdio: 'ignore' });
   const declared = { steps: [{ id: 'i', kind: 'integrate', target: 'release' }] };
   assert.equal(resolveIntegrationTarget({ repoRoot: tmp, workflow: declared }), 'release', 'declared target wins over everything');
+  assert.equal(resolveIntegrationTarget({ repoRoot: tmp, workflow: { steps: [{ kind: 'integrate', target: 'missing' }] } }), null, 'an absent declared target is explicit unknown');
 });
 
 test('a step target is accepted on integrate steps only', () => {
@@ -2145,4 +2146,52 @@ test('integration uses the recorded replacement branch and preserves the predece
   assert.equal(fs.readFileSync(path.join(tmp, 'out.txt'), 'utf8'), 'replacement work');
   assert.equal(fs.readFileSync(path.join(original.worktreePath, 'keep.txt'), 'utf8'), 'predecessor work');
   assert.equal(execFileSync('git', ['show', `${original.branch}:README.md`], { cwd: tmp, encoding: 'utf8' }).length > 0, true);
+});
+
+test('workflow cleanup preserves dirty bytes, registration and branch on refusal', () => {
+  const tmp = setupTestRepo();
+  const branch = 'wf/dirty-cleanup';
+  const { worktreePath } = createWorkflowWorktree({ repoRoot: tmp, branch });
+  worktreeDirs.push(worktreePath);
+  const scratch = path.join(worktreePath, 'scratch.txt');
+  fs.writeFileSync(scratch, 'must survive\n');
+  assert.throws(() => cleanupWorkflowWorktree({ repoRoot: tmp, worktreePath, branch }), /worktree.*dirty|dirty.*preserved/);
+  assert.equal(fs.readFileSync(scratch, 'utf8'), 'must survive\n');
+  assert.equal(execFileSync('git', ['branch', '--list', branch], { cwd: tmp, encoding: 'utf8' }).trim(), `+ ${branch}`);
+  assert.ok(execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: tmp, encoding: 'utf8' }).includes(worktreePath));
+});
+
+test('an integration conflict fails the workflow and preserves both branches', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({ id: 'test/conflicting-integration', steps: [
+    { id: 'write', units: [{ id: 'u1', template: { capability: 'docs:write', writes: ['README.md'] } }] },
+    { id: 'land', kind: 'integrate', dependsOn: ['write'], units: [] },
+  ] });
+  const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
+  const wt = createWorkflowWorktree({ repoRoot: tmp, branch: `wf/${workflowRunId}/u1` });
+  worktreeDirs.push(wt.worktreePath);
+  for (const [cwd, content] of [[wt.worktreePath, 'incoming\n'], [tmp, 'target\n']]) {
+    fs.writeFileSync(path.join(cwd, 'README.md'), content);
+    execFileSync('git', ['add', 'README.md'], { cwd });
+    execFileSync('git', ['commit', '-qm', 'conflicting change'], { cwd });
+  }
+  const tip = cwd => execFileSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim();
+  const oldTarget = tip(tmp);
+  const oldSource = tip(wt.worktreePath);
+  const hold = acquireAdvanceLock(tmp, workflowRunId);
+  try {
+    for (const [type, payload] of [
+      ['step.start', { stepId: 'write' }],
+      ['unit.scheduled', { stepId: 'write', unitId: 'u1', ...wt }],
+      ['unit.complete', { stepId: 'write', unitId: 'u1', outcome: 'pass' }],
+      ['step.complete', { stepId: 'write', outcome: 'pass' }],
+    ]) appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type, payload }, hold });
+  } finally { hold.release(); }
+  const state = await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
+  assert.equal(state.status, 'failed');
+  assert.equal(state.steps.land.status, 'failed');
+  assert.equal(tip(tmp), oldTarget);
+  assert.equal(tip(wt.worktreePath), oldSource);
+  assert.equal(fs.readFileSync(path.join(wt.worktreePath, 'README.md'), 'utf8'), 'incoming\n');
+  assert.ok(readWorkflowEvents({ repoRoot: tmp, workflowRunId }).some(e => e.type === 'step.fail' && /integration.*refused/.test(e.payload.reason)));
 });
