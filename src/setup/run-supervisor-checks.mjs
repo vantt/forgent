@@ -254,15 +254,23 @@ export function fixRuntimeSocketDir({ env = process.env, uid = process.getuid?.(
 const STUCK_STATES = new Set(['needs-adopt', 'open']);
 
 /**
- * Why adopt cannot finish an attempt whose envelope names a host binary that no longer exists, or `null`.
- * The envelope binds the attempt's steps to the release that wrote it (the step refuses any other host), so
- * there is no fallback to the active release; the remedy is to bring that release directory back.
+ * Why adopt cannot finish an attempt whose envelope names a host binary or a Node payload that no longer
+ * exists, or `null`. The envelope binds the attempt's steps to the release that wrote it: the host must be
+ * that binary and the step runs that payload's `src/run-supervisor/attempt-step.mjs`. There is no fallback
+ * to the active release; the remedy is to bring back what is gone at the same paths (for a dev-door host,
+ * a host binary of the same protocol at that path and a checkout at the payload root).
  */
 function releaseGoneReason(attemptDir) {
   try {
-    const { hostBin } = JSON.parse(fs.readFileSync(path.join(attemptDir, 'envelope.json'), 'utf8'));
-    if (typeof hostBin === 'string' && hostBin !== '' && !fs.existsSync(hostBin)) {
-      return `the release that wrote it was removed (${hostBin} is gone) and the envelope binds its steps to that host, so adopt cannot run them: restore that release directory, then run "fgos doctor --fix" again`;
+    const { hostBin, payloadRoot } = JSON.parse(fs.readFileSync(path.join(attemptDir, 'envelope.json'), 'utf8'));
+    const gone = [];
+    if (typeof hostBin === 'string' && hostBin !== '' && !fs.existsSync(hostBin)) gone.push(hostBin);
+    if (typeof payloadRoot === 'string' && payloadRoot !== '') {
+      const entry = path.join(payloadRoot, 'src', 'run-supervisor', 'attempt-step.mjs');
+      if (!fs.existsSync(entry)) gone.push(entry);
+    }
+    if (gone.length > 0) {
+      return `the release that wrote it was removed (${gone.map((p) => `${p} is gone`).join(', ')}) and the envelope binds its steps to that host and payload, so adopt cannot run them: restore them at those paths, then run "fgos doctor --fix" again`;
     }
   } catch { /* an envelope that cannot be read is judged by adopt itself */ }
   return null;

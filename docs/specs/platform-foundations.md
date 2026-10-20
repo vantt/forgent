@@ -531,3 +531,27 @@ Giữ nguyên ý và phát biểu của 0061; vế "code đơn giản hơn" mang
 #### Tham chiếu
 
 - 0061 — quyết định bị supersede.
+
+### 0072 — Một bằng chứng: mỗi hành vi có đúng một bằng chứng chính; gỡ cơ chế thì gỡ test của nó
+
+#### Bối cảnh
+
+Owner (2026-10-20, nguyên văn): "có rất rất nhiều test, anh cảm giác là thừa. gỡ đi thì phải cân nhắc xem có gỡ test liên quan không" và "hiện số lượng test tăng lên chóng mặt, nhưng thực chất anh không muốn suy yếu hệ thống. chỉ là anh nghi ngờ nó cứ thêm vào và không hề đánh giá xem có cần thiết và dư thừa hay không." Tư vấn [counsel-261020-1658-test-suite-growth-rule](../../plans/reports/counsel-261020-1658-test-suite-growth-rule.md) đo: 94 file/1.987 test (08-01) lên 581 file/8.066 test Node cộng 1.295 test Rust; trùng trực tiếp chỉ ~3–4%; gốc là luật — L5 câu 5 chỉ nói "thêm test", E6 gần như không cho gỡ, "không làm yếu" chưa được định nghĩa, nên lead báo "giữ đủ 989 dòng assertion" như thành tích.
+
+#### Quyết định
+
+Owner duyệt cả ba khuyến nghị (2026-10-20 17:47, "đồng ý cả 3 khuyến nghị"):
+
+- Nguyên tắc thiết kế 8 **One proof** (`core/instructions/design-principles.md`): mỗi hành vi có một bằng chứng chính ở tầng thấp nhất quan sát được nó; mỗi ranh giới phía trên tối đa một test nối dây; test mới nêu hành vi trong tiêu đề, lý do chưa test nào chứng minh, và nằm trong file sở hữu module đó; *làm yếu* là khẳng định ít hơn về một hành vi vẫn còn — bị cấm; gỡ, chuyển, gộp bằng chứng không phải làm yếu. `AGENTS.md` L5 câu 5 nói lại bằng bốn câu và trỏ về nguyên tắc 8.
+- Vùng đã chuyển sang Rust (git, holder-lock, event-store, run-supervisor, terminal-control): mỗi port giữ một test route Node cộng các hành vi chỉ Node mới có; các ca chi tiết ở Rust.
+- Các cụm test liệt kê tổ hợp: chỉ tách test use-case trực tiếp cho file chậm; xem lại bộ sinh tổ hợp chỉ khi `npm test` vẫn trên ~5 phút sau đợt dọn đó.
+
+#### Hệ quả
+
+- Spec Git §15 E6 phân loại theo hành vi (kept / retargeted / retired), retired có hai trường hợp và ghi test đang sở hữu hành vi.
+- Brief lead và checklist review dùng cùng luật; báo cáo liệt kê test gỡ kèm bằng chứng chính, test thêm kèm lý do, và tổng số trước/sau.
+- Lane `chore/test-governance` làm phần cơ chế tối thiểu (dòng tổng kết của `npm test`, kiểm tra thân test trùng) và dọn theo phase của tư vấn.
+
+#### Tham chiếu
+
+- `plans/reports/counsel-261020-1658-test-suite-growth-rule.md`.
