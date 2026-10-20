@@ -3,7 +3,9 @@
 //
 // It records every child process whose binary is `git` or a repository hook -- directly, through a
 // shell string or `sh -c`, or behind `env`/`xargs`-style launchers -- that code in this checkout's
-// `src/`, `bin/` or `scripts/` starts. Product code reaches Git only through the
+// `src/`, `bin/`, `scripts/` or `core/skills/` starts. A spawn from a skill that declares itself
+// standalone (`metadata.oneDoor: standalone` in its SKILL.md) is recorded under the named class
+// `standalone-skill-script`, which the run-tests door counts but does not fail on. Product code reaches Git only through the
 // fgos-git driver, which the addon runs in Rust, so any such spawn is a writer outside the one door.
 // The run-tests door reads the record after the run and fails the suite on any entry.
 //
@@ -21,11 +23,11 @@ import module from 'node:module';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
-import { CONSUMER_COMMAND, SANDBOX_DOOR, sandboxNamedPaths, shellRunsGit } from '../../scripts/lib/git-spawn-match.mjs';
+import { CONSUMER_COMMAND, SANDBOX_DOOR, STANDALONE_SKILL_CLASS, sandboxNamedPaths, shellRunsGit, standaloneSkillOf } from '../../scripts/lib/git-spawn-match.mjs';
 
 export const SPY_LOG_ENV = 'FGOS_GIT_SPAWN_SPY_LOG';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const PRODUCT = ['src', 'bin', 'scripts'].map((dir) => path.join(ROOT, dir) + path.sep);
+const PRODUCT = ['src', 'bin', 'scripts', 'core/skills'].map((dir) => path.join(ROOT, dir) + path.sep);
 const SELF = fileURLToPath(import.meta.url);
 const HOOK_NAMES = /(^|[\\/])(\.githooks|hooks)[\\/][\w.-]+$/;
 const SHELLS = new Set(['sh', 'bash', 'zsh', 'dash', 'cmd', 'cmd.exe', 'powershell', 'pwsh']);
@@ -98,7 +100,8 @@ export function installGitSpawnSpy(cp = childProcess) {
     if (opts?.[CONSUMER_COMMAND] === true) return; // a consumer's declared command: configured, not a site
     const sandbox = opts?.[SANDBOX_DOOR];
     if (sandbox && insideSandbox(sandbox, file, argv, opts)) return;
-    record({ target, frame, file: String(file), args: argv.map(String).slice(0, 12), cwd: opts?.cwd ? String(opts.cwd) : process.cwd(), stack: String(stack).split('\n').slice(2, 10).map((l) => l.trim()) });
+    const skill = standaloneSkillOf(path.join(ROOT, frame.replace(/:\d+$/, '')), ROOT);
+    record({ ...(skill ? { class: STANDALONE_SKILL_CLASS, skill } : {}), target, frame, file: String(file), args: argv.map(String).slice(0, 12), cwd: opts?.cwd ? String(opts.cwd) : process.cwd(), stack: String(stack).split('\n').slice(2, 10).map((l) => l.trim()) });
   };
   for (const name of ['execFileSync', 'execFile', 'spawnSync', 'spawn']) {
     const original = cp[name];

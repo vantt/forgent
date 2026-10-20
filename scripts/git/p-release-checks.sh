@@ -41,8 +41,8 @@ check v-pack-native-load   node --test test/git/native-load.test.mjs
 # Live old process during rollback and forward activation (E3's rollback row, owner budget:
 # refused by the C5 door or completed, zero lost or corrupt records).
 check live-process-rollback node scripts/git/e3-bench.mjs rollback --root "$WORK/rollback"
-# Stale global npm `fgos merge`: spec §12 needs the protocol bump to refuse it. Without a bump the
-# old package speaks the same lock protocol to the new host and nothing refuses its legacy writer.
+# Stale global npm `fgos merge`: spec §12 needs the protocol bump to refuse it. The old package must
+# speak a different lock protocol than the new host, or nothing refuses its legacy writer.
 if [ -n "$STALE" ]; then
   protocol_of() { node --input-type=module -e "console.log((await import('$1/src/holder-lock/protocol.mjs')).PROTOCOL)"; }
   old_protocol="$(protocol_of "$STALE")" new_protocol="$(protocol_of "$CHECKOUT")"

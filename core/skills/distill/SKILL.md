@@ -12,6 +12,8 @@ description: >-
 metadata:
   version: "0.1"
   ecosystem: forgent
+  # Outside the fgOS product one-door boundary (Git spec §12): its own git calls are a named class.
+  oneDoor: standalone
   dependencies:
     nodejs-runtime:
       kind: command

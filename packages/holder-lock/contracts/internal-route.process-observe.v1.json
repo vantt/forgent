@@ -1,11 +1,11 @@
 {
   "contract": { "id": "internal-route-process-observe", "version": 1 },
-  "command": "fgos internal process-observe --protocol 1 --pid N",
+  "command": "fgos internal process-observe --protocol 2 --pid N",
   "description": "One look at a pid through the process facts crate, the reading the Rust judge decides from. The Node payload asks it where it has no process table of its own to read: on Windows, the creation time (FILETIME, decimal) of a process. It signals nothing and changes nothing.",
-  "argv": { "required": ["--protocol 1", "--pid N (positive integer)"] },
+  "argv": { "required": ["--protocol 2", "--pid N (positive integer)"] },
   "stdout": {
-    "v": 1,
-    "protocol": 1,
+    "v": 2,
+    "protocol": 2,
     "state": { "enum": ["live", "zombie", "absent", "unreadable"] },
     "startTime": "string, only for live: the start time the OS reports (Linux: /proc stat field 22; Windows: creation FILETIME)",
     "cause": "string, only for unreadable: driver-missing, permission or timeout"

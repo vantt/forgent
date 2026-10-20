@@ -107,8 +107,9 @@ done
 # 4. The same workload's syscall order (§10) on this disk, unprivileged.
 as_user env -C "$CHECKOUT" "$NODE" scripts/git/e1-power-cut.mjs trace --root "$OUT/trace" --ops "$OPS" > "$OUT/order.json" || FAILED=$((FAILED + 1))
 
+GIT_VERSION="$("$NODE" "$CHECKOUT/scripts/lib/sandbox-git.mjs" --root "$OUT" -- -C "$OUT" --version)"
 cat > "$WORK/e1-verdict.json" <<EOF
-{"experiment":"E1","kernel":"$(uname -r)","git":"$(git --version)","filesystem":"ext4","data":"$DATA","ops":$OPS,
+{"experiment":"E1","kernel":"$(uname -r)","git":"$GIT_VERSION","filesystem":"ext4","data":"$DATA","ops":$OPS,
  "checkpoints":$CHECKED,"failedCheckpoints":$FAILED,"checkpointLog":"$RESULTS","order":"$OUT/order.json",
  "result":"$([ "$FAILED" = 0 ] && [ "$CHECKED" -gt 0 ] && echo held || echo violated)"}
 EOF

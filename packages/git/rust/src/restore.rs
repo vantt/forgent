@@ -143,6 +143,48 @@ fn data_path(name: &str) -> bool {
     name != ".fgos" && !name.starts_with(".fgos/")
 }
 impl GitDriver {
+    /// Whether tracked `.fgos` paths take part in this restore as data paths: a
+    /// confirmed main discard always covers them; an unconfirmed main-checkout
+    /// restore covers them only while Git sees every one equal to HEAD (index and
+    /// work tree, deletions and type changes included). A linked checkout never does.
+    fn fgos_data(&self, repo: &RepoHandle, scope: &LockScope<'_>, confirmed: bool) -> Result<bool> {
+        if confirmed {
+            return Ok(true);
+        }
+        if repo.work_tree() != Some(repo.trusted_main_root()) {
+            return Ok(false);
+        }
+        for args in [
+            &[
+                "diff",
+                "--name-only",
+                "--no-renames",
+                "--no-ext-diff",
+                "--no-textconv",
+                "-z",
+                "--",
+                ".fgos",
+            ][..],
+            &[
+                "diff",
+                "--cached",
+                "--name-only",
+                "--no-renames",
+                "--no-ext-diff",
+                "--no-textconv",
+                "--ita-visible-in-index",
+                "-z",
+                "HEAD",
+                "--",
+                ".fgos",
+            ][..],
+        ] {
+            if !self.checkout_bytes(repo, scope, args)?.is_empty() {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
     pub(crate) fn restore_patch_paths(&self, repo: &RepoHandle) -> Result<Vec<std::path::PathBuf>> {
         let HeadFact::Attached { target, .. } = self.resolve_head(repo)? else {
             return Ok(vec![]);
@@ -292,22 +334,17 @@ impl GitDriver {
             scope,
             &["ls-tree", "-r", "--name-only", "-z", target.as_str()],
         )?)?;
-        if !linked
-            && !confirmed
-            && tracked
-                .iter()
-                .chain(target_paths.iter())
-                .any(|p| !data_path(p))
-        {
+        let fgos_data = self.fgos_data(repo, scope, confirmed)?;
+        if !linked && !fgos_data {
             return Err(failure("restore-protected-fgos-path"));
         }
         let tracked: BTreeSet<_> = tracked
             .into_iter()
-            .filter(|p| confirmed || data_path(p))
+            .filter(|p| fgos_data || data_path(p))
             .collect();
         let target_paths: Vec<_> = target_paths
             .into_iter()
-            .filter(|p| confirmed || data_path(p))
+            .filter(|p| fgos_data || data_path(p))
             .collect();
         let target_entries =
             self.checkout_bytes(repo, scope, &["ls-tree", "-r", "-z", target.as_str()])?;
@@ -457,6 +494,7 @@ impl GitDriver {
         confirmed: bool,
     ) -> Result<Snapshot> {
         let mut remaining = 32 * 1024 * 1024;
+        let fgos_data = self.fgos_data(repo, scope, confirmed)?;
         let mut local_paths = checkout::paths(&self.checkout_bytes(
             repo,
             scope,
@@ -470,7 +508,7 @@ impl GitDriver {
                     "-z",
                     &preview.head,
                 ],
-                confirmed,
+                fgos_data,
             ),
         )?)?;
         local_paths.extend(checkout::paths(&self.checkout_bytes(
@@ -487,7 +525,7 @@ impl GitDriver {
                     "-z",
                     &preview.head,
                 ],
-                confirmed,
+                fgos_data,
             ),
         )?)?);
         // Untracked `.fgos` runtime state is never part of a restore.
@@ -503,7 +541,7 @@ impl GitDriver {
                 ":!.fgos",
             ],
         )?)?);
-        local_paths.retain(|p| confirmed || data_path(p));
+        local_paths.retain(|p| fgos_data || data_path(p));
         local_paths.sort();
         local_paths.dedup();
         let head_paths: BTreeSet<_> = checkout::paths(&self.checkout_bytes(
@@ -543,7 +581,7 @@ impl GitDriver {
                     "--ita-visible-in-index",
                     &preview.head,
                 ],
-                confirmed,
+                fgos_data,
             ),
         )?)?;
         let hidden = checkout::paths(&self.checkout_bytes(
@@ -558,7 +596,7 @@ impl GitDriver {
                     "--ita-invisible-in-index",
                     &preview.head,
                 ],
-                confirmed,
+                fgos_data,
             ),
         )?)?;
         let intent_to_add = visible
@@ -579,7 +617,7 @@ impl GitDriver {
                     "--no-textconv",
                     &preview.head,
                 ],
-                confirmed,
+                fgos_data,
             ),
         )?;
         let worktree_patch = self.checkout_bytes(
@@ -593,7 +631,7 @@ impl GitDriver {
                     "--no-ext-diff",
                     "--no-textconv",
                 ],
-                confirmed,
+                fgos_data,
             ),
         )?;
         let raw = self.checkout_bytes(
@@ -609,7 +647,7 @@ impl GitDriver {
                     &preview.head,
                     &preview.target,
                 ],
-                confirmed,
+                fgos_data,
             ),
         )?;
         let fields: Vec<_> = raw.split(|b| *b == 0).filter(|b| !b.is_empty()).collect();

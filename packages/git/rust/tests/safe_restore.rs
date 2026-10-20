@@ -1063,3 +1063,123 @@ fn confirmed_main_discard_clears_a_stopped_merge_and_retains_its_bytes() {
         serde_json::json!(merge_msg)
     );
 }
+/// Commit a tracked `.fgos` store on trunk, then a descendant that changes one
+/// tracked `.fgos` path and adds another. Returns (trunk head, descendant).
+fn tracked_fgos_descendant(f: &Fixture) -> (String, String) {
+    fs::write(f.main.join(".fgos/store.jsonl"), "one\n").unwrap();
+    git(&f.main, &["add", ".fgos/store.jsonl"]);
+    git(&f.main, &["commit", "-qm", "tracked store"]);
+    let head = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["checkout", "-qb", "next"]);
+    fs::write(f.main.join(".fgos/store.jsonl"), "two\n").unwrap();
+    fs::write(f.main.join(".fgos/added.jsonl"), "added\n").unwrap();
+    fs::write(f.main.join("a"), "incoming\n").unwrap();
+    git(&f.main, &["add", ".fgos/added.jsonl"]);
+    git(&f.main, &["commit", "-qam", "next"]);
+    let next = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["checkout", "-q", "trunk"]);
+    (head, next)
+}
+fn forward(head: &str, target: &str) -> RestoreRequest {
+    RestoreRequest {
+        expected_head: head.into(),
+        target: target.into(),
+        reason: "forward main reset".into(),
+        reapply_local_delta: false,
+        allowed_replacements: vec![],
+        checkout_baseline: None,
+        discard_local_delta: false,
+        require_clean_baseline: false,
+        require_staged_only: false,
+        confirmed_by: None,
+    }
+}
+// Behaviour change: an unconfirmed forward restore used to refuse any tracked
+// `.fgos` path; it now updates those equal to HEAD. No earlier test covered it.
+#[test]
+fn forward_restore_updates_clean_tracked_fgos_paths_and_leaves_runtime_state() {
+    let f = Fixture::new();
+    let (head, next) = tracked_fgos_descendant(&f);
+    fs::write(f.main.join(".fgos/runtime.tmp"), "untracked state\n").unwrap();
+    let r = forward(&head, &next);
+    let preview = f.driver.preview_restore(&f.repo, vec![], &r).unwrap();
+    assert!(preview.paths.contains(&".fgos/store.jsonl".to_owned()));
+    f.driver
+        .apply_restore(&f.repo, vec![], &r, "fixture", "forward-fgos")
+        .unwrap();
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), next);
+    assert_eq!(
+        fs::read(f.main.join(".fgos/store.jsonl")).unwrap(),
+        b"two\n"
+    );
+    assert_eq!(
+        fs::read(f.main.join(".fgos/added.jsonl")).unwrap(),
+        b"added\n"
+    );
+    assert_eq!(fs::read(f.main.join("a")).unwrap(), b"incoming\n");
+    assert_eq!(
+        fs::read(f.main.join(".fgos/runtime.tmp")).unwrap(),
+        b"untracked state\n"
+    );
+    assert!(git(
+        &f.main,
+        &["status", "--porcelain", "--", ".fgos/store.jsonl"]
+    )
+    .is_empty());
+}
+// No earlier test proves the dirty-`.fgos` refusal of an unconfirmed forward
+// restore: staged, unstaged and deleted tracked `.fgos` paths all refuse and
+// change nothing; an untracked file where the target adds one refuses by collision.
+#[test]
+fn forward_restore_refuses_dirty_tracked_fgos_and_untracked_collision_and_changes_nothing() {
+    let f = Fixture::new();
+    let (head, next) = tracked_fgos_descendant(&f);
+    let r = forward(&head, &next);
+    let store = f.main.join(".fgos/store.jsonl");
+    type Dirt = fn(&Path);
+    let dirts: [(&str, Dirt); 3] = [
+        ("unstaged", |s| fs::write(s, "dirty\n").unwrap()),
+        ("deleted", |s| fs::remove_file(s).unwrap()),
+        ("staged", |s| {
+            fs::write(s, "staged\n").unwrap();
+            git(s.parent().unwrap(), &["add", "store.jsonl"]);
+            fs::write(s, "one\n").unwrap();
+        }),
+    ];
+    for (name, make) in dirts {
+        make(&store);
+        let before = git(&f.main, &["status", "--porcelain"]);
+        let index = fs::read(f.main.join(".git/index")).unwrap();
+        for err in [
+            f.driver.preview_restore(&f.repo, vec![], &r).unwrap_err(),
+            f.driver
+                .apply_restore(&f.repo, vec![], &r, "fixture", &format!("dirty-{name}"))
+                .unwrap_err(),
+        ] {
+            assert!(
+                err.cause.contains("restore-protected-fgos-path"),
+                "{name}: {}",
+                err.cause
+            );
+        }
+        assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), head, "{name}");
+        assert_eq!(git(&f.main, &["status", "--porcelain"]), before, "{name}");
+        assert_eq!(
+            fs::read(f.main.join(".git/index")).unwrap(),
+            index,
+            "{name}"
+        );
+        git(&f.main, &["reset", "-q", "--hard", &head]);
+    }
+    fs::write(f.main.join(".fgos/added.jsonl"), "runtime\n").unwrap();
+    let err = f.driver.preview_restore(&f.repo, vec![], &r).unwrap_err();
+    assert!(
+        err.cause.contains("restore-untracked-target-collision"),
+        "{}",
+        err.cause
+    );
+    assert_eq!(
+        fs::read(f.main.join(".fgos/added.jsonl")).unwrap(),
+        b"runtime\n"
+    );
+}

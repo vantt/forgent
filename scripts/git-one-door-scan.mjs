@@ -16,7 +16,9 @@
 //   - production-sandbox-probe: a Rust Git spawn whose repository the same function creates under
 //     `temp_dir()`;
 //   - hook-read-context: a read-verb Git spawn inside a shipped hook (`.githooks/`);
-//   - rust-test: Rust code under `tests/` or `#[cfg(test)]`.
+//   - rust-test: Rust code under `tests/` or `#[cfg(test)]`;
+//   - standalone-skill-script: code of a skill whose own SKILL.md declares `metadata.oneDoor: standalone`
+//     (owner decision 2026-10-20): outside the product one-door boundary, reported and counted.
 //
 // Usage: node scripts/git-one-door-scan.mjs [--json] [--root <dir>] [--write-census]
 // The release build writes the census (packages/git/contracts/mutation-census.v1.json); doctor's
@@ -27,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lexSource } from './lib/js-source-lexer.mjs';
-import { shellRunsGit } from './lib/git-spawn-match.mjs';
+import { STANDALONE_SKILL_CLASS, shellRunsGit, standaloneSkillOf } from './lib/git-spawn-match.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const SCAN_ROOTS = ['src', 'bin', 'scripts', 'packages', 'apps', '.githooks', 'core/skills'];
@@ -208,8 +210,8 @@ class JsFile {
     if (/(?:\?\.|\.)verify$/.test(shapeExpr)) return [{ external: `consumer verify command (${expr})` }];
     const pick = /^([\s\S]+?)\s*(?:\?\.|\.)\s*(?:find|findLast|at)\s*\(/.exec(shapeExpr);
     if (pick && splitArgs(shapeExpr, pick[0].length - 1).close === shapeExpr.trimEnd().length - 1) return this.elements(expr.slice(0, pick[1].length), index, depth + 1);
-    const indexed = /^([A-Za-z_$][\w$.]*)\s*\[[^\[\]]+\]$/.exec(shapeExpr);
-    if (indexed) return this.elements(indexed[1], index, depth + 1);
+    const indexed = /^([A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)*)\s*(?:\?\.)?\[[^\[\]]+\]$/.exec(shapeExpr);
+    if (indexed) return this.elements(expr.slice(0, indexed[1].length), index, depth + 1);
     const ctor = /^new\s+URL\s*\(/.exec(shapeExpr);
     if (ctor && splitArgs(shapeExpr, ctor[0].length - 1).close === shapeExpr.trimEnd().length - 1) return this.callValue('new URL', expr, ctor[0].length - 1, index, depth);
     const callMember = /^([A-Za-z_$][\w$.]*)\s*\(/.exec(shapeExpr);
@@ -224,6 +226,16 @@ class JsFile {
     }
     const call = /^([A-Za-z_$][\w$.]*)\s*\(/.exec(shapeExpr);
     if (call && splitArgs(shapeExpr, call[0].length - 1).close === shapeExpr.trimEnd().length - 1) return this.callValue(call[1], expr, call[0].length - 1, index, depth);
+    // `make().method(args)`: the method of the object the call returns.
+    const chained = /^([\s\S]+\))\s*(?:\?\.|\.)\s*([A-Za-z_$][\w$]*)\s*\(/.exec(shapeExpr);
+    if (chained && this.ctx && topLevel(shapeExpr.slice(0, chained[1].length), '?') < 0 && splitArgs(shapeExpr, chained[0].length - 1).close === shapeExpr.trimEnd().length - 1) {
+      const argText = splitArgs(shapeExpr, chained[0].length - 1).args.map(({ from, to }) => expr.slice(from, to));
+      const out = this.evaluate(expr.slice(0, chained[1].length), index, depth + 1).flatMap((holder) => {
+        const target = holder.object !== undefined ? objectMethod(this.ctx, holder, chained[2]) : null;
+        return target ? bindCall(holder, this.returnsOf(target, argText, index, depth), depth) : [{ unknown: expr }];
+      });
+      return out.length ? out : [{ unknown: expr }];
+    }
     const member = /^([A-Za-z_$][\w$]*)((?:\??\.[A-Za-z_$][\w$]*)+)$/.exec(expr);
     if (member) return this.memberValue(member[1], member[2].split(/\??\./).filter(Boolean), index, depth);
     const id = /^[A-Za-z_$][\w$]*$/.test(expr) ? expr : null;
@@ -308,7 +320,10 @@ class JsFile {
     if (narrowed && splitArgs(shape, narrowed[0].length - 1).close === shape.trimEnd().length - 1) return this.elements(expr.slice(0, narrowed[1].length), index, depth + 1);
     if (/^process\.argv\b/.test(expr)) return [{ external: 'command-line arguments' }];
     if (/^[A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)+$/.test(expr)) {
-      return this.evaluate(expr, index, depth + 1).map((v) => (v.external || v.param !== undefined ? (v.param !== undefined ? { ...v, elements: true } : v) : { unknown: `elements of ${expr}` }));
+      return this.evaluate(expr, index, depth + 1).flatMap((v) => {
+        if (v.object !== undefined) return bindCall(v, v.file.elements(v.object, v.at, depth + 1), depth); // an object literal's values
+        return [v.external || v.param !== undefined ? (v.param !== undefined ? { ...v, elements: true } : v) : { unknown: `elements of ${expr}` }];
+      });
     }
     const mapped = /^([\s\S]+?)\s*\.\s*(?:map|flatMap)\s*\(/.exec(shape);
     if (mapped && splitArgs(shape, mapped[0].length - 1).close === shape.trimEnd().length - 1) {
@@ -400,8 +415,23 @@ class JsFile {
     if (/^(fileURLToPath|url\.fileURLToPath)$/.test(callee) || callee === 'new URL') return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     if (callee === 'JSON.parse') return [{ external: 'configuration file data' }];
     if (/^(fs\.realpathSync|path\.basename|String)$/.test(callee)) return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
+    if (callee === 'Object.freeze') return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
+    // `obj.method(args)`: the method of each object `obj` may hold, returning with its own arguments bound.
+    if (this.ctx && callee.includes('.')) {
+      const dot = callee.lastIndexOf('.');
+      const out = this.evaluate(callee.slice(0, dot), index, depth + 1).flatMap((holder) => {
+        const target = holder.object !== undefined ? objectMethod(this.ctx, holder, callee.slice(dot + 1)) : null;
+        return target ? bindCall(holder, this.returnsOf(target, argText, index, depth), depth) : [{ unknown: expr }];
+      });
+      return out.length ? out : [{ unknown: expr }];
+    }
     const target = this.ctx && resolveFunction(this.ctx, this, callee);
     if (!target) return [{ unknown: expr }];
+    return this.returnsOf(target, argText, index, depth, expr);
+  }
+
+  /** What calling `target` with `argText` (evaluated here) returns. */
+  returnsOf(target, argText, index, depth, expr = target.fn.name) {
     const out = [];
     for (const v of returnValues(target.file, target.fn, depth + 1)) {
       if (v.param !== undefined && v.fn === target.fn) {
@@ -517,6 +547,21 @@ function resolveFunction(ctx, file, callee) {
     }
   }
   return null;
+}
+
+/** The method `name` of the object literal `holder` holds (`{ name(...) {...} }`, `name: (...) =>`), or a
+ * function its `name:` property names. */
+function objectMethod(ctx, holder, name) {
+  const file = holder.file;
+  let at = file.code.indexOf(holder.object, holder.at);
+  if (at < 0) at = file.code.indexOf(holder.object);
+  if (at < 0) return null;
+  const end = at + holder.object.length;
+  const outer = enclosing(file.spans, at);
+  const fn = file.spans.find((s) => s.name === name && s.from > at && s.to < end && enclosing(file.spans, s.from - 1) === outer && literalMemberAt(file.shape, s) >= 0);
+  if (fn) return { file, fn };
+  const ref = literalMember(holder.object, name)?.trim();
+  return ref && /^[A-Za-z_$][\w$]*$/.test(ref) ? resolveFunction(ctx, file, ref) : null;
 }
 
 const returning = new Set();
@@ -841,6 +886,12 @@ function describe(value) {
 }
 
 function importersOf(ctx, file) {
+  ctx.importers ??= new Map();
+  if (!ctx.importers.has(file.name)) ctx.importers.set(file.name, findImporters(ctx, file));
+  return ctx.importers.get(file.name);
+}
+
+function findImporters(ctx, file) {
   return [...ctx.js.values()].filter((other) => other !== file && [...other.code.matchAll(/(?:import|export)\s*\{[^}]*\}\s*from\s*['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]/g)].some((m) => {
     const spec = m[1] ?? m[2];
     return spec.startsWith('.') && path.posix.normalize(path.posix.join(path.posix.dirname(other.name), spec)) === file.name;
@@ -890,7 +941,7 @@ function callersOf(ctx, file, fnName) {
     }
   }
   const exported = new RegExp(`export\\s+(?:async\\s+)?(?:function\\s*\\*?\\s*|const\\s+|let\\s+)${fnName}\\b|export\\s*\\{[^}]*\\b${fnName}\\b`).test(file.code);
-  if (!exported) return out;
+  if (!exported) return dedupeCalls(out);
   for (const other of ctx.js.values()) {
     if (other === file) continue;
     for (const m of other.code.matchAll(/import\s*\{([^}]*)\}\s*from\s*['"]([^'"]+)['"]/g)) {
@@ -902,6 +953,321 @@ function callersOf(ctx, file, fnName) {
         if (orig === fnName) find(other, alias ?? orig);
       }
     }
+  }
+  return dedupeCalls(out);
+}
+
+function dedupeCalls(calls) {
+  return [...new Map(calls.map((c) => [`${c.file.name}:${c.open}`, c])).values()];
+}
+
+// ---------- function values ----------
+// A function handed on as a value -- an alias, an argument, an object property, a table entry, a return
+// value, `.bind(...)` -- is called wherever that value is called. The flow follows the value together with
+// the property path it sits under (`return { spawnHolding }`, later read as `lock.spawnHolding`), through
+// local and imported functions. A value passed to a callee the scan cannot resolve flows to every
+// parameter that destructures its key and every read of that key. A flow this model cannot follow (an
+// array element, `.call`, an unresolved callee taking the function itself) is an escape: the wrapper then
+// keeps its site, whatever call sites were found.
+
+const IDENT = '[A-Za-z_$][\\w$]*';
+const IDENT_RE = new RegExp(`^${IDENT}$`);
+const esc = (name) => name.replace(/\$/g, '\\$');
+const MAX_FLOW_ITEMS = 200;
+// Built-ins that inspect or print a value and never call a function inside it.
+const NO_FLOW_CALLEES = /^(?:JSON\.stringify|Object\.(?:keys|is|isFrozen|getOwnPropertyNames|hasOwn)|Array\.isArray|String|Number|Boolean|console\.\w+|assert(?:\.\w+)?|Reflect\.(?:has|ownKeys)|process\.(?:stdout|stderr)\.write)$/;
+
+/** What a reference at `index` sits in: the nearest unmatched opener, `,`, `;`, assignment `=`, object
+ * key `:`, `return` or arrow `=>` before it, skipping the operands of `??`, `||` and `?:` around it. A
+ * newline alone never ends the walk (object literals span lines); a `}` that ends a line before does. */
+function flowContext(shape, index) {
+  let depth = 0;
+  for (let i = index - 1; i >= 0; i--) {
+    const c = shape[i];
+    if (c === '}' && depth === 0 && /^[ \t]*\n/.test(shape.slice(i + 1, index))) return { stop: ';', at: i }; // a block ended the statement before
+    if (')]}'.includes(c)) { depth++; continue; }
+    if ('([{'.includes(c)) { if (depth-- === 0) return { stop: c, at: i }; continue; }
+    if (depth !== 0) continue;
+    if (c === ';' || c === ',') return { stop: c, at: i };
+    if (c === '>' && shape[i - 1] === '=') return { stop: 'return', at: i };
+    if (c === '=' && !'=!<>'.includes(shape[i - 1]) && shape[i + 1] !== '=' && shape[i + 1] !== '>') return { stop: '=', at: i };
+    if (c === ':' && new RegExp(`[{,]\\s*(?:${IDENT}|['"][^'"]*['"]|\\[[^\\]]*\\])\\s*$`).test(shape.slice(Math.max(0, i - 200), i))) return { stop: ':', at: i };
+    if (/\breturn$/.test(shape.slice(Math.max(0, i - 6), i + 1)) && /[\s(]/.test(shape[i + 1] ?? ' ')) return { stop: 'return', at: i };
+  }
+  return { stop: ';', at: -1 };
+}
+
+/** Where function span `fn` is a method or property of an object literal (`{ name(...) {`, `, name: (...) =>`),
+ * the index just after the `{` or `,` that starts its member; else -1. */
+function literalMemberAt(shape, fn) {
+  if (!fn.name) return -1;
+  const before = shape.slice(Math.max(0, fn.from - 4000), fn.from);
+  const m = new RegExp(`[{,]\\s*(?:async\\s+)?${esc(fn.name)}\\s*(?::\\s*(?:async\\s*)?(?:function\\s*\\*?\\s*${IDENT}?\\s*)?)?$`).exec(before);
+  return m ? fn.from - before.length + m.index + 1 : -1;
+}
+
+/** Call sites `fn` (a function defined in `file`) reaches as a value, and the flows that escape. */
+function valueFlowCalls(ctx, file, fn) {
+  ctx.valueFlow ??= new Map();
+  const memo = `${file.name}:${fn.from}`;
+  if (!ctx.valueFlow.has(memo)) ctx.valueFlow.set(memo, computeValueFlow(ctx, file, fn));
+  return ctx.valueFlow.get(memo);
+}
+
+function computeValueFlow(ctx, file, fn) {
+  const calls = [];
+  const escapes = [];
+  const items = [];
+  const seen = new Set();
+  const followed = new Set();
+  const escape = (f, at, why) => escapes.push(`${why} (${f.name}:${lineOf(f.source, Math.max(0, at))})`);
+  const push = (item) => {
+    if (item.path.length > 4) return; // a cycle such as `fn.execute = fn`: shorter paths already cover its reads
+    const key = `${item.kind}:${item.file.name}:${item.scope?.from ?? -1}:${item.name}:${item.path.join('.')}`;
+    if (seen.has(key)) return;
+    if (seen.size >= MAX_FLOW_ITEMS) { escape(item.file, 0, 'value flow too wide'); return; }
+    seen.add(key);
+    items.push(item);
+  };
+  const scopeOf = (f, id, at) => {
+    for (let s = enclosing(f.spans, at); s; s = enclosing(f.spans, s.from - 1)) {
+      if (s.params.some((p) => paramNames(p).includes(id))) return s;
+      if (s.from <= 0) break;
+    }
+    return f.binding(id, at)?.scope ?? null;
+  };
+  // A parameter receiving the value (at `path`): a plain name, or a destructuring that takes its key.
+  const intoParam = (f, span, param, path, at) => {
+    const text = param.trim();
+    if (text.startsWith('...')) { escape(f, at, 'passed into a rest parameter'); return; }
+    if (text.startsWith('{')) {
+      const pattern = text.slice(0, splitArgs(lexSource(text).shape, 0).close + 1);
+      if (!path.length) { escape(f, at, 'destructured as a function'); return; }
+      for (const [key, local] of destructuredPairs(pattern)) if (key === path[0]) push({ kind: 'name', file: f, scope: span, name: local, path: path.slice(1) });
+      return;
+    }
+    const name = text.replace(/\s*=[\s\S]*$/, '');
+    if (IDENT_RE.test(name)) push({ kind: 'name', file: f, scope: span, name, path });
+    else escape(f, at, 'passed into an unreadable parameter');
+  };
+  // A value handed to a callee the scan cannot resolve, under a key: every receiver of that key.
+  const byKey = (f, at, path) => {
+    if (!path.length) { escape(f, at, 'passed to an unresolved callee'); return; }
+    const index = keyIndex(ctx);
+    for (const d of index.destructured.get(path[0]) ?? []) push({ kind: 'name', file: d.file, scope: d.scope, name: d.local, path: path.slice(1) });
+    for (const r of index.reads.get(path[0]) ?? []) {
+      const start = r.at - (/[\w$.?\][)]*$/.exec(r.file.shape.slice(Math.max(0, r.at - 200), r.at))?.[0].length ?? 0);
+      follow(r.file, start, r.at + r.length, path.slice(1));
+    }
+  };
+  // The expression [start, end) in `f` holds the function at property `path` of its value.
+  const follow = (f, start, end, path) => {
+    const flowKey = `${f.name}:${start}:${end}:${path.join('.')}`;
+    if (followed.has(flowKey)) return;
+    followed.add(flowKey);
+    for (;;) {
+      const tail = f.shape.slice(end, end + 200);
+      let m;
+      if (path.length) {
+        if ((m = new RegExp(`^\\s*(?:\\?\\.|\\.)\\s*(${IDENT})`).exec(tail))) {
+          if (m[1] !== path[0] && path[0] !== '*') return; // another property: not this value
+          end += m[0].length; path = path.slice(1); continue;
+        }
+        if ((m = /^\s*(?:\?\.)?\[/.exec(tail))) { end = splitArgs(f.shape, end + m[0].length - 1).close + 1; path = path.slice(1); continue; }
+        if (/^\s*(?:\?\.)?\(/.test(tail)) return; // calling the holder: its result is not the holder
+      } else {
+        if ((m = /^\s*(?:\?\.|\.)\s*bind\s*\(/.exec(tail))) { end = splitArgs(f.shape, end + m[0].length - 1).close + 1; continue; }
+        if ((m = /^\s*(?:\?\.)?\(/.exec(tail))) { calls.push({ file: f, open: end + m[0].length - 1 }); return; }
+        if (/^\s*(?:\?\.|\.)\s*(?:call|apply)\s*\(/.test(tail)) { escape(f, end, 'called through .call/.apply'); return; }
+        if (/^\s*(?:\?\.|\.)/.test(tail)) return; // a property of the function itself
+      }
+      break;
+    }
+    if (/^\s*=(?![=>])/.test(f.shape.slice(end, end + 4))) return; // the place is written, not read
+    // Tested, not passed on: `typeof fn`, `!fn`, `fn === x`, `fn && x`, `fn ? a : b`, `key in fn`.
+    if (/(?:\btypeof|\bvoid|\bdelete|!|[=!]==?|\binstanceof|\bin)\s*$/.test(f.shape.slice(Math.max(0, start - 12), start))) return;
+    if (/^\s*(?:[=!]==?|&&|\binstanceof\b|\bin\b|\?(?![.?]))/.test(f.shape.slice(end, end + 12))) return;
+    const { stop, at } = flowContext(f.shape, start);
+    const head = f.shape.slice(Math.max(0, at - 300), at);
+    let m;
+    if (stop === '=') {
+      if ((m = /\b(?:const|let|var)\s*\{([^}]*)\}\s*$/.exec(head))) {
+        if (!path.length) { escape(f, at, 'destructured as a function'); return; }
+        for (const [key, local] of destructuredPairs(`{${f.code.slice(at - m[0].length, at).match(/\{([^}]*)\}/)[1]}}`)) if (key === path[0]) push({ kind: 'name', file: f, scope: enclosing(f.spans, at), name: local, path: path.slice(1) });
+        return;
+      }
+      if ((m = new RegExp(`(?<![\\w$.])(${IDENT})\\s*$`).exec(head))) { push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path }); return; }
+      if ((m = new RegExp(`(?<![\\w$.])(${IDENT})\\s*(?:\\?\\.)?\\[[^\\]\\n]*\\]\\s*$`).exec(head))) { push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path: ['*', ...path] }); return; }
+      if ((m = new RegExp(`(?<![\\w$.])(${IDENT})((?:\\s*\\.\\s*${IDENT})+)\\s*$`).exec(head))) {
+        push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path: [...m[2].split('.').map((k) => k.trim()).filter(Boolean), ...path] });
+        return;
+      }
+      escape(f, at, 'assigned to an unreadable place');
+      return;
+    }
+    if (stop === ':') {
+      const key = new RegExp(`(?:(${IDENT})|['"]([^'"]*)['"]|\\[[^\\]]*\\])\\s*$`).exec(head);
+      let outer = flowContext(f.shape, at);
+      while (outer.stop === ',' || outer.stop === ':') outer = flowContext(f.shape, outer.at);
+      if (outer.stop !== '{') { escape(f, at, 'an unreadable object key'); return; }
+      follow(f, outer.at, splitArgs(f.shape, outer.at).close + 1, [key?.[1] ?? key?.[2] ?? '*', ...path]);
+      return;
+    }
+    if (stop === 'return') {
+      const span = f.shape[at] === '>' ? f.spans.find((s) => s.from < at && at < s.bodyFrom) : enclosing(f.spans, at);
+      if (!span?.name) { escape(f, at, 'returned from an anonymous function'); return; }
+      if (literalMemberAt(f.shape, span) >= 0) { escape(f, at, `returned from method ${span.name}`); return; }
+      for (const c of directCalls(ctx, f, span.name)) {
+        const callee = new RegExp(`${IDENT}(?:\\s*\\.\\s*${IDENT})*\\s*(?:\\?\\.)?\\s*$`).exec(c.file.shape.slice(Math.max(0, c.open - 200), c.open));
+        follow(c.file, c.open - (callee?.[0].length ?? 0), splitArgs(c.file.shape, c.open).close + 1, path);
+      }
+      return;
+    }
+    let outer = { stop, at };
+    while (outer.stop === ',' || outer.stop === ':') outer = flowContext(f.shape, outer.at);
+    const ref = f.shape.slice(start, end).trim();
+    if (outer.stop === '{') {
+      const close = splitArgs(f.shape, outer.at).close + 1;
+      const spread = f.shape.slice(Math.max(0, start - 3), start) === '...';
+      if (!spread && !IDENT_RE.test(ref)) return; // a statement inside a block: the value is not kept
+      if (spread && !path.length) return; // spreading a function copies its own properties, not the function
+      if (!/(?:[=(,:?[]|\breturn|=>)\s*$/.test(f.shape.slice(Math.max(0, outer.at - 12), outer.at))) return; // a block, not an object literal
+      follow(f, outer.at, close, spread ? path : [ref, ...path]);
+      return;
+    }
+    if (outer.stop === '(') {
+      const calleeMatch = new RegExp(`(${IDENT}(?:\\s*\\.\\s*${IDENT})*)\\s*(?:\\?\\.)?\\s*$`).exec(f.shape.slice(Math.max(0, outer.at - 200), outer.at));
+      const callee = calleeMatch?.[1].replace(/\s+/g, '');
+      const close = splitArgs(f.shape, outer.at).close + 1;
+      if (!callee) { follow(f, outer.at, close, path); return; } // parentheses around the value
+      if (/^(if|while|switch|for|typeof|catch|with)$/.test(callee)) return; // tested, not kept
+      const { args } = splitArgs(f.shape, outer.at);
+      const index = args.findIndex(({ from, to }) => from <= start && end <= to);
+      if (index < 0) return;
+      if (callee === 'Reflect.set' && index === 2) {
+        const table = f.code.slice(args[0].from, args[0].to).trim();
+        if (IDENT_RE.test(table)) push({ kind: 'name', file: f, scope: scopeOf(f, table, outer.at), name: table, path: ['*', ...path] });
+        else escape(f, outer.at, 'stored into an unreadable table');
+        return;
+      }
+      if (callee === 'Object.freeze') { follow(f, outer.at - calleeMatch[0].length, close, path); return; }
+      if (NO_FLOW_CALLEES.test(callee) || (callee === 'Reflect.set' && index === 0)) return; // reads or prints the value, never calls it
+      const target = resolveFunction(ctx, f, callee);
+      if (target && target.fn.params[index] !== undefined) { intoParam(target.file, target.fn, target.fn.params[index], path, outer.at); return; }
+      byKey(f, outer.at, path);
+      return;
+    }
+    if (outer.stop === '[') { escape(f, outer.at, 'stored in an array'); return; }
+    if (outer.stop === ';') {
+      if (/\bexport\s+default\s*$/.test(f.shape.slice(Math.max(0, start - 20), start))) escape(f, start, 'exported as default');
+      return; // an expression statement: the value is not kept
+    }
+    escape(f, at, 'an unreadable use');
+  };
+
+  const member = literalMemberAt(file.shape, fn);
+  if (member >= 0) {
+    // A method or property of an object literal: the literal holds it under its name.
+    let outer = flowContext(file.shape, member);
+    while (outer.stop === ',' || outer.stop === ':') outer = flowContext(file.shape, outer.at);
+    if (outer.stop === '{') follow(file, outer.at, splitArgs(file.shape, outer.at).close + 1, [fn.name]);
+    else escape(file, fn.from, 'a member of an unreadable object');
+  } else {
+    push({ kind: 'name', file, scope: enclosing(file.spans, fn.from - 1), name: fn.name, path: [], origin: true });
+  }
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const f = item.file;
+    // A module-level binding is read wherever it is imported.
+    if (!item.scope && new RegExp(`export\\s+(?:const|let|var|(?:async\\s+)?function\\s*\\*?)\\s*${esc(item.name)}\\b|export\\s*\\{[^}]*\\b${esc(item.name)}\\b`).test(f.code)) {
+      for (const [other, alias] of importedAs(ctx, f, item.name)) push({ ...item, file: other, name: alias, origin: false });
+    }
+    f.flowShape ??= f.shape.replace(/(?:import|export)\s*\{[^}]*\}\s*from\s*['"][^'"]*['"]/g, (m) => ' '.repeat(m.length));
+    const shape = f.flowShape;
+    const from = item.scope ? item.scope.from : 0;
+    const to = item.scope ? item.scope.to : shape.length;
+    const re = new RegExp(`(?<![\\w$.])${esc(item.name)}(?![\\w$])`, 'g');
+    re.lastIndex = from;
+    for (let m; (m = re.exec(shape)) && m.index <= to;) {
+      const at = m.index;
+      const after = at + item.name.length;
+      if (/(?:\bfunction\s*\*?|\b(?:const|let|var)|\.\.\.)\s*$/.test(shape.slice(Math.max(0, at - 12), at))) continue;
+      if (f.spans.some((s) => s.name === item.name && s.from >= after && /^\s*(?:=\s*(?:async\s*)?(?:function\s*\*?\s*\w*\s*)?)?\($/.test(shape.slice(after, s.from + 1)))) continue; // a definition
+      if (/^\s*:(?!:)/.test(shape.slice(after)) && /[{,]\s*$/.test(shape.slice(Math.max(0, at - 40), at))) continue; // an object key
+      const params = f.spans.find((s) => s.from < at && at < s.bodyFrom && shape.slice(s.from, s.bodyFrom).includes('('));
+      if (params) {
+        // Inside a parameter list: a default value flows into its parameter; a parameter name is a declaration.
+        const dflt = new RegExp(`(${IDENT})\\s*=\\s*[^,]*$`).exec(shape.slice(params.from + 1, at));
+        if (dflt && params.params.some((p) => paramNames(p).includes(dflt[1]))) push({ kind: 'name', file: f, scope: params, name: dflt[1], path: item.path });
+        continue;
+      }
+      if (item.origin && /^\s*\.\s*[A-Za-z_$][\w$]*\s*=(?![=>])/.test(shape.slice(after, after + 80))) continue; // `fn.prop = ...` describes the function
+      follow(f, at, after, item.path);
+    }
+  }
+  return { calls, escapes };
+}
+
+/** Calls of a named function by name: in its own file and where it is imported (under any alias). */
+function directCalls(ctx, file, fnName) {
+  const out = [];
+  const find = (f, local) => {
+    for (const m of f.shape.matchAll(new RegExp(`(?<![\\w$.])${esc(local)}\\s*\\(`, 'g'))) {
+      const open = m.index + m[0].length - 1;
+      if (f.spans.some((s) => s.from === open)) continue; // the definition itself
+      if (/(?:function|async)\s*\*?\s*$/.test(f.shape.slice(Math.max(0, m.index - 14), m.index))) continue;
+      out.push({ file: f, open });
+    }
+  };
+  find(file, fnName);
+  for (const [other, alias] of importedAs(ctx, file, fnName)) find(other, alias);
+  return out;
+}
+
+/** [file, local name] for every relative `import { name }` of `file`'s export `name`. */
+function importedAs(ctx, file, name) {
+  const out = [];
+  for (const other of importersOf(ctx, file)) {
+    for (const m of other.code.matchAll(/import\s*\{([^}]*)\}\s*from\s*['"]([^'"]+)['"]/g)) {
+      if (path.posix.normalize(path.posix.join(path.posix.dirname(other.name), m[2])) !== file.name) continue;
+      for (const part of m[1].split(',')) {
+        const [orig, alias] = part.trim().split(/\s+as\s+/);
+        if (orig === name) out.push([other, alias ?? orig]);
+      }
+    }
+  }
+  return out;
+}
+
+/** Every member read `.key` and every destructuring of `key` in the payload, by key, built once. */
+function keyIndex(ctx) {
+  if (ctx.keyIndex) return ctx.keyIndex;
+  const reads = new Map();
+  const destructured = new Map();
+  const add = (map, key, entry) => { if (!map.has(key)) map.set(key, []); map.get(key).push(entry); };
+  for (const f of ctx.js.values()) {
+    for (const m of f.shape.matchAll(/(?:\?\.|\.)\s*([A-Za-z_$][\w$]*)(?![\w$])/g)) add(reads, m[1], { file: f, at: m.index, length: m[0].length });
+    const patterns = [
+      ...f.spans.flatMap((span) => span.params.filter((p) => p.trim().startsWith('{')).map((p) => ({ text: p, scope: span }))),
+      ...[...f.shape.matchAll(/\b(?:const|let|var)\s*\{([^}]*)\}\s*=/g)].map((m) => ({ text: `{${f.code.slice(m.index, m.index + m[0].length).match(/\{([^}]*)\}/)[1]}}`, scope: enclosing(f.spans, m.index) })),
+    ];
+    for (const { text, scope } of patterns) {
+      for (const [key, local] of destructuredPairs(text)) add(destructured, key, { file: f, scope, local });
+    }
+  }
+  ctx.keyIndex = { reads, destructured };
+  return ctx.keyIndex;
+}
+
+/** The [key, local] pairs a destructuring pattern `{ ... }` binds. */
+function destructuredPairs(pattern) {
+  const text = pattern.trim();
+  if (!text.startsWith('{')) return [];
+  const shape = lexSource(text).shape;
+  const out = [];
+  for (const { from, to } of splitArgs(shape, 0).args) {
+    const m = new RegExp(`^(${IDENT})\\s*(?::\\s*(${IDENT}))?\\s*(?:=[\\s\\S]*)?$`).exec(shape.slice(from, to).trim());
+    if (m) out.push([m[1], m[2] ?? m[1]]);
   }
   return out;
 }
@@ -932,7 +1298,10 @@ function resolveWrappers(ctx) {
     const key = `${w.record.path}:${w.record.line}:${fn?.name}:${value.param}:${(value.path ?? []).join('.')}`;
     if (seen.has(key) || seen.size > 20000) continue;
     seen.add(key);
-    const callers = callersOf(ctx, w.file, fn?.name);
+    let callers = callersOf(ctx, w.file, fn?.name);
+    // No call by name: the function may still be called where it travels as a value.
+    const flow = !callers.length && fn?.name ? valueFlowCalls(ctx, w.file, fn) : null;
+    if (flow) callers = flow.calls;
     if (!callers.length && fn?.name && !referenced(ctx, w.file, fn)) {
       // Nothing in the payload names it outside its definition and import clauses: no product data flow
       // reaches it. Tests that call it are watched by the runtime spy.
@@ -943,6 +1312,8 @@ function resolveWrappers(ctx) {
       ctx.raw.push({ ...w.record, family: 'unresolved-binary', binary: `${w.record.binary} (no caller found for ${fn?.name ?? 'anonymous function'})`, file: w.file, site: w.site, enclosing: enclosing(w.file.spans, w.site.open) });
       continue;
     }
+    // The value also goes somewhere the flow cannot follow: the call sites found are not all of them.
+    if (flow?.escapes.length) ctx.raw.push({ ...w.record, family: 'unresolved-binary', binary: `${w.record.binary} (${fn.name} escapes: ${flow.escapes[0]})`, file: w.file, site: w.site, enclosing: enclosing(w.file.spans, w.site.open) });
     for (const c of callers) {
       budget.steps = 0;
       const { args } = splitArgs(c.file.shape, c.open);
@@ -1103,6 +1474,16 @@ function rustModel(name, source) {
       if (fn && new RegExp(`\\b${firstOf[1]}\\s*:`).test(fn.params)) return [{ param: firstOf[1], fn, path: [], first: true }];
       const d = new RegExp(`\\blet\\s+(?:mut\\s+)?${firstOf[1]}\\b[^=;]*=\\s*(?:vec!\\s*)?\\[\\s*([^,\\]]+)`).exec(code.slice(fn?.bodyFrom ?? 0, index));
       if (d) return evalRust(d[1], index, depth + 1);
+      // `let argv = shape(&spec.argv);`: the first element of the Vec that local function returns.
+      const c = new RegExp(`\\blet\\s+(?:mut\\s+)?${firstOf[1]}\\b[^=;]*=\\s*([a-z_]\\w*)\\s*\\(([^;]*)\\)\\s*;`).exec(code.slice(fn?.bodyFrom ?? 0, index));
+      const callee = c && fns.find((f) => f.name === c[1]);
+      if (callee) return firstReturned(callee, c[2], index, depth + 1);
+      // A Vec read out of parsed data (`request.get("argv")...collect()`): its elements are that data too.
+      const read = new RegExp(`\\blet\\s+(?:mut\\s+)?${firstOf[1]}\\b[^=;]*=\\s*([^;]+);`).exec(code.slice(fn?.bodyFrom ?? 0, index));
+      if (read) {
+        const values = evalRust(read[1], index, depth + 1);
+        if (values.length && values.every((v) => v.external)) return values;
+      }
     }
     const id = /^[a-z_][\w]*$/i.test(expr) ? expr : null;
     if (!id) return [{ unknown: expr }];
@@ -1117,6 +1498,29 @@ function rustModel(name, source) {
     let init = source.slice(found.index + found[0].indexOf(found[1]), found.index + found[0].length - 1).trim();
     init = init.replace(/\.into_iter\(\)$/, '');
     return evalRust(init, found.index, depth + 1);
+  };
+  // The first element of the Vec `f` returns when called with `argText`: its literal's first item, or the
+  // first `push` into the local it returns. Parameters of `f` are this call's arguments.
+  const firstReturned = (f, argText, index, depth) => {
+    const body = code.slice(f.bodyFrom, f.to);
+    const args = argText.split(',');
+    const out = rustExits(model, f).map((e) => e.replace(/^[\s\S]*\}\s*([a-z_]\w*)$/i, '$1')).flatMap((e) => {
+      const lit = /^(?:vec!\s*)?\[\s*([^,\]]+)/.exec(e);
+      if (lit) return evalRust(lit[1], f.bodyFrom + 1, depth + 1);
+      if (!/^[a-z_]\w*$/i.test(e)) return [{ unknown: `first element of ${e}` }];
+      const push = new RegExp(`\\b${e}\\.push\\(`).exec(body);
+      if (!push || !new RegExp(`\\blet\\s+mut\\s+${e}\\b[^=;]*=\\s*Vec::`).test(body.slice(0, push.index))) return [{ unknown: `first element of ${e}` }];
+      const open = f.bodyFrom + push.index + push[0].length - 1;
+      const [first] = rustArgs(model, open);
+      return first ? evalRust(first.text, open, depth + 1) : [{ unknown: `first element of ${e}` }];
+    }).flatMap((v) => {
+      if (v.param === undefined || v.fn !== f || v.path?.length) return [v];
+      const pos = f.params.split(',').findIndex((p) => new RegExp(`^\\s*(?:mut\\s+)?${v.param}\\s*:`).test(p));
+      if (args[pos] === undefined) return [{ unknown: `${f.name} argument ${v.param}` }];
+      const arg = args[pos].trim().replace(/^&/, '');
+      return evalRust(v.first ? `${arg}[0]` : arg, index, depth + 1);
+    });
+    return out.length ? out : [{ unknown: `first element of ${f.name}()` }];
   };
   model.eval = evalRust;
   return model;
@@ -1358,9 +1762,46 @@ function scanRust(model, ctx) {
 
 // ---------- shell and skill text ----------
 
+// Commands that never run their operands: a quoted operand of one is text, not a command. A script
+// function counts when every command of its body that reads its arguments is one of these (`die`).
+const DATA_COMMANDS = new Set(['echo', 'printf', ':']);
+
+function shellDataFunctions(source) {
+  const fns = new Set();
+  for (const m of source.matchAll(/^\s*([\w-]+)\s*\(\)\s*\{(.*)\}\s*$/gm)) {
+    const users = m[2].split(/;|&&|\|\|/).map((c) => c.trim()).filter((c) => /\$[*@1-9]|\$\{[*@1-9]/.test(c));
+    if (users.length && users.every((c) => DATA_COMMANDS.has(c.split(/\s+/)[0]))) fns.add(m[1]);
+  }
+  return fns;
+}
+
+/** The line with every quoted operand of a data command blanked, keeping `$(...)` and backtick
+ * substitutions inside double quotes: those still run. An operand whose output is piped into a shell
+ * stays a script. */
+function shellCodeOf(line, dataCommands) {
+  let out = '';
+  for (let i = 0; i < line.length;) {
+    const q = line[i];
+    if ((q !== '"' && q !== "'") || line[i - 1] === '\\') { out += q; i += 1; continue; }
+    let end = i + 1;
+    while (end < line.length && !(line[end] === q && (q === "'" || line[end - 1] !== '\\'))) end += 1;
+    const inner = line.slice(i + 1, end);
+    const word = out.split(/;|&&|\|\||\||\(|\{|`|\b(?:then|do|else)\b/).pop().trim().replace(/^(?:\w+=\S*\s+)*/, '').split(/\s+/)[0];
+    if (!dataCommands.has(word)) out += q + inner + q;
+    else if (/\|\s*(?:\S*\/)?(?:sh|bash|zsh|dash)\b/.test(line.slice(end + 1))) out += ` ; ${inner} ; `; // text piped into a shell is a script
+    else {
+      const subs = q === '"' ? [...inner.matchAll(/\$\((?:[^()]|\([^()]*\))*\)|`[^`]*`/g)].map((m) => m[0]) : [];
+      out += `${q}${subs.join(' ; ')}${q}`;
+    }
+    i = end + 1;
+  }
+  return out;
+}
+
 function scanShell(name, source, ctx) {
+  const dataCommands = new Set([...DATA_COMMANDS, ...shellDataFunctions(source)]);
   source.split('\n').forEach((text, i) => {
-    const line = text.replace(/(^|\s)#.*$/, '');
+    const line = shellCodeOf(text.replace(/(^|\s)#.*$/, ''), dataCommands);
     if (!shellRunsGit(line)) return;
     const record = { path: name, line: i + 1, spawn: 'shell', binary: line.trim().slice(0, 80) };
     if (name.startsWith('.githooks/') && !WRITE_VERBS.test(line)) { ctx.classes.push({ ...record, class: 'hook-read-context' }); return; }
@@ -1419,6 +1860,8 @@ export function scan({ root = REPO, roots = SCAN_ROOTS, files } = {}) {
   const sites = [];
   for (const s of ctx.raw) {
     const { file, site, enclosing: _e, ...record } = s;
+    const skill = standaloneSkillOf(path.join(root, record.path), root);
+    if (skill) { ctx.classes.push({ ...record, class: STANDALONE_SKILL_CLASS, skill }); continue; }
     if (doors.has(record.path) && file && /\[\s*SANDBOX_DOOR\s*\]/.test(file.code.slice(site.open, splitArgs(file.shape, site.open).close))) {
       ctx.classes.push({ ...record, class: 'sandbox-door' }); continue;
     }

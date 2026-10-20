@@ -3,7 +3,7 @@
   "command": "fgos internal lock-fd",
   "description": "Cold-path helper for Node, which cannot call flock. Node opens the lock file (O_RDWR) and hands that fd in slot 3; the helper locks the inherited description and exits. The lock stays with the description Node owns. The helper is never the owner.",
   "argv": {
-    "required": ["--protocol 1"],
+    "required": ["--protocol 2"],
     "predecessorKinds": "--predecessor-kinds <kind,kind>: on acquire reject other recorded kinds under the kernel lock before ordinary cleanup",
     "mode": {
       "exactlyOne": [
@@ -32,7 +32,7 @@
     "stdin": "unused, may be closed"
   },
   "stdout": {
-    "common": { "v": 1, "protocol": 1 },
+    "common": { "v": 2, "protocol": 2 },
     "results": {
       "drained": { "result": "drained", "leftoversKilled": "integer", "remaining": [] },
       "not-drained": { "result": "not-drained", "leftoversKilled": "integer", "remaining": "pid array; description retained" },
@@ -51,7 +51,7 @@
   "exitCodes": {
     "0": "acquired | free | borrower | guarantee | predecessor",
     "2": "usage error (result error, code usage)",
-    "3": "protocol mismatch (result error, code host-version-mismatch; --protocol absent or != 1)",
+    "3": "protocol mismatch (result error, code host-version-mismatch; --protocol absent or != 2)",
     "10": "held | not-borrower",
     "11": "timeout",
     "12": "unavailable",

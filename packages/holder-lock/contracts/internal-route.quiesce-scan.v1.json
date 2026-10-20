@@ -1,6 +1,7 @@
 {
   "contract": { "id": "internal-route-quiesce-scan", "version": 1 },
   "command": "fgos internal quiesce-scan",
+  "protocolNote": "quiesce-scan keeps protocol 1 when the other holder-lock routes moved to 2 (2026-10-20): its callers (the cutover fence, fgctl activation) pin it separately and it is read-only, so a stale payload gains nothing by being refused here",
   "description": "Read-only scan that tells the stop-everything cutover whether any other fgOS process of a workspace is still running. It never signals or modifies anything.",
   "argv": {
     "required": ["--protocol 1"],

@@ -379,6 +379,30 @@ fn remember_tree(leader: &ProcTuple, seen: &mut Vec<ProcTuple>) {
     }
 }
 
+/// Pids of live processes of this user whose environment carries
+/// `name=value`. A descendant inherits its ancestor's environment, so a marker
+/// planted in a child's environment still names its descendants after they
+/// left the process group, the session or the tree (`setsid`, double fork,
+/// reparenting to init), which no group or parent scan can see. Best-effort:
+/// a descendant that clears its own environment is not found, and other users'
+/// processes are unreadable.
+pub fn environment_marked(name: &str, value: &str) -> Vec<u32> {
+    let wanted = format!("{name}={value}");
+    let Ok(entries) = fs::read_dir("/proc") else {
+        return Vec::new();
+    };
+    let me = std::process::id();
+    entries
+        .filter_map(|entry| entry.ok())
+        .filter_map(|entry| entry.file_name().to_str().and_then(|n| n.parse::<u32>().ok()))
+        .filter(|pid| *pid != me)
+        .filter(|pid| read_stat(*pid).is_some_and(|row| row.state != 'Z' && row.state != 'X'))
+        .filter(|pid| {
+            fs::read(format!("/proc/{pid}/environ")).is_ok_and(|bytes| bytes.split(|b| *b == 0).any(|entry| entry == wanted.as_bytes()))
+        })
+        .collect()
+}
+
 /// The state of a `linux-pgroup` domain: the leader is dead, nobody is left in
 /// its group, and no process seen in its tree is still alive.
 pub(crate) fn pgroup_state(leader: &ProcTuple, seen: &[ProcTuple]) -> DomainState {
@@ -545,6 +569,19 @@ mod tests {
         assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
         assert_eq!(driver.kill_all(&mut domain, 100), KillOutcome::Ok);
         assert_eq!(crate::domain_kill_all(domain.domain().unwrap()), KillOutcome::Ok);
+    }
+
+    #[test]
+    fn environment_marker_finds_a_live_carrier_and_not_its_dead_or_unmarked_neighbours() {
+        let value = format!("marker-{}", std::process::id());
+        let mut carrier = Command::new("/bin/sleep").arg("30").env("FGOS_TEST_MARK", &value).spawn().unwrap();
+        let mut bystander = Command::new("/bin/sleep").arg("30").env("FGOS_TEST_MARK", "other").spawn().unwrap();
+        assert!(wait_until(Duration::from_secs(5), || environment_marked("FGOS_TEST_MARK", &value) == vec![carrier.id()]));
+        carrier.kill().unwrap();
+        carrier.wait().unwrap();
+        assert!(environment_marked("FGOS_TEST_MARK", &value).is_empty());
+        bystander.kill().unwrap();
+        bystander.wait().unwrap();
     }
 
     #[test]

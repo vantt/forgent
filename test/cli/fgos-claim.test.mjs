@@ -163,6 +163,40 @@ test('main-checkout-reset from the main checkout itself, no --dir, still works e
 });
 
 
+// Forward move without --confirm in a repository that tracks .fgos files: the CLI
+// wires the plain restore through SafeRestore, whose owning proof is
+// packages/git/rust/tests/safe_restore.rs. This one wiring case covers a tracked
+// .fgos path the target changes (updated when clean) and one local edit of a
+// tracked .fgos path (refused by name, nothing moved).
+test('main-checkout-reset forward without --confirm updates clean tracked .fgos paths and refuses dirty ones', () => {
+  const cwd = initGitCwdFast();
+  const store = path.join(cwd, '.fgos', 'tracked-state.txt');
+  fs.mkdirSync(path.dirname(store), { recursive: true });
+  fs.writeFileSync(store, 'one\n');
+  commitFile(cwd, 'second.txt');
+  const base = gitHead(cwd);
+  fs.writeFileSync(store, 'two\n');
+  commitFile(cwd, 'third.txt');
+  const target = gitHead(cwd);
+  const back = run(cwd, ['main-checkout-reset', '--sha', base, '--confirm']);
+  assert.equal(back.status, 0, `backward reset failed: ${back.stderr}`);
+  assert.equal(fs.readFileSync(store, 'utf8'), 'one\n');
+
+  fs.writeFileSync(store, 'runtime edit\n');
+  const refused = run(cwd, ['main-checkout-reset', '--sha', target]);
+  assert.notEqual(refused.status, 0);
+  assert.match(refused.stderr, /restore-protected-fgos-path/);
+  assert.equal(gitHead(cwd), base);
+  assert.equal(fs.readFileSync(store, 'utf8'), 'runtime edit\n');
+
+  execFileSync('git', ['checkout', '-q', '--', '.fgos/tracked-state.txt'], { cwd });
+  const forward = run(cwd, ['main-checkout-reset', '--sha', target]);
+  assert.equal(forward.status, 0, `forward reset failed: ${forward.stderr}`);
+  assert.equal(gitHead(cwd), target);
+  assert.equal(fs.readFileSync(store, 'utf8'), 'two\n');
+});
+
+
 test('session start inside a .fgos/-less linked worktree still succeeds (D10 symlink actor exempt from the requiresExistingStore guard)', () => {
   const { wt } = tmpLinkedWorktree();
   assert.ok(!fs.existsSync(path.join(wt, '.fgos')));

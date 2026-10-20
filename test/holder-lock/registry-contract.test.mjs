@@ -273,7 +273,7 @@ test('lock-fd adds the path probe and the read-only predecessor state', () => {
 
 test('lock-hold names its argv and every work-directory file', () => {
   assert.equal(lockHoldContract.command, 'fgos internal lock-hold');
-  assert.deepEqual(lockHoldContract.argv.required, ['--protocol 1', '--path <lockFile>', '--mode ex|sh', '--work <dir>']);
+  assert.deepEqual(lockHoldContract.argv.required, ['--protocol 2', '--path <lockFile>', '--mode ex|sh', '--work <dir>']);
   assert.deepEqual(lockHoldContract.argv.wait.exactlyOne.map((entry) => entry.flag.split(' ')[0]), ['--try', '--wait-ms']);
   assert.deepEqual(Object.keys(lockHoldContract.workDir.files).sort(), ['err-<n>.log', 'out-<n>.log', 'ready.json', 'req-<n>.json', 'result-<n>.json', 'started-<n>.json']);
   assert.deepEqual(Object.keys(lockHoldContract.exitCodes), ['0', '2', '3', '10', '11', '12', '70']);

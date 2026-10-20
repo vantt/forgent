@@ -85,7 +85,7 @@ test('a borrowed git commit ends the background process its hook left, and a hoo
   initRepo(repo);
   const pidFile = path.join(dir, 'sleep.pid');
   const marker = path.join(dir, 'borrower.json');
-  const hostRoute = `'${shPath(HOST_BIN)}' internal lock-fd --protocol 1 --borrowed-check`;
+  const hostRoute = `'${shPath(HOST_BIN)}' internal lock-fd --protocol 2 --borrowed-check`;
   const handle = acquireSync(createLockScope('test'), LOCK, { fgosDir }).handle;
   fs.writeFileSync(path.join(repo, GIT_DIR, 'hooks', 'pre-commit'), [
     '#!/bin/sh',

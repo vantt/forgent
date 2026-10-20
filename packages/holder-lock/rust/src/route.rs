@@ -21,8 +21,21 @@ use crate::state_root;
 
 mod hold;
 
-/// The protocol these routes speak.
-pub const PROTOCOL: u64 = 1;
+/// The protocol the lock routes speak (`lock-fd`, `lock-hold`, `state-root`,
+/// `process-observe`, `lock-borrow-vectors`). Protocol 1 was the first
+/// release; a payload that still sends it is refused, and every answer
+/// carries 2, so an older facade fails closed on either side.
+pub const PROTOCOL: u64 = 2;
+
+/// The protocol of `quiesce-scan`, a read-only scan its callers (the cutover
+/// fence, `fgctl` activation) pin on their own. It does not move with the
+/// lock-route protocol.
+pub const SCAN_PROTOCOL: u64 = 1;
+
+/// The protocol a route answers to and accepts.
+fn protocol_of(route: &str) -> u64 {
+    if route == "quiesce-scan" { SCAN_PROTOCOL } else { PROTOCOL }
+}
 
 const EXIT_OK: i32 = 0;
 const EXIT_USAGE: i32 = 2;
@@ -48,10 +61,10 @@ fn seal_slot3() {
     }
 }
 
-fn line(result: Option<&str>, fields: Value) -> String {
+fn line(protocol: u64, result: Option<&str>, fields: Value) -> String {
     let mut map = Map::new();
-    map.insert("v".into(), json!(1));
-    map.insert("protocol".into(), json!(PROTOCOL));
+    map.insert("v".into(), json!(protocol));
+    map.insert("protocol".into(), json!(protocol));
     if let Some(result) = result {
         map.insert("result".into(), json!(result));
     }
@@ -61,18 +74,30 @@ fn line(result: Option<&str>, fields: Value) -> String {
     Value::Object(map).to_string()
 }
 
-fn emit(result: Option<&str>, fields: Value, code: i32) -> i32 {
-    println!("{}", line(result, fields));
+fn emit_as(protocol: u64, result: Option<&str>, fields: Value, code: i32) -> i32 {
+    println!("{}", line(protocol, result, fields));
     code
 }
 
-fn error(code: &str, message: &str, exit: i32) -> i32 {
+fn emit(result: Option<&str>, fields: Value, code: i32) -> i32 {
+    emit_as(PROTOCOL, result, fields, code)
+}
+
+fn error_as(protocol: u64, code: &str, message: &str, exit: i32) -> i32 {
     eprintln!("fgos internal: {code}: {message}");
-    emit(Some("error"), json!({ "code": code, "message": message }), exit)
+    emit_as(protocol, Some("error"), json!({ "code": code, "message": message }), exit)
+}
+
+fn error(code: &str, message: &str, exit: i32) -> i32 {
+    error_as(PROTOCOL, code, message, exit)
+}
+
+fn usage_as(protocol: u64, message: &str) -> i32 {
+    error_as(protocol, "usage", message, EXIT_USAGE)
 }
 
 fn usage(message: &str) -> i32 {
-    error("usage", message, EXIT_USAGE)
+    usage_as(PROTOCOL, message)
 }
 
 /// Flags of one route call: `--name value` pairs and bare switches, in order.
@@ -131,7 +156,7 @@ pub fn main(args: &[OsString]) -> i32 {
         }
     }
     let Some((route, rest)) = strings.split_first() else {
-        return usage("fgos internal <lock-fd|lock-hold|state-root|process-observe|quiesce-scan|lock-borrow-vectors> --protocol 1 ...");
+        return usage("fgos internal <lock-fd|lock-hold|state-root|process-observe|quiesce-scan|lock-borrow-vectors> --protocol 2 ...");
     };
     // The protocol is checked before anything else about the call, so a
     // payload of another release always learns that first.
@@ -145,9 +170,10 @@ pub fn main(args: &[OsString]) -> i32 {
             others.push(arg.clone());
         }
     }
-    if protocol != Some("1") {
-        let message = format!("this host speaks internal protocol {PROTOCOL}; the call asked for {}", protocol.unwrap_or("none"));
-        return error("host-version-mismatch", &message, EXIT_MISMATCH);
+    let spoken = protocol_of(route);
+    if protocol != Some(spoken.to_string().as_str()) {
+        let message = format!("this host speaks internal protocol {spoken} on {route}; the call asked for {}", protocol.unwrap_or("none"));
+        return error_as(spoken, "host-version-mismatch", &message, EXIT_MISMATCH);
     }
     match route.as_str() {
         "lock-fd" => lock_fd(&others),
@@ -518,22 +544,22 @@ fn lock_borrow_vectors(args: &[String]) -> i32 {
 fn quiesce_scan(args: &[String]) -> i32 {
     let flags = match Flags::parse(args, &["--root", "--dir", "--exclude-pid"], &["--workspace-only"]) {
         Ok(flags) => flags,
-        Err(message) => return usage(&message),
+        Err(message) => return usage_as(SCAN_PROTOCOL, &message),
     };
     let roots: Vec<PathBuf> = flags.values("--root").into_iter().map(PathBuf::from).collect();
     if roots.is_empty() {
-        return usage("quiesce-scan needs at least one --root <path>");
+        return usage_as(SCAN_PROTOCOL, "quiesce-scan needs at least one --root <path>");
     }
     // Linked worktrees come from the caller's Git listing; holder-lock never runs Git.
     let dirs: Vec<PathBuf> = flags.values("--dir").into_iter().map(PathBuf::from).collect();
     if !dirs.is_empty() && roots.len() != 1 {
-        return usage("quiesce-scan --dir belongs to exactly one --root");
+        return usage_as(SCAN_PROTOCOL, "quiesce-scan --dir belongs to exactly one --root");
     }
     let mut exclude = Vec::new();
     for raw in flags.values("--exclude-pid") {
         match raw.parse::<u32>() {
             Ok(pid) => exclude.push(pid),
-            Err(_) => return usage(&format!("--exclude-pid needs a pid, got {raw}")),
+            Err(_) => return usage_as(SCAN_PROTOCOL, &format!("--exclude-pid needs a pid, got {raw}")),
         }
     }
     quiesce::scan(&roots, &dirs, &exclude, flags.has("--workspace-only"))
@@ -541,6 +567,10 @@ fn quiesce_scan(args: &[String]) -> i32 {
 
 mod quiesce {
     use super::*;
+
+    fn emit(result: Option<&str>, fields: Value, code: i32) -> i32 {
+        emit_as(SCAN_PROTOCOL, result, fields, code)
+    }
     use fgos_process::facts::{scan as scan_processes, Scan, ScanFilter};
 
     /// A workspace root and the linked worktrees its caller listed.

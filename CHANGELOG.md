@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `fgos doctor` check `git-mutation-one-door` reads the release's `packages/git/contracts/mutation-census.v1.json`, which the release build writes from `scripts/git-one-door-scan.mjs`. The check fails when the census lists any `git` or hook spawn outside the fgos-git driver, or was not built from the payload it ships in. `npm test` also fails when product code (`src`, `bin`, `scripts`) starts `git` or a hook while the suite runs, and names the call site.
   - Commands from operator configuration or from a Work item's declared verify command count as configured binaries, not sites.
-  - Today the census lists 9 sites (from 70). The phase 07 unit 21 report names each open site.
+  - Scripts of a skill that declares `metadata.oneDoor: standalone` in its SKILL.md (`distill`, `instruction-audit`) are counted as `standalone-skill-script`, not as sites; the test spy now watches `core/skills/` too.
+  - The scan now follows functions passed around as values and methods of returned objects. The phase 07 unit 22 report names each open site.
 
 - `fgos main-checkout-reset` resets through the Git SafeRestore port instead of a raw `git reset --hard`.
   - With `--confirm` it keeps the old HEAD pinned and snapshots the discarded local changes, and its result carries an `operationId` and a `snapshot`.
@@ -369,10 +370,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A Unit's `persona` is resolved and its text pinned when the unit run starts, so a persona defined only in the workspace (`fgos/agents/`) is rendered with its definition instead of its bare name.
 - A help token never runs the verb: `fgos init --json -h` created a store and `fgos session start --json -h` created a worktree, because the help token was read as the previous flag's value; through the Rust host, `fgos version --help` ran `version` and `fgos metrics runs --help` ran `runs`.
 - Manifest entries now match what the CLI reads: `merge next` lists the flags it forwards to approve/sync-root, `workflow start --stance-options`, `workflow operations --step` (was `--stage`), `tool --config`, `tool check --name` (was a positional), `dispatch decide --assignment`, `run record --result`. AGENTS.md and the dispatch fallback skill say `decide --work <id> [--stage <stage>]` (was `--step`).
+- `fgos main-checkout-reset` without `--confirm` moves forward again in a repository that tracks `.fgos` files: tracked `.fgos` paths that match HEAD are updated with the rest of the tree, and the reset refuses `restore-protected-fgos-path` only while a tracked `.fgos` path differs from HEAD.
+- On a host without user namespaces (`linux-pgroup`), a ScopedCommit, Sync or Land whose hook or filter left a `setsid` or double-fork child alive after the borrow now returns `containment-unproven` as `recovery-required` instead of plain success; operations without hooks or filters are unchanged.
 
 ### Security
 
 - The runner commit no longer trusts a worktree's `.git` file, a relative hooks path or fsmonitor: its git runs against the main repository's gitdir with the caller's `GIT_*` variables dropped, and a worktree outside the main repository is refused.
+- The holder-lock routes (`lock-fd`, `lock-hold`, `state-root`, `process-observe`, `lock-borrow-vectors`) now speak internal protocol 2. A stale global npm `fgos` whose Node payload still sends `--protocol 1` is refused by the new host with `host-version-mismatch` before any lock is taken; reinstall or upgrade the npm package to match the active release. `quiesce-scan` stays on protocol 1.
 
 ## [v0.2.0-rc.5] - 2026-10-14
 

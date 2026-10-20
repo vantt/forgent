@@ -1,6 +1,6 @@
 // `fgos internal ...` through the real host binary (FGOS_HOST_BIN, which
 // `npm test` builds from this checkout): the routes answer one JSON line,
-// a protocol other than 1 fails closed with exit 3 (host-version-mismatch),
+// a protocol other than the route's own fails closed with exit 3 (host-version-mismatch),
 // and `internal` is in neither the route table nor the help manifest.
 import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
@@ -35,8 +35,7 @@ function line(result) {
   const lines = result.stdout.split('\n').filter((l) => l.trim() !== '');
   assert.equal(lines.length, 1, `one JSON line expected, got ${JSON.stringify(result.stdout)} (stderr ${result.stderr})`);
   const parsed = JSON.parse(lines[0]);
-  assert.equal(parsed.v, 1);
-  assert.equal(parsed.protocol, 1);
+  assert.equal(parsed.v, parsed.protocol);
   return parsed;
 }
 
@@ -54,8 +53,8 @@ test('internal is neither a route nor in the help manifest', () => {
   assert.equal(ROUTES['terminal-control'], undefined);
 });
 
-test('a protocol other than 1 fails closed with exit 3 and host-version-mismatch', () => {
-  for (const args of [['state-root'], ['state-root', '--protocol', '2'], ['lock-fd', '--try'], ['lock-borrow-vectors', '--protocol', '9'], ['terminal-control', 'capabilities', '--json'], ['terminal-control', 'capabilities', '--protocol', '2', '--json']]) {
+test('a protocol other than the route protocol fails closed with exit 3 and host-version-mismatch', () => {
+  for (const args of [['state-root'], ['state-root', '--protocol', '1'], ['state-root', '--protocol', '3'], ['lock-fd', '--try'], ['lock-fd', '--protocol', '1', '--try'], ['lock-borrow-vectors', '--protocol', '9'], ['terminal-control', 'capabilities', '--json'], ['terminal-control', 'capabilities', '--protocol', '2', '--json']]) {
     const result = host(args);
     assert.equal(result.status, 3, args.join(' '));
     const parsed = line(result);
@@ -63,13 +62,13 @@ test('a protocol other than 1 fails closed with exit 3 and host-version-mismatch
     assert.equal(parsed.code, 'host-version-mismatch');
     assert.match(result.stderr, /host-version-mismatch/);
   }
-  const unknown = host(['nope', '--protocol', '1']);
+  const unknown = host(['nope', '--protocol', '2']);
   assert.equal(unknown.status, 2);
   assert.equal(line(unknown).code, 'usage');
 });
 
 test('state-root answers the pinned root and its lock root', () => {
-  const result = host(['state-root', '--protocol', '1'], { env: { FGOS_STATE_ROOT: path.join(scratch, 'state') } });
+  const result = host(['state-root', '--protocol', '2'], { env: { FGOS_STATE_ROOT: path.join(scratch, 'state') } });
   assert.equal(result.status, 0, result.stderr);
   const parsed = line(result);
   assert.equal(parsed.stateRoot, path.join(scratch, 'state'));
@@ -81,14 +80,14 @@ test('lock-fd locks the caller\'s description at fd 3 and the lock outlives the 
   const lockPath = path.join(scratch, 'node.lock');
   const mine = fs.openSync(lockPath, 'a+');
   try {
-    const acquired = host(['lock-fd', '--protocol', '1', '--try'], { fd: mine });
+    const acquired = host(['lock-fd', '--protocol', '2', '--try'], { fd: mine });
     assert.equal(acquired.status, 0, acquired.stderr);
     assert.equal(line(acquired).result, 'acquired');
     const other = fs.openSync(lockPath, 'a+');
     try {
-      const held = host(['lock-fd', '--protocol', '1', '--try'], { fd: other });
+      const held = host(['lock-fd', '--protocol', '2', '--try'], { fd: other });
       assert.equal(held.status, 10);
-      assert.deepEqual(line(held), { v: 1, protocol: 1, result: 'held', reason: 'kernel-lock-held' });
+      assert.deepEqual(line(held), { v: 2, protocol: 2, result: 'held', reason: 'kernel-lock-held' });
     } finally {
       fs.closeSync(other);
     }
@@ -97,7 +96,7 @@ test('lock-fd locks the caller\'s description at fd 3 and the lock outlives the 
   }
   const again = fs.openSync(lockPath, 'a+');
   try {
-    const free = host(['lock-fd', '--protocol', '1', '--try'], { fd: again });
+    const free = host(['lock-fd', '--protocol', '2', '--try'], { fd: again });
     assert.equal(line(free).result, 'acquired', 'closing the owner description released the lock');
   } finally {
     fs.closeSync(again);

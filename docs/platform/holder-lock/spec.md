@@ -226,7 +226,9 @@ The synchronous native bridge (2026-10-19) uses the existing private description
 
 ## 10. Internal routes
 
-The routes live in `apps/fgos/src/main.rs` as the earliest branch of `main()` (before any composition, provider or spawn, so no child can inherit fd 3). They are not in `command-routes.json` and not in help. Every route requires `--protocol 1`; absent or different, the answer is `host-version-mismatch` (one release, one protocol). Each prints one JSON line on stdout (`{v: 1, protocol: 1, ...}`); stderr is for people and never parsed.
+The routes live in `apps/fgos/src/main.rs` as the earliest branch of `main()` (before any composition, provider or spawn, so no child can inherit fd 3). They are not in `command-routes.json` and not in help. Every lock route (`lock-fd`, `lock-hold`, `state-root`, `process-observe`, `lock-borrow-vectors`) requires `--protocol 2` and answers `v` and `protocol` 2; absent or different, the answer is `host-version-mismatch` (one release, one protocol). `quiesce-scan` is the one exception and stays on protocol 1. Each prints one JSON line on stdout (`{v: 1, protocol: 1, ...}`); stderr is for people and never parsed.
+
+2026-10-20 (phase 07 unit 22, owner decision): route protocol 2. The lock routes moved from protocol 1 to 2 so that a stale global npm `fgos merge` (an old Node payload that sends `--protocol 1`) is refused by the new host with `host-version-mismatch`, which the facade surfaces as `unavailable/host-version-mismatch`, and an old Node facade that talks to a new host fails closed because every answer carries protocol 2 (its parser accepts only 1). Only the current protocol is accepted: there is no dual-accept window, because the mismatch is the point. The five lock routes share the one constant (`PROTOCOL` in `src/holder-lock/protocol.mjs`, `route.rs`) and bump together. `quiesce-scan` keeps its own protocol 1 (`SCAN_PROTOCOL`): it is read-only, its contract does not tie it to the lock protocol, and its other callers (`fgctl` activation, the distribution git gate) pin it themselves.
 
 | Route | Contract | Does |
 |---|---|---|

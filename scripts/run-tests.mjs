@@ -201,7 +201,7 @@ export function readGitSpawnLog(file) {
   const sites = new Map();
   for (const line of text.split('\n').filter(Boolean)) {
     const entry = JSON.parse(line);
-    const key = `${entry.frame} ${entry.target} ${entry.file} ${entry.args?.[0] ?? ''}`;
+    const key = `${entry.class ?? ''} ${entry.frame} ${entry.target} ${entry.file} ${entry.args?.[0] ?? ''}`;
     if (!sites.has(key)) sites.set(key, { ...entry, count: 0 });
     sites.get(key).count += 1;
   }
@@ -544,7 +544,12 @@ export function runSelectedTests(files, {
     result.status = result.status !== 0 ? result.status : 1;
   }
 
+  // A standalone skill's own spawns are a named class (Git spec §12): counted, not a failure.
+  const standaloneSpawns = gitSpawns.filter((s) => s.class === 'standalone-skill-script');
+  gitSpawns = gitSpawns.filter((s) => !s.class);
   result.gitSpawns = gitSpawns;
+  result.standaloneSkillSpawns = standaloneSpawns;
+  if (standaloneSpawns.length) log(`run-tests: ${standaloneSpawns.length} standalone-skill-script Git spawn site(s), outside the product one door: ${[...new Set(standaloneSpawns.map((s) => s.skill))].join(', ')}`);
   if (gitSpawns.length) {
     log('run-tests: ERROR: product code started git or a hook outside the fgos-git driver (Git spec §12, one door):');
     for (const s of gitSpawns) log(`  ${s.frame}: ${s.target} ${s.file} ${(s.args ?? []).join(' ')} (${s.count}x)`);

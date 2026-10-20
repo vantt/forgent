@@ -169,6 +169,7 @@ pub(crate) trait BorrowedSpawn {
         &self,
         spec: &fgos_holder_lock::BorrowSpec,
         io: &fgos_holder_lock::BorrowIo,
+        watch: bool,
     ) -> Result<fgos_holder_lock::BorrowIoOutcome>;
 }
 impl BorrowedSpawn for fgos_holder_lock::Handle {
@@ -176,8 +177,10 @@ impl BorrowedSpawn for fgos_holder_lock::Handle {
         &self,
         spec: &fgos_holder_lock::BorrowSpec,
         io: &fgos_holder_lock::BorrowIo,
+        watch: bool,
     ) -> Result<fgos_holder_lock::BorrowIoOutcome> {
-        fgos_holder_lock::run_borrowed_io(self, spec, io).map_err(|e| refusal(e.to_string()))
+        let run = if watch { fgos_holder_lock::run_borrowed_io_watched } else { fgos_holder_lock::run_borrowed_io };
+        run(self, spec, io).map_err(|e| refusal(e.to_string()))
     }
 }
 
@@ -893,6 +896,70 @@ impl GitDriver {
             repo, cwd, args, policy, loan, hardened, limit, timeout, input, None,
         )
     }
+    /// The hook directory a repository's own policy names, never the
+    /// driver's empty one.
+    fn repository_hooks(&self, repo: &RepoHandle) -> Result<PathBuf> {
+        let configured = self
+            .config(repo)?
+            .into_iter()
+            .rev()
+            .find(|(_, k, v)| {
+                k == "core.hookspath" && v.as_slice() != self.hooks.to_string_lossy().as_bytes()
+            })
+            .map(|(_, _, v)| v);
+        Ok(match configured {
+            Some(bytes) => {
+                let value = std::str::from_utf8(&bytes).map_err(|_| refusal("non-utf8-hook-path"))?;
+                if value.starts_with('~') {
+                    return Err(refusal("unresolved-hook-path"));
+                }
+                repo.trusted_main_root.join(value)
+            }
+            None => repo.common_dir.join("hooks"),
+        })
+    }
+
+    /// Whether user code (a hook or a filter driver) may run inside a borrowed
+    /// operation. Conservative: an executable hook file, an unreadable hook
+    /// directory, or any configured filter command counts.
+    fn user_code_may_run(&self, repo: &RepoHandle, policy: Policy) -> Result<bool> {
+        if policy == Policy::HookContext {
+            let hooks = self.repository_hooks(repo)?;
+            match fs::read_dir(&hooks) {
+                Ok(entries) => {
+                    for entry in entries {
+                        let Ok(entry) = entry else { return Ok(true) };
+                        let name = entry.file_name();
+                        if name.to_string_lossy().ends_with(".sample") {
+                            continue;
+                        }
+                        #[cfg(unix)]
+                        let executable = {
+                            use std::os::unix::fs::PermissionsExt;
+                            fs::metadata(entry.path())
+                                .map_or(true, |m| m.is_file() && m.permissions().mode() & 0o111 != 0)
+                        };
+                        #[cfg(not(unix))]
+                        let executable = true;
+                        if executable {
+                            return Ok(true);
+                        }
+                    }
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+                Err(_) => return Ok(true),
+            }
+        }
+        if matches!(policy, Policy::HookContext | Policy::Publication | Policy::LocalMutation) {
+            return Ok(self.config(repo)?.iter().any(|(_, k, _)| {
+                let key = k.to_ascii_lowercase();
+                key.starts_with("filter.")
+                    && [".clean", ".smudge", ".process"].iter().any(|tail| key.ends_with(tail))
+            }));
+        }
+        Ok(false)
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn invoke_context(
         &self,
@@ -935,25 +1002,7 @@ impl GitDriver {
         );
         if policy == Policy::HookContext {
             let repo = repo.ok_or_else(|| refusal("hook-repository-required"))?;
-            let configured = self
-                .config(repo)?
-                .into_iter()
-                .rev()
-                .find(|(_, k, v)| {
-                    k == "core.hookspath" && v.as_slice() != self.hooks.to_string_lossy().as_bytes()
-                })
-                .map(|(_, _, v)| v);
-            let hooks = match configured {
-                Some(bytes) => {
-                    let value =
-                        std::str::from_utf8(&bytes).map_err(|_| refusal("non-utf8-hook-path"))?;
-                    if value.starts_with('~') {
-                        return Err(refusal("unresolved-hook-path"));
-                    }
-                    repo.trusted_main_root.join(value)
-                }
-                None => repo.common_dir.join("hooks"),
-            };
+            let hooks = self.repository_hooks(repo)?;
             argv.extend([
                 "-c".into(),
                 format!("core.hooksPath={}", text_path(&hooks)?),
@@ -1070,6 +1119,15 @@ impl GitDriver {
             || ((policy == Policy::Remote || policy == Policy::HookContext) && loan.is_some())
         {
             let loan = loan.ok_or_else(|| refusal("publication-borrow-required"))?;
+            // `linux-pgroup` cannot prove an escapee that dropped the borrowed
+            // descriptor and left the process group is gone. Where user code
+            // may run, the borrow marks the child's environment and reports
+            // survivors that inherited the mark.
+            // Reading the configuration runs no user code, and it is itself how
+            // the check below learns the configuration.
+            let watch = self.containment.guarantee().driver == "linux-pgroup"
+                && args.first() != Some(&"config")
+                && repo.is_some_and(|r| self.user_code_may_run(r, policy).unwrap_or(true));
             let result = loan.run_borrowed(
                 &fgos_holder_lock::BorrowSpec {
                     argv,
@@ -1086,7 +1144,13 @@ impl GitDriver {
                         .checked_add(timeout)
                         .ok_or_else(|| refusal("invalid-git-deadline"))?,
                 },
+                watch,
             )?;
+            // The effect stays recorded for recovery; a failed run already
+            // reports failure, never plain success.
+            if result.outcome.exit == Some(0) && !result.escaped.is_empty() {
+                return Err(crate::refs::recovery("containment-unproven"));
+            }
             return Ok(Output {
                 stdout: result.stdout,
                 stderr: redact(&result.stderr),

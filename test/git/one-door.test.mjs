@@ -31,6 +31,11 @@ const SHAPES = [
   ['rust-argv-runner', 'packages/demo/rust/src/lib.rs', 'rust', 'git passed to a Rust argv-running primitive through a struct field'],
   ['launcher-operand', 'src/plan.mjs', 'wrapper-caller', 'git as the command operand of a timeout launcher'],
   ['consumer-marker-on-git', 'src/verify.mjs', 'consumer-marker', 'the consumer-command marker on a spawn of git itself'],
+  // A function handed on as a value, a method of a returned object, and a Vec's first element built by push.
+  ['function-value-flow', 'src/probe.mjs', 'wrapper-caller', 'a returned method passed under a key to an unresolved callee'],
+  ['method-return', 'src/run.mjs', 'spawn', "the binary returned by a method of a factory's object"],
+  ['rust-first-push', 'packages/demo/rust/src/lib.rs', 'rust', 'git as the first push of a Vec a local Rust function builds'],
+  ['shell-data-operand', 'scripts/setup.sh', 'shell', 'a command substitution inside a quoted echo operand'],
 ];
 
 test('the static scan reports a Git spawn in each shape a literal search misses', () => {
@@ -41,6 +46,15 @@ test('the static scan reports a Git spawn in each shape a literal search misses'
   // The callback shape counts the caller in the other file on the spawn site.
   const [site] = scan({ root: path.join(PROBES, 'callback-argv') }).sites;
   assert.deepEqual(site.callers, ['src/caller.mjs:4']);
+});
+
+test('a declared standalone skill and text quoted into a data command are not sites', () => {
+  // The skill is known by its own SKILL.md declaration: the same script in an undeclared skill is a site.
+  const skills = scan({ root: path.join(PROBES, 'standalone-skill') });
+  assert.deepEqual(skills.sites.map((s) => s.path), ['core/skills/plain/scripts/run.mjs']);
+  assert.deepEqual(skills.classes.map((c) => [c.class, c.path, c.skill]), [['standalone-skill-script', 'core/skills/learn/scripts/run.mjs', 'learn']]);
+  // `die "... (git clone ...)"` only prints: line 3 is not a site, the substitution on line 4 is.
+  assert.deepEqual(scan({ root: path.join(PROBES, 'shell-data-operand') }).sites.map((s) => s.line), [4]);
 });
 
 test('doctor refuses a census that lists a site, or whose files do not match the payload it sits in', () => {
