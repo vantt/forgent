@@ -30,7 +30,7 @@ Skip this call when `docsRef` is already set — never overwrite a value
 that already points somewhere real. Without it, `fgos approve`'s own
 heavy-tier gate has no way to find `plan.md` unless `<feature>` happens
 to equal the item id by coincidence — a real refusal one session hit
-live, worked around there with a manual `git mv` to the item-id path.
+live, worked around there by moving the file to the item-id path by hand.
 `fgos-coding-exploring`'s own CONTEXT.md-creation step registers `docsRef`
 the same way, at the same trigger.
 

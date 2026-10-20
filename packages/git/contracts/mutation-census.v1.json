@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "abae58e1c6f7dfc471b389e7e325ac50dc05e79e75c86a1fa90185fd2f06c693",
+  "payloadDigest": "c48ba2f59700e1a62c838d209ade6064daaeaf95b7de6cc1e374768ec2a47890",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -44,7 +44,7 @@
     ".agents/skills/fgos-coding-knowledge/SKILL.md": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
     ".agents/skills/fgos-coding-planning/SKILL.md": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
     ".agents/skills/fgos-coding-planning/references/approach-and-shape.md": "8b264db72fb94bd59c8bd3e5b1ebb939f3a7b0776645bcda7fa54b5577004f9b",
-    ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md": "49fed6b7fb21fab69354cb383c8857926d3636c53f08e8c040e4763f1a50aa70",
+    ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
     ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md": "d15bbb0c0b52d6bca57ede0d785dce5a4682db90912a499f9ee164b457e25c77",
     ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
     ".agents/skills/fgos-coding-shaping/SKILL.md": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3",
@@ -143,7 +143,7 @@
     "domains/coding/skills/fgos-coding-knowledge/SKILL.md": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
     "domains/coding/skills/fgos-coding-planning/SKILL.md": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
     "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md": "f6d79063ae11e9e48db33b5876ea414292f9023c1da4b2adc70478e4785ce576",
-    "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md": "4eca5e5f5db1c61d2582cced415a1b283d3663274760fea6e76e9ffb3ad3b3e7",
+    "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md": "3d105acc669252ba60d02244b944b77812ddbd65d3087035cc5fcf4e95bd98bd",
     "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md": "5d48fdf43978474a8339f75bf2b1bc9e215e02545a2cbda4019845d6feb42297",
     "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
     "domains/coding/skills/fgos-coding-shaping/SKILL.md": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
@@ -953,28 +953,13 @@
     "install.sh": 1,
     "package-lock.json": 1,
     "packages": 135,
-    "plans": 1731,
+    "plans": 1733,
     "plugins": 97,
     "rustfmt.toml": 1,
     "test": 755,
     "tools": 13
   },
-  "sites": [
-    {
-      "path": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
-      "line": 33,
-      "spawn": "skill text",
-      "binary": "git mv",
-      "family": "skill"
-    },
-    {
-      "path": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
-      "line": 32,
-      "spawn": "skill text",
-      "binary": "git mv",
-      "family": "skill"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
