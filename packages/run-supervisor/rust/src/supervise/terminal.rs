@@ -459,6 +459,9 @@ fn io_err(refusal: TerminalRefusal) -> IoError {
 
 impl AgentIo for TermIo<'_, '_> {
     fn send(&mut self, input: &SendInput) -> Result<(), IoError> {
+        // A cancel, deadline or lost gate seen since the last tick must stop this send: a long
+        // typed brief that lands after the seat was stopped ends up in the pane's shell.
+        self.sup.tick(self.core, self.key);
         if self.sup.finished() {
             return Err(IoError::Io("the attempt is ending".into()));
         }
