@@ -62,8 +62,12 @@ A stranger agent with no chat history should be able to answer, for any change:
    in-process contracts.
 4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,
    or existing covered behavior in the test suite? Either raises the bar.
-5. **What proof means done?** `npm test` (state + cli + runner + e2e suite) green;
-   new or changed behavior gets a matching test. Green must come from real
+5. **What proof means done?** `npm test` (state + cli + runner + e2e suite) and
+   `cargo test --workspace` green. Every behaviour has one owning proof, at the
+   lowest layer that can observe it; a boundary above it gets at most one wiring
+   proof, never a second copy of the cases (design principle 8). Before adding a
+   test, find the behaviour's owning proof and extend it; deleting or replacing a
+   mechanism retires its tests in the same change. Green must come from real
    behavior: never add an env switch, flag, or test-only code branch that skips
    checks to make tests pass; fix production code or the fixture instead.
 6. **What learning gets left behind?** A settled decision goes into
@@ -392,5 +396,16 @@ check exists it is named, otherwise the reviewer checks it.
 7. **One authority, one source of truth.** Each component owns exactly one kind
    of decision. Code and its documentation agree at one source; generated text
    is regenerated from its source, never copied by hand.
+8. **One proof.** A behaviour, not a line, is what a test preserves. Each
+   behaviour has one owning proof at the lowest layer that can observe it, and
+   each boundary above it (Node route over a Rust port, CLI over a use case, e2e
+   over CLI) has at most one wiring proof. A new test names its behaviour in plain
+   words in its title, says why no existing test proves it, and lands in the file
+   that owns that module unless the module or boundary is new. Weakening means
+   asserting less about a behaviour that still exists, and it is forbidden;
+   retiring a proof whose behaviour is gone, or whose cases another named test
+   owns, and moving or merging proofs are not weakening. A change that retires a
+   test names the test that now owns the behaviour, or says the behaviour was
+   removed. Reports never count "all N assertion lines kept" as success.
 
 <!-- fgos:instruction-projection:end -->

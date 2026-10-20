@@ -3,9 +3,11 @@
 // The cutover deletes the v1 lock code from the tree, so the fence tests
 // cannot import it from `src/`. This fixture materializes `src/` as it was
 // at the base commit (`git archive <base> src`, the same bytes `git show
-// <base>:<path>` gives for each file) into a scratch directory, next to a
-// `node_modules` link (plus `scripts/lib`, which old `src/` modules import) so the old modules resolve their one dependency, and
-// lets a test import any old module from there.
+// <base>:<path>` gives for each file) into a scratch directory, plus
+// `scripts/lib`, which old `src/` modules import, and lets a test import any
+// old module from there. Old `src/` imports its one dependency, the `yaml`
+// package, which the repo no longer installs: the scratch tree gets a `yaml`
+// module whose `parse` is today's YAML door (src/util/yaml.mjs).
 //
 // Old lock acquires can block synchronously (`Atomics.wait` loops), which no
 // in-process timer can interrupt, so `probeV1` runs a snippet against the
@@ -34,7 +36,11 @@ export function extractV1Source({ base = DEFAULT_V1_BASE, repoRoot = REPO_ROOT }
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-holder-lock-v1-'));
   const tarball = execFileSync('git', ['archive', '--format=tar', sha, 'src', 'scripts/lib'], { cwd: repoRoot, maxBuffer: 256 * 1024 * 1024 });
   execFileSync('tar', ['-x', '-C', dir], { input: tarball });
-  fs.symlinkSync(path.join(repoRoot, 'node_modules'), path.join(dir, 'node_modules'), 'dir');
+  const yamlShim = path.join(dir, 'node_modules', 'yaml');
+  fs.mkdirSync(yamlShim, { recursive: true });
+  fs.writeFileSync(path.join(yamlShim, 'package.json'), '{"name":"yaml","type":"module","exports":"./index.mjs"}\n');
+  const door = pathToFileURL(path.join(repoRoot, 'src', 'util', 'yaml.mjs')).href;
+  fs.writeFileSync(path.join(yamlShim, 'index.mjs'), `import { parseYaml } from ${JSON.stringify(door)};\nexport const parse = (text) => parseYaml(text);\nexport default { parse };\n`);
   fs.writeFileSync(path.join(dir, 'package.json'), '{"type":"module"}\n');
   const handle = {
     dir,

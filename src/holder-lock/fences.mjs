@@ -171,7 +171,11 @@ function mergeSlotCandidates(workspaceRoot) {
 // straight from the registry's `v1Path`.
 const ENUMERATED_V1_PATHS = {
   advance: ({ fgosDir }) => subdirs(path.join(fgosDir, 'workflow-runs')).map((runDir) => path.join(runDir, 'advance.lock')),
-  recovery: ({ fgosDir }) => [...listAssignmentRuns(fgosDir)].map(({ runDir }) => path.join(runDir, '.recovery.lock')),
+  // Tombstoned for every run that existed at cutover, never placed lazily: a run holding `attempt.lock`
+  // was made by the run supervisor, whose release already takes the recovery lock as a kernel lock.
+  recovery: ({ fgosDir }) => [...listAssignmentRuns(fgosDir)]
+    .filter(({ runDir }) => !fs.existsSync(path.join(runDir, 'attempt.lock')))
+    .map(({ runDir }) => path.join(runDir, '.recovery.lock')),
   'merge-slot': ({ fgosDir, workspaceRoot }) => mergeSlotCandidates(workspaceRoot).map((ref) => path.join(fgosDir, `merge-slot--${encodeURIComponent(ref)}.lock`)),
   'dispatch-cwd': ({ fgosDir, workspaceRoot }) => dispatchCwds(workspaceRoot).map((cwd) => path.join(fgosDir, `dispatch--${encodeURIComponent(cwd)}.lock`)),
   'provider-account': ({ providerRuntimeDir }) => accountLockDirs(providerRuntimeDir),

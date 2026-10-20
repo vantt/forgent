@@ -12,6 +12,7 @@ import {
   REPO_ROOT,
   buildRustDistribution,
   computeArtifactDigest,
+  releaseOutputDir,
 } from '../../scripts/build-rust-distribution.mjs';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import { pathWithGcLeakingGit, processesUnder } from './fgctl-init-fixture.mjs';
@@ -19,8 +20,8 @@ import { pathWithGcLeakingGit, processesUnder } from './fgctl-init-fixture.mjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const FGCTL_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgctl');
-const FGOS_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgos');
+const FGCTL_BIN = releaseBinaryPath(releaseOutputDir(), 'fgctl');
+const FGOS_BIN = releaseBinaryPath(releaseOutputDir(), 'fgos');
 
 const releaseDirName = (digest) => (process.platform === 'win32' ? digest.replace(':', '-') : digest);
 

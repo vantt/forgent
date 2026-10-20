@@ -74,6 +74,21 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
   return { addon, manifest, cargoEnv };
 }
 
+/**
+ * Builds the release-profile artifacts the release-tree tests stage from (`fgos`, `fgctl` and the
+ * native addon under `releaseOutputDir()`), as CI does before `npm test`. Incremental: a no-op when
+ * they are current. Runs inside the full-suite queue, so worktrees sharing a cargo target never
+ * rebuild under one another's run.
+ */
+export function ensureReleaseArtifacts(env = process.env, cwd = REPO_ROOT) {
+  const targetDir = path.resolve(cwd, env.CARGO_TARGET_DIR || 'target');
+  execFileSync('cargo', ['build', '--locked', '--release', '-p', 'fgos', '-p', 'fgctl', '-p', 'fgos-node-addon'], {
+    cwd,
+    env: { ...env, CARGO_TARGET_DIR: targetDir },
+    stdio: 'inherit',
+  });
+}
+
 const TEST_FILE_SUFFIX = '.test.mjs';
 
 /**
@@ -446,8 +461,9 @@ export function runSelectedTests(files, {
     ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, log })
     : null;
   try {
+    const started = Date.now();
     const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
-    result = { status: spawnResult.status ?? 1, files: relFiles, runTemp };
+    result = { status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000 };
   } finally {
     if (supervisor) timedOut = supervisor.stop();
     for (const root of [runTemp, fixtureRoot]) {
@@ -593,7 +609,7 @@ export function queueWithHostBin(options, {
 }
 
 if (isMainModule(import.meta.url)) {
-  const { status, message } = runTests({
+  const { status, message, files, wallSeconds } = runTests({
     forwardedArgs: process.argv.slice(2),
     queue(options) {
       const release = queueWithHostBin(options);
@@ -601,6 +617,7 @@ if (isMainModule(import.meta.url)) {
         const host = ensureHostBin(process.env, REPO_ROOT);
         process.env.FGOS_HOST_BIN = host;
         ensureGitAddon(process.env, REPO_ROOT);
+        ensureReleaseArtifacts(process.env, REPO_ROOT);
         return release;
       } catch (err) {
         release();
@@ -609,5 +626,12 @@ if (isMainModule(import.meta.url)) {
     },
   });
   if (message) console.error(message);
-  process.exitCode = status;
+  let reportStatus = 0;
+  if (files.length > 0) {
+    const { suiteReport } = await import('./test-proof-inventory.mjs');
+    const report = suiteReport({ files, wallSeconds });
+    for (const line of report.lines) console.error(line);
+    reportStatus = report.status;
+  }
+  process.exitCode = status || reportStatus;
 }
