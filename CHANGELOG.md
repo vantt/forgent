@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `npm test` ends with a `suite:` line: test files, `test()` calls and wall time against the committed `test/suite-baseline.json`. It fails when a test body is copied byte for byte into a second file and the baseline does not list that clone, and warns on titles shared across files and on new unmarked `fgos init` or network calls in tests. `node scripts/test-proof-inventory.mjs --duplicates` lists the clones and shared titles; `--write-baseline [--wall-seconds <s>]` refreshes the baseline.
+
+- `fgos worktree remove` no longer refuses every worktree `fgos worktree create` made. Create records what provisioning placed (each copied file with its content digest, and the installed `node_modules` declared regenerable) under the state root. Remove sets exactly those bytes aside before the Git port's clean check, puts them back if the port refuses, and deletes them once the checkout is gone. A copied file a worker edited, or any other ignored byte, still makes the port refuse with `worktree-ignored-bytes-preserved`. A worktree made before this change has no record and still needs its provisioned bytes cleaned by hand once.
+
+- `fgos doctor` check `lock-fences` no longer counts a run made by the run supervisor (it holds `attempt.lock`) as a missing `.recovery.lock` tombstone. Per-run tombstones belong only to runs that existed at the cutover, so the warning no longer grows with every new run. `run-attempts-stuck` now also names a removed payload checkout of an attempt's release, not only a removed host binary.
+
+- Close settled run panes when the gate proves the worker ended and stdout/stderr are captured, including cancellation and non-zero exits; retain crash diagnostics and uncertain attempts. A settlement step that has not completed yet no longer fixes the pane as retained: the pass that completes it decides. `npm run fgos:dev` keeps its staged host while a detached run supervisor still runs from it.
+
+- Reduce dormant Event Store read overhead through validated retained views and current-command Git fact reuse; verify only new active-log tails, preserve append durability, and fix concurrent store benchmark cursors with explicit outside-read timings.
+
+- Keep Event Store retired-path enforcement dormant until the tracked cutover fence; preserve append root durability, tolerate partial maintenance headers, and expose an absent local origin as `null`. Dormant door checks tolerate unrelated Work edits.
+
+- Harden the dormant Event Store: reuse verified reads and stamped Git configuration, avoid syncing untouched directories, expose local maintenance facts and canonical branch keys, and block retired event paths and event-ref bypasses. Store latency benchmarks can seed realistic history without a Work consumer.
+
+- `fgos worktree create` now provisions the new checkout after the Git port returns: dependency install, then the project's `worktreeSetup.commands`. This repo's setup also copies the untracked `ak-*` skill directories from the main checkout, so a worker in that worktree can use `ak:cook`. The setup no longer builds the Rust workspace in each new worktree (a run that needs a binary builds it with its own Cargo target). `fgos setup` no longer deletes skills other tools installed into `.agents/skills` (only entries fgOS itself assembled are pruned). The claude executor declares `ak:cook` in `supports.skills`, and `fgos doctor` check `executor-skills-installed` fails when a declared skill is missing from the runtime's skill directory. `core/skills/_shared/ak-cook-worker-contract.md` is the brief for an `ak:cook` worker.
+- Add the `debate` collaboration pattern: a thesis side and an antithesis side argue blind in parallel, answer each other's round-1 argument (`params.rebuttal: false` skips it), and a read-only judge on a provider family different from both sides rules; a pool that cannot seat such a judge is refused by name. `group-cognition`'s dialectical step now runs `debate` instead of `reviewed`, and its action synthesis builds on the judge's ruling.
+
 - `fgos version` (and the `cli-version-visible` doctor row) shows the first 12 hex digits of the checkout's full commit id instead of Git's variable-length short id. `fgos init` and every other Git read now work on a machine where the fgOS state root does not exist yet: it is created owner-only, as `fgos doctor --fix` would.
 
 - `approve`, `sync-root` and `merge next` with `--no-wait` refuse a held merge slot of the target before reading anything else, so the refusal comes at once.

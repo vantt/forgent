@@ -10,7 +10,8 @@
 // argument that merely names the directory (a `rm -rf`, an editor) does not count.
 //
 // LINUX ONLY. It reads /proc. Where /proc is absent nothing is known to be running and it stops
-// nothing; confinement itself is Linux-only, so the leak it closes is too.
+// nothing; confinement itself is Linux-only, so the leak it closes is too. `processesInside` is the
+// same look without the stop, for a caller that must leave a directory alone while it is in use.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -25,17 +26,17 @@ const alive = (pid) => {
 const withoutDeletedSuffix = (p) => (typeof p === 'string' && p.endsWith(' (deleted)') ? p.slice(0, -' (deleted)'.length) : p);
 
 /**
- * @param {string} dir directory whose processes are stopped
- * @param {{ graceMs?: number }} [options] how long SIGTERM gets before SIGKILL
- * @returns {number} how many processes were found
+ * The processes (other than this one and its parent) whose executable or working directory is inside `dir`.
+ * @param {string} dir
+ * @returns {number[]} their pids
  */
-export function stopProcessesInside(dir, { graceMs = 1500 } = {}) {
+export function processesInside(dir) {
   let root;
   try { root = fs.realpathSync(dir); } catch { root = path.resolve(dir); }
   const inside = (p) => typeof p === 'string' && (p === root || p.startsWith(root + path.sep));
 
   let names;
-  try { names = fs.readdirSync('/proc'); } catch { return 0; }
+  try { names = fs.readdirSync('/proc'); } catch { return []; }
 
   const found = [];
   for (const name of names) {
@@ -48,6 +49,16 @@ export function stopProcessesInside(dir, { graceMs = 1500 } = {}) {
     try { cwd = fs.readlinkSync(`/proc/${pid}/cwd`); } catch { /* same */ }
     if (inside(withoutDeletedSuffix(exe)) || inside(withoutDeletedSuffix(cwd))) found.push(pid);
   }
+  return found;
+}
+
+/**
+ * @param {string} dir directory whose processes are stopped
+ * @param {{ graceMs?: number }} [options] how long SIGTERM gets before SIGKILL
+ * @returns {number} how many processes were found
+ */
+export function stopProcessesInside(dir, { graceMs = 1500 } = {}) {
+  const found = processesInside(dir);
 
   for (const pid of found) {
     try { process.kill(pid, 'SIGTERM'); } catch { /* gone already */ }

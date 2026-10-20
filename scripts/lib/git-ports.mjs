@@ -8,7 +8,7 @@
 import { createGitInspect, gitPortOptions } from '../../src/git/inspect.mjs';
 import { createGitScopedCommit } from '../../src/git/scoped-commit.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
-import { ensureGitAddon } from '../../test/helpers/git-addon.mjs';
+import { ensureGitAddon } from '../git-addon.mjs';
 
 /** Makes the Git addon loadable for this process: the host's payload when one runs us, else this checkout's staged copy. */
 export function ensureScriptAddon(env = process.env) {

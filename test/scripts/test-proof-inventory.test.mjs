@@ -16,6 +16,10 @@ import {
   inventoryProfiledFiles,
   checkAdmission,
   addedLinesFromGitDiff,
+  scanTestCalls,
+  findCloneGroups,
+  suiteReport,
+  buildSuiteBaseline,
 } from '../../scripts/test-proof-inventory.mjs';
 
 test('RESPONSIBILITIES is the exact eight-category taxonomy from the plan, unknown last', () => {
@@ -250,4 +254,60 @@ test('addedLinesFromGitDiff reads the work tree against the base commit for the 
     { file: 'test/x.test.mjs', line: 2, text: 'added', prevText: null },
     { file: 'test/x.test.mjs', line: 3, text: 'next', prevText: 'added' },
   ]);
+});
+
+test('scanTestCalls splits title from body and is not fooled by parens inside strings, templates, regexes or comments', () => {
+  const source = [
+    "test('a (title)', () => {",
+    "  assert.match(x, /\\(unbalanced/); // a ) in a comment",
+    "  const s = `${f(')')} )`;",
+    "});",
+    "  it(\"second\", async () => { await go(); });",
+    "notATest('x', () => {});",
+  ].join('\n');
+  const calls = scanTestCalls(source, 'test/a.test.mjs');
+  assert.deepEqual(calls.map((c) => [c.line, c.title]), [[1, "'a(title)'"], [5, '"second"']]);
+  assert.equal(calls[0].body, "()=>{assert.match(x,/\\(unbalanced/);//a)inacommentconsts=`${f(')')})`;}");
+  assert.equal(calls[1].body, 'async()=>{awaitgo();}');
+});
+
+test('findCloneGroups reports a body shared by two files, whatever the titles, and ignores a body repeated inside one file', () => {
+  const calls = [
+    { file: 'test/a.test.mjs', line: 1, title: "'one'", body: '()=>{x();}' },
+    { file: 'test/b.test.mjs', line: 9, title: "'other'", body: '()=>{x();}' },
+    { file: 'test/a.test.mjs', line: 5, title: "'p'", body: '()=>{y();}' },
+    { file: 'test/a.test.mjs', line: 7, title: "'q'", body: '()=>{y();}' },
+  ];
+  const groups = findCloneGroups(calls);
+  assert.equal(groups.length, 1);
+  assert.deepEqual(groups[0].files, ['test/a.test.mjs', 'test/b.test.mjs']);
+  assert.match(groups[0].hash, /^[0-9a-f]{16}$/);
+});
+
+test('suiteReport prints the size line against the baseline, fails only on a clone the baseline does not list, notes baselined clones that are gone, and survives a checkout git cannot diff', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-suite-report-'));
+  const write = (rel, text) => { fs.mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true }); fs.writeFileSync(path.join(dir, rel), text); };
+  write('test/a.test.mjs', "test('a', () => { known(); });\ntest('b', () => { fresh(); });\n");
+  write('test/b.test.mjs', "test('a', () => { known(); });\n");
+  const files = ['test/a.test.mjs', 'test/b.test.mjs'];
+  const baselinePath = path.join(dir, 'test', 'suite-baseline.json');
+  const baseline = buildSuiteBaseline({ files, cwd: dir, sha: '0123456789abcdef', wallSeconds: 10 });
+  assert.equal(baseline.tests, 3);
+  baseline.knownClones.push({ hash: 'ffffffffffffffff', files: ['test/gone.test.mjs', 'test/b.test.mjs'] });
+  fs.writeFileSync(baselinePath, JSON.stringify(baseline));
+  const admission = () => [{ file: 'test/a.test.mjs', line: 2, ruleId: 'new-real-provider-network-without-marker', message: 'm' }];
+
+  const clean = suiteReport({ files, wallSeconds: 12.4, cwd: dir, baselinePath, admission });
+  assert.equal(clean.status, 0);
+  assert.equal(clean.lines[0], 'suite: 2 files, 3 test() calls, 12 s wall (baseline 2 / 3 / 10 s at 012345678)');
+  assert.ok(clean.lines.some((l) => /1 known cross-file clone/.test(l)));
+  assert.ok(clean.lines.some((l) => /1 baselined clone\(s\) are gone/.test(l)));
+  assert.ok(clean.lines.some((l) => /warning: test\/a\.test\.mjs:2 \[new-real-provider-network-without-marker\]/.test(l)));
+
+  write('test/b.test.mjs', "test('a', () => { known(); });\ntest('copy of b', () => { fresh(); });\n");
+  const dirty = suiteReport({ files, cwd: dir, baselinePath, admission: () => { throw new Error('git diff failed\nstderr'); } });
+  assert.equal(dirty.status, 1);
+  assert.ok(dirty.lines.includes('  test/b.test.mjs:2'));
+  assert.ok(dirty.lines.includes('suite: warning: admission rules not checked: git diff failed'));
+  assert.match(dirty.lines[0], /, \? s wall/);
 });

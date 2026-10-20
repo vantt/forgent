@@ -461,8 +461,9 @@ export function runSelectedTests(files, {
     ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, log })
     : null;
   try {
+    const started = Date.now();
     const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
-    result = { status: spawnResult.status ?? 1, files: relFiles, runTemp };
+    result = { status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000 };
   } finally {
     if (supervisor) timedOut = supervisor.stop();
     for (const root of [runTemp, fixtureRoot]) {
@@ -608,7 +609,7 @@ export function queueWithHostBin(options, {
 }
 
 if (isMainModule(import.meta.url)) {
-  const { status, message } = runTests({
+  const { status, message, files, wallSeconds } = runTests({
     forwardedArgs: process.argv.slice(2),
     queue(options) {
       const release = queueWithHostBin(options);
@@ -624,5 +625,12 @@ if (isMainModule(import.meta.url)) {
     },
   });
   if (message) console.error(message);
-  process.exitCode = status;
+  let reportStatus = 0;
+  if (files.length > 0) {
+    const { suiteReport } = await import('./test-proof-inventory.mjs');
+    const report = suiteReport({ files, wallSeconds });
+    for (const line of report.lines) console.error(line);
+    reportStatus = report.status;
+  }
+  process.exitCode = status || reportStatus;
 }

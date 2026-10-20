@@ -461,6 +461,12 @@ fn find_segment(
 }
 /// Oldest local unsealed file age; no Git or gate work.
 pub fn oldest_unsealed_age_sec(layout: &Layout, streams: &[StreamId]) -> Result<u64, Error> {
+    if streams.is_empty() || !layout.root.try_exists().map_err(io)? {
+        return Ok(0);
+    }
+    // Serialize the header read with append recovery/truncation and rotation.
+    // Sealing may unlink an already-open closed file; its handle stays valid.
+    let _guard = crate::locks::acquire_append(layout, &[], &crate::fsio::OsFileSystem)?;
     let mut age = 0;
     for s in streams {
         let p = layout.stream(s);
@@ -469,10 +475,21 @@ pub fn oldest_unsealed_age_sec(layout: &Layout, streams: &[StreamId]) -> Result<
             files.push(p.active());
         }
         for p in files {
-            let bytes = std::fs::read(p).map_err(io)?;
-            if let Some(line) = bytes.split(|b| *b == b'\n').find(|l| !l.is_empty()) {
+            // Open once: rename/unlink cannot change this header snapshot. A writer
+            // only appends; an incomplete first line is not an observation yet.
+            use std::io::BufRead;
+            let file = match std::fs::File::open(p) {
+                Ok(file) => file,
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
+                Err(e) => return Err(io(e)),
+            };
+            let mut line = Vec::new();
+            std::io::BufReader::new(file)
+                .read_until(b'\n', &mut line)
+                .map_err(io)?;
+            if line.last() == Some(&b'\n') && line.len() > 1 {
                 {
-                    let e = serde_json::from_slice::<crate::envelope::Envelope>(line)
+                    let e = serde_json::from_slice::<crate::envelope::Envelope>(&line)
                         .map_err(|e| invalid(e.to_string()))?;
                     let first = crate::publish::timestamp_seconds(&e.ts)?;
                     let now = std::time::SystemTime::now()

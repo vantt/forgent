@@ -24,13 +24,22 @@ pub(crate) fn authority(port: &dyn Inspect, repo: &RepoHandle) -> Result<RepoHan
     }
 }
 pub(crate) fn pinned_legacy(port: &dyn Inspect, repo: &RepoHandle) -> Result<Option<Oid>, Error> {
-    let repo = authority(port, repo)?;
-    let head = match port.resolve_head(&repo).map_err(git_error)? {
+    let authority = authority(port, repo)?;
+    let head = port.resolve_head(&authority).map_err(git_error)?;
+    pinned_at_head(port, &authority, &head)
+}
+/// Reuse a command's already observed authority and HEAD, never a prior command's.
+pub(crate) fn pinned_at_head(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    head: &HeadFact,
+) -> Result<Option<Oid>, Error> {
+    let head = match head {
         HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => commit,
         HeadFact::Unborn { .. } => return Ok(None),
     };
     let values = port
-        .read_paths_at(&repo, &head, &[b".fgos/events".to_vec()], 32 * 1024 * 1024)
+        .read_paths_at(repo, head, &[b".fgos/events".to_vec()], 32 * 1024 * 1024)
         .map_err(git_error)?;
     let bytes = match values.into_iter().next().map(|p| p.value) {
         Some(PathValue::Blob(b)) => b,
@@ -41,7 +50,7 @@ pub(crate) fn pinned_legacy(port: &dyn Inspect, repo: &RepoHandle) -> Result<Opt
     let fence: Fence = serde_json::from_slice(&bytes).map_err(|e| invalid(e.to_string()))?;
     let oid = Oid::parse(&fence.legacy_ref_oid, repo.object_format())
         .map_err(|e| invalid(e.to_string()))?;
-    let seal = walk::header(port, &repo, &oid)?;
+    let seal = walk::header(port, repo, &oid)?;
     if fence.seal_digest != seal.digest()?
         || !matches!(seal, crate::envelope::Seal::Legacy {ref from_commit,..} if fence.from_commit == *from_commit)
     {

@@ -54,7 +54,7 @@ test('1. a controller killed with SIGKILL after the binding: the supervisor brie
   assert.equal(readJson(file(dir, 'receipt.json')).outcome, 'exited');
 });
 
-test('2. the soft deadline passes after the controller died: the agent is stopped, the receipt says timeout and the pane stays', { skip: noHost, timeout: 180_000 }, async () => {
+test('2. the soft deadline passes after the controller died: the agent is stopped, the receipt says timeout and the captured pane closes', { skip: noHost, timeout: 180_000 }, async () => {
   const project = await newProject('c2');
   const run = project.startController({ timeoutMs: 9_000 });
   const { dir } = await bound(project, run);
@@ -70,8 +70,8 @@ test('2. the soft deadline passes after the controller died: the agent is stoppe
   assert.equal(receipt.outcome, 'timeout');
   assert.equal(readJson(file(dir, 'gate-exit.json')).stoppedBy, 'soft-deadline');
   await waitUntil(() => !alive(agent), { what: 'the agent to be gone' });
-  assert.equal(stepReceipt(dir, 'release-slot').detail.disposition, 'retain', 'the screen of a failed attempt is kept');
-  assert.equal(project.callsStarting('pane close').length, 0, 'nothing closes the pane');
+  assert.equal(stepReceipt(dir, 'release-slot').detail.disposition, 'close', 'the stopped worker output is captured');
+  assert.equal(project.callsStarting('pane close').length, 1, 'the stopped pane closes once');
   assert.ok(readJson(file(dir, 'result.json')), 'the timeout is settled by the step, not by a controller');
 });
 

@@ -293,6 +293,7 @@
     "src/runner/execution/case-admission-port.mjs": "infra",
     "src/runner/execution/run.mjs": "use-case",
     "src/runner/execution/patterns/index.mjs": "domain",
+    "src/runner/execution/patterns/debate.mjs": "domain",
     "src/runner/execution/patterns/panel.mjs": "domain",
     "src/runner/execution/patterns/presets.mjs": "domain",
     "src/runner/execution/patterns/reviewed.mjs": "domain",

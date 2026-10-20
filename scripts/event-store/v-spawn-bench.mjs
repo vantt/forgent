@@ -14,7 +14,7 @@ export function percentile(values, fraction) {
   const sorted = [...values].sort((a, b) => a - b);
   return sorted[Math.max(0, Math.ceil(sorted.length * fraction) - 1)];
 }
-export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 20], hostBin, entry = 'host' } = {}) {
+export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 15, 20], hostBin, entry = 'host', storeIncrement = false, strace = false, seedItems = 1000, seedHistory } = {}) {
   if (!['host', 'node-payload'].includes(entry)) throw new Error('entry must be host or node-payload');
   if (!root || !out) throw new Error('--root and --out required');
   if (!Number.isInteger(samples) || samples < 1 || sessions.some(n => !Number.isInteger(n) || n < 1)) throw new Error('invalid samples/sessions');
@@ -35,6 +35,7 @@ export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 20
   const parent = path.dirname(root);
   const filesystem = execFileSync('findmnt', ['-T', parent, '-n', '-o', 'FSTYPE'], { encoding: 'utf8' }).trim();
   if (filesystem !== 'ext4') throw new Error(`ext4 required; got ${filesystem}`);
+  if (storeIncrement) return storeIncrementBenchmark({root,out,sessions,filesystem,checkout,strace,seedItems,seedHistory});
   hostBin ??= resolveActiveHostBin({ cwd: checkout }).bin;
   if (!hostBin) throw new Error('pass --host-bin (real activated Rust host required)');
   hostBin = fs.realpathSync(hostBin);
@@ -84,12 +85,107 @@ const dir=process.argv[1]; initStore(dir); for(const id of JSON.parse(process.ar
   if (rows.some(r=>r.errors.length)) throw new Error('benchmark has failed mutations; inspect output');
   return result;
 }
+async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,strace,seedItems,seedHistory}) {
+  if (!strace) throw Error('--store-increment requires --strace for the zero-spawn verdict');
+  if (JSON.stringify(sessions)!==JSON.stringify([1,10,15,20])) throw Error('store acceptance requires --sessions 1,10,15,20');
+  execFileSync('strace',['-V'],{stdio:'pipe'}); // Missing tool is a hard failure.
+  // Build/load the working-tree combined addon, never the activated payload.
+  const {ensureGitAddon}=await import('../git-addon.mjs');
+  const built=ensureGitAddon();
+  fs.mkdirSync(root);
+  const stateRoot=path.join(root,'state');fs.mkdirSync(stateRoot,{mode:0o700});
+  const result={contract:'v-spawn-store-increment.v1',filesystem,checkout,
+    commit:inspectRepo(checkout).resolveCommit({name:'HEAD'}),
+    node:process.version,cpu:os.cpus()[0].model,rows:[],verdict:'FAIL'};
+  const env={...process.env};for(const k of Object.keys(env))if(k.startsWith('GIT_'))delete env[k];
+  const git=sandboxGit(root,{env});
+  for(const concurrency of sessions){
+    const repo=path.join(root,`sessions-${concurrency}`);fs.mkdirSync(repo);
+    git(['-C',repo,'init','-q'],{stdio:'pipe'});git(['-C',repo,'config','fgos.machineId','spawn-benchmark'],{stdio:'pipe'});
+    fs.mkdirSync(path.join(repo,'.git/fgos/events/locks'),{recursive:true,mode:0o700});
+    const hot=path.join(repo,'.fgos');fs.mkdirSync(hot);
+    const fence=path.join(hot,'locks/activation.lock');fs.mkdirSync(fence,{recursive:true});
+    fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'benchmark'}));
+    const {benchmarkStore,seedStore}=await import('./store-increment-worker.mjs');
+    const seed=seedStore(benchmarkStore(repo,stateRoot,built.manifest,checkout),{items:seedItems,history:seedHistory});
+    const barrier=path.join(repo,'barrier');fs.mkdirSync(barrier);
+    const children=[];const pending=[];
+    let failure;
+    try {
+      for(let i=0;i<concurrency;i++){
+        const log=path.join(repo,`trace-${i}`);
+        const count=Math.floor(200/concurrency)+(i<200%concurrency?1:0);
+        const child=spawn('strace',['-f','-e','trace=process,write,fsync,fdatasync','-s','256','-o',log,
+          process.execPath,path.join(checkout,'scripts/event-store/store-increment-worker.mjs'),
+          repo,stateRoot,built.manifest,checkout,String(i),String(count),barrier,'yes'],{env});
+        children.push(child);
+        let stdout='',stderr='';child.stdout.on('data',b=>stdout+=b);child.stderr.on('data',b=>stderr+=b);
+        const done=new Promise((resolve,reject)=>{child.on('error',reject);child.on('close',code=>{
+          if(code!==0)return reject(Error(`worker ${i}: ${code}: ${stderr}`));
+          try{resolve({measurements:JSON.parse(stdout),log});}catch(e){reject(e);}
+        });});
+        done.catch(e=>{failure=e;});pending.push(done);
+      }
+      const readyDeadline=Date.now()+60000;
+      while(!children.every((_,i)=>fs.existsSync(path.join(barrier,`${i}.ready`)))){
+        if(failure)throw failure;
+        if(Date.now()>readyDeadline)throw Error('workers did not reach ready barrier');
+        await new Promise(r=>setTimeout(r,10));
+      }
+      const start=performance.now();fs.writeFileSync(path.join(barrier,'go'),'go');
+      // Spec 17(a): the 60 s exhaustion bound applies at 20 sessions; other levels only measure, under a safety bound.
+      const limitMs=concurrency===20?60000:900000;
+      const timer=setTimeout(()=>{failure=Error(`200 mutations exceeded ${limitMs/1000} s`);for(const c of children)c.kill('SIGKILL');},limitMs);
+      let completed;try{completed=await Promise.all(pending);}finally{clearTimeout(timer);}
+      const elapsedMs=performance.now()-start;
+      const observations=completed.flatMap(c=>c.measurements.observations);
+      let spawns=0,windows=0,gitExecsBetweenGates=0;
+      const appendFsyncs=[];
+      for(const c of completed){
+        const lines=fs.readFileSync(c.log,'utf8').split('\n');let inside=false,appending=false,fsyncs=0,seenGate=false;
+        for(const line of lines){
+          if(line.includes('ES_APPEND_BEGIN:')){if(appending)throw Error('nested append marker');appending=true;fsyncs=0;continue;}
+          if(line.includes('ES_APPEND_END:')){if(!appending)throw Error('unmatched append end');appending=false;appendFsyncs.push(fsyncs);continue;}
+          if(appending && /\b(?:fsync|fdatasync)\(/.test(line))fsyncs++;
+          if(!inside && seenGate && /\bexecve\("[^"]*\/git",/.test(line) && /= 0$/.test(line))gitExecsBetweenGates++;
+          if(line.includes('ES_GATE_BEGIN:')){if(inside)throw Error('nested trace marker');inside=true;seenGate=true;windows++;continue;}
+          if(line.includes('ES_GATE_END:')){if(!inside)throw Error('unmatched trace end');inside=false;continue;}
+          if(inside && /\b(?:clone|clone3|fork|vfork|execve|execveat)\(/.test(line))spawns++;
+        }
+        if(inside || appending)throw Error('incomplete gate/append trace');
+      }
+      const increments=observations.map(o=>o.storeIncrementMs), upperBounds=observations.map(o=>o.incrementUpperBoundMs), waits=observations.map(o=>o.waitMs);
+      const row={seed,sessions:concurrency,mutations:observations.length,elapsedMs,windows,spawns,
+        outsideRead:{p50Ms:percentile(observations.map(o=>o.outsideReadMs),.5),p95Ms:percentile(observations.map(o=>o.outsideReadMs),.95)},
+        incrementUpperBoundP95Ms:percentile(upperBounds,.95),
+        storeIncrementP50Ms:percentile(increments,.5),storeIncrementP95Ms:percentile(increments,.95),
+        stages:Object.fromEntries(['readInGate','append','fold','prepareEvents','cacheWrite'].map(stage=>[stage,{
+          p50Ms:percentile(observations.map(o=>o.stages[stage]),.5),p95Ms:percentile(observations.map(o=>o.stages[stage]),.95),
+        }])),
+        appendFsyncs:{min:Math.min(...appendFsyncs),max:Math.max(...appendFsyncs),observations:appendFsyncs},
+        gitExecsBetweenGates,gitExecsPerSteadyMutation:gitExecsBetweenGates/Math.max(1,windows-concurrency),
+        convoy:{waitP50Ms:percentile(waits,.5),waitP95Ms:percentile(waits,.95),waitMaxMs:Math.max(...waits),observations},
+        verdict:observations.length===200&&windows===200&&appendFsyncs.length===200&&spawns===0&&(concurrency!==20||(elapsedMs<=60000&&percentile(increments,.95)<=50))?'PASS':'FAIL'};
+      result.rows.push(row);console.log(JSON.stringify({...row,convoy:{...row.convoy,observations:undefined}}));
+    } finally {for(const c of children)if(c.exitCode===null)c.kill('SIGKILL');}
+  }
+  result.verdict=result.rows.every(r=>r.verdict==='PASS')?'PASS':'FAIL';
+  fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,JSON.stringify(result,null,2)+'\n');
+  console.log(JSON.stringify({contract:result.contract,verdict:result.verdict,out}));
+  if(result.verdict!=='PASS')throw Error('store increment acceptance failed');
+  return result;
+}
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2); const options = {};
   for(let i=0;i<args.length;i+=2) {
-    const key = {'--root':'root','--out':'out','--samples':'samples','--sessions':'sessions','--host-bin':'hostBin','--entry':'entry'}[args[i]];
+    if(args[i]==='--store-increment'||args[i]==='--strace'){options[args[i]==='--strace'?'strace':'storeIncrement']=true;i--;continue;}
+    const key = {'--root':'root','--out':'out','--samples':'samples','--sessions':'sessions','--host-bin':'hostBin','--entry':'entry','--seed-items':'seedItems','--seed-history':'seedHistory'}[args[i]];
     if (!key || args[i+1] === undefined) throw new Error(`unknown/missing argument ${args[i]}`);
-    options[key] = key==='samples' ? Number(args[i+1]) : key==='sessions' ? args[i+1].split(',').map(Number) : args[i+1];
+    options[key] = ['samples','seedItems'].includes(key) ? Number(args[i+1]) : key==='sessions' ? args[i+1].split(',').map(Number) : args[i+1];
   }
-  await benchmark(options);
+  try { await benchmark(options); }
+  catch(error) {
+    console.log(JSON.stringify({contract:options.storeIncrement?'v-spawn-store-increment.v1':'v-spawn-benchmark.v1',verdict:'FAIL',error:error.message}));
+    process.exitCode=1;
+  }
 }

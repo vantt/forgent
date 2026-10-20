@@ -69,9 +69,12 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
   available();
   if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
   const native = call(() => loadNativeAddon(loaderOptions).openStore(resolvedRoot, machineId, files, remote));
+  const views = new WeakMap();
   const facade = {
     commonDir: resolvedRoot.commonDir,
     machineId,
+    // null means this clone has no local store identity yet (no append).
+    get ownOrigin() { return call(() => native.ownOrigin); },
     append(stream, events, cursor, writer, heldRanks) {
       available();
       const ranks = ranksOf(heldRanks);
@@ -80,11 +83,18 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
     readInGate(origin, stream, cursorSeq) { return call(() => native.readInGate(origin, stream, cursorSeq)); },
     read({ streams, cursor = null, folded = [], project = true }, heldRanks) {
       const ranks = outsideGate(heldRanks);
-      return historical(call(() => native.read(streams, cursor, folded, project, ranks, hotLockDepth())), 'legacy');
+      const retained = JSON.stringify(folded);
+      const response = call(() => native.read({ streams, cursor, folded: retained, project, view: views.get(folded) }, ranks, hotLockDepth()));
+      const { sequencePrefix, ...result } = historical(response.result, 'legacy');
+      // Preserve independent snapshots and use the exact bytes native verified,
+      // including when a caller supplied objects with custom JSON serialization.
+      result.sequence = (sequencePrefix ? JSON.parse(retained).slice(0, sequencePrefix) : []).concat(result.sequence);
+      views.set(result.sequence, response.view);
+      return result;
     },
-    seal(stream, heldRanks) {
+    seal(stream, heldRanks, { opportunistic = false } = {}) {
       const ranks = outsideGate(heldRanks);
-      return call(() => native.seal(stream, ranks, hotLockDepth()));
+      return call(() => native.seal(stream, ranks, hotLockDepth(), opportunistic));
     },
     sealIfDue(stream, intervalSec, heldRanks) {
       const ranks = outsideGate(heldRanks);
@@ -94,9 +104,17 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
       const ranks = outsideGate(heldRanks);
       return call(() => native.sealAll(streams, ranks, hotLockDepth()));
     },
+    promote({ branch, throughSeq, cursor, writer, ts = new Date().toISOString() }, heldRanks) {
+      const ranks = outsideGate(heldRanks);
+      return call(() => native.promote({ branch, throughSeq, cursor, writer, ts }, ranks, hotLockDepth()));
+    },
     sync({ remote = 'origin', noPush = false } = {}, heldRanks) {
       const ranks = outsideGate(heldRanks);
       return call(() => native.sync(remote, noPush, ranks, hotLockDepth()));
+    },
+    maintenance(heldRanks) {
+      const ranks = outsideGate(heldRanks);
+      return call(() => native.maintenance(ranks, hotLockDepth()));
     },
     status(heldRanks, remote = 'origin') {
       const ranks = outsideGate(heldRanks);
@@ -144,11 +162,22 @@ export function eventStoreAddonAvailable(loaderOptions) {
   const native = call(() => loadNativeAddon(loaderOptions));
   return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
     && typeof native.eventStoreFacts === 'function' && typeof native.ensureEventStoreRefspecs === 'function'
-    && typeof native.mintEventStoreMachineId === 'function'
-    && ['read', 'append', 'sync', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
+    && typeof native.mintEventStoreMachineId === 'function' && typeof native.eventStoreBranchKey === 'function'
+    && ['read', 'append', 'promote', 'sync', 'maintenance', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
 }
 
 export function mintEventStoreMachineId(stateRoot, hostname, loaderOptions) {
   outsideGate([]);
   return call(() => loadNativeAddon(loaderOptions).mintEventStoreMachineId(stateRoot, hostname));
+}
+
+/** Decode an explicit legacy inventory through the crate's frozen ordering rule. */
+export function decodeLegacyFiles(files, loaderOptions) {
+  return call(() => loadNativeAddon(loaderOptions).decodeLegacyFiles(files))
+    .map(record => ({ ...record, event: JSON.parse(record.raw) }));
+}
+
+/** Branch stream key, defined and validated by the crate. */
+export function branchKey(branch, loaderOptions) {
+  return call(() => loadNativeAddon(loaderOptions).eventStoreBranchKey(branch));
 }

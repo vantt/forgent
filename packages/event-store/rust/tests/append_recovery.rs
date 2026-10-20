@@ -495,3 +495,38 @@ fn a_verifying_marker_with_internal_sequence_overlap_refuses_instead_of_truncati
     );
     assert_eq!(fs::read(p.active()).unwrap(), bytes);
 }
+
+#[test]
+fn repeated_verified_reads_still_detect_changed_bytes_and_authority() {
+    let r = Repo::new();
+    let a = r.append(2);
+    let p = r.layout.stream(&r.stream);
+    let original = fs::read(p.active()).unwrap();
+    for _ in 0..2 {
+        assert_eq!(
+            read_in_gate(&r.layout, &a.ack.origin, &r.stream, 0)
+                .unwrap()
+                .events
+                .len(),
+            2
+        );
+    }
+    let mut changed = original.clone();
+    let position = changed.windows(8).position(|b| b == b"work.add").unwrap();
+    changed[position] = b'X';
+    fs::write(p.active(), &changed).unwrap();
+    code(
+        read_in_gate(&r.layout, &a.ack.origin, &r.stream, 0).unwrap_err(),
+        "event-store-integrity",
+    );
+    fs::write(p.active(), &original).unwrap();
+    assert!(
+        fgos_event_store::open_read::decode(&original, &"f".repeat(32), &r.stream, false).is_err()
+    );
+    // A speculative suffix accepted for an active file is never accepted as
+    // an immutable segment merely because its bytes were previously verified.
+    let torn = [original.as_slice(), b"{"].concat();
+    assert!(fgos_event_store::open_read::decode(&torn, &a.ack.origin, &r.stream, false).is_ok());
+    assert!(fgos_event_store::open_read::decode(&torn, &a.ack.origin, &r.stream, true).is_err());
+    assert_eq!(r.append(1).ack.first_seq, 3);
+}

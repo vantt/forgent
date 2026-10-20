@@ -10,6 +10,9 @@
 // families and lets seats share one when families run out, so a short pool is never a failure. It
 // is reported as a note naming the seats that would share, so degraded independence stays visible.
 //
+// A `debate` unit prefers a different family per side (a note when they share) but its judge must
+// differ from both sides: a pool that cannot seat such a judge fails here, not after the sides ran.
+//
 // The verdict is never recomputed here: each unit is driven through the runner's own pattern code
 // with a role runner that only calls bind() (src/runner/execution/dry-bind.mjs). Nothing is
 // dispatched and nothing is written. What bind() treats as available (governance, posture) is what
@@ -25,7 +28,7 @@ import { resolvePattern } from '../runner/execution/patterns/presets.mjs';
 import { describeYamlError, parseYaml } from '../util/yaml.mjs';
 
 // Patterns whose roles are bound against each other's provider family.
-const INDEPENDENCE_PATTERNS = new Set(['panel', 'reviewed']);
+const INDEPENDENCE_PATTERNS = new Set(['panel', 'reviewed', 'debate']);
 
 // bind() refuses with these when there is no candidate pool to walk at all.
 const NO_POOL_REASONS = new Set(['headless-no-executor', 'no-candidate']);

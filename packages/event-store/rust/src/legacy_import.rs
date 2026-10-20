@@ -41,29 +41,40 @@ pub fn inventory(port: &dyn Inspect, repo: &RepoHandle) -> Result<Inventory, Err
 /// The existing pre-migration consumer roots; broad porting discovery belongs
 /// to migrate/doctor, never the routine admission/read path.
 fn consumer_inventory(port: &dyn Inspect, repo: &RepoHandle) -> Result<Inventory, Error> {
+    let head = port.resolve_head(repo).map_err(git_error)?;
+    let from_commit = committed_head(&head)?;
+    let refs = crate::refs::list(
+        port,
+        repo,
+        &[RefPrefix::parse("refs/fgos/legacy").map_err(|e| invalid(e.to_string()))?],
+    )?;
+    let hint = refs.iter().find_map(|r| {
+        if r.name.as_str() == "refs/fgos/legacy" {
+            if let RefValue::Direct(oid) = &r.value {
+                return Some(oid);
+            }
+        }
+        None
+    });
+    consumer_inventory_at(port, repo, from_commit, hint)
+}
+fn consumer_inventory_at(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    from_commit: &Oid,
+    hint: Option<&Oid>,
+) -> Result<Inventory, Error> {
     let mut roots = vec![
         b".fgos/".to_vec(),
         b"docs/distillery/state/porting/".to_vec(),
         b"porting/".to_vec(),
     ];
-    // Published import names are discovery hints only. Every byte still comes
-    // from HEAD; a missing, stale or invalid import is never read as truth.
-    let refs = crate::refs::list(
-        port,
-        repo,
-        &[RefPrefix::parse("refs/fgos/").map_err(|e| invalid(e.to_string()))?],
-    )?;
-    for r in refs
-        .iter()
-        .filter(|r| r.name.as_str() == "refs/fgos/legacy")
-    {
-        if let RefValue::Direct(oid) = &r.value {
-            if !matches!(
-                crate::walk::header(port, repo, oid),
-                Ok(Seal::Legacy { .. })
-            ) {
-                continue;
-            }
+    // An import is a discovery hint only; all event bytes come from this HEAD.
+    if let Some(oid) = hint {
+        if matches!(
+            crate::walk::header(port, repo, oid),
+            Ok(Seal::Legacy { .. })
+        ) {
             if let Ok(entries) = all_entries(port, repo, oid) {
                 for e in entries {
                     if let Ok(path) = std::str::from_utf8(&e.path) {
@@ -81,9 +92,10 @@ fn consumer_inventory(port: &dyn Inspect, repo: &RepoHandle) -> Result<Inventory
     }
     roots.sort();
     roots.dedup();
-    inventory_roots(
+    inventory_roots_at(
         port,
         repo,
+        from_commit,
         &roots.iter().map(Vec::as_slice).collect::<Vec<_>>(),
     )
 }
@@ -92,16 +104,27 @@ fn inventory_roots(
     repo: &RepoHandle,
     roots: &[&[u8]],
 ) -> Result<Inventory, Error> {
-    let from_commit = match port.resolve_head(repo).map_err(git_error)? {
-        HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => commit,
-        HeadFact::Unborn { .. } => return Err(invalid("migration requires a committed HEAD")),
-    };
+    let head = port.resolve_head(repo).map_err(git_error)?;
+    inventory_roots_at(port, repo, committed_head(&head)?, roots)
+}
+fn committed_head(head: &HeadFact) -> Result<&Oid, Error> {
+    match head {
+        HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => Ok(commit),
+        HeadFact::Unborn { .. } => Err(invalid("migration requires a committed HEAD")),
+    }
+}
+fn inventory_roots_at(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    from_commit: &Oid,
+    roots: &[&[u8]],
+) -> Result<Inventory, Error> {
     let mut entries = Vec::new();
     for root in roots {
         let mut cursor = None;
         loop {
             let page = port
-                .list_tree(repo, &from_commit, root, cursor, 100_000)
+                .list_tree(repo, from_commit, root, cursor, 100_000)
                 .map_err(git_error)?;
             entries.extend(page.entries);
             if page.complete {
@@ -144,12 +167,12 @@ fn inventory_roots(
         }
         files.insert(
             path.into(),
-            blob(port, repo, &from_commit, &entry.path)?
+            blob(port, repo, from_commit, &entry.path)?
                 .ok_or_else(|| invalid("legacy file disappeared"))?,
         );
     }
     Ok(Inventory {
-        from_commit,
+        from_commit: from_commit.clone(),
         files,
         porting_log,
         migrated,
@@ -209,13 +232,17 @@ pub fn read_legacy_from_head(
     }
     Ok(result)
 }
-pub(crate) fn read_consumer_from_head(
+pub(crate) fn read_consumer_at(
     port: &dyn Inspect,
     repo: &RepoHandle,
     streams: &[StreamId],
+    head: &HeadFact,
+    hint: Option<&Oid>,
 ) -> Result<Vec<LegacyEvent>, Error> {
-    let authority = crate::fence::authority(port, repo)?;
-    let mut result = events(&consumer_inventory(port, &authority)?, streams)?;
+    let mut result = events(
+        &consumer_inventory_at(port, repo, committed_head(head)?, hint)?,
+        streams,
+    )?;
     for e in &mut result {
         if !e.provenance.file.starts_with("porting/") {
             e.provenance.file = format!(".fgos/{}", e.provenance.file);

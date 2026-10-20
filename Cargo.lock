@@ -321,6 +321,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-secrets"
+version = "0.2.0"
+dependencies = [
+ "libc",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "fgos-session-identity"
 version = "0.2.0"
 dependencies = [

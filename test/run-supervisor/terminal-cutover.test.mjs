@@ -38,7 +38,7 @@ test('a herdr-spawn seat runs as a terminal attempt: brief typed by the supervis
   const envelope = readJson(path.join(attemptDir, 'envelope.json'));
   assert.equal(envelope.mode, 'terminal');
   assert.equal(envelope.slot.key, envelope.attemptId);
-  assert.equal(envelope.terminal.retainFailedPaneMs, null, 'the configured retain window travels with the attempt (the default keeps a failed pane until a person closes it)');
+  assert.equal(envelope.terminal.retainFailedPaneMs, null, 'the configured retain window travels with the attempt (the default keeps a genuine crash pane until a person closes it)');
   assert.equal(envelope.agentProtocol.cli, 'claude');
   assert.deepEqual(envelope.steps.map((s) => s.stepId), ['settle-attempt', 'finalize-home', 'cleanup-trust', 'release-slot']);
   assert.equal(envelope.identity.writerId, `att-${envelope.attemptId}`);
@@ -119,7 +119,7 @@ test('a pane stopped on the provider\'s own limit screen settles as a provider l
   const { result } = run.answer();
   assert.equal(result.classification.failure.code, 'provider-limit', JSON.stringify(result.classification));
   assert.equal(result.classification.failure.family, 'provider');
-  assert.equal(readJson(path.join(project.attemptDir(), 'steps', 'release-slot.json')).detail.disposition, 'retain', 'the screen that says when it resets stays');
+  assert.equal(readJson(path.join(project.attemptDir(), 'steps', 'release-slot.json')).detail.disposition, 'close', 'the stopped worker output is captured');
 });
 
 test('an agent stopped on a trust prompt ends as blocked, not as a timeout, and the failure names the screen and the repair', { skip: noHost, timeout: 180_000 }, async () => {
@@ -133,7 +133,7 @@ test('an agent stopped on a trust prompt ends as blocked, not as a timeout, and 
   assert.equal(result.classification.outcome.category, 'blocked');
   assert.match(result.runnerNote.summary, /Back to Agent Command Center/);
   assert.match(result.runnerNote.summary, /grant trust for this project in the agent's own home/);
-  assert.equal(project.callsStarting('pane close').length, 0, 'the pane stays for the person');
+  assert.equal(project.callsStarting('pane close').length, 1, 'the stopped trust-prompt worker has captured output');
   assert.equal(project.callsStarting('tab create').length, 1, 'no second candidate was tried');
 });
 

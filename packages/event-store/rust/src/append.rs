@@ -141,8 +141,10 @@ pub(crate) fn prepare_stream(
     fs::create_dir_all(paths.closed()).map_err(io)?;
     if created {
         fs.sync_directory(&paths.closed()).map_err(io)?;
-        fs.sync_directory(&layout.root).map_err(io)?;
     }
+    // Existence is not durability: a predecessor may die after mkdir but before
+    // syncing the stream entry in the store root. Re-establish this before ack.
+    fs.sync_directory(&layout.root).map_err(io)?;
     // Also covers a predecessor killed after creating active but before dir sync.
     fs.sync_directory(&paths.root).map_err(io)?;
     Ok(paths)

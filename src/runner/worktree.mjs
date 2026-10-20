@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { StoreError } from '../state/store.mjs';
 import { createLockScope, HolderLockError, acquireSync } from '../holder-lock/index.mjs';
 import { addWorktreeSync } from './repo-locks.mjs';
@@ -65,7 +66,8 @@ function restoreCheckout(repo, worktree, target, { baseline, reapplyLocalDelta =
 export function resetDispatchWorktree(repo, worktree, target) { return restoreCheckout(repo, worktree, target, { discardLocalDelta: true }); }
 
 import { readWorktreeSetupCommands } from '../config/shared-config-file.mjs';
-import { statusPaths } from '../util/git-paths.mjs';
+import { statusPaths, nulPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
+import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
  * reuses the vocabulary declared in `recovery.mjs`'s `ERROR_CLASSES` (per
@@ -102,13 +104,14 @@ export function branchNameFor(id) {
  * (D2) — never a `node_modules` symlink from the host repo (D2's rejected
  * alternative: risks masking a real dependency mismatch when the
  * worktree's own `package.json` diverged from the host's installed set).
+ * Returns true when it installed, so a caller knows `node_modules` is its.
  */
 export function provisionDependencies(worktreePath) {
   const packageJsonPath = path.join(worktreePath, 'package.json');
-  if (!fs.existsSync(packageJsonPath)) return;
+  if (!fs.existsSync(packageJsonPath)) return false;
   const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
   const hasDeps = Object.keys(pkg.dependencies ?? {}).length > 0 || Object.keys(pkg.devDependencies ?? {}).length > 0;
-  if (!hasDeps) return;
+  if (!hasDeps) return false;
   const hasLockfile = fs.existsSync(path.join(worktreePath, 'package-lock.json'));
   // On Windows, npm is a .cmd shim, not a directly-executable PE binary --
   // execFileSync without a shell fails ENOENT before npm ever runs.
@@ -117,6 +120,7 @@ export function provisionDependencies(worktreePath) {
     stdio: 'ignore',
     shell: process.platform === 'win32',
   });
+  return true;
 }
 
 // Generous ceiling for one setup command (a cold compile can take minutes on
@@ -157,6 +161,140 @@ export function runWorktreeSetupCommands(worktreePath, repoRoot) {
 }
 
 
+// The provisioning record: what `provisionWorktree` placed in one checkout,
+// so `fgos worktree remove` can take back exactly those bytes before the Git
+// port's clean check, and nothing else. One file per checkout, keyed by its
+// real path, under the machine state root; Git never reads it.
+const PROVISIONING_CONTRACT = 'worktree-provisioning.v1';
+
+function provisioningRecordPath(stateRoot, worktreePath) {
+  const key = createHash('sha256').update(realpathOrSelf(worktreePath)).digest('hex');
+  return path.join(stateRoot, 'worktree-provisioning', `${key}.json`);
+}
+
+// Untracked and ignored paths, a wholly untracked directory collapsed to `dir/`.
+function untrackedEntries(worktreePath) {
+  return nulPaths(execFileSync('git', ['ls-files', '--others', '--directory', '-z'], {
+    cwd: worktreePath, encoding: 'utf8', shell: false, maxBuffer: GIT_LIST_MAX_BUFFER,
+  }));
+}
+
+function fileDigest(file) {
+  return createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+}
+
+// Record `rel` and everything under it: a file by its digest, a symlink by its
+// target. Any other kind is left unrecorded, so remove leaves it in place.
+function recordPlaced(worktreePath, rel, placed) {
+  const abs = path.join(worktreePath, rel);
+  const st = fs.lstatSync(abs);
+  if (st.isSymbolicLink()) placed.push({ path: rel, kind: 'symlink', target: fs.readlinkSync(abs) });
+  else if (st.isFile()) placed.push({ path: rel, kind: 'file', sha256: fileDigest(abs) });
+  else if (st.isDirectory()) {
+    placed.push({ path: rel, kind: 'dir' });
+    for (const name of fs.readdirSync(abs).sort()) recordPlaced(worktreePath, path.join(rel, name), placed);
+  }
+}
+
+/**
+ * Provision a checkout the Git port has just created (dependency install,
+ * then the project's `worktreeSetup.commands`) and record what that placed:
+ * every new untracked or ignored path, a file with its content digest, and
+ * the dependency directory `provisionDependencies` installed declared as
+ * regenerable. The record is written even when a step fails, so a half
+ * provisioned checkout can still be removed.
+ */
+export function provisionWorktree(worktreePath, repoRoot, stateRoot) {
+  const before = new Set(untrackedEntries(worktreePath));
+  const regenerable = [];
+  try {
+    if (provisionDependencies(worktreePath)) regenerable.push('node_modules');
+    runWorktreeSetupCommands(worktreePath, repoRoot);
+  } finally {
+    const placed = [];
+    for (const entry of untrackedEntries(worktreePath)) {
+      const rel = entry.replace(/\/$/, '');
+      if (!before.has(entry) && !regenerable.includes(rel)) recordPlaced(worktreePath, rel, placed);
+    }
+    const { dev, ino } = fs.statSync(worktreePath);
+    const file = provisioningRecordPath(stateRoot, worktreePath);
+    const record = { contract: PROVISIONING_CONTRACT, worktree: realpathOrSelf(worktreePath), identity: { dev, ino }, regenerable, placed };
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    const tmp = `${file}.${uniqueTmpTag()}.tmp`;
+    fs.writeFileSync(tmp, `${JSON.stringify(record, null, 2)}\n`);
+    fs.renameSync(tmp, file);
+  }
+}
+
+function readProvisioningRecord(file, worktreePath) {
+  let record;
+  try { record = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
+  const { dev, ino } = fs.statSync(worktreePath);
+  // A record left by another directory once at this path is not this checkout's.
+  if (record?.contract !== PROVISIONING_CONTRACT || record.identity?.dev !== dev || record.identity?.ino !== ino) return null;
+  return record;
+}
+
+function stillAsPlaced(abs, entry) {
+  let st;
+  try { st = fs.lstatSync(abs); } catch { return false; }
+  if (entry.kind === 'symlink') return st.isSymbolicLink() && fs.readlinkSync(abs) === entry.target;
+  return entry.kind === 'file' && st.isFile() && fileDigest(abs) === entry.sha256;
+}
+
+/**
+ * Move what `provisionWorktree` placed out of `worktreePath`, into a sibling
+ * directory, so the Git port judges only the checkout's own bytes. The
+ * declared dependency directory moves whole; a copied file or symlink moves
+ * only while it still matches the record; a directory the record names is
+ * taken out once it is empty. A worker-edited copy, or any byte the record
+ * does not name, stays where it is and the port refuses on it.
+ * `restore()` puts everything back (the port refused); `discard()` deletes
+ * the moved bytes and the record (the port removed the checkout). Without a
+ * record for this checkout nothing moves.
+ */
+export function setProvisionedAside(stateRoot, worktreePath) {
+  const recordFile = provisioningRecordPath(stateRoot, worktreePath);
+  const record = readProvisioningRecord(recordFile, worktreePath);
+  const aside = path.join(path.dirname(worktreePath), `.${path.basename(worktreePath)}.provisioned-${uniqueTmpTag()}`);
+  const moved = [];
+  const emptied = [];
+  const restore = () => {
+    for (const rel of emptied.reverse()) fs.mkdirSync(path.join(worktreePath, rel), { recursive: true });
+    for (const rel of moved.reverse()) {
+      fs.mkdirSync(path.dirname(path.join(worktreePath, rel)), { recursive: true });
+      fs.renameSync(path.join(aside, rel), path.join(worktreePath, rel));
+    }
+    fs.rmSync(aside, { recursive: true, force: true });
+  };
+  if (!record) return { moved: 0, restore() {}, discard() {} };
+  const move = (rel) => {
+    fs.mkdirSync(path.dirname(path.join(aside, rel)), { recursive: true });
+    fs.renameSync(path.join(worktreePath, rel), path.join(aside, rel));
+    moved.push(rel);
+  };
+  try {
+    for (const rel of record.regenerable ?? []) if (fs.existsSync(path.join(worktreePath, rel))) move(rel);
+    for (const entry of record.placed ?? []) if (entry.kind !== 'dir' && stillAsPlaced(path.join(worktreePath, entry.path), entry)) move(entry.path);
+    const dirs = (record.placed ?? []).filter(e => e.kind === 'dir').map(e => e.path).sort((a, b) => b.length - a.length);
+    for (const rel of dirs) {
+      try { fs.rmdirSync(path.join(worktreePath, rel)); emptied.push(rel); } catch (err) {
+        if (err.code !== 'ENOENT' && err.code !== 'ENOTEMPTY' && err.code !== 'EEXIST') throw err;
+      }
+    }
+  } catch (err) {
+    restore();
+    throw err;
+  }
+  return {
+    moved: moved.length,
+    restore,
+    discard() {
+      fs.rmSync(aside, { recursive: true, force: true });
+      fs.rmSync(recordFile, { force: true });
+    },
+  };
+}
 
 // Same call as `git` above, but with git's own stderr swallowed rather than
 // inherited by this process. Only the two probe helpers below use it: both

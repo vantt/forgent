@@ -312,8 +312,13 @@ test('run-attempts-stuck: an attempt whose release was removed is named with the
   const res = checkRunAttemptsStuck(root);
   assert.equal(res.passed, false, res.message);
   assert.match(res.message, new RegExp(`runs/01 \\(the release that wrote it was removed \\(${gone} is gone\\)`));
-  assert.match(res.message, /restore that release directory, then run "fgos doctor --fix" again/);
+  assert.match(res.message, /restore them at those paths, then run "fgos doctor --fix" again/);
   assert.match(fixRunAttemptsStuck(root).message, /1 still open: .*the release that wrote it was removed/);
+
+  // A dev-door host lives in a checkout: the payload it names is gone with it, and both are named.
+  const checkout = path.join(scratch, 'removed-checkout');
+  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: HOST_BIN, payloadRoot: checkout }));
+  assert.match(checkRunAttemptsStuck(root).message, new RegExp(`\\(${path.join(checkout, 'src', 'run-supervisor', 'attempt-step.mjs')} is gone\\)`));
 
   // A release that is still there is not blamed: adopt's own reason stands.
   fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: HOST_BIN }));

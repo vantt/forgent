@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { ensureGitAddon, root } from '../helpers/git-addon.mjs';
+import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { createGitInspect } from '../../src/git/index.mjs';
 import { withStateTx } from '../../src/state/hot-lock.mjs';
 const built = ensureGitAddon();

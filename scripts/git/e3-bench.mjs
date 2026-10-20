@@ -138,8 +138,13 @@ async function idle() {
 async function census(args) {
   const { index, loader } = await loaders(args.descriptor);
   const mark = (label) => { try { fs.accessSync(`/nonexistent-e3-marker/${label}`); } catch {} };
-  bindSandbox(args.root);
-  const local = args.repo, remote = args.remote;
+  // This subprocess owns fresh fixture repositories too: --repo/--remote
+  // must never turn a raw legacy baseline into a write to a caller's repo.
+  const root = fs.mkdtempSync(path.join(args.state, 'e3-census-'));
+  bindSandbox(root);
+  const local = bareRepo(path.join(root, 'local.git'));
+  const remote = bareRepo(path.join(root, 'remote.git'));
+  git(['--git-dir', local, 'remote', 'add', 'origin', remote]);
   const port = index.createGitPublication({ stateRoot: args.state, repoPath: local, trustedMain: local, reference: 'refs/fgos/events/e3-census', writer: WRITER }, loader);
   const grant = { name: 'origin', pinnedUrl: remote };
   let tip = null;
@@ -585,7 +590,7 @@ async function run(args) {
   // Local transport push of one ref, with and without new objects.
   {
     const local = bareRepo(path.join(root, 'push-local.git'));
-    const remote = fs.realpathSync((git(['init', '-q', '--bare', path.join(root, 'push-remote.git')]), path.join(root, 'push-remote.git')));
+    const remote = bareRepo(path.join(root, 'push-remote.git'));
     git(['--git-dir', local, 'remote', 'add', 'origin', remote]);
     const reference = 'refs/fgos/events/e3-push';
     const port = open(local, reference);
@@ -614,11 +619,8 @@ async function run(args) {
 
   // Git subprocess count per operation (strace census in a separate process).
   {
-    const local = bareRepo(path.join(root, 'census-local.git'));
-    const remote = fs.realpathSync((git(['init', '-q', '--bare', path.join(root, 'census-remote.git')]), path.join(root, 'census-remote.git')));
-    git(['--git-dir', local, 'remote', 'add', 'origin', remote]);
     const log = path.join(root, 'census.strace');
-    execFileSync('strace', ['-f', '-qq', '-e', 'trace=execve,access,faccessat,faccessat2,fsync,fdatasync', '-o', log, process.execPath, SELF, 'census', '--descriptor', descriptor, '--state', state, '--root', root, '--repo', local, '--remote', remote], { stdio: 'inherit' });
+    execFileSync('strace', ['-f', '-qq', '-e', 'trace=execve,access,faccessat,faccessat2,fsync,fdatasync', '-o', log, process.execPath, SELF, 'census', '--descriptor', descriptor, '--state', state], { stdio: 'inherit' });
     const counts = {};
     let open = null;
     for (const line of fs.readFileSync(log, 'utf8').split('\n')) {

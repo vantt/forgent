@@ -97,6 +97,17 @@ test('placeFences tombstones every old file-lock path of the workspace, in both 
   assert.equal(fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).complete, true);
 });
 
+test('a run made by the run supervisor after the cutover needs no recovery tombstone', () => {
+  const ws = makeWorkspace('supervisor-run');
+  const later = path.join(ws.fgosDir, 'assignments', 'a2', 'runs', '01');
+  fs.mkdirSync(later, { recursive: true });
+  fs.writeFileSync(path.join(later, 'run.json'), JSON.stringify({ runId: 'run-2', assignmentId: 'a2' }));
+  fs.writeFileSync(path.join(later, 'attempt.lock'), '');
+  const recovery = fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot })
+    .filter((t) => t.lock === 'recovery').map((t) => t.path);
+  assert.deepEqual(recovery, [path.join(ws.runDir, '.recovery.lock')]);
+});
+
 test('every real v1 acquire fails loudly against the tombstones instead of taking the lock', (t) => {
   const ws = makeWorkspace('v1-acquires');
   assert.equal(placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).ok, true);

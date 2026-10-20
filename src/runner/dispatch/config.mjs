@@ -1563,15 +1563,14 @@ function validateRigorToTierShape(rigorToTier, label) {
  * `MODEL_POLICY_TIERS` (valid per `validateModelPoliciesShape` above) simply
  * answers `false` for the tiers it omits. Available to a future
  * Cohort-Planner-facing caller that needs to exclude an executor for an
- * activity's tier floor without triggering `resolveTierModel`'s throw, so a
- * cell declares the tier only when one of its entries is served by the
- * family's own pool, the entry `resolveTierModel` returns.
+ * activity's tier floor without triggering `resolveTierModel`'s throw. A cell
+ * declares the tier when it parses to at least one entry, served by any pool.
  */
 export function supportsPolicyTier(cfg, providerModel, policyTier) {
   const cell = cfg?.modelPolicies?.[providerModel]?.[policyTier];
   if (cell === undefined) return false;
   try {
-    return parseTierCell(cell, providerModel).some((entry) => entry.pool === providerModel);
+    return parseTierCell(cell, providerModel).length > 0;
   } catch {
     return false;
   }

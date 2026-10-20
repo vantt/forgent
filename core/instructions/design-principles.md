@@ -42,4 +42,15 @@ check exists it is named, otherwise the reviewer checks it.
 7. **One authority, one source of truth.** Each component owns exactly one kind
    of decision. Code and its documentation agree at one source; generated text
    is regenerated from its source, never copied by hand.
+8. **One proof.** A behaviour, not a line, is what a test preserves. Each
+   behaviour has one owning proof at the lowest layer that can observe it, and
+   each boundary above it (Node route over a Rust port, CLI over a use case, e2e
+   over CLI) has at most one wiring proof. A new test names its behaviour in plain
+   words in its title, says why no existing test proves it, and lands in the file
+   that owns that module unless the module or boundary is new. Weakening means
+   asserting less about a behaviour that still exists, and it is forbidden;
+   retiring a proof whose behaviour is gone, or whose cases another named test
+   owns, and moving or merging proofs are not weakening. A change that retires a
+   test names the test that now owns the behaviour, or says the behaviour was
+   removed. Reports never count "all N assertion lines kept" as success.
 
