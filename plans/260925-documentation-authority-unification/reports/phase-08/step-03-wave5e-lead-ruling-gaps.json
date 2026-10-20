@@ -1,0 +1,23 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "rule": "L12-50; no checker/probe/resolver edit",
+  "open": [
+    {
+      "set": "batch-089",
+      "file": "docs/platform/agent-coordination/spec.md",
+      "edgeId": "maps-j-06547",
+      "sourceExpression": "[docs/specs/runner.md](../../specs/runner.md)",
+      "target": "docs/platform/runner/spec.md",
+      "question": {
+        "whatIsHappening": "Complete root-path label and relative link destination identify the same retiring runner source; a correct cutover patch must update both.",
+        "cause": "The unchanged checker form() only follows labels equal to raw destination or its basename. It cannot express this existing root-label/relative-destination combination without retaining a stale label.",
+        "optionsWithCost": [
+          "Extend canonical form() and add a focused negative/positive probe under Lead custody; then reauthor this edge (checker/probe change outside Doer scope).",
+          "Keep this edge parked for complete description/link rewrite at Phase 9; leaves one unresolved author set until the rewrite is reviewed."
+        ],
+        "recommendation": "Lead extends the existing form door with a regression probe; then reauthor the single complete link and re-review its file.",
+        "scopeOfAnswer": "This mixed-coordinate path-text label case only; no consumer edit, no new alias or authority flip; Doer leaves checker/probes/resolver unchanged."
+      }
+    }
+  ]
+}

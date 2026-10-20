@@ -1,0 +1,3441 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "method": "Complete immutable source traversal, inventory binding and unchanged supplemental scan; source-role decisions are author judgments pending independent review.",
+  "files": [
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 131125,
+      "lines": 493,
+      "sha256": "6b314f37f7a87aac6f37ce3be3a2229567313b4c87969fc3968e0d32390284bf",
+      "inventoryEdges": 469,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3d3e472f98e9ff7c747e96f8e7c32950e6ff0b4ce6fcffbf2f9e96ef4690b3bd"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "327a096a2ed6497078ac4acab97fd38e4f8431f239a7558c78a0b18faf227a02"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "268c711390bfa94cc507b435b1d493aa1f646b2f2948d195160f86df9ccc1805"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "018a280d63626159af6394302d6d76f4169ba2766dd71f1a8e66400cb7c709b6"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "414f527170cccbba707187baffdc1dcb0726ba33b784f30ff668dde584794960"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "29d54e450ad918533501eeed6bbb1c9ea2c7f318b5d337488db4cbd8087f6d92"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 493,
+          "sha256": "c3bf74f9ab5bedfdf1d10dfd305e3bce1055744e8b0856d1d7fe5d287185d1c5"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2642,
+      "lines": 53,
+      "sha256": "ed1dce37107235dd5a5b5fb18664601e0227d7be43acfaf5cdea331c8e9a72f1",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 53,
+          "sha256": "4addea965cb4267ec5f99584e469cb6674bdda0b6b8ce9272820b39e5e70cdf3"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 12385,
+      "lines": 185,
+      "sha256": "875a2f7fe2989d987c980470959b1e64219b5a455f9db401db98928241a1f865",
+      "inventoryEdges": 18,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2984507c78e5036e2c90a8c02df2601bcdeb58e9c15542acdffdab6391eb541e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "588c81cbb6d80349cbcfe2581b75d1aee0b879f1b55a38e5269c05d11f35f3ec"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 185,
+          "sha256": "7954f63dd1aac3848fa57aeb7e8eb1e63cb7d9632503e4d7fc163341094c7628"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 17824,
+      "lines": 314,
+      "sha256": "c470ced668aab375c2b846672efce763561beb71f13867607b4de87b9b740ccc",
+      "inventoryEdges": 14,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "53fde4513b4904305a2f915a41c48b1898588ee1e9d59570d5873cb3adef9ddd"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "862597417080572f8b3e1715225841ea340a7af501c256e2c77c4e1f1dc4e541"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "953cf5ca54463b057b71ded4d1fc561a30e898cea9e857c3166382a11299ff24"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 314,
+          "sha256": "c12220bef31e10dcbfce5ea73ddc146f19efba31810c55b3e440876b0d8f9735"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8035,
+      "lines": 190,
+      "sha256": "5e9fa05c1f8d9b689985685240a6c17375fd575b9978fb29b9391460fdfd2b99",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "0c99ffa9519ae07fc54af4c4ec5349aefb38a316860cc077b749ec3e0e510e61"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "bc7e6c0560af953348f1a5244d190f7aa22b426e10c7d2da7155296e05612854"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 190,
+          "sha256": "ad40de9f83a634679a75aa6fd3e7ecc3bb3372adaab6b187456d9a182cd5a42e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 21935,
+      "lines": 358,
+      "sha256": "44583d97aa123e556e59e1bf2df83c010bcd17943c7783b18008ce8c08815c56",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "24549acd457403c8f233a838c13767c2e20f3ccc1371e5011c42394040052a47"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "555230edce0f5589a8727c4b17de8b1e16b4954ce011404aad10cb0b54d796c8"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "5e431b84d4845fb5253c711d2e846529cbf3411fd2a62eb9c27706793ac9c2f9"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "bbbe9f339bed743f2df94b69fdb8369f081b92f71c22f3d63f7599caf7d7f68f"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 358,
+          "sha256": "52ff63449c53179ef38c63553a21761073a7e9630e0f9e823a2d4b1ad8e809db"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9372,
+      "lines": 178,
+      "sha256": "337a8434c51b1e72aa0944e01c9db3daae5da16ca2ccd1995e4decfa148a99e9",
+      "inventoryEdges": 9,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b116ebebe7fff1f8a1c83ccb1324241743a6c9c28a85c5814df12a581323cb6c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e8777d3056de85570909a8300e8229570f7e29db70c2991f025db447c467842a"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 178,
+          "sha256": "e0f5854fb5b728e88d48dd97f7777e1624fc01b2b9722eb11fa1afe4b4cbeb2f"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 25272,
+      "lines": 434,
+      "sha256": "05b1c7ceba3a89083d8fc1dd3565db2fcd27ce9ed1a588b5653a41bcb0369ba7",
+      "inventoryEdges": 15,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "656c406ebc8f80b03ec91a8e67cc891823a238076b96b717d93ca7ed9bdc44fe"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "9b8282b13a6932bf4839d2ad5f859ebdf71e416c94c32506db2898782488dd63"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "dbfb65f2cff2d200817a502be8899b3cc96ad7c16dff8940a238744a447340ce"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "b1ab356c2d4ef2b31f7173b1e66eb615326cfb3c4ef5422e59f92f064a3dd385"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "b0adeb0c2c748527c3484ebace1b1ae3d5f895cb4bcf48ec155a6d06ff0fcd0e"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 434,
+          "sha256": "551f98821b40b4ac4e05ac8d10fe95fc52c014f4e094016c53e592ecf71ae7e7"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4199,
+      "lines": 98,
+      "sha256": "cd4f9064ace300da4a752c04c3a091eba598dba0b8e1d2d9050383f77877b616",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3739afb277ba8d43512284a01fb835b76a97b5c70fc4ec3ee971ee8a130fddcb"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 98,
+          "sha256": "8727fa10b4eb0143accfa9d6981add986d57e3b7f8d4001c2b6ae9760f640e5c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15791,
+      "lines": 270,
+      "sha256": "94d0bd5ebe83755e5a14422e455c20e6c9dab09f5ced70f0e6c34d46b105d317",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "52f82f7cb18f145a0708edb56eda8bc692245ddb6a91e2219e100ff6e4af2986"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6a73659bf313a545569278d6fbad73fa43c468031dc83c86c513831d0de6e3e2"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "1768d79e7b856cdc7a98cbfd8ef35d937dad921d587dae33a58a4d5ff3fb4b14"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 270,
+          "sha256": "75ab27db79fc53a5c9046841c021b4e277baed3e57051f673669eb5544934b6b"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 17806,
+      "lines": 231,
+      "sha256": "dd12830b9f191b0182b16daa4942bec55b41593d1cfe8061792ecca5f42d019f",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e9778dd9943f0999e377b8ddfc003a880b7ffc90bce294bf677457c1cb3dca71"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e1dd600a237e91e8d1513516dda9a5e88ba8ae83136b3363794566c357894afb"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 231,
+          "sha256": "8829ec71131054820fe376b101ccf729e86d3f37e8bfed32d4e45eb9b2e15cbf"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8545,
+      "lines": 182,
+      "sha256": "138c4eefc7fdb7d702586d2951f11aeed7ae4ba1c0955bfd895922185c3e2d92",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "262e6b0e0c9a5ec4a6e64ee5cc04d44d38f29eaa5a7ab63020d4be276b333f81"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "fd4daad803c6f5f1b0f4bd136a9fb63019610d86bbdf2fce6c3825add38cc724"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 182,
+          "sha256": "d13cd8141c64eb68098b9bd16719284e5e59ea7024f2af350091187ab3298cbc"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 19393,
+      "lines": 319,
+      "sha256": "b18256aa248efdcb884ca4df66b25da2abc63b9d1c93a2e06a6d7dccfd52fc59",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "aa19a01647120029e2231bb38220a3a12fbeedd5e28d1193491c1e3f00d468ab"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "d1d1240fd07f1a11ef3ec884a38523710aa5bf9efca73371c539d3febed2465b"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "c8a0d5c56039311187fecf80c4783110363bc56bf95c39400515c5c275216714"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 319,
+          "sha256": "300b2b27af124214ade0e7392961905fc247573c12d4141dc97613e06456f3f0"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5439,
+      "lines": 119,
+      "sha256": "c6cfad4c026309f70f772452d657dd1cb748929abb83dedfbdaa8f9afc6a9d50",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "db513dace75c08e11c7750b2c2f49800b0a186137a881e4177205aae9f9f82dc"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 119,
+          "sha256": "0d761d014746a480fd4a96752dbd30fe787117a6cc5683128983ef47857d11ff"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 27397,
+      "lines": 377,
+      "sha256": "a1ae971fb4d7cf344269017c6679a28dc99dfe321946fce5bc565ef8e25a5f09",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "fe3b1daed809548cfe32f50d23cac71295e1d500be419e040bcd4a47b49d3ca3"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6c660d58e41f061ab75f14447c61e5bc7993e3ad4a0640752cfd0fc7bfe2a8ef"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "f94158ca67113e42a2b5079454b23d1c1b359fe3a351d40412822215fcf72542"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "15b43cb28f14b5836ce83b073c34fe0c91561a143b71ed958b6a41b843395f81"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 377,
+          "sha256": "501b933913b2bfdb475a6e1b382bdb429fa070ec1e3bfab43337ddcdde916674"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7402,
+      "lines": 161,
+      "sha256": "36e3264a2dc695a6ee00f89df32f1542624b5c4c01272597726df0e070b127d3",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3515c760b9273640d8c2971c02f23049b08dcb1172f357c3898797a620e67643"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "2f9472708918e689222fa671e04abbc5bbf4b1b6711727613861eb39169bc5f2"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 161,
+          "sha256": "53e86e10d9d3f1f7ff63f93d2cfa5f9cadfe7b08ac161795bbabf0acb1d8a625"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7936,
+      "lines": 163,
+      "sha256": "11c25a2b3f26acd7d04b6debb29df9684fe53d61fa48dc13359fa50c86a8688d",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "67fef39fae5047af24cff567b217cae8672db2d97d12f5dfa7808cac5e66e189"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "c001db8c2c0ac18c3b7c21fdfbca4f7a928d09e1cb8cb2721d34b1757243df41"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 163,
+          "sha256": "8d46fc44d050991cc04e681ee61ca970f86a6c406aea1c45d08fdf39bc69c6aa"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6217,
+      "lines": 128,
+      "sha256": "3a9a96dc3be9ea7d8818ced5870d9289ffa28299be93e5d19855a6ae3030111a",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2053b2ed61ad7851564c856a46fdb0cb45e00a7af124f4eebbd17f7478b64a0b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 128,
+          "sha256": "ab7e4a1e5a6a9a13e1b98782468c64d051bd2cc3b58c050b0e1aaee2fb2e80e4"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 21707,
+      "lines": 380,
+      "sha256": "8693fefc4020ecee41bd8e37384f37049cbc33e555952ae9a97090b4535b502b",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a26d4a2420cb63d013561214de6f36e38451fadcdf8a0b968b474198b440e068"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "7d391de6b229071bfc680aaa6349933d3100dac1ded3f8928ac13a01ada8443b"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "a8a1d3ca676b557f19276ec2f73c221d4fe03473f7c2747a3c5eea1c6af92339"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "7b159ab6f3a0b8c954e9a36a22130977b24602e008b61109075d9078e91b3a88"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 380,
+          "sha256": "ecb0619df074bf56b6b42bb43362b08ba6f70e9522705a30b0a57d9fc76f3f14"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 86106,
+      "lines": 1273,
+      "sha256": "268af8311d9e1f0dc91579d75ba43174395362e5f33346a3911524cb00229064",
+      "inventoryEdges": 10,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3ef4781e889fa77d037d8bd1af79f19f640a29d675f7152e2fab329a6bf7890e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "cb7cb7fe9a6bd14c8c37d080893c66209e3fcba346b158f6866d4b992e9d9697"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "598cdb168cb7caa9332b7cef52e7b16afac21c0d9e4ce6691190d5aabd87930f"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "4624fa65a18f7d0b851db517141534c1c3bdcd247598652b118ab1e0341160ae"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "9ea9c93ab7c8f1d8e4538fbab67893eb186fc14c3f430cc1a7c0c753e246bdad"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "5c591ca488dedd084bafd245a56fda735bdb93d2429180177618e754eeeb12f7"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "b34a7e2ae8b4dd13b75b993a8ad43273dcdd93bb9f97c1196fa6d18357c08a3b"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "5f7b1e135915c3866e7d825c2d1a8ab408289f511726fab6d9313be81d0e4136"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "6c8ba2cf588a45245c64546837648c8ca1ccc7ff39f404d4a8439248d0a6e93e"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "a625d4712968c627a5531cc482065f01ae7a363867bc6bfcc655e3f9487e05c5"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "ef098b178258f1d62f7de99b96ef85e86d626e3090ad0423978d26d96089cc4c"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "ee2ed24a53389155b2d0a6b0dcf0da809d250efa8285090bbb8b077e864669ee"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "7bc96620c07fbcba8ee087dccff67de6ccbe429a650940966810c53a63d731c2"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "45a619f31ec0798bf66b6f06908c3c0d062d778a0f6ac113d6c4640d6c611bfb"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "39d3618073c0a9eb4c13ddd1cd1ea6b57e93abd1d3aa2c4a927ac1f0b1257b7d"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1273,
+          "sha256": "803e17e27bdaed49e40c28d443e78cb3d6735d4bb532863def4980ffa5ed1adc"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 46499,
+      "lines": 766,
+      "sha256": "e005edcfa74d8745286a261247ee5ab09193e34c90a3ef3cc3cd51a27e94378a",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "bff92a2c0187cb80c3fa5bb121f7e20ae28e92b820a09dcd46b3e06ffff59227"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "62c4e9c42f9a325695abf73ad57ae499a30d5c5ee4a4a9ab0e619440c57e0cdf"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "c8e7430ba272e6479abe1e8cb331bbcdbcc403e800debd8e0d4c9fd004c73346"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "3534f6c70b07ba7cbeb471e646ce5d74e5cc57f0c86aedadc2079c29a3712cc1"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "d284b4ac50503fa85c0a2c33a25b4b31027ef8f7f3544aa9a2f816e2e5f14ef6"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "47ae2f2a25429547c5aadeae72ee238a6256e04d6d47da175617b91d26b67655"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "9c591755a13427390328f7b2ac48ca7bbf4ebfe9c5a442d5f89475496180299c"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "13a7f817d2d9e386beeeb9ecb5d3e3e7f496b6363c010212b2f6b529c2c98622"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "35b7a42288728982103968a70905d0932edea69caa0866d1f27337e094cac81d"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 766,
+          "sha256": "1ade9956420c02964550379f65fa84af2b362682486e55a41d9f258e321f9059"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5401,
+      "lines": 131,
+      "sha256": "26ce4d27a2f8b90f65797587b7f43858197bb65966a9acba72e9dd090c5852d0",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "c4d8a2cf37a1d5c7f0e47123be615bd6821726067ba11d7a7c91157051e1bb0c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 131,
+          "sha256": "471a81218734100ffbc56dd58a59dc00402b051114e1c8152f9e505ffcf80e7b"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3547,
+      "lines": 75,
+      "sha256": "9b2060aaa38a81f3af5667dd0322a82b1236932cae1750901cbf9aa19510d365",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 75,
+          "sha256": "27dd4eb36884ba445c77378067d56dc1910e8b7c92e06c31d42b55459c136bab"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3447,
+      "lines": 72,
+      "sha256": "05d0d9904b1585e51ad9e68d08222dbccaeb17a6c33ae82ee586c5a8c5076a40",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 72,
+          "sha256": "270c5890f428c61e0ed8a8cba260c28d15000c9601746dded6a276f9df7a164c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3439,
+      "lines": 74,
+      "sha256": "641e53d699bed08b8bc1a2560d34782af56d6a6f06ffd223bf03651cb18bd89a",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 74,
+          "sha256": "b434a679968700f8ca0df6adc594ef6734584e28d242b78de773cfd24bac108c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3289,
+      "lines": 72,
+      "sha256": "9b6a2a82e9ef0f03b398b920806da34590518285669fe5035f6fe6370d899dfe",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 72,
+          "sha256": "6f781fcbbe88385cef603b66d7036ce34b8d481906de8d10ed1ebc8620a1f71f"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3325,
+      "lines": 72,
+      "sha256": "7cabdda6aa024a58c620dc0db7aba105f42e066df52cdece07a48e0e4b3944ce",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 72,
+          "sha256": "73b0f31c719ce5d1e5b2848c0403b118c777961d8e9bbe0e6d17217113c718df"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7390,
+      "lines": 127,
+      "sha256": "c120616f2ef08d3436082fce5723096abc10a8b0139fd05d4831c5f3b8d3e786",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a396d44ca8c308bc13142f86201c911975006e293421871684206dd7957cf7cf"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 127,
+          "sha256": "212e89398a07c7530a9430fbea968d6da5a7ed3456eead765ef904e73aef9a43"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6298,
+      "lines": 109,
+      "sha256": "378ddfb0b9ee7ac7fb1ae64bf78132657a62a215983ac81fea89b27b0144925a",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "18a473c403f017405250cbf60ce929fbce0c242c7bc18a279fdb6575fa3e04de"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 109,
+          "sha256": "43955e931374b69e6386b51d09bc0faeadc46ac6a2b1aa4e1b96c23e3277e5ac"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 12398,
+      "lines": 192,
+      "sha256": "5993832e16b9f9c083c70ab559ded77ee40611699900a8501048956a8d673ee2",
+      "inventoryEdges": 9,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8e674302925b4bc2927b6656d116655e72d3e2578f4ab19f5f31df50ee1b83b9"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "d64c6a927c7e561551ecf2fa0c3f41793a8aff9654f35f6a873430592cd8efb6"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 192,
+          "sha256": "9ca6a160ceff04dc572a82f84626b12d15241d15f1eb185c1d2d6a5a62ad8e50"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 11543,
+      "lines": 181,
+      "sha256": "5e24133ed6af0fd697eceeec9f89314343f53e1b9d4c9ee14b848f6e47c531e8",
+      "inventoryEdges": 9,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "c02623b26f529c0eacfe45a716feb443160eeb0955f09b9d58b35bbf44df7679"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "60c409430e910bc84b727449de9963666c72c68171493640f4560a5c0065d77f"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 181,
+          "sha256": "3e5600d738612dc4a016c84265f0588b64bb626e914bd9bc7e2fd4429f9f8d39"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9583,
+      "lines": 155,
+      "sha256": "83b15457c3df4736e1f8599311713d7edc1845de2e15b9b6cc6348370d5d7cf3",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6a1d38f493532f69db691e8d4438f22e4446ac7fa09bb05463360c1112b001f3"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 155,
+          "sha256": "46d4a31d6befd01a2dc9818dcb7dae978265577d9d7e7c269264b622ed946e7a"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7700,
+      "lines": 142,
+      "sha256": "e10f823de2e7971378e617bdd8eecc2a5603bb064dbbac994355f41d1693bc46",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "cc8ac246665faba56a9ec06b3abb8f9e9eb642d596cd1d140b586aac5c3578e5"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 142,
+          "sha256": "1e99cf549965e36a4164fa8eeab3f712ee5b2f39db03ac29e8fc553613fb2a05"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 33688,
+      "lines": 450,
+      "sha256": "68caae1d33be3dc6f94375bdf3aa25e8aee90ce46b00975e3559f44224faa082",
+      "inventoryEdges": 22,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e1be7745e4c45442dd6a9146952bc0cbf358379cc4c205a108053b282fd1aa2c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "f95e60a59dbc49859e8a6ea00946094a069193e642f96661770d2abcfaf789c3"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "eed36ae418f94d21675bb2b026da2224f3b67b95f9f02926aeee28aaa0d0a4a0"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "193fc166603f7527e6a7287a9d26296e7f0669f221e5428066f4e50d4f4c5f94"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "95bf1f394efecc50c883679d18dff76f9737b02d40cf9223b3f9267906e069e9"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 450,
+          "sha256": "b72fb2ae5999eaf6850789c3745268046a4703641f666f527d9ee97b8d1794bd"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 41088,
+      "lines": 749,
+      "sha256": "8dd0dca9b7fa9fe292617af44f7db4f83a841bc3a0e6b1394a0224e1bab6eb07",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "602791f4f4831295587822f071ea16213cb8a344e4bc235136cfbe17cc91af94"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "1be792874e703159cd3eceb309a0331f2aa8e353509dc3008ac697ea5d16c0d3"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "b00bc8482e7c13b66764c77c7dbd7c2269d08ac22e79fb471905ad3c82cabc25"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "42e485d71c0078669096dbc1c484be308c74530fce03db7aa29954d3891563dd"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "e71ac0aa4d71d37a9e167e8b28d91d9997224389fd8f17dccc9a6b58d181bcd9"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "7e9312933cbc71ff15b86e1a113a4e83cf313aa5bb4eded6f25b6cce567a4f48"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "97c7e76e2809c7ab53c3e26fe2a286706257a91458bb614fde345a12db8b76d0"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "d2d72b775a0b5d07517e22264d336b42dacfb4cb5bb22ba19f7c6ca9252a482e"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "bf27242752873ab1701092daefa3923303b7fe75d347799c9c5ea7cff037c345"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 749,
+          "sha256": "9305cf20fe2a1e8338d753a6eff409aa6682fd03a04493f7a3a62efa5e5835a9"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 42264,
+      "lines": 1005,
+      "sha256": "d272fe276db3a6b29828803f5b59caa32bc0ea4ba8039bfbce18edfcb66fdf31",
+      "inventoryEdges": 31,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7f4eb40a41521ac34c8659cc2647fb269e0bf8df69283389a4e4e66cf73c2c73"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "0ae66128d74e87e866852eceb3a7553f097cd0495bc718c63d332b6b648265b9"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "67430ba8ec8f6419259197f77a5d4f62f906333aa4e1c1cd86befa2f784f3cf1"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "4956da7e1d46ae4036fc2c2458cbe0445982dca802ce0b1841c9db46a7bbca4c"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "fd427c61ff5a7aa67b7ff0fadedfef23e8750533e6ff157ec4a2a96f67b54610"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "986e1a5888ab4586e614072e15d809f1d2c988ad0b19298803be6ac4dddc1efc"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "62055abc93cf66a325aa17db30aa1c52b9d1b9eb51410aedf4e136f18dc2f819"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "c87c7a38215b191d5208a96bf53eb885e57dc0b43e7a7bdeca5be75fd4837a7b"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "e6b57498d98c39553c62d28fdb11ef32bee20a2fe162f922399a166f69b46476"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "2563f9e5b864dc0954e57cc969ea69bff1501e50bdd17de56c0a8af17aae7295"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "b80fb07c0817c93ea28637d2f614098d63df0e2865273dcb0c4d8e19d62066c8"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "3694f96e4946155846a030da16833a38c431e7f759a341b191fab3f15d8d4dff"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1005,
+          "sha256": "309c3f791b6327ffa5fb6bea864648ee74f502b37c3c18d0ac4a05502e239a01"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5856,
+      "lines": 93,
+      "sha256": "8114708dd784265bb50d7daf8093bb550bb4ff55f9bb49e1dd1b6a80cab2384c",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d1f11353494736bd91e65ff0887b8f6053172bbf1f1e7b62f24930e3312f2be8"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 93,
+          "sha256": "6daa207f1408e2e91a8b03630a1fd8a157106a3891f0c191265ce0a1cf288612"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 44538,
+      "lines": 986,
+      "sha256": "e44cdc1e389036e9013dac23a8eee07cc696ae1e577cd90682a08476a1b1ca6f",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6951ee861bb4f40b3c58afc7e0891b2e1d4afe7d44e4fd43e751c98dfd8ddd3f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "4d3d60c7a3d3755e875129c3e004f35304d24421f9790c612f9cea11326fa3ef"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "8f6b5757a06e5734af5461930bb05d5cf684a228a495f26384028f46076858f7"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "a48a5481b0b99f9e8aa738774563ff7ef2a2f6f1af8d5af5dc8425128f739c3f"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "91f916f56f7f2d6a4f6999471049ee559c7c02347eb66b49dbb782a802b6e654"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "0c4cccb685981b5a380e4d3df14b98156f5cc22efc70d57ed7d0aca7c395d114"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "cc4b85f2e143320fb2cbad621ba4b18e2c07dc9112118f66c9799bb0eeca3567"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "93dda539a356c5f12288eb9d7620104221683576cade1f481686ed35f335d1a7"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "565bc6583af91e40f8f6af8f6548ca2f367de06fbd4eba3d88932d642556618f"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "284a2366db5d7bb94efb67c934df03f7b0c8c6bcd6cc307d2f4773a4c818998a"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "8ebb5cfe9d04dd584981ce805b070c5e53fecfb3776c8331ce14c84de68d5158"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "f29d1d13dab799ac5da0ea832a6da0f67abe89d82ceab001dd98e0ee0719e583"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 986,
+          "sha256": "7268509716fd9df63bc0500a04e55deeae940a8488c2ecae2e68baaecff96b68"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 77561,
+      "lines": 1793,
+      "sha256": "8b0629c39c72db62ea6bd1b7dc5bac2ee80436d5db7ee9ba72a078c56bb729a4",
+      "inventoryEdges": 17,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "5c48fb41249e47a85289b8524e085c0f1fb919fc6ef35731a21583da60b7df52"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "10912a7c581d687c3a1c860a8656ab4dd2074da8678aca24675e7bc4e1880dc6"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "b82017003c7f043afd9151848612873a08bf037bc580d906f6cff28c57928d2d"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "0af00450224687d85a754a82f78df6bdbfa889baa4312e68649ddb9e203eef80"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "dec9d12c90f67c603d339cf0bdff5a9320415569d7bf9f1020ec9c0a48ed79c0"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "5c5bc2d18e4406e9f69a58988327805b01784031571ac0b6b653d8aeaf46e81b"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "3a6a65666fa03f2204bd1472a948cd41d24745f443e006a425c27c8b3a984e38"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "3ad389e0f9e9074f85a3366da24247fae890b908d8e5e4e0076d5e3efbfd7a4d"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "701e4b78f948a2ca04c203e4b1dd7a00091c2a86786d2bea160c4e4a92e45df2"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "b10a27dc81419478d8e6f2ed0da39abea352851b512fab0e7522d5b037e82d33"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "f9828798cc1f1d03bd1f7f4773b433ca34f48c65e5ae07cdbaec8ef24f0ff821"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "2cfd5b89d0083ee5e6c09c19805b58db1365b8fc3777582be9c4c83a739ac8fd"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "b97da420582430d4ee32daeaf2da813d5b2c18e27dbac73755cf30be8dc2a957"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "b954d94bdffbf48348463c48a0804d1bd73ceb38f8bb1dfb719ed924d16bc4c7"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "61dc99808ee3a2a1b732d1bc47f310a3fe9b24836a90cd57b03dc050687bea93"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1280,
+          "sha256": "53c69b05e0caf5cd9e91069450d44fd29c7798b3f4f9ff8582c6fa5c1bc24bc6"
+        },
+        {
+          "firstLine": 1281,
+          "lastLine": 1360,
+          "sha256": "27b73f01b71c3569df105dab20b0947aa7831b1f9a3c7fac3a4275231a811ce2"
+        },
+        {
+          "firstLine": 1361,
+          "lastLine": 1440,
+          "sha256": "af2ed0e59d3a602d56a285ca6a9d24486e9679615ff51948b87387b7747fde74"
+        },
+        {
+          "firstLine": 1441,
+          "lastLine": 1520,
+          "sha256": "92e7a4a78ce159a589a0732e4f1e837b0d5fd74d596b0cc7c5bf1fb59f2ecd8d"
+        },
+        {
+          "firstLine": 1521,
+          "lastLine": 1600,
+          "sha256": "c1853b7d3e9bc43a84f468a5567f2e7d42ff7b0ddce619d38090050e794e372c"
+        },
+        {
+          "firstLine": 1601,
+          "lastLine": 1680,
+          "sha256": "22663a67c4a195a27fde721df45cb323082aff71ac9715fca0ad2958ff731877"
+        },
+        {
+          "firstLine": 1681,
+          "lastLine": 1760,
+          "sha256": "f353fcb05e0bb755317bfb294ac7f6d2d19141800f59b6d549d92f0fb426e7b0"
+        },
+        {
+          "firstLine": 1761,
+          "lastLine": 1793,
+          "sha256": "ed5cc5b9ae8c7771df9ed310a49259b2a059ceccd1d1391b650674ee2af7de07"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 16744,
+      "lines": 415,
+      "sha256": "7541a5f027caf273459b72b36fe635ebd7262db1a28a5dee4bf8fb8ac9b4df41",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1d9109ae6d4d6119d890596e27da9b566ed3d81435705bcdd44479a120d1af0e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "2523b4e84c9d6c191c3ea92ae93349143ee4e14e5a4991ec1157ae7d01f51bdb"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "ee5579f38b7409f68b4749a94701fa7d21b9fc3ff9d8ecf24744f754744188dd"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "c21de320d012e9063d6a321ce9e746ab1cdde9dc800e03e3845dc48d0e66f90e"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "09c45aa1c7e74244a8950ce1d1aa176dbd05548655cc999b291597bbba3f79bb"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 415,
+          "sha256": "d6f878afd07573990e85efe4d81e39a50f9952d9b1084e9fe2e3d4b1cf19ceeb"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 56626,
+      "lines": 1612,
+      "sha256": "150dc5f95a94a0e0addc9789bf196635ab90a26e1b61ecee33c128806850420c",
+      "inventoryEdges": 15,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7d3348859646c5fe4077e67da47afe7369ae2e5c4e46692518c21af3d855571e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6412b8a57d947285ca718573ed6af65f8fc1c52c4c9f4e3057a74e318161e6ca"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "c8d73366411c54736933b0f0cbe3e0445afbc8437961cb85b4b74285027e7f00"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "dfab1c3818476b6cd29109b6a20a4ce63e6a68fe960e82e6e8a727d1c93535ef"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "e0794a79309b7220c59630eb529909962dec122ee6597c0b4aaceb88718b9e8a"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "c00445ebeaf92466ef61ff4e873f5d6e271b650db5f4c151f7fdfa29face3b6f"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "17a368920ace92dcded04e63b0836e6006490fb60a56ef198381f94cafb33198"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "c129796e18451c4e58ed2859c7062f326faa21b2876a95a71f35af73cb5e0995"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "71fd4247685227e19bc05cb485688bb00b52f3c508033f99138b1c3b0a73a0b9"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "ed391b285712d0f3f2fbb8979259dde502c3593642bf7ef3d57203450954af4b"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "3b81b0c4b4ee4ab04d844437777b99e54db9f2dd676a07567e7199496385de3e"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "7974d486cb9a959ee8f37d4991dcd3b57b9ca7608cdd521e1a2fa957629dea5c"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "222eb42aa5ed5746c7cc894f1b392622f7511383da6409ea74f29ceaaf10e8f6"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "d436e6c62eccf7bee9fc310f22eb7712524f92c16c1444ccbccb65674cc3bcff"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "59567282d981a4d9f41c5f785e4cda4d964ce9ada9d8004b1e539d0d5ca259bf"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1280,
+          "sha256": "ad3a359b876716ddc549d56c5a0e9a180e88c550cc970d6f30d6b37a10d00627"
+        },
+        {
+          "firstLine": 1281,
+          "lastLine": 1360,
+          "sha256": "0579619b48a8b1418bb5f3210f0a533f65aa89672d25d08ade085e06bd8b5ad1"
+        },
+        {
+          "firstLine": 1361,
+          "lastLine": 1440,
+          "sha256": "8b7ddbd40f281d0b4d6ad4073f07f2834dedcb6ecfd7acc72a9ef3b8e5dbd8cc"
+        },
+        {
+          "firstLine": 1441,
+          "lastLine": 1520,
+          "sha256": "d12d481f163880c21e10dd2b58e2677e798bbe096c085f084c0139594cdf574e"
+        },
+        {
+          "firstLine": 1521,
+          "lastLine": 1600,
+          "sha256": "13c04d2d0dc4caf69d1f21172123f47b25977f39d9f1393ffc11fea98e8fafb1"
+        },
+        {
+          "firstLine": 1601,
+          "lastLine": 1612,
+          "sha256": "81e50da08b336c8d3072444364a5051333dc5bfc42189d8400eee758c17679a4"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 30939,
+      "lines": 855,
+      "sha256": "8a38625d069995729408e380fbb13b94a28c1fb7b048e3b4d43c7f6bc9044e64",
+      "inventoryEdges": 13,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4a19ad474b7e740b7ccf257126b51368486fca1bde8cf62ff8e9ade2a2d5d5c4"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "0207d5d83a9d499a28295ef518b0edcac946189ee6d6d1208d928169e9f5a7dc"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "ad6f3c116e9c2b8cd14c03bd846d2f2f15eff27626649eb65df10bd4021b671a"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "0fd74f47957305dd459d086f0784b62762b91de1315181ee38f61c6b08832a4c"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "84fe4a23f4a705e49ef1d215aa7a372cf2110539282f9db12182fd514564d58e"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "2ed9de2702e526017c9650f3bb801cf726dcdd29594dd5e35cba865519008240"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "1116bb657250bc62640dc1103091684eb6a2555615b76e31afe8a77da0b1cb32"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "fe66fc868166d9c2b1bfc273c22d3df748d54f30a0d03e981d4bc0edb92259de"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "c092bf089fcac1ba7b8a7e7b08a55a549a9988d0d562fd7b68554fcf53cbd8bc"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "bf64f033899e44652067da4862fde5f907ebde91f179c63347529a6e96f575f6"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 855,
+          "sha256": "0ed85ff128d2d15a7aab67c0535b96307909915e9ba74e68f356baac731b0be3"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 22499,
+      "lines": 546,
+      "sha256": "68995fdfc911f40d52bedfb39bd05cf31d135e67a81bbd34f475a891193ce66e",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "0702f7d4205e8167f14368b4bf1c7b0b30cbff37d65833b48d4730af7ccb6942"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "29606de4ae4a33fdff6d5cd7ec717bb43d11b1cdf91625eafa93dfbb3e9c24cc"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "d73ab8aad7457161d018e83c14429c9fac00ff6dfb85392c5b03ba33fcb6afe2"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "f412e3cab553c730adb7c88e9626de0d23d5f47c7ff03b98beb3612e0a1e69f4"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "3e1905197bf9bc40913ae84a97d4e81578ab79af430c315950d5f3a932428a6b"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "abfffff9877091beb44071833b296b8827ec6e4aaed6fbc00b750958d29bab85"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 546,
+          "sha256": "6d98d72d3c8654c2dee19f6e7ab0fd3b69acfa32506d0689667c5dc3811e2a28"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 27341,
+      "lines": 808,
+      "sha256": "84b1b55b1864360075d21d32da2b9bba07a151aad393dcc11539239ee7501bc1",
+      "inventoryEdges": 11,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "446557637d32c5d1345b083b5a8f24418fd6f1472c0284bc8c4ae2cdfe6b74c1"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "fd22a908393f9b74e482006bd3fc5315365ec09087a4a787df2ac0391f0f4a40"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "141335493f262a5fce85bcafe44fa9143c132a6d56895371331e8c612e994344"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "9accad1a08144c7193cb937e15258bbb33ef902a508c6a1bf5208a0cd236c4a0"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "7f319a514d2df6441ee04498f00edc5524b4ae93f79ec4279df85b95cacea682"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "154f9449e4afa9ab9584d278fc26fe5250d72f3d49cbd37070d78485fb4c97c6"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "9ec29921c12179cccd9abf7d83dc13fbe76d63bba22370c75b5c94900c853a2c"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "8792d06fd6332196874ee96889db5e9b48940dc508f95aebbd162e7124afbb2f"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "e6d0f4061b1ef5f85881c1be9c852edc71efa42211db7e99a799a874bde1ac60"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "944c90e1bb06e6d3589b674fb2d92adaeffe4b21dc32b0b70fffd50c7695d9a2"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 808,
+          "sha256": "051ed2c6a78404fecbccfad56bc9e7763bb86e6e11b043d482b630076a76c3cf"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 12413,
+      "lines": 387,
+      "sha256": "a41b3d29e10acf28e75f0e1d2cecdfa5c65feac5c72dcff1906335b75c66daf8",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7fa2a4934588a55a767c0b40399e958c15d8e372c5b18146c2903ab26910b142"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "34cf549aef9fbbde70cb0b8a6ac03cc68c0de1c629710e2d893bbe4a4d10053e"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "bb4565ba18903708aa67b0fd3a3e7f06e60a00bc588dc8ae0baf3eb152700118"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "974de98cd5efbb25cfb04977644fbd6b1e5becc71a2f18e81a1cd77dd0b51078"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 387,
+          "sha256": "f10bb3c69949bfe4804f2706e95b537d7198d73a6bb4694f392a8abd3e439c92"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 11443,
+      "lines": 366,
+      "sha256": "1d49e4d8a239fd0a5cebda8b65be30b480f5733f48e55539e16874c9519a618b",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "cbc77200a41d52c686fd13f46855ede2e2ef6c692b30d5bae6ed97d23839a94e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "fa1c94845d0f99a610df6a21791581ca86c1f82518470f51f24f60d7ee235cbc"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "b6a734ffce1119a5c01825a1d1591e785e2d341cd8fde6cbbc4e50f3714c67a4"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "5def21be2f03329b5a38ac639562af7edbe833d63e9bdf961d88f21362716abf"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 366,
+          "sha256": "50c415b2e746daeb4aabdaef102bf1d19745e5d96c3a3bf56e8f5477cb8a7b68"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8521,
+      "lines": 241,
+      "sha256": "fc65852d0612eaa6556520014e2a377976d1e691d2828fd5bc2deecc7c004ae3",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "c4279793e44ca567dc3d1d1a1f92b045cbe879436cad796ed74bf5bf7c3dceef"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "32e1c540d03446524abef5fa95b8e0d4fafd3e5309c1a252568f7f583e707612"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "d157f82c9085be8e136fcf9ddeebe331cda96858108e4a6dccf2d2460e7d44a1"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 241,
+          "sha256": "53e86e10d9d3f1f7ff63f93d2cfa5f9cadfe7b08ac161795bbabf0acb1d8a625"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7623,
+      "lines": 134,
+      "sha256": "5610ecb432d5458add306daed63d04b9baa590d2dbbc8d390fff40ab8c74fe7a",
+      "inventoryEdges": 13,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d77fc43ec75a4f2bde4593af0c602795d355e97432d7441edf64e086cf459976"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 134,
+          "sha256": "6ea1d19d88a940ad30bf6a745e5a1e452d1ce9d4e305c0a597a3f4cb2d6cf294"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3395,
+      "lines": 62,
+      "sha256": "5a27d9dab4ffd936948174f231ebeac8b95a55e03149189501cd1fcf127fe021",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 62,
+          "sha256": "51cdb76d253d0993b3a166c1a72b323b73ae1aa55c1a31d772843e4bb2e7bb47"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 19658,
+      "lines": 446,
+      "sha256": "0bc5655a72cb5fb06754a2448a48cf57bcb66ed9a4d154ea8bb36fdbd1af9657",
+      "inventoryEdges": 15,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "badd9c598c6e60efd38f12f278ac3da9c9dc76c4a636881c47aca441f2b94967"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "f6927fa78f896b0b375f22f49c00cecc8175d132334f8b0c99ca6ba856d3386f"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "cd748c1cc172cbf7b2e9d26fa022e96c32cd6ecd1a846453e1c524410c506ea9"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "f2de0bb7e3b34f91ee6c44481caf263d41425b1524b6dd8a1a1fb234e59020cc"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "cba17da3f06273366a83698569ca1e726de8747c9d43380fe35b137310887055"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 446,
+          "sha256": "3f2fb5890e2ce8530b634a7ff5640991308566a0ed52f6f44e1fe06288977935"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 14950,
+      "lines": 355,
+      "sha256": "23b76d492c80579e73be3a44e96cdac73d75bef4ff4066bd5fa749300e336282",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "5e3d68bfddbb9e67a3191d8a1973abc9531b21db4ab850dffb7abd09650ffb73"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "b4d532d6825c94315dd4aac7950511f2f5936cf4521ea7b02c0b2fd5da12d3fb"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "19aa9c6218873cae3ccff276e7117593af114014bddf86094b7ffa81c5c2c440"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "4fd6a8954c333fbbb4b709f15e757bde31b9a70c14d7b2970a5cc923641a9060"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 355,
+          "sha256": "ff097791d427d621a082b1eb1405825eb273c1330ecc7cdfded22f70d1984359"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7115,
+      "lines": 183,
+      "sha256": "420853736e8f1a7b8488a70ec3d2ee398b975867091ff4bc12e613590d6fbeb6",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1cfb6907d8bc60127dffa912dcac46a82168c1e2eb7185d0093cf9bad97d2ff7"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "c93b897b8df67fbee4cc67e759ad7b23dc911db729d2b59a66eaa23fc35e8966"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 183,
+          "sha256": "be76f33490ea2d89382e53220cd2943df27646c33a8d93846b79d01ef8fa3aa4"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5704,
+      "lines": 128,
+      "sha256": "282210b38026e6b7b1349865798b5073558791ba9a918a51322057890e94d77e",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "53cd5650d66f02e4d857df783e3841b6eb05304d0665381ac7c63438962cd7f1"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 128,
+          "sha256": "361307e3186b27df8858a3c0e00e965b33be761078dfad7b46722f04b7f210e5"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15923,
+      "lines": 83,
+      "sha256": "58360696c73e0f97f1f035df9db5cdffa1d7a896b6a76c73de4899c1789f664b",
+      "inventoryEdges": 33,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "114ef72b2f77a0280fc69ba7b04fd2b01a8b887ff15486a6eeacdc713b666eb4"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 83,
+          "sha256": "bf4f44110ba859e55c87acbf129c46f8483677be3e54945876692016e9600a1e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10490,
+      "lines": 87,
+      "sha256": "1625a572e0e8fc27464381a006e9531fc8dbc6e95d1e04827cbc09862f16ea25",
+      "inventoryEdges": 26,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e7941dd04c47cfc4d9ef8b9141c9975484594881c70ab53e653210dab25c68e8"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 87,
+          "sha256": "f5c93876d1c1f53a9db53d8be12f72aa1b321fae16da0761a77c4be7b5cd0f60"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6859,
+      "lines": 70,
+      "sha256": "df0cd53a930f745d5a633f3b67f144ffb67a183b7508a47bbc0e7a0c54a5a8cd",
+      "inventoryEdges": 10,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 70,
+          "sha256": "542fd6979783b6e55b735b0205443bb0d8fd8e301baa931353032380d8d53a44"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5536,
+      "lines": 71,
+      "sha256": "4a5cbc0c2be348d6ed60be11afb1a1ed17c9300226c63bcb276a49d85015aa6b",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 71,
+          "sha256": "971dc44cb9a508b160bbd7f8f0e0e56bbf8abb3c41d1decc429c80bd46878f07"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 16220,
+      "lines": 133,
+      "sha256": "491d90a6755cdb6ef0f17b2befd8861c29cf101c87d7a9938ebf2721e133a9d6",
+      "inventoryEdges": 12,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "fda0a591b4e341159670ac75cbede2f55d639981b4f4e4c16fb9652bf2b07994"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 133,
+          "sha256": "f52de6ea4e54d0ca012224e50f039a0e8017dcae9543c006c5493bd354d0bc75"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 35775,
+      "lines": 486,
+      "sha256": "e7ffb99241761e46ec108f2e9d4e47a6fa67be124594b75661b8aaebf16d1210",
+      "inventoryEdges": 21,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "0fa4f61b2c18f7b4361a0fee7ae8b78ada8e75c03c65f8cc0aebffe21dd7728b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6c1a24ac1eef8090cf24e20affc77f93943fde90d0989fd438276b502cb415ed"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "1b543f5b538cb71c032e1f3c2876896e67976629b764df2b2b509114e529cac4"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "ed27886af42857d24f8b36e3492dcd03ed279429c2aff6d1e1be2c70d9fc0245"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "1a97dc99616727f126e4ab2a3eae1796c675773f971cc4907923b0b54875b7d5"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "17b6b23939aa5ed5092cab2c23b377f86885f596293272033595bed2ed4fe806"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 486,
+          "sha256": "b160d3d7f13098414646ae56c8ec6db529e100bf18b7fa8a6772c9c7f7dd550c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6078,
+      "lines": 141,
+      "sha256": "faa90b316286f190e01a800ad9a2c27cd5d9e1aeb8d22adaebaaf727f62a09ea",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "46ecc42c26b9584fd4887da4dba38189208ad6804c7e6536886844d006e83a8d"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 141,
+          "sha256": "b7c040ee0427071991b9f5ea00c5ba5ed059cafcb106e9bdd35ac1070df693f5"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 31872,
+      "lines": 431,
+      "sha256": "60a61d421faa9cd83d7625c3068aedb604a5edd02f78840c82cd445ba64e919e",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "c3e3a46f8fa2c6ab67c570835aab60d25ea138a854a574d281b306546f958103"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "f85ac753b5b45723be1aa94b4ba9465590e43b662e68ba80f7b087768139cec2"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "5771cf6f9cba432b2684dd3415f539251d33a30079fcce5ca67fb660787f707b"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "58c68e1f728829821c9c0da52bce9da1b96cb1d619328da51e37ad1db5241b2e"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "599fb454fe23e9fcda0bc0b12ce095e5a7a22e0e8c67a6ff3c07b91f2a1e4740"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 431,
+          "sha256": "55614ef06505582cb6479aa268d0a3d5953e04fc0d2c50a99ac3c4618267172f"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7006,
+      "lines": 102,
+      "sha256": "8a4d1ebaf6562f253c3ccd0a4410658d7144e084e3834c08a88eb9288a7915b6",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8a5bce40b3c77469ca51fa3f12cec8b23687618b63d18f542816ea96ba0b5280"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 102,
+          "sha256": "c73f23a1c90eb907587c0d6e2b50373f10fb46b0d316cfa697f6cac32c96995a"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 13530,
+      "lines": 204,
+      "sha256": "42cab41d7ab9739a2145b68cf20599b95119007c79f5888f335a89fad8a14466",
+      "inventoryEdges": 25,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a0ab571aae1cb4bcb197d26ffd836397200b95c351da71aa34e2523d1d30b391"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "c04cdce13d977415beb776712413d9bec402c8cbd5a200fa4eca0f9c119a3d7f"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 204,
+          "sha256": "7cacf7a36f6a2244e47e7ef74955836e93cc9bd6b601b1d02fe443232ad49cd4"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9697,
+      "lines": 87,
+      "sha256": "526d0b22dc43ed34423acfd18d97458ce411819271eb1c3a22bf9639c59cf85e",
+      "inventoryEdges": 11,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "64916637c9a8241f68aa0039dcdc15e98aca52ab22204ca1248fd25064ef7682"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 87,
+          "sha256": "91be665a46b8fbb9dc047260668d3a1750a9a6c5821b20b5243e894fc33c761c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 41339,
+      "lines": 922,
+      "sha256": "4b5425c7104d77f69f4beaf6f00e96950042ce8a81efbedf148cd42c117d13fb",
+      "inventoryEdges": 28,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "bb02c113832b42321c927f372562fa71e59f17b528fdce48a5c5b421173fefae"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "ed2a12e8533c4d30a3b40c5cafbe3c8faedac446dd0d4322885f0e671125a46f"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "950331913840013e1fb48db53aaec0afa95a413441c3a3e08edb3cb78edbbb3a"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "216022d4161c3464726bd7852e0aeb06b03b33abafcb32708241abcb80c73ba3"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "a9c115abfff16466a50d2960dbe916368561d61a57df4173f2c709bf0e67f7ba"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "acb3fd4a846797c86b645bb54dcbc55be5936855179328cb5b55b27fc06e00dd"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "06ca63b8fac923c42ac7fef658e789cd2cb4e4d260f9bc8d8a45a74692a078dd"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "40f0c7d368fc7cdfb5c10f5fc047e187f6380ef46e78991050f087c04282846f"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "3ba7337301b961658cacdcbb2aaa001d9d29ccbd00183ece66a68f3c43739c4c"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "b80fb07c0817c93ea28637d2f614098d63df0e2865273dcb0c4d8e19d62066c8"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "fb4370e5cd6fad5990ede6001a829ab561d628b91985e2175c27ea51b23f28df"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 922,
+          "sha256": "e7f0efcd4fa3918167d6100c9b2b9d7b144635d2d013907bc301f460a970cb28"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 16084,
+      "lines": 357,
+      "sha256": "6283f064d761fc87f746031a2d12da027c06bbea5be85e5a45365ed8d2df4088",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f0e7957bf960cee3ee832d2ee789c7206feab2aa25fbe91ecd977067a63fd820"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "a66fa0abe52284c919b7da3786033be8af85536b24e52d18f6ae3bfa76d24894"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "e320ae454a583f09ab97a917c74b32a81ea0f2d3a1197050b3ced36a9ca0c2e7"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "af8160080098affac8f4d2b0e25c192f4b3d173cd1bf5ca51205feaef3a91ec0"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 357,
+          "sha256": "e31a35c2b65e81f18f2f7b938b81c60e1ba2d97fc2b2820d099a24dda8f5446e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7571,
+      "lines": 109,
+      "sha256": "1306d4f34b42fb2f6eaf9aff1dfb894e300e989975ab0ba9a0842847f24d22c9",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ef2a513fa86d5a1ee185b9c44e5ba5db41e16a4d294ec1cc78a404c14f6f0e01"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 109,
+          "sha256": "44f31ea7dfe672dec4b1f648ba321ca1a450e3a59008316c824bc8a98fdb0f8e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/vision.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 16165,
+      "lines": 358,
+      "sha256": "15424581be04de19fc1a9b5477ddd42d7822ef1a434f1a5a867ffea5d7103bf6",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "09d5a1e9be2f9c0ea4982fa69c7209343d7831c260a95fe0e4d23af63e73b3ef"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "1e6cbc87899c417b4bf2f1ceb6d05572844a2594ede7e03cd537c039bcfda3b1"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "5375e0421525768c248ec162a9afa15209cb45c0964993a815d1309aceef6a9d"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "83248fa5ec71f0346ca35dad3a023cb4f1f10013c9d4776f51e90cea1339d3e1"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 358,
+          "sha256": "61cb1d0e05b04c314cdc54c66a66a8f64b0cc65382f06af8d406f19f084b08e3"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8196,
+      "lines": 186,
+      "sha256": "f1d218d61037b623fd05d40247f36463cdd6461841278c4cc85c0c43a49c7803",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "806d08188be186b60c1b80c0a12d67abc25d756e71eaaffe583ebf05260aac5f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "c8ee916ec08ec944dd3c65e1dbc882a0d7f9ea467ab428deabf34ec8497d3801"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 186,
+          "sha256": "54b4ff27e251363ee3a73fe68c22db5aed8e7ec10f9c3ffe129a72a4bf6108af"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5498,
+      "lines": 112,
+      "sha256": "6ae9d176df352daeec9b335040b7672706cf6f6719ae79fb5c2c9b85111faafb",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "715646ffc3fefade30f2e8dcbe0024e23c26ef3fb0fc901dd3cf4985bae4527f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 112,
+          "sha256": "d1783c213c8b23a95da8636d2ce422e76ff2f2eda8ecffd613d7be6b52e461c0"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3700,
+      "lines": 87,
+      "sha256": "f1af5a4cf9705322fd21d12ce41e4fa9a0138ca9792e1c14b5f32606a1fb6318",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "25f3a84c1d5f659ed98ad85066824fe79ca68ddb860b4763dfa6e828210523dd"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 87,
+          "sha256": "7d4a1d1b946bdb13ac968c284517f15886b1fed6b8c78afcec53f707442ff9bb"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-protocol/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 14509,
+      "lines": 145,
+      "sha256": "236da5383cf15476b84f06f106d7a941b00d9abc7ef8f32190a6606f4a95bfb7",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d2d84084c3088dd81e3f4dd5b535615ce5ef1d5b51fb18156055bed1ffa33f47"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 145,
+          "sha256": "8fd622660975dcd826fdb8021155603314652cb1fef31c6d10b9e106f828066d"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/claude-plugin/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 11817,
+      "lines": 191,
+      "sha256": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7a2e83e35f055e85cc57f9cd941d3bf69a603f374de075b05c7d526c8196be5a"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "99ffa48bfe44ee384e8a20c8fad8129861b796e3de57bf98a59114e1384841af"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 191,
+          "sha256": "d248e80172a86ce40cb56551832e9717ab0530f9af4fe1e9a50907bebc85259c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/coexistence/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8043,
+      "lines": 157,
+      "sha256": "954d7bc90bb7ee28a45c8f9c5a48fdb3fab119e06e0d902ffdfce438cb5b4d5f",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e46acd06b8fa07518aac9b4b3ae05e57de35feb057a741ee1e6a7feba6590998"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 157,
+          "sha256": "7a94eba83563a66679f84b7d214d18ee725788406713fa9d7540425184efd4c4"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/component-boundary.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 101816,
+      "lines": 1641,
+      "sha256": "6c28a1a96e9671e4938a280c3a9102520429f4b75baa81a8f5cbf806d18e639c",
+      "inventoryEdges": 39,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d8a555b1e6cc3b995f47d39fb2287d92d6fb5602ed9c9837a518dfc80784ff2c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "a27c5dd614b3ab66f95ceaa99fb2a3bca84f68e65f981fc316c59d2f97444f8c"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "854228cadffff2bd8ee5f84df31495e3215791eecc11a2b09f3a180c1f974d2f"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "0374e1d205547dae0c8e9820e7502441f4afdd4e9971373b2cade1f760b8239d"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "c49f9fd75e8d06fab367ea5494144cce83556814aa451f3dee43870307f225d5"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "764ba111f19c72cb7f245cfe9805bbc3c273bfb756af61e1c4153273f666fdbd"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "a858d8ac8038f164f4c4cd6643726131d7ad630af8dfb6628c43ac7738337248"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "d32a70a36ddad88939a0f3f69cb7cb19cdd3e9f89fbc921a55430ce0d58f509d"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "e2caf666c0fc53f1be0892e5de6d95e2c5802d71948f18fd8c656dcabdb1e8e8"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "ce3b8b2ebe34258b4ec92b2e223eb6e709d63975e1959aa55222ed3ec7047c83"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "e34f91539557b300f097e1208a567aeb47fa606ed73d42b2e889d9ec817fd435"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "22845be107fc72a16011539cf67ee9f0afd07c5397f951b6a67a3dfcec79a1f3"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "4cb06673cd9f1ea1bcb9983501b84a132d9ca5098f62c8e320625625f88f130b"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "537435b4312af99e0927096025db0764ab11841beb130a3975f905235b2f641f"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "736a2ba193999891808c17d12f2930b214a8d74748b1453959bc7fd3eecd6cfd"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1280,
+          "sha256": "9a3ba85c014ca979840b0e4a5481c9ef602b59e423ff742db9681ab316b79273"
+        },
+        {
+          "firstLine": 1281,
+          "lastLine": 1360,
+          "sha256": "bd381cd6041749924cad91cbb45c143605a803d73d7e8613dc8ae45ca2cc4db4"
+        },
+        {
+          "firstLine": 1361,
+          "lastLine": 1440,
+          "sha256": "c357613ab433741321aee888c73e0a8badd5e6375bef39abca00eb1753fcae95"
+        },
+        {
+          "firstLine": 1441,
+          "lastLine": 1520,
+          "sha256": "38d91bc06901ce9e84315ce21455abe4e27ccb1f616358248b9838ac974fb1f2"
+        },
+        {
+          "firstLine": 1521,
+          "lastLine": 1600,
+          "sha256": "0fdfb9c0a578a1ea0bc9a198c24cec6928f263c161b49ed932978b2161f9483a"
+        },
+        {
+          "firstLine": 1601,
+          "lastLine": 1641,
+          "sha256": "3fa0c211c9b4a4230cef0adeb8b23a62116e57f23af10a3fe0db35640d21c483"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/contracts/architecture-manifest.json",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 13283,
+      "lines": 288,
+      "sha256": "d47d61b0eb85cd18e5ee986a3a56db7c1bb1834dfdce50f6084c9181b3465dbc",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "11dbbbd38fd2ac124942f2eeb9a268619aab81443f2444ab26ad0112b5c9908f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "2c3c2fd89e5d30b83d219aaedc069d69ca3c2419c2a87c4b3f1c222f4037afe6"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "66c46f2a9a66e4f764996a52ec74a73f546106f779df6c2c0669d11482d94b16"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 288,
+          "sha256": "41da3103b4c29212bccdfb1ec35a3fba7ba391333d026a50e9867554135ce71e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/convention/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 26208,
+      "lines": 371,
+      "sha256": "17dceaa007bfb1e1223cdb3cf7bfdad214a251b066bb464950e9ba925f06467b",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3fd2d38c79f0f488b344cf0681caf4301da6bab401102f8da825ab3c5f0a76ca"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "a9833873e02f68d3d4c8dc69937b3d000d85cbe697f1533c1575c06ef7979a05"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "85da9712343aba436a25a8574d90e48bab49cc02661bcc838be6ae82431386a4"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "1f2ea2009ea9eebcdf451936a2080e544b20db78c1b5f3495003dcee3bbd5f9a"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 371,
+          "sha256": "99321f6276dbba60eec73066f17d86c020ebeb4c1bb0cff23425a04fb09466f6"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/decision-citation-drift/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7339,
+      "lines": 136,
+      "sha256": "43e2f1bf7f664a981125a4afe802d4abcda3621580c13c6d4e6f2f5bdb5ef2f3",
+      "inventoryEdges": 16,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ffdd87ca26d36c4f7b172ac925e8a2d84059ecf7875968143f7a7050c52f374b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 136,
+          "sha256": "8ad06173e338c3249c2d15fe6cb8056863d6de8d413544ef9e28f73b2d0bb4e6"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/distillery/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8286,
+      "lines": 160,
+      "sha256": "2a208ae64a9fc79022a1afd30c3fa525367ea2a9374aed6a2fb5680a58e4b166",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1d9e3391e84651fd5590d8215f83de78daa2f2499902abc5ce86c354f07ee7cf"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "faa5c4a802d38bad95c5d7043d23cb002574bd615181e0658f2f52c9bcc5ce48"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 20398,
+      "lines": 713,
+      "sha256": "004bb912d6e4e132ac65a486c8b209e4b5e33c89fd19032c23738679743d842b",
+      "inventoryEdges": 12,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "5257637d6b01f9c670a95dfaf7bb618cbc2410b2028829aadfc46b4e2bb27b45"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "d1ae289bea141420f78b558155b6ea079cb8e98617747d7b3c72a7ace6cf691a"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "6f745c2635a72e91a9144d2172d96f4fa6ab59b34815175f355d0e58054d104c"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "4d34133378f7ae78c7d68a483451f66c955842840787a47f393b77e32e84e243"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "d5df88ccc667d9ae8c3dd9c8f8617f66ffb58275fd86cc4ccd55c868bc91f031"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "eec1c6a135c30d8b5c9dd3158e273c03409d0f2046fa726e150f04b14961a41d"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "d92dd3ce9aba9257003a34a841eaa345a5fcd29a8a45379f90358867d2f87311"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "077d4f1f3c2256686771a5826f87a1bb15e010255a8616643b85f41bcbef17b2"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 713,
+          "sha256": "459ada2fe67e3868f091cb231f1776c166223165c150e97ecad6ab9a43997d34"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 14455,
+      "lines": 202,
+      "sha256": "50a036a1cafbca9862192a0ba11927cc60aa9f5e35a26667e15175ff487e0161",
+      "inventoryEdges": 25,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "9c1cbea5597aaeba3b62a3d0c2744e60e1c19718b0d37f4189fd5446f27a100b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "5ea24b27c47320dd0d6e7f564136ef03ce91f3b49fa2c8f76860429e12e4dded"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 202,
+          "sha256": "991f1fb2b186a10c763ae4b2dc4da59ef823bba379764940d8b8a25aba29ea0a"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 63603,
+      "lines": 1656,
+      "sha256": "3ef1aba54d0e3cfe7fa2d11ab8d70c7c6a4c814a636bedf21b7eb9014eca5645",
+      "inventoryEdges": 82,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "80419b7615f086b45c6a5d8706d01120826a4f5b6d8b21db41a01f47ec0d7330"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "71640e8eea36583c2bc37469b71e6d4c81fccb3b08d8686c9ac6281fd33bd163"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "8dddb84e41ca356e74f17ffa59543c2981ab0928a603863a41d2ab2afd8d9a30"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "a3edd04df9f008c9e222e4a38ac27e547336dba25d755a6df60b12f2c2004267"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "dca23f3be57234858e3273e1d8bd413d41924c580f55a25c4daa8755b3eacfb8"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "370f258b6e23686003959dafeddb0c3a7b39348affa91a7f8a16b943643076bb"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "cd016f1a885ac58356423554656d7ed589dcf1605aeda2d79f7314be9d6ecf44"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "baf75f42c2adb847eb199aa2fe8cea44dcb6f7c762ec99a0a3237791581ad807"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "a95ba9c42613ed2ba993f32ccb9aa6811a56e18dd5eced6c8d28b43d571c413d"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "25a836f4d33b861c8ffbbac95c46da0d4a9727f6868e85c4819825d87ab177bc"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "e98a9c85d12a384095c7f661e62082aeaa883774c79a67064201a4b1e06fab8d"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "205de8135d842a81a62b241a7d337bd7671b696bbf305ceab656211a717663f4"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "be8f9b0af556a555322e0b40dc51d77aed637fceb1539c694901b67dbd302df0"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "e2201147b939c3e3bb8dd78501d478ef04911b131ffd31b326d35b96bc112ded"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "4f57738ea105de609d794961b1100502da4b8071a2ce58030d68ca66610e1329"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1280,
+          "sha256": "7c071e5596c29256e7696126f8f389583c498636dea83223fe0a51532b0787b3"
+        },
+        {
+          "firstLine": 1281,
+          "lastLine": 1360,
+          "sha256": "f87906ae1e865e35bad0dbf37977983ea2d5848435eb92292b8efb7cb4138950"
+        },
+        {
+          "firstLine": 1361,
+          "lastLine": 1440,
+          "sha256": "e384cabcbc5cba185a4dcab2165f1fd11dd3db8229941dfa961db03b51284b14"
+        },
+        {
+          "firstLine": 1441,
+          "lastLine": 1520,
+          "sha256": "0ea95e6c1460fb04c95638be0587725d44423742b60d9ac6e662dceaf432bf93"
+        },
+        {
+          "firstLine": 1521,
+          "lastLine": 1600,
+          "sha256": "150ced34bbce9b28f6e198603600c01e61f3975ad51dda6bbab063c82cb08a27"
+        },
+        {
+          "firstLine": 1601,
+          "lastLine": 1656,
+          "sha256": "ebd136d413274435fb23aa25d00a7dc58da25e5ed7c72f2e4da2b459a3edf994"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/architecture.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2315,
+      "lines": 85,
+      "sha256": "500c3ac7b8fd82ffeaa106ca32aa26680533b858efdad70fadd7d3c8e3e6f7f6",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d9969a5d1c7ac5f27e33977acbce469fd887a9fa2bba3910c5a1b4e0d3a7e83f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 85,
+          "sha256": "a321126dba6402ced20d6d05e4b81c58f37167c64844b427f2d27d35519665f4"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/area-readme.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4629,
+      "lines": 139,
+      "sha256": "24a1a1b9a6dd2b7c4fbda242eeeffbfa6471040bc30010589d47199e870ef035",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "767684fb55d43e8b81c457c844282c9c549b3a90bbdf6bbeb3f3b59a05f8948c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 139,
+          "sha256": "f8eec98cb8604300bba55e54794533b9d8cade21bf4f320df124ca32d985cb3e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/contract.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2017,
+      "lines": 79,
+      "sha256": "6cd3b2bd82763b02bcba0eaaa7eaa3da4c7e263a15f34947930c3d4bb39e80d6",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 79,
+          "sha256": "c173f95457143b255965e00ce64d9855ae92057b3e8ef390bcff969d2ff28923"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/decision.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1635,
+      "lines": 69,
+      "sha256": "dde490a25e8a16f00ccf97addbfa0bed07a7388db6fc0bd437a617a733bcc8fd",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 69,
+          "sha256": "26b6a869e38fe08c2cf8c0ce6c6a22ed76420e320c245f1d566114e90e936323"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/discussion.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1578,
+      "lines": 61,
+      "sha256": "ec55d4b8104b30c412b07ac1ea49a092972313bf78f08702b8a97d89fa91b906",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 61,
+          "sha256": "e7179a62cae55e3dfdbdc3fed09f4b3c0016bf6c60fb935ac542580cc4215679"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/generated.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1398,
+      "lines": 50,
+      "sha256": "381cbb52c73b4aea17cadacba120f422f21199d65e257c97ecb612c49c1ad913",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 50,
+          "sha256": "66551cfbe93f9061965fb8a2c11c924511118139f9d46936349269faf3290b3f"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2693,
+      "lines": 80,
+      "sha256": "ac84ad0bbf0dc4fbcb25595c0443a509e2c5b24b08e8e668c4cad8c34f1f1835",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "c6d77e6888a15d274b0d5da8b009eaedb9fd63f7bc0f29d965eed76d4d9de499"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2219,
+      "lines": 93,
+      "sha256": "d55f536a4f3df59ffc1e21235f864a9fe15cf7a00222bfb45f1ca9aa5396f900",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a6f57bae681efb6e6b5c7fca35e40fe9221a59975aa2d7a8fca5e23893ea3f16"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 93,
+          "sha256": "4d22bf572b2c7b4d34e8f1a7f90e40bac0ba5bf44054ab9c24a9de60c24322cf"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/subcomponent-readme.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3338,
+      "lines": 110,
+      "sha256": "e3ebd0038ae629ff900dfd45099b8311861b5c33d4f2c64690ed41b47e643d5e",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "270ed3d9d2a2d1f2c4a820a550dccb574f399e169a68c5e0fd19e20a7ffc9651"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 110,
+          "sha256": "b42c4197af840caadee4286302dfe801c5c47ac25b25ffc9ba41c253d8744122"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/verification.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1615,
+      "lines": 63,
+      "sha256": "4326b0fab45e9677cc59afe4572c62fa70522820035822ae6469ec7ae097e089",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 63,
+          "sha256": "0a6ce4c2d6b6e4bbb27b5a45c20cffc234e96f05af153906d297046af3bbde29"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/vision.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2012,
+      "lines": 71,
+      "sha256": "3b1371f3ea56ce3a14db1d1330f1b1bee1053fc1278550983e6be831524be591",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 71,
+          "sha256": "4b9517da4315004955994b94b1c8bca16ee31a91e2c713dfc6161ef365620eeb"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/switchboard.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 13993,
+      "lines": 143,
+      "sha256": "f58542c47377976500986df9364802e7c4d58709467c93775dff1cb8fd2e9886",
+      "inventoryEdges": 68,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4e02101729935007afaa9919f1da7171ca1db717523ceff3c288b7ca1e51bf01"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 143,
+          "sha256": "d2ee11031ecae7e06a7bff9b8256f777e86bf2de9823c477d5d641468c2b034c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/domainization/architecture/domainization.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 12153,
+      "lines": 305,
+      "sha256": "286644bd4a86e60c872cb890bb73d3aa05da605364e0dfc4c87831a79e9fd1cb",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "5dc224028faa46c6e96a45d1c1e19384f05c78272ccfad290b8fdf88b0dfe5c0"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "c5bbd33f31eb0c2edb188a2649acfa902b26f6f3d5520eea64e88c7212534717"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "25f6281709908565fb66208ac2756812546f34a6f092e2a5ec30c1183e95b390"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 305,
+          "sha256": "68dbe9e311fdfdca606d3eda6782d374ef186d036892ea909945e1ff94dd2659"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/event-store/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 113730,
+      "lines": 940,
+      "sha256": "7d26c6c46a48789a8ba63be3576867dd3279308e3894ec8c40bc9317e5f4db80",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "aada163abd107174c67747d1be4a650808a0de31a4526633916f4ade5fcdc7da"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "ae90353e4a2e5711913b0e1a7435c9b2e6bf50e6d32efd7de0f62c5300bf51aa"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "ae0ee4e4bf285410093935bc89698b20db8faa5c1882b9e7fa81efd84c53a745"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "45a3d010c2e05b701df29071a361b532eaecaca18fa1f129396802fb88b58741"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "fc10356617f43d40566e5aefaa050b82ef6e34f1dcd2520a8e6e143badfb67aa"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "2c121511272cee82d8eb375d334c1150fe9d897b7a981dfe7e485bf2b8837b84"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "7a413df663cc50e029e2df012404c3829859ab3a44bc89f5da5a5b982a82282a"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "5264834510b2807c6a59fd3724551f7ba7faa0b7e439f0dd0fe2d96360e108bf"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "7af5cb12d3328ea1cd4e099e9b0d60bfdd7f23e743fd13470137a9cdc60e690e"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "477ab83e1e698ba5ad4a43687565610ae9c1277d794d92a91feaf0eac9e09984"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "6f4851f5b3cf549f84b5d052a955941eb7b421f01cac16799b77a0601f36e0e8"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 940,
+          "sha256": "0b75c633b75077f8cb688b4e79f80f4048a87a2c9117bd20ce3b324c52958342"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/git/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 271464,
+      "lines": 1032,
+      "sha256": "b40cad45b20331b2699ede4d9e777486bbff67d96205783439c118c53cf39e20",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "da2b1c9fa208979c13bf57af196140b6a45bea04886cac506e3c73162a720ae5"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "7a33ad60512b5afa35f263d7646dedbd4bd96fd8168d48f1e29ee62aa2b467e8"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "a389c3d792996ce9aff78139ca2802a6725c1c1c3193b130c027a3469d9479c2"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "2bbddc722daf37992c92534ec2df191b90ec1fb925cb1b36e13d42d61c18e99b"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "be764fed47b5bf687e04ff4f656a173620e0700a0f1766f4ce0ec0f80b0924de"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "2e5bf44b2935b958f5b4410f0058a8a8cbc7fe2c09185f8ba04de4d604a687fe"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "c1b683b4bdcf92d7130686addce8c297655c7f5dc8674a1b87900cf09e619e07"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "72ef90d9eb3b91baf7d0d77d46116becc5604f932cd66ca53febf124eb5a6b50"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "87742c9596b99b7c9739f616b94acffa0c05bf2f7b42ee1fe024e18d42051a48"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "4187b7eebec60610adf5ca1a02a53c38fff514fda190547629464b10b4182079"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "4a7957a6fba0707f69c9e5211b481f57d68b461a963c4629e77c59d5b473296d"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "2d99bbf13e27082b377f128e3360651d28aa11794e73a5fc8b5a1bd6fcf61b79"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1032,
+          "sha256": "70ee14616461f65b7bb68e2a43922e823359695433f7855511896e24830198bd"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/governance.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 19443,
+      "lines": 500,
+      "sha256": "0e7d820925c594df12b2895a18158fdb91a2e2c5cf257f5d61463b3e9f7af536",
+      "inventoryEdges": 10,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "77e46b943c8e55a22590c02dbee9733762a10fdc844e5537206550821c035ccc"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "951a9022714ad6536a7eba93dfd2ac0d545885a97c0e912d6c97fad5b596b118"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "5432495443169703a5b30559187102d1f6be822e7778841695e3f6f48065c2b6"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "1e55d1b1513c3bb9df4d117c7112001f5c51d640bcc0fdf6ded15bc347eda437"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "bd2ee0c8fc7781ccda1a4ead5b3df4b4a3cdb971361c0698ab50beb14a02736a"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "7154b9602973be76dce7f47ebb0a2414dc3defdbeb849e735d6eed75ef43ec5f"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 500,
+          "sha256": "e1757e9197a439bbb570ffccf0a6fb202fcf530d3146ef2d22bd7b4cb0413131"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 34956,
+      "lines": 863,
+      "sha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "inventoryEdges": 17,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4ef95d8fa08dcb8bf38c3571d7cb5b7926bde3387adfd0de6356a801729ee463"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "5c41a3db0637272920a0cde1dfc5e9e83b2f51c1b95d0c9d9b8dc130c5b1f3dc"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "cfab3a6349f2cf1f2816636fb32a782c38e2f8655e0824535d1f76ab8d2decd6"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "fefb2f842e193c56844e70a2a5cf066419f51fee008ee0e2fc24ca5baacf0d19"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "faed8503d3e59c72eac1c37c8d899b463bccad356c0badf950d2cedc4d5ca199"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "7e9575aa63228d89cb206212661e869683531d45d3bd39153388295020ead791"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "6afc3499c58e1b8dec35b79d07b43b220f9f2d4dc1e65d22203d75a008c84ad2"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "8e2e07a41dd2efcbd980cb2e159f71b040b52b623e2c3e0fd9a71ce784c876e1"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "f82cb4eab6c788dac79d76f15cc476db5653ca6229663418c0f60c7efb803d18"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "aacf3907946a50faedc947d688a0c9c85ca6ea591284bdb9f3d6d1be049a096e"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 863,
+          "sha256": "3fcb07ddf114702e3d277d7c331275ec862a361f449e4ed494dfa131d79b10fb"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4227,
+      "lines": 93,
+      "sha256": "1e6946675c09f08237ac65c65c4525b822ca219cd2fae6fcb99c72f3d63d105e",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "32690d36ea665a5ccf3b8c7c7203ede37ad07855a6d058b0a03914fb050f0491"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 93,
+          "sha256": "e413535fc6ff22ce16e6016214d321076cfc2eb3016b6a5846337274dbf14119"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/herdr-web-dashboard/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 22973,
+      "lines": 352,
+      "sha256": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80",
+      "inventoryEdges": 19,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4687671c3479901d1ac12f4cd70a0a7d8d01b1363908f21f2af7846601c364e0"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "8762b1842e6c49fa7669665e7168f3f2afcbfed7d6df141c7e4714ffe7070917"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "0db73474917c63e63f049cdb678ae82ec839b423ec7eca6fcb02ec3d42a9ec59"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "ab7ec286700ada87b7c71202abc9dd0c74da77ee28842c4b9d20cfcedab2bb70"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 352,
+          "sha256": "99fb1ff0d22a6e80f8f4045ef707951d55a452191cd1c9383d380dae22c2cbda"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/holder-lock/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 89194,
+      "lines": 407,
+      "sha256": "2ef3d8c66a4d0720d684da08adc0492a9696c19fdd6d199af22b85dec7e0166f",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "20333eb703aa51853603362d0e77316e605f8a0033f886938f3cb5677ed41f8b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "f47ad1a73099375912c22ac399af23e92aaeb08fe9af45f9d15ff2b9872b1d58"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "c02bdd0a25b7ea00149f3e693d5c99c1e35a0c7a9c25926f8f6dd3b288367f5e"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "ce00459cf1064e6c855cac7c518bd71daa495be3ebc409a46b5725d6761d24dd"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "3399d3e64779826e7e72af635bc2e86012e629097cacec9bddcde940ddbddf0d"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 407,
+          "sha256": "ea515c57a1cb11460e8ea96a9052b9a9c1a379deebb294f05a466d231f72c1ef"
+        }
+      ]
+    }
+  ]
+}

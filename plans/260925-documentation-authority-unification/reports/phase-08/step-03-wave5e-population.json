@@ -1,0 +1,71 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "completedBatches": [
+    "086",
+    "087",
+    "088",
+    "089",
+    "090",
+    "091",
+    "092",
+    "093",
+    "094",
+    "095",
+    "096",
+    "097",
+    "098",
+    "099",
+    "100",
+    "101",
+    "102",
+    "103",
+    "104"
+  ],
+  "pendingAssignedBatches": [],
+  "files": 102,
+  "inventoryEdges": 1404,
+  "addedEdges": 235,
+  "edges": 1639,
+  "patchedFiles": 67,
+  "dispositions": {
+    "preserve": 1432,
+    "parked": 56,
+    "patch": 81,
+    "phase9-row-flip": 70
+  },
+  "parks": {
+    "description-rewrite": 19,
+    "lead-ruling": 1,
+    "GAP-02": 4,
+    "workflow-carry": 9,
+    "phase9-carry": 1,
+    "step5-parity": 22
+  },
+  "openLeadRulingEdgesBySet": {
+    "batch-086": [],
+    "batch-087": [],
+    "batch-088": [],
+    "batch-089": [
+      "maps-j-06547"
+    ],
+    "batch-090": [],
+    "batch-091": [],
+    "batch-092": [],
+    "batch-093": [],
+    "batch-094": [],
+    "batch-095": [],
+    "batch-096": [],
+    "batch-097": [],
+    "batch-098": [],
+    "batch-099": [],
+    "batch-100": [],
+    "batch-101": [],
+    "batch-102": [],
+    "batch-103": [],
+    "batch-104": []
+  },
+  "sampledFiles": 34,
+  "sampledEdges": 1013,
+  "reviewParts": 9,
+  "acceptance": "pending independent A51 review; no set closure, committed-byte acceptance, parity or Phase 9 approval"
+}

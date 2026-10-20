@@ -1,0 +1,13 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "file": "docs/platform/component-boundary.md",
+  "line": 105,
+  "completeLink": "[README.md](README.md)",
+  "resolvedNativeTarget": "docs/platform/README.md",
+  "excludedScannerCandidates": [
+    "author-wave5e-docs-platform-component-boundary-L105C22",
+    "author-wave5e-docs-platform-component-boundary-L105C33"
+  ],
+  "rule": "L12-34(5–7), candidate-native precedence and whole-link unit",
+  "outcome": "Two draft author-added false legacy parks replaced by exact contextual exclusions. No inventory edge or diff changed; no checker/probe/resolver edit; independent review has not started. A51 memberships stay unchanged; new draft packet hashes/counts are refreshed before handoff."
+}

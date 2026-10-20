@@ -1,0 +1,312 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "assignmentInputHead": "18824b36a93a8f2b9f75ef73c048d56959579f81",
+  "records": {
+    "newFiles": 102,
+    "newEdges": 1639,
+    "completedBatches": [
+      "086",
+      "087",
+      "088",
+      "089",
+      "090",
+      "091",
+      "092",
+      "093",
+      "094",
+      "095",
+      "096",
+      "097",
+      "098",
+      "099",
+      "100",
+      "101",
+      "102",
+      "103",
+      "104"
+    ]
+  },
+  "samplingReplay": [
+    {
+      "set": "batch-086",
+      "patchedPopulation": 0,
+      "patchedSeeded": 0,
+      "mandatory": 1,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "distinct": 1
+    },
+    {
+      "set": "batch-087",
+      "patchedPopulation": 21,
+      "patchedSeeded": 4,
+      "mandatory": 1,
+      "unpatchedEligible": 4,
+      "unpatchedSeeded": 1,
+      "distinct": 6
+    },
+    {
+      "set": "batch-088",
+      "patchedPopulation": 25,
+      "patchedSeeded": 4,
+      "mandatory": 1,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "distinct": 5
+    },
+    {
+      "set": "batch-089",
+      "patchedPopulation": 13,
+      "patchedSeeded": 2,
+      "mandatory": 0,
+      "unpatchedEligible": 7,
+      "unpatchedSeeded": 2,
+      "distinct": 4
+    },
+    {
+      "set": "batch-090",
+      "patchedPopulation": 1,
+      "patchedSeeded": 1,
+      "mandatory": 0,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "distinct": 1
+    },
+    {
+      "set": "batch-091",
+      "patchedPopulation": 1,
+      "patchedSeeded": 1,
+      "mandatory": 0,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "distinct": 1
+    },
+    {
+      "set": "batch-092",
+      "patchedPopulation": 1,
+      "patchedSeeded": 1,
+      "mandatory": 0,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "distinct": 1
+    },
+    {
+      "set": "batch-093",
+      "patchedPopulation": 1,
+      "patchedSeeded": 1,
+      "mandatory": 1,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "distinct": 1
+    },
+    {
+      "set": "batch-094",
+      "patchedPopulation": 0,
+      "patchedSeeded": 0,
+      "mandatory": 0,
+      "unpatchedEligible": 1,
+      "unpatchedSeeded": 1,
+      "distinct": 1
+    },
+    {
+      "set": "batch-095",
+      "patchedPopulation": 0,
+      "patchedSeeded": 0,
+      "mandatory": 0,
+      "unpatchedEligible": 1,
+      "unpatchedSeeded": 1,
+      "distinct": 1
+    },
+    {
+      "set": "batch-096",
+      "patchedPopulation": 0,
+      "patchedSeeded": 0,
+      "mandatory": 0,
+      "unpatchedEligible": 1,
+      "unpatchedSeeded": 1,
+      "distinct": 1
+    },
+    {
+      "set": "batch-097",
+      "patchedPopulation": 0,
+      "patchedSeeded": 0,
+      "mandatory": 0,
+      "unpatchedEligible": 1,
+      "unpatchedSeeded": 1,
+      "distinct": 1
+    },
+    {
+      "set": "batch-098",
+      "patchedPopulation": 0,
+      "patchedSeeded": 0,
+      "mandatory": 2,
+      "unpatchedEligible": 5,
+      "unpatchedSeeded": 1,
+      "distinct": 3
+    },
+    {
+      "set": "batch-099",
+      "patchedPopulation": 0,
+      "patchedSeeded": 0,
+      "mandatory": 0,
+      "unpatchedEligible": 1,
+      "unpatchedSeeded": 1,
+      "distinct": 1
+    },
+    {
+      "set": "batch-100",
+      "patchedPopulation": 0,
+      "patchedSeeded": 0,
+      "mandatory": 1,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "distinct": 1
+    },
+    {
+      "set": "batch-101",
+      "patchedPopulation": 1,
+      "patchedSeeded": 1,
+      "mandatory": 1,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "distinct": 1
+    },
+    {
+      "set": "batch-102",
+      "patchedPopulation": 0,
+      "patchedSeeded": 0,
+      "mandatory": 0,
+      "unpatchedEligible": 1,
+      "unpatchedSeeded": 1,
+      "distinct": 1
+    },
+    {
+      "set": "batch-103",
+      "patchedPopulation": 2,
+      "patchedSeeded": 1,
+      "mandatory": 0,
+      "unpatchedEligible": 1,
+      "unpatchedSeeded": 1,
+      "distinct": 2
+    },
+    {
+      "set": "batch-104",
+      "patchedPopulation": 1,
+      "patchedSeeded": 1,
+      "mandatory": 1,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "distinct": 1
+    }
+  ],
+  "sampleTotals": {
+    "patchedSeeded": 17,
+    "mandatory": 9,
+    "mandatoryAlreadySeeded": 3,
+    "unpatchedSeeded": 11,
+    "distinctFiles": 34,
+    "edges": 1013
+  },
+  "packets": [
+    {
+      "part": 1,
+      "files": 1,
+      "edges": 469,
+      "indivisible": true
+    },
+    {
+      "part": 2,
+      "files": 6,
+      "edges": 76,
+      "indivisible": false
+    },
+    {
+      "part": 3,
+      "files": 6,
+      "edges": 141,
+      "indivisible": false
+    },
+    {
+      "part": 4,
+      "files": 6,
+      "edges": 27,
+      "indivisible": false
+    },
+    {
+      "part": 5,
+      "files": 1,
+      "edges": 39,
+      "indivisible": true
+    },
+    {
+      "part": 6,
+      "files": 6,
+      "edges": 131,
+      "indivisible": false
+    },
+    {
+      "part": 7,
+      "files": 3,
+      "edges": 75,
+      "indivisible": false
+    },
+    {
+      "part": 8,
+      "files": 2,
+      "edges": 15,
+      "indivisible": false
+    },
+    {
+      "part": 9,
+      "files": 3,
+      "edges": 40,
+      "indivisible": false
+    }
+  ],
+  "allBindingRecordsVerified": 875,
+  "sourceTraversalReceiptsVerified": 102,
+  "progressSha256": "6fa074e13107b3d76a8a71c977e4e9dff9a7a6e6a562bdb4579f9678b8e449e1",
+  "reviewRequestSha256": "41519c8de2ed28e7994aac0f6a0d3d35d09793fa3f1811d28ab6102d1b6a777d",
+  "protectedControlsSha256": {
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py": "9049a171e9f1037fcd45581fe6442410d0d982f55fdc1f45799d0b47134f4a28",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-resolve.py": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py": "0715367a52e37f61c9bfd8b8622d35f9ede7c12d08e0f16b5040babf0f3714d5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md": "e9b5e3cec792a816ec6f4ad4cf91eafb1dc70de7d7399699725bb137083c84b8"
+  },
+  "priorBatchesVerified": 85,
+  "phase06FilesVerified": 2639,
+  "trackedDeltaOnlyProgress": true,
+  "whitespace": "git diff --check passed",
+  "fullChecker": {
+    "files": 875,
+    "edges": 6310,
+    "failures": 0,
+    "openLeadRulingEdgesBySet": {
+      "batch-089": [
+        {
+          "file": "docs/platform/agent-coordination/spec.md",
+          "edgeId": "maps-j-06547"
+        }
+      ]
+    },
+    "notClosableSets": [
+      "batch-089"
+    ],
+    "inheritedLocatorFlagsUnchanged": 5
+  },
+  "commands": {
+    "fullChecker": "env -u CLAUDE_CODE_SESSION_ID python3 /tmp/fgos-work/wave5e/check.py",
+    "checkerWrapperScript": "import sys\nsys.dont_write_bytecode=True\nexec(open('/tmp/fgos-work/wave5e/inspect.py').read().split(\"if __name__\")[0])\nimport tempfile\noriginal=tempfile.TemporaryDirectory\ndef confined(*args,**kwargs):\n kwargs['dir']='/tmp/fgos-work/wave5e';return original(*args,**kwargs)\ntempfile.TemporaryDirectory=confined\nm.SETS=tuple(sys.argv[1:]) or tuple(f'{i:03}' for i in range(1,105))\nrs=m.records()\nimport time\nstart=time.monotonic();checker=m.Checker(b.PIN);original_check=checker.check_record;count=[0]\ndef traced_record(*args,**kwargs):\n out=original_check(*args,**kwargs);count[0]+=1\n if count[0]%50==0:print(json.dumps({'checkedFiles':count[0],'totalFiles':len(rs),'elapsedSeconds':round(time.monotonic()-start,1),'lastFile':args[0]['file']}),flush=True)\n return out\nchecker.check_record=traced_record\nresult=checker.all(rs)\nresult['elapsedSeconds']=round(time.monotonic()-start,1)\n\nresult['openLeadRulingEdgesPerSet']={f'batch-{x}':[e['edgeId'] for r in rs if r['reviewSet']=='batch-'+x for e in r['edges'] if e.get('blockedCategory')=='lead-ruling'] for x in m.SETS}\nout=pathlib.Path('/tmp/fgos-work/wave5e/check-'+m.SETS[0]+'-'+m.SETS[-1]+'.json');out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\\n');print(json.dumps({'files':result['files'],'edges':result['edges'],'failureCount':result['failureCount'],'failuresByCheck':dict(collections.Counter(f['check'] for f in result['failures'])),'notClosableSets':result['notClosableSets'],'elapsedSeconds':result['elapsedSeconds']},ensure_ascii=False),flush=True)\n",
+    "checkerBootstrapScript": "import sys\nsys.dont_write_bytecode=True\nimport importlib.util,pathlib,json,collections\nP=pathlib.Path.cwd()/'plans/260925-documentation-authority-unification/reports/phase-08'\ns=importlib.util.spec_from_file_location('b',P/'step-03-wave5b-author.py');b=importlib.util.module_from_spec(s);s.loader.exec_module(b)\nm=b.m;m.SETS=tuple(f'{i:03}' for i in range(86,105))\n# Keep the unchanged resolver's disposable anchor-cache IO inside this assignment's scratch.\nimport types\n_real_path=pathlib.Path\ndef scratch_path(value):\n return _real_path('/tmp/fgos-work/wave5e/anchor-cache' if str(value)=='/tmp/fgos-work/step03-anchor-cache' else value)\nm.resolver.pathlib=types.SimpleNamespace(Path=scratch_path)\n\n",
+    "independentVerification": "env -u CLAUDE_CODE_SESSION_ID python3 /tmp/fgos-work/wave5e/verify.py",
+    "independentVerificationScript": "import sys\nsys.dont_write_bytecode=True\nimport pathlib,json,hashlib,math,subprocess,collections,os\nP=pathlib.Path.cwd()/'plans/260925-documentation-authority-unification/reports/phase-08';REL=P.relative_to(pathlib.Path.cwd());PIN='ae141550c2e022310de7a0efea757580c0b2479f';NEW=[f'{i:03}' for i in range(86,105)]\ndef sha(b):return hashlib.sha256(b if isinstance(b,bytes) else b.encode()).hexdigest()\ndef read(n):return json.loads((P/n).read_text())\ndef git(*args):return subprocess.check_output(['git',*args],env={**os.environ,'GIT_OPTIONAL_LOCKS':'0'})\ndef blob(f):return git('show',PIN+':'+f)\ndef records(b):return [json.loads(l) for l in (P/'step-03-records'/f'batch-{b}.jsonl').read_text().splitlines()]\nwave=[r for b in NEW for r in records(b)];by={r['file']:r for r in wave};allrs=[r for b in range(1,105) for r in records(f'{b:03}')]\nmanifest=read('step-03-wave5e-manifest.json');index=read('step-03-wave5e-review-index.json');binding=read('step-03-wave5e-binding-manifest.json');population=read('step-03-wave5e-population.json')\nassert set(population['completedBatches'])==set(NEW) and not population['pendingAssignedBatches']\nselections=[];selected_all=set();patched_seed=mandatory_sum=unpatched_seed=mandatory_overlap=0\nfor b in NEW:\n group=[r for r in wave if r['reviewSet']=='batch-'+b];g=next(s for s in manifest['sets'] if s['set']=='batch-'+b);u=manifest['unpatchedStrata'][b]\n seed='A51-step03-file-v1\\0'+PIN+'\\0'+b\n pop=sorted(r['file'] for r in group if r['diff']);ranks=sorted([{'file':f,'rankHash':sha(seed+'\\0'+f)} for f in pop],key=lambda x:(x['rankHash'],x['file']))\n sample=[x['file'] for x in ranks[:math.ceil(.15*len(pop))]]\n mandatory={r['file'] for r in group if len(blob(r['file']))>=65536 or len(r['edges'])>=40}\n inventory_mandatory={r['file'] for r in group if len(blob(r['file']))>=65536 or len(r['inventoryEdgeIds'])>=40}\n assert inventory_mandatory<=mandatory\n ps=set(sample)|mandatory\n assert g['seed']==seed and g['population']==pop and g['ranks']==ranks and g['sample']==sample and set(g['selected'])==ps\n assert {x['file'] for x in g['mandatoryWitnesses']}==mandatory\n for witness in g['mandatoryWitnesses']:\n  r=by[witness['file']];assert witness['bytes']==len(blob(r['file'])) and witness['edges']==len(r['edges'])\n upop=sorted(r['file'] for r in group if not r['diff'] and r['edges'] and r['file'] not in ps)\n useed='A51-step03-file-v1-unpatched\\0'+PIN+'\\0batch-'+b\n uranks=sorted([{'file':f,'rankHash':sha(useed+'\\0'+f)} for f in upop],key=lambda x:(x['rankHash'],x['file']))\n usample=[x['file'] for x in uranks[:math.ceil(.15*len(upop))]]\n assert u['seed']==useed and u['population']==upop and u['ranks']==uranks and u['selected']==usample\n selected_all|=ps|set(usample);patched_seed+=len(sample);mandatory_sum+=len(mandatory);unpatched_seed+=len(usample);mandatory_overlap+=len(set(sample)&mandatory)\n a=next(a for a in index['perSet'] if a['set']=='batch-'+b)\n assert a['distinctSelected']==len(ps|set(usample)) and a['patchedStratum']['reviewedDenominator']==0 and a['unpatchedStratum']['reviewedDenominator']==0\n selections.append({'set':'batch-'+b,'patchedPopulation':len(pop),'patchedSeeded':len(sample),'mandatory':len(mandatory),'unpatchedEligible':len(upop),'unpatchedSeeded':len(usample),'distinct':len(ps|set(usample))})\nassigned=[];packets=[]\nfor p in index['parts']:\n assert p['fileCount']==len(p['files']) and p['report'].endswith(f\"review-a38-step-03-wave5e-p{p['part']:02}.md\")\n assert p['edges']==sum(x['edges'] for x in p['files']) and p['sourcePlusRecordBytes']==sum(x['contextPlusRecordBytes'] for x in p['files'])\n if p['indivisibleOversize']:assert p['fileCount']==1\n else:assert p['fileCount']<=6 and p['edges']<=150 and p['sourcePlusRecordBytes']<=400000\n for row in p['files']:\n  r=by[row['file']];assigned.append(r['file']);data=json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\\n'\n  assert row['recordSha256']==sha(data) and row['diffSha256']==sha(r['diff']) and row['sourceDigest']==sha(blob(r['file'])) and row['recordBytes']==len(data.encode()) and row['sourceBytes']==len(blob(r['file'])) and row['edges']==len(r['edges'])\n for page in p['readingPages']:\n  ranges=page['edgeRanges'];assert [n for rg in ranges for n in range(rg['first'],rg['last']+1)]==list(range(1,len(by[page['file']]['edges'])+1))\n  assert all(rg['last']-rg['first']+1<=100 for rg in ranges)\n packets.append({'part':p['part'],'files':p['fileCount'],'edges':p['edges'],'indivisible':p['indivisibleOversize']})\nassert len(assigned)==len(set(assigned))==index['selectedFiles'] and set(assigned)==selected_all\nassert index['selectedEdges']==sum(len(by[f]['edges']) for f in selected_all)\nfor row in manifest['files']:\n r=by[row['file']];assert row['digest']==sha(blob(r['file'])) and row['diffSha256']==sha(r['diff']) and row['recordSha256']==sha(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\\n')\nfor row in binding['files']:\n r=next(r for r in allrs if r['file']==row['file']);assert row['sourceDigest']==r['digest'] and row['diffSha256']==sha(r['diff']) and row['recordSha256']==sha(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\\n')\nfor row in manifest['recordFiles']+binding['recordFiles']:assert sha(pathlib.Path(row['path']).read_bytes())==row['sha256']\nreads=read('step-03-wave5e-whole-file-reads.json')['files'];assert {r['file'] for r in reads}==set(by) and len(reads)==len(by)\nfor receipt in reads:\n raw=blob(receipt['file']);ls=raw.decode().splitlines();assert receipt['sha256']==sha(raw) and receipt['bytes']==len(raw)\n for chunk in receipt['orderedWholeFileChunks']:assert chunk['sha256']==sha('\\n'.join(ls[chunk['firstLine']-1:chunk['lastLine']]))\ntracked=git('diff','--name-only','HEAD').decode().splitlines();assert tracked==[str(REL/'progress.md')]\nfor p in git('ls-files','--others','--exclude-standard').decode().splitlines():\n assert p.startswith(str(REL)+'/'),p\n name=pathlib.PurePosixPath(p).name\n assert name.startswith('step-03-wave5e-') or (name.startswith('batch-') and name.endswith('.jsonl') and 86<=int(name[6:9])<=104),p\nassert git('diff','--check')==b''\ncheck=read('step-03-wave5e-check-result.json');assert check['failureCount']==0 and check['files']==875 and check['edges']==6310\nassert check['notClosableSets']==['batch-089'] and check['openLeadRulingEdgesPerSet']['batch-089']==['maps-j-06547']\nassert sum(len(v) for v in check['openLeadRulingEdgesPerSet'].values())==1\nprior=read('step-03-wave5b-check-result.json');assert check['locatorReviewFlags']==prior['locatorReviewFlags']\nprotected={}\nfor name in ['step-03-check.py','step-03-resolve.py','step-03-probes.py','owner-answers.md']:\n f=str(REL/name);assert (P/name).read_bytes()==git('show','HEAD:'+f);protected[f]=sha((P/name).read_bytes())\nfor b in range(1,86):\n f=str(REL/'step-03-records'/f'batch-{b:03}.jsonl');assert pathlib.Path(f).read_bytes()==git('show','HEAD:'+f)\nphase6=git('ls-tree','-r','--name-only','HEAD','--',str(REL.parent/'phase-06')).decode().splitlines()\nfor f in phase6:assert pathlib.Path(f).read_bytes()==git('show','HEAD:'+f)\nproof={'pin':PIN,'assignmentInputHead':git('rev-parse','HEAD').decode().strip(),'records':{'newFiles':len(wave),'newEdges':sum(len(r['edges']) for r in wave),'completedBatches':NEW},'samplingReplay':selections,'sampleTotals':{'patchedSeeded':patched_seed,'mandatory':mandatory_sum,'mandatoryAlreadySeeded':mandatory_overlap,'unpatchedSeeded':unpatched_seed,'distinctFiles':len(selected_all),'edges':index['selectedEdges']},'packets':packets,'allBindingRecordsVerified':len(allrs),'sourceTraversalReceiptsVerified':len(reads),'progressSha256':sha((P/'progress.md').read_bytes()),'reviewRequestSha256':sha((P/'step-03-wave5e-review-request.md').read_bytes()),'protectedControlsSha256':protected,'priorBatchesVerified':85,'phase06FilesVerified':len(phase6),'trackedDeltaOnlyProgress':True,'whitespace':'git diff --check passed','fullChecker':{'files':check['files'],'edges':check['edges'],'failures':check['failureCount'],'openLeadRulingEdgesBySet':check['openLeadRulingEdgesBySet'],'notClosableSets':check['notClosableSets'],'inheritedLocatorFlagsUnchanged':len(check['locatorReviewFlags'])},'commands':{'fullChecker':'env -u CLAUDE_CODE_SESSION_ID python3 /tmp/fgos-work/wave5e/check.py','checkerWrapperScript':pathlib.Path('/tmp/fgos-work/wave5e/check.py').read_text(),'checkerBootstrapScript':pathlib.Path('/tmp/fgos-work/wave5e/inspect.py').read_text().split(\"if __name__\")[0],'independentVerification':'env -u CLAUDE_CODE_SESSION_ID python3 /tmp/fgos-work/wave5e/verify.py','independentVerificationScript':pathlib.Path(__file__).read_text()},'verificationHistory':{'firstScopedPass':'086–088: 261 retiring-preserve-wording failures in batch-086 reasons only; corrected wording, no disposition/diff delta.','supersededFullAttempt':'Stopped before completion to apply concrete source-role/row-description refinements; no passing result claimed.','newOnlyPassBeforeAnchorCorrections':'102 files / 1641 edges; four anchor-from-evidence failures corrected to actual nearest enclosing heading.','preNativeExclusionFullPass':'875 files / 6312 edges / 0 failures; superseded only by the source-bound exclusion of two bare hits from the same native Markdown link. No inventory, diff, seed or selection-membership change.', 'finalFullPass':'Unchanged Checker.all over every current canonical batch 001–104 after native-link exclusions; 875 files / 6310 edges, result artifact linked separately.'},'limits':'Records only; no npm/probe replay, semantic acceptance, consumer edit, runtime parity, set closure or Phase 9 approval. Batch-089 cannot close pending maps-j-06547 ruling. Runner commits; Lead owns preview, independent review/acceptance and actual-commit accounting.'}\n(P/'step-03-wave5e-verification.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\\n')\nprint(json.dumps({k:v for k,v in proof.items() if k not in ('commands','samplingReplay','limits','protectedControlsSha256')},ensure_ascii=False))\n"
+  },
+  "verificationHistory": {
+    "firstScopedPass": "086–088: 261 retiring-preserve-wording failures in batch-086 reasons only; corrected wording, no disposition/diff delta.",
+    "supersededFullAttempt": "Stopped before completion to apply concrete source-role/row-description refinements; no passing result claimed.",
+    "newOnlyPassBeforeAnchorCorrections": "102 files / 1641 edges; four anchor-from-evidence failures corrected to actual nearest enclosing heading.",
+    "preNativeExclusionFullPass": "875 files / 6312 edges / 0 failures; superseded only by the source-bound exclusion of two bare hits from the same native Markdown link. No inventory, diff, seed or selection-membership change.",
+    "finalFullPass": "Unchanged Checker.all over every current canonical batch 001–104 after native-link exclusions; 875 files / 6310 edges, result artifact linked separately."
+  },
+  "limits": "Records only; no npm/probe replay, semantic acceptance, consumer edit, runtime parity, set closure or Phase 9 approval. Batch-089 cannot close pending maps-j-06547 ruling. Runner commits; Lead owns preview, independent review/acceptance and actual-commit accounting."
+}

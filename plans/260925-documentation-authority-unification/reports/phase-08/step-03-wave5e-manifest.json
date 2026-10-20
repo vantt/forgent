@@ -1,0 +1,2924 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+      "set": "batch-086",
+      "sourceBytes": 131125,
+      "digest": "6b314f37f7a87aac6f37ce3be3a2229567313b4c87969fc3968e0d32390284bf",
+      "inventoryFileDigest": "6b314f37f7a87aac6f37ce3be3a2229567313b4c87969fc3968e0d32390284bf",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9a905e040dd5cb86da3d42b5b0f40599dbbb68f5be2cdfc9cc2be85524865835",
+      "recordBytes": 555224,
+      "retiresWithTree": false,
+      "edgeCount": 469,
+      "dispositions": {
+        "preserve": 469
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+      "set": "batch-087",
+      "sourceBytes": 2642,
+      "digest": "ed1dce37107235dd5a5b5fb18664601e0227d7be43acfaf5cdea331c8e9a72f1",
+      "inventoryFileDigest": "ed1dce37107235dd5a5b5fb18664601e0227d7be43acfaf5cdea331c8e9a72f1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "5d12240d1f608b6dc2d488e4eca6c26126f3b56cadd3eb85a25b4f5f3404cede",
+      "recordBytes": 3083,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+      "set": "batch-087",
+      "sourceBytes": 12385,
+      "digest": "875a2f7fe2989d987c980470959b1e64219b5a455f9db401db98928241a1f865",
+      "inventoryFileDigest": "875a2f7fe2989d987c980470959b1e64219b5a455f9db401db98928241a1f865",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1036348e80b527885c1c51f2b52c2ea90cce94fac6fe59ef8f951d834a7aa01a",
+      "recordBytes": 24722,
+      "retiresWithTree": false,
+      "edgeCount": 18,
+      "dispositions": {
+        "preserve": 17,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
+      "set": "batch-087",
+      "sourceBytes": 17824,
+      "digest": "c470ced668aab375c2b846672efce763561beb71f13867607b4de87b9b740ccc",
+      "inventoryFileDigest": "c470ced668aab375c2b846672efce763561beb71f13867607b4de87b9b740ccc",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b249dc9bf7b5bb173a00ee9d6e27d7e6d643642529e6fd7607682e1d6e5331db",
+      "recordBytes": 23866,
+      "retiresWithTree": false,
+      "edgeCount": 14,
+      "dispositions": {
+        "preserve": 13,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
+      "set": "batch-087",
+      "sourceBytes": 8035,
+      "digest": "5e9fa05c1f8d9b689985685240a6c17375fd575b9978fb29b9391460fdfd2b99",
+      "inventoryFileDigest": "5e9fa05c1f8d9b689985685240a6c17375fd575b9978fb29b9391460fdfd2b99",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "66e1e791ff6f10eafaff6ab1e92a31ac90cbe4fcd22c5211b673ea2ea55d6970",
+      "recordBytes": 10299,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "preserve": 9
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+      "set": "batch-087",
+      "sourceBytes": 21935,
+      "digest": "44583d97aa123e556e59e1bf2df83c010bcd17943c7783b18008ce8c08815c56",
+      "inventoryFileDigest": "44583d97aa123e556e59e1bf2df83c010bcd17943c7783b18008ce8c08815c56",
+      "diffSha256": "dfb0e5add143db7bd9f2b7dc98704da1b7dc8240ffde0cc9f687395aedd3818d",
+      "recordSha256": "59c1c53b74fc3af82a905f4ad9135a4bc4fb1d6d2ddd5427d7eb1de396f1f00a",
+      "recordBytes": 13748,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+      "set": "batch-087",
+      "sourceBytes": 9372,
+      "digest": "337a8434c51b1e72aa0944e01c9db3daae5da16ca2ccd1995e4decfa148a99e9",
+      "inventoryFileDigest": "337a8434c51b1e72aa0944e01c9db3daae5da16ca2ccd1995e4decfa148a99e9",
+      "diffSha256": "4c55b7c1354c9c2476f55b1da658f5a01591415a08f5f8f51eff20fe7c19ec2e",
+      "recordSha256": "97dfac875d7aa64d5a1f297eb8374c3c9f825f9c57bed213f3f681926590b4f9",
+      "recordBytes": 36360,
+      "retiresWithTree": false,
+      "edgeCount": 25,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 24
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+      "set": "batch-087",
+      "sourceBytes": 25272,
+      "digest": "05b1c7ceba3a89083d8fc1dd3565db2fcd27ce9ed1a588b5653a41bcb0369ba7",
+      "inventoryFileDigest": "05b1c7ceba3a89083d8fc1dd3565db2fcd27ce9ed1a588b5653a41bcb0369ba7",
+      "diffSha256": "d8eb89de5f8e253c4c7a8a20fa0de48519eeb4c4bcb0b91b196a4b4b0637b7f0",
+      "recordSha256": "3f6a5e747d9cd947ea2bb57b3741bf3ac542c9cec61c9d0e9d75737239ade412",
+      "recordBytes": 22112,
+      "retiresWithTree": false,
+      "edgeCount": 18,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 17
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md",
+      "set": "batch-087",
+      "sourceBytes": 4199,
+      "digest": "cd4f9064ace300da4a752c04c3a091eba598dba0b8e1d2d9050383f77877b616",
+      "inventoryFileDigest": "cd4f9064ace300da4a752c04c3a091eba598dba0b8e1d2d9050383f77877b616",
+      "diffSha256": "219900e3cab5731e2afaf965b2cb3b11a03d7df01a7e848e61adf1517d5e1f27",
+      "recordSha256": "908f87f9218b4c0818c7c866df8d073cb955c0a4e7da36b004cb4ae02bbe6f0f",
+      "recordBytes": 10850,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
+      "set": "batch-087",
+      "sourceBytes": 15791,
+      "digest": "94d0bd5ebe83755e5a14422e455c20e6c9dab09f5ced70f0e6c34d46b105d317",
+      "inventoryFileDigest": "94d0bd5ebe83755e5a14422e455c20e6c9dab09f5ced70f0e6c34d46b105d317",
+      "diffSha256": "d51e31f48b3e36682a994e24733bb011aeecfb4ebd6fc2ecc2b0270afb2d4e7d",
+      "recordSha256": "789856c8aeac7e519216aa90b37b71d05559962b718f8b1f3ccc6425558324a5",
+      "recordBytes": 13703,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+      "set": "batch-087",
+      "sourceBytes": 17806,
+      "digest": "dd12830b9f191b0182b16daa4942bec55b41593d1cfe8061792ecca5f42d019f",
+      "inventoryFileDigest": "dd12830b9f191b0182b16daa4942bec55b41593d1cfe8061792ecca5f42d019f",
+      "diffSha256": "18fc953427fcb3777d98ec9a8b362abb9ef8232841500f8d4b6de5d4f07c0f54",
+      "recordSha256": "78cb79e03e6856bdf2654284ab2fa6dee3311fdaa6fb9925ea24836e2b6f612c",
+      "recordBytes": 14168,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+      "set": "batch-087",
+      "sourceBytes": 8545,
+      "digest": "138c4eefc7fdb7d702586d2951f11aeed7ae4ba1c0955bfd895922185c3e2d92",
+      "inventoryFileDigest": "138c4eefc7fdb7d702586d2951f11aeed7ae4ba1c0955bfd895922185c3e2d92",
+      "diffSha256": "0d1bc9f2e1be5b7efd3dcdff42dc593c4ac096dd83d00f4e99426efc40129ee0",
+      "recordSha256": "226ebd2c91a9fc5be1646ba6ebe8954465a20d890a250fd6f2468c0b474bd791",
+      "recordBytes": 16722,
+      "retiresWithTree": false,
+      "edgeCount": 10,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 9
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+      "set": "batch-087",
+      "sourceBytes": 19393,
+      "digest": "b18256aa248efdcb884ca4df66b25da2abc63b9d1c93a2e06a6d7dccfd52fc59",
+      "inventoryFileDigest": "b18256aa248efdcb884ca4df66b25da2abc63b9d1c93a2e06a6d7dccfd52fc59",
+      "diffSha256": "4ccdfeea3fea6e148e0e58fb61593f37ef22ca57ff31c40e22553984807870e0",
+      "recordSha256": "a4445cfde1a357ac022794267cb4099f3e7c6a1a70952d832a1428cf16dd8e8b",
+      "recordBytes": 15521,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+      "set": "batch-087",
+      "sourceBytes": 5439,
+      "digest": "c6cfad4c026309f70f772452d657dd1cb748929abb83dedfbdaa8f9afc6a9d50",
+      "inventoryFileDigest": "c6cfad4c026309f70f772452d657dd1cb748929abb83dedfbdaa8f9afc6a9d50",
+      "diffSha256": "a8a91a4fb3c8fa6ca7f52b9e4f32f30994dbb935d96d03ae525bd1a75da9eb42",
+      "recordSha256": "91cc79358696884ef81baafa3e1de4aeec890653101361f21269a2a3c19a61c5",
+      "recordBytes": 15453,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+      "set": "batch-087",
+      "sourceBytes": 27397,
+      "digest": "a1ae971fb4d7cf344269017c6679a28dc99dfe321946fce5bc565ef8e25a5f09",
+      "inventoryFileDigest": "a1ae971fb4d7cf344269017c6679a28dc99dfe321946fce5bc565ef8e25a5f09",
+      "diffSha256": "36f02b8560ed53548fbb80053f7d14aeb8b5933ff29d887b19bec4b058bf2b52",
+      "recordSha256": "9f49e2483c4dbc76a9a220b0fd811f1b5ce5c2715be974ae35e84326526dfe1b",
+      "recordBytes": 17268,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 10
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+      "set": "batch-087",
+      "sourceBytes": 7402,
+      "digest": "36e3264a2dc695a6ee00f89df32f1542624b5c4c01272597726df0e070b127d3",
+      "inventoryFileDigest": "36e3264a2dc695a6ee00f89df32f1542624b5c4c01272597726df0e070b127d3",
+      "diffSha256": "195b428ecd4336581018cf7b5a26b1936344ea5ec70f281052e8cd2b38f5a59e",
+      "recordSha256": "1f83ea6d47fccaefc390e3eda7f0dd1f024bc1a0e6458fdd1dd3b930b7afe364",
+      "recordBytes": 12331,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+      "set": "batch-087",
+      "sourceBytes": 7936,
+      "digest": "11c25a2b3f26acd7d04b6debb29df9684fe53d61fa48dc13359fa50c86a8688d",
+      "inventoryFileDigest": "11c25a2b3f26acd7d04b6debb29df9684fe53d61fa48dc13359fa50c86a8688d",
+      "diffSha256": "5814833af35c73c636f8f5831e649ae47fbabad787f0ef1419a757564b17ae58",
+      "recordSha256": "d7f9fa7660dee1b3ccbec2a9152c5a4fe469ec5da8dee76b87ed400bab494e97",
+      "recordBytes": 15047,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+      "set": "batch-087",
+      "sourceBytes": 6217,
+      "digest": "3a9a96dc3be9ea7d8818ced5870d9289ffa28299be93e5d19855a6ae3030111a",
+      "inventoryFileDigest": "3a9a96dc3be9ea7d8818ced5870d9289ffa28299be93e5d19855a6ae3030111a",
+      "diffSha256": "9164d9406d309850c60e7271bfebff083793ca7a3f653812b88d7b4065fa49df",
+      "recordSha256": "143f58af86f66675d6ed485a7c134260a5958277e86fe5ba2f41930b5cb8291f",
+      "recordBytes": 16631,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+      "set": "batch-087",
+      "sourceBytes": 21707,
+      "digest": "8693fefc4020ecee41bd8e37384f37049cbc33e555952ae9a97090b4535b502b",
+      "inventoryFileDigest": "8693fefc4020ecee41bd8e37384f37049cbc33e555952ae9a97090b4535b502b",
+      "diffSha256": "a0710d5a4739e64ae193fcda1da426eccef9a3412396c246a7ec1d16282a105d",
+      "recordSha256": "2d5614ef94712ac29c561f9ae9e71c4d768d193c39d8b33fd36f9d0d3d97fbb9",
+      "recordBytes": 20820,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 10
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+      "set": "batch-087",
+      "sourceBytes": 86106,
+      "digest": "268af8311d9e1f0dc91579d75ba43174395362e5f33346a3911524cb00229064",
+      "inventoryFileDigest": "268af8311d9e1f0dc91579d75ba43174395362e5f33346a3911524cb00229064",
+      "diffSha256": "c3e5e868c47720a782eb8f821b3394d576d02b38014440f27df9613a9813dd8a",
+      "recordSha256": "9e7c3364b52d570f528fae980598754a44d4c13bc773f9ece8623b6684a6bee3",
+      "recordBytes": 49273,
+      "retiresWithTree": false,
+      "edgeCount": 32,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 31
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "set": "batch-087",
+      "sourceBytes": 46499,
+      "digest": "e005edcfa74d8745286a261247ee5ab09193e34c90a3ef3cc3cd51a27e94378a",
+      "inventoryFileDigest": "e005edcfa74d8745286a261247ee5ab09193e34c90a3ef3cc3cd51a27e94378a",
+      "diffSha256": "9e9b12be7c85ad1e5ea319eb6510aec44ffa617e44455981412299bb3469bf62",
+      "recordSha256": "ec9c495835f912beb864cf9316dc1a813003babf7c7030ad1f9977b03a9ce066",
+      "recordBytes": 39378,
+      "retiresWithTree": false,
+      "edgeCount": 26,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 25
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+      "set": "batch-087",
+      "sourceBytes": 5401,
+      "digest": "26ce4d27a2f8b90f65797587b7f43858197bb65966a9acba72e9dd090c5852d0",
+      "inventoryFileDigest": "26ce4d27a2f8b90f65797587b7f43858197bb65966a9acba72e9dd090c5852d0",
+      "diffSha256": "b0eb78ec7109300062f4cf8414ae63642820d6e3c0faaf5112f71f64d3ab3914",
+      "recordSha256": "2614d4b8d22ec32375567cf7da0ff5631d0245235994be4541430acda831d53c",
+      "recordBytes": 13632,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+      "set": "batch-087",
+      "sourceBytes": 3547,
+      "digest": "9b2060aaa38a81f3af5667dd0322a82b1236932cae1750901cbf9aa19510d365",
+      "inventoryFileDigest": "9b2060aaa38a81f3af5667dd0322a82b1236932cae1750901cbf9aa19510d365",
+      "diffSha256": "61f8ae9926e1b831a144e05f6513cb6b96e2836e10fb0184ae65dc38203df9df",
+      "recordSha256": "99325092bd849335d7f4189edc16602c67c5fb5927a92397be72a2a080aef7e6",
+      "recordBytes": 10896,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+      "set": "batch-087",
+      "sourceBytes": 3447,
+      "digest": "05d0d9904b1585e51ad9e68d08222dbccaeb17a6c33ae82ee586c5a8c5076a40",
+      "inventoryFileDigest": "05d0d9904b1585e51ad9e68d08222dbccaeb17a6c33ae82ee586c5a8c5076a40",
+      "diffSha256": "e1bebfafafc8035b2cd19c34136d064a0d4c6530acc5457e2309f4f1fc570056",
+      "recordSha256": "8746d610ffe236c62628e60c1b06713b0baed75886a808053598fd7b26ca30de",
+      "recordBytes": 10921,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "set": "batch-087",
+      "sourceBytes": 3439,
+      "digest": "641e53d699bed08b8bc1a2560d34782af56d6a6f06ffd223bf03651cb18bd89a",
+      "inventoryFileDigest": "641e53d699bed08b8bc1a2560d34782af56d6a6f06ffd223bf03651cb18bd89a",
+      "diffSha256": "987b9c8b15a1ab4042fe9a4322954524935a0c47fd059dc22d107a591236b04c",
+      "recordSha256": "05fa1890b5fb8bad51d1140b20ab23ae9341868f6612a103003e47394c9ad4b9",
+      "recordBytes": 10951,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+      "set": "batch-087",
+      "sourceBytes": 3289,
+      "digest": "9b6a2a82e9ef0f03b398b920806da34590518285669fe5035f6fe6370d899dfe",
+      "inventoryFileDigest": "9b6a2a82e9ef0f03b398b920806da34590518285669fe5035f6fe6370d899dfe",
+      "diffSha256": "2bbf3e69da8c8e2d93019fd3892c7f4e7c3668af81d62ae813586dd97e6a400d",
+      "recordSha256": "afab448115fa86b94ed4c135fd1f9012bd6898b054605dfe7ca552b1a0a9377f",
+      "recordBytes": 10830,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+      "set": "batch-088",
+      "sourceBytes": 3325,
+      "digest": "7cabdda6aa024a58c620dc0db7aba105f42e066df52cdece07a48e0e4b3944ce",
+      "inventoryFileDigest": "7cabdda6aa024a58c620dc0db7aba105f42e066df52cdece07a48e0e4b3944ce",
+      "diffSha256": "6622554bb051c43359659ab9d6f85d6ae324628f1a5ecc08470863d7a6cf4e5a",
+      "recordSha256": "8ea96a7b3305ae5cd25f03b5a0b50ad95b01076bcb872f00843adab62bda8707",
+      "recordBytes": 10881,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "set": "batch-088",
+      "sourceBytes": 7390,
+      "digest": "c120616f2ef08d3436082fce5723096abc10a8b0139fd05d4831c5f3b8d3e786",
+      "inventoryFileDigest": "c120616f2ef08d3436082fce5723096abc10a8b0139fd05d4831c5f3b8d3e786",
+      "diffSha256": "68f135892112f8e65f2967c1e77959259d88fd8777059ee19ec1cfb887d77e15",
+      "recordSha256": "280b2603b4b2a4324118cb00ccc380d70832d5759b0d5e61757f597c613ef315",
+      "recordBytes": 15848,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "set": "batch-088",
+      "sourceBytes": 6298,
+      "digest": "378ddfb0b9ee7ac7fb1ae64bf78132657a62a215983ac81fea89b27b0144925a",
+      "inventoryFileDigest": "378ddfb0b9ee7ac7fb1ae64bf78132657a62a215983ac81fea89b27b0144925a",
+      "diffSha256": "a1ea78fd47b2a04e409174ef262734a33eae747ecfc03446e6d191909996566a",
+      "recordSha256": "d9821f3d5cd8f479b039d4b3f80248ff595a1d3b951854d64a44cb09ffa113df",
+      "recordBytes": 18412,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "set": "batch-088",
+      "sourceBytes": 12398,
+      "digest": "5993832e16b9f9c083c70ab559ded77ee40611699900a8501048956a8d673ee2",
+      "inventoryFileDigest": "5993832e16b9f9c083c70ab559ded77ee40611699900a8501048956a8d673ee2",
+      "diffSha256": "82743b85b978f8d0d6fb2e0cd9739cde7e2c1252cbefffa505e31daa3bfeaff4",
+      "recordSha256": "619970177ca9f08afcf46aef4031290ce006c09f40588febfec2b2b3dfe715e4",
+      "recordBytes": 29166,
+      "retiresWithTree": false,
+      "edgeCount": 19,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 18
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "set": "batch-088",
+      "sourceBytes": 11543,
+      "digest": "5e24133ed6af0fd697eceeec9f89314343f53e1b9d4c9ee14b848f6e47c531e8",
+      "inventoryFileDigest": "5e24133ed6af0fd697eceeec9f89314343f53e1b9d4c9ee14b848f6e47c531e8",
+      "diffSha256": "e4e2c6069ad4e1f164d28606e4abccfe1151e50c8821ebc19d5635f33cc3a0fd",
+      "recordSha256": "8b00fcdf6575d9f13467719ef4feabab57d1a287ce6529a047a0b121b51d8358",
+      "recordBytes": 23216,
+      "retiresWithTree": false,
+      "edgeCount": 15,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 14
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "set": "batch-088",
+      "sourceBytes": 9583,
+      "digest": "83b15457c3df4736e1f8599311713d7edc1845de2e15b9b6cc6348370d5d7cf3",
+      "inventoryFileDigest": "83b15457c3df4736e1f8599311713d7edc1845de2e15b9b6cc6348370d5d7cf3",
+      "diffSha256": "31d8fdecf1751a55ffc18d5884d8042331b36e15f4a4ac9558439ad5838fc3ac",
+      "recordSha256": "95a2444883baa900db318332d28b06244a9899bc8a8dbbb12309975cce6eeca1",
+      "recordBytes": 21322,
+      "retiresWithTree": false,
+      "edgeCount": 12,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 11
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "set": "batch-088",
+      "sourceBytes": 7700,
+      "digest": "e10f823de2e7971378e617bdd8eecc2a5603bb064dbbac994355f41d1693bc46",
+      "inventoryFileDigest": "e10f823de2e7971378e617bdd8eecc2a5603bb064dbbac994355f41d1693bc46",
+      "diffSha256": "4650a7d04e82a95ca619b319ce796176e86062303f5e9066e10d95ca7f545f18",
+      "recordSha256": "9885b707ffffb9aa25b0e529b2ab8d8603876ca07c85e1e5749ab8936f9b48af",
+      "recordBytes": 11011,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+      "set": "batch-088",
+      "sourceBytes": 33688,
+      "digest": "68caae1d33be3dc6f94375bdf3aa25e8aee90ce46b00975e3559f44224faa082",
+      "inventoryFileDigest": "68caae1d33be3dc6f94375bdf3aa25e8aee90ce46b00975e3559f44224faa082",
+      "diffSha256": "7b2daaf58761d790edfe9929c2e9b94b445898442df7594a472a5280750eb30e",
+      "recordSha256": "fe43bf7dabb3e801597bd73d93290c37846ad2908eb03f17b47546772c55ce4c",
+      "recordBytes": 26229,
+      "retiresWithTree": false,
+      "edgeCount": 22,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 21
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+      "set": "batch-088",
+      "sourceBytes": 41088,
+      "digest": "8dd0dca9b7fa9fe292617af44f7db4f83a841bc3a0e6b1394a0224e1bab6eb07",
+      "inventoryFileDigest": "8dd0dca9b7fa9fe292617af44f7db4f83a841bc3a0e6b1394a0224e1bab6eb07",
+      "diffSha256": "350ae0729dca76fb270ba5ee2b86af31a02bdbdbe753a40b0d74b80d4cc1cfd7",
+      "recordSha256": "157598aa8c58a7b102da687d04f1c95e9c009ea73f0203814d17db46d3db27d1",
+      "recordBytes": 15056,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+      "set": "batch-088",
+      "sourceBytes": 42264,
+      "digest": "d272fe276db3a6b29828803f5b59caa32bc0ea4ba8039bfbce18edfcb66fdf31",
+      "inventoryFileDigest": "d272fe276db3a6b29828803f5b59caa32bc0ea4ba8039bfbce18edfcb66fdf31",
+      "diffSha256": "ef8fb2ae46f1d5730f52938b0a0ca00c3255c1ece89cddb37f2d15a84a4491fe",
+      "recordSha256": "7894c3c5916a58bbd9fe2f82d4c17f23eb9439ecd5dd3f5f27ab5850ff9e2839",
+      "recordBytes": 26648,
+      "retiresWithTree": false,
+      "edgeCount": 32,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 31
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+      "set": "batch-088",
+      "sourceBytes": 5856,
+      "digest": "8114708dd784265bb50d7daf8093bb550bb4ff55f9bb49e1dd1b6a80cab2384c",
+      "inventoryFileDigest": "8114708dd784265bb50d7daf8093bb550bb4ff55f9bb49e1dd1b6a80cab2384c",
+      "diffSha256": "9e6e6f29f100533529989ace6a5667e39873fd570fb942c461ae1b0a10b72170",
+      "recordSha256": "29752f9e38ac095a33a3140c2e760dfc62522a018866ba3110f6b31ae2674b9c",
+      "recordBytes": 11227,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+      "set": "batch-088",
+      "sourceBytes": 44538,
+      "digest": "e44cdc1e389036e9013dac23a8eee07cc696ae1e577cd90682a08476a1b1ca6f",
+      "inventoryFileDigest": "e44cdc1e389036e9013dac23a8eee07cc696ae1e577cd90682a08476a1b1ca6f",
+      "diffSha256": "1214a5fa3f7fe8c42e2112b6c8092beba76a32dcd2a6ffe6b5d521a526196c31",
+      "recordSha256": "a54a3d88eaa6be545c50e8ede9e380a98c5c17ad514734f08714ea41fcd16e47",
+      "recordBytes": 23121,
+      "retiresWithTree": false,
+      "edgeCount": 12,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 11
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+      "set": "batch-088",
+      "sourceBytes": 77561,
+      "digest": "8b0629c39c72db62ea6bd1b7dc5bac2ee80436d5db7ee9ba72a078c56bb729a4",
+      "inventoryFileDigest": "8b0629c39c72db62ea6bd1b7dc5bac2ee80436d5db7ee9ba72a078c56bb729a4",
+      "diffSha256": "432a9a8b6214dbf922598aa50e4424183c01dfaa00157b477e05156d276d77ee",
+      "recordSha256": "38f3b791b10fdaa3bf86d6f10288c0298c406f1f957c724f8c68283a4c501588",
+      "recordBytes": 40158,
+      "retiresWithTree": false,
+      "edgeCount": 31,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 30
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+      "set": "batch-088",
+      "sourceBytes": 16744,
+      "digest": "7541a5f027caf273459b72b36fe635ebd7262db1a28a5dee4bf8fb8ac9b4df41",
+      "inventoryFileDigest": "7541a5f027caf273459b72b36fe635ebd7262db1a28a5dee4bf8fb8ac9b4df41",
+      "diffSha256": "61607ddac9413f6051092b3056b3f598515e2b1986ecfad44445bada387434a6",
+      "recordSha256": "ae844906a8d9ffb3d4f330fa5acc28d31c2d1fdbe5126e9305543a648464862a",
+      "recordBytes": 16788,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+      "set": "batch-088",
+      "sourceBytes": 56626,
+      "digest": "150dc5f95a94a0e0addc9789bf196635ab90a26e1b61ecee33c128806850420c",
+      "inventoryFileDigest": "150dc5f95a94a0e0addc9789bf196635ab90a26e1b61ecee33c128806850420c",
+      "diffSha256": "b13c28c4a1e8cad67a14003e8a07133feec7d720ed26f358b2c0efaf644b5865",
+      "recordSha256": "3c2ee397aee6dd4ec26d80d6fde51f4dcbe96e45c62b8800b11e43115d8918a9",
+      "recordBytes": 20118,
+      "retiresWithTree": false,
+      "edgeCount": 16,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 15
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "set": "batch-088",
+      "sourceBytes": 30939,
+      "digest": "8a38625d069995729408e380fbb13b94a28c1fb7b048e3b4d43c7f6bc9044e64",
+      "inventoryFileDigest": "8a38625d069995729408e380fbb13b94a28c1fb7b048e3b4d43c7f6bc9044e64",
+      "diffSha256": "7293603fb2955b42577d5b773b709ba9ffa6e8bac95bf0486e7f7841971a4bb2",
+      "recordSha256": "f5d8130abcd381dd2b43f32f27f14e7893c77bb42e576d02945f4fc37e13e977",
+      "recordBytes": 16544,
+      "retiresWithTree": false,
+      "edgeCount": 13,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 12
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+      "set": "batch-088",
+      "sourceBytes": 22499,
+      "digest": "68995fdfc911f40d52bedfb39bd05cf31d135e67a81bbd34f475a891193ce66e",
+      "inventoryFileDigest": "68995fdfc911f40d52bedfb39bd05cf31d135e67a81bbd34f475a891193ce66e",
+      "diffSha256": "9542244df2250e903165b3b1ae36dbcf646bb0b01c823659441d02b5be709698",
+      "recordSha256": "58535dd8b2a817caa7ddcd0f784e8d0ffa2e5b7370df4b28121844762fe2754e",
+      "recordBytes": 13343,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+      "set": "batch-088",
+      "sourceBytes": 27341,
+      "digest": "84b1b55b1864360075d21d32da2b9bba07a151aad393dcc11539239ee7501bc1",
+      "inventoryFileDigest": "84b1b55b1864360075d21d32da2b9bba07a151aad393dcc11539239ee7501bc1",
+      "diffSha256": "2fafa198fc73d202f279b676b6939e6168578e10593d0ed718dc9ca5e2a468ae",
+      "recordSha256": "8a7a38cf4fdf11c731054111d2a2605729d0cb23d2d20f8b527c1ec366f3c0a7",
+      "recordBytes": 15947,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 10
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+      "set": "batch-088",
+      "sourceBytes": 12413,
+      "digest": "a41b3d29e10acf28e75f0e1d2cecdfa5c65feac5c72dcff1906335b75c66daf8",
+      "inventoryFileDigest": "a41b3d29e10acf28e75f0e1d2cecdfa5c65feac5c72dcff1906335b75c66daf8",
+      "diffSha256": "057f6acc52aa206b9b967984d6e0dfee1752e99cf17196f8f3bb81785e6a7beb",
+      "recordSha256": "683d67c671bf4fdd88df46d58871bcfddcb76750e314335a1bcd2e77a30b2f10",
+      "recordBytes": 13622,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+      "set": "batch-088",
+      "sourceBytes": 11443,
+      "digest": "1d49e4d8a239fd0a5cebda8b65be30b480f5733f48e55539e16874c9519a618b",
+      "inventoryFileDigest": "1d49e4d8a239fd0a5cebda8b65be30b480f5733f48e55539e16874c9519a618b",
+      "diffSha256": "4351ce6de64ed429cfe0d6b778afcac3c4a870878303eff67ade50c9c3c60eac",
+      "recordSha256": "2437955ef4648387b73806d28372912c0f1cc6bbe457ff72f58a236aae179acd",
+      "recordBytes": 11595,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+      "set": "batch-088",
+      "sourceBytes": 8521,
+      "digest": "fc65852d0612eaa6556520014e2a377976d1e691d2828fd5bc2deecc7c004ae3",
+      "inventoryFileDigest": "fc65852d0612eaa6556520014e2a377976d1e691d2828fd5bc2deecc7c004ae3",
+      "diffSha256": "9060f90d1e947f05fa7d42f60aa3bd8845d7ed9ac0266a0e185a57fd513dc737",
+      "recordSha256": "f1af1b4fe2a3ce975442f9f683e97d67d2c57ddaa5a66733b5afafca0c02efaf",
+      "recordBytes": 12044,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+      "set": "batch-088",
+      "sourceBytes": 7623,
+      "digest": "5610ecb432d5458add306daed63d04b9baa590d2dbbc8d390fff40ab8c74fe7a",
+      "inventoryFileDigest": "5610ecb432d5458add306daed63d04b9baa590d2dbbc8d390fff40ab8c74fe7a",
+      "diffSha256": "3a561cd48bbb58b0b6b7a7f90be61233fe7975110b41bc5bd6eed5326bf2fe1a",
+      "recordSha256": "23b25b34275209f8655c76554f926738dcef6d8623086727cd2d5fc8d21c9696",
+      "recordBytes": 15979,
+      "retiresWithTree": false,
+      "edgeCount": 13,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 12
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+      "set": "batch-088",
+      "sourceBytes": 3395,
+      "digest": "5a27d9dab4ffd936948174f231ebeac8b95a55e03149189501cd1fcf127fe021",
+      "inventoryFileDigest": "5a27d9dab4ffd936948174f231ebeac8b95a55e03149189501cd1fcf127fe021",
+      "diffSha256": "ce090edef0f49a521a660adebda1c4f8cf24e11e4a056cfb18303d057660d6b8",
+      "recordSha256": "9f2c611bac060dd555d5084a2f38dcd6d2c95cc5af6f7b68b2df027dfdb82e01",
+      "recordBytes": 12363,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 5,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+      "set": "batch-088",
+      "sourceBytes": 19658,
+      "digest": "0bc5655a72cb5fb06754a2448a48cf57bcb66ed9a4d154ea8bb36fdbd1af9657",
+      "inventoryFileDigest": "0bc5655a72cb5fb06754a2448a48cf57bcb66ed9a4d154ea8bb36fdbd1af9657",
+      "diffSha256": "fdd3c3ae7d5e0377d2b282e140862ec3f514aa2703dae917d2eb5c7bc9eab8e0",
+      "recordSha256": "6609b994e366a268852348b68d0c72e0b76bbeb6494c76e4373284f5179d87e9",
+      "recordBytes": 18608,
+      "retiresWithTree": false,
+      "edgeCount": 16,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 15
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
+      "set": "batch-088",
+      "sourceBytes": 14950,
+      "digest": "23b76d492c80579e73be3a44e96cdac73d75bef4ff4066bd5fa749300e336282",
+      "inventoryFileDigest": "23b76d492c80579e73be3a44e96cdac73d75bef4ff4066bd5fa749300e336282",
+      "diffSha256": "3cfa2dd9a574751de15a2959d8e568cc4840f4b69ef4eaebb124c1d3ce72e73b",
+      "recordSha256": "b516edf09bd1177ea9e75654af6e78d17e01541c07ebdd5606c9ef1d6fa03b65",
+      "recordBytes": 35275,
+      "retiresWithTree": false,
+      "edgeCount": 24,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 23
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+      "set": "batch-089",
+      "sourceBytes": 7115,
+      "digest": "420853736e8f1a7b8488a70ec3d2ee398b975867091ff4bc12e613590d6fbeb6",
+      "inventoryFileDigest": "420853736e8f1a7b8488a70ec3d2ee398b975867091ff4bc12e613590d6fbeb6",
+      "diffSha256": "b13c51c7d5fa679f31c722190be2d855ead179c681afab39e66f7c579f12f9fb",
+      "recordSha256": "4d6065ab64d1f454368b832209bb386f9e11131da935bdc6cf201236a2a1d9d2",
+      "recordBytes": 12159,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+      "set": "batch-089",
+      "sourceBytes": 5704,
+      "digest": "282210b38026e6b7b1349865798b5073558791ba9a918a51322057890e94d77e",
+      "inventoryFileDigest": "282210b38026e6b7b1349865798b5073558791ba9a918a51322057890e94d77e",
+      "diffSha256": "15c272717d62a8c8890bd5548b491a29f9b75b59028858ae4c6c90b119f64370",
+      "recordSha256": "9c3ab92086594a80be93aaaf59afb87199b19d1f5257cf883a7ae2942748510b",
+      "recordBytes": 15732,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+      "set": "batch-089",
+      "sourceBytes": 15923,
+      "digest": "58360696c73e0f97f1f035df9db5cdffa1d7a896b6a76c73de4899c1789f664b",
+      "inventoryFileDigest": "58360696c73e0f97f1f035df9db5cdffa1d7a896b6a76c73de4899c1789f664b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "5f3ff2f274af46536abde4e55f5afe26865ba6697d8cb1dbb07f5873e407c801",
+      "recordBytes": 26580,
+      "retiresWithTree": false,
+      "edgeCount": 36,
+      "dispositions": {
+        "preserve": 36
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md",
+      "set": "batch-089",
+      "sourceBytes": 10490,
+      "digest": "1625a572e0e8fc27464381a006e9531fc8dbc6e95d1e04827cbc09862f16ea25",
+      "inventoryFileDigest": "1625a572e0e8fc27464381a006e9531fc8dbc6e95d1e04827cbc09862f16ea25",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "18d4f524c33913b9a1a33801e7d2c4267bdf3ac43014158e4065f7fe708a2c6c",
+      "recordBytes": 16859,
+      "retiresWithTree": false,
+      "edgeCount": 26,
+      "dispositions": {
+        "preserve": 26
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md",
+      "set": "batch-089",
+      "sourceBytes": 6859,
+      "digest": "df0cd53a930f745d5a633f3b67f144ffb67a183b7508a47bbc0e7a0c54a5a8cd",
+      "inventoryFileDigest": "df0cd53a930f745d5a633f3b67f144ffb67a183b7508a47bbc0e7a0c54a5a8cd",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b2ad0f4ad02b0067e12983a2e83ecf5ac07565bad65e9b411d95eb4622b77df1",
+      "recordBytes": 7127,
+      "retiresWithTree": false,
+      "edgeCount": 10,
+      "dispositions": {
+        "preserve": 10
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+      "set": "batch-089",
+      "sourceBytes": 5536,
+      "digest": "4a5cbc0c2be348d6ed60be11afb1a1ed17c9300226c63bcb276a49d85015aa6b",
+      "inventoryFileDigest": "4a5cbc0c2be348d6ed60be11afb1a1ed17c9300226c63bcb276a49d85015aa6b",
+      "diffSha256": "61492c02aae15f6c75b09cad0702f630fbb97d44cb37006df1b9c89114e45540",
+      "recordSha256": "0feea168704f08af1045abf09fdbb71659ee15dde295aab2fd67df4e54eeb446",
+      "recordBytes": 17319,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 10
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md",
+      "set": "batch-089",
+      "sourceBytes": 16220,
+      "digest": "491d90a6755cdb6ef0f17b2befd8861c29cf101c87d7a9938ebf2721e133a9d6",
+      "inventoryFileDigest": "491d90a6755cdb6ef0f17b2befd8861c29cf101c87d7a9938ebf2721e133a9d6",
+      "diffSha256": "2e2dd4816509a4475ccb61149d0ff39bec32b3c6627da8156610f00d4a9f252d",
+      "recordSha256": "f97a08d5056e63f906d9b88167c1ddcd38bd54237b8617b0a9c2620d37717328",
+      "recordBytes": 17384,
+      "retiresWithTree": false,
+      "edgeCount": 13,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 12
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+      "set": "batch-089",
+      "sourceBytes": 35775,
+      "digest": "e7ffb99241761e46ec108f2e9d4e47a6fa67be124594b75661b8aaebf16d1210",
+      "inventoryFileDigest": "e7ffb99241761e46ec108f2e9d4e47a6fa67be124594b75661b8aaebf16d1210",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "5c3c5fe34b823e55771085d57179cd036c541a37ae5e84ac75f63183a48f856e",
+      "recordBytes": 35801,
+      "retiresWithTree": false,
+      "edgeCount": 36,
+      "dispositions": {
+        "preserve": 36
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
+      "set": "batch-089",
+      "sourceBytes": 6078,
+      "digest": "faa90b316286f190e01a800ad9a2c27cd5d9e1aeb8d22adaebaaf727f62a09ea",
+      "inventoryFileDigest": "faa90b316286f190e01a800ad9a2c27cd5d9e1aeb8d22adaebaaf727f62a09ea",
+      "diffSha256": "2935bfb826745da41faf409a4e8c2c81ef5e24dcd19d6e3effa8b036a7284d6c",
+      "recordSha256": "0c769a2adcf5aed2f955b7981719ef28d0f453c76cf990a03c74b08696102ec2",
+      "recordBytes": 19204,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "preserve": 10,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+      "set": "batch-089",
+      "sourceBytes": 31872,
+      "digest": "60a61d421faa9cd83d7625c3068aedb604a5edd02f78840c82cd445ba64e919e",
+      "inventoryFileDigest": "60a61d421faa9cd83d7625c3068aedb604a5edd02f78840c82cd445ba64e919e",
+      "diffSha256": "8beab6257f60f7eb1417738dd9ecca186dfd99f90db4f70a2f4a625d962027af",
+      "recordSha256": "2db6f2d88ec8afaeddcc31d0d3cf56d9f98644c0c8e87a53cd5eec401cd65f2d",
+      "recordBytes": 49089,
+      "retiresWithTree": false,
+      "edgeCount": 32,
+      "dispositions": {
+        "preserve": 31,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "set": "batch-089",
+      "sourceBytes": 7006,
+      "digest": "8a4d1ebaf6562f253c3ccd0a4410658d7144e084e3834c08a88eb9288a7915b6",
+      "inventoryFileDigest": "8a4d1ebaf6562f253c3ccd0a4410658d7144e084e3834c08a88eb9288a7915b6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1662e3a136ee40c8ad8f0f6caaa7532850429d25746fe861f1482ac356115fa6",
+      "recordBytes": 2240,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "set": "batch-089",
+      "sourceBytes": 13530,
+      "digest": "42cab41d7ab9739a2145b68cf20599b95119007c79f5888f335a89fad8a14466",
+      "inventoryFileDigest": "42cab41d7ab9739a2145b68cf20599b95119007c79f5888f335a89fad8a14466",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7a86316b012add1f29dd5e759f26a63d806c984b6b0e0dc75b277e15bea7e983",
+      "recordBytes": 18373,
+      "retiresWithTree": false,
+      "edgeCount": 25,
+      "dispositions": {
+        "preserve": 25
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+      "set": "batch-089",
+      "sourceBytes": 9697,
+      "digest": "526d0b22dc43ed34423acfd18d97458ce411819271eb1c3a22bf9639c59cf85e",
+      "inventoryFileDigest": "526d0b22dc43ed34423acfd18d97458ce411819271eb1c3a22bf9639c59cf85e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "32831583517be45ebc60c2c67281f6eef744abc3919ea04d932877f99359d04f",
+      "recordBytes": 8649,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "preserve": 11
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "set": "batch-089",
+      "sourceBytes": 41339,
+      "digest": "4b5425c7104d77f69f4beaf6f00e96950042ce8a81efbedf148cd42c117d13fb",
+      "inventoryFileDigest": "4b5425c7104d77f69f4beaf6f00e96950042ce8a81efbedf148cd42c117d13fb",
+      "diffSha256": "c57697ca625d9eadb11ba754006f62547e51d76fa7caacb8ec2d58eb020aaca6",
+      "recordSha256": "852ada830a435fbccbe5565d2b6575ce7b809889d16211cece97f2407604b72e",
+      "recordBytes": 251354,
+      "retiresWithTree": false,
+      "edgeCount": 28,
+      "dispositions": {
+        "patch": 4,
+        "preserve": 24
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "set": "batch-089",
+      "sourceBytes": 16084,
+      "digest": "6283f064d761fc87f746031a2d12da027c06bbea5be85e5a45365ed8d2df4088",
+      "inventoryFileDigest": "6283f064d761fc87f746031a2d12da027c06bbea5be85e5a45365ed8d2df4088",
+      "diffSha256": "13273484e6f217b440d3dc38f4b6710faf8160af3c793214ef483a68043e075c",
+      "recordSha256": "963e737e7d452afd46a82ce455fcaf6c9394b6d705f07370f19eaf2641181992",
+      "recordBytes": 9961,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/spec.md",
+      "set": "batch-089",
+      "sourceBytes": 7571,
+      "digest": "1306d4f34b42fb2f6eaf9aff1dfb894e300e989975ab0ba9a0842847f24d22c9",
+      "inventoryFileDigest": "1306d4f34b42fb2f6eaf9aff1dfb894e300e989975ab0ba9a0842847f24d22c9",
+      "diffSha256": "f7d3fb80ed607ad695f4f999cbf6f7e2292ee4db473ee0afa39a985e00af997f",
+      "recordSha256": "a8ea71fa272e7399550e88f3adf8cfe81858e669617d70db7f509f8d3093ab63",
+      "recordBytes": 29305,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 3,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/vision.md",
+      "set": "batch-089",
+      "sourceBytes": 16165,
+      "digest": "15424581be04de19fc1a9b5477ddd42d7822ef1a434f1a5a867ffea5d7103bf6",
+      "inventoryFileDigest": "15424581be04de19fc1a9b5477ddd42d7822ef1a434f1a5a867ffea5d7103bf6",
+      "diffSha256": "7061aef6e37fce724c5672347cf7b6cfcd805c8fe3baca31eb72efb3fea65a33",
+      "recordSha256": "39bc61652bd8fc3c98d33e1eadfabcd19b026b42956294df0a9b715ae07f2fef",
+      "recordBytes": 7629,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "set": "batch-089",
+      "sourceBytes": 8196,
+      "digest": "f1d218d61037b623fd05d40247f36463cdd6461841278c4cc85c0c43a49c7803",
+      "inventoryFileDigest": "f1d218d61037b623fd05d40247f36463cdd6461841278c4cc85c0c43a49c7803",
+      "diffSha256": "97a5cc9512736816ce1b70a3d071b13d3c8148c22732b1776cc5edd3e196f364",
+      "recordSha256": "0435533841fe64d3a43b0ef17256e2969c9870fc4de9c6615550ac94d1b4ba75",
+      "recordBytes": 7698,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+      "set": "batch-089",
+      "sourceBytes": 5498,
+      "digest": "6ae9d176df352daeec9b335040b7672706cf6f6719ae79fb5c2c9b85111faafb",
+      "inventoryFileDigest": "6ae9d176df352daeec9b335040b7672706cf6f6719ae79fb5c2c9b85111faafb",
+      "diffSha256": "0c79566fc7a74bb8f3962d50290e76c8b006c67730e7920324091ac23b32aac9",
+      "recordSha256": "6c70017f1ca6c3f5da290b387b30b08a40fa7c991250576e553db49d7725557d",
+      "recordBytes": 15553,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "set": "batch-089",
+      "sourceBytes": 3700,
+      "digest": "f1af5a4cf9705322fd21d12ce41e4fa9a0138ca9792e1c14b5f32606a1fb6318",
+      "inventoryFileDigest": "f1af5a4cf9705322fd21d12ce41e4fa9a0138ca9792e1c14b5f32606a1fb6318",
+      "diffSha256": "30e749097d515ee940486a0a7caff5993b810a200b1e2738951c154e70d4f350",
+      "recordSha256": "514c5dd770fd4b4e573c9090c213af4d6e68ee74d3266a560a7c28fd09ad496a",
+      "recordBytes": 13241,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-protocol/spec.md",
+      "set": "batch-090",
+      "sourceBytes": 14509,
+      "digest": "236da5383cf15476b84f06f106d7a941b00d9abc7ef8f32190a6606f4a95bfb7",
+      "inventoryFileDigest": "236da5383cf15476b84f06f106d7a941b00d9abc7ef8f32190a6606f4a95bfb7",
+      "diffSha256": "4ff0bd2ca7c0b95ad96307fe002a0e63ab73963dfaf7105cf5768699a888db62",
+      "recordSha256": "f0c88d09b6722f295c5e91b9844263d7714cb7426f26277e82c02f40db00d636",
+      "recordBytes": 7409,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/claude-plugin/spec.md",
+      "set": "batch-091",
+      "sourceBytes": 11817,
+      "digest": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
+      "inventoryFileDigest": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
+      "diffSha256": "24e29bb7d4f17d73b8e643a04ceabf0c148232d27d7643d815907cc5f2897bcf",
+      "recordSha256": "662d8fb47b98eb3ac70d79e2cd5b864b4b4c73ad05cac8f34843a5096a926325",
+      "recordBytes": 75094,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 1,
+        "parked": 1,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/platform/coexistence/spec.md",
+      "set": "batch-092",
+      "sourceBytes": 8043,
+      "digest": "954d7bc90bb7ee28a45c8f9c5a48fdb3fab119e06e0d902ffdfce438cb5b4d5f",
+      "inventoryFileDigest": "954d7bc90bb7ee28a45c8f9c5a48fdb3fab119e06e0d902ffdfce438cb5b4d5f",
+      "diffSha256": "a07872cfc730b08910f40310d6db770a42188d65fdd93af41a309e1e49ebbc60",
+      "recordSha256": "0d2332ed559da83b74ca8de26a0cf11c3070e3b1d79061d3a9d6da1807222eaf",
+      "recordBytes": 211431,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 4,
+        "parked": 2,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/platform/component-boundary.md",
+      "set": "batch-093",
+      "sourceBytes": 101816,
+      "digest": "6c28a1a96e9671e4938a280c3a9102520429f4b75baa81a8f5cbf806d18e639c",
+      "inventoryFileDigest": "6c28a1a96e9671e4938a280c3a9102520429f4b75baa81a8f5cbf806d18e639c",
+      "diffSha256": "2720f13acd6a51485e1d2338894503443f72c6fcc34e8cfb738b07f4b8eeb0e4",
+      "recordSha256": "c381af56a33b8f4c9e5df8ba352f0d3df35914829cb4af0c4dee03605f37e10a",
+      "recordBytes": 1641052,
+      "retiresWithTree": false,
+      "edgeCount": 39,
+      "dispositions": {
+        "parked": 18,
+        "preserve": 16,
+        "phase9-row-flip": 3,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/platform/contracts/architecture-manifest.json",
+      "set": "batch-094",
+      "sourceBytes": 13283,
+      "digest": "d47d61b0eb85cd18e5ee986a3a56db7c1bb1834dfdce50f6084c9181b3465dbc",
+      "inventoryFileDigest": "d47d61b0eb85cd18e5ee986a3a56db7c1bb1834dfdce50f6084c9181b3465dbc",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "fcc60607d907c1aab50f4dd3417d694a9d51e978db6928b521667dfec44ec3eb",
+      "recordBytes": 16524,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/convention/spec.md",
+      "set": "batch-095",
+      "sourceBytes": 26208,
+      "digest": "17dceaa007bfb1e1223cdb3cf7bfdad214a251b066bb464950e9ba925f06467b",
+      "inventoryFileDigest": "17dceaa007bfb1e1223cdb3cf7bfdad214a251b066bb464950e9ba925f06467b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "69cba94bd4ce75d89334dda93b355059bf30931224253b7a979980790e8b25e1",
+      "recordBytes": 2620,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/decision-citation-drift/spec.md",
+      "set": "batch-096",
+      "sourceBytes": 7339,
+      "digest": "43e2f1bf7f664a981125a4afe802d4abcda3621580c13c6d4e6f2f5bdb5ef2f3",
+      "inventoryFileDigest": "43e2f1bf7f664a981125a4afe802d4abcda3621580c13c6d4e6f2f5bdb5ef2f3",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6f01c93b9a470507590c697e40a3bc253ebe417bf3a2f2499d4f3e880c1dd80c",
+      "recordBytes": 78214,
+      "retiresWithTree": false,
+      "edgeCount": 17,
+      "dispositions": {
+        "preserve": 4,
+        "parked": 13
+      }
+    },
+    {
+      "file": "docs/platform/distillery/spec.md",
+      "set": "batch-097",
+      "sourceBytes": 8286,
+      "digest": "2a208ae64a9fc79022a1afd30c3fa525367ea2a9374aed6a2fb5680a58e4b166",
+      "inventoryFileDigest": "2a208ae64a9fc79022a1afd30c3fa525367ea2a9374aed6a2fb5680a58e4b166",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "5c0dad7687732eb17c0cb90c09e83b243ffd60f2e6538f8d0de020f0e3bbcf29",
+      "recordBytes": 13400,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 3,
+        "parked": 2
+      }
+    },
+    {
+      "file": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "set": "batch-098",
+      "sourceBytes": 20398,
+      "digest": "004bb912d6e4e132ac65a486c8b209e4b5e33c89fd19032c23738679743d842b",
+      "inventoryFileDigest": "004bb912d6e4e132ac65a486c8b209e4b5e33c89fd19032c23738679743d842b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "527391134216c5413524872335045f96fbe7dbff833d9d4106c163a7081f52f9",
+      "recordBytes": 19830,
+      "retiresWithTree": false,
+      "edgeCount": 12,
+      "dispositions": {
+        "preserve": 11,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "set": "batch-098",
+      "sourceBytes": 14455,
+      "digest": "50a036a1cafbca9862192a0ba11927cc60aa9f5e35a26667e15175ff487e0161",
+      "inventoryFileDigest": "50a036a1cafbca9862192a0ba11927cc60aa9f5e35a26667e15175ff487e0161",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1a79f963c8083d88ee59a8bb0f651c2dd601485230bdef4e7ea9b1cf9e5fc0c4",
+      "recordBytes": 25148,
+      "retiresWithTree": false,
+      "edgeCount": 25,
+      "dispositions": {
+        "preserve": 25
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+      "set": "batch-098",
+      "sourceBytes": 63603,
+      "digest": "3ef1aba54d0e3cfe7fa2d11ab8d70c7c6a4c814a636bedf21b7eb9014eca5645",
+      "inventoryFileDigest": "3ef1aba54d0e3cfe7fa2d11ab8d70c7c6a4c814a636bedf21b7eb9014eca5645",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3a04958ae1414a1f854a1e30cf30842f774c1927ec8bbf1603aba280bab1a897",
+      "recordBytes": 99143,
+      "retiresWithTree": false,
+      "edgeCount": 82,
+      "dispositions": {
+        "preserve": 81,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/architecture.md",
+      "set": "batch-098",
+      "sourceBytes": 2315,
+      "digest": "500c3ac7b8fd82ffeaa106ca32aa26680533b858efdad70fadd7d3c8e3e6f7f6",
+      "inventoryFileDigest": "500c3ac7b8fd82ffeaa106ca32aa26680533b858efdad70fadd7d3c8e3e6f7f6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2db9f35370b213241bfd1bfee2915071198ae36cc86410281fa5f151cfc325fc",
+      "recordBytes": 2646,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/area-readme.md",
+      "set": "batch-098",
+      "sourceBytes": 4629,
+      "digest": "24a1a1b9a6dd2b7c4fbda242eeeffbfa6471040bc30010589d47199e870ef035",
+      "inventoryFileDigest": "24a1a1b9a6dd2b7c4fbda242eeeffbfa6471040bc30010589d47199e870ef035",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e680547a3758f942d658b5c6d1b292c881104c0f503bc35fcf63a2ff9aedc195",
+      "recordBytes": 5678,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/contract.md",
+      "set": "batch-098",
+      "sourceBytes": 2017,
+      "digest": "6cd3b2bd82763b02bcba0eaaa7eaa3da4c7e263a15f34947930c3d4bb39e80d6",
+      "inventoryFileDigest": "6cd3b2bd82763b02bcba0eaaa7eaa3da4c7e263a15f34947930c3d4bb39e80d6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "fb5cf096b01ac6c3100b8f62409c69b91b52f11061a09e1ed75c23498dfb2b99",
+      "recordBytes": 1742,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/decision.md",
+      "set": "batch-098",
+      "sourceBytes": 1635,
+      "digest": "dde490a25e8a16f00ccf97addbfa0bed07a7388db6fc0bd437a617a733bcc8fd",
+      "inventoryFileDigest": "dde490a25e8a16f00ccf97addbfa0bed07a7388db6fc0bd437a617a733bcc8fd",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c8bec5f36cc8c8a2be66eeee89966994b11113ee2e0be26194e13ce4351c3375",
+      "recordBytes": 900,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/discussion.md",
+      "set": "batch-098",
+      "sourceBytes": 1578,
+      "digest": "ec55d4b8104b30c412b07ac1ea49a092972313bf78f08702b8a97d89fa91b906",
+      "inventoryFileDigest": "ec55d4b8104b30c412b07ac1ea49a092972313bf78f08702b8a97d89fa91b906",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "20f9d7f53fc2afe903b299125cb0c079eac52ea152185488ba1a585fff33ebf6",
+      "recordBytes": 902,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/generated.md",
+      "set": "batch-098",
+      "sourceBytes": 1398,
+      "digest": "381cbb52c73b4aea17cadacba120f422f21199d65e257c97ecb612c49c1ad913",
+      "inventoryFileDigest": "381cbb52c73b4aea17cadacba120f422f21199d65e257c97ecb612c49c1ad913",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6482b0f9f723ec7377248233257e5823cf756bcf41439b917ae0695bb4bfa43a",
+      "recordBytes": 901,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
+      "set": "batch-098",
+      "sourceBytes": 2693,
+      "digest": "ac84ad0bbf0dc4fbcb25595c0443a509e2c5b24b08e8e668c4cad8c34f1f1835",
+      "inventoryFileDigest": "ac84ad0bbf0dc4fbcb25595c0443a509e2c5b24b08e8e668c4cad8c34f1f1835",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "bf9f399a1c8e5870081cdb754b7d1305482c06b4e199f586406d747559f226ee",
+      "recordBytes": 1729,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/spec.md",
+      "set": "batch-098",
+      "sourceBytes": 2219,
+      "digest": "d55f536a4f3df59ffc1e21235f864a9fe15cf7a00222bfb45f1ca9aa5396f900",
+      "inventoryFileDigest": "d55f536a4f3df59ffc1e21235f864a9fe15cf7a00222bfb45f1ca9aa5396f900",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "01899f20a03aaa0816e730118a90c4ea30a69e662ba5a84258e1ebae54da7a39",
+      "recordBytes": 1707,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/subcomponent-readme.md",
+      "set": "batch-098",
+      "sourceBytes": 3338,
+      "digest": "e3ebd0038ae629ff900dfd45099b8311861b5c33d4f2c64690ed41b47e643d5e",
+      "inventoryFileDigest": "e3ebd0038ae629ff900dfd45099b8311861b5c33d4f2c64690ed41b47e643d5e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c141b3555c4c058ca0db052848c32b6556d920abafcf71b4f3e0a7759d490669",
+      "recordBytes": 1472,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/verification.md",
+      "set": "batch-098",
+      "sourceBytes": 1615,
+      "digest": "4326b0fab45e9677cc59afe4572c62fa70522820035822ae6469ec7ae097e089",
+      "inventoryFileDigest": "4326b0fab45e9677cc59afe4572c62fa70522820035822ae6469ec7ae097e089",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7f553580e49ed2455988354925e518cd73dc441eede14b32cf17e72e830d70dd",
+      "recordBytes": 904,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/vision.md",
+      "set": "batch-098",
+      "sourceBytes": 2012,
+      "digest": "3b1371f3ea56ce3a14db1d1330f1b1bee1053fc1278550983e6be831524be591",
+      "inventoryFileDigest": "3b1371f3ea56ce3a14db1d1330f1b1bee1053fc1278550983e6be831524be591",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "45534b67c6ddd59e7e92f1886a8751fcb443ca4f5e3882910a8fd39066155e88",
+      "recordBytes": 1769,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/documentation/switchboard.md",
+      "set": "batch-098",
+      "sourceBytes": 13993,
+      "digest": "f58542c47377976500986df9364802e7c4d58709467c93775dff1cb8fd2e9886",
+      "inventoryFileDigest": "f58542c47377976500986df9364802e7c4d58709467c93775dff1cb8fd2e9886",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7743029a29e617d9ac7def16da22c842099ae5a7a750db1f2d344b0db04f867a",
+      "recordBytes": 78172,
+      "retiresWithTree": false,
+      "edgeCount": 68,
+      "dispositions": {
+        "phase9-row-flip": 65,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/domainization/architecture/domainization.md",
+      "set": "batch-099",
+      "sourceBytes": 12153,
+      "digest": "286644bd4a86e60c872cb890bb73d3aa05da605364e0dfc4c87831a79e9fd1cb",
+      "inventoryFileDigest": "286644bd4a86e60c872cb890bb73d3aa05da605364e0dfc4c87831a79e9fd1cb",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "5ae76cb8b15d19d129a8789380ef07bb179535aa2ca9f9df60f28cd25edb813d",
+      "recordBytes": 8715,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 3,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/event-store/spec.md",
+      "set": "batch-100",
+      "sourceBytes": 113730,
+      "digest": "7d26c6c46a48789a8ba63be3576867dd3279308e3894ec8c40bc9317e5f4db80",
+      "inventoryFileDigest": "7d26c6c46a48789a8ba63be3576867dd3279308e3894ec8c40bc9317e5f4db80",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "923d2d13bfadebb1bdeebfffd2265aff2f62f0c2bca6dbec18389077c563e9bb",
+      "recordBytes": 3857,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/git/spec.md",
+      "set": "batch-101",
+      "sourceBytes": 271464,
+      "digest": "b40cad45b20331b2699ede4d9e777486bbff67d96205783439c118c53cf39e20",
+      "inventoryFileDigest": "b40cad45b20331b2699ede4d9e777486bbff67d96205783439c118c53cf39e20",
+      "diffSha256": "a6296d870020152f4790c872a5cecac1c561666863943970296c034afb365b5e",
+      "recordSha256": "ff71e38fe41152e19c5d5bcc08db3d94da6fd05e7ad7533b2f2a513a8d7f73d2",
+      "recordBytes": 18808,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/platform/governance.md",
+      "set": "batch-102",
+      "sourceBytes": 19443,
+      "digest": "0e7d820925c594df12b2895a18158fdb91a2e2c5cf257f5d61463b3e9f7af536",
+      "inventoryFileDigest": "0e7d820925c594df12b2895a18158fdb91a2e2c5cf257f5d61463b3e9f7af536",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6a58d9b0ac7f9f7ff84973bf81cb72df985a99d1f3307c513462dd4d81a79e5b",
+      "recordBytes": 21786,
+      "retiresWithTree": false,
+      "edgeCount": 13,
+      "dispositions": {
+        "preserve": 10,
+        "phase9-row-flip": 2,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "set": "batch-103",
+      "sourceBytes": 34956,
+      "digest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "inventoryFileDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3f033733e3a01d5b50f617f16846ef2fbdaebc0c6135882ae8e44febee8c812a",
+      "recordBytes": 67026,
+      "retiresWithTree": false,
+      "edgeCount": 17,
+      "dispositions": {
+        "preserve": 8,
+        "parked": 9
+      }
+    },
+    {
+      "file": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+      "set": "batch-103",
+      "sourceBytes": 4227,
+      "digest": "1e6946675c09f08237ac65c65c4525b822ca219cd2fae6fcb99c72f3d63d105e",
+      "inventoryFileDigest": "1e6946675c09f08237ac65c65c4525b822ca219cd2fae6fcb99c72f3d63d105e",
+      "diffSha256": "729bf0b80712c3520d1d4db9a1567ff598f968d84125fa45c6007ee5c1b4832c",
+      "recordSha256": "11265935186cfe38decb3ad27e3bebf6818d2f4163d9e5f57ac0ff090a9ae91c",
+      "recordBytes": 397045,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/platform/herdr-web-dashboard/spec.md",
+      "set": "batch-103",
+      "sourceBytes": 22973,
+      "digest": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80",
+      "inventoryFileDigest": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80",
+      "diffSha256": "70798ecfadf5fb2538689b4411a38b315bb5df6fca2778ea933c4579a8a6134e",
+      "recordSha256": "219dd92d432e630fa83cd64ac93d99fa54e9f90219127fb6bff3dba749d3d397",
+      "recordBytes": 69176,
+      "retiresWithTree": false,
+      "edgeCount": 19,
+      "dispositions": {
+        "preserve": 15,
+        "parked": 2,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/platform/holder-lock/spec.md",
+      "set": "batch-104",
+      "sourceBytes": 89194,
+      "digest": "2ef3d8c66a4d0720d684da08adc0492a9696c19fdd6d199af22b85dec7e0166f",
+      "inventoryFileDigest": "2ef3d8c66a4d0720d684da08adc0492a9696c19fdd6d199af22b85dec7e0166f",
+      "diffSha256": "fd0d227e0e9dc8e88b84eb6c2a9da7157e2123c7b35bbac2cc8b3c46c9862a0e",
+      "recordSha256": "dfb11711498feda25dd3dcaefeca69d267bc724110b5f71f06be66b0b75796f9",
+      "recordBytes": 45559,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 3,
+        "parked": 1
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-086",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000086",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+          "bytes": 131125,
+          "edges": 469,
+          "sizeThreshold": true,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md"
+      ],
+      "dispositions": {
+        "preserve": 469
+      }
+    },
+    {
+      "set": "batch-087",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000087",
+      "population": [
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md"
+      ],
+      "populationCount": 21,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+          "rankHash": "09e3e77414f765afb838216046b04cee42a5067bd70a1a74b6e63e8d5bd929b9"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+          "rankHash": "0c9d52e20f08ec876f43b0a34367b9fe5bc26ed477339217152e615f68d99514"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+          "rankHash": "1c24fb0b21d135d078c7c0f5d16a0cd77d651ceaf2b80730254b953c1bd3cd1b"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+          "rankHash": "256a2664edd89ffe701757b56900f1369301fe03d12b768a6e5778caef268d2c"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+          "rankHash": "30322c52c6d79cd756790211152b7a41e84abd4fc85b6980ab21d5f759938838"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+          "rankHash": "3bbac77a5a4a7c5919ce7fbf0de8c4c43fc8ceca2ab18c00a915aec9b8130ab2"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+          "rankHash": "42a559a626ee4d6ed5442fdf2175292e70c8019deabe695d2f40cb44135cc163"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+          "rankHash": "486c449ce264fe7caaa86d3b8e94ba3bb2be342a9be357e893d55b5bb39136c1"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+          "rankHash": "61a8fd7892c4faa049d302856a8d88bed1bbcc421827ea8db1c4dba960bbdab0"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+          "rankHash": "65a5d5adbd05213785478f620d433181b52ad3b7d8d6b4962551871ed37f759d"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
+          "rankHash": "66000e4fb0d1d05d65d2eafeac8b6e53567dfa17aa3eb17aad69e406f2b5fd61"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+          "rankHash": "823f6896a8251f1fdc40a209fd7c34fcc51f6b293a94e40e41b56d254a090065"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+          "rankHash": "8c0a9556688d90d0d8ac650dbf433a95c35ef12e380aa1756e2d9d5327c3a52e"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md",
+          "rankHash": "b8e9383b2e863e320ed0e8a1aeec7d0f19e6985cc60803b0da20b4856c9915b1"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+          "rankHash": "c1f745ee98a1484c4deda33d907283f0e4a630e20d21d102bd555db0db4964fa"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+          "rankHash": "d8b959369f773d27baff57d454fe95c016406241c6ee14d56b2af4d0b403fdc7"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+          "rankHash": "ecae9b47a8ec1b6c8b181cbdaa1526c2f66337f2ed60d5730746d34c4d6bc598"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+          "rankHash": "ee4dfc896f5c82c679bd15b0f0ec388bb7264a9fc7e062f82df61f114ed0b30c"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+          "rankHash": "f01bb4aa73223854b9e53d0a136c09886ce95bfb6ee6103a724a2700b1d2367e"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+          "rankHash": "f355fbc032bfa4fa6daee083470b97ad403207ee5daca2eaf505ad1a316781ff"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+          "rankHash": "f8b705350c8cbb5e64bfa92cac50d0bd5ec4a963bc86fafbb09e956eb3557b3e"
+        }
+      ],
+      "sample": [
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+          "bytes": 86106,
+          "edges": 32,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md"
+      ],
+      "distinctReviewCount": 5,
+      "pilotFullReviewFiles": [
+        "docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+        "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
+        "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md"
+      ],
+      "dispositions": {
+        "preserve": 236,
+        "parked": 2,
+        "patch": 21
+      }
+    },
+    {
+      "set": "batch-088",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000088",
+      "population": [
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md"
+      ],
+      "populationCount": 25,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+          "rankHash": "037fcbb828efd6883533f845cdd7e37355ba45514e33b2785319ca418bc46e07"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
+          "rankHash": "041d704b856da1d38e162819e3a55c97634501c252d1460891d53e309c08f8e0"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+          "rankHash": "049e392ac0523e6efa1a0c5c889a67bf8e673e886c8223fd21003c2eba3fe122"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+          "rankHash": "0b21fb92a78e86bb46b00caf8c633986a5162ff0f23c526d3fbcab611df8460b"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+          "rankHash": "1ab6b1ec21e0f2b25d4bd409ae52a4ca2e126815456035eb313bd9e2b2c774fb"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+          "rankHash": "2289b2e1713fedbc5d1e089946a9722f5b9ce5cdf9e0b4cea0d5d05fe3afa476"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+          "rankHash": "306c93e69c106edce96d62174c946feacf6cba79b0d0a5c21fe699d1c69083a4"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+          "rankHash": "36cecc7297c4bb9b6dcac6642dbee0d1062b7a3615d441e232f83d6161764f5b"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+          "rankHash": "3e3d36ae6d94e8d13395b5e4588c7f70948586bd0427072b787fbcd0ca854f47"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+          "rankHash": "59006bde7f7a21e3653b7269aa708966a54c3f64308a673deaddf2662be90539"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+          "rankHash": "5ab7a1fd2ef897ce8a31d5cebd0f1c0ced2d6385aa16453976ea0b3129315a6a"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+          "rankHash": "5c478f7389314cdee249ae6d06ccfbd70e6691416582351fcf88d57427148c5c"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+          "rankHash": "6221256375b0b6a7c6ea723d4fd2fe397d3d4d3c13a707da3658488c80073c53"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+          "rankHash": "642ce17e67c458a90f7f7e512227f7b4174d89a0c298107bfca3230734e1dcd4"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+          "rankHash": "6b0cd611c6ba78fad98967f322425420df4c8cc6e8a006c6380fc0431ce18373"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+          "rankHash": "71dd6a3383d11882478cb9f99bc1dea72e0151167db17554e0d1c736559520f9"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+          "rankHash": "7e2b74c6493058619fa759ffa1d2d66d4ecb7f614a654eb31274997bd546c3d7"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+          "rankHash": "81f7c070b65f6cca77ffbbfb8f6d44057a8c64f893f724179bfa531d9ff5b0c9"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+          "rankHash": "926cd0c941d0b4bd861d5ab406a632a9fc7a336ba55b0c07b89f033d32723e57"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+          "rankHash": "d430c4dbc80251ec6c66bdf795bdeac8793723f80dd0b496a87d3916ff918e46"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+          "rankHash": "d7997c211bf47319d0287643935d0e133ae25eb67b284932cfe576d1e68598bc"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+          "rankHash": "e34c4489a26ce955b814be0bbcc18ea6b24e00e64d6f059d10dce703e4f36650"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+          "rankHash": "e7439dc42c0f8fbc22af4f06416de9ebef8f2305704eec3c9297f68a22c1929b"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+          "rankHash": "f6d7e694bc22ebadd3e49844baf0bd044ed85a4cce34bbcad8499519922e9e10"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+          "rankHash": "ff4daebbc900fe5ccd6079f248dbe76a0e14b035d01e74a5738b155114075e0b"
+        }
+      ],
+      "sample": [
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/spec.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+          "bytes": 77561,
+          "edges": 31,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md"
+      ],
+      "distinctReviewCount": 5,
+      "pilotFullReviewFiles": [
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md"
+      ],
+      "dispositions": {
+        "patch": 25,
+        "preserve": 287
+      }
+    },
+    {
+      "set": "batch-089",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000089",
+      "population": [
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+        "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+        "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md",
+        "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
+        "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+        "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+        "docs/platform/agent-coordination/spec.md",
+        "docs/platform/agent-coordination/vision.md",
+        "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+        "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md"
+      ],
+      "populationCount": 13,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+          "rankHash": "01507a61accf2de33b71e25f76b7eaf6743af20d0aafc964b3042f4a08d00c8a"
+        },
+        {
+          "file": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+          "rankHash": "058d25627d5c22d9bd12c83a583539bddd434fb4170cbaf956916da00a02a62f"
+        },
+        {
+          "file": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+          "rankHash": "3727ce75a37cef3bd2df80cf50964f9667dfd56c08d61f7a7359f01177a008fa"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+          "rankHash": "49b473a55ce53b4b11b6cdec847055c3062acb0fabb4d64a4ace8de8f0184424"
+        },
+        {
+          "file": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "rankHash": "5c2c1eaa7fde1dd49bfba1489a49ca9e9759b52fa010a7ce246875ffe68347c3"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+          "rankHash": "60841c27327aeaa7396335e8f5629316bb5d0e5087fde6b26dd1c8708ba704be"
+        },
+        {
+          "file": "docs/platform/agent-coordination/vision.md",
+          "rankHash": "6206bd934373cb7e3abf69bb9091b66b36f069a18cd2cf9c80197ccf13abac15"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+          "rankHash": "81b81a4aa7e45144fbac2ddacd163cf6ca10306f0f28c9f139f315b09b4f0322"
+        },
+        {
+          "file": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+          "rankHash": "91244206bed3db616b617576ddb9a6faff97db36fc03858882c0679f94faed3a"
+        },
+        {
+          "file": "docs/platform/agent-coordination/spec.md",
+          "rankHash": "958c42b362675840975d7c587acae9482e8916d464be47552f350233b48d5459"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
+          "rankHash": "c026d20e171f8b77170e8fb78265d543d50c285aed80fcddea19f6ac9d555789"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md",
+          "rankHash": "c600aad28a88eb0a5734f5228d5f9145b1dfd9122dc4deb4c63e4d944d4be343"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+          "rankHash": "f75e082e2c31a52ff2af9e47e1bf1dd3a740ec8b89506d4ae86d46718cba76f6"
+        }
+      ],
+      "sample": [
+        "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+        "docs/platform/agent-coordination/vocabulary/canonical-concepts.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+        "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+        "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+        "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md",
+        "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md",
+        "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+        "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md",
+        "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+        "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
+        "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+        "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+        "docs/platform/agent-coordination/history/retired-engine/spec.md",
+        "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+        "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+        "docs/platform/agent-coordination/spec.md",
+        "docs/platform/agent-coordination/vision.md",
+        "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+        "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md"
+      ],
+      "dispositions": {
+        "patch": 19,
+        "preserve": 245,
+        "parked": 2
+      }
+    },
+    {
+      "set": "batch-090",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000090",
+      "population": [
+        "docs/platform/agent-protocol/spec.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-protocol/spec.md",
+          "rankHash": "9dcb672be82493517a49800e5ec73c7bf614b7c22f384358b3d589c3df818f75"
+        }
+      ],
+      "sample": [
+        "docs/platform/agent-protocol/spec.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/agent-protocol/spec.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/agent-protocol/spec.md"
+      ],
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "set": "batch-091",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000091",
+      "population": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/claude-plugin/spec.md",
+          "rankHash": "93414a26d64535082d8d2db9f4e707a7c08e03effa2908f1436129adb65feb05"
+        }
+      ],
+      "sample": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "dispositions": {
+        "preserve": 1,
+        "parked": 1,
+        "patch": 2
+      }
+    },
+    {
+      "set": "batch-092",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000092",
+      "population": [
+        "docs/platform/coexistence/spec.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/coexistence/spec.md",
+          "rankHash": "6c1d3e9675fb1fbaa43ec519a79967474f1e650d62c2797186255df07588a595"
+        }
+      ],
+      "sample": [
+        "docs/platform/coexistence/spec.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/coexistence/spec.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/coexistence/spec.md"
+      ],
+      "dispositions": {
+        "preserve": 4,
+        "parked": 2,
+        "patch": 2
+      }
+    },
+    {
+      "set": "batch-093",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000093",
+      "population": [
+        "docs/platform/component-boundary.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/component-boundary.md",
+          "rankHash": "963dff33346a9a45ea3cfab589702772431377e87eef18096e8e572091ca152f"
+        }
+      ],
+      "sample": [
+        "docs/platform/component-boundary.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/component-boundary.md",
+          "bytes": 101816,
+          "edges": 39,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        }
+      ],
+      "selected": [
+        "docs/platform/component-boundary.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/component-boundary.md"
+      ],
+      "dispositions": {
+        "parked": 18,
+        "preserve": 16,
+        "phase9-row-flip": 3,
+        "patch": 2
+      }
+    },
+    {
+      "set": "batch-094",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000094",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/platform/contracts/architecture-manifest.json"
+      ],
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "set": "batch-095",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000095",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/platform/convention/spec.md"
+      ],
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "set": "batch-096",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000096",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "dispositions": {
+        "preserve": 4,
+        "parked": 13
+      }
+    },
+    {
+      "set": "batch-097",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000097",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "dispositions": {
+        "preserve": 3,
+        "parked": 2
+      }
+    },
+    {
+      "set": "batch-098",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000098",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+          "bytes": 63603,
+          "edges": 82,
+          "sizeThreshold": false,
+          "edgeThreshold": true
+        },
+        {
+          "file": "docs/platform/documentation/switchboard.md",
+          "bytes": 13993,
+          "edges": 68,
+          "sizeThreshold": false,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+        "docs/platform/documentation/switchboard.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/platform/documentation/architecture/documentation-system-design.md",
+        "docs/platform/documentation/history/id-systems-audit.md",
+        "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+        "docs/platform/documentation/history/templates/architecture.md",
+        "docs/platform/documentation/history/templates/area-readme.md",
+        "docs/platform/documentation/history/templates/contract.md",
+        "docs/platform/documentation/history/templates/decision.md",
+        "docs/platform/documentation/history/templates/discussion.md",
+        "docs/platform/documentation/history/templates/generated.md",
+        "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
+        "docs/platform/documentation/history/templates/spec.md",
+        "docs/platform/documentation/history/templates/subcomponent-readme.md",
+        "docs/platform/documentation/history/templates/verification.md",
+        "docs/platform/documentation/history/templates/vision.md",
+        "docs/platform/documentation/switchboard.md"
+      ],
+      "dispositions": {
+        "preserve": 124,
+        "parked": 2,
+        "phase9-row-flip": 65
+      }
+    },
+    {
+      "set": "batch-099",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000099",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/platform/domainization/architecture/domainization.md"
+      ],
+      "dispositions": {
+        "preserve": 3,
+        "parked": 1
+      }
+    },
+    {
+      "set": "batch-100",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000100",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/event-store/spec.md",
+          "bytes": 113730,
+          "edges": 3,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        }
+      ],
+      "selected": [
+        "docs/platform/event-store/spec.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/event-store/spec.md"
+      ],
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "set": "batch-101",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000101",
+      "population": [
+        "docs/platform/git/spec.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/git/spec.md",
+          "rankHash": "af607b0f1007f7f1cb309ac9f426cc1552e95a2d9ba9044997d952be1b8208c0"
+        }
+      ],
+      "sample": [
+        "docs/platform/git/spec.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/git/spec.md",
+          "bytes": 271464,
+          "edges": 2,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        }
+      ],
+      "selected": [
+        "docs/platform/git/spec.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/git/spec.md"
+      ],
+      "dispositions": {
+        "patch": 2
+      }
+    },
+    {
+      "set": "batch-102",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000102",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/platform/governance.md"
+      ],
+      "dispositions": {
+        "preserve": 10,
+        "phase9-row-flip": 2,
+        "parked": 1
+      }
+    },
+    {
+      "set": "batch-103",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000103",
+      "population": [
+        "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "populationCount": 2,
+      "ranks": [
+        {
+          "file": "docs/platform/herdr-web-dashboard/spec.md",
+          "rankHash": "df5c31d95d1bf7e9b7d1b52351b98fcaa604b1010c9d3300edc0d87551503b68"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+          "rankHash": "f5227150f481d95a71ad99b196aa72507310aed0310d29aab21d947789a5884c"
+        }
+      ],
+      "sample": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+        "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "dispositions": {
+        "preserve": 25,
+        "parked": 11,
+        "patch": 4
+      }
+    },
+    {
+      "set": "batch-104",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000104",
+      "population": [
+        "docs/platform/holder-lock/spec.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/holder-lock/spec.md",
+          "rankHash": "92bded10037e43c7e69f3131f5d0742a17938e8629d4086b0f76571e95487094"
+        }
+      ],
+      "sample": [
+        "docs/platform/holder-lock/spec.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/holder-lock/spec.md",
+          "bytes": 89194,
+          "edges": 4,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        }
+      ],
+      "selected": [
+        "docs/platform/holder-lock/spec.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/holder-lock/spec.md"
+      ],
+      "dispositions": {
+        "patch": 3,
+        "parked": 1
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "086": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-086",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "087": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-087",
+      "population": [
+        "docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+        "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
+        "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md"
+      ],
+      "populationCount": 4,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
+          "rankHash": "0f35af7e83e47071133593591068fcc2828e9abb6b7397ba458ca20135ff6eae"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+          "rankHash": "284ea61ad3c8036e9635a96682c8871fa74b65eba57b50590560dff5d84003ab"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+          "rankHash": "6eba54b9940f089188cce300515451736ae5bfc6a8cec60459ebed38e2bf872f"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
+          "rankHash": "f884dc1d0eb4c2767495bca392aaeb23e6cd22fd46c0afd34fa5f9861abac5a8"
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "088": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-088",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "089": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-089",
+      "population": [
+        "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+        "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md",
+        "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md",
+        "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+        "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+        "docs/platform/agent-coordination/history/retired-engine/spec.md",
+        "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md"
+      ],
+      "populationCount": 7,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+          "rankHash": "3201bb43da5ba5d54cc9ba94e5c532636b044640a37db3acd7982a24945bde28"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+          "rankHash": "622b3a96de6a0ec0849ffa74d3a635642ceef859a19b25e5c79dd651e4879601"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+          "rankHash": "7cce934eee2bf4cb3453cba194639e4a8d32782174bdb2e30006212bc1596374"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md",
+          "rankHash": "b2d8abb64f49b0f62170ced306e3648bda41cfe506ae878604d95d945e5d5372"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+          "rankHash": "b962b4a5fe9c89868a029e8d9a55bde559e16f7f2ffd191a390e5849e0ca3fac"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md",
+          "rankHash": "c67c015b527dd4972e4a95b1645662d07876cca162ba234ae926473df90857ff"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+          "rankHash": "df30d23445bc40d6629d6b3a1883635386200b06d846ba54033ceec62bb37baf"
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+        "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "090": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-090",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "091": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-091",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "092": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-092",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "093": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-093",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "094": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-094",
+      "population": [
+        "docs/platform/contracts/architecture-manifest.json"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/contracts/architecture-manifest.json",
+          "rankHash": "58cd91d752bfb044d9c953fbdd8dad3fbbcf4ec2b747a7aeb88e0cfdbcc523c1"
+        }
+      ],
+      "selected": [
+        "docs/platform/contracts/architecture-manifest.json"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "095": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-095",
+      "population": [
+        "docs/platform/convention/spec.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/convention/spec.md",
+          "rankHash": "52d033584c83ca45746cdd5d2996af729788103ca5c306bd5c28af71e347afcc"
+        }
+      ],
+      "selected": [
+        "docs/platform/convention/spec.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "096": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-096",
+      "population": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/decision-citation-drift/spec.md",
+          "rankHash": "421d14940d9a6114c22d4c1fdbc671a61cd548f199c190da33cbce6c5eba147f"
+        }
+      ],
+      "selected": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "097": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-097",
+      "population": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/distillery/spec.md",
+          "rankHash": "1f3f27908479d21b74ebf5010a08d9544bf969154d1a9d6c4da0ab275880575d"
+        }
+      ],
+      "selected": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "098": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-098",
+      "population": [
+        "docs/platform/documentation/architecture/documentation-system-design.md",
+        "docs/platform/documentation/history/id-systems-audit.md",
+        "docs/platform/documentation/history/templates/architecture.md",
+        "docs/platform/documentation/history/templates/area-readme.md",
+        "docs/platform/documentation/history/templates/contract.md"
+      ],
+      "populationCount": 5,
+      "ranks": [
+        {
+          "file": "docs/platform/documentation/history/id-systems-audit.md",
+          "rankHash": "1bb6bc7eb12253a15b5e426eb7d530f09ee01662df013f2e69e84163b1aed4d6"
+        },
+        {
+          "file": "docs/platform/documentation/history/templates/contract.md",
+          "rankHash": "3f841458661c75081fb69be188fc075528fa67a2f847ea950543789e97cc7cc6"
+        },
+        {
+          "file": "docs/platform/documentation/history/templates/architecture.md",
+          "rankHash": "a68780f007243bad4b3213d841b55623ba3cb6739b5104cd358f00a89d9bc615"
+        },
+        {
+          "file": "docs/platform/documentation/history/templates/area-readme.md",
+          "rankHash": "c239e3b888e4e8866c16d88288fe1d008905d88d6a373adb4a92d4b8d87f4455"
+        },
+        {
+          "file": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "rankHash": "dec7fafb6500a38e00ed19ae6ef618228583ed1c84fe3b6541e900183cdbc106"
+        }
+      ],
+      "selected": [
+        "docs/platform/documentation/history/id-systems-audit.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "099": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-099",
+      "population": [
+        "docs/platform/domainization/architecture/domainization.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/domainization/architecture/domainization.md",
+          "rankHash": "0477523ff8efe334b8c9a35c7d8fcf4206d9b6aab84ead24e90bc18fe4c873ca"
+        }
+      ],
+      "selected": [
+        "docs/platform/domainization/architecture/domainization.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "100": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-100",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "101": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-101",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "102": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-102",
+      "population": [
+        "docs/platform/governance.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/governance.md",
+          "rankHash": "927ade2d02befe17256dc7525a5283dba60c147d2114d535e9d03b7bb811d588"
+        }
+      ],
+      "selected": [
+        "docs/platform/governance.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "103": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-103",
+      "population": [
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "rankHash": "d300cb37fe4f946c46068dff136c2839e9f4bc4afe2372fe259c2d2a00665d89"
+        }
+      ],
+      "selected": [
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "104": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-104",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-086.jsonl",
+      "sha256": "9a905e040dd5cb86da3d42b5b0f40599dbbb68f5be2cdfc9cc2be85524865835"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-087.jsonl",
+      "sha256": "cca538ea055f80a40bc0d7cf2385df3a03eaf8d0bac0674fbd2e934f426c09f2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-088.jsonl",
+      "sha256": "02c67a5f6d38dbac4a0ddbabd43b346cc3fe2646be1248faf24b693177584818"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-089.jsonl",
+      "sha256": "5559d7af360ad36e8b845086673be5221d1c183e6f87ccb48a9468b1dc34fb9b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-090.jsonl",
+      "sha256": "f0c88d09b6722f295c5e91b9844263d7714cb7426f26277e82c02f40db00d636"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-091.jsonl",
+      "sha256": "662d8fb47b98eb3ac70d79e2cd5b864b4b4c73ad05cac8f34843a5096a926325"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-092.jsonl",
+      "sha256": "0d2332ed559da83b74ca8de26a0cf11c3070e3b1d79061d3a9d6da1807222eaf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-093.jsonl",
+      "sha256": "c381af56a33b8f4c9e5df8ba352f0d3df35914829cb4af0c4dee03605f37e10a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-094.jsonl",
+      "sha256": "fcc60607d907c1aab50f4dd3417d694a9d51e978db6928b521667dfec44ec3eb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-095.jsonl",
+      "sha256": "69cba94bd4ce75d89334dda93b355059bf30931224253b7a979980790e8b25e1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-096.jsonl",
+      "sha256": "6f01c93b9a470507590c697e40a3bc253ebe417bf3a2f2499d4f3e880c1dd80c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-097.jsonl",
+      "sha256": "5c0dad7687732eb17c0cb90c09e83b243ffd60f2e6538f8d0de020f0e3bbcf29"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-098.jsonl",
+      "sha256": "accb23d01d0919691660e6ad46dddec041439a75707ead49424a46b5cd2ae3ce"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-099.jsonl",
+      "sha256": "5ae76cb8b15d19d129a8789380ef07bb179535aa2ca9f9df60f28cd25edb813d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-100.jsonl",
+      "sha256": "923d2d13bfadebb1bdeebfffd2265aff2f62f0c2bca6dbec18389077c563e9bb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-101.jsonl",
+      "sha256": "ff71e38fe41152e19c5d5bcc08db3d94da6fd05e7ad7533b2f2a513a8d7f73d2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-102.jsonl",
+      "sha256": "6a58d9b0ac7f9f7ff84973bf81cb72df985a99d1f3307c513462dd4d81a79e5b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+      "sha256": "f1046b14cf8e097d872075c5e57674fe960faeda7ee5fccc0614f9bf81a4c1e5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-104.jsonl",
+      "sha256": "dfb11711498feda25dd3dcaefeca69d267bc724110b5f71f06be66b0b75796f9"
+    }
+  ]
+}
