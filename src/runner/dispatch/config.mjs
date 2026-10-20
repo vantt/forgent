@@ -17,6 +17,7 @@
 // committed (per D2's durability policy) so it is reviewable like any other
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
+import { CHECKER_SEATS } from '../execution/seat-resolver.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
 import { RUN_TIMEOUT_MIN_MS, RUN_TIMEOUT_MAX_MS, runTimeoutProblem } from './run-timeout.mjs';
@@ -1347,9 +1348,9 @@ function validateCapabilitiesShape(capabilities, label) {
       }
     }
     if (entry.minCheckers !== undefined) {
-      if (!Array.isArray(entry.minCheckers) || !entry.minCheckers.every((c) => VALID_CHECKER_ROLES.has(c))) {
+      if (!Array.isArray(entry.minCheckers) || !entry.minCheckers.every((c) => VALID_CHECKER_SEATS.has(c))) {
         throw new RunnerConfigError(
-          `runner config (${entryLabel}) "minCheckers" must be an array of strings in [${Array.from(VALID_CHECKER_ROLES).join(', ')}] when present.`,
+          `runner config (${entryLabel}) "minCheckers" must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}] when present.`,
         );
       }
     }
@@ -1380,7 +1381,9 @@ function validateCapabilitiesShape(capabilities, label) {
   }
 }
 
-export const VALID_CHECKER_ROLES = Object.freeze(new Set(['reviewer', 'red-team', 'tester']));
+export { CHECKER_SEATS };
+
+export const VALID_CHECKER_SEATS = Object.freeze(new Set(Object.keys(CHECKER_SEATS)));
 
 export function validateRunnerPatternsShape(patterns, label) {
   if (!patterns || typeof patterns !== 'object' || Array.isArray(patterns)) {
@@ -1435,9 +1438,9 @@ export function validateRunnerPatternsShape(patterns, label) {
         if (!RIGOR_VALUES.includes(rigor)) {
           throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) contains unknown rigor "${rigor}".`);
         }
-        if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_ROLES.has(c))) {
+        if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_SEATS.has(c))) {
           throw new RunnerConfigError(
-            `runner config (${label}.reviewed.checkersByRigor.${rigor}) must be an array of strings in [${Array.from(VALID_CHECKER_ROLES).join(', ')}].`,
+            `runner config (${label}.reviewed.checkersByRigor.${rigor}) must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}].`,
           );
         }
       }

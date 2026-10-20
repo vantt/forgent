@@ -10,6 +10,7 @@ import { RunnerConfigError } from './config.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorConfig } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { refuseWorkItemInput, resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
+import { capabilityRigorOf } from '../execution/seat-resolver.mjs';
 
 // Additive check for the `capability.unknown` reason code (never changes
 // `mechanism`): is `name` a real entry key, or a declared `aliases[]` member,
@@ -412,7 +413,7 @@ export function compileDispatchPlan(
   // caller-supplied cliOverride.preferExecutor disagrees anyway.
   const realAssignmentForPolicy = assignmentItem ?? (typeof assignmentArg === 'object' && assignmentArg ? assignmentArg : null);
   const syntheticPolicy = { preferExecutor: executorId };
-  const capRigor = capability ? cfg?.capabilities?.[capability]?.rigor : undefined;
+  const capRigor = capabilityRigorOf(cfg, capability);
   if (capRigor) syntheticPolicy.rigor = capRigor;
   if (capability) syntheticPolicy.capability = capability;
   const assignmentForPolicy = realAssignmentForPolicy ?? {

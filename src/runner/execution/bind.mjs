@@ -11,17 +11,10 @@ import { resolveStrongerTier, TIER_STRENGTH } from '../dispatch/assignment-polic
 import { credentialSourceForCli, credentialStoreOf, providerAccountInventory } from '../dispatch/provider-capacity.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
 import { PIN_REFUSES_SEAT, parseAccountPin, resolveAccountPin } from './account-pin.mjs';
+import { PRODUCER_POSTURE } from './seat-resolver.mjs';
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
 
-// The one list of pattern roles that never run inline or in-process: checkers, panel seats, and the
-// debate's two sides and its judge.
-const CHECKER_ROLES = new Set(['reviewer', 'red-team', 'tester', 'panelist', 'synthesizer', 'thesis', 'antithesis', 'judge']);
-
-/** Checker, panel and debate roles never run inline or in-process. */
-function isCheckerOrPanelRole(role) {
-  return CHECKER_ROLES.has(role) || Boolean(role && role.startsWith('panelist-'));
-}
 
 /**
  * Normalizes capability prefer pool to array of { executor, invocation }
@@ -88,15 +81,16 @@ function lookupCapabilityConfig(runnerConfig, capability) {
 /**
  * Filter candidate matching scope
  */
-function findMatchingOverride(overrides, unit, role) {
+function findMatchingOverride(overrides, unit, seat, role) {
   if (!Array.isArray(overrides)) return null;
   return overrides.find((ov) => {
     if (!ov || typeof ov !== 'object') return false;
     const scope = ov.scope;
     if (!scope) return true; // Global scope override
     const unitMatch = scope.unit === undefined || scope.unit === null || scope.unit === unit?.id;
+    const seatMatch = scope.seat === undefined || scope.seat === null || scope.seat === seat;
     const roleMatch = scope.role === undefined || scope.role === null || scope.role === role;
-    return unitMatch && roleMatch;
+    return unitMatch && seatMatch && roleMatch;
   }) ?? null;
 }
 
@@ -234,7 +228,9 @@ export function poolUnusableReason(inventory, { pool, family, executorEntry, inv
 function prepare(ask, ctx, { excludePools = [] } = {}) {
   const {
     unit,
-    role,
+    seat = 'producer',
+    role = 'producer',
+    posture: seatPosture = PRODUCER_POSTURE,
     readOnly = false,
     independentOf = [],
     overrides = [],
@@ -246,15 +242,15 @@ function prepare(ask, ctx, { excludePools = [] } = {}) {
 
   // Posture resolution (X-1)
   const isWriteEmpty = !Array.isArray(unit?.writes) || unit.writes.length === 0;
-  const isReadOnlyPosture = readOnly === true || isWriteEmpty;
-  const posture = isReadOnlyPosture ? 'read-only' : (role === 'producer' ? 'workspace-write' : 'read-only');
+  const isReadOnlyPosture = readOnly === true || seatPosture.readOnly === true || isWriteEmpty;
+  const posture = isReadOnlyPosture ? 'read-only' : (seatPosture.writer ? 'workspace-write' : 'read-only');
 
   // Candidate collection (5 levels). Level 4: overrides matching role/unit.
-  const matchingOverride = findMatchingOverride(overrides, unit, role);
+  const matchingOverride = findMatchingOverride(overrides, unit, seat, role);
 
   // Skills the work needs. Only roles that do the unit's work are asked for them; a checker or panel
   // seat reads the result and is chosen on independence, not on what the producer's task needs.
-  const requiredSkills = !isCheckerOrPanelRole(role) && Array.isArray(unit?.skills) ? unit.skills : [];
+  const requiredSkills = !seatPosture.forceOutOfProcess && Array.isArray(unit?.skills) ? unit.skills : [];
 
   // Level 2 & 1: Capability prefer candidates (project / global)
   const { entry: capConfig, key: capKey } = lookupCapabilityConfig(runnerConfig, unit?.capability);
@@ -298,7 +294,7 @@ function prepare(ask, ctx, { excludePools = [] } = {}) {
     const executorEntry = executors[base.executor];
     const family = getProviderFamily(runnerConfig, base.executor);
     const mechanism = !executorEntry ? null
-      : isCheckerOrPanelRole(role) ? 'out-of-process'
+      : seatPosture.forceOutOfProcess ? 'out-of-process'
         : decideExecutorDispatchMechanism(runnerConfig, base.executor, { hasLiveTaskAccess: Boolean(session.hasNativeAgent) });
     const common = { ...base, family, executorEntry, mechanism, launch: executorEntry ? resolveLaunch(base, launchEnv) : null, entry: null, cellProblem: null };
     const leases = Boolean(executorEntry) && executorEntry.kind !== 'tool' && mechanism === 'out-of-process';
@@ -396,7 +392,7 @@ function prepare(ask, ctx, { excludePools = [] } = {}) {
 
     // A blind role needs a sandbox around its worker. An in-process agent has none,
     // so a candidate that would run in-process is never chosen for it.
-    if (blind && !isCheckerOrPanelRole(role) && cand.mechanism !== 'out-of-process') {
+    if (blind && !seatPosture.forceOutOfProcess && cand.mechanism !== 'out-of-process') {
       return { reason: 'blind-in-process', detail: `Candidate "${executorId}" would run in-process, where no sandbox can keep a blind role blind` };
     }
 
@@ -413,7 +409,7 @@ function prepare(ask, ctx, { excludePools = [] } = {}) {
   };
 
   return {
-    unit, role, blind, runnerConfig, session, executors, policyConfig,
+    unit, seat, role, seatPosture, seatPersona: ask?.persona ?? null, blind, runnerConfig, session, executors, policyConfig,
     posture, isReadOnlyPosture, matchingOverride, requiredSkills, capConfig, capKey,
     seatTier, candidates, identityOf, rejectionOf, inventory,
   };
@@ -452,13 +448,13 @@ function walkOrder(prep, tried) {
  */
 export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
   const prep = prepare(ask, ctx, { excludePools });
-  const { unit, role, blind, runnerConfig, session, executors, posture, isReadOnlyPosture, matchingOverride, requiredSkills, capConfig, capKey, seatTier } = prep;
+  const { unit, seat, seatPosture, seatPersona, blind, runnerConfig, session, executors, posture, isReadOnlyPosture, matchingOverride, requiredSkills, capConfig, capKey, seatTier } = prep;
   const { preferIndependentOf = null, lockedPersona = null } = ask ?? {};
   const isHeadless = Boolean(session.headless);
   const isLeadPresent = !isHeadless && (session.hasNativeAgent || session.provider);
 
-  // Soft spread: `preferIndependentOf` is [{ role, executor }] of the seats already bound (empty
-  // for the first seat of a spread; absent when the role asks for none). It never refuses; it only
+  // Soft spread: `preferIndependentOf` is [{ seat, executor }] of the seats already bound (empty
+  // for the first seat of a spread; absent when the seat asks for none). It never refuses; it only
   // ranks the candidates that passed every filter, in first-binding order or, after a failure, in
   // walk order.
   const walking = tried.length > 0;
@@ -498,9 +494,9 @@ export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
   // Fallback: If no candidate chosen yet
   let inlineFallback = false;
   if (!chosen) {
-    // If role === 'producer' and session has Lead (not headless) -> inline
+    // If the seat may run inline and the session has a Lead (not headless) -> inline
     // The session lead declares no skills, so a unit that needs some never falls back to it.
-    if (role === 'producer' && isLeadPresent && !blind && requiredSkills.length === 0) {
+    if (seatPosture.inlineAllowed && isLeadPresent && !blind && requiredSkills.length === 0) {
       inlineFallback = true;
       const leadId = session.provider ?? 'lead';
       chosen = {
@@ -517,7 +513,7 @@ export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
       const reason = refusalReason || (requiredSkills.length > 0 ? 'skills-unavailable' : (isHeadless ? 'headless-no-executor' : 'no-candidate'));
       const detail = refusalDetail || (isHeadless
         ? `No candidate executor available in headless session for capability "${unit?.capability}"`
-        : `No candidate executor found for role "${role}" and capability "${unit?.capability}"`);
+        : `No candidate executor found for seat "${seat}" and capability "${unit?.capability}"`);
       return { refused: { reason, detail } };
     }
   }
@@ -543,7 +539,7 @@ export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
   const { invocation, transport, transportSource } = chosen.launch;
   const mechanism = chosen.mechanism ?? 'out-of-process';
   const mechanismSource = inlineFallback ? 'lead-producer-inline'
-    : isCheckerOrPanelRole(role) ? 'checker-role-forced-out-of-process'
+    : seatPosture.forceOutOfProcess ? 'posture-forced-out-of-process'
       : 'decideExecutorDispatchMechanism';
 
   let account = null;
@@ -586,6 +582,9 @@ export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
     }
     persona = matchingOverride.persona;
     personaSource = `override:${matchingOverride.origin ?? 'unknown'}`;
+  } else if (seatPersona) {
+    persona = seatPersona;
+    personaSource = 'seat';
   } else if (unitPersona) {
     persona = unitPersona;
     personaSource = 'unit';
@@ -659,7 +658,7 @@ export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
     const family = providerFamily.toLowerCase();
     const sharedWith = preferIndependentOf
       .filter((seat) => seat?.executor && getProviderFamily(runnerConfig, seat.executor).toLowerCase() === family)
-      .map((seat) => seat.role);
+      .map((peer) => peer.seat);
     provenance.familySpread = {
       value: { family: providerFamily, sharedWith: [...new Set(sharedWith)] },
       source: sharedWith.length === 0 ? 'prefer-independent-of:distinct-family' : 'prefer-independent-of:no-eligible-unused-family',

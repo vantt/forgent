@@ -109,6 +109,10 @@ function setupTestRepo() {
   return tmp;
 }
 
+function memberSeats(n = 3) {
+  return [...Array.from({ length: n }, (_, i) => ({ seat: `member-${i + 1}`, role: 'producer' })), { seat: 'synthesizer', role: 'synthesizer' }];
+}
+
 test('validateWorkflow enforces schema and rejects G2 infrastructure fields', () => {
   const valid = {
     id: 'test/simple',
@@ -954,7 +958,7 @@ test('a step after a panel step is handed the report of every panelist and of th
   const workflow = validateWorkflow({
     id: 'panel-then-solo',
     steps: [
-      { id: 'panel', units: [{ id: 'p', template: { capability: 'docs:write', pattern: 'panel', objective: 'Review the design', writes: [] } }] },
+      { id: 'panel', units: [{ id: 'p', template: { capability: 'docs:write', pattern: 'panel', seats: memberSeats(), objective: 'Review the design', writes: [] } }] },
       { id: 'after', dependsOn: ['panel'], units: [{ id: 's', template: { capability: 'docs:write', pattern: 'solo', objective: 'Decide', writes: [] } }] },
     ],
   });
@@ -967,7 +971,7 @@ test('a step after a panel step is handed the report of every panelist and of th
     fs.readFileSync(path.join(tmp, '.fgos', 'assignments', soloRunId, 'producer', '1', 'assignment.json'), 'utf8'),
   ).contextRefs;
   assert.equal(refs.length, 4, `refs: ${JSON.stringify(refs)}`);
-  for (const role of ['panelist-1', 'panelist-2', 'panelist-3', 'synthesizer']) {
+  for (const role of ['member-1', 'member-2', 'member-3', 'synthesizer']) {
     const ref = refs.find((r) => r.includes(`/assignments/${panelRunId}/${role}/`));
     assert.ok(ref && path.isAbsolute(ref) && fs.existsSync(ref), `${role} report is listed: ${JSON.stringify(refs)}`);
   }
@@ -1001,7 +1005,7 @@ test('anonymizeInputs hands a later unit neutral copies and a brief that names n
   const workflow = validateWorkflow({
     id: 'panel-then-anonymous-solo',
     steps: [
-      { id: 'independent-opinions', units: [{ id: 'p', template: { capability: 'docs:write', pattern: 'panel', objective: 'Review the design', writes: [] } }] },
+      { id: 'independent-opinions', units: [{ id: 'p', template: { capability: 'docs:write', pattern: 'panel', seats: memberSeats(), objective: 'Review the design', writes: [] } }] },
       { id: 'cross-examine', dependsOn: ['independent-opinions'], units: [{ id: 'x', template: { capability: 'docs:write', pattern: 'solo', objective: 'Cross-examine', writes: [], anonymizeInputs: true } }] },
     ],
   });
@@ -1029,7 +1033,7 @@ test('anonymizeInputs hands a later unit neutral copies and a brief that names n
   const { inputMap } = JSON.parse(fs.readFileSync(path.join(xDir, 'unit.json'), 'utf8'));
   assert.deepEqual(
     inputMap.map((m) => m.input),
-    ['panelist-1', 'panelist-2', 'panelist-3', 'synthesizer'].map((role) => `unit-run:${panelRunId}/${role}`),
+    ['member-1', 'member-2', 'member-3', 'synthesizer'].map((role) => `unit-run:${panelRunId}/${role}`),
   );
 });
 
@@ -1058,7 +1062,7 @@ test('a unit template that declares inputs gets only those steps, and its own se
   }
   fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
 
-  const panel = (extra = {}) => ({ capability: 'docs:write', pattern: 'panel', writes: [], ...extra });
+  const panel = (extra = {}) => ({ capability: 'docs:write', pattern: 'panel', seats: memberSeats(), writes: [], ...extra });
   const workflow = validateWorkflow({
     id: 'own-seat-round',
     steps: [
@@ -1086,10 +1090,10 @@ test('a unit template that declares inputs gets only those steps, and its own se
   const assignment = (id, role) => JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', id, role, '1', 'assignment.json'), 'utf8'));
   const r2Dir = path.join(tmp, '.fgos', 'assignments', runId('round-2', 'p2'));
 
-  for (const role of ['panelist-1', 'panelist-2', 'panelist-3']) {
+  for (const role of ['member-1', 'member-2', 'member-3']) {
     const { contextRefs, objective } = assignment(runId('round-2', 'p2'), role);
     assert.deepEqual(contextRefs, [path.join(r2Dir, 'inputs', 'seat-A.md'), path.join(r2Dir, role, '1', 'inputs', 'own-previous.md')], role);
-    const own = state.steps['round-1'].units.p1.results.find((r) => r.role === role).runResult.settleReports[0].path;
+    const own = state.steps['round-1'].units.p1.results.find((r) => r.seat === role).runResult.settleReports[0].path;
     assert.ok(fs.readFileSync(contextRefs[1]).equals(fs.readFileSync(path.join(tmp, own))), `${role} gets its own round 1 report`);
     assert.match(objective, /### seat-A \(group summary\)/);
     assert.match(objective, /### your own previous proposal\nIt is the file named "own-previous"/);
@@ -1268,10 +1272,11 @@ test('a step target is accepted on integrate steps only', () => {
 });
 
 test('validateWorkflow keeps a unit template persona and params and rejects params that are not an object', () => {
-  const base = { id: 'test/persona-params', steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', pattern: 'panel', persona: ' panelist ', params: { members: 2 } } }] }] };
+  const base = { id: 'test/persona-params', steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', pattern: 'panel', persona: ' panelist ', seats: memberSeats(2), params: { roleTasks: { x: 'y' } } } }] }] };
   const template = validateWorkflow(base).steps[0].units[0].template;
   assert.equal(template.persona, 'panelist');
-  assert.deepEqual(template.params, { members: 2 });
+  assert.deepEqual(template.params, { roleTasks: { x: 'y' } });
+  assert.equal(template.seats.length, 3, 'two members and the synthesizer');
 
   for (const bad of ['x', ['a'], 3]) {
     const workflow = { ...base, steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', params: bad } }] }] };
@@ -1350,7 +1355,8 @@ test('a unit template persona and params reach the binding and the per-role obje
               capability: 'docs:write',
               pattern: 'panel',
               persona: 'panelist',
-              params: { members: 2, roleTasks: { synthesizer: 'WORKFLOW-SYNTH-TASK for: {objective}' } },
+              seats: memberSeats(2),
+              params: { roleTasks: { synthesizer: 'WORKFLOW-SYNTH-TASK for: {objective}' } },
               objective: 'Review the design',
               writes: [],
             },
@@ -1368,14 +1374,14 @@ test('a unit template persona and params reach the binding and the per-role obje
   const panelRunId = state.steps.panel.units.p.unitRunId;
 
   // params.members reached the pattern: two panelists, not the default three.
-  assert.ok(fs.existsSync(path.join(runDir(panelRunId), 'panelist-2')));
-  assert.ok(!fs.existsSync(path.join(runDir(panelRunId), 'panelist-3')));
+  assert.ok(fs.existsSync(path.join(runDir(panelRunId), 'member-2')));
+  assert.ok(!fs.existsSync(path.join(runDir(panelRunId), 'member-3')));
   // params.roleTasks reached roleUnit: the synthesizer was given the workflow's own task text.
   assert.match(readAssignment(panelRunId, 'synthesizer').objective, /^WORKFLOW-SYNTH-TASK for: Review the design/);
 
   // persona travels on the Unit itself, which bind() reads below an override: every seat carries
   // it with provenance "unit", and no override is made up for it.
-  for (const role of ['panelist-1', 'panelist-2']) {
+  for (const role of ['member-1', 'member-2']) {
     assert.equal(readAssignment(panelRunId, role).policy.preferPersona, 'panelist', role);
     assert.equal(readAssignment(panelRunId, role).binding.provenance.persona.source, 'unit', role);
   }
@@ -1416,7 +1422,7 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
     if (choices) {
       const options = JSON.parse(choices[1]);
       if (options.length < 2) throw new Error('worker received fewer than two options');
-      claim.stance = { choice: options[1], confidence: target.includes('/panelist-2/') ? 'malformed' : 0.9 };
+      claim.stance = { choice: options[1], confidence: target.includes('/member-2/') ? 'malformed' : 0.9 };
     }
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(path.join(path.dirname(target), 'agent-report.md'), '# Report\nThe second strategy favors a simpler implementation and bounded rebuild cost. Review correctness against the stated workload.\n');
@@ -1431,7 +1437,7 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
   const workflow = {
     id: 'stance-cli',
     steps: [{ id: 'opinions', units: [{ id: 'question', template: {
-      capability: 'docs:write', pattern: 'panel', params: { members: 2 },
+      capability: 'docs:write', pattern: 'panel', seats: memberSeats(2),
       objective: 'Choose incremental or full rebuilding', writes: [],
     } }] }],
   };
@@ -1453,14 +1459,14 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
   assert.deepEqual(summary.workflow, expectedLink);
   assert.deepEqual(summary.stanceOptions, ['incremental', 'full']);
   assert.equal(summary.outcome, 'pass', 'malformed optional stance never fails a seat');
-  for (const role of ['panelist-1', 'panelist-2']) {
+  for (const role of ['member-1', 'member-2']) {
     const brief = dispatchedPrompt(unitDir, role);
     assert.match(brief, /Assess correctness/);
     assert.match(brief, /Declared choices: \["incremental","full"\]/);
     assert.match(brief, /"stance": \{"choice"/);
-    const seat = summary.seats.find((entry) => entry.role === role);
+    const seat = summary.seats.find((entry) => entry.seat === role);
     assert.equal(seat.kind, 'panelist');
-    assert.deepEqual(seat.final.stance, role === 'panelist-1'
+    assert.deepEqual(seat.final.stance, role === 'member-1'
       ? { status: 'valid', choice: 'full', confidence: 0.9 }
       : { status: 'invalid', reason: 'confidence-out-of-range' });
   }
@@ -1469,7 +1475,7 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
     'the synthesizer was never asked, so it never voted');
   // The same labels have a direct-unit CLI door and do not acquire a workflow link.
   const unitFile = path.join(tmp, 'unit.json');
-  fs.writeFileSync(unitFile, JSON.stringify({ id: 'direct-question', capability: 'docs:write', pattern: 'panel', objective: 'Choose rebuilding strategy', writes: [] }));
+  fs.writeFileSync(unitFile, JSON.stringify({ id: 'direct-question', capability: 'docs:write', pattern: 'panel', seats: memberSeats(), objective: 'Choose rebuilding strategy', writes: [] }));
   const direct = runFgos('`fgos run --unit`', [
     'run', '--unit', unitFile, '--stance-options', 'incremental|full', '--dir', tmp,
   ]);
@@ -1479,9 +1485,9 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
   assert.equal(directRecord.workflow, null);
   assert.equal(directSummary.workflow, null);
   assert.deepEqual(directSummary.stanceOptions, ['incremental', 'full']);
-  assert.match(dispatchedPrompt(directDir, 'panelist-1'), /Declared choices: \["incremental","full"\]/);
+  assert.match(dispatchedPrompt(directDir, 'member-1'), /Declared choices: \["incremental","full"\]/);
   assert.equal(directSummary.outcome, 'pass');
-  assert.deepEqual(directSummary.seats.find((seat) => seat.role === 'panelist-1').final.stance, { status: 'valid', choice: 'full', confidence: 0.9 });
+  assert.deepEqual(directSummary.seats.find((seat) => seat.seat === 'member-1').final.stance, { status: 'valid', choice: 'full', confidence: 0.9 });
 });
 
 test('workflow template option labels normalize without accepting malformed sets', () => {
@@ -1803,7 +1809,7 @@ function writeSeatBase(tmp) {
   fs.writeFileSync(path.join(tmp, 'core', 'workflows', 'seat-base.json'), JSON.stringify({
     id: 'seat-base',
     steps: [
-      { id: 'opinions', units: [{ id: 'panel', template: { capability: 'docs:write', pattern: 'panel', blind: true, objective: 'Weigh the question', writes: [] } }] },
+      { id: 'opinions', units: [{ id: 'panel', template: { capability: 'docs:write', pattern: 'panel', seats: memberSeats(), blind: true, objective: 'Weigh the question', writes: [] } }] },
       { id: 'decide', dependsOn: ['opinions'], units: [{ id: 'verdict', template: { capability: 'docs:write', pattern: 'solo', objective: 'Decide', writes: [] } }] },
     ],
   }));
@@ -1823,8 +1829,8 @@ test('workflow start --seats through the real CLI stores the expanded definition
   // The stored definition and provenance are what status and resume read back.
   const status = runFgos(['workflow', 'status', state.workflowRunId, '--dir', tmp]);
   const panel = status.workflow.steps[0].units[0].template;
-  assert.equal(panel.params.members, 3);
-  assert.deepEqual(Object.keys(panel.params.roleTasks), ['panelist-1', 'panelist-2', 'panelist-3']);
+  assert.deepEqual(panel.seats.filter((seat) => seat.role === 'producer').map((seat) => seat.seat), ['member-1', 'member-2', 'member-3']);
+  assert.deepEqual(Object.keys(panel.params.roleTasks), ['member-1', 'member-2', 'member-3']);
   assert.equal(status.workflowId, 'seat-base');
   assert.deepEqual(status.seats.seats, lenses);
   assert.equal(status.seats.baseId, 'seat-base');
@@ -1846,12 +1852,12 @@ test('workflow start --seats through the real CLI stores the expanded definition
     return envelope.launch.args.find((arg) => arg.includes('Write structured JSON to'));
   };
   lenses.forEach((lens, i) => {
-    const brief = prompt(`panelist-${i + 1}`);
+    const brief = prompt(`member-${i + 1}`);
     assert.match(brief, new RegExp(`Your analytic lens for this question: ${lens}\\.`));
     assert.match(brief, /Weigh the question/);
     for (const other of lenses.filter((l) => l !== lens)) assert.ok(!brief.includes(other), `seat ${i + 1} must not see "${other}"`);
   });
-  assert.ok(!fs.existsSync(path.join(unitDir, 'panelist-4')));
+  assert.ok(!fs.existsSync(path.join(unitDir, 'member-4')));
   assert.doesNotMatch(prompt('synthesizer'), /analytic lens/);
 
   // The downstream unit received the shared ref.
@@ -1904,8 +1910,8 @@ test('six seats on a pool with fewer provider families start without a waiver an
   assert.equal(state.status, 'completed', JSON.stringify(state.steps));
   assert.equal(state.seats.seats.length, 6);
   const unitDir = path.join(tmp, '.fgos', 'assignments', state.steps.opinions.units.panel.unitRunId);
-  for (let i = 1; i <= 6; i += 1) assert.ok(fs.existsSync(path.join(unitDir, `panelist-${i}`)), `panelist-${i} ran`);
-  assert.ok(!fs.existsSync(path.join(unitDir, 'panelist-7')));
+  for (let i = 1; i <= 6; i += 1) assert.ok(fs.existsSync(path.join(unitDir, `member-${i}`)), `member-${i} ran`);
+  assert.ok(!fs.existsSync(path.join(unitDir, 'member-7')));
 });
 
 test('a pool that cannot serve a panel role at all refuses the seated start before any run exists', async (t) => {
@@ -1963,12 +1969,12 @@ function writeTwoRoundSeatBase(tmp) {
   fs.writeFileSync(path.join(tmp, 'core', 'workflows', 'two-round.json'), JSON.stringify({
     id: 'two-round',
     steps: [
-      { id: 'opinions', units: [{ id: 'panel', template: { capability: 'docs:write', pattern: 'panel', persona: 'panelist', objective: 'Weigh the question', writes: [] } }] },
+      { id: 'opinions', units: [{ id: 'panel', template: { capability: 'docs:write', pattern: 'panel', seats: memberSeats(), persona: 'panelist', objective: 'Weigh the question', writes: [] } }] },
       {
         id: 'again',
         dependsOn: ['opinions'],
         gate: { kind: 'human', question: 'Run the second round?' },
-        units: [{ id: 'panel-two', template: { capability: 'docs:write', pattern: 'panel', persona: 'panelist', objective: 'Weigh it again', writes: [] } }],
+        units: [{ id: 'panel-two', template: { capability: 'docs:write', pattern: 'panel', seats: memberSeats(), persona: 'panelist', objective: 'Weigh it again', writes: [] } }],
       },
     ],
   }));
@@ -2008,8 +2014,8 @@ test('a named persona lands on its own seat only, mixed with a lens and an insta
   // Pinned at start, in the event and the projection, with the digest of the exact bytes.
   const installed = fs.readFileSync(path.resolve('core/agents/council-assumptions.yaml'), 'utf8');
   const expected = [
-    { seat: 'panelist-2', name: 'finance-controller', tier: 'workspace', source: 'fgos/agents/finance-controller.yaml', digest: sha256(personaText), text: personaText },
-    { seat: 'panelist-3', name: 'council-assumptions', tier: 'core', source: 'core/agents/council-assumptions.yaml', digest: sha256(installed), text: installed },
+    { seat: 'member-2', name: 'finance-controller', tier: 'workspace', source: 'fgos/agents/finance-controller.yaml', identity: 'workspace:fgos/agents/finance-controller', digest: sha256(personaText), text: personaText },
+    { seat: 'member-3', name: 'council-assumptions', tier: 'core', source: 'core/agents/council-assumptions.yaml', identity: 'core:core/agents/council-assumptions', digest: sha256(installed), text: installed },
   ];
   assert.deepEqual(state.seats.seats, seats);
   assert.deepEqual(state.seats.personas, expected);
@@ -2020,29 +2026,29 @@ test('a named persona lands on its own seat only, mixed with a lens and an insta
   const unitRunId = state.steps.opinions.units.panel.unitRunId;
   // Only the named seats are overrides; the unit's own persona travels on the Unit and serves every other role.
   const unitRecord = JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
-  assert.deepEqual(unitRecord.overrides.map((o) => [o.scope.role ?? null, o.persona]), [
-    ['panelist-2', 'finance-controller'], ['panelist-3', 'council-assumptions'],
+  assert.deepEqual(unitRecord.overrides.map((o) => [o.scope.seat ?? null, o.persona]), [
+    ['member-2', 'finance-controller'], ['member-3', 'council-assumptions'],
   ]);
   assert.equal(unitRecord.unit.persona, 'panelist');
   const personaOf = (role) => seatAssignment(tmp, unitRunId, role).policy.preferPersona;
-  assert.equal(personaOf('panelist-1'), 'panelist', 'a lens seat keeps the unit-wide persona');
-  assert.equal(personaOf('panelist-2'), 'finance-controller');
-  assert.equal(personaOf('panelist-3'), 'council-assumptions');
+  assert.equal(personaOf('member-1'), 'panelist', 'a lens seat keeps the unit-wide persona');
+  assert.equal(personaOf('member-2'), 'finance-controller');
+  assert.equal(personaOf('member-3'), 'council-assumptions');
   assert.equal(personaOf('synthesizer'), 'panelist', 'the synthesizer never inherits a seat persona');
   assert.equal(seatAssignment(tmp, unitRunId, 'synthesizer').policy.personaPin, undefined);
 
   // What each seat was actually briefed with: the pinned text on its own seat, the lens on the lens seat.
-  const second = seatBrief(tmp, unitRunId, 'panelist-2');
+  const second = seatBrief(tmp, unitRunId, 'member-2');
   assert.match(second, /resolved persona "finance-controller"/);
   assert.ok(second.includes('Description: Weighs the cash impact of {objective} before anything else'), 'persona text stays literal');
   assert.ok(second.includes('Voice: Plain controller voice') && second.includes('- Whether the cash impact is acceptable'));
   assert.doesNotMatch(second, /analytic lens/);
   assert.match(second, /Weigh the question/, 'a named seat keeps the unit objective as its task');
-  const third = seatBrief(tmp, unitRunId, 'panelist-3');
+  const third = seatBrief(tmp, unitRunId, 'member-3');
   assert.match(third, /resolved persona "council-assumptions"/);
   assert.ok(third.includes('Description: Council task posture: assumption testing.'));
   assert.ok(!third.includes('finance-controller') && !third.includes('Plain controller voice'));
-  const first = seatBrief(tmp, unitRunId, 'panelist-1');
+  const first = seatBrief(tmp, unitRunId, 'member-1');
   assert.match(first, /Your analytic lens for this question: cash flow and payback\./);
   assert.match(first, /resolved persona "panelist"/);
   assert.ok(!first.includes('Plain controller voice') && !first.includes('assumption testing'));
@@ -2064,7 +2070,7 @@ test('resume uses the persona text pinned at start after the file is edited or d
 
     const done = await answerWorkflow(parked.workflowRunId, { stepId: 'again', answer: 'go', approved: true, repoRoot: tmp, cwd: tmp, worktree: tmp });
     assert.equal(done.status, 'completed', `${label}: ${JSON.stringify(done.steps)}`);
-    const brief = seatBrief(tmp, done.steps.again.units['panel-two'].unitRunId, 'panelist-1');
+    const brief = seatBrief(tmp, done.steps.again.units['panel-two'].unitRunId, 'member-1');
     assert.ok(brief.includes('Voice: Plain controller voice\n'), `${label}: the pinned voice reaches the later round`);
     assert.ok(!brief.includes('EDITED AFTER START'), `${label}: the live file must not be re-read`);
     assert.ok(brief.includes('Description: Weighs the cash impact of {objective}'), label);
@@ -2078,7 +2084,7 @@ test('a workspace definition replaces the installed one of the same name whole',
   const state = await startWorkflow(seatedParams(tmp, ['cash flow and payback', '@council-assumptions']));
   assert.equal(state.status, 'parked', JSON.stringify(state.steps));
   assert.equal(state.seats.personas[0].tier, 'workspace');
-  const brief = seatBrief(tmp, state.steps.opinions.units.panel.unitRunId, 'panelist-2');
+  const brief = seatBrief(tmp, state.steps.opinions.units.panel.unitRunId, 'member-2');
   assert.ok(brief.includes('Description: Customer assumption tester'));
   assert.ok(!brief.includes('Voice:') && !brief.includes('Blind spot: questioning without convergence'), 'fields of the installed file are not merged in');
 });
@@ -2094,8 +2100,9 @@ test('unknown, colliding, duplicated and malformed persona entries refuse the st
   writeWorkspacePersona(tmp, 'wrong-shape', 'name: other\ndescription: x\n');
 
   const refused = [
-    [['good lens', '@nobody-here'], /persona "nobody-here" not found; searched fgos\/agents \(.*domains\/\*\/agents \(.*core\/agents \(/],
-    [['good lens', '@shared-name'], /persona "shared-name" is defined more than once in the domains\/\*\/agents tier \(domains\/finance\/agents\/shared-name\.yaml, domains\/hr\/agents\/shared-name\.yaml\)/],
+    [['good lens', '@nobody-here'], /persona "nobody-here" not found; searched fgos\/agents \(.*core\/agents \(/],
+    // A domain's persona is invisible to a core workflow, so the name is simply not found.
+    [['good lens', '@shared-name'], /persona "shared-name" not found; searched fgos\/agents \(.*core\/agents \(/],
     [['@finance-controller', '@finance-controller'], /seat 2 repeats seat 1/],
     [['good lens', '@'], /names a persona \("@"\)/],
     [['good lens', '@Finance-Controller'], /names a persona/],

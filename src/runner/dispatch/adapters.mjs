@@ -116,6 +116,9 @@ export function currentDispatchDepth() {
  * Case authority is no more inherited than identity: `FGOS_CASE_ID` and `FGOS_CASE_RESERVATION` are
  * dropped here and set again only from the reservation the door admitted for this very launch.
  *
+ * Host authority is not inherited either: `FGOS_HOST_BIN` is dropped, so a worker cannot point its
+ * parent's next seat binding at another host binary.
+ *
  * Lock authority never crosses this boundary: `FGOS_LOCK_FD` (a borrowed description's slot, useless
  * without the description and wrong if believed), `FGOS_LOCK_JOB` (a borrow job's name, only meaningful
  * inside that job) and `FGOS_MAIN_LOCK_HOLDER_PID` are dropped. The
@@ -134,6 +137,7 @@ export function workerBaseEnv(baseEnv = process.env) {
     FGOS_LOCK_JOB: _lockJob,
     FGOS_MAIN_LOCK_HOLDER_PID: _mainLockHolderPid,
     FGOS_STATE_ROOT: _inheritedStateRoot,
+    FGOS_HOST_BIN: _hostBin,
     FGOS_SESSION_ID: _sessionId,
     FGOS_CASE_ID: _caseId,
     FGOS_CASE_RESERVATION: _caseReservation,

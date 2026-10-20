@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { normalizeContextRefs } from './definition.mjs';
-import { loadWorkflow } from './loader.mjs';
+import { loadWorkflow, workflowPersonaScope } from './loader.mjs';
 import { createWorkflowRun, appendWorkflowEvent, readWorkflowEvents, projectWorkflowState } from './store.mjs';
 import { translateUnitsToWorkflow } from './units-source.mjs';
 import { snapshotRunnerConfig, resolveGitRoots, detectHerdrPresent } from '../runner/execution/run.mjs';
@@ -199,9 +199,11 @@ function resolveStart(params) {
     // Names are resolved (and a missing or duplicated one refused) here, before any run exists; the
     // text found now is what the run pins, so a later edit of the file never reaches it.
     const personas = {};
+    // The same scope the run's Units look personas up in: the workflow's own folder and owning domain.
+    const personaScope = workflowPersonaScope(workflow.id, { packageRoot: mainRoot, cwd });
     for (const entry of normalizeSeats(params.seats)) {
       const name = personaNameOf(entry);
-      if (name !== null) personas[name] = resolveAgentDefinition(name, { projectRoot: worktreePath });
+      if (name !== null) personas[name] = resolveAgentDefinition(name, { projectRoot: worktreePath, workflow: personaScope });
     }
     ({ workflow, provenance: seats } = expandWorkflowSeats(workflow, params.seats, { contextRefs, personas }));
     seats = { ...seats, refDigests: digestContextRefs(contextRefs, worktreePath) };
@@ -218,7 +220,7 @@ function resolveStart(params) {
  * Dry-bind a seated definition before anything is spent: every panel unit's seats and synthesizer are
  * bound against the pool exactly as a run would bind them, nothing is dispatched or written.
  * Seats that would share a provider family are only reported (a preference, bind() spreads what it
- * can); a role no candidate can serve refuses the start. Without `params.seats` it does nothing.
+ * can); a seat no candidate can serve refuses the start. Without `params.seats` it does nothing.
  *
  * @param {object} params the same params as startWorkflow
  * @returns {Promise<{ warnings: string[] }>}
@@ -231,10 +233,10 @@ export async function preflightWorkflowSeats(params = {}) {
   const warnings = [];
   const refused = [];
   for (const unit of seatedPanelUnits(workflow)) {
-    const { roles } = await simulateUnitBindings(unit, runnerConfig, { session });
-    for (const role of roles) {
-      if (role.refused) refused.push(`${unit.id}/${role.role}: ${role.refused.reason}: ${role.refused.detail}`);
-      else if (role.sharesFamilyWith?.length) warnings.push(`${unit.id}/${role.role}=${role.executor} shares a provider family with ${role.sharesFamilyWith.join(', ')}`);
+    const { seats } = await simulateUnitBindings(unit, runnerConfig, { session });
+    for (const seat of seats) {
+      if (seat.refused) refused.push(`${unit.id}/${seat.seat}: ${seat.refused.reason}: ${seat.refused.detail}`);
+      else if (seat.sharesFamilyWith?.length) warnings.push(`${unit.id}/${seat.seat}=${seat.executor} shares a provider family with ${seat.sharesFamilyWith.join(', ')}`);
     }
   }
   if (refused.length > 0) {

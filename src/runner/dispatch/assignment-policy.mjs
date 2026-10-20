@@ -27,6 +27,7 @@ import { REPEAT_MODE_VALUES } from './execution-contract.mjs';
 import { checkProviderDisallowed } from './provider-adapter.mjs';
 import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
 import { deriveOperationCapability } from '../operation-capability.mjs';
+import { capabilityRigorOf } from '../execution/seat-resolver.mjs';
 export const TIER_STRENGTH = Object.freeze({
   nano: 1,
   mini: 2,
@@ -284,8 +285,8 @@ export function resolveAssignmentDispatchPolicy({
     runnerConfig,
   );
   const targetCap = opPolicy.capability ?? assignment.capability ?? derivedCapability.name;
-  if (targetCap && runnerConfig?.capabilities?.[targetCap]?.rigor !== undefined) {
-    const capRigor = runnerConfig.capabilities[targetCap].rigor;
+  if (targetCap && capabilityRigorOf(runnerConfig, targetCap) !== undefined) {
+    const capRigor = capabilityRigorOf(runnerConfig, targetCap);
     if (!RIGOR_VALUES.includes(capRigor)) {
       throw new RunnerConfigError(`invalid capability rigor "${capRigor}" for "${targetCap}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
     }

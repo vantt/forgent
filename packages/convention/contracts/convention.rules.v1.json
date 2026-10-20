@@ -90,5 +90,47 @@
       "generated": false,
       "requiredMetadataFields": []
     }
+  ],
+  "identifiers": [
+    {
+      "id": "seat-id",
+      "description": "A seat id names a directory and a ref segment of a unit run, so it is a short lowercase slug and never a name the run layout or the runner itself uses.",
+      "first": "abcdefghijklmnopqrstuvwxyz",
+      "rest": "abcdefghijklmnopqrstuvwxyz0123456789-",
+      "maxLength": 40,
+      "reserved": ["runs", "outbox", "inbox", "inputs", "unit-control", "control", "sync", "verify", "verifier"]
+    },
+    {
+      "id": "workflow-name",
+      "description": "A packaged workflow's name is also its directory name.",
+      "first": "abcdefghijklmnopqrstuvwxyz",
+      "rest": "abcdefghijklmnopqrstuvwxyz0123456789-",
+      "maxLength": 64,
+      "reserved": []
+    },
+    {
+      "id": "agent-name",
+      "description": "A persona's name is also the name inside its file name.",
+      "first": "abcdefghijklmnopqrstuvwxyz",
+      "rest": "abcdefghijklmnopqrstuvwxyz0123456789-",
+      "maxLength": 64,
+      "reserved": []
+    }
+  ],
+  "definitionFiles": [
+    {
+      "id": "workflow-file",
+      "description": "A packaged workflow is a directory <name>/ holding wf.<name>.yaml; its own personas sit beside it.",
+      "prefix": "wf.",
+      "suffix": ".yaml",
+      "nameIdentifier": "workflow-name"
+    },
+    {
+      "id": "agent-file",
+      "description": "A persona file inside a packaged workflow's directory.",
+      "prefix": "agent.",
+      "suffix": ".yaml",
+      "nameIdentifier": "agent-name"
+    }
   ]
 }

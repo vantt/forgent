@@ -25,6 +25,11 @@ steps:
         template:
           capability: group-cognition:explore
           pattern: panel
+          seats:
+            - { seat: member-1, role: producer }
+            - { seat: member-2, role: producer }
+            - { seat: member-3, role: producer }
+            - { seat: synthesis, role: synthesizer }
           persona: researcher
           objective: Conduct divergent exploration and sense-making across multiple independent researcher perspectives
           blind: true
@@ -36,6 +41,10 @@ steps:
         template:
           capability: group-cognition:critique
           pattern: debate
+          seats:
+            - { seat: thesis, role: producer }
+            - { seat: antithesis, role: producer }
+            - { seat: judge, role: judge, tier: flagship }
           persona: critic
           objective: >-
             Debate the strongest conclusion of the sense-making reports listed under Context refs. The

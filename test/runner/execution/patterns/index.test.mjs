@@ -3,24 +3,31 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { runPattern, VALID_OUTCOMES } from '../../../../src/runner/execution/patterns/index.mjs';
 
+const PANEL_SEATS = [
+  { seat: 'member-1', role: 'producer' },
+  { seat: 'member-2', role: 'producer' },
+  { seat: 'member-3', role: 'producer' },
+  { seat: 'synthesis', role: 'synthesizer' },
+];
+
 test('runPattern dispatches solo pattern by default or name', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
-    return { role: opts.role, outcome: 'pass' };
+    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
 
   const res = await runPattern('solo', { id: 'u-1', objective: 'Solo task' }, {}, { runRole });
   assert.equal(res.outcome, 'pass');
   assert.equal(calls.length, 1);
-  assert.equal(calls[0].role, 'producer');
+  assert.equal(calls[0].seat.seat, 'producer');
 });
 
 test('runPattern dispatches reviewed pattern with parameters', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
-    return { role: opts.role, outcome: 'pass' };
+    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
 
   const res = await runPattern(
@@ -31,28 +38,28 @@ test('runPattern dispatches reviewed pattern with parameters', async () => {
   );
 
   assert.equal(res.outcome, 'pass');
-  assert.ok(calls.some((c) => c.role === 'producer'));
-  assert.ok(calls.some((c) => c.role === 'reviewer'));
-  assert.ok(calls.some((c) => c.role === 'red-team'));
+  assert.ok(calls.some((c) => c.seat.seat === 'producer'));
+  assert.ok(calls.some((c) => c.seat.seat === 'reviewer'));
+  assert.ok(calls.some((c) => c.seat.seat === 'red-team'));
 });
 
 test('runPattern dispatches panel pattern', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
-    return { role: opts.role, outcome: 'pass' };
+    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
 
-  const res = await runPattern('panel', { id: 'u-3', objective: 'Panel task' }, {}, { runRole });
+  const res = await runPattern('panel', { id: 'u-3', objective: 'Panel task', seats: PANEL_SEATS }, {}, { runRole });
   assert.equal(res.outcome, 'pass');
-  assert.equal(calls.length, 4); // 3 panelists + 1 synthesizer
+  assert.equal(calls.length, 4); // 3 members + 1 synthesizer
 });
 
 test('runPattern dispatches named preset "code-change"', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
-    return { role: opts.role, outcome: 'pass' };
+    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
   const verify = async () => ({ pass: true });
 
@@ -64,16 +71,16 @@ test('runPattern dispatches named preset "code-change"', async () => {
   );
 
   assert.equal(res.outcome, 'pass');
-  assert.ok(calls.some((c) => c.role === 'producer'));
-  assert.ok(calls.some((c) => c.role === 'reviewer'));
-  assert.ok(calls.some((c) => c.role === 'red-team'));
+  assert.ok(calls.some((c) => c.seat.seat === 'producer'));
+  assert.ok(calls.some((c) => c.seat.seat === 'reviewer'));
+  assert.ok(calls.some((c) => c.seat.seat === 'red-team'));
 });
 
-test('runPattern dispatches named preset "consult" with advisor role', async () => {
+test('runPattern dispatches named preset "consult" with its advisor seat', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
-    return { role: opts.role, outcome: 'pass' };
+    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
 
   const res = await runPattern(
@@ -85,14 +92,15 @@ test('runPattern dispatches named preset "consult" with advisor role', async () 
 
   assert.equal(res.outcome, 'pass');
   assert.equal(calls.length, 1);
-  assert.equal(calls[0].role, 'advisor');
+  assert.equal(calls[0].seat.seat, 'advisor');
+  assert.equal(calls[0].seat.role, 'producer');
 });
 
-test('runPattern dispatches named preset "research-fan-out" with researcher roles', async () => {
+test('runPattern dispatches named preset "research-fan-out" with researcher seats', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
-    return { role: opts.role, outcome: 'pass' };
+    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
 
   const res = await runPattern(
@@ -104,17 +112,17 @@ test('runPattern dispatches named preset "research-fan-out" with researcher role
 
   assert.equal(res.outcome, 'pass');
   assert.equal(calls.length, 4);
-  assert.equal(calls[0].role, 'researcher-1');
-  assert.equal(calls[1].role, 'researcher-2');
-  assert.equal(calls[2].role, 'researcher-3');
-  assert.equal(calls[3].role, 'synthesizer');
+  assert.equal(calls[0].seat.seat, 'researcher-1');
+  assert.equal(calls[1].seat.seat, 'researcher-2');
+  assert.equal(calls[2].seat.seat, 'researcher-3');
+  assert.equal(calls[3].seat.seat, 'synthesizer');
 });
 
 test('runPattern dispatches named preset "rfc" with reviewer and red-team checkers', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
-    return { role: opts.role, outcome: 'pass' };
+    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
 
   const res = await runPattern(
@@ -126,21 +134,21 @@ test('runPattern dispatches named preset "rfc" with reviewer and red-team checke
 
   assert.equal(res.outcome, 'pass');
   assert.equal(res.rounds, 1);
-  assert.ok(calls.some((c) => c.role === 'producer'));
-  assert.ok(calls.some((c) => c.role === 'reviewer'));
-  assert.ok(calls.some((c) => c.role === 'red-team'));
+  assert.ok(calls.some((c) => c.seat.seat === 'producer'));
+  assert.ok(calls.some((c) => c.seat.seat === 'reviewer'));
+  assert.ok(calls.some((c) => c.seat.seat === 'red-team'));
 });
 
 test('runPattern uses unit.pattern when nameOrPreset is omitted', async () => {
   const calls = [];
   const runRole = async (opts) => {
     calls.push(opts);
-    return { role: opts.role, outcome: 'pass' };
+    return { seat: opts.seat.seat, role: opts.seat.role, outcome: 'pass' };
   };
 
   const res = await runPattern(
     null,
-    { id: 'u-5', objective: 'From unit pattern', pattern: 'panel' },
+    { id: 'u-5', objective: 'From unit pattern', pattern: 'panel', seats: PANEL_SEATS },
     {},
     { runRole },
   );

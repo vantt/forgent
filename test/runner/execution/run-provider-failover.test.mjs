@@ -186,7 +186,8 @@ const runFile = (repoRoot, res, subdir, file, role = 'producer') => readJson(pat
 const selectedAccount = (repoRoot, res, subdir) => runFile(repoRoot, res, subdir, 'provider-capacity-selection.json').accountId;
 
 const solo = (id) => ({ id, objective: 'Inspect the docs', capability: 'docs:write', writes: [], pattern: 'solo' });
-const panel = (id) => ({ id, objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', stanceOptions: ['a', 'b'] });
+const panel = (id) => ({ id, objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', stanceOptions: ['a', 'b'],
+  seats: [1, 2, 3].map((n) => ({ seat: `member-${n}`, role: 'producer' })).concat([{ seat: 'synthesizer', role: 'synthesizer' }]) });
 const run = (fx, unitData, extra = {}) => runUnit({
   unitData,
   repoRoot: fx.repoRoot,
@@ -377,10 +378,10 @@ test('a panel seat that rotated keeps its role and the unit passes', { skip: SKI
   const res = await run(fx, panel('u-panel-rotate'), { pattern: 'panel' });
   assert.equal(res.outcome, 'pass', JSON.stringify(res.results.map((r) => [r.role, r.outcome])));
 
-  const panelist1 = attemptsOf(fx.repoRoot, res, 'panelist-1/1');
-  assert.deepEqual(panelist1.map((a) => [a.role, a.binding.executor, a.outcome]), [['panelist-1', 'alpha', 'provider-limit'], ['panelist-1', 'alpha', 'pass']]);
+  const panelist1 = attemptsOf(fx.repoRoot, res, 'member-1/1');
+  assert.deepEqual(panelist1.map((a) => [a.seat, a.binding.executor, a.outcome]), [['member-1', 'alpha', 'provider-limit'], ['member-1', 'alpha', 'pass']]);
   const summary = summaryOf(fx.repoRoot, res);
-  const seat = summary.seats.find((s) => s.role === 'panelist-1');
+  const seat = summary.seats.find((s) => s.seat === 'member-1');
   assert.equal(seat.kind, 'panelist');
   assert.equal(seat.final.executor, 'alpha');
   assert.equal(seat.final.outcome, 'pass');
@@ -400,10 +401,10 @@ test('a panel seat that walked to another provider lands on a family its sibling
   });
   const res = await run(fx, panel('u-panel-walk'), { pattern: 'panel' });
   assert.equal(res.outcome, 'pass', JSON.stringify(res.results.map((r) => [r.role, r.outcome])));
-  const panelist1 = attemptsOf(fx.repoRoot, res, 'panelist-1/1');
+  const panelist1 = attemptsOf(fx.repoRoot, res, 'member-1/1');
   assert.deepEqual(panelist1.map((a) => a.outcome), ['provider-limit', 'pass']);
   assert.equal(panelist1[1].fallbackFrom.kind, 'next-candidate');
-  const finalExecutors = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult.executorId);
+  const finalExecutors = res.results.filter((r) => r.seat.startsWith('member-')).map((r) => r.runResult.executorId);
   assert.equal(new Set(finalExecutors).size, 3, `final panelist executors are pairwise distinct families, got ${finalExecutors.join(',')}`);
   assert.ok(!finalExecutors.includes('alpha'));
   assert.equal(summaryOf(fx.repoRoot, res).sharedFamilies, undefined);

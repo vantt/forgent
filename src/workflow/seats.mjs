@@ -8,8 +8,8 @@
 // topology, gates, blind flags, checker tasks and synthesizer text exactly as registered, with one
 // panel seat per entry: a plain-text lens, or `@name` for a named persona that the Workflow runner
 // binds to that seat alone. The expansion changes only the seat fields of the panel units whose seats
-// are generic (a count and one task per `panelist-N` role) and, when shared context refs are
-// supplied, copies them into the units that the run-level refs would not reach.
+// are generic (producer seats with no persona, tier or seat-keyed task of their own) and, when shared
+// context refs are supplied, copies them into the units that the run-level refs would not reach.
 
 import crypto from 'node:crypto';
 
@@ -20,7 +20,6 @@ export const SEAT_MIN_ENTRIES = 2;
 export const SEAT_MIN_CHARS = 3;
 export const SEAT_MAX_CHARS = 160;
 
-const PANELIST_ROLE = /^panelist-\d+$/;
 const PERSONA_ENTRY = /^@([a-z][a-z0-9-]{0,63})$/;
 // eslint-disable-next-line no-control-regex -- a lens is one printable line: no newline, tab or other control character
 const CONTROL_CHARS = /[\u0000-\u001f\u007f\u2028\u2029]/;
@@ -91,21 +90,30 @@ function panelUnits(workflow) {
   return workflow.steps.flatMap((step) => step.units.filter((unit) => unit.template.pattern === 'panel').map((unit) => ({ step, unit })));
 }
 
-/** Why a panel unit's seats are not generic, or null when they are: curated per-seat tasks or custom role names. */
+/** The seat id of the n-th generic member seat (1-based). */
+const memberSeat = (n) => `member-${n}`;
+
+/** The producer seats a panel template declares: the members. */
+const memberSeatsOf = (template) => (template.seats ?? []).filter((entry) => entry.role === 'producer');
+
+/** Why a panel unit's seats are not generic, or null when they are: a member seat carries its own persona, tier or task. */
 function curatedReason(template) {
+  const members = memberSeatsOf(template);
   const roleTasks = template.params?.roleTasks;
-  if (roleTasks && typeof roleTasks === 'object' && Object.keys(roleTasks).some((role) => PANELIST_ROLE.test(role))) {
-    return 'its seats carry curated tasks (panelist-N roleTasks)';
+  if (members.some((entry) => entry.persona !== undefined || entry.tier !== undefined)) {
+    return 'its member seats carry their own persona or tier';
   }
-  if (template.params?.role !== undefined) return 'its seats use custom role names';
+  if (roleTasks && typeof roleTasks === 'object' && members.some((entry) => Object.hasOwn(roleTasks, entry.seat))) {
+    return 'its member seats carry curated tasks (seat-keyed roleTasks)';
+  }
   return null;
 }
 
 /**
  * Rebuild `base` with one panel seat per lens.
  *
- * On every panel unit whose seats are generic: `params.members` becomes the lens count and the lenses
- * map in order to the `panelist-1..N` role tasks, the same on every such unit so a later round's
+ * On every panel unit whose seats are generic: the member seats become `member-1..N`, one per lens,
+ * and the lenses map in order to their seat-keyed tasks, the same on every such unit so a later round's
  * same-seat inputs stay aligned. A base that has no such unit, or that also has a curated panel, is
  * refused: lenses never overwrite a base's own seat tasks.
  *
@@ -129,7 +137,7 @@ export function expandWorkflowSeats(base, rawSeats, { contextRefs = [], personas
     if (name === null) return;
     const found = personas[name];
     if (!found) throw new RunnerConfigError(`seat ${index + 1} names persona "${name}" but it was not resolved`);
-    pinned.push({ seat: `panelist-${index + 1}`, name, tier: found.tier, source: found.source, digest: found.digest, text: found.text });
+    pinned.push({ seat: memberSeat(index + 1), name, tier: found.tier, source: found.source, identity: found.identity, digest: found.digest, text: found.text });
   });
   const panels = panelUnits(base);
   if (panels.length === 0) {
@@ -151,9 +159,13 @@ export function expandWorkflowSeats(base, rawSeats, { contextRefs = [], personas
         const roleTasks = { ...(template.params?.roleTasks ?? {}) };
         // A named persona carries its own posture, so its seat keeps the unit's objective as its task.
         seats.forEach((lens, index) => {
-          if (personaNameOf(lens) === null) roleTasks[`panelist-${index + 1}`] = seatTask(lens);
+          if (personaNameOf(lens) === null) roleTasks[memberSeat(index + 1)] = seatTask(lens);
         });
-        template.params = { ...(template.params ?? {}), members: seats.length, roleTasks };
+        template.params = { ...(template.params ?? {}), roleTasks };
+        template.seats = [
+          ...seats.map((_, index) => ({ seat: memberSeat(index + 1), role: 'producer' })),
+          ...(template.seats ?? []).filter((entry) => entry.role !== 'producer'),
+        ];
       }
       if (refs.length > 0 && step.dependsOn.length > 0) {
         const own = template.contextRefs ?? [];
@@ -168,7 +180,7 @@ export function expandWorkflowSeats(base, rawSeats, { contextRefs = [], personas
   };
 }
 
-/** The panel units an expansion touched, as dry-bindable units: { id, objective, capability, rigor, writes, pattern }. */
+/** The panel units an expansion touched, as dry-bindable units: { id, objective, capability, rigor, writes, pattern, seats }. */
 export function seatedPanelUnits(workflow) {
   return panelUnits(workflow).map(({ unit }) => ({
     id: unit.id,
@@ -177,5 +189,6 @@ export function seatedPanelUnits(workflow) {
     rigor: unit.template.rigor,
     writes: unit.template.writes ?? [],
     pattern: { pattern: 'panel', params: unit.template.params },
+    seats: unit.template.seats,
   }));
 }

@@ -135,8 +135,8 @@ for (const flow of [
     if (flow.id === 'architecture-advisory') {
       const shaping = state.steps.shaping.units['shape-proposals'];
       const lenses = [];
-      for (const role of ['panelist-1', 'panelist-2', 'panelist-3']) {
-        const seat = shaping.results.find((result) => result.role === role);
+      for (const id of ['system', 'alternative', 'constraint']) {
+        const seat = shaping.results.find((result) => result.seat === id);
         const report = seat.runResult.settleReports[0];
         const packet = JSON.parse(fs.readFileSync(path.resolve(root, report.path), 'utf8'));
         lenses.push(packet.lens);

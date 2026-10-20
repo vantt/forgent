@@ -25,6 +25,11 @@ steps:
         template:
           capability: nominal-group:generate
           pattern: panel
+          seats:
+            - { seat: member-1, role: producer }
+            - { seat: member-2, role: producer }
+            - { seat: member-3, role: producer }
+            - { seat: synthesis, role: synthesizer }
           persona: panelist
           objective: Silently generate independent ideas and options without cross-influence
           blind: true
