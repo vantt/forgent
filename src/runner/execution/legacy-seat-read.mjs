@@ -107,7 +107,7 @@ export function legacySeatsOf(record) {
  * record, whatever its `execution` says (or lacks).
  */
 export function isSeatRecord(record) {
-  return record?.seatSchema === 1;
+  return typeof record?.seatSchema === 'number' && record.seatSchema >= 1;
 }
 
 /** The seats of a record: its own list when fenced, else what its pattern had before the fence. */

@@ -214,10 +214,10 @@ function leftByDeadController(attempt, assignmentsDir) {
   return prior !== null && fs.existsSync(path.join(prior.dir, 'envelope.json'));
 }
 
-/** The newest `seatSchema` of a unit record this release can resume. It writes none, so a record that
- * carries the field came from a newer release: resuming it here would run it under rules this release
- * does not know. Read-only inspection of the record is unaffected. */
-const KNOWN_SEAT_SCHEMA = 0;
+/** The newest `seatSchema` of a unit record this release can resume. It writes schema 1, so a record
+ * that carries a later one came from a newer release: resuming it here would run it under rules this
+ * release does not know. Read-only inspection of the record is unaffected. */
+const KNOWN_SEAT_SCHEMA = 1;
 
 function assertRecordNotFromNewerRelease(unitRunId, unitRecord) {
   const schema = unitRecord?.seatSchema;

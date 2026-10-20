@@ -274,7 +274,7 @@ test('a panel Unit is admitted under a ceiling of its planned seats times the fa
   const workflow = validateWorkflow({
     id: 'proposer-ceiling',
     frameDefaults: { dispatches: 1, mutatingDispatches: 0, seatLaunchesPerDispatch: 4, fallbackPerSeat: 2, deviationsBeforeAsk: 0, rigorFloor: 'standard' },
-    steps: [{ id: 'think', units: [unit('u-panel', 'Think', { pattern: 'panel', params: { members: 3 } })] }],
+    steps: [{ id: 'think', units: [unit('u-panel', 'Think', { pattern: 'panel', seats: [{ seat: 'a', role: 'producer' }, { seat: 'b', role: 'producer' }, { seat: 'c', role: 'producer' }, { seat: 'chair', role: 'synthesizer' }] })] }],
   });
   const state = await startWorkflow({ workflow, ...opts(tmp) });
   assert.equal(state.status, 'completed', JSON.stringify(state.steps));

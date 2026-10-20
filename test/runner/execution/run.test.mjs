@@ -753,12 +753,12 @@ test('a resume refuses a unit record carrying a seatSchema from a newer release,
   assert.equal(first.outcome, 'pass');
   const unitPath = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId, 'unit.json');
   const record = JSON.parse(fs.readFileSync(unitPath, 'utf8'));
-  fs.writeFileSync(unitPath, JSON.stringify({ ...record, seatSchema: 1 }));
+  fs.writeFileSync(unitPath, JSON.stringify({ ...record, seatSchema: 2 }));
   await assert.rejects(
     () => run(undefined, { resumeUnitRunId: first.unitRunId }),
     (err) => err.code === 'record-from-newer-release' && /seatSchema/.test(err.message),
   );
-  assert.equal(JSON.parse(fs.readFileSync(unitPath, 'utf8')).seatSchema, 1, 'the refused record is left untouched');
+  assert.equal(JSON.parse(fs.readFileSync(unitPath, 'utf8')).seatSchema, 2, 'the refused record is left untouched');
 });
 
 test('anonymizeInputs hands the role a copy under a neutral name, keeps the mapping in unit.json, and a resume reuses it', async () => {

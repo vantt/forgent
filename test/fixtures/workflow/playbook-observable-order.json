@@ -10,10 +10,10 @@
             "blind": true,
             "roles": [
               [
-                "panelist-1",
-                "panelist-2",
-                "panelist-3",
-                "synthesizer"
+                "assumptions",
+                "feedback-loops",
+                "ship-maintain",
+                "synthesis"
               ]
             ],
             "outcome": "pass",
@@ -37,10 +37,10 @@
             "blind": true,
             "roles": [
               [
-                "panelist-1",
-                "panelist-2",
-                "panelist-3",
-                "synthesizer"
+                "member-1",
+                "member-2",
+                "member-3",
+                "synthesis"
               ]
             ],
             "outcome": "pass",
@@ -78,10 +78,10 @@
             "blind": true,
             "roles": [
               [
-                "panelist-1",
-                "panelist-2",
-                "panelist-3",
-                "synthesizer"
+                "member-1",
+                "member-2",
+                "member-3",
+                "synthesis"
               ]
             ],
             "outcome": "pass",
@@ -124,10 +124,10 @@
             "blind": true,
             "roles": [
               [
-                "panelist-1",
-                "panelist-2",
-                "panelist-3",
-                "synthesizer"
+                "member-1",
+                "member-2",
+                "member-3",
+                "synthesis"
               ]
             ],
             "outcome": "pass",
@@ -208,10 +208,10 @@
             "blind": true,
             "roles": [
               [
-                "panelist-1",
-                "panelist-2",
-                "panelist-3",
-                "synthesizer"
+                "member-1",
+                "member-2",
+                "member-3",
+                "synthesis"
               ]
             ],
             "outcome": "pass",
@@ -298,10 +298,10 @@
             "blind": true,
             "roles": [
               [
-                "panelist-1",
-                "panelist-2",
-                "panelist-3",
-                "synthesizer"
+                "member-1",
+                "member-2",
+                "member-3",
+                "synthesis"
               ]
             ],
             "outcome": "pass",
@@ -408,10 +408,10 @@
             "blind": true,
             "roles": [
               [
-                "panelist-1",
-                "panelist-2",
-                "panelist-3",
-                "synthesizer"
+                "alternative",
+                "constraint",
+                "synthesis",
+                "system"
               ]
             ],
             "outcome": "pass",
