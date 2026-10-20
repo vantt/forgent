@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A pi or omp seat in a herdr pane now gets its brief through the agent prompt door (one send that types and submits), as codex does. The raw typed brief took 7 to 25 s and sometimes lost its final Enter, and a seat stopped mid-typing could leave the rest of the brief in the pane's shell. The supervisor also re-reads its stop state before every send into the pane.
+
 - `npm test` now prepares the release fgos, fgctl and native addon it tests against (incremental), so the suite is green on a fresh machine, not only in CI.
 
 - `npm test` ends with a `suite:` line: test files, `test()` calls and wall time against the committed `test/suite-baseline.json`. It fails when a test body is copied byte for byte into a second file and the baseline does not list that clone, and warns on titles shared across files and on new unmarked `fgos init` or network calls in tests. `node scripts/test-proof-inventory.mjs --duplicates` lists the clones and shared titles; `--write-baseline [--wall-seconds <s>]` refreshes the baseline.

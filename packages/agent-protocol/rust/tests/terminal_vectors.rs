@@ -157,6 +157,10 @@ fn sent_texts(pane: &ScriptedPane) -> usize {
     pane.sent.iter().filter(|s| s.text.is_some()).count()
 }
 
+fn submit_sends(pane: &ScriptedPane) -> usize {
+    pane.sent.iter().filter(|s| s.text.is_some() && s.submit).count()
+}
+
 fn sent_enters(pane: &ScriptedPane) -> usize {
     pane.sent
         .iter()
@@ -229,7 +233,7 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
             };
             let mut want = expect.clone();
             if let Some(map) = want.as_object_mut() {
-                for key in ["readiness", "sentTexts", "minEnters", "maxEnters"] {
+                for key in ["readiness", "sentTexts", "submitSends", "minEnters", "maxEnters"] {
                     map.remove(key);
                 }
             }
@@ -244,6 +248,9 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
             assert_eq!(got, want, "{name}");
             if let Some(count) = expect["sentTexts"].as_u64() {
                 assert_eq!(sent_texts(&pane) as u64, count, "{name}: typed brief count");
+            }
+            if let Some(count) = expect["submitSends"].as_u64() {
+                assert_eq!(submit_sends(&pane) as u64, count, "{name}: prompt-door send count");
             }
             if let Some(min) = expect["minEnters"].as_u64() {
                 assert!(
@@ -441,4 +448,90 @@ fn unreadable_results_exclude_empty_and_completed_publications_and_track_edits()
     assert!(outbox.newest_unreadable().is_none());
     assert_eq!(outbox.newest_complete(), Some(path));
     fs::remove_dir_all(dir).unwrap();
+}
+
+/// A pane whose attempt starts ending at the first pause after the brief went in:
+/// from then on every call is refused, as the supervisor's pane access does.
+struct EndingPane {
+    now: u64,
+    ending: bool,
+    accepted: Vec<SendInput>,
+    refused: usize,
+}
+
+impl EndingPane {
+    fn new() -> Self {
+        Self { now: 0, ending: false, accepted: vec![], refused: 0 }
+    }
+
+    fn gate(&mut self) -> Result<(), IoError> {
+        if self.ending {
+            self.refused += 1;
+            return Err(IoError::Io("the attempt is ending".into()));
+        }
+        Ok(())
+    }
+}
+
+impl AgentIo for EndingPane {
+    fn send(&mut self, input: &SendInput) -> Result<(), IoError> {
+        self.gate()?;
+        self.accepted.push(input.clone());
+        Ok(())
+    }
+    fn read(&mut self) -> Result<Vec<String>, IoError> {
+        Err(IoError::Unsupported)
+    }
+    fn activity(&self) -> Option<u64> {
+        None
+    }
+    fn screen(&mut self) -> Result<String, IoError> {
+        self.gate()?;
+        Ok("ready".into())
+    }
+    fn inspect(&mut self) -> Result<Inspection, IoError> {
+        self.gate()?;
+        Ok(Inspection { state: Some("idle".into()), ..Default::default() })
+    }
+    fn now_ms(&self) -> u64 {
+        self.now
+    }
+    fn pause(&mut self, ms: u64) {
+        self.now += ms;
+        if !self.accepted.is_empty() {
+            self.ending = true;
+        }
+    }
+}
+
+struct NoOutbox;
+
+impl Outbox for NoOutbox {
+    fn newest_complete(&mut self) -> Option<PathBuf> {
+        None
+    }
+}
+
+#[test]
+fn terminal_delivery_sends_nothing_once_the_attempt_is_ending() {
+    for cli in CLIS {
+        let adapter = adapter_for(cli).unwrap();
+        let mut pane = EndingPane::new();
+        let outcome = adapter.deliver_brief(&mut pane, "Read the brief file and do the task.", &mut NoOutbox);
+        assert_eq!(outcome.to_json(), json!({ "outcome": "delivery-unknown" }), "{cli}");
+        assert_eq!(pane.accepted.len(), 1, "{cli}: only the brief itself went in before the stop");
+        assert!(pane.accepted.iter().all(|s| s.text.is_some()), "{cli}: no key press after the stop");
+    }
+}
+
+#[test]
+fn terminal_delivery_into_an_attempt_that_is_already_ending_types_nothing() {
+    for cli in CLIS {
+        let adapter = adapter_for(cli).unwrap();
+        let mut pane = EndingPane::new();
+        pane.ending = true;
+        let outcome = adapter.deliver_brief(&mut pane, "Read the brief file and do the task.", &mut NoOutbox);
+        assert_eq!(outcome.to_json(), json!({ "outcome": "delivery-unknown" }), "{cli}");
+        assert!(pane.accepted.is_empty(), "{cli}: nothing reaches the pane");
+    }
 }
