@@ -1,13 +1,13 @@
 {
   "inputHEAD": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
-  "state": "All 33 sets reworked under L12-62; independent wave3 review pending",
+  "state": "Wave3 accepted except indexing; wave4 indexing rework pending independent review",
   "pairEstimateAssumption": "5 report paths per author batch: records, frozen manifest, request, verification receipt, progress; no consumer/render change authorized. Actual git commit/path pairs from real runner commit replace this estimate before L12-11 accounting. 2 accounting manifest files belong to the following accounting Unit, never fabricated into author pairs. Both exception literals reviewed for every pair.",
   "summary": {
     "batches": 33,
     "sourceRecords": 275,
-    "slots": 933,
+    "slots": 890,
     "openLeadRulingSlots": 0,
-    "reviewRequest": "step-04-wave3-review-request.md"
+    "reviewRequest": "step-04-wave4-review-request.md"
   },
   "batches": [
     {
@@ -1043,7 +1043,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-002",
@@ -2142,7 +2142,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-003",
@@ -3015,7 +3015,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-004",
@@ -3827,7 +3827,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-005",
@@ -4594,7 +4594,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-006",
@@ -5373,7 +5373,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-007",
@@ -5545,7 +5545,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-008",
@@ -6302,7 +6302,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-009",
@@ -6979,7 +6979,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 7,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-010",
@@ -6994,11 +6994,11 @@
         "bin/fgos.mjs"
       ],
       "renderFiles": [],
-      "edges": 36,
+      "edges": 29,
       "classes": {
-        "parked": 4,
-        "patch": 3,
-        "preserve": 29
+        "parked": 5,
+        "patch": 2,
+        "preserve": 22
       },
       "edgeRefs": [
         {
@@ -7094,13 +7094,7 @@
               "edgeId": "class6-l-000081",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 212
-            }
-          ]
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "edgeId": "class6-l-000081",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000081",
@@ -7142,13 +7136,7 @@
               "edgeId": "class6-l-000085",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 1056
-            }
-          ]
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "edgeId": "class6-l-000085",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000085",
@@ -7190,13 +7178,7 @@
               "edgeId": "class6-l-000088",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 1160
-            }
-          ]
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "edgeId": "class6-l-000088",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000088",
@@ -7304,13 +7286,7 @@
               "edgeId": "class6-l-000102",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 2279
-            }
-          ]
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "edgeId": "class6-l-000102",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000102",
@@ -7328,13 +7304,7 @@
               "edgeId": "class6-l-000103",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 2582
-            }
-          ]
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "edgeId": "class6-l-000103",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000103",
@@ -7364,13 +7334,7 @@
               "edgeId": "class6-l-000106",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 3909
-            }
-          ]
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "edgeId": "class6-l-000106",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000106",
@@ -7388,13 +7352,7 @@
               "edgeId": "class6-l-000107",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 4067
-            }
-          ]
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "edgeId": "class6-l-000107",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000107",
@@ -7412,13 +7370,7 @@
               "edgeId": "class6-l-000108",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 4080
-            }
-          ]
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "edgeId": "class6-l-000108",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000108",
@@ -7462,10 +7414,23 @@
               "originalLine": 4744
             }
           ]
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "bin/fgos.mjs",
+            "line": 2974,
+            "columnStart": 33,
+            "columnEndExclusive": 49,
+            "text": "docs/<quadrant>/"
+          }
         }
       ],
       "currentSourceBytes": 298883,
-      "censusMetadataBytes": 38057,
+      "censusMetadataBytes": 32118,
       "mandatoryFiles": [
         {
           "file": "bin/fgos.mjs",
@@ -7486,7 +7451,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 6,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-011",
@@ -7547,7 +7512,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 6,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-012",
@@ -7604,10 +7569,10 @@
         "apps/fgos-gateway/web/src/screens/Taskboard.tsx"
       ],
       "renderFiles": [],
-      "edges": 51,
+      "edges": 46,
       "classes": {
-        "preserve": 46,
-        "parked": 4,
+        "preserve": 42,
+        "parked": 3,
         "patch": 1
       },
       "edgeRefs": [
@@ -7884,13 +7849,7 @@
               "edgeId": "class6-l-000039",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 1261
-            }
-          ]
-        },
-        {
-          "file": "apps/fgos-gateway/src/gateway.rs",
-          "edgeId": "class6-l-000039",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000039",
@@ -7968,13 +7927,7 @@
               "edgeId": "class6-l-000054",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 213
-            }
-          ]
-        },
-        {
-          "file": "apps/fgos-gateway/src/mcp.rs",
-          "edgeId": "class6-l-000054",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000054",
@@ -8052,13 +8005,7 @@
               "edgeId": "class6-l-000067",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 1
-            }
-          ]
-        },
-        {
-          "file": "apps/fgos-gateway/web/src/lib/network.ts",
-          "edgeId": "class6-l-000067",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000067",
@@ -8076,13 +8023,7 @@
               "edgeId": "class6-l-000068",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 3
-            }
-          ]
-        },
-        {
-          "file": "apps/fgos-gateway/web/src/lib/network.ts",
-          "edgeId": "class6-l-000068",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000068",
@@ -8112,13 +8053,7 @@
               "edgeId": "class6-l-000070",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 7
-            }
-          ]
-        },
-        {
-          "file": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
-          "edgeId": "class6-l-000070",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000070",
@@ -8225,7 +8160,7 @@
         }
       ],
       "currentSourceBytes": 238182,
-      "censusMetadataBytes": 56314,
+      "censusMetadataBytes": 51635,
       "mandatoryFiles": [
         {
           "file": "apps/fgos-gateway/src/gateway.rs",
@@ -8248,7 +8183,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-013",
@@ -8266,9 +8201,9 @@
         "src/config/shared-config-file.mjs"
       ],
       "renderFiles": [],
-      "edges": 3,
+      "edges": 2,
       "classes": {
-        "preserve": 3
+        "preserve": 2
       },
       "edgeRefs": [
         {
@@ -8292,13 +8227,7 @@
               "edgeId": "class6-l-000227",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 45
-            }
-          ]
-        },
-        {
-          "file": "src/config/shared-config-file.mjs",
-          "edgeId": "class6-l-000227",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000227",
@@ -8309,7 +8238,7 @@
         }
       ],
       "currentSourceBytes": 11154,
-      "censusMetadataBytes": 3277,
+      "censusMetadataBytes": 2398,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -8322,7 +8251,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-014",
@@ -8369,7 +8298,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-015",
@@ -8393,9 +8322,9 @@
         "src/intake/verify-pattern-check.mjs"
       ],
       "renderFiles": [],
-      "edges": 22,
+      "edges": 18,
       "classes": {
-        "preserve": 20,
+        "preserve": 16,
         "patch": 2
       },
       "edgeRefs": [
@@ -8408,13 +8337,7 @@
               "edgeId": "class6-l-000229",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 43
-            }
-          ]
-        },
-        {
-          "file": "src/intake/discovery.mjs",
-          "edgeId": "class6-l-000229",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000229",
@@ -8552,13 +8475,7 @@
               "edgeId": "class6-l-000240",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 8
-            }
-          ]
-        },
-        {
-          "file": "src/intake/plan.mjs",
-          "edgeId": "class6-l-000240",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000240",
@@ -8576,13 +8493,7 @@
               "edgeId": "class6-l-000241",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 88
-            }
-          ]
-        },
-        {
-          "file": "src/intake/plan.mjs",
-          "edgeId": "class6-l-000241",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000241",
@@ -8600,13 +8511,7 @@
               "edgeId": "class6-l-000242",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 286
-            }
-          ]
-        },
-        {
-          "file": "src/intake/plan.mjs",
-          "edgeId": "class6-l-000242",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000242",
@@ -8665,7 +8570,7 @@
         }
       ],
       "currentSourceBytes": 108604,
-      "censusMetadataBytes": 24113,
+      "censusMetadataBytes": 20750,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -8678,7 +8583,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-016",
@@ -8696,9 +8601,9 @@
         ".github/workflows/ci.yml"
       ],
       "renderFiles": [],
-      "edges": 4,
+      "edges": 3,
       "classes": {
-        "preserve": 4
+        "preserve": 3
       },
       "edgeRefs": [
         {
@@ -8722,13 +8627,7 @@
               "edgeId": "class6-l-000009",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 342
-            }
-          ]
-        },
-        {
-          "file": ".githooks/pre-commit",
-          "edgeId": "class6-l-000009",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000009",
@@ -8751,7 +8650,7 @@
         }
       ],
       "currentSourceBytes": 41175,
-      "censusMetadataBytes": 5366,
+      "censusMetadataBytes": 4168,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -8764,7 +8663,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-017",
@@ -8856,7 +8755,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-018",
@@ -9095,7 +8994,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-019",
@@ -9227,7 +9126,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 10,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-020",
@@ -9314,7 +9213,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-021",
@@ -9361,7 +9260,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-022",
@@ -9394,9 +9293,9 @@
         "src/runner/dispatch/cli.mjs"
       ],
       "renderFiles": [],
-      "edges": 10,
+      "edges": 8,
       "classes": {
-        "preserve": 9,
+        "preserve": 7,
         "parked": 1
       },
       "edgeRefs": [
@@ -9421,13 +9320,7 @@
               "edgeId": "class6-l-000250",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 21
-            }
-          ]
-        },
-        {
-          "file": "src/runner/anti-loop.mjs",
-          "edgeId": "class6-l-000250",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000250",
@@ -9505,13 +9398,7 @@
               "edgeId": "class6-l-000257",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 5
-            }
-          ]
-        },
-        {
-          "file": "src/runner/dispatch/cli.mjs",
-          "edgeId": "class6-l-000257",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000257",
@@ -9522,7 +9409,7 @@
         }
       ],
       "currentSourceBytes": 254714,
-      "censusMetadataBytes": 10997,
+      "censusMetadataBytes": 9191,
       "mandatoryFiles": [
         {
           "file": "src/runner/dispatch/assignment-runner.mjs",
@@ -9543,7 +9430,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 6,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-023",
@@ -9585,11 +9472,11 @@
         "src/runner/dispatch/prepare.mjs"
       ],
       "renderFiles": [],
-      "edges": 21,
+      "edges": 17,
       "classes": {
-        "preserve": 13,
+        "preserve": 10,
         "patch": 5,
-        "parked": 3
+        "parked": 2
       },
       "edgeRefs": [
         {
@@ -9601,13 +9488,7 @@
               "edgeId": "class6-l-000258",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 10
-            }
-          ]
-        },
-        {
-          "file": "src/runner/dispatch/config.mjs",
-          "edgeId": "class6-l-000258",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000258",
@@ -9667,13 +9548,7 @@
               "edgeId": "class6-l-000262",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 1634
-            }
-          ]
-        },
-        {
-          "file": "src/runner/dispatch/config.mjs",
-          "edgeId": "class6-l-000262",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000262",
@@ -9763,13 +9638,7 @@
               "edgeId": "class6-l-000269",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 9
-            }
-          ]
-        },
-        {
-          "file": "src/runner/dispatch/mechanism.mjs",
-          "edgeId": "class6-l-000269",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000269",
@@ -9815,19 +9684,6 @@
           ]
         },
         {
-          "file": "src/runner/dispatch/mechanism.mjs",
-          "edgeId": null,
-          "inventoryRefs": [],
-          "supplementalOccurrenceKey": {
-            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
-            "file": "src/runner/dispatch/mechanism.mjs",
-            "line": 15,
-            "columnStart": 49,
-            "columnEndExclusive": 76,
-            "text": "docs/decisions/0026-vision-"
-          }
-        },
-        {
           "file": "src/runner/dispatch/operation-prompt-templates.mjs",
           "edgeId": "class6-l-000273",
           "inventoryRefs": [
@@ -9853,7 +9709,7 @@
         }
       ],
       "currentSourceBytes": 323839,
-      "censusMetadataBytes": 26383,
+      "censusMetadataBytes": 21581,
       "mandatoryFiles": [
         {
           "file": "src/runner/dispatch/config.mjs",
@@ -9885,7 +9741,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 12,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-024",
@@ -9921,9 +9777,9 @@
         "src/runner/loop.mjs"
       ],
       "renderFiles": [],
-      "edges": 23,
+      "edges": 18,
       "classes": {
-        "preserve": 21,
+        "preserve": 16,
         "patch": 2
       },
       "edgeRefs": [
@@ -9936,13 +9792,7 @@
               "edgeId": "class6-l-000275",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 9
-            }
-          ]
-        },
-        {
-          "file": "src/runner/dispatch/resolve.mjs",
-          "edgeId": "class6-l-000275",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000275",
@@ -10008,13 +9858,7 @@
               "edgeId": "class6-l-000280",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 18
-            }
-          ]
-        },
-        {
-          "file": "src/runner/dispatch/transport.mjs",
-          "edgeId": "class6-l-000280",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000280",
@@ -10104,13 +9948,7 @@
               "edgeId": "class6-l-000286",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 7
-            }
-          ]
-        },
-        {
-          "file": "src/runner/frozen-judge.mjs",
-          "edgeId": "class6-l-000286",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000286",
@@ -10176,13 +10014,7 @@
               "edgeId": "class6-l-000291",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 1349
-            }
-          ]
-        },
-        {
-          "file": "src/runner/loop.mjs",
-          "edgeId": "class6-l-000291",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000291",
@@ -10200,13 +10032,7 @@
               "edgeId": "class6-l-000292",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 1631
-            }
-          ]
-        },
-        {
-          "file": "src/runner/loop.mjs",
-          "edgeId": "class6-l-000292",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000292",
@@ -10217,7 +10043,7 @@
         }
       ],
       "currentSourceBytes": 234155,
-      "censusMetadataBytes": 27419,
+      "censusMetadataBytes": 22386,
       "mandatoryFiles": [
         {
           "file": "src/runner/loop.mjs",
@@ -10240,7 +10066,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-025",
@@ -10270,11 +10096,11 @@
         "src/runner/worktree.mjs"
       ],
       "renderFiles": [],
-      "edges": 37,
+      "edges": 34,
       "classes": {
         "parked": 1,
-        "patch": 7,
-        "preserve": 29
+        "patch": 6,
+        "preserve": 27
       },
       "edgeRefs": [
         {
@@ -10370,13 +10196,7 @@
               "edgeId": "class6-l-000307",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 676
-            }
-          ]
-        },
-        {
-          "file": "src/runner/merge.mjs",
-          "edgeId": "class6-l-000307",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000307",
@@ -10563,13 +10383,7 @@
               "edgeId": "class6-l-000326",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 136
-            }
-          ]
-        },
-        {
-          "file": "src/runner/work-compat.mjs",
-          "edgeId": "class6-l-000326",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000326",
@@ -10707,13 +10521,7 @@
               "edgeId": "class6-l-000338",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 1340
-            }
-          ]
-        },
-        {
-          "file": "src/runner/worktree.mjs",
-          "edgeId": "class6-l-000338",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000338",
@@ -10724,7 +10532,7 @@
         }
       ],
       "currentSourceBytes": 200305,
-      "censusMetadataBytes": 39653,
+      "censusMetadataBytes": 36967,
       "mandatoryFiles": [
         {
           "file": "src/runner/merge.mjs",
@@ -10751,7 +10559,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 7,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-026",
@@ -10811,9 +10619,9 @@
         "src/state/status-fsm.mjs"
       ],
       "renderFiles": [],
-      "edges": 55,
+      "edges": 48,
       "classes": {
-        "preserve": 44,
+        "preserve": 37,
         "patch": 3,
         "parked": 8
       },
@@ -10875,13 +10683,7 @@
               "edgeId": "class6-l-000412",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 11
-            }
-          ]
-        },
-        {
-          "file": "src/state/drift-status.mjs",
-          "edgeId": "class6-l-000412",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000412",
@@ -10911,13 +10713,7 @@
               "edgeId": "class6-l-000414",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 1
-            }
-          ]
-        },
-        {
-          "file": "src/state/events-jsonl-truncation-guard.mjs",
-          "edgeId": "class6-l-000414",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000414",
@@ -10947,13 +10743,7 @@
               "edgeId": "class6-l-000417",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 204
-            }
-          ]
-        },
-        {
-          "file": "src/state/frontier.mjs",
-          "edgeId": "class6-l-000417",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000417",
@@ -10971,13 +10761,7 @@
               "edgeId": "class6-l-000418",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 208
-            }
-          ]
-        },
-        {
-          "file": "src/state/frontier.mjs",
-          "edgeId": "class6-l-000418",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000418",
@@ -10995,13 +10779,7 @@
               "edgeId": "class6-l-000419",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 3
-            }
-          ]
-        },
-        {
-          "file": "src/state/gate-bypass.mjs",
-          "edgeId": "class6-l-000419",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000419",
@@ -11418,13 +11196,7 @@
               "edgeId": "class6-l-000450",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 751
-            }
-          ]
-        },
-        {
-          "file": "src/state/replay.mjs",
-          "edgeId": "class6-l-000450",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000450",
@@ -11466,13 +11238,7 @@
               "edgeId": "class6-l-000453",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 179
-            }
-          ]
-        },
-        {
-          "file": "src/state/status-fsm.mjs",
-          "edgeId": "class6-l-000453",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000453",
@@ -11483,7 +11249,7 @@
         }
       ],
       "currentSourceBytes": 299154,
-      "censusMetadataBytes": 60285,
+      "censusMetadataBytes": 53823,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -11502,7 +11268,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 10,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-027",
@@ -11526,9 +11292,9 @@
         "src/state/worker-slots.mjs"
       ],
       "renderFiles": [],
-      "edges": 29,
+      "edges": 24,
       "classes": {
-        "preserve": 28,
+        "preserve": 23,
         "parked": 1
       },
       "edgeRefs": [
@@ -11553,13 +11319,7 @@
               "edgeId": "class6-l-000456",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 857
-            }
-          ]
-        },
-        {
-          "file": "src/state/store.mjs",
-          "edgeId": "class6-l-000456",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000456",
@@ -11577,13 +11337,7 @@
               "edgeId": "class6-l-000457",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 892
-            }
-          ]
-        },
-        {
-          "file": "src/state/store.mjs",
-          "edgeId": "class6-l-000457",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000457",
@@ -11769,13 +11523,7 @@
               "edgeId": "class6-l-000472",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 676
-            }
-          ]
-        },
-        {
-          "file": "src/state/work.mjs",
-          "edgeId": "class6-l-000472",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000472",
@@ -11827,19 +11575,6 @@
           "supplementalOccurrenceKey": {
             "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
             "file": "src/state/work.mjs",
-            "line": 122,
-            "columnStart": 5,
-            "columnEndExclusive": 77,
-            "text": "docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-"
-          }
-        },
-        {
-          "file": "src/state/work.mjs",
-          "edgeId": null,
-          "inventoryRefs": [],
-          "supplementalOccurrenceKey": {
-            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
-            "file": "src/state/work.mjs",
             "line": 132,
             "columnStart": 66,
             "columnEndExclusive": 71,
@@ -11867,13 +11602,7 @@
               "edgeId": "class6-l-000477",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 11
-            }
-          ]
-        },
-        {
-          "file": "src/state/worker-slots.mjs",
-          "edgeId": "class6-l-000477",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000477",
@@ -11884,7 +11613,7 @@
         }
       ],
       "currentSourceBytes": 179754,
-      "censusMetadataBytes": 31093,
+      "censusMetadataBytes": 26214,
       "mandatoryFiles": [
         {
           "file": "src/state/store.mjs",
@@ -11905,7 +11634,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 6,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-028",
@@ -11923,9 +11652,9 @@
         "src/util/format-duration.mjs"
       ],
       "renderFiles": [],
-      "edges": 4,
+      "edges": 3,
       "classes": {
-        "preserve": 4
+        "preserve": 3
       },
       "edgeRefs": [
         {
@@ -11937,13 +11666,7 @@
               "edgeId": "class6-l-000478",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 2
-            }
-          ]
-        },
-        {
-          "file": "src/util/format-bytes.mjs",
-          "edgeId": "class6-l-000478",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000478",
@@ -11978,7 +11701,7 @@
         }
       ],
       "currentSourceBytes": 2117,
-      "censusMetadataBytes": 4387,
+      "censusMetadataBytes": 3427,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -11991,7 +11714,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-029",
@@ -12015,9 +11738,9 @@
         "src/verbs/merge/sync-root.mjs"
       ],
       "renderFiles": [],
-      "edges": 17,
+      "edges": 13,
       "classes": {
-        "preserve": 17
+        "preserve": 13
       },
       "edgeRefs": [
         {
@@ -12041,13 +11764,7 @@
               "edgeId": "class6-l-000482",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 257
-            }
-          ]
-        },
-        {
-          "file": "src/verbs/merge/approve.mjs",
-          "edgeId": "class6-l-000482",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000482",
@@ -12077,13 +11794,7 @@
               "edgeId": "class6-l-000484",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 431
-            }
-          ]
-        },
-        {
-          "file": "src/verbs/merge/approve.mjs",
-          "edgeId": "class6-l-000484",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000484",
@@ -12101,13 +11812,7 @@
               "edgeId": "class6-l-000485",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 440
-            }
-          ]
-        },
-        {
-          "file": "src/verbs/merge/approve.mjs",
-          "edgeId": "class6-l-000485",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000485",
@@ -12149,13 +11854,7 @@
               "edgeId": "class6-l-000488",
               "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
               "originalLine": 4
-            }
-          ]
-        },
-        {
-          "file": "src/verbs/merge/merge.mjs",
-          "edgeId": "class6-l-000488",
-          "inventoryRefs": [
+            },
             {
               "inventory": "step-02l-census-class6.json",
               "edgeId": "class6-l-000488",
@@ -12226,7 +11925,7 @@
         }
       ],
       "currentSourceBytes": 78730,
-      "censusMetadataBytes": 18115,
+      "censusMetadataBytes": 14503,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -12239,7 +11938,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-030",
@@ -12314,11 +12013,11 @@
         "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
         "plugins/fgOS/skills/fgos-indexing/SKILL.md"
       ],
-      "edges": 101,
+      "edges": 107,
       "classes": {
         "preserve": 29,
-        "render-join": 63,
-        "parked": 6,
+        "render-join": 67,
+        "parked": 8,
         "patch": 3
       },
       "edgeRefs": [
@@ -13410,6 +13109,84 @@
           }
         },
         {
+          "file": "core/skills/fgos-indexing/SKILL.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "core/skills/fgos-indexing/SKILL.md",
+            "line": 20,
+            "columnStart": 14,
+            "columnEndExclusive": 30,
+            "text": "docs/<quadrant>/"
+          }
+        },
+        {
+          "file": ".agents/skills/fgos-indexing/SKILL.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": ".agents/skills/fgos-indexing/SKILL.md",
+            "line": 21,
+            "columnStart": 14,
+            "columnEndExclusive": 30,
+            "text": "docs/<quadrant>/"
+          }
+        },
+        {
+          "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+            "line": 21,
+            "columnStart": 14,
+            "columnEndExclusive": 30,
+            "text": "docs/<quadrant>/"
+          }
+        },
+        {
+          "file": "core/skills/fgos-indexing/SKILL.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "core/skills/fgos-indexing/SKILL.md",
+            "line": 41,
+            "columnStart": 52,
+            "columnEndExclusive": 68,
+            "text": "docs/<quadrant>/"
+          }
+        },
+        {
+          "file": ".agents/skills/fgos-indexing/SKILL.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": ".agents/skills/fgos-indexing/SKILL.md",
+            "line": 42,
+            "columnStart": 52,
+            "columnEndExclusive": 68,
+            "text": "docs/<quadrant>/"
+          }
+        },
+        {
+          "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+            "line": 42,
+            "columnStart": 52,
+            "columnEndExclusive": 68,
+            "text": "docs/<quadrant>/"
+          }
+        },
+        {
           "file": ".agents/skills/_shared/capability-catalog.md",
           "edgeId": "class4-l-000001",
           "inventoryRefs": [
@@ -13756,7 +13533,7 @@
         }
       ],
       "currentSourceBytes": 107545,
-      "censusMetadataBytes": 121619,
+      "censusMetadataBytes": 128409,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [
         "core/skills/fgos-run/SKILL.md"
@@ -13775,7 +13552,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     },
     {
       "batch": "step04-031",
@@ -14027,7 +13804,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+      "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
     }
   ],
   "mainMergeSupplement": {
@@ -14112,7 +13889,7 @@
         ],
         "currentSourceBytes": 2584,
         "censusMetadataBytes": 3779,
-        "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+        "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
       },
       {
         "batch": "step04-033",
@@ -14246,7 +14023,7 @@
         "renderFiles": [],
         "currentSourceBytes": 65277,
         "censusMetadataBytes": 8862,
-        "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
+        "reviewVolume": "Wave4 outcome changes only: bin/fgos.mjs and core/skills/fgos-indexing/SKILL.md. Record-text and duplicate-row normalization checker-verified; other outcomes retain wave3 custody."
       }
     ]
   },

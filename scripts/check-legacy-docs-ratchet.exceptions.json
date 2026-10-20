@@ -6,10 +6,10 @@
     {
       "path": "docs/specs/reading-map.md",
       "kind": "allowed-edit",
-      "rationale": "Phase 01 verified stale standing route correction: update transitional rule banner to cite docs/transitional-switchboard.md, record Phase 00 and Phase 01 completion, and replace defunct fgos-coding-compounding skill references with fgos-coding-knowledge. Re-reviewed 2026-09-29 after main sync: feat(coding): convert fgos-plan-loop/fgos-code-panel to deprecated stubs (Unit I29) Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 8 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store | docs(gateway): name the fgos gateway as its own component and guard the retired names (+5 more) A31 upstream boundary merge from 554401219ddbc4676c3b57381a468904442855e9: import main source bytes, preserve candidate relocation shape; independent merge/conservation review pending. A31 SYNC 59b9b7087: main Session Identity change imported unchanged; changed spans carried verbatim into the mapped candidate and changed units re-decided pending independent review. No authority flip. L11-21 close-pin accounting 2026-10-18: main imports through eab4d617b; carried main commits: fccd2218a5f64f04a69996a5ddbe355dbd6039c1 merge: bring main with the holder-lock Rust callers into the main door integration branch | dc6600a1ec8dec22a6294805062e377ac85620e7 merge: bring the main door integration branch into the doctor and docs phase | f9ea9c2197a5b4daa7c6d1ba7a47bfcdbd5109aa docs(agents): deliver L1-L10, the design principles and the reuse rule where agents read them | 9a5cc2df7b09e7f63de828a694c81b1784da5498 docs(holder-lock): describe the cut-over kernel locks, the doctor checks and fixes, and the changelog of the cutover | b9a00c589d02f0afeebcce671cf3912dc37ffe50 docs(holder-lock): specify main checkout single door, hot state mutex, worktree-admin and lock fence | 0e377d7b6dd3094021e1bb2be2c4a359a465a77c docs(holder-lock): add holder-lock and process specs, boundary rows, doctor/setup/activation rules. No authority or content approval; independent changed-row review owed. PARK-PROTECTED-01: branch preserves current fgos-coding-knowledge; main says fgos-coding-compounding. Inherited B0/merge-parent provenance is recorded; literal equality is false. L12-1 main-merge accounting 2026-10-19: merge 49ad04648447439b5c243af6ddd0b604acb5b3e5 imports main 708ea660894eb88aa4575ec07bf13d916d02c14c; path main commits: 4414664c6e56499fb9c526788164c9b6598cc9ff docs(run-supervisor): controller death, resume rule, ledger rows, exit codes and changelog | 9f59fe278bcc72097cd47ffb93fd7647d6f0acdf docs: terminal mode specs, writer id per attempt, boundary and changelog for the supervised herdr round | c66363e0051be4b3a3f87dfb1181d0fa6c242fa1 Merge branch 'main' into run-supervisor/integration | ea9584116867673c58c9b9ad654de2808b52e273 docs(run-supervisor): specs, boundary, runner decision, doctor rows, changelog | b3d73291210e55bbce84e973f2a4f58a63949975 feat(terminal): terminal config section, doctor checks and setup directory for terminal-control | e6b80eb82abdf0eabdd3c2e889dd97104fb7aaaa Merge branch 'main' into terminal-control/integration | 8f08065ec2b9f53d1415b725b24df498697a9bc2 fix(holder-lock): judge a Windows hot record from the holder's creation time and start borrowed children with an explicit handle list | cdd3777085235b4866dcde6f40cf3e03f31c756d merge: main into the Windows driver integration branch (state hot-lock) | 024d7ce486342fe920c8fdee6a2020f0d2c90e93 feat(holder-lock): run doctor and the fgctl gate on Windows, add the read-only predecessor-state route | dc8acf9bf897e9fce728d92b05d885c1b1b2a32a feat(locks): fence the old state locks, doctor check for unreadable hot records, docs and changelog for the state hot mutex | 9574d09e4d83f2a39db25938f9d20b3047f5680c docs(terminal-control): add the terminal-control spec, boundary row and reading-map entry. Reading-map retains L11-25 accepted transition-banner and compounding-to-knowledge divergence; no equality with main asserted. Accounting only; no content approval, carry or rebind; changed-unit conservation is owed first in Phase 9 under A47. L12-27 main merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74 imports aff81800e at a batch boundary (base 51c61af64, 102 commits, no conflicts): 664a4ab7a93c536f4995147a6bb4eed49265ae28 docs(spec): settle workflow spec as D-ADR0070 with owner-chosen feature ideas | 2834832e25b3b383090c554856b81cd60d5532ba docs(boundary): record proposed workflow authority rows and spec pointers. Accounting only; independent content/conservation review owed; no approval carry. L12-44 main merge 6b3335711454f638780affa907353992dcde82ba imports main release 585044f1975141831fade830398e9e98bc328362 after AGENT-WF 05–09 / model pool B1 landing (base aff81800e, 120 release-range commits, no conflicts; actual merge parent e93bae4626a0871f4454407950f8456e50970a79, 123 commits): a94115474f9ebfc9551849def2880b9c3c50a103 docs(workflow): teach the case model in the coordination driver doctrine and record what main now implements. Accounting only; independent content/conservation review owed; no approval carry. L12-61 main merge dc24ce64527fbffd23e1643f35a7ddf808fd7b45 imports main 943b92bc12ebfc94eb63125d197d49594e59904e (base 7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7, 19 commits): f38dfd1d0dcda03e6b09201ffdcaafc29bd9809a chore(test): print a suite line in npm test, fail on new cross-file test clones, retire the first. Accounting only; no authority/content approval; A47 final conservation and changed-binding review owed.",
-      "approvedBy": "Phase 01 unification authorization (asgn_pi_lead_phase01_op_001); human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report); Lead L11-21 (2026-10-18), accounting only; Lead L12-1 / A49 (2026-10-19), main-merge accounting only; Lead L12-27 assignment unit-run-1792410674862-d90d5884 authorizes main merge accounting, not content approval; Lead L12-44 assignment unit-run-1792462376545-6b7ea56c authorizes main merge accounting, not content approval; Lead L12-60 fix assignment authorizes L12-61 main-merge accounting only",
+      "rationale": "Phase 01 verified stale standing route correction: update transitional rule banner to cite docs/transitional-switchboard.md, record Phase 00 and Phase 01 completion, and replace defunct fgos-coding-compounding skill references with fgos-coding-knowledge. Re-reviewed 2026-09-29 after main sync: feat(coding): convert fgos-plan-loop/fgos-code-panel to deprecated stubs (Unit I29) Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 8 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store | docs(gateway): name the fgos gateway as its own component and guard the retired names (+5 more) A31 upstream boundary merge from 554401219ddbc4676c3b57381a468904442855e9: import main source bytes, preserve candidate relocation shape; independent merge/conservation review pending. A31 SYNC 59b9b7087: main Session Identity change imported unchanged; changed spans carried verbatim into the mapped candidate and changed units re-decided pending independent review. No authority flip. L11-21 close-pin accounting 2026-10-18: main imports through eab4d617b; carried main commits: fccd2218a5f64f04a69996a5ddbe355dbd6039c1 merge: bring main with the holder-lock Rust callers into the main door integration branch | dc6600a1ec8dec22a6294805062e377ac85620e7 merge: bring the main door integration branch into the doctor and docs phase | f9ea9c2197a5b4daa7c6d1ba7a47bfcdbd5109aa docs(agents): deliver L1-L10, the design principles and the reuse rule where agents read them | 9a5cc2df7b09e7f63de828a694c81b1784da5498 docs(holder-lock): describe the cut-over kernel locks, the doctor checks and fixes, and the changelog of the cutover | b9a00c589d02f0afeebcce671cf3912dc37ffe50 docs(holder-lock): specify main checkout single door, hot state mutex, worktree-admin and lock fence | 0e377d7b6dd3094021e1bb2be2c4a359a465a77c docs(holder-lock): add holder-lock and process specs, boundary rows, doctor/setup/activation rules. No authority or content approval; independent changed-row review owed. PARK-PROTECTED-01: branch preserves current fgos-coding-knowledge; main says fgos-coding-compounding. Inherited B0/merge-parent provenance is recorded; literal equality is false. L12-1 main-merge accounting 2026-10-19: merge 49ad04648447439b5c243af6ddd0b604acb5b3e5 imports main 708ea660894eb88aa4575ec07bf13d916d02c14c; path main commits: 4414664c6e56499fb9c526788164c9b6598cc9ff docs(run-supervisor): controller death, resume rule, ledger rows, exit codes and changelog | 9f59fe278bcc72097cd47ffb93fd7647d6f0acdf docs: terminal mode specs, writer id per attempt, boundary and changelog for the supervised herdr round | c66363e0051be4b3a3f87dfb1181d0fa6c242fa1 Merge branch 'main' into run-supervisor/integration | ea9584116867673c58c9b9ad654de2808b52e273 docs(run-supervisor): specs, boundary, runner decision, doctor rows, changelog | b3d73291210e55bbce84e973f2a4f58a63949975 feat(terminal): terminal config section, doctor checks and setup directory for terminal-control | e6b80eb82abdf0eabdd3c2e889dd97104fb7aaaa Merge branch 'main' into terminal-control/integration | 8f08065ec2b9f53d1415b725b24df498697a9bc2 fix(holder-lock): judge a Windows hot record from the holder's creation time and start borrowed children with an explicit handle list | cdd3777085235b4866dcde6f40cf3e03f31c756d merge: main into the Windows driver integration branch (state hot-lock) | 024d7ce486342fe920c8fdee6a2020f0d2c90e93 feat(holder-lock): run doctor and the fgctl gate on Windows, add the read-only predecessor-state route | dc8acf9bf897e9fce728d92b05d885c1b1b2a32a feat(locks): fence the old state locks, doctor check for unreadable hot records, docs and changelog for the state hot mutex | 9574d09e4d83f2a39db25938f9d20b3047f5680c docs(terminal-control): add the terminal-control spec, boundary row and reading-map entry. Reading-map retains L11-25 accepted transition-banner and compounding-to-knowledge divergence; no equality with main asserted. Accounting only; no content approval, carry or rebind; changed-unit conservation is owed first in Phase 9 under A47. L12-27 main merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74 imports aff81800e at a batch boundary (base 51c61af64, 102 commits, no conflicts): 664a4ab7a93c536f4995147a6bb4eed49265ae28 docs(spec): settle workflow spec as D-ADR0070 with owner-chosen feature ideas | 2834832e25b3b383090c554856b81cd60d5532ba docs(boundary): record proposed workflow authority rows and spec pointers. Accounting only; independent content/conservation review owed; no approval carry. L12-44 main merge 6b3335711454f638780affa907353992dcde82ba imports main release 585044f1975141831fade830398e9e98bc328362 after AGENT-WF 05–09 / model pool B1 landing (base aff81800e, 120 release-range commits, no conflicts; actual merge parent e93bae4626a0871f4454407950f8456e50970a79, 123 commits): a94115474f9ebfc9551849def2880b9c3c50a103 docs(workflow): teach the case model in the coordination driver doctrine and record what main now implements. Accounting only; independent content/conservation review owed; no approval carry. L12-61 main merge dc24ce64527fbffd23e1643f35a7ddf808fd7b45 imports main 943b92bc12ebfc94eb63125d197d49594e59904e (base 7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7, 19 commits): f38dfd1d0dcda03e6b09201ffdcaafc29bd9809a chore(test): print a suite line in npm test, fail on new cross-file test clones, retire the first. Accounting only; no authority/content approval; A47 final conservation and changed-binding review owed. L12-63 main merge bf5d847c9df6a4fac57747ef95ce0d11bc29cb76 imports main 71888fdf54a3767d7de3ec545b4820a54d0d16b9 (base 73ad73558e7515719038b31254d484564807b165, 22 commits): bafb3f5f4d5a716713d95045024870322886fbc9 test(event-store): prove the store part of the phase 10 gate on main. Accounting only; no authority/content approval; A47 final conservation and changed-binding review owed.",
+      "approvedBy": "Phase 01 unification authorization (asgn_pi_lead_phase01_op_001); human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report); Lead L11-21 (2026-10-18), accounting only; Lead L12-1 / A49 (2026-10-19), main-merge accounting only; Lead L12-27 assignment unit-run-1792410674862-d90d5884 authorizes main merge accounting, not content approval; Lead L12-44 assignment unit-run-1792462376545-6b7ea56c authorizes main merge accounting, not content approval; Lead L12-60 fix assignment authorizes L12-61 main-merge accounting only; Lead L12-63 fix assignment authorizes L12-63 main-merge accounting only",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "285f0d2d1120156fb2ab38703a98c0a6e2f93f3ce0fa9d44a39a917feb204e22",
+      "expectedDigest": "e5290901ffca88ca177dd337cb6ae33d106dd55ff5a93120d07a7ac97480070e",
       "reviewedAt": "2026-10-20",
       "revisitTrigger": "Phase 08 cutover (retirement of legacy reading-map in favor of docs/reading-map.md)"
     },
@@ -310,62 +310,40 @@
     }
   ],
   "mainMergeAccounting": {
-    "commit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
-    "authorization": "A42/L12-60; assignment unit-run-1792498121301-3ada6ffe",
-    "meaning": "L12-61: all seven changed documentation targets accounted. Three ratchet exceptions refreshed. Six content-bound Step 0 rebindings pending independent review. Step 3 overlaps deferred once to Step 7. No content approval, authority flip, baseline/checker change, origin pull or consumer edit.",
+    "commit": "bf5d847c9df6a4fac57747ef95ce0d11bc29cb76",
+    "authorization": "A42/L12-63; assignment unit-run-1792504721337-23e83594",
+    "meaning": "L12-63: all four changed documentation targets accounted. One ratchet exception refreshed. Content-bound Step 0 rebindings pending independent review. Step 3 overlaps deferred once to Step 7. No content approval, authority flip, baseline/checker change, origin pull or consumer edit.",
     "rows": [
       {
-        "path": "docs/backlog.md",
+        "path": "docs/platform/agent-mailbox/spec.md",
         "kind": "allowed-edit",
         "owner": "documentation-authority-unification-lead",
         "revisitTrigger": "Phase 09 final conservation/cutover",
-        "rationale": "L12-61 merge dc24ce64527fbffd23e1643f35a7ddf808fd7b45 imports 943b92bc12ebfc94eb63125d197d49594e59904e, base 7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7, 19 commits: ad2a4b233ed5cb36322d49fb72483021e9808ff0 docs(backlog): record agent seats whose herdr launch never starts. Accounting only; independent changed-binding/content/conservation review owed; no approval carry.",
-        "approvedBy": "Lead L12-60 assignment authorizes merge accounting only",
-        "expectedDigest": "6ffd196ef5dfec1bf62328a9f06d3936429d5c90c8089871e4f1636176504e8c",
+        "rationale": "L12-63 merge bf5d847c9df6a4fac57747ef95ce0d11bc29cb76 imports 71888fdf54a3767d7de3ec545b4820a54d0d16b9, base 73ad73558e7515719038b31254d484564807b165, 22 commits: 4fdfec45a3e01b68cf6fdfc1cbee3ab903f0af81 docs(platform): add the stop rule and a verification ladder to the mailbox plan | 253efe1d46e743666cccdbbe3a6ba003004aa893 docs(platform): move the typed nudge for idle agy and its supporting chain to a later part | 2184756eca47e989f2f909ec1bb672f454860d26 docs(platform): the shared adapter crate observes and the caller decides; create it at S3 | 6f94ed42f2c1d1dd765a0169b265760bc4ec572c docs(platform): mark the address unit as agreed after the research | 6bbf8b0c22b199d012a437ac54685d396a48b1f5 docs(platform): record the shared agent-terminal crate and the confirmed record location. Accounting only; independent changed-binding/content/conservation review owed; no approval carry.",
+        "approvedBy": "Lead L12-63 assignment authorizes merge accounting only",
+        "expectedDigest": "cb267a501112686dd994a60c41e9a62643b1271447d1dbe2eeedb481104f9aa0",
         "reviewedAt": "2026-10-20",
         "ratchetScope": "outside-default-roots"
       },
       {
-        "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+        "path": "docs/platform/component-boundary.md",
         "kind": "allowed-edit",
         "owner": "documentation-authority-unification-lead",
         "revisitTrigger": "Phase 09 final conservation/cutover",
-        "rationale": "L12-61 merge dc24ce64527fbffd23e1643f35a7ddf808fd7b45 imports 943b92bc12ebfc94eb63125d197d49594e59904e, base 7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7, 19 commits: bf56bdf1b43266cb37bd4244875be1402b435de6 fix(doctor): look up executor skills by each invocation's CLI directory. Accounting only; independent changed-binding/content/conservation review owed; no approval carry.",
-        "approvedBy": "Lead L12-60 assignment authorizes merge accounting only",
-        "expectedDigest": "9bdf1fe4b06079cdd87d6b96993ca3c0580376027164925258a136ef83aa3cbd",
+        "rationale": "L12-63 merge bf5d847c9df6a4fac57747ef95ce0d11bc29cb76 imports 71888fdf54a3767d7de3ec545b4820a54d0d16b9, base 73ad73558e7515719038b31254d484564807b165, 22 commits: bafb3f5f4d5a716713d95045024870322886fbc9 test(event-store): prove the store part of the phase 10 gate on main. Accounting only; independent changed-binding/content/conservation review owed; no approval carry.",
+        "approvedBy": "Lead L12-63 assignment authorizes merge accounting only",
+        "expectedDigest": "05e44709b74989ee151cbbc9b077723e879adbe31990a2bac3363f7f1ab18339",
         "reviewedAt": "2026-10-20",
         "ratchetScope": "outside-default-roots"
       },
       {
-        "path": "docs/platform/git/spec.md",
+        "path": "docs/platform/event-store/spec.md",
         "kind": "allowed-edit",
         "owner": "documentation-authority-unification-lead",
         "revisitTrigger": "Phase 09 final conservation/cutover",
-        "rationale": "L12-61 merge dc24ce64527fbffd23e1643f35a7ddf808fd7b45 imports 943b92bc12ebfc94eb63125d197d49594e59904e, base 7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7, 19 commits: fb8c6e4ae152ea6d93d2efe4c454e020fb5e9062 docs(platform): give every behaviour one owning proof and retire tests with their mechanism. Accounting only; independent changed-binding/content/conservation review owed; no approval carry.",
-        "approvedBy": "Lead L12-60 assignment authorizes merge accounting only",
-        "expectedDigest": "3534bfd0d0e80ac8faed63ac9fddf61ccf45376517921ca0da5bf94fe5ff5139",
-        "reviewedAt": "2026-10-20",
-        "ratchetScope": "outside-default-roots"
-      },
-      {
-        "path": "docs/specs/distribution.md",
-        "kind": "allowed-edit",
-        "owner": "documentation-authority-unification-lead",
-        "revisitTrigger": "Phase 09 final conservation/cutover",
-        "rationale": "L12-61 merge dc24ce64527fbffd23e1643f35a7ddf808fd7b45 imports 943b92bc12ebfc94eb63125d197d49594e59904e, base 7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7, 19 commits: bf56bdf1b43266cb37bd4244875be1402b435de6 fix(doctor): look up executor skills by each invocation's CLI directory | 56e3172ed12a3d473f78c56663c6158ef41179f7 fix(worktree): take back provisioned bytes on remove and stop counting post-cutover runs as unfenced. Accounting only; independent changed-binding/content/conservation review owed; no approval carry.",
-        "approvedBy": "Lead L12-60 assignment authorizes merge accounting only",
-        "expectedDigest": "50caaa90bbe5ca52d0966a963fe89f3956e996275c5b56160197aadee4e64f38",
-        "reviewedAt": "2026-10-20",
-        "ratchetScope": "active-exception"
-      },
-      {
-        "path": "docs/specs/platform-foundations.md",
-        "kind": "allowed-edit",
-        "owner": "documentation-authority-unification-lead",
-        "revisitTrigger": "Phase 09 final conservation/cutover",
-        "rationale": "L12-61 merge dc24ce64527fbffd23e1643f35a7ddf808fd7b45 imports 943b92bc12ebfc94eb63125d197d49594e59904e, base 7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7, 19 commits: fb8c6e4ae152ea6d93d2efe4c454e020fb5e9062 docs(platform): give every behaviour one owning proof and retire tests with their mechanism. Accounting only; independent changed-binding/content/conservation review owed; no approval carry.",
-        "approvedBy": "Lead L12-60 assignment authorizes merge accounting only",
-        "expectedDigest": "724cb15eacab003e2c0dc03fe188ff19d627a3d8bc896dc708c2825817f1f274",
+        "rationale": "L12-63 merge bf5d847c9df6a4fac57747ef95ce0d11bc29cb76 imports 71888fdf54a3767d7de3ec545b4820a54d0d16b9, base 73ad73558e7515719038b31254d484564807b165, 22 commits: 79c5ce5a270be12ce9f975133bc26780e90a54df test(distribution): prove the staged release carries the Event Store exports | bafb3f5f4d5a716713d95045024870322886fbc9 test(event-store): prove the store part of the phase 10 gate on main. Accounting only; independent changed-binding/content/conservation review owed; no approval carry.",
+        "approvedBy": "Lead L12-63 assignment authorizes merge accounting only",
+        "expectedDigest": "dd71662df18d64ae324b6bde21505dec276094936adf15d746fa5de211f2a6ba",
         "reviewedAt": "2026-10-20",
         "ratchetScope": "outside-default-roots"
       },
@@ -374,30 +352,19 @@
         "kind": "allowed-edit",
         "owner": "documentation-authority-unification-lead",
         "revisitTrigger": "Phase 09 final conservation/cutover",
-        "rationale": "L12-61 merge dc24ce64527fbffd23e1643f35a7ddf808fd7b45 imports 943b92bc12ebfc94eb63125d197d49594e59904e, base 7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7, 19 commits: f38dfd1d0dcda03e6b09201ffdcaafc29bd9809a chore(test): print a suite line in npm test, fail on new cross-file test clones, retire the first. Accounting only; independent changed-binding/content/conservation review owed; no approval carry.",
-        "approvedBy": "Lead L12-60 assignment authorizes merge accounting only",
-        "expectedDigest": "285f0d2d1120156fb2ab38703a98c0a6e2f93f3ce0fa9d44a39a917feb204e22",
-        "reviewedAt": "2026-10-20",
-        "ratchetScope": "active-exception"
-      },
-      {
-        "path": "docs/specs/runner.md",
-        "kind": "allowed-edit",
-        "owner": "documentation-authority-unification-lead",
-        "revisitTrigger": "Phase 09 final conservation/cutover",
-        "rationale": "L12-61 merge dc24ce64527fbffd23e1643f35a7ddf808fd7b45 imports 943b92bc12ebfc94eb63125d197d49594e59904e, base 7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7, 19 commits: bf56bdf1b43266cb37bd4244875be1402b435de6 fix(doctor): look up executor skills by each invocation's CLI directory | 56e3172ed12a3d473f78c56663c6158ef41179f7 fix(worktree): take back provisioned bytes on remove and stop counting post-cutover runs as unfenced. Accounting only; independent changed-binding/content/conservation review owed; no approval carry.",
-        "approvedBy": "Lead L12-60 assignment authorizes merge accounting only",
-        "expectedDigest": "1881ed87c6109e4128e21dfb5e190591c36515751a539fc2d6136dc8b74f1cd1",
+        "rationale": "L12-63 merge bf5d847c9df6a4fac57747ef95ce0d11bc29cb76 imports 71888fdf54a3767d7de3ec545b4820a54d0d16b9, base 73ad73558e7515719038b31254d484564807b165, 22 commits: bafb3f5f4d5a716713d95045024870322886fbc9 test(event-store): prove the store part of the phase 10 gate on main. Accounting only; independent changed-binding/content/conservation review owed; no approval carry.",
+        "approvedBy": "Lead L12-63 assignment authorizes merge accounting only",
+        "expectedDigest": "e5290901ffca88ca177dd337cb6ae33d106dd55ff5a93120d07a7ac97480070e",
         "reviewedAt": "2026-10-20",
         "ratchetScope": "active-exception"
       }
     ]
   },
   "previousMainMergeAccounting": {
-    "inputCommit": "4deddc8e6c0eb40de32c80e16c699bd8f1699997",
+    "inputCommit": "bf5d847c9df6a4fac57747ef95ce0d11bc29cb76",
     "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-    "commit": "3732d245d75d7c40b7206ac53707821176c471ec",
-    "objectSha256": "cf4ff9675b4208ef536308a7ff42b6c01cb9c10a3008e812c5d87e8fa3c38cb8",
+    "commit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+    "objectSha256": "d097973f33f65b4e78ea0aee4a5110d37032f723046d2656f028aa08e837e981",
     "meaning": "Previous accounting retained at the exact input commit; exception rationales above retain all preceding accounting text verbatim."
   }
 }

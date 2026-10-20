@@ -1,0 +1,78 @@
+{
+  "authorPin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "inputHEAD": "bf5d847c9df6a4fac57747ef95ce0d11bc29cb76",
+  "selectedFiles": [
+    "bin/fgos.mjs",
+    "core/skills/fgos-indexing/SKILL.md"
+  ],
+  "selectedRecords": [
+    {
+      "file": "bin/fgos.mjs",
+      "recordSha256": "6aad007cf751ced7f55f0662a1193196cb25080622e20c350f7895cb7ce67541",
+      "slots": 29
+    },
+    {
+      "file": "core/skills/fgos-indexing/SKILL.md",
+      "recordSha256": "74bcbe278497601b8dbf4db8c42e55b08b12e6b0d9a79cf65fd9313a6eeea6a1",
+      "slots": 21
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "set": "step04-010",
+      "files": [
+        "bin/fgos.mjs"
+      ],
+      "slots": 0,
+      "bytes": 163574,
+      "payload": "step-04-wave4-p01.json",
+      "payloadSha256": "3e49632d9384531c3eed5368395c34b607a055a2a93bc07ea4f8fd5aaffa0920",
+      "requiredReviewerOutput": "review-a38-step-04-wave4-p01.md",
+      "reviewStatus": "pending Lead-started review"
+    },
+    {
+      "part": 2,
+      "set": "step04-010",
+      "files": [
+        "bin/fgos.mjs"
+      ],
+      "slots": 0,
+      "bytes": 142341,
+      "payload": "step-04-wave4-p02.json",
+      "payloadSha256": "71edd77cb411792c11606682d536fddecdad373eca3c11d4dc82a7bc1ca23763",
+      "requiredReviewerOutput": "review-a38-step-04-wave4-p02.md",
+      "reviewStatus": "pending Lead-started review"
+    },
+    {
+      "part": 3,
+      "set": "step04-010",
+      "files": [
+        "bin/fgos.mjs"
+      ],
+      "slots": 29,
+      "bytes": 337409,
+      "payload": "step-04-wave4-p03.json",
+      "payloadSha256": "9024f64ac5a1266380caf0cc5bd0b63f7a208f9565758908d031a2feb19a617e",
+      "requiredReviewerOutput": "review-a38-step-04-wave4-p03.md",
+      "reviewStatus": "pending Lead-started review"
+    },
+    {
+      "part": 4,
+      "set": "step04-030",
+      "files": [
+        "core/skills/fgos-indexing/SKILL.md"
+      ],
+      "slots": 21,
+      "bytes": 140048,
+      "payload": "step-04-wave4-p04.json",
+      "payloadSha256": "9e80c4b8a057087e4ef104fad02dd42d1de8f5fde61faadea18551fe8ffb5dfa",
+      "requiredReviewerOutput": "review-a38-step-04-wave4-p04.md",
+      "reviewStatus": "pending Lead-started review"
+    }
+  ],
+  "maxSlots": 29,
+  "maxBytes": 337409,
+  "reviewersStarted": 0,
+  "reviewersAccepted": 0
+}

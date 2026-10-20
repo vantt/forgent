@@ -1,0 +1,56 @@
+[
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+    "file": "docs/specs/reading-map.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "b1526ab184a7d8ab5cf9124355efc0cf950788878808dd22a5940bc4c50252c8",
+    "digest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+    "currentDigest": "e5290901ffca88ca177dd337cb6ae33d106dd55ff5a93120d07a7ac97480070e",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-093.jsonl",
+    "file": "docs/platform/component-boundary.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "08afcd61b4fcdbd3b33265bf40651ae381a29aee46287be531d3787e49e05eee",
+    "digest": "6c28a1a96e9671e4938a280c3a9102520429f4b75baa81a8f5cbf806d18e639c",
+    "currentDigest": "05e44709b74989ee151cbbc9b077723e879adbe31990a2bac3363f7f1ab18339",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-100.jsonl",
+    "file": "docs/platform/event-store/spec.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "49d86abfb90457e2380dd5f29899b6fc5d2278af4b8f3025a8d36eed6ead0a1a",
+    "digest": "7d26c6c46a48789a8ba63be3576867dd3279308e3894ec8c40bc9317e5f4db80",
+    "currentDigest": "dd71662df18d64ae324b6bde21505dec276094936adf15d746fa5de211f2a6ba",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-040.jsonl",
+    "file": "docs/specs/reading-map.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "30edfb2bfc3d73104cfecf3cda58a685f91bd8171445245b6892b82daffb60f2",
+    "digest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+    "currentDigest": "e5290901ffca88ca177dd337cb6ae33d106dd55ff5a93120d07a7ac97480070e",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r2/batch-040.jsonl",
+    "file": "docs/specs/reading-map.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "da95573f0099e96ed5827fa81b7fd0459d3e996087ce136e0645d7b7abc04332",
+    "digest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+    "currentDigest": "e5290901ffca88ca177dd337cb6ae33d106dd55ff5a93120d07a7ac97480070e",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r3/batch-040.jsonl",
+    "file": "docs/specs/reading-map.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "f96ceea9a2e9bf9802b1ac4c7416cc280e5c68a3c37c5344472a622ad3a8c46a",
+    "digest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+    "currentDigest": "e5290901ffca88ca177dd337cb6ae33d106dd55ff5a93120d07a7ac97480070e",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  }
+]

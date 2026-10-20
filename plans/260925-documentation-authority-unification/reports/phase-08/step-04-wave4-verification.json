@@ -1,0 +1,70 @@
+{
+  "pass": true,
+  "scope": "Records only; no Step 3, consumer, checker/gate/vocabulary/extractor/comparator/baseline edits, CLI or git writes. Runner commits.",
+  "merge": "bf5d847c9df6a4fac57747ef95ce0d11bc29cb76",
+  "authorPin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "checks": {
+    "fullCheckerFailures": 0,
+    "openLeadRulingSlots": 0,
+    "probesPassed": 20,
+    "probesTotal": 20,
+    "lightCommands": [
+      {
+        "label": "ratchet",
+        "command": [
+          "node",
+          "scripts/check-legacy-docs-ratchet.mjs"
+        ],
+        "exit": 0,
+        "elapsedSeconds": 60.084,
+        "log": "step-04-wave4-ratchet.log",
+        "sha256": "6cbeaa998a4dbca53e4c04e411d654cc715ca13d8113f9bf80dda70669bb5ab2"
+      },
+      {
+        "label": "ratchet-binding-tests",
+        "command": [
+          "node",
+          "--test",
+          "test/scripts/check-legacy-docs-ratchet.test.mjs",
+          "test/scripts/doc-binding-repair.test.mjs",
+          "test/scripts/doc-decision-exact.test.mjs",
+          "test/scripts/doc-decision-conservation.test.mjs",
+          "test/scripts/doc-decision-review.test.mjs",
+          "test/scripts/generate-doc-inventory.test.mjs",
+          "test/scripts/doc-corpus-decisions.test.mjs",
+          "test/scripts/doc-decision-mirrors.test.mjs"
+        ],
+        "exit": 0,
+        "elapsedSeconds": 1.567,
+        "log": "step-04-wave4-ratchet-binding-tests.log",
+        "sha256": "8eb9923774b9bdbd2da96d2a585542b9b1df7265978f92cde693bc10706d5b0c"
+      },
+      {
+        "label": "citation-drift",
+        "command": [
+          "node",
+          "scripts/check-decision-citation-drift.mjs"
+        ],
+        "exit": 0,
+        "elapsedSeconds": 2.689,
+        "log": "step-04-wave4-citation-drift.log",
+        "sha256": "a55a98ef3a961181b729bb169cefd37a7a0d63c12438c58c4f8a40902ec998e8"
+      },
+      {
+        "label": "whitespace",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exit": 0,
+        "elapsedSeconds": 0.209,
+        "log": "step-04-wave4-whitespace.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "scopeReceipt": "step-04-wave4-scope-verification.json",
+    "outcomeProof": "step-04-wave4-outcome-proof.json"
+  },
+  "acceptanceLimit": "Author proof only. One Step 0 content rebind and two outcome-changed source files need independent review. Actual runner commit L12-11 accounting, Step 7 final rebindings, Step 5 parity and Phase 9 application remain Lead custody. No newer unmerged-main, full npm/cargo, generator/installed or source application acceptance."
+}

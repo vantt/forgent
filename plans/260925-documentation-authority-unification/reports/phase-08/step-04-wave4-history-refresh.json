@@ -1,0 +1,182 @@
+{
+  "mainBefore": "14a31e704242f15a089c3f0fdeaf5f1abd3d4a44",
+  "mainAfterRead": "14a31e704242f15a089c3f0fdeaf5f1abd3d4a44",
+  "changed": [
+    {
+      "file": "src/runner/dispatch/config.mjs",
+      "slotKey": "{\"edgeId\":\"class6-l-000261\",\"file\":\"src/runner/dispatch/config.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000261\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1163}]}",
+      "before": {
+        "path": "docs/specs/runner.md",
+        "state": "tree",
+        "treeMatchCount": 1,
+        "treeMatchesSha256": "591ee522668979de30f39de3deece9554c73cdf971bcde4331b889a1954c4207",
+        "treeSample": [
+          "docs/specs/runner.md"
+        ],
+        "historyCommitCount": 360,
+        "historyCommitsSha256": "015e11eaac4f5790fe9de6b51e4302713d3325a9c0596cdfc401c99fe0993378",
+        "historySample": [
+          "bf56bdf1b43266cb37bd4244875be1402b435de6",
+          "56e3172ed12a3d473f78c56663c6158ef41179f7"
+        ]
+      },
+      "after": {
+        "path": "docs/specs/runner.md",
+        "state": "tree",
+        "treeMatchCount": 1,
+        "treeMatchesSha256": "591ee522668979de30f39de3deece9554c73cdf971bcde4331b889a1954c4207",
+        "treeSample": [
+          "docs/specs/runner.md"
+        ],
+        "historyCommitCount": 361,
+        "historyCommitsSha256": "edabc17fc02562ac166860225bc7d780c65904a26090cc9d43f40bb09ad1ad68",
+        "historySample": [
+          "964d2837d0c7e4e972c8499afd545e8f80e71dd7",
+          "bf56bdf1b43266cb37bd4244875be1402b435de6"
+        ]
+      },
+      "outcomeUnchanged": true
+    },
+    {
+      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":72,\"columnStart\":52,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":38,\"text\":\"docs/specs/runner.md\"}}",
+      "before": {
+        "path": "docs/specs/runner.md",
+        "state": "tree",
+        "treeMatchCount": 1,
+        "treeMatchesSha256": "591ee522668979de30f39de3deece9554c73cdf971bcde4331b889a1954c4207",
+        "treeSample": [
+          "docs/specs/runner.md"
+        ],
+        "historyCommitCount": 360,
+        "historyCommitsSha256": "015e11eaac4f5790fe9de6b51e4302713d3325a9c0596cdfc401c99fe0993378",
+        "historySample": [
+          "bf56bdf1b43266cb37bd4244875be1402b435de6",
+          "56e3172ed12a3d473f78c56663c6158ef41179f7"
+        ]
+      },
+      "after": {
+        "path": "docs/specs/runner.md",
+        "state": "tree",
+        "treeMatchCount": 1,
+        "treeMatchesSha256": "591ee522668979de30f39de3deece9554c73cdf971bcde4331b889a1954c4207",
+        "treeSample": [
+          "docs/specs/runner.md"
+        ],
+        "historyCommitCount": 361,
+        "historyCommitsSha256": "edabc17fc02562ac166860225bc7d780c65904a26090cc9d43f40bb09ad1ad68",
+        "historySample": [
+          "964d2837d0c7e4e972c8499afd545e8f80e71dd7",
+          "bf56bdf1b43266cb37bd4244875be1402b435de6"
+        ]
+      },
+      "outcomeUnchanged": true
+    },
+    {
+      "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":48,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":35,\"text\":\"docs/specs/runner.md\"}}",
+      "before": {
+        "path": "docs/specs/runner.md",
+        "state": "tree",
+        "treeMatchCount": 1,
+        "treeMatchesSha256": "591ee522668979de30f39de3deece9554c73cdf971bcde4331b889a1954c4207",
+        "treeSample": [
+          "docs/specs/runner.md"
+        ],
+        "historyCommitCount": 360,
+        "historyCommitsSha256": "015e11eaac4f5790fe9de6b51e4302713d3325a9c0596cdfc401c99fe0993378",
+        "historySample": [
+          "bf56bdf1b43266cb37bd4244875be1402b435de6",
+          "56e3172ed12a3d473f78c56663c6158ef41179f7"
+        ]
+      },
+      "after": {
+        "path": "docs/specs/runner.md",
+        "state": "tree",
+        "treeMatchCount": 1,
+        "treeMatchesSha256": "591ee522668979de30f39de3deece9554c73cdf971bcde4331b889a1954c4207",
+        "treeSample": [
+          "docs/specs/runner.md"
+        ],
+        "historyCommitCount": 361,
+        "historyCommitsSha256": "edabc17fc02562ac166860225bc7d780c65904a26090cc9d43f40bb09ad1ad68",
+        "historySample": [
+          "964d2837d0c7e4e972c8499afd545e8f80e71dd7",
+          "bf56bdf1b43266cb37bd4244875be1402b435de6"
+        ]
+      },
+      "outcomeUnchanged": true
+    },
+    {
+      "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":157,\"columnStart\":137,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":28,\"text\":\"docs/specs/runner.md\"}}",
+      "before": {
+        "path": "docs/specs/runner.md",
+        "state": "tree",
+        "treeMatchCount": 1,
+        "treeMatchesSha256": "591ee522668979de30f39de3deece9554c73cdf971bcde4331b889a1954c4207",
+        "treeSample": [
+          "docs/specs/runner.md"
+        ],
+        "historyCommitCount": 360,
+        "historyCommitsSha256": "015e11eaac4f5790fe9de6b51e4302713d3325a9c0596cdfc401c99fe0993378",
+        "historySample": [
+          "bf56bdf1b43266cb37bd4244875be1402b435de6",
+          "56e3172ed12a3d473f78c56663c6158ef41179f7"
+        ]
+      },
+      "after": {
+        "path": "docs/specs/runner.md",
+        "state": "tree",
+        "treeMatchCount": 1,
+        "treeMatchesSha256": "591ee522668979de30f39de3deece9554c73cdf971bcde4331b889a1954c4207",
+        "treeSample": [
+          "docs/specs/runner.md"
+        ],
+        "historyCommitCount": 361,
+        "historyCommitsSha256": "edabc17fc02562ac166860225bc7d780c65904a26090cc9d43f40bb09ad1ad68",
+        "historySample": [
+          "964d2837d0c7e4e972c8499afd545e8f80e71dd7",
+          "bf56bdf1b43266cb37bd4244875be1402b435de6"
+        ]
+      },
+      "outcomeUnchanged": true
+    },
+    {
+      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":97,\"columnStart\":77,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":16,\"text\":\"docs/specs/runner.md\"}}",
+      "before": {
+        "path": "docs/specs/runner.md",
+        "state": "tree",
+        "treeMatchCount": 1,
+        "treeMatchesSha256": "591ee522668979de30f39de3deece9554c73cdf971bcde4331b889a1954c4207",
+        "treeSample": [
+          "docs/specs/runner.md"
+        ],
+        "historyCommitCount": 360,
+        "historyCommitsSha256": "015e11eaac4f5790fe9de6b51e4302713d3325a9c0596cdfc401c99fe0993378",
+        "historySample": [
+          "bf56bdf1b43266cb37bd4244875be1402b435de6",
+          "56e3172ed12a3d473f78c56663c6158ef41179f7"
+        ]
+      },
+      "after": {
+        "path": "docs/specs/runner.md",
+        "state": "tree",
+        "treeMatchCount": 1,
+        "treeMatchesSha256": "591ee522668979de30f39de3deece9554c73cdf971bcde4331b889a1954c4207",
+        "treeSample": [
+          "docs/specs/runner.md"
+        ],
+        "historyCommitCount": 361,
+        "historyCommitsSha256": "edabc17fc02562ac166860225bc7d780c65904a26090cc9d43f40bb09ad1ad68",
+        "historySample": [
+          "964d2837d0c7e4e972c8499afd545e8f80e71dd7",
+          "bf56bdf1b43266cb37bd4244875be1402b435de6"
+        ]
+      },
+      "outcomeUnchanged": true
+    }
+  ],
+  "note": "Refresh live --all git history witness after local refs advanced; pinned tree/existence state and all outcomes remain unchanged. Existing checker/library caching reused within this fresh invocation."
+}

@@ -928,3 +928,21 @@ All named reworks and rulings 1–9 are addressed in records only. Twelve file o
 - **ONE wave 3 request:** `step-04-wave3-review-request.md`; **39 outcome-changed files (A) + 29 expanded-set unreviewed files (B), overlap 8 = 60 whole source files**, including 21 B-only files. Exact filenames per category and every expanded-set final-state decision appear in `step-04-wave3-review-scope.json`. **28 parts**, maximum **50 slots / 385,791 UTF-8 bytes**, outputs `review-a38-step-04-wave3-p01.md`–`p28.md`. Reviewers never run checker/probes; none launched or accepted by author. Earlier review packets/reports are unchanged.
 
 Lead custody: **44 genuine source parks** (21 phase9-carry / 12 description-rewrite / 7 dead-link / 4 GAP-02), independent final-state review and ordinary actual runner-commit L12-11 accounting. Step 3 final-pin rebindings, A34 residual, A47 conservation, workflow carry and Step 5/Phase 9 obligations remain with their existing owners. No full npm/cargo, installed parity, source application or committed-byte reproduction acceptance is claimed. Current-source drift against author pin is listed in the scope receipt (0 files), without silently changing pins. Markdown preview remains with Lead's environment under this report-only write boundary. needsWrites is empty.
+
+
+## Wave 4 final-state correction — in progress (2026-10-20)
+
+Input bf5d847c9; records-only merge accounting and placeholder sweep over all 33 batches. Wave 3 has one outcome rework (indexing skill lines 20/41 plus renders). Record-text cleanup retains existing outcomes; checker/probes and bounded wave 4 packet follow. No consumer/Step 3 edits, CLI, generator or git writes.
+
+
+## Wave 4 — final author handback (2026-10-20)
+
+L12-63 records bf5d847c9 accounting: four docs, one ratchet refresh, 271 Step 0 bindings, one content rebind pending review, zero drift; six Step 3 overlap instances deferred once to Step 7. The single supplied component-boundary conflict retains main's newer Event Store foundation row; no docs content authored here.
+
+All 33 batches / 346 physical files scanned: 211 placeholder hits. Indexing lines 20/41 plus renders and one CLI maintained comment add **3 source parks + 4 render joins**. Current totals: **275 records / 890 slots** (609 preserve, 59 Phase 9 patch, 45 park, 177 render-join). Removed 50 duplicate physical-slot rows and 28 redundant supplemental exclusions; every existing physical outcome, full diff and all 995 qualified census refs are conserved. Text cleanup: 90 prefix fields, 3 park explanations, 1 RUL45 description, 8 rejected-holder notes, 1 historical successor note. instructions-025's final key is explicitly verified against line 15. Prompt golden co-edit / Step 5 parity and repository-slug / GitHub-rendering dependencies are recorded.
+
+Final full checker **0 failures / 0 open Lead-ruling slots**, probes **20/20**, ratchet / citation drift / whitespace pass, binding-ledger-ratchet suite **172/172**. Five live history witnesses refreshed after local refs advanced; pinned tree/outcomes unchanged. Exact receipts: `step-04-wave4-{check-result,probes-result,light-verification,outcome-proof,history-refresh}.json`. Earlier failed diagnostics are not final proof. The unchanged production source suite is not rerun for record-only changes.
+
+ONE wave 4 request: **2 outcome-changed files / 4 parts**, maxima **29 slots / 337,409 bytes**, outputs `review-a38-step-04-wave4-p01.md`–`p04.md`. Record-text-only changes are mechanically verified; all prior review reports stay untouched. Lead owns independent review, one Step 0 binding re-acceptance and actual runner-commit accounting. Step 3/A34/A47/workflow carry, Step 5 parity and Phase 9 application retain their owners. No full npm/cargo or installed/generator acceptance, CLI, git mutation, state/secrets access, consumer write or Step 3 edit. Preview stays with Lead's authorized environment. needsWrites empty.
+
+Final scope receipt passes: current checker/probe/record hashes agree, four review payloads equal current selected records and stay within bounds, protected checker/resolver/census artifacts unchanged, zero out-of-scope paths or bytecode outputs. `step-04-wave4-scope-verification.json` and `step-04-wave4-verification.json` complete the handback; needsWrites is empty.

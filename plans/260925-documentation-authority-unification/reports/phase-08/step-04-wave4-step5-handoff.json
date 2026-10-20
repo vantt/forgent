@@ -1,0 +1,24 @@
+{
+  "authorPin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "promptSource": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+  "promptSourceLines": [
+    31,
+    48
+  ],
+  "goldenFile": "test/runner/prompt-templates.test.mjs",
+  "goldenSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f",
+  "escapedGoldenOccurrences": [
+    {
+      "line": 198,
+      "text": "\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`'s"
+    },
+    {
+      "line": 215,
+      "text": "\\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\\`"
+    }
+  ],
+  "censusGap": "The byte-exact template-literal golden escapes backticks with backslashes, so census missed the embedded path occurrences. Do not invent Step 2 ids.",
+  "phase9AtomicDependency": "Co-edit both golden occurrences in the same Phase 9 step as the prompt source patches; this changes worker prompt text, not only read-only comments.",
+  "step5Parity": "Prove final worker prompt and golden agree; run the existing owning prompt-templates test. Generated skill renders use their existing generator door at Phase 9; no generator ran here.",
+  "replacementTarget": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+}

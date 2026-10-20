@@ -1,0 +1,2396 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-030",
+  "files": [
+    "core/skills/fgos-indexing/SKILL.md"
+  ],
+  "joinedSlots": 21,
+  "items": [
+    {
+      "file": "core/skills/fgos-indexing/SKILL.md",
+      "kind": "complete-source-context",
+      "path": "core/skills/fgos-indexing/SKILL.md",
+      "startLine": 1,
+      "endLine": 84,
+      "content": "---\nname: fgos-indexing\nuser-invocable: false\ndescription: >-\n  Regenerate the machine-readable, read-by-tag index of fgOS end-user\n  documents after any end-user doc is written during compound-learn. Use\n  once `fgos-coding-compounding` has stored a `docType`/`docPath`-tagged capture\n  and written its document — this skill turns the real docs on disk into\n  `docs/enduser-docs-index.json`. Examples: \"the end-user doc just landed,\n  update the index\", \"regenerate the docs index\", \"where do I point a\n  reader who wants docs by audience/purpose instead of by file path\".\n---\n\n# fgos-indexing\n\nRuns after `fgos-coding-compounding` has written an end-user document and stored\nits `docType`/`docPath` on the item's capture. This skill does not classify\nor write documents itself — that stays `fgos-coding-compounding`'s job — it only\nregenerates the read-by-tag catalog over whatever real documents already\nexist under `docs/<quadrant>/`.\n\n## When to run\n\nRun it with the main-checkout root resolved explicitly, the same way\nevery other cross-worktree verb is invoked from a claimed item's own\nworktree (ADR0020 — a worktree never carries its own `.fgos/`):\n\n```bash\nfgos docs-index\n```\n\nRun this once, right after step 4/5 of `fgos-coding-compounding` (the document\nis on disk and the capture's `docType`/`docPath` are confirmed). It is\nsafe to re-run any time the set of end-user documents changes — it always\nregenerates the whole manifest fresh from disk (skipping the actual write\nwhen the computed content is unchanged), never accumulates or appends\nacross runs.\n\n## What it produces\n\n`fgos docs-index` enumerates every document under `docs/<quadrant>/`\n(the four Diataxis quadrant directories) and writes\n`repo/docs/enduser-docs-index.json` — the machine-readable, read-by-tag\nindex of fgOS end-user docs. Each entry carries the doc's quadrant,\n`purpose`/`audience`, `docPath`, `title`, and `sourceCaptureId` (the\ncompound-learn capture the doc came from, or `null` when none is\nrecorded yet — e.g. a doc written before `--doc-path` capture existed).\n\n## The quadrant → {purpose, audience} mapping\n\nThe fixed mapping from Diataxis quadrant to its `{purpose, audience}`\npair is **not** defined by this skill. It lives in exactly one place —\n`QUADRANT_META` in `repo/src/report/enduser-index.mjs` — and this skill\nonly points at it. Read that export if you need to see or discuss the\nactual purpose/audience strings; never restate or re-derive them here,\nand never hand-edit an index entry's `purpose`/`audience` — they come\nfrom `QUADRANT_META` alone, keyed by the entry's `quadrant`.\n\n## Superseded pointer\n\nThis skill's manifest supersedes **only** the end-user-docs pointer bullet\nin `docs/specs/reading-map.md` (the line naming `docs/how-to/`,\n`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file\nitself stays the whole-repo canonical first-read and every other entry in\nit is unaffected — this skill never removes or restructures\n`reading-map.md`, it only keeps that one pointer accurate: it now names\n`docs/enduser-docs-index.json` as the machine-readable read-by-tag index,\nin place of a hand-maintained prose description of the four directories.\n\n## Red flags\n\n- restating or re-deriving a `purpose`/`audience` string instead of\n  reading it from `QUADRANT_META`\n- hand-editing `docs/enduser-docs-index.json` instead of re-running\n  `fgos docs-index`\n- treating this skill as a document-writer or classifier — that is\n  `fgos-coding-compounding`'s job; this skill only indexes what already exists\n- removing `reading-map.md` or any of its other entries while updating\n  the end-user-docs pointer\n\nViolating the letter of the rules is violating the spirit of the rules.\n\nManifest regenerated from real docs on disk, pointer in `reading-map.md`\nkept accurate. This skill's job ends there.\n",
+      "continued": false
+    },
+    {
+      "file": "core/skills/fgos-indexing/SKILL.md",
+      "kind": "complete-render-context",
+      "path": ".agents/skills/fgos-indexing/SKILL.md",
+      "startLine": 1,
+      "endLine": 85,
+      "content": "---\nname: fgos-indexing\nuser-invocable: false\ndescription: >-\n  Regenerate the machine-readable, read-by-tag index of fgOS end-user\n  documents after any end-user doc is written during compound-learn. Use\n  once `fgos-coding-compounding` has stored a `docType`/`docPath`-tagged capture\n  and written its document — this skill turns the real docs on disk into\n  `docs/enduser-docs-index.json`. Examples: \"the end-user doc just landed,\n  update the index\", \"regenerate the docs index\", \"where do I point a\n  reader who wants docs by audience/purpose instead of by file path\".\n---\n<!-- Generated by fgOS skill assembly from core/skills/fgos-indexing/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n\n# fgos-indexing\n\nRuns after `fgos-coding-compounding` has written an end-user document and stored\nits `docType`/`docPath` on the item's capture. This skill does not classify\nor write documents itself — that stays `fgos-coding-compounding`'s job — it only\nregenerates the read-by-tag catalog over whatever real documents already\nexist under `docs/<quadrant>/`.\n\n## When to run\n\nRun it with the main-checkout root resolved explicitly, the same way\nevery other cross-worktree verb is invoked from a claimed item's own\nworktree (ADR0020 — a worktree never carries its own `.fgos/`):\n\n```bash\nfgos docs-index\n```\n\nRun this once, right after step 4/5 of `fgos-coding-compounding` (the document\nis on disk and the capture's `docType`/`docPath` are confirmed). It is\nsafe to re-run any time the set of end-user documents changes — it always\nregenerates the whole manifest fresh from disk (skipping the actual write\nwhen the computed content is unchanged), never accumulates or appends\nacross runs.\n\n## What it produces\n\n`fgos docs-index` enumerates every document under `docs/<quadrant>/`\n(the four Diataxis quadrant directories) and writes\n`repo/docs/enduser-docs-index.json` — the machine-readable, read-by-tag\nindex of fgOS end-user docs. Each entry carries the doc's quadrant,\n`purpose`/`audience`, `docPath`, `title`, and `sourceCaptureId` (the\ncompound-learn capture the doc came from, or `null` when none is\nrecorded yet — e.g. a doc written before `--doc-path` capture existed).\n\n## The quadrant → {purpose, audience} mapping\n\nThe fixed mapping from Diataxis quadrant to its `{purpose, audience}`\npair is **not** defined by this skill. It lives in exactly one place —\n`QUADRANT_META` in `repo/src/report/enduser-index.mjs` — and this skill\nonly points at it. Read that export if you need to see or discuss the\nactual purpose/audience strings; never restate or re-derive them here,\nand never hand-edit an index entry's `purpose`/`audience` — they come\nfrom `QUADRANT_META` alone, keyed by the entry's `quadrant`.\n\n## Superseded pointer\n\nThis skill's manifest supersedes **only** the end-user-docs pointer bullet\nin `docs/specs/reading-map.md` (the line naming `docs/how-to/`,\n`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file\nitself stays the whole-repo canonical first-read and every other entry in\nit is unaffected — this skill never removes or restructures\n`reading-map.md`, it only keeps that one pointer accurate: it now names\n`docs/enduser-docs-index.json` as the machine-readable read-by-tag index,\nin place of a hand-maintained prose description of the four directories.\n\n## Red flags\n\n- restating or re-deriving a `purpose`/`audience` string instead of\n  reading it from `QUADRANT_META`\n- hand-editing `docs/enduser-docs-index.json` instead of re-running\n  `fgos docs-index`\n- treating this skill as a document-writer or classifier — that is\n  `fgos-coding-compounding`'s job; this skill only indexes what already exists\n- removing `reading-map.md` or any of its other entries while updating\n  the end-user-docs pointer\n\nViolating the letter of the rules is violating the spirit of the rules.\n\nManifest regenerated from real docs on disk, pointer in `reading-map.md`\nkept accurate. This skill's job ends there.\n",
+      "continued": false
+    },
+    {
+      "file": "core/skills/fgos-indexing/SKILL.md",
+      "kind": "complete-render-context",
+      "path": ".claude/skills/fgos-indexing/SKILL.md",
+      "startLine": 1,
+      "endLine": 16,
+      "content": "---\nname: fgos-indexing\nuser-invocable: false\ndescription: >-\n  Regenerate the machine-readable, read-by-tag index of fgOS end-user\n  documents after any end-user doc is written during compound-learn. Use\n  once `fgos-coding-compounding` has stored a `docType`/`docPath`-tagged capture\n  and written its document — this skill turns the real docs on disk into\n  `docs/enduser-docs-index.json`. Examples: \"the end-user doc just landed,\n  update the index\", \"regenerate the docs index\", \"where do I point a\n  reader who wants docs by audience/purpose instead of by file path\".\n---\n\nThis is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.\nThe real skill content lives at `../../../.agents/skills/fgos-indexing/SKILL.md`, an assembled projection whose generated header identifies its canonical source.\nRead that file and follow it directly.\n",
+      "continued": false
+    },
+    {
+      "file": "core/skills/fgos-indexing/SKILL.md",
+      "kind": "complete-render-context",
+      "path": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+      "startLine": 1,
+      "endLine": 85,
+      "content": "---\nname: fgos-indexing\nuser-invocable: false\ndescription: >-\n  Regenerate the machine-readable, read-by-tag index of fgOS end-user\n  documents after any end-user doc is written during compound-learn. Use\n  once `fgos-coding-compounding` has stored a `docType`/`docPath`-tagged capture\n  and written its document — this skill turns the real docs on disk into\n  `docs/enduser-docs-index.json`. Examples: \"the end-user doc just landed,\n  update the index\", \"regenerate the docs index\", \"where do I point a\n  reader who wants docs by audience/purpose instead of by file path\".\n---\n<!-- Generated by fgOS skill assembly from core/skills/fgos-indexing/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n\n# fgos-indexing\n\nRuns after `fgos-coding-compounding` has written an end-user document and stored\nits `docType`/`docPath` on the item's capture. This skill does not classify\nor write documents itself — that stays `fgos-coding-compounding`'s job — it only\nregenerates the read-by-tag catalog over whatever real documents already\nexist under `docs/<quadrant>/`.\n\n## When to run\n\nRun it with the main-checkout root resolved explicitly, the same way\nevery other cross-worktree verb is invoked from a claimed item's own\nworktree (ADR0020 — a worktree never carries its own `.fgos/`):\n\n```bash\nfgos docs-index\n```\n\nRun this once, right after step 4/5 of `fgos-coding-compounding` (the document\nis on disk and the capture's `docType`/`docPath` are confirmed). It is\nsafe to re-run any time the set of end-user documents changes — it always\nregenerates the whole manifest fresh from disk (skipping the actual write\nwhen the computed content is unchanged), never accumulates or appends\nacross runs.\n\n## What it produces\n\n`fgos docs-index` enumerates every document under `docs/<quadrant>/`\n(the four Diataxis quadrant directories) and writes\n`repo/docs/enduser-docs-index.json` — the machine-readable, read-by-tag\nindex of fgOS end-user docs. Each entry carries the doc's quadrant,\n`purpose`/`audience`, `docPath`, `title`, and `sourceCaptureId` (the\ncompound-learn capture the doc came from, or `null` when none is\nrecorded yet — e.g. a doc written before `--doc-path` capture existed).\n\n## The quadrant → {purpose, audience} mapping\n\nThe fixed mapping from Diataxis quadrant to its `{purpose, audience}`\npair is **not** defined by this skill. It lives in exactly one place —\n`QUADRANT_META` in `repo/src/report/enduser-index.mjs` — and this skill\nonly points at it. Read that export if you need to see or discuss the\nactual purpose/audience strings; never restate or re-derive them here,\nand never hand-edit an index entry's `purpose`/`audience` — they come\nfrom `QUADRANT_META` alone, keyed by the entry's `quadrant`.\n\n## Superseded pointer\n\nThis skill's manifest supersedes **only** the end-user-docs pointer bullet\nin `docs/specs/reading-map.md` (the line naming `docs/how-to/`,\n`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file\nitself stays the whole-repo canonical first-read and every other entry in\nit is unaffected — this skill never removes or restructures\n`reading-map.md`, it only keeps that one pointer accurate: it now names\n`docs/enduser-docs-index.json` as the machine-readable read-by-tag index,\nin place of a hand-maintained prose description of the four directories.\n\n## Red flags\n\n- restating or re-deriving a `purpose`/`audience` string instead of\n  reading it from `QUADRANT_META`\n- hand-editing `docs/enduser-docs-index.json` instead of re-running\n  `fgos docs-index`\n- treating this skill as a document-writer or classifier — that is\n  `fgos-coding-compounding`'s job; this skill only indexes what already exists\n- removing `reading-map.md` or any of its other entries while updating\n  the end-user-docs pointer\n\nViolating the letter of the rules is violating the spirit of the rules.\n\nManifest regenerated from real docs on disk, pointer in `reading-map.md`\nkept accurate. This skill's job ends there.\n",
+      "continued": false
+    },
+    {
+      "file": "core/skills/fgos-indexing/SKILL.md",
+      "kind": "complete-final-record",
+      "record": {
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          },
+          {
+            "path": "step-02l-census-class4.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "51c1701eafb40e09329d9c096f1a757c836663757dee8ecc7877e459dafca62c",
+            "counts": {
+              "dynamicConstructions": 3542,
+              "dynamicFiles": 176,
+              "edgeFiles": 122,
+              "edges": 3334,
+              "files": 225
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+        "digest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+        "inventoryEdgeIds": [
+          "skills-043",
+          "skills-085",
+          "skills-176",
+          "class4-l-000081",
+          "class4-l-000082",
+          "class4-l-000083",
+          "class4-l-000084",
+          "class4-l-002083",
+          "class4-l-002084",
+          "class4-l-002085",
+          "class4-l-002086",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "diff": "--- a/core/skills/fgos-indexing/SKILL.md\n+++ b/core/skills/fgos-indexing/SKILL.md\n@@ -59,7 +59,7 @@\n ## Superseded pointer\n \n This skill's manifest supersedes **only** the end-user-docs pointer bullet\n-in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,\n+in `docs/reading-map.md#5-detailed-product-and-source-map` (the line naming `docs/how-to/`,\n `docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file\n itself stays the whole-repo canonical first-read and every other entry in\n it is unaffected — this skill never removes or restructures\n",
+        "edges": [
+          {
+            "edgeId": "skills-043",
+            "slotKey": "{\"edgeId\":\"skills-043\",\"file\":\".agents/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-043\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":63},{\"edgeId\":\"class4-l-000080\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":63}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-043",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 63
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000080",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 63
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 63,
+                "columnStart": 5,
+                "columnEndExclusive": 30,
+                "text": "docs/specs/reading-map.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 63,
+                "columnStart": 5,
+                "columnEndExclusive": 30,
+                "text": "docs/specs/reading-map.md"
+              }
+            ],
+            "matchedExpression": "docs/specs/reading-map.md",
+            "logicalReference": "docs/specs/reading-map.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: patch. Own render passage: 'in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,'",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/specs/reading-map.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-043",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 63,
+                "matchedExpression": "docs/specs/reading-map.md",
+                "originalLineText": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000080",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 63,
+                "matchedExpression": "docs/specs/reading-map.md",
+                "originalLineText": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+              }
+            ],
+            "sourceDisposition": "patch",
+            "sourceSlotKey": "{\"edgeId\":\"skills-085\",\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-085\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":62}]}"
+          },
+          {
+            "edgeId": "skills-085",
+            "slotKey": "{\"edgeId\":\"skills-085\",\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-085\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":62}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-085",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 62
+              }
+            ],
+            "consumerFile": "core/skills/fgos-indexing/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 62,
+                "columnStart": 5,
+                "columnEndExclusive": 30,
+                "text": "docs/specs/reading-map.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 62,
+                "columnStart": 5,
+                "columnEndExclusive": 30,
+                "text": "docs/specs/reading-map.md"
+              }
+            ],
+            "matchedExpression": "docs/specs/reading-map.md",
+            "logicalReference": "docs/specs/reading-map.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -59,7 +59,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/reading-map.md",
+            "anchor": "5-detailed-product-and-source-map",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/specs/reading-map.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-085",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 62,
+                "matchedExpression": "docs/specs/reading-map.md",
+                "originalLineText": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+              }
+            ],
+            "parkSourceQuote": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,",
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,",
+              "terms": [
+                "Detailed Product And Source Map",
+                "enduser-docs-index.json"
+              ],
+              "queries": [
+                {
+                  "term": "Detailed Product And Source Map",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                },
+                {
+                  "term": "enduser-docs-index.json",
+                  "hitCount": 44,
+                  "liveHits": 40,
+                  "hitsSha256": "e677ab2c15ba483af23237316f4f654cba11c237b9bb9b9bd71bfd91d8ffe4d0",
+                  "files": {
+                    "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md": {
+                      "live": 4,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is/docs-index-preserves-prior-id-when-the-store-is-unreachable.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/P04.2.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/doer-report.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/reviewer-report.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/code-implementation-track-policy/p01.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P07.1.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/config-precedence/doctor-output-under-fake-global-home.json": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md": {
+                      "live": 0,
+                      "carriage": 2
+                    },
+                    "docs/platform/packaging-distribution/spec.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/runner/decisions/h-36d872fbb0e5.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/work-state/spec.md": {
+                      "live": 2,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+                      "line": 57,
+                      "text": "`docs/enduser-docs-index.json`, a real file outside `.fgos/`; it should",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+                      "line": 135,
+                      "text": "- scan and write `docs/enduser-docs-index.json` inside the **worktree's",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+                      "line": 14,
+                      "text": "`docs/enduser-docs-index.json` as a side effect of `npm test`.",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+                      "line": 79,
+                      "text": "docs/enduser-docs-index.json` (or any similar guard) failing on the very",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+                      "line": 267,
+                      "text": "constraint, not a preference: `.fgos/docs/enduser-docs-index.json`'s",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+                      "line": 3,
+                      "text": "title: Why docs/enduser-docs-index.json needed a doctor check, not just a regenerate skill",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            },
+            "unitDispositionReason": "{\"edgeId\":\"skills-085\",\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-085\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":62}]} Distinct claim: docs/specs/reading-map.md A51, L12-7/30/31/32/58: L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+          },
+          {
+            "edgeId": "skills-176",
+            "slotKey": "{\"edgeId\":\"skills-176\",\"file\":\"plugins/fgOS/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-176\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":63},{\"edgeId\":\"class4-l-002082\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":63}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-176",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 63
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002082",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 63
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 63,
+                "columnStart": 5,
+                "columnEndExclusive": 30,
+                "text": "docs/specs/reading-map.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 63,
+                "columnStart": 5,
+                "columnEndExclusive": 30,
+                "text": "docs/specs/reading-map.md"
+              }
+            ],
+            "matchedExpression": "docs/specs/reading-map.md",
+            "logicalReference": "docs/specs/reading-map.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: patch. Own render passage: 'in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,'",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/specs/reading-map.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-176",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 63,
+                "matchedExpression": "docs/specs/reading-map.md",
+                "originalLineText": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002082",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 63,
+                "matchedExpression": "docs/specs/reading-map.md",
+                "originalLineText": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+              }
+            ],
+            "sourceDisposition": "patch",
+            "sourceSlotKey": "{\"edgeId\":\"skills-085\",\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-085\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":62}]}"
+          },
+          {
+            "edgeId": "class4-l-000081",
+            "slotKey": "{\"edgeId\":\"class4-l-000081\",\"file\":\".agents/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-000081\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":63}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000081",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 63
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000081",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 63,
+                "matchedExpression": "docs/how-to/",
+                "originalLineText": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 62,
+                "columnStart": 50,
+                "line": 63,
+                "text": "docs/how-to/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 62,
+                "columnStart": 50,
+                "line": 63,
+                "text": "docs/how-to/"
+              }
+            ],
+            "matchedExpression": "docs/how-to/",
+            "logicalReference": "docs/how-to/",
+            "legacyPath": "docs/how-to/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: 'in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":62,\"columnStart\":50,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":62,\"text\":\"docs/how-to/\"}}"
+          },
+          {
+            "edgeId": "class4-l-000082",
+            "slotKey": "{\"edgeId\":\"class4-l-000082\",\"file\":\".agents/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-000082\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":64}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000082",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000082",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64,
+                "matchedExpression": "docs/tutorials/",
+                "originalLineText": "`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file"
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 17,
+                "columnStart": 2,
+                "line": 64,
+                "text": "docs/tutorials/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 17,
+                "columnStart": 2,
+                "line": 64,
+                "text": "docs/tutorials/"
+              }
+            ],
+            "matchedExpression": "docs/tutorials/",
+            "logicalReference": "docs/tutorials/",
+            "legacyPath": "docs/tutorials/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":17,\"columnStart\":2,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":63,\"text\":\"docs/tutorials/\"}}"
+          },
+          {
+            "edgeId": "class4-l-000083",
+            "slotKey": "{\"edgeId\":\"class4-l-000083\",\"file\":\".agents/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-000083\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":64}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000083",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000083",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64,
+                "matchedExpression": "docs/reference/",
+                "originalLineText": "`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file"
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 36,
+                "columnStart": 21,
+                "line": 64,
+                "text": "docs/reference/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 36,
+                "columnStart": 21,
+                "line": 64,
+                "text": "docs/reference/"
+              }
+            ],
+            "matchedExpression": "docs/reference/",
+            "logicalReference": "docs/reference/",
+            "legacyPath": "docs/reference/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":36,\"columnStart\":21,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":63,\"text\":\"docs/reference/\"}}"
+          },
+          {
+            "edgeId": "class4-l-000084",
+            "slotKey": "{\"edgeId\":\"class4-l-000084\",\"file\":\".agents/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-000084\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":64}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000084",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000084",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64,
+                "matchedExpression": "docs/explanation/",
+                "originalLineText": "`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file"
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 57,
+                "columnStart": 40,
+                "line": 64,
+                "text": "docs/explanation/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 57,
+                "columnStart": 40,
+                "line": 64,
+                "text": "docs/explanation/"
+              }
+            ],
+            "matchedExpression": "docs/explanation/",
+            "logicalReference": "docs/explanation/",
+            "legacyPath": "docs/explanation/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":57,\"columnStart\":40,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":63,\"text\":\"docs/explanation/\"}}"
+          },
+          {
+            "edgeId": "class4-l-002083",
+            "slotKey": "{\"edgeId\":\"class4-l-002083\",\"file\":\"plugins/fgOS/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002083\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":63}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002083",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 63
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002083",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 63,
+                "matchedExpression": "docs/how-to/",
+                "originalLineText": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,"
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 62,
+                "columnStart": 50,
+                "line": 63,
+                "text": "docs/how-to/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 62,
+                "columnStart": 50,
+                "line": 63,
+                "text": "docs/how-to/"
+              }
+            ],
+            "matchedExpression": "docs/how-to/",
+            "logicalReference": "docs/how-to/",
+            "legacyPath": "docs/how-to/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: 'in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":62,\"columnStart\":50,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":62,\"text\":\"docs/how-to/\"}}"
+          },
+          {
+            "edgeId": "class4-l-002084",
+            "slotKey": "{\"edgeId\":\"class4-l-002084\",\"file\":\"plugins/fgOS/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002084\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":64}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002084",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002084",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64,
+                "matchedExpression": "docs/tutorials/",
+                "originalLineText": "`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file"
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 17,
+                "columnStart": 2,
+                "line": 64,
+                "text": "docs/tutorials/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 17,
+                "columnStart": 2,
+                "line": 64,
+                "text": "docs/tutorials/"
+              }
+            ],
+            "matchedExpression": "docs/tutorials/",
+            "logicalReference": "docs/tutorials/",
+            "legacyPath": "docs/tutorials/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":17,\"columnStart\":2,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":63,\"text\":\"docs/tutorials/\"}}"
+          },
+          {
+            "edgeId": "class4-l-002085",
+            "slotKey": "{\"edgeId\":\"class4-l-002085\",\"file\":\"plugins/fgOS/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":64}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002085",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002085",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64,
+                "matchedExpression": "docs/reference/",
+                "originalLineText": "`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file"
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 36,
+                "columnStart": 21,
+                "line": 64,
+                "text": "docs/reference/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 36,
+                "columnStart": 21,
+                "line": 64,
+                "text": "docs/reference/"
+              }
+            ],
+            "matchedExpression": "docs/reference/",
+            "logicalReference": "docs/reference/",
+            "legacyPath": "docs/reference/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":36,\"columnStart\":21,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":63,\"text\":\"docs/reference/\"}}"
+          },
+          {
+            "edgeId": "class4-l-002086",
+            "slotKey": "{\"edgeId\":\"class4-l-002086\",\"file\":\"plugins/fgOS/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002086\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":64}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002086",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002086",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 64,
+                "matchedExpression": "docs/explanation/",
+                "originalLineText": "`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file"
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 57,
+                "columnStart": 40,
+                "line": 64,
+                "text": "docs/explanation/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 57,
+                "columnStart": 40,
+                "line": 64,
+                "text": "docs/explanation/"
+              }
+            ],
+            "matchedExpression": "docs/explanation/",
+            "logicalReference": "docs/explanation/",
+            "legacyPath": "docs/explanation/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":57,\"columnStart\":40,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":63,\"text\":\"docs/explanation/\"}}"
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":62,\"columnStart\":50,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":62,\"text\":\"docs/how-to/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "core/skills/fgos-indexing/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 62,
+                "columnStart": 50,
+                "line": 62,
+                "text": "docs/how-to/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 62,
+                "columnStart": 50,
+                "line": 62,
+                "text": "docs/how-to/"
+              }
+            ],
+            "matchedExpression": "docs/how-to/",
+            "logicalReference": "docs/how-to/",
+            "legacyPath": "docs/how-to/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native reference exists at the author pin; no authority route change. Own source passage: 'in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-source-counterpart",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "core/skills/fgos-indexing/SKILL.md",
+              "columnEndExclusive": 62,
+              "columnStart": 50,
+              "line": 62,
+              "text": "docs/how-to/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "unitDispositionReason": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":62,\"columnStart\":50,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":62,\"text\":\"docs/how-to/\"}} Distinct claim: docs/how-to/ A51, L12-60/26/38/40/46: Retained native reference exists at the author pin; no authority route change. Own source passage: 'in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,'",
+            "preservedPathWitness": {
+              "path": "docs/how-to",
+              "state": "tree",
+              "treeMatchCount": 34,
+              "treeMatchesSha256": "d7ab1cd02e90111972961218b9e90b7b420477fc32bf853a32e72e1e1e73dd2c",
+              "treeSample": [
+                "docs/how-to/author-a-plan-loop-track.md",
+                "docs/how-to/check-rollup-progress.md"
+              ],
+              "historyCommitCount": 384,
+              "historyCommitsSha256": "b5ee61c7b8ea6e0292f002c79c60321da9a22540649d0f9b569f11e539ef8712",
+              "historySample": [
+                "bf56bdf1b43266cb37bd4244875be1402b435de6",
+                "0c61b49b5b3777b250bd7c077e587ca44448170c"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":17,\"columnStart\":2,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":63,\"text\":\"docs/tutorials/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "core/skills/fgos-indexing/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 17,
+                "columnStart": 2,
+                "line": 63,
+                "text": "docs/tutorials/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 17,
+                "columnStart": 2,
+                "line": 63,
+                "text": "docs/tutorials/"
+              }
+            ],
+            "matchedExpression": "docs/tutorials/",
+            "logicalReference": "docs/tutorials/",
+            "legacyPath": "docs/tutorials/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native reference exists at the author pin; no authority route change. Own source passage: '`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-source-counterpart",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "core/skills/fgos-indexing/SKILL.md",
+              "columnEndExclusive": 17,
+              "columnStart": 2,
+              "line": 63,
+              "text": "docs/tutorials/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/tutorials",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "f8eadb3ac8957795919fa4dcee7a21b150314dc4703b9e2083968211c6dd0929",
+              "treeSample": [
+                "docs/tutorials/.gitkeep"
+              ],
+              "historyCommitCount": 9,
+              "historyCommitsSha256": "e157f81bc70eee8e3cb671f3bdb0af43d795c1e7ba3c7169df1733fe81d72b44",
+              "historySample": [
+                "0b528b6e954e34acb9514ad41361d5250bb12bab",
+                "23fb220e309f82998a62ae4e62727bc405515035"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":36,\"columnStart\":21,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":63,\"text\":\"docs/reference/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "core/skills/fgos-indexing/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 36,
+                "columnStart": 21,
+                "line": 63,
+                "text": "docs/reference/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 36,
+                "columnStart": 21,
+                "line": 63,
+                "text": "docs/reference/"
+              }
+            ],
+            "matchedExpression": "docs/reference/",
+            "logicalReference": "docs/reference/",
+            "legacyPath": "docs/reference/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native reference exists at the author pin; no authority route change. Own source passage: '`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-source-counterpart",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "core/skills/fgos-indexing/SKILL.md",
+              "columnEndExclusive": 36,
+              "columnStart": 21,
+              "line": 63,
+              "text": "docs/reference/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/reference",
+              "state": "tree",
+              "treeMatchCount": 7,
+              "treeMatchesSha256": "3997baab65c7f3ce3ad6d37bb263031194f4693f7c30893659a3b4f18fdbb48a",
+              "treeSample": [
+                "docs/reference/claude-named-executor.md",
+                "docs/reference/codebase-scatter-consolidation-roadmap.md"
+              ],
+              "historyCommitCount": 126,
+              "historyCommitsSha256": "aeb926593b67a8b64a81fdede5c59199354b4fcfd150f065532b63935fb09a2d",
+              "historySample": [
+                "15c7e720ccc97c5817363a0da15cc74e15e71ac5",
+                "efbf76e8f9b0d1a8b60f490768e47145f0016998"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":57,\"columnStart\":40,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":63,\"text\":\"docs/explanation/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "core/skills/fgos-indexing/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 57,
+                "columnStart": 40,
+                "line": 63,
+                "text": "docs/explanation/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 57,
+                "columnStart": 40,
+                "line": 63,
+                "text": "docs/explanation/"
+              }
+            ],
+            "matchedExpression": "docs/explanation/",
+            "logicalReference": "docs/explanation/",
+            "legacyPath": "docs/explanation/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native reference exists at the author pin; no authority route change. Own source passage: '`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-source-counterpart",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "core/skills/fgos-indexing/SKILL.md",
+              "columnEndExclusive": 57,
+              "columnStart": 40,
+              "line": 63,
+              "text": "docs/explanation/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/explanation",
+              "state": "tree",
+              "treeMatchCount": 137,
+              "treeMatchesSha256": "9f8ac9966648b7305246c05ed8ff0dd90214425a7b6afd2338887bcd60043b91",
+              "treeSample": [
+                "docs/explanation/agy-permission-denylist-not-allowlist.md",
+                "docs/explanation/approve-cas-mismatch-block.md"
+              ],
+              "historyCommitCount": 852,
+              "historyCommitsSha256": "04ccff64191cee1dbec15b5fad845d0be971730be5699e9202c775e2c219a1d3",
+              "historySample": [
+                "699009f2b33b427ceca77889db543a6ae7af760c",
+                "8f746303682aba4e0da4d6f4d45d408f49870eec"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":30,\"columnStart\":14,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":20,\"text\":\"docs/<quadrant>/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "core/skills/fgos-indexing/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 20,
+                "columnStart": 14,
+                "columnEndExclusive": 30,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 20,
+                "columnStart": 14,
+                "columnEndExclusive": 30,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "matchedExpression": "docs/<quadrant>/",
+            "logicalReference": "docs/<quadrant>/",
+            "legacyPath": "docs/<quadrant>/",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-63: Retiring four-quadrant input layout; catalog input documents already exist under this root. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: 'exist under `docs/<quadrant>/`.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-63: Retiring four-quadrant input layout; catalog input documents already exist under this root. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: 'exist under `docs/<quadrant>/`.'",
+            "dependency": "L12-63: Retiring four-quadrant input layout; catalog input documents already exist under this root. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: 'exist under `docs/<quadrant>/`.'",
+            "blockedCategory": "description-rewrite",
+            "dependencyCategory": "description-rewrite",
+            "sweepOrigin": "L12-63-retiring-placeholder-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "core/skills/fgos-indexing/SKILL.md",
+              "line": 20,
+              "columnStart": 14,
+              "columnEndExclusive": 30,
+              "text": "docs/<quadrant>/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/<quadrant>/",
+              "passage": "exist under `docs/<quadrant>/`.",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/<quadrant>/",
+                  "hitCount": 6,
+                  "liveHitCount": 5,
+                  "hitsSha256": "278765d9e5f8995e1cbbdb672ce7daab07fb43ca283b6c25ed27ade3f1bb744c"
+                }
+              ],
+              "assessment": "L12-63: Retiring four-quadrant input layout; catalog input documents already exist under this root. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: 'exist under `docs/<quadrant>/`.'",
+              "hitGroups": [
+                {
+                  "query": "docs/<quadrant>/",
+                  "carriageCount": 1,
+                  "liveCount": 5,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-63: Retiring four-quadrant input layout; catalog input documents already exist under this root. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: 'exist under `docs/<quadrant>/`.'",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "parkSourceQuote": "exist under `docs/<quadrant>/`.",
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "exist under `docs/<quadrant>/`.",
+              "terms": [
+                "<quadrant>",
+                "enduser-docs",
+                "read-by-tag"
+              ],
+              "queries": [
+                {
+                  "term": "<quadrant>",
+                  "hitCount": 13,
+                  "liveHits": 12,
+                  "hitsSha256": "4a181588e43debf2e3959d1c33777c5f2febe405579ad8a6b4d641e144a8e5b4",
+                  "files": {
+                    "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/work-state/spec.md": {
+                      "live": 3,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+                      "line": 75,
+                      "text": "5. `fgos compound <root-id> --doc-type <quadrant> --doc-path ...` — same",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+                      "line": 170,
+                      "text": "6. `fgos compound <milestone-id> --doc-type <quadrant> --doc-path ...` —",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+                      "line": 164,
+                      "text": "fgos compound <id> --doc-type <quadrant> --doc-path docs/<quadrant>/<file>.md",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+                      "line": 165,
+                      "text": "fgos doc-sources docs/<quadrant>/<file>.md    # gather every linked capture first",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
+                      "line": 60,
+                      "text": "git -C \"$root\" add \"docs/<quadrant>/<file>.md\"",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+                      "line": 44,
+                      "text": "`fgos compound <id> --doc-type <quadrant> --doc-path <path>` — called a",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "enduser-docs",
+                  "hitCount": 122,
+                  "liveHits": 109,
+                  "hitsSha256": "5f960bed38af7097ff590664119dbd75640b21d3461e528268eaf9c1a5c7aa59",
+                  "files": {
+                    "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md": {
+                      "live": 4,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is/docs-index-preserves-prior-id-when-the-store-is-unreachable.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/P04.2.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/doer-report.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/reviewer-report.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/code-implementation-track-policy/p01.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P07.1.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/config-precedence/doctor-output-under-fake-global-home.json": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/component-boundary.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md": {
+                      "live": 0,
+                      "carriage": 2
+                    },
+                    "docs/platform/documentation/switchboard.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/packaging-distribution/history/distribution-baseline.md": {
+                      "live": 0,
+                      "carriage": 4
+                    },
+                    "docs/platform/packaging-distribution/spec.md": {
+                      "live": 0,
+                      "carriage": 3
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 2
+                    },
+                    "docs/platform/runner/decisions/h-36d872fbb0e5.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/system-overview/spec.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/work-state/spec.md": {
+                      "live": 10,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+                      "line": 57,
+                      "text": "`docs/enduser-docs-index.json`, a real file outside `.fgos/`; it should",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+                      "line": 54,
+                      "text": "`docs/explanation/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md`)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+                      "line": 91,
+                      "text": "compound-learn-enduser-docs (bước-3, `enduser-index.mjs` itself);",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+                      "line": 135,
+                      "text": "- scan and write `docs/enduser-docs-index.json` inside the **worktree's",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+                      "line": 14,
+                      "text": "`docs/enduser-docs-index.json` as a side effect of `npm test`.",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+                      "line": 79,
+                      "text": "docs/enduser-docs-index.json` (or any similar guard) failing on the very",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "read-by-tag",
+                  "hitCount": 3,
+                  "liveHits": 0,
+                  "hitsSha256": "b9985115c1aa93e74dcad0a808496c5914b2fa5ef4d8eefdf9d47d39176243f2",
+                  "files": {
+                    "docs/platform/packaging-distribution/history/distribution-baseline.md": {
+                      "live": 0,
+                      "carriage": 2
+                    },
+                    "docs/platform/packaging-distribution/spec.md": {
+                      "live": 0,
+                      "carriage": 1
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+                      "line": 264,
+                      "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |",
+                      "carriage": true
+                    },
+                    {
+                      "file": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+                      "line": 285,
+                      "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |",
+                      "carriage": true
+                    },
+                    {
+                      "file": "docs/platform/packaging-distribution/spec.md",
+                      "line": 571,
+                      "text": "  guides, design-rationale docs, and the read-by-tag index) — every link the",
+                      "carriage": true
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-63: Retiring four-quadrant input layout; catalog input documents already exist under this root. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: 'exist under `docs/<quadrant>/`.'"
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\".agents/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":30,\"columnStart\":14,\"file\":\".agents/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":21,\"text\":\"docs/<quadrant>/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": ".agents/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 14,
+                "columnEndExclusive": 30,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 14,
+                "columnEndExclusive": 30,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "matchedExpression": "docs/<quadrant>/",
+            "logicalReference": "docs/<quadrant>/",
+            "legacyPath": "docs/<quadrant>/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-63: exact equal-passage canonical source join; no render diff. Source outcome: parked. Own render passage: 'exist under `docs/<quadrant>/`.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-63-retiring-placeholder-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": ".agents/skills/fgos-indexing/SKILL.md",
+              "line": 21,
+              "columnStart": 14,
+              "columnEndExclusive": 30,
+              "text": "docs/<quadrant>/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":30,\"columnStart\":14,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":20,\"text\":\"docs/<quadrant>/\"}}",
+            "sourceDisposition": "parked"
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"plugins/fgOS/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":30,\"columnStart\":14,\"file\":\"plugins/fgOS/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":21,\"text\":\"docs/<quadrant>/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 14,
+                "columnEndExclusive": 30,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 14,
+                "columnEndExclusive": 30,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "matchedExpression": "docs/<quadrant>/",
+            "logicalReference": "docs/<quadrant>/",
+            "legacyPath": "docs/<quadrant>/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-63: exact equal-passage canonical source join; no render diff. Source outcome: parked. Own render passage: 'exist under `docs/<quadrant>/`.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-63-retiring-placeholder-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+              "line": 21,
+              "columnStart": 14,
+              "columnEndExclusive": 30,
+              "text": "docs/<quadrant>/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":30,\"columnStart\":14,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":20,\"text\":\"docs/<quadrant>/\"}}",
+            "sourceDisposition": "parked"
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":52,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":41,\"text\":\"docs/<quadrant>/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "core/skills/fgos-indexing/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 41,
+                "columnStart": 52,
+                "columnEndExclusive": 68,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 41,
+                "columnStart": 52,
+                "columnEndExclusive": 68,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "matchedExpression": "docs/<quadrant>/",
+            "logicalReference": "docs/<quadrant>/",
+            "legacyPath": "docs/<quadrant>/",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-63: Retiring four-quadrant input layout; docs-index enumerates all documents from these four directories. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: '`fgos docs-index` enumerates every document under `docs/<quadrant>/`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-63: Retiring four-quadrant input layout; docs-index enumerates all documents from these four directories. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: '`fgos docs-index` enumerates every document under `docs/<quadrant>/`'",
+            "dependency": "L12-63: Retiring four-quadrant input layout; docs-index enumerates all documents from these four directories. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: '`fgos docs-index` enumerates every document under `docs/<quadrant>/`'",
+            "blockedCategory": "description-rewrite",
+            "dependencyCategory": "description-rewrite",
+            "sweepOrigin": "L12-63-retiring-placeholder-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "core/skills/fgos-indexing/SKILL.md",
+              "line": 41,
+              "columnStart": 52,
+              "columnEndExclusive": 68,
+              "text": "docs/<quadrant>/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/<quadrant>/",
+              "passage": "`fgos docs-index` enumerates every document under `docs/<quadrant>/`",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/<quadrant>/",
+                  "hitCount": 6,
+                  "liveHitCount": 5,
+                  "hitsSha256": "278765d9e5f8995e1cbbdb672ce7daab07fb43ca283b6c25ed27ade3f1bb744c"
+                }
+              ],
+              "assessment": "L12-63: Retiring four-quadrant input layout; docs-index enumerates all documents from these four directories. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: '`fgos docs-index` enumerates every document under `docs/<quadrant>/`'",
+              "hitGroups": [
+                {
+                  "query": "docs/<quadrant>/",
+                  "carriageCount": 1,
+                  "liveCount": 5,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-63: Retiring four-quadrant input layout; docs-index enumerates all documents from these four directories. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: '`fgos docs-index` enumerates every document under `docs/<quadrant>/`'",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "parkSourceQuote": "`fgos docs-index` enumerates every document under `docs/<quadrant>/`",
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "`fgos docs-index` enumerates every document under `docs/<quadrant>/`",
+              "terms": [
+                "<quadrant>",
+                "enduser-docs",
+                "read-by-tag"
+              ],
+              "queries": [
+                {
+                  "term": "<quadrant>",
+                  "hitCount": 13,
+                  "liveHits": 12,
+                  "hitsSha256": "4a181588e43debf2e3959d1c33777c5f2febe405579ad8a6b4d641e144a8e5b4",
+                  "files": {
+                    "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/work-state/spec.md": {
+                      "live": 3,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+                      "line": 75,
+                      "text": "5. `fgos compound <root-id> --doc-type <quadrant> --doc-path ...` — same",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+                      "line": 170,
+                      "text": "6. `fgos compound <milestone-id> --doc-type <quadrant> --doc-path ...` —",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+                      "line": 164,
+                      "text": "fgos compound <id> --doc-type <quadrant> --doc-path docs/<quadrant>/<file>.md",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+                      "line": 165,
+                      "text": "fgos doc-sources docs/<quadrant>/<file>.md    # gather every linked capture first",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
+                      "line": 60,
+                      "text": "git -C \"$root\" add \"docs/<quadrant>/<file>.md\"",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+                      "line": 44,
+                      "text": "`fgos compound <id> --doc-type <quadrant> --doc-path <path>` — called a",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "enduser-docs",
+                  "hitCount": 122,
+                  "liveHits": 109,
+                  "hitsSha256": "5f960bed38af7097ff590664119dbd75640b21d3461e528268eaf9c1a5c7aa59",
+                  "files": {
+                    "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md": {
+                      "live": 4,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is/docs-index-preserves-prior-id-when-the-store-is-unreachable.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/P04.2.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/doer-report.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/reviewer-report.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/code-implementation-track-policy/p01.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P07.1.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/config-precedence/doctor-output-under-fake-global-home.json": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/component-boundary.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md": {
+                      "live": 0,
+                      "carriage": 2
+                    },
+                    "docs/platform/documentation/switchboard.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/packaging-distribution/history/distribution-baseline.md": {
+                      "live": 0,
+                      "carriage": 4
+                    },
+                    "docs/platform/packaging-distribution/spec.md": {
+                      "live": 0,
+                      "carriage": 3
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 2
+                    },
+                    "docs/platform/runner/decisions/h-36d872fbb0e5.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/system-overview/spec.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/work-state/spec.md": {
+                      "live": 10,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+                      "line": 57,
+                      "text": "`docs/enduser-docs-index.json`, a real file outside `.fgos/`; it should",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+                      "line": 54,
+                      "text": "`docs/explanation/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md`)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+                      "line": 91,
+                      "text": "compound-learn-enduser-docs (bước-3, `enduser-index.mjs` itself);",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+                      "line": 135,
+                      "text": "- scan and write `docs/enduser-docs-index.json` inside the **worktree's",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+                      "line": 14,
+                      "text": "`docs/enduser-docs-index.json` as a side effect of `npm test`.",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+                      "line": 79,
+                      "text": "docs/enduser-docs-index.json` (or any similar guard) failing on the very",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "read-by-tag",
+                  "hitCount": 3,
+                  "liveHits": 0,
+                  "hitsSha256": "b9985115c1aa93e74dcad0a808496c5914b2fa5ef4d8eefdf9d47d39176243f2",
+                  "files": {
+                    "docs/platform/packaging-distribution/history/distribution-baseline.md": {
+                      "live": 0,
+                      "carriage": 2
+                    },
+                    "docs/platform/packaging-distribution/spec.md": {
+                      "live": 0,
+                      "carriage": 1
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+                      "line": 264,
+                      "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |",
+                      "carriage": true
+                    },
+                    {
+                      "file": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+                      "line": 285,
+                      "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |",
+                      "carriage": true
+                    },
+                    {
+                      "file": "docs/platform/packaging-distribution/spec.md",
+                      "line": 571,
+                      "text": "  guides, design-rationale docs, and the read-by-tag index) — every link the",
+                      "carriage": true
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-63: Retiring four-quadrant input layout; docs-index enumerates all documents from these four directories. Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on the docs/knowledge layout before changing this input contract. Own source passage: '`fgos docs-index` enumerates every document under `docs/<quadrant>/`'"
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\".agents/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":52,\"file\":\".agents/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":42,\"text\":\"docs/<quadrant>/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": ".agents/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 42,
+                "columnStart": 52,
+                "columnEndExclusive": 68,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 42,
+                "columnStart": 52,
+                "columnEndExclusive": 68,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "matchedExpression": "docs/<quadrant>/",
+            "logicalReference": "docs/<quadrant>/",
+            "legacyPath": "docs/<quadrant>/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-63: exact equal-passage canonical source join; no render diff. Source outcome: parked. Own render passage: '`fgos docs-index` enumerates every document under `docs/<quadrant>/`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-63-retiring-placeholder-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": ".agents/skills/fgos-indexing/SKILL.md",
+              "line": 42,
+              "columnStart": 52,
+              "columnEndExclusive": 68,
+              "text": "docs/<quadrant>/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":52,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":41,\"text\":\"docs/<quadrant>/\"}}",
+            "sourceDisposition": "parked"
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"plugins/fgOS/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":52,\"file\":\"plugins/fgOS/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":42,\"text\":\"docs/<quadrant>/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 42,
+                "columnStart": 52,
+                "columnEndExclusive": 68,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 42,
+                "columnStart": 52,
+                "columnEndExclusive": 68,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "matchedExpression": "docs/<quadrant>/",
+            "logicalReference": "docs/<quadrant>/",
+            "legacyPath": "docs/<quadrant>/",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-63: exact equal-passage canonical source join; no render diff. Source outcome: parked. Own render passage: '`fgos docs-index` enumerates every document under `docs/<quadrant>/`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-63-retiring-placeholder-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+              "line": 42,
+              "columnStart": 52,
+              "columnEndExclusive": 68,
+              "text": "docs/<quadrant>/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":52,\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":41,\"text\":\"docs/<quadrant>/\"}}",
+            "sourceDisposition": "parked"
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"skills-085\",\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-085\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":62}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"skills-085\",\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-085\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":62}]}": {
+                "sourcePassage": "in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,",
+                "adjacentPassage": "This skill's manifest supersedes **only** the end-user-docs pointer bullet\nin `docs/specs/reading-map.md` (the line naming `docs/how-to/`,\n`docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file\nitself stays the whole-repo canonical first-read and every other entry in\nit is unaffected — this skill never removes or restructures\n`reading-map.md`, it only keeps that one pointer accurate: it now names\n`docs/enduser-docs-index.json` as the machine-readable read-by-tag index,\nin place of a hand-maintained prose description of the four directories.",
+                "target": "docs/reading-map.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+                "targetEvidence": [
+                  {
+                    "line": 122,
+                    "text": "## 5. Detailed Product And Source Map"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  }
+                },
+                "assessment": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+              }
+            },
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {
+            "{\"edgeId\":\"skills-085\",\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-085\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":62}]}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+              "passage": "## 5. Detailed Product And Source Map",
+              "targetEvidenceLine": 122,
+              "targetLines": [
+                122
+              ],
+              "targetLineText": [
+                "## 5. Detailed Product And Source Map"
+              ],
+              "sourceLocatorTokens": []
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"skills-085\",\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-085\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":62}]}": {
+              "replacement": "docs/reading-map.md#5-detailed-product-and-source-map",
+              "resolvedTarget": "docs/reading-map.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"skills-085\",\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-085\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":62}]}": {
+              "source": "docs/specs/reading-map.md",
+              "replacement": "docs/reading-map.md#5-detailed-product-and-source-map",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-030",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [
+          {
+            "sourcePath": "core/skills/fgos-indexing/SKILL.md",
+            "sourceDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+            "renderFiles": [
+              {
+                "path": ".agents/skills/fgos-indexing/SKILL.md",
+                "digest": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+                "sourceDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+                "headerWitnesses": [
+                  {
+                    "line": 13,
+                    "text": "<!-- Generated by fgOS skill assembly from core/skills/fgos-indexing/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "core/skills/fgos-indexing/SKILL.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-043",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-043",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 63
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "L12-60-complete-source-line-correspondence",
+                      "oldLine": 63,
+                      "line": 63,
+                      "columnStart": 5,
+                      "columnEndExclusive": 30,
+                      "text": "docs/specs/reading-map.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": ".claude/skills/fgos-indexing/SKILL.md",
+                "digest": "9259337c685dab5a1627c837f2b3a81c04bd630e9d7ed013e2bf1b4ab8bd6cce",
+                "sourceDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+                "headerWitnesses": [],
+                "censusSourcePath": "core/skills/fgos-indexing/SKILL.md",
+                "existingEdgeJoins": [],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null,
+                "generatorDoor": "npm run build:skills",
+                "wrapperProvenance": "L12-60(6): thin wrappers are build:skills outputs."
+              },
+              {
+                "path": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+                "digest": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+                "sourceDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+                "headerWitnesses": [
+                  {
+                    "line": 13,
+                    "text": "<!-- Generated by fgOS skill assembly from core/skills/fgos-indexing/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "core/skills/fgos-indexing/SKILL.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-176",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-176",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 63
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "L12-60-complete-source-line-correspondence",
+                      "oldLine": 63,
+                      "line": 63,
+                      "columnStart": 5,
+                      "columnEndExclusive": 30,
+                      "text": "docs/specs/reading-map.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              }
+            ]
+          }
+        ],
+        "wholeFileRead": {
+          "file": "core/skills/fgos-indexing/SKILL.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+          "bytes": 3844,
+          "lines": 84,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "instruction": "Read the complete file, all slots/joins and target passages at author pin. Only new retiring-placeholder slots change outcomes; normalized duplicate rows retain every original census identity and outcome. No checker/probe/author scripts. Return one whole-file verdict across streamed parts."
+    }
+  ]
+}
