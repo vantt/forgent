@@ -15,6 +15,7 @@
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
 import { resolvePanelRoles } from './patterns/panel.mjs';
+import { debateSeatLaunches } from './patterns/debate.mjs';
 import { resolveCheckers } from './patterns/reviewed.mjs';
 
 export const PORT_MISSING = 'case-admission-port-missing';
@@ -75,6 +76,8 @@ export function seatLaunchesOf({ pattern, unit, runnerConfig }) {
       const { panelists } = resolvePanelRoles(runnerConfig, {}, params);
       return panelists.length + 1;
     }
+    case 'debate':
+      return debateSeatLaunches(params);
     default:
       return null;
   }

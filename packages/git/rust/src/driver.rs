@@ -687,7 +687,16 @@ impl GitDriver {
             *cache = Some(fresh);
             return Ok(records);
         }
-        Ok(self.validated_config(repo, None, Policy::Inspect, None)?.records)
+        // The same config door serves Inspect and Publication. Every use
+        // rechecks source stamps, including missing files; no HEAD/ref fact
+        // is retained between commands. A refusal keeps the last good stamp
+        // so a long-lived read handle can recover after a config repair.
+        let mut cache = self.publication_config.lock()
+            .map_err(|_| refusal("config-cache-poisoned"))?;
+        let fresh = self.validated_config(repo, cache.get(&repo.git_dir), Policy::Inspect, None)?;
+        let records = fresh.records.clone();
+        cache.insert(repo.git_dir.clone(), fresh);
+        Ok(records)
     }
     /// Read-only diagnostic shared with Remote admission. Scope, rather than
     /// origin spelling, determines trust even for linked worktrees and symlinks.

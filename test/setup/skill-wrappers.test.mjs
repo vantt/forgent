@@ -306,7 +306,12 @@ test('assembleSkills prunes orphaned skills from .agents/skills when removed fro
   writeSkill(path.join(root, 'core', 'skills'), 'skill-active', SAMPLE_FRONTMATTER, '# Active\n');
 
   const targetAgentsSkills = path.join(root, '.agents', 'skills');
-  writeSkill(targetAgentsSkills, 'skill-orphaned', SAMPLE_FRONTMATTER, '# Orphaned\n');
+  // Assembled once from a source that is then removed: fgOS wrote it, so it is stale.
+  writeSkill(path.join(root, 'core', 'skills'), 'skill-orphaned', SAMPLE_FRONTMATTER, '# Orphaned\n');
+  assembleSkills(root);
+  fs.rmSync(path.join(root, 'core', 'skills', 'skill-orphaned'), { recursive: true, force: true });
+  // Installed by another tool: no generated header, must survive.
+  writeSkill(targetAgentsSkills, 'ak-cook', SAMPLE_FRONTMATTER, '# Third party\n');
 
   assert.ok(fs.existsSync(path.join(targetAgentsSkills, 'skill-orphaned')));
 
@@ -314,6 +319,7 @@ test('assembleSkills prunes orphaned skills from .agents/skills when removed fro
 
   assert.ok(fs.existsSync(path.join(targetAgentsSkills, 'skill-active')));
   assert.equal(fs.existsSync(path.join(targetAgentsSkills, 'skill-orphaned')), false);
+  assert.ok(fs.existsSync(path.join(targetAgentsSkills, 'ak-cook', 'SKILL.md')));
 });
 
 test('generateAllSkillWrappers prunes orphaned wrappers from .claude/skills when source skill is gone', () => {

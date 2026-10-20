@@ -12,7 +12,7 @@ function agent(providerModel, command = providerModel) {
 }
 
 /** Run one check with `runner` as the project runner section and `globalRunner` as the global one. */
-function runCheck(id, runner, globalRunner) {
+function runCheck(id, runner, globalRunner, setup) {
   const dir = mkTemp('model-pool-check-');
   const home = mkTemp('model-pool-check-home-');
   try {
@@ -26,6 +26,7 @@ function runCheck(id, runner, globalRunner) {
         ...runner,
       },
     }));
+    setup?.(dir);
     if (globalRunner) {
       fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
       fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: globalRunner }));
@@ -44,6 +45,23 @@ test('executor-family-unique passes with one executor per family and names both 
   const two = runCheck('executor-family-unique', { executors: { claude: agent('claude'), 'claude-herdr': agent('claude') } });
   assert.equal(two.passed, false);
   assert.match(two.message, /claude \(claude, claude-herdr\)/);
+});
+
+test('executor-skills-installed passes when the declared skill is installed and fails naming the missing path', () => {
+  const executors = { claude: { ...agent('claude'), supports: { skills: ['ak:cook'] } }, openai: agent('openai', 'codex') };
+  const missing = runCheck('executor-skills-installed', { executors });
+  assert.equal(missing.passed, false);
+  assert.match(missing.message, /claude declares ak:cook but \.claude\/skills\/ak-cook\/SKILL\.md is missing/);
+
+  const installed = runCheck('executor-skills-installed', { executors }, undefined, (dir) => {
+    fs.mkdirSync(path.join(dir, '.claude', 'skills', 'ak-cook'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.claude', 'skills', 'ak-cook', 'SKILL.md'), '# ak:cook\n');
+  });
+  assert.equal(installed.passed, true, installed.message);
+  assert.match(installed.message, /1 declared executor skill/);
+
+  const none = runCheck('executor-skills-installed', { executors: { claude: agent('claude') } });
+  assert.equal(none.passed, true);
 });
 
 test('model-policy-pools is quiet without a named pool and warns about a pool runner.llmAccounts lacks', () => {

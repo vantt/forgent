@@ -1,4 +1,4 @@
-//! Read-only observations. No recovery, receipt writes, locks or configuration writes.
+//! Read-only observations. No recovery, receipt writes or configuration writes; age reads hold the append lock.
 use crate::{
     errors::{io, Error},
     layout::{Layout, StreamId},
@@ -66,6 +66,17 @@ pub fn facts(
     Ok(
         json!({"commonDir":repo.common_dir(),"trustedMain":repo.trusted_main_root(),"openRoot":layout.root,"floor":{"supported":floor.supported,"version":floor.version,"minimum":floor.minimum,"probes":floor.probes.iter().map(|p|json!({"passed":p.passed,"name":p.name,"evidence":p.evidence})).collect::<Vec<_>>()},"remote":remote,"remoteFact":urls,"fetchRefspecs":fetch.iter().map(|f| String::from_utf8_lossy(&f.value)).collect::<Vec<_>>(),"pushRefspecs":push.iter().map(|f| String::from_utf8_lossy(&f.value)).collect::<Vec<_>>(),"expectedFetchRefspecs":crate::refspec::mappings(remote)?,"provenance":provenance.map(|p|json!({"url":p.remote_url,"refspecs":p.refspecs})),"machineId":machine.as_ref().ok(),"machineError":machine.err().map(|e|e.to_string()),"guarantee":guarantee.to_json()}),
     )
+}
+/// Trigger observations from local open files and sync receipts only.
+/// Never inspects refs, worktrees or legacy history; this is not integrity status.
+pub fn maintenance(layout: &Layout) -> Result<Value, Error> {
+    let mut rows = Vec::new();
+    for stream in streams(layout)? {
+        let age = crate::seal::oldest_unsealed_age_sec(layout, std::slice::from_ref(&stream))?;
+        rows.push(json!({"stream":stream.as_str(),"oldestUnsealedAgeSec":age}));
+    }
+    let sync = crate::sync::sync_status(layout)?;
+    Ok(json!({"streams":rows,"lastPush":sync.last_push}))
 }
 pub fn status(
     driver: &GitDriver,

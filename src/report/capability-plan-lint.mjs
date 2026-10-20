@@ -59,6 +59,7 @@ const KNOWN_PATTERNS = Object.freeze(new Set([
   'solo',
   'reviewed',
   'panel',
+  'debate',
   'code-change',
   'consult',
   'research-fan-out',

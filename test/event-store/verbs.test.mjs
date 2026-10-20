@@ -64,7 +64,7 @@ test('status identifies deferred predecessors explicitly and exports no deferred
 });
 
 test('rebuild resolves shipped consumer contracts, removes both caches and refolds from real events', async t => {
-  const { root } = await import('../helpers/git-addon.mjs');
+  const { root } = await import('../../scripts/git-addon.mjs');
   const { execFileSync } = await import('node:child_process');
   const { pathToFileURL } = await import('node:url');
   const f = fixture(t); append(f.store, [{}]);

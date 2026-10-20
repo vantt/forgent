@@ -14,6 +14,9 @@ pub struct Cursor {
     pub project_order: bool,
     pub cover: Positions,
     pub certified: BTreeSet<String>,
+    /// Exact ref-to-object bindings verified for this retained view.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub verified_tips: BTreeMap<String, String>,
     pub mirror_tips: BTreeMap<String, String>,
     pub legacy_tips: BTreeMap<String, String>,
     pub legacy_digest: Option<String>,
@@ -44,6 +47,7 @@ impl Cursor {
             || c.mirror_tips
                 .iter()
                 .chain(&c.legacy_tips)
+                .chain(&c.verified_tips)
                 .any(|(name, oid)| {
                     fgos_git::RefName::parse(name).is_err()
                         || !crate::validation::valid_object_id(oid)

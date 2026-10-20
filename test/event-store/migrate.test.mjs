@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { root } from '../helpers/git-addon.mjs';
+import { root } from '../../scripts/git-addon.mjs';
 import { fixture, addon, loaderOptions } from './phase07-fixture.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
 import { migrationParity, migrateUseCase, importPlan, cutoverFailure } from '../../src/verbs/events/migrate.mjs';

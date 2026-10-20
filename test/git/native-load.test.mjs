@@ -7,7 +7,7 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import { Worker } from 'node:worker_threads';
-import { ensureGitAddon, root } from '../helpers/git-addon.mjs';
+import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { createGitPublication } from '../../src/git/index.mjs';
 import { openStore } from '../../src/event-store/index.mjs';

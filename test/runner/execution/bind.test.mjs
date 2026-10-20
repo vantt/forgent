@@ -974,3 +974,16 @@ test('bind skills: checker and panel seats are chosen on independence, not on th
   const reviewer = bind({ unit, role: 'reviewer', readOnly: true, independentOf: ['claude'] }, { runnerConfig: skillsConfig(), session: { headless: true } });
   assert.equal(reviewer.executor, 'codex');
 });
+
+test('bind: debate roles never run inline or in-process and are not asked for the unit skills', () => {
+  const runnerConfig = createMockRunnerConfig();
+  const unit = { id: 'u-debate', capability: 'unknown:verb', writes: [] };
+  const ctx = { runnerConfig, session: { headless: false, hasNativeAgent: true, provider: 'claude' } };
+  for (const role of ['thesis', 'antithesis', 'judge']) {
+    assert.ok(bind({ unit, role }, ctx).refused, `${role} is refused rather than falling back to the lead inline`);
+  }
+  const skilled = { id: 'u-skills', capability: 'docs:write', writes: [], skills: ['mermaid'] };
+  const judge = bind({ unit: skilled, role: 'judge', readOnly: true, independentOf: ['claude'] }, { runnerConfig: skillsConfig(), session: { headless: true } });
+  assert.equal(judge.executor, 'codex', 'a judge is chosen on independence alone');
+  assert.equal(judge.mechanism, 'out-of-process');
+});
