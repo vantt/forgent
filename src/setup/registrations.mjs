@@ -64,6 +64,7 @@ import {
 } from './workflow-pool-independence.mjs';
 import {
   checkExecutorFamilyUnique,
+  checkExecutorSkillsInstalled,
   checkTierFallback,
   checkModelPolicyPools,
   checkLlmAccountsShape,
@@ -1472,6 +1473,12 @@ registerCheck({
   id: 'executor-family-unique',
   description: 'each agent family (providerModel) is served by exactly one executor; its transports are invocations of that executor',
   check: (cwd) => checkExecutorFamilyUnique(cwd),
+});
+
+registerCheck({
+  id: 'executor-skills-installed',
+  description: 'every skill an executor declares in supports.skills exists in that runtime\'s skill directory of the main checkout; fails naming the missing path',
+  check: (cwd) => checkExecutorSkillsInstalled(cwd),
 });
 
 registerCheck({

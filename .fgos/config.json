@@ -789,6 +789,9 @@
             "medium",
             "high"
           ],
+          "skills": [
+            "ak:cook"
+          ],
           "systemPrompt": false,
           "toolGating": "allowedTools"
         },
@@ -1403,6 +1406,7 @@
   },
   "worktreeSetup": {
     "commands": [
+      "for d in .claude/skills .agents/skills .omp/skills .pi/skills .grok/skills; do [ -d \"$FGOS_REPO_ROOT/$d\" ] || continue; mkdir -p \"$d\"; for s in \"$FGOS_REPO_ROOT/$d\"/ak-*; do [ -d \"$s\" ] && cp -R \"$s\" \"$d/\"; done; done; true",
       "cargo build --release --workspace"
     ]
   },

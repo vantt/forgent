@@ -200,6 +200,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'tier-vocabulary-dead-keys',
       'model-policy-tier-coverage',
       'executor-family-unique',
+      'executor-skills-installed',
       'tier-fallback',
       'model-policy-pools',
       'llm-accounts-shape',
