@@ -259,6 +259,7 @@ Each phase lives in its own `phase-NN-*.md` file (AgentKit plan format). Phases 
 | 8 | Eliminate switchboard bypasses and prepare consumers | 07 | authorized (2026-10-19, A49); detailing | [phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md](phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md) |
 | 9 | Atomic platform-authority cutover | 08 | pending (not authorized) | [phase-09-atomic-platform-authority-cutover.md](phase-09-atomic-platform-authority-cutover.md) |
 | 10 | Post-cutover maintenance MVP | 09 | pending (not authorized) | [phase-10-post-cutover-maintenance-mvp.md](phase-10-post-cutover-maintenance-mvp.md) |
+| 11 | Retrospective post series | 10 | pending (owner request 2026-10-20; starts after this plan finishes) | [phase-11-retrospective-post-series.md](phase-11-retrospective-post-series.md) |
 
 ### 7.1. Detailed status and authorization (snapshot)
 
