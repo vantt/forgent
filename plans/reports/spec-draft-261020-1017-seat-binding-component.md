@@ -215,6 +215,14 @@ Chia theo việc phân biệt rõ được hay không, không theo việc hôm n
 | flagship | phán đoán, thiết kế, phản biện | kết quả là một ý kiến hay thiết kế? | review, phản biện, thiết kế giải pháp, tổng hợp hội đồng |
 | frontier | quyết định đắt giá nhất | quyết định khó đảo ngược, sai thì tốn kém lớn? | chốt kiến trúc, ghế tổng hợp cuối của hội đồng quan trọng |
 
+**Kiểm với các họ (research [261020-1339](research-261020-1339-model-family-tier-ladders.md), owner 13:45 đồng ý):** không họ nào có 6 model riêng; claude, openai, gemini đạt 6 mức khi tính mức suy luận; xai ~4–5, deepseek 4, glm 3–4. Quyết định:
+- Giữ 6 bậc làm chuẩn theo bản chất việc.
+- **Ô = model + mức suy luận tùy chọn** (vd opus ở flagship, opus + effort max ở frontier); thay việc nhúng mức suy luận vào tên model như gemini `flash-medium` hôm nay.
+- **Khai trùng có chủ đích** giữa hai bậc liền nhau được phép.
+- **Bậc mà họ không đạt chất lượng thì để trống, không khai đại.** Walk bỏ họ thiếu ô (B1 đã có); ghế ghim họ đó ở bậc trống → `tier-cell-missing` có tên; không bao giờ tự hạ. Doctor `model-policy-tier-coverage` (bắt đủ ô theo `rigorToTier`) được thay trong đợt chuyển đổi bằng luật này.
+- Đề xuất ô: deepseek nano/mini/standard `v4.1-flash`, advanced `v4-pro`, flagship/frontier **trống**; glm nano/mini/standard `glm-5.3-flash`, advanced `glm-5.3`, flagship/frontier **trống**.
+- Cập nhật model mới (openai `gpt-6-luna`, thay `gpt-5.6-sol`, xai `grok-4.7`, điền ô `mini` mọi họ) là một diff config riêng cho owner duyệt, sau khi land Seat Binding.
+
 **Định nghĩa phải nằm ngay cạnh config** (owner). Config là JSON, không có comment. Quyết định: **một nguồn** là hằng số định nghĩa thang trong component Seat Binding (cùng chỗ với từ vựng tier); `fgos setup` sinh khoá `"$comment"` (quy ước của JSON Schema, loader bỏ qua mọi khoá `$comment` ở mọi cấp) ngay cạnh `modelPolicies`, `tierFallback`, `maxTier` từ nguồn đó; doctor báo khi `$comment` lệch nguồn; `fgos dispatch explain` in định nghĩa bậc của ghế. Không chép tay (luật thiết kế 7). Phương án loại: đổi config sang JSONC/YAML (đổi định dạng mọi workspace, quá lớn); khoá dữ liệu `tiers` mang mô tả (hai nguồn sự thật cho một từ vựng cố định).
 
 ## 9. Câu hỏi cho owner
