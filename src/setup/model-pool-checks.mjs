@@ -12,6 +12,9 @@ import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { resolveTierCeiling } from '../runner/execution/bind.mjs';
 import { resolveTierModel } from '../runner/dispatch/resolve.mjs';
 import { loadGlobalConfig } from '../config/global-config.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 
 function loadOrExplain(cwd) {
   try {
@@ -39,6 +42,40 @@ export function checkExecutorFamilyUnique(cwd) {
     };
   }
   return { passed: true, message: `each of ${byFamily.size} agent families has one executor` };
+}
+
+// Where each agent family's CLI reads project skills from. A family not listed has no known
+// skill directory here, so its declared skills are reported as not checked rather than failed.
+const FAMILY_SKILL_DIRS = { claude: '.claude/skills', openai: '.agents/skills' };
+
+/**
+ * An executor that declares `supports.skills` is only truthful when the skill is really installed
+ * in its runtime's skill directory of the main checkout (a linked worktree has no copy of it
+ * until worktreeSetup provisions one). `ak:cook` lives in `ak-cook/SKILL.md`.
+ */
+export function checkExecutorSkillsInstalled(cwd) {
+  const { runnerConfig, skip } = loadOrExplain(cwd);
+  if (skip) return skip;
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const missing = [];
+  const unchecked = [];
+  let checked = 0;
+  for (const [id, entry] of Object.entries(runnerConfig.executors ?? {})) {
+    const skills = entry?.supports?.skills;
+    if (entry?.kind !== 'agent' || !Array.isArray(skills)) continue;
+    const family = deriveProviderFamily(entry);
+    const dir = FAMILY_SKILL_DIRS[family];
+    if (!dir) { unchecked.push(`${id} (family ${family})`); continue; }
+    for (const skill of skills) {
+      checked += 1;
+      if (!fs.existsSync(path.join(root, dir, skill.replaceAll(':', '-'), 'SKILL.md'))) {
+        missing.push(`${id} declares ${skill} but ${dir}/${skill.replaceAll(':', '-')}/SKILL.md is missing in ${root} -- install the skill for that runtime, or remove it from executors.${id}.supports.skills`);
+      }
+    }
+  }
+  if (missing.length > 0) return { passed: false, message: missing.join('; ') };
+  const note = unchecked.length > 0 ? `; not checked, no known skill directory: ${unchecked.join(', ')}` : '';
+  return { passed: true, message: `${checked} declared executor skill(s) installed${note}` };
 }
 
 /**

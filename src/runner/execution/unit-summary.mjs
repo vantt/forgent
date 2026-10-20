@@ -7,6 +7,7 @@ import { normalizeWorkflowLink } from './unit.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
 import { reviewedHistoryOutcome } from './patterns/reviewed.mjs';
 import { resolvePanelRoles, VALID_OUTCOMES } from './patterns/panel.mjs';
+import { debateHistoryOutcome, resolveDebateRoles } from './patterns/debate.mjs';
 
 // Version 2: every seat carries an owner-written kind, and a finished unit whose pattern was never
 // recorded is published as UNDETERMINED_OUTCOME instead of being derived as if it were solo.
@@ -61,6 +62,7 @@ function unitHasActiveRun(unitDir, record) {
 function patternHistoryOutcome(patternName, params, cfg, unit, history, panelRoles) {
   if (patternName === 'reviewed') return reviewedHistoryOutcome(unit, cfg, history, params);
   if (patternName === 'solo') return history.find((seat) => seat.role === (params.role || 'producer'))?.outcome ?? null;
+  if (patternName === 'debate') return debateHistoryOutcome(params, history);
   if (patternName !== 'panel') return null;
   const members = panelRoles.panelists.map(({ role }) => history.find((seat) => seat.role === role));
   if (members.some((seat) => !seat)) return null;
@@ -80,8 +82,10 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const { patternName, params } = pattern === null ? { patternName: null, params: {} } : resolvePattern(pattern);
   const cfg = record.configSnapshot?.runner ?? {};
   const panelRoles = patternName === 'panel' ? resolvePanelRoles(cfg, {}, params) : null;
+  const debateRoles = patternName === 'debate' ? resolveDebateRoles(params) : null;
   const kinds = new Map(panelRoles
-    ? [...panelRoles.panelists, panelRoles.synthesizer].map(({ role, kind }) => [role, kind]) : []);
+    ? [...panelRoles.panelists, panelRoles.synthesizer].map(({ role, kind }) => [role, kind])
+    : debateRoles ? [...debateRoles.sides, debateRoles.judge].map(({ role, kind }) => [role, kind]) : []);
   const options = record.unit?.stanceOptions ?? [];
   const rawSeats = readUnitRunSeats(unitDir);
   const settlementTimes = [];
@@ -115,7 +119,7 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
     return {
       role: seat.role,
       kind: patternName === null ? 'unknown'
-        : panelRoles ? kinds.get(seat.role) ?? 'unknown'
+        : panelRoles || debateRoles ? kinds.get(seat.role) ?? 'unknown'
         : patternName === 'solo' || seat.role === 'producer' ? 'producer'
           : seat.role === 'verify' || seat.role === 'verifier' ? 'verifier'
             : patternName === 'reviewed' ? 'checker' : 'unknown',

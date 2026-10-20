@@ -27,7 +27,7 @@ test('claude runs a claude REPL in a pane under the bwrap posture', () => {
 test('glm has no pane invocation: in a herdr pane GLM loops on one tool call, so it runs headless only', () => {
   assert.equal(invocation('glm'), undefined);
   assert.equal(runner.executors.glm.providerModel, 'z-ai');
-  assert.equal(runner.modelPolicies['z-ai'].standard, 'z-ai/glm-5.3');
+  assert.equal(runner.modelPolicies['z-ai'].standard, 'z-ai/glm-5.3-flash@openrouter');
 });
 
 test('glm is headless pi through OpenRouter, its key read from its login store, with no claude gateway variables', () => {

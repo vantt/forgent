@@ -133,9 +133,8 @@ export function resolveCapabilityDetailsFromHints({
 
 /**
  * Every entry of the cell cfg.modelPolicies[provider][tier], in order, as
- * `{model, pool, explicitPool}` (see `parseTierCell`). Entries served by a
- * pool other than the provider family's own are listed too; the lease cannot
- * run them yet, so only `explain` and doctor read them.
+ * `{model, pool, explicitPool}` (see `parseTierCell`), whichever pool serves
+ * them: each is a candidate of the seat's walk.
  * Valid tiers: nano | mini | standard | advanced | flagship | frontier.
  */
 export function resolveTierCandidates(cfg, tier, provider = 'claude') {
@@ -176,16 +175,13 @@ export function tierFallbackOf(cfg, tier) {
 }
 
 /**
- * Resolve a tier to the model name the provider family runs: the first entry
- * of cfg.modelPolicies[provider][tier] served by the family's own pool. A cell
- * that names only other pools has no model for this family yet.
+ * Resolve a tier to the model name the provider family runs first: the model of the first entry of
+ * cfg.modelPolicies[provider][tier], whichever pool serves it (the primary candidate of the seat's
+ * walk). Callers that need the pool, or whether the pool can serve the call, read the candidates:
+ * bind() expands every entry and drops the ones whose pool is unusable.
  */
 export function resolveTierModel(cfg, tier, provider = 'claude') {
-  const own = resolveTierCandidates(cfg, tier, provider).find((entry) => entry.pool === provider);
-  if (!own) {
-    throw new RunnerConfigError(`no model for tier "${tier}" in pool "${provider}"; the cell names only other pools.`);
-  }
-  return own.model;
+  return resolveTierCandidates(cfg, tier, provider)[0].model;
 }
 
 /**

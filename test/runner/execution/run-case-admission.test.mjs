@@ -325,5 +325,7 @@ test('the planned seat launches follow the pattern the run will use', () => {
   assert.equal(seatLaunchesOf({ pattern: 'reviewed', unit: { ...unit, rigor: 'high' }, runnerConfig: cfg }), 6);
   assert.equal(seatLaunchesOf({ pattern: 'code-change', unit, runnerConfig: cfg }) > 0, true);
   assert.equal(seatLaunchesOf({ pattern: { pattern: 'panel', params: { members: 3 } }, unit, runnerConfig: cfg }), 4, 'three panelists and the synthesizer');
+  assert.equal(seatLaunchesOf({ pattern: 'debate', unit, runnerConfig: cfg }), 5, 'two sides in two rounds and the judge');
+  assert.equal(seatLaunchesOf({ pattern: { pattern: 'debate', params: { rebuttal: false } }, unit, runnerConfig: cfg }), 3);
   assert.equal(seatLaunchesOf({ pattern: 'unheard-of', unit, runnerConfig: cfg }), null);
 });

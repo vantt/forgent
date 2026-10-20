@@ -85,6 +85,20 @@ impl EventStore {
             json!({"ack": result.ack, "events": result.events, "guarantee": guarantee(&result.guarantee)}),
         )
     }
+    #[napi(getter)]
+    pub fn own_origin(&self) -> Result<Option<String>> {
+        available()?;
+        match std::fs::symlink_metadata(self.layout.store()) {
+            Ok(_) => Ok(Some(
+                StoreIdentity::open(&self.layout, &self.machine)
+                    .map_err(error)?
+                    .store_id,
+            )),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+            Err(e) => Err(error(e)),
+        }
+    }
+
     #[napi]
     pub fn read_in_gate(&self, origin: String, stream: String, cursor_seq: f64) -> Result<Value> {
         available()?;
@@ -205,7 +219,13 @@ impl EventStore {
 #[napi]
 impl EventStore {
     #[napi]
-    pub fn seal(&self, stream: String, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<Value> {
+    pub fn seal(
+        &self,
+        stream: String,
+        held_ranks: Vec<u32>,
+        hot_lock_depth: u32,
+        opportunistic: Option<bool>,
+    ) -> Result<Value> {
         let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
         let stream = StreamId::parse(&stream).map_err(error)?;
         Ok(sealed(
@@ -218,7 +238,7 @@ impl EventStore {
                     stream: &stream,
                     held_ranks: &held_ranks,
                     hot_lock_depth,
-                    opportunistic: false,
+                    opportunistic: opportunistic.unwrap_or(false),
                 },
             )
             .map_err(error)?,
@@ -272,6 +292,58 @@ impl EventStore {
         Ok(Value::Array(results.into_iter().map(sealed).collect()))
     }
     #[napi]
+    pub fn promote(
+        &self,
+        request: Value,
+        held_ranks: Vec<u32>,
+        hot_lock_depth: u32,
+    ) -> Result<Value> {
+        let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
+        if let Some(reason) = &self.write_refusal {
+            return Err(error(reason));
+        }
+        #[derive(Deserialize)]
+        #[serde(rename_all = "camelCase", deny_unknown_fields)]
+        struct Request {
+            branch: String,
+            through_seq: u64,
+            cursor: append::Positions,
+            writer: String,
+            ts: String,
+        }
+        let Request {
+            branch,
+            through_seq,
+            cursor,
+            writer,
+            ts,
+        } = serde_json::from_value(request).map_err(error)?;
+        if !(1..=9_007_199_254_740_991).contains(&through_seq) {
+            return Err(error("invalid promote sequence"));
+        }
+        let branch = StreamId::parse(&branch).map_err(error)?;
+        serde_json::to_value(
+            fgos_event_store::promote::promote(
+                driver,
+                repo,
+                &self.registry,
+                fgos_event_store::promote::PromoteRequest {
+                    layout: &self.layout,
+                    machine,
+                    branch: &branch,
+                    through_seq,
+                    writer: &writer,
+                    ts: &ts,
+                    cursor: &cursor,
+                    held_ranks: &held_ranks,
+                    hot_lock_depth,
+                },
+            )
+            .map_err(error)?,
+        )
+        .map_err(error)
+    }
+    #[napi]
     pub fn sync(
         &self,
         remote: String,
@@ -294,6 +366,11 @@ impl EventStore {
         )
         .map_err(error)?;
         Ok(json!({"mirrorsChanged":result.mirrors_changed,"warnings":result.warnings}))
+    }
+    #[napi]
+    pub fn maintenance(&self, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<Value> {
+        self.context(&held_ranks, hot_lock_depth)?;
+        fgos_event_store::diagnostics::maintenance(&self.layout).map_err(error)
     }
     #[napi]
     pub fn unpublished_summary(
@@ -527,7 +604,8 @@ impl EventStore {
         if check {
             fgos_event_store::legacy_import::ensure_clean(driver, repo, &inv).map_err(error)?;
         }
-        let (data_tree, legacy_oid) = fgos_event_store::legacy_import::import_identity(driver, repo, &inv).map_err(error)?;
+        let (data_tree, legacy_oid) =
+            fgos_event_store::legacy_import::import_identity(driver, repo, &inv).map_err(error)?;
         let existing_legacy = match driver
             .resolve_ref(
                 repo,
@@ -574,4 +652,27 @@ impl EventStore {
         let (driver, repo, _) = self.context(&held_ranks, hot_lock_depth)?;
         fgos_event_store::legacy_import::legacy_layout(driver, repo).map_err(error)
     }
+}
+
+/// Frozen legacy decoding for migration/export proofs; no filesystem discovery.
+#[napi]
+pub fn decode_legacy_files(files: std::collections::BTreeMap<String, String>) -> Result<Value> {
+    available()?;
+    let mut events = Vec::new();
+    for (file, raw) in files {
+        events.extend(fgos_event_store::legacy::parse_file(&file, &raw).map_err(error)?);
+    }
+    Ok(Value::Array(
+        fgos_event_store::legacy::order(events)
+            .into_iter()
+            .map(|e| json!({"raw": e.raw, "provenance": e.provenance}))
+            .collect(),
+    ))
+}
+
+/// The crate owns branch stream naming; adapters must not reimplement it.
+#[napi]
+pub fn event_store_branch_key(branch: String) -> Result<String> {
+    available()?;
+    fgos_event_store::layout::branch_key(&branch).map_err(error)
 }

@@ -7,7 +7,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import * as gitPorts from '../../src/git/index.mjs';
-import { root } from '../helpers/git-addon.mjs';
+import { root } from '../../scripts/git-addon.mjs';
 import { fixture } from './phase07-fixture.mjs';
 import { trackedLegacy } from './phase08-fixture.mjs';
 import { migrateUseCase } from '../../src/verbs/events/migrate.mjs';

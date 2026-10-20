@@ -701,7 +701,7 @@ Both tasks ran on 2026-10-17 in run `wf-run-1792224866445-9a03a834`. Their findi
 8. **Latency and IPC (V-SPAWN-01 on ext4):** the N-API route meets parts (a) and (b) of the section 17 budget. `strace` over the gate window confirms 0 spawns inside the gate. Lock-convoy behavior is profiled at 15 and 20 sessions.
 9. **Native addon distribution:** the addon loads on every supported platform and for every Node ABI the payload supports, in both the npm package and the legacy-node payload. Activation refuses a payload without it, and `event-store-native-addon` has setup and doctor vectors.
 10. **Filesystem crash consistency:** a power-loss simulation on ext4 (for example `dm-flakey` or a hard VM reset) loses no acked event. Doctor reports the guarantee level per filesystem. APFS, NTFS and WSL2 stay unsupported claims until they are measured.
-11. **V-DOOR-01:** `rg` finds no git invocation for `refs/fgos/*` outside the publication driver and no `git commit` of event files anywhere.
+11. **V-DOOR-01:** `rg` finds no git invocation for `refs/fgos/*` outside the publication driver and no `git commit` of event files anywhere. The architecture scanner follows ref arguments through assignments, aliases and forwarding calls; generic `update-ref`/`push`/`fetch` sites must prove their refs cannot name `refs/fgos/*`, or fail. Git-basename binaries, shells and launchers are sinks; unresolved Git argv fails closed. A glob operand is accepted only with a proven non-event source namespace. The named exemption class **E3 legacy baseline on fixture repos** applies only where the census proves each repository path belongs to a fresh temporary fixture created by that benchmark, and enumerates each exempt site. The general one-door gate for branch refs belongs to Git phase 07 (V-GATE), after cutover; it is not a prerequisite of V-DOOR-01.
 12. **Topologies:** plain repository, linked worktree on another filesystem, `--separate-git-dir`, bare with worktree, submodule; non-git refusal; git version floor.
 13. **Setup and doctor** vectors for every check and fix; full `npm test` and cargo tests green.
 
@@ -1028,3 +1028,64 @@ requirement; only the exact documented PID-namespace-unprovable refusal skips.
 The coordinator's host gate requires zero skips. No migrated workspace may
 resume writers before that gate passes. Export paths refuse Windows reserved
 names, colon, trailing dot/space, and other Windows-invalid characters.
+
+
+## Store-layer completion (2026-10-20, dormant)
+
+The consumer registry remains empty. These store/facade operations do not wire
+Work, porting or command lifecycle triggers.
+
+- Append keeps the active-file, stream-directory and store-root durability barriers.
+  The store root is synced on every append: an existing stream directory may
+  have been created by a predecessor killed before its parent was synced. Recovery
+  cleanup syncs the identity directory only after removing a temporary file.
+  Repeated decoding reuses one thread-local verified frame only for exact bytes,
+  origin, stream and strictness (at most 4 MiB of input); changed bytes always
+  pass the full verifier. Reads still load the actual bytes.
+- Inspect reuses Git's existing config cache and validates source stamps on each
+  use. Authority and HEAD reuse is limited to the current read; ref/HEAD facts
+  are never carried across commands.
+- `store.maintenance(heldRanks)` returns local open-stream names and
+  `oldestUnsealedAgeSec`, plus `lastPush` from the sync receipt. It uses no Git
+  ref walk, worktree listing or legacy read, and runs outside hot gates. Full
+  `status` remains the integrity/diagnostic operation. Future trigger consumers
+  must use maintenance facts rather than full status. Age reads hold the append
+  lock against recovery/truncation and rotation, open each file once and read only
+  its first line, treating an incomplete first line as no age observation. The
+  open handle retains the header snapshot across a concurrent sealing unlink;
+  a file already removed by sealing is skipped. Later batch bytes are not parsed.
+- `branchKey(branch, loaderOptions)` exposes the crate's single branch-key rule.
+  `ownOrigin` is `null` when this clone has no local store identity yet (before
+  its first append); otherwise it is the local origin string. Opportunistic seal
+  and promotion are available on the facade;
+  policy and lifecycle wiring remain consumer-owned.
+- `read({cursor, folded, ...}, heldRanks)` forwards the supplied coverage and
+  retained envelopes into the certified walk. A cursor without retained history
+  cannot substitute for a lost view and still forces rebuild. Consumer cache reuse checks must
+  compare only `cover`, `streams` and `deferred`, while refreshing certification
+  and tip metadata from the returned cursor; these checks never replace the
+  reader's fold/rebuild decision for changed foreign history.
+- The pre-commit hook refuses staged added, renamed, copied and type-changed
+  retired event paths using `--no-renames --diff-filter=ACRT`, **only when** the
+  exact `.fgos/events` regular-file fence is in the index or HEAD. Without that
+  fence, legacy shard/checkpoint commits keep their existing behavior. Enforced
+  families are `.fgos/events.jsonl*` and `.fgos/events/`; unrelated prefixes are
+  admitted, as is the exact fence path. Existing Work guards remain installed.
+
+The store-increment benchmark uses the facade directly and its existing kernel
+state gate, independently of a Work consumer. `--seed-items 1000` (the default)
+seeds roughly 8 MB of payloads and seals them before measurement;
+`--seed-history <jsonl>` instead copies explicit history records into benchmark
+payloads without modifying the input. Every result records seed count, bytes and
+source. Store-only numbers are not Work end-to-end acceptance. Ext4 latency,
+power-loss qualification and the parked Work cutover remain separate gates.
+
+The dormant branch's repository door test is a regression census, not evidence
+that cutover V-DOOR-01 is complete: it asserts the exact pre-cutover invocation
+and retired-reader findings as a shrink-only declared list keyed by file, call
+kind and target family, with counts for distinct sites. It pins neither hashes
+nor line numbers. Reader debt includes exact sites in legacy owner files rather
+than exempting those files. New findings fail; removed findings must be removed
+from the list. The generic scanner still returns those findings; E3 remains its
+only fixture exemption class. WORK/Git caller cutover must remove these findings
+before claiming the whole-repository zero-legacy gate.
