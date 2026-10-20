@@ -29,6 +29,16 @@ Thêm: từ vựng chéo nhau (`prefer` theo executor, `tierFallback` theo họ,
 
 ## 3. Component Seat Binding
 
+### 3.0 Ba khái niệm, model là kết quả (owner 2026-10-20 12:20)
+
+| Khái niệm | Là gì | Trả lời câu | Ví dụ | Ai khai |
+|---|---|---|---|---|
+| **Seat (ghế)** | một chỗ ngồi trong một nhóm (unit) | ngồi ở đâu, trong nhóm nào | `panelist-3` của `shape-proposals`; `red-team` của `critique-proposals` | pattern sinh ra khi chạy unit |
+| **Role (vai)** | nhiệm vụ của ghế, chung toàn hệ thống | làm gì | `producer`, `panelist-N`, `synthesizer`, `reviewer`, `red-team` (đổi tên theo preset: `advisor`, `researcher`) | pattern, kèm câu giao việc chuẩn |
+| **Persona** (tuỳ chọn) | góc nhìn hoặc chuyên môn mang vào ghế | nhìn bằng con mắt nào | `advisor`; lens "CONSTRAINT LENS"; `@council-assumptions` | preset workflow, hoặc `--seats` lúc chạy |
+
+Một ghế có đúng một role; một role ngồi ở nhiều ghế, nhiều nhóm. Một ghế có tối đa một persona (gắn theo ghế, không theo role; có thể bị khoá). **Model** (họ, tier, account) không phải lớp thứ tư mà là lựa chọn cho tổ hợp (ghế, role, persona) trong khuôn capability của nhóm; Seat Binding là nơi tính lựa chọn đó. Role và persona vẫn do Workflow quyết.
+
 ### 3.1 Authority (một câu)
 
 **Seat Binding là authority duy nhất trả lời: "ghế này chạy ai (họ, invocation, model), ở tier nào, bằng account nào, và khi hỏng thì sang đâu" — kèm lý do cho từng phần.** Không component nào khác tự tính tier, model, thứ tự họ, thứ tự account hay bước dự phòng.
@@ -166,6 +176,9 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 4. **Ngôn ngữ component:** Node trước (đề xuất), hay Rust ngay theo luật thiết kế 4?
 5. **Có cần hội đồng kiến trúc soát bản này trước khi duyệt?** Đề xuất có: nó đổi authority và contract config của mọi lượt chạy.
 6. **Năm câu taste** của [báo cáo thảo luận](discussion-261020-0947-model-tier-by-capability-and-seat.md) (số ghế frontier ở `shape-proposals`, `explain` hạ tier, synthesis business/delphi, panel ý kiến dẫn bằng họ rẻ, `code:review`) — có thể trả lời sau, vì chỉ là giá trị trong config mới.
+
+7. **Persona có được ảnh hưởng model không?** Ví dụ persona "kiến trúc sư hệ thống" luôn kéo tier lên flagship. Bản này chưa cho: model chỉ theo capability, role và ghế. Cho thì thêm một lớp vào 5.1 (giữa role và ghế), persona khai `tier`/`families`.
+8. **Các mục chuyển từ MP-B1 06 (owner 11:56):** tier hội đồng kiến trúc (tổng hợp frontier, còn lại flagship, một ghế phản biện frontier), red-team → xai, trần `advanced`/`maxTier` theo capability — config mẫu 5.2 đã thể hiện; làm cùng đợt chuyển đổi mục 8.
 
 ## Phụ lục: phát hiện thêm khi chứng minh MP-B1 (2026-10-20 11:15)
 
