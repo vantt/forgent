@@ -485,3 +485,8 @@ All seven new findings have text dispositions; implementation, actual accounting
 
 - **Context:** `2dad00900` authored batches 077–078 (50 files / 132 edges; full checker 652 files / 4,237 edges, 0 failures) and left 04741–04744 as `lead-ruling`: exact file identities inside the explicitly completed "Post-merge prose sync (tsk-2tk)" section of `why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md`, narrated in the past tense.
 - **Ruling:** a section whose heading names a completed task or action and whose body narrates it in the past tense is a history region, like the "Document history" regions of L12-39(6) and the captured evidence of L12-40. Edges inside it preserve with a title-matched successor note and are exempt from the renamed-alias rule. A record declares such a region with `historyRegion: {heading, line, marker}`, quoting the heading and the past-tense/completion marker; the checker verifies that the heading exists, encloses the edge and that the marker text occurs in the section, with a probe. 04741–04744 preserve.
+
+## L12-47 — Wave 4g review result and provenance lines (Lead, A42/A51, 2026-10-20)
+
+- **Result:** both wave4g parts (`review-a38-step-03-wave4g-p01.md`, `-p02.md`) found no rework. Batches 077–078 close: `1c43db5de` set 04741–04744 to preserve under the L12-46 `historyRegion` declaration, checker 741 files / 4,487 edges, 0 failures.
+- **Ruling:** a `**Source:**` provenance line records where a document came from, so its edge preserves even when the named path never existed under that name; the record notes the pre-rename holder when one exists. A live prose pointer to a path that does not exist is a dead link and parks as before.
