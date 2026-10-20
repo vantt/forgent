@@ -21,6 +21,9 @@ function runnerConfig(capabilities) {
   };
 }
 
+const panelSeats = (n) => [...Array.from({ length: n }, (_, i) => ({ seat: `member-${i + 1}`, role: 'producer' })), { seat: 'synthesizer', role: 'synthesizer' }];
+const debateSeats = [{ seat: 'thesis', role: 'producer' }, { seat: 'antithesis', role: 'producer' }, { seat: 'judge', role: 'judge' }];
+
 const prefer = (...ids) => ({ prefer: ids.map((executor) => ({ executor })) });
 
 function mkPackageRoot(workflowYaml) {
@@ -41,6 +44,11 @@ steps:
         template:
           capability: fixture:generate
           pattern: panel
+          seats:
+            - { seat: member-1, role: producer }
+            - { seat: member-2, role: producer }
+            - { seat: member-3, role: producer }
+            - { seat: synthesizer, role: synthesizer }
           objective: Generate ideas
   - id: tally
     title: Tally
@@ -91,7 +99,7 @@ test('a panel whose pool has only as many families as panelists passes and repor
   });
   assert.equal(result.passed, true, result.message);
   assert.match(result.message, /panel-fixture\/ideas\/generate \(panel, capability "fixture:generate"\)/);
-  assert.match(result.message, /synthesizer=alpha shares a family with panelist-1/);
+  assert.match(result.message, /synthesizer=alpha shares a family with member-1/);
   assert.match(result.message, /a preference, not a failure/);
   assert.doesNotMatch(result.message, /fixture\/tally/);
 });
@@ -106,29 +114,29 @@ test('a panel with a fourth family for the synthesizer passes', async () => {
 test('a panel pool with two executors of one family spreads panelists over distinct families and the synthesizer shares one', async () => {
   const config = runnerConfig({ 'fixture:generate': prefer('alpha', 'beta', 'alpha-twin', 'gamma') });
   config.executors['alpha-twin'] = { agentType: 'alpha-twin', providerModel: 'claude' };
-  const unit = { id: 'u', capability: 'fixture:generate', pattern: 'panel', writes: [] };
-  const { roles } = await simulateUnitBindings(unit, config);
-  const bound = Object.fromEntries(roles.map((r) => [r.role, r.executor]));
-  assert.deepEqual(bound, { 'panelist-1': 'alpha', 'panelist-2': 'beta', 'panelist-3': 'gamma', synthesizer: 'alpha' });
-  assert.equal(roles.every((r) => !r.refused), true);
-  assert.deepEqual(roles.find((r) => r.role === 'synthesizer').sharesFamilyWith, ['panelist-1']);
+  const unit = { id: 'u', capability: 'fixture:generate', pattern: 'panel', writes: [], seats: panelSeats(3) };
+  const { seats } = await simulateUnitBindings(unit, config);
+  const bound = Object.fromEntries(seats.map((r) => [r.seat, r.executor]));
+  assert.deepEqual(bound, { 'member-1': 'alpha', 'member-2': 'beta', 'member-3': 'gamma', synthesizer: 'alpha' });
+  assert.equal(seats.every((r) => !r.refused), true);
+  assert.deepEqual(seats.find((r) => r.seat === 'synthesizer').sharesFamilyWith, ['member-1']);
 });
 
 test('six panel seats over three families all bind with no waiver and share families in pool order', async () => {
   const config = runnerConfig({ 'fixture:generate': prefer('alpha', 'beta', 'gamma') });
-  const unit = { id: 'u', capability: 'fixture:generate', pattern: { pattern: 'panel', params: { members: 6 } }, writes: [] };
-  const { outcome, roles } = await simulateUnitBindings(unit, config);
+  const unit = { id: 'u', capability: 'fixture:generate', pattern: 'panel', writes: [], seats: panelSeats(6) };
+  const { outcome, seats: roles } = await simulateUnitBindings(unit, config);
   assert.equal(outcome, 'pass');
   assert.deepEqual(roles.map((r) => r.executor), ['alpha', 'beta', 'gamma', 'alpha', 'beta', 'gamma', 'alpha']);
   assert.equal(roles.length, 7);
   assert.deepEqual(roles[0].sharesFamilyWith, undefined, 'the first seat is bound before anyone shares with it');
-  assert.deepEqual(roles[3].sharesFamilyWith, ['panelist-1']);
+  assert.deepEqual(roles[3].sharesFamilyWith, ['member-1']);
 });
 
 test('with enough families every panel seat and the synthesizer land on distinct families in pool order', async () => {
   const config = runnerConfig({ 'fixture:generate': prefer('alpha', 'beta', 'gamma', 'delta') });
-  const unit = { id: 'u', capability: 'fixture:generate', pattern: 'panel', writes: [] };
-  const { roles } = await simulateUnitBindings(unit, config);
+  const unit = { id: 'u', capability: 'fixture:generate', pattern: 'panel', writes: [], seats: panelSeats(3) };
+  const { seats: roles } = await simulateUnitBindings(unit, config);
   assert.deepEqual(roles.map((r) => r.executor), ['alpha', 'beta', 'gamma', 'delta']);
   assert.equal(roles.some((r) => r.sharesFamilyWith), false);
 });
@@ -189,6 +197,10 @@ steps:
         template:
           capability: fixture:dispute
           pattern: debate
+          seats:
+            - { seat: thesis, role: producer }
+            - { seat: antithesis, role: producer }
+            - { seat: judge, role: judge }
           objective: Decide the question
 `;
 
@@ -208,11 +220,11 @@ test('a debate whose pool has only two families cannot seat an independent judge
 test('two families of three seat the sides apart and the judge on the third; one extra executor of a side family changes nothing', async () => {
   const config = runnerConfig({ 'fixture:dispute': prefer('alpha', 'alpha-twin', 'beta', 'gamma') });
   config.executors['alpha-twin'] = { agentType: 'alpha-twin', providerModel: 'claude' };
-  const unit = { id: 'u', capability: 'fixture:dispute', pattern: 'debate', writes: [] };
-  const { outcome, roles } = await simulateUnitBindings(unit, config);
+  const unit = { id: 'u', capability: 'fixture:dispute', pattern: 'debate', writes: [], seats: debateSeats };
+  const { outcome, seats: roles } = await simulateUnitBindings(unit, config);
   assert.equal(outcome, 'pass');
-  const first = Object.fromEntries(roles.filter((r) => !r.refused).slice(0, 2).map((r) => [r.role, r.executor]));
+  const first = Object.fromEntries(roles.filter((r) => !r.refused).slice(0, 2).map((r) => [r.seat, r.executor]));
   assert.deepEqual(first, { thesis: 'alpha', antithesis: 'beta' }, 'the sides spread over distinct families');
-  const judge = roles.find((r) => r.role === 'judge');
+  const judge = roles.find((r) => r.seat === 'judge');
   assert.equal(judge.executor, 'gamma', 'the judge takes the family neither side used, skipping the twin of a side');
 });

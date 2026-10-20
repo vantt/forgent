@@ -14,6 +14,7 @@ import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
 import { nulPaths } from '../util/git-paths.mjs';
 import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
+import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 import { cleanupWorkflowWorktree, resolveIntegrationTarget } from './integrate.mjs';
 import { digestUnitRunReports } from './ref-digests.mjs';
 
@@ -24,7 +25,7 @@ const GATE_ANSWER_NOTE_CHARS = 200;
  * with, and what the steps it depends on (directly or not) produced.
  *
  * The objective carries only an index of the earlier units -- one summary line each, tagged with
- * its Unit run id. The reports themselves travel as `inputs`, one `unit-run:<id>/<role>` per role
+ * its Unit run id. The reports themselves travel as `inputs`, one `unit-run:<id>/<seat>` per seat
  * of every earlier unit; the Execution Core turns them into absolute report paths in the
  * assignment's context refs, so nothing is truncated and no panelist is dropped.
  */
@@ -50,9 +51,9 @@ export function buildUnitHandoff({ template, state, step, workflow }) {
     ? template.inputs.map((entry) => ({ prior: workflow.steps.find((s) => s.id === entry.step), sameSeat: entry.sameSeat === true, label: entry.label }))
     : workflow.steps.filter((s) => wanted.has(s.id)).map((prior) => ({ prior }));
 
-  // With anonymizeInputs the Execution Core copies each role's report as seat-A, seat-B, ... in
+  // With anonymizeInputs the Execution Core copies each seat's report as seat-A, seat-B, ... in
   // the order of `inputs`, so the index below names them that way and nothing else: no step,
-  // unit, unit run or role. A same-seat input is not part of that numbering: the role it is for
+  // unit, unit run or seat. A same-seat input is not part of that numbering: the seat it is for
   // gets it as its own earlier result, and the brief only says so.
   const anonymize = template.anonymizeInputs === true;
   const index = [];
@@ -68,21 +69,21 @@ export function buildUnitHandoff({ template, state, step, workflow }) {
         continue;
       }
       if (anonymize) {
-        for (const role of new Set(results.map((r) => r.role))) {
-          const summary = results.filter((r) => r.role === role).at(-1)?.runResult.agentClaim?.summary;
+        for (const seat of new Set(results.map(seatKeyOf))) {
+          const summary = results.filter((r) => seatKeyOf(r) === seat).at(-1)?.runResult.agentClaim?.summary;
           index.push(`### ${anonymousInputName(anonymized++)}${label ? ` (${label})` : ''}${summary ? `\nSummary: ${summary}` : ''}`);
-          inputs.push(`unit-run:${unitState.unitRunId}/${role}`);
+          inputs.push(`unit-run:${unitState.unitRunId}/${seat}`);
         }
         continue;
       }
       const summary = results.at(-1)?.runResult.agentClaim?.summary;
       index.push(`### ${prior.id} / ${unitId} (unit run ${unitState.unitRunId})${label ? ` (${label})` : ''}${summary ? `\nSummary: ${summary}` : ''}`);
-      for (const role of new Set(results.map((r) => r.role))) inputs.push(`unit-run:${unitState.unitRunId}/${role}`);
+      for (const seat of new Set(results.map(seatKeyOf))) inputs.push(`unit-run:${unitState.unitRunId}/${seat}`);
     }
   }
   if (index.length > 0) {
     parts.push(
-      `Output of earlier steps${anonymize ? ', anonymized' : ''} (the full report of every role is listed under Context refs; read them before answering):\n\n${index.join('\n\n')}`,
+      `Output of earlier steps${anonymize ? ', anonymized' : ''} (the full report of every seat is listed under Context refs; read them before answering):\n\n${index.join('\n\n')}`,
     );
   }
 
@@ -141,7 +142,7 @@ export function renderGateQuestion(step, state, mainRoot) {
     (_, stepId, unitId) => {
       const unit = state.steps[stepId]?.units[unitId];
       if (unit?.status !== 'completed' || !unit.unitRunId) throw new RunnerConfigError('gate report producer is not settled');
-      const producer = unit.results?.filter((record) => record.role === 'producer').at(-1);
+      const producer = unit.results?.filter((record) => seatKeyOf(record) === 'producer').at(-1);
       if (!producer?.runResult?.settleReports?.length) throw new RunnerConfigError('gate requires a settled producer report');
       const [file] = resolveUnitInputs([`unit-run:${unit.unitRunId}/producer`], mainRoot).refs;
       const expertise = readMissingExpertise(file, producer.runResult.settledAt);
@@ -166,8 +167,8 @@ export function unitPatternOf(template) {
  * The overrides a unit implies. A template's `persona` is not one of them: it travels on the Unit
  * itself (unitData.persona), which bind() ranks below an override and above the capability's.
  *
- * A `--seats` run binds each named persona to its own seat of every panel unit, scoped by role,
- * with the persona text pinned at start: the named seat keeps its persona, every other role (the
+ * A `--seats` run binds each named persona to its own seat of every panel unit, scoped by seat,
+ * with the persona text pinned at start: the named seat keeps its persona, every other seat (the
  * synthesizer included) has no matching override and falls through to the unit's own persona.
  *
  * A run started with `--effort` asks every role for that reasoning effort, the way `fgos run --effort`
@@ -181,7 +182,7 @@ export function unitOverridesOf(unit, seatPersonas = [], options = {}) {
 
   const seatScoped = unit.template?.pattern === 'panel'
     ? seatPersonas.map(({ seat, name, digest, text }) => ({
-      scope: { unit: unit.id, role: seat },
+      scope: { unit: unit.id, seat },
       persona: name,
       personaPin: { name, digest, text },
       origin: 'workflow',
@@ -356,7 +357,7 @@ export function canResumeUnitRun(mainRoot, uState) {
 function unitRunsOf(state, stepIds) {
   return stepIds.flatMap((stepId) => Object.values(state.steps[stepId]?.units ?? {})
     .filter((unit) => unit.unitRunId && unit.status === 'completed')
-    .map((unit) => ({ unitRunId: unit.unitRunId, roles: [...new Set((unit.results ?? []).filter((r) => r?.runResult).map((r) => r.role))] })));
+    .map((unit) => ({ unitRunId: unit.unitRunId, seats: [...new Set((unit.results ?? []).filter((r) => r?.runResult).map(seatKeyOf))] })));
 }
 
 /**
@@ -388,7 +389,7 @@ export function approvedReportDigests({ events, state, workflow, mainRoot }) {
     const approval = [...events].reverse().find((e) => e.type === 'gate.answer' && e.payload?.stepId === step.id && e.payload.approved === true);
     const current = approval?.payload?.subjectDigest;
     if (!current || current !== stepSubjectDigest({ state, workflow, stepId: step.id, mainRoot })) continue;
-    const refs = unitRunsOf(state, step.dependsOn).flatMap(({ unitRunId, roles }) => roles.map((role) => `unit-run:${unitRunId}/${role}`));
+    const refs = unitRunsOf(state, step.dependsOn).flatMap(({ unitRunId, seats }) => seats.map((seat) => `unit-run:${unitRunId}/${seat}`));
     try {
       for (const file of resolveUnitInputs(refs, mainRoot, { accept: 'any' }).refs) accepted.add(crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'));
     } catch {

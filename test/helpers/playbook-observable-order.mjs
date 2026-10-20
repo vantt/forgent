@@ -64,13 +64,13 @@ function fixtureRepo() {
   });
 }
 
-/** Roles of a unit's runs, one list per round, each in role-name order (seats of a round run together). */
+/** Seats of a unit's runs, one list per round, each in seat-id order (seats of a round run together). */
 function rolesByRound(results) {
   const rounds = new Map();
   for (const result of results ?? []) {
     const round = result.round ?? 1;
     if (!rounds.has(round)) rounds.set(round, []);
-    rounds.get(round).push(result.role);
+    rounds.get(round).push(result.seat ?? result.role);
   }
   return [...rounds.entries()].sort(([a], [b]) => a - b).map(([, roles]) => roles.sort());
 }
@@ -109,7 +109,8 @@ export function observableOrder(events) {
     } else if (type === 'unit.complete') {
       const unit = stepOf(p.stepId).units.find((u) => u.unit === p.unitId);
       unit.roles = rolesByRound(p.results);
-      unit.seats = unit.roles.flat().filter((role) => role.startsWith('panelist')).length;
+      // Members of a panel are the seats whose posture measures a stance.
+      unit.seats = (p.results ?? []).filter((result) => result.posture?.stance === true).length;
       unit.outcome = p.outcome;
     } else if (type === 'gate.park') stepOf(p.stepId).gate = 'parked';
     else if (type === 'gate.answer') stepOf(p.stepId).gate = p.approved === true ? 'approved' : 'answered';

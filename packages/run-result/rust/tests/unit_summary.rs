@@ -85,7 +85,7 @@ impl Drop for Fixture {
 
 fn attempt(run_id: Option<&str>, executor: &str, outcome: &str, fallback: Option<&str>) -> Value {
     json!({
-        "assignmentId": "unit-run-synthetic/panelist-1/1", "runId": run_id,
+        "assignmentId": "unit-run-synthetic/member-1/1", "runId": run_id,
         "executor": executor, "provider": executor, "persona": format!("lens-{executor}"),
         "model": "synthetic-model", "outcome": outcome,
         "fallbackFrom": fallback.map(|executor| json!({
@@ -110,7 +110,7 @@ fn unit(id: &str, choices: &[Option<&str>]) -> Value {
         "workflow": {"runId": "workflow-synthetic", "stepId": "discuss", "unitId": "panel"},
         "pattern": "panel", "capability": "analysis", "outcome": "pass",
         "startedAt": "2026-10-05T12:00:00.000Z", "settledAt": "2026-10-05T12:01:00.000Z",
-        "seats": choices.iter().enumerate().map(|(i, choice)| seat(&format!("panelist-{}", i + 1), "panelist", *choice)).collect::<Vec<_>>(),
+        "seats": choices.iter().enumerate().map(|(i, choice)| seat(&format!("member-{}", i + 1), "panelist", *choice)).collect::<Vec<_>>(),
         "inline": false, "stanceOptions": ["a", "b", "c"],
     })
 }
@@ -279,7 +279,7 @@ fn summary_source_never_rebuilds_results_and_does_not_double_count_runs() {
     root.summary(&unit("unit-run-summary-only", &[Some("a")]));
     let dir = root
         .0
-        .join(".fgos/assignments/unit-run-dispatch/panelist-1/1/runs/01");
+        .join(".fgos/assignments/unit-run-dispatch/member-1/1/runs/01");
     fs::create_dir_all(&dir).unwrap();
     fs::write(
         dir.join("result.json"),
@@ -340,7 +340,7 @@ fn reader_reports_root_wide_missing_and_unusable_summaries_without_reconstructio
     .unwrap();
     let planted = root
         .0
-        .join(".fgos/assignments/unit-run-good/panelist-1/1/runs/01/outbox/unit-run-planted");
+        .join(".fgos/assignments/unit-run-good/member-1/1/runs/01/outbox/unit-run-planted");
     fs::create_dir_all(root.0.join(".fgos/assignments/unit-run-missing")).unwrap();
     fs::create_dir_all(root.0.join(".fgos/assignments/unrelated-assignment")).unwrap();
     let mut invalid_timestamp = unit("unit-run-invalid-time", &[]);
@@ -601,7 +601,7 @@ fn voting_kind_is_independent_of_role_names_and_preserves_nonvoting_seats() {
         seat("researcher-2", "panelist", Some("a")),
         seat("legal-adviser", "panelist", Some("b")),
         seat("panelist", "producer", Some("c")),
-        seat("panelist-9", "synthesizer", Some("c")),
+        seat("member-9", "synthesizer", Some("c")),
         seat("synthesizer", "synthesizer", Some("c"))
     ]);
     root.summary(&summary);

@@ -160,7 +160,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let nested = scan.runs.iter().find(|o| o.subject.id == "nested").unwrap();
     assert_eq!(
         nested.attrs["assignmentId"],
-        "unit-run-example/panelist-1/1"
+        "unit-run-example/member-1/1"
     );
     let flat = scan.runs.iter().find(|o| o.subject.id == "flat").unwrap();
     assert_eq!(flat.attrs["assignmentId"], "legacy");

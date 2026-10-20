@@ -262,6 +262,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
               ...(u.template.blind ? { blind: true } : {}),
               ...(u.template.prefer ? { prefer: u.template.prefer } : {}),
               ...(u.template.persona ? { persona: u.template.persona } : {}),
+              ...(u.template.seats ? { seats: u.template.seats } : {}),
               ...(u.template.timeoutMs !== undefined ? { timeoutMs: u.template.timeoutMs } : {}),
               ...(u.template.verify !== undefined ? { verify: u.template.verify } : {}),
               ...(u.template.skills !== undefined ? { skills: u.template.skills } : {}),
@@ -366,7 +367,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                       runnerConfig,
                       { session: { headless: true, herdrPresent: detectHerdrPresent() }, overrides: testOverrides },
                     );
-                    if (!dry.roles.some((r) => r.account)) {
+                    if (!dry.seats.some((r) => r.account)) {
                       // No seat of this unit runs on the account's provider: the unit runs unpinned,
                       // and the run says so instead of dropping the pin silently.
                       recordEvent({

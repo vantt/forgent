@@ -20,6 +20,7 @@ import {
 } from './run-lock.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { normalizeRunResultV2, normalizeRunResultV3, interpretRunResult } from './run-result.mjs';
+import { isVerdictSeat } from './agent-result-claim-contract.mjs';
 import { validateAgentResultClaim, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
 import { attributeWorkspaceChanges, evaluateAttributionPolicy } from './evidence-attribution.mjs';
@@ -287,7 +288,7 @@ function classifyEvidenceToOutcomeFacts({
   const hasWorkerReport = companionReportArtifacts.length > 0;
 
   if (agentClaim?.status === 'failed') {
-    const isReviewerRole = role === 'reviewer' || role === 'red-team' || assignment?.role === 'reviewer' || assignment?.role === 'red-team';
+    const isReviewerRole = isVerdictSeat({ role, posture: assignment?.posture }) || isVerdictSeat({ role: assignment?.role, posture: assignment?.posture });
     const isFindingVerdict = agentClaim?.assessment?.verdict === 'findings';
     if ((isReviewerRole || isFindingVerdict) && hasWorkerReport && exitCode === 0 && !isTimeout) {
       return {
@@ -565,7 +566,7 @@ export async function settleRunOutcome({
     try {
       const claimBytes = fs.readFileSync(agentResultPath);
       const parsed = JSON.parse(claimBytes.toString('utf8'));
-      const validation = validateAgentResultClaim(parsed, { role: assignment?.role, operation: assignment?.operation });
+      const validation = validateAgentResultClaim(parsed, { role: assignment?.role, posture: assignment?.posture, operation: assignment?.operation });
       if (validation.valid) {
         agentClaim = parsed;
         claimSha256 = crypto.createHash('sha256').update(claimBytes).digest('hex');

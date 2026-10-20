@@ -88,12 +88,13 @@ import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/
 import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError, VALID_CHECKER_SEATS } from '../runner/dispatch/config.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { bind, hasUsablePrefer } from '../runner/execution/bind.mjs';
 import { walkStateOf } from '../runner/execution/account-rotation.mjs';
+import { bindSeatOf } from '../runner/execution/seat-resolver.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
@@ -588,13 +589,12 @@ export function checkRunnerPatternsConfig(cwd) {
           if (!cbr || typeof cbr !== 'object' || Array.isArray(cbr)) {
             problems.push(`${level} runner.patterns.reviewed.checkersByRigor must be an object`);
           } else {
-            const VALID_CHECKERS = new Set(['reviewer', 'red-team', 'tester']);
             for (const [rigor, checkers] of Object.entries(cbr)) {
               if (!RIGOR_VALUES.includes(rigor)) {
                 problems.push(`${level} runner.patterns.reviewed.checkersByRigor has unknown rigor "${rigor}"`);
               }
-              if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKERS.has(c))) {
-                problems.push(`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKERS).join(', ')}]`);
+              if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_SEATS.has(c))) {
+                problems.push(`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}]`);
               }
             }
             const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);
@@ -635,8 +635,8 @@ export function checkMutatingAssignmentBindingSnapshot(cwd) {
   const units = new Map();
   try {
     for (const run of listAssignmentRuns(path.join(root, '.fgos'))) {
-      const [unitId, role, round] = run.assignmentId.split('/');
-      if (!role || !round) continue;
+      const [unitId, seat, round] = run.assignmentId.split('/');
+      if (!seat || !round) continue;
       if (!units.has(unitId)) {
         const unitJsonPath = path.join(assignmentsDir, unitId, 'unit.json');
         let unitRecord = null;
@@ -661,7 +661,7 @@ export function checkMutatingAssignmentBindingSnapshot(cwd) {
           const recomputed = bind(
             {
               unit: unitRecord.unit,
-              role: resultData.role,
+              ...bindSeatOf(unitRecord, seat),
               readOnly: false,
               overrides: unitRecord.overrides || [],
             },
@@ -670,11 +670,11 @@ export function checkMutatingAssignmentBindingSnapshot(cwd) {
               session: {},
             },
             // A fallback attempt lives at `<round>-fb<n>`; its walk state is read from the seat's
-            // `<role>/<round>` chain exactly as the write gate reads it.
-            walkStateOf(unitRecord, { role, round: round.replace(/-fb\d+$/, ''), assignmentId: run.assignmentId }),
+            // `<seat>/<round>` chain exactly as the write gate reads it.
+            walkStateOf(unitRecord, { seat, round: round.replace(/-fb\d+$/, ''), assignmentId: run.assignmentId }),
           );
           if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
-            problems.push(`unit run "${unitId}" role "${role}" round "${round}" attempt "${run.attempt}" binding mismatches unit.json snapshot`);
+            problems.push(`unit run "${unitId}" seat "${seat}" round "${round}" attempt "${run.attempt}" binding mismatches unit.json snapshot`);
           }
         }
       } catch {

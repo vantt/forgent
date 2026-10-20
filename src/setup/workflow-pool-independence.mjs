@@ -157,22 +157,23 @@ async function evaluatePools(workflows, runnerConfig) {
           capability: template.capability,
           rigor: template.rigor,
           writes: template.writes ?? [],
-          pattern: template.pattern,
+          pattern: template.params ? { pattern: template.pattern, params: template.params } : template.pattern,
+          ...(template.seats ? { seats: template.seats } : {}),
         };
         try {
-          const { roles } = await simulateUnitBindings(unit, runnerConfig, { session });
+          const { seats } = await simulateUnitBindings(unit, runnerConfig, { session });
           // A capability with no prefer pool at all is refused the same way for any pattern; that gap
           // belongs to workflow-capabilities-configured and says nothing about independence.
-          const refused = roles.filter((r) => r.refused && !NO_POOL_REASONS.has(r.refused.reason));
-          const sharers = roles.filter((r) => r.sharesFamilyWith?.length > 0);
+          const refused = seats.filter((r) => r.refused && !NO_POOL_REASONS.has(r.refused.reason));
+          const sharers = seats.filter((r) => r.sharesFamilyWith?.length > 0);
           if (refused.length === 0 && sharers.length > 0) {
-            sharing.push(`${wf.id}/${step.id}/${u.id} (${patternName}, capability "${template.capability}"): ${sharers.map((r) => `${r.role}=${r.executor} shares a family with ${r.sharesFamilyWith.join(', ')}`).join('; ')}`);
+            sharing.push(`${wf.id}/${step.id}/${u.id} (${patternName}, capability "${template.capability}"): ${sharers.map((r) => `${r.seat}=${r.executor} shares a family with ${r.sharesFamilyWith.join(', ')}`).join('; ')}`);
           }
           if (refused.length === 0) continue;
-          const bound = roles.filter((r) => r.executor).map((r) => `${r.role}=${r.executor}`).join(', ');
+          const bound = seats.filter((r) => r.executor).map((r) => `${r.seat}=${r.executor}`).join(', ');
           problems.push(
             `${wf.id}/${step.id}/${u.id} (${patternName}, capability "${template.capability}"): `
-            + `${refused.map((r) => `${r.role} refused for ${r.refused.reason}: ${r.refused.detail}`).join('; ')}`
+            + `${refused.map((r) => `${r.seat} refused for ${r.refused.reason}: ${r.refused.detail}`).join('; ')}`
             + `${bound ? ` [bound before refusal: ${bound}]` : ''}`,
           );
         } catch (err) {

@@ -103,6 +103,12 @@ function createMockRunnerConfig() {
   };
 }
 
+// Seats as the resolver describes them: the posture, not the role name, decides how a seat may run.
+const POSTURE = { readOnly: false, writer: false, forceOutOfProcess: false, inlineAllowed: false, stance: false, verdict: false };
+const CHECKER = { seat: 'reviewer', role: 'reviewer', posture: { ...POSTURE, readOnly: true, forceOutOfProcess: true, verdict: true } };
+const PANEL_MEMBER = { seat: 'member-9', role: 'producer', posture: { ...POSTURE, readOnly: true, forceOutOfProcess: true, stance: true } };
+const DEBATE_POSTURE = { ...POSTURE, readOnly: true, forceOutOfProcess: true };
+
 test('bind: successfully binds producer with herdr transport when herdrPresent is true', () => {
   const runnerConfig = createMockRunnerConfig();
   const unit = {
@@ -216,7 +222,7 @@ test('bind: read-only posture is enforced when unit.writes is empty or readOnly 
   };
   const ask2 = {
     unit: unitWithWrites,
-    role: 'reviewer',
+    ...CHECKER,
     readOnly: true,
   };
   const res2 = bind(ask2, ctx);
@@ -232,7 +238,7 @@ test('bind: independence filter selects candidate of different provider family',
   };
   const ask = {
     unit,
-    role: 'reviewer',
+    ...CHECKER,
     readOnly: true,
     independentOf: ['claude'], // Must differ from claude
   };
@@ -256,7 +262,7 @@ test('bind: independence violation refuses unless human-cli override has acceptD
   // Agent override violating independence
   const askAgentOverride = {
     unit,
-    role: 'reviewer',
+    ...CHECKER,
     readOnly: true,
     independentOf: ['claude'],
     overrides: [{
@@ -273,7 +279,7 @@ test('bind: independence violation refuses unless human-cli override has acceptD
   // Human CLI override with acceptDependence: true
   const askHumanOverride = {
     unit,
-    role: 'reviewer',
+    ...CHECKER,
     readOnly: true,
     independentOf: ['claude'],
     overrides: [{
@@ -366,7 +372,7 @@ test('bind: lead session falls back to inline for producer when no candidates co
   assert.equal(result.executor, 'claude');
 });
 
-test('bind: checker role NEVER gets inline mechanism', () => {
+test('bind: a seat whose posture forces it out of process NEVER gets inline mechanism', () => {
   const runnerConfig = createMockRunnerConfig();
   const unit = {
     id: 'u1',
@@ -375,7 +381,7 @@ test('bind: checker role NEVER gets inline mechanism', () => {
   };
   const ask = {
     unit,
-    role: 'reviewer',
+    ...CHECKER,
   };
   const ctx = { runnerConfig, session: { headless: false, hasNativeAgent: true, provider: 'claude' } };
 
@@ -568,9 +574,9 @@ test('bind: with no prefer pool anywhere a headless unit is refused and its desc
 // used family, and is never refused for sharing one. Pool order (claude, openai, gemini) is the
 // tie-break.
 const SPREAD_UNIT = { id: 'u-spread', capability: 'code:implement', writes: [] };
-const seatOn = (role, executor) => ({ role, executor });
+const seatOn = (seat, executor) => ({ seat, executor });
 const spreadAsk = (preferIndependentOf, extra = {}) => ({
-  unit: SPREAD_UNIT, role: 'panelist-9', readOnly: true, preferIndependentOf, ...extra,
+  unit: SPREAD_UNIT, ...PANEL_MEMBER, readOnly: true, preferIndependentOf, ...extra,
 });
 
 test('bind spread: the first family in pool order that no listed seat uses is chosen', () => {
@@ -578,8 +584,8 @@ test('bind spread: the first family in pool order that no listed seat uses is ch
   const first = bind(spreadAsk([]), ctx);
   assert.equal(first.executor, 'claude');
   assert.equal(first.provenance.familySpread.source, 'prefer-independent-of:distinct-family', 'the first seat records that it asked for spread');
-  assert.equal(bind(spreadAsk([seatOn('panelist-1', 'claude')]), ctx).executor, 'codex');
-  const third = bind(spreadAsk([seatOn('panelist-1', 'claude'), seatOn('panelist-2', 'codex')]), ctx);
+  assert.equal(bind(spreadAsk([seatOn('member-1', 'claude')]), ctx).executor, 'codex');
+  const third = bind(spreadAsk([seatOn('member-1', 'claude'), seatOn('member-2', 'codex')]), ctx);
   assert.equal(third.executor, 'gemini-cli');
   assert.deepEqual(third.provenance.familySpread.value.sharedWith, []);
   assert.equal(third.provenance.familySpread.source, 'prefer-independent-of:distinct-family');
@@ -587,52 +593,52 @@ test('bind spread: the first family in pool order that no listed seat uses is ch
 
 test('bind spread: seats outnumbering the families share the least used family instead of being refused', () => {
   const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
-  const used = [seatOn('panelist-1', 'claude'), seatOn('panelist-2', 'codex'), seatOn('panelist-3', 'gemini-cli')];
+  const used = [seatOn('member-1', 'claude'), seatOn('member-2', 'codex'), seatOn('member-3', 'gemini-cli')];
   const fourth = bind(spreadAsk(used), ctx);
   assert.equal(fourth.refused, undefined);
   assert.equal(fourth.executor, 'claude', 'every family used once: pool order breaks the tie');
-  assert.deepEqual(fourth.provenance.familySpread.value, { family: 'claude', sharedWith: ['panelist-1'] });
+  assert.deepEqual(fourth.provenance.familySpread.value, { family: 'claude', sharedWith: ['member-1'] });
   assert.equal(fourth.provenance.familySpread.source, 'prefer-independent-of:no-eligible-unused-family');
 
-  const fifth = bind(spreadAsk([...used, seatOn('panelist-4', 'claude')]), ctx);
+  const fifth = bind(spreadAsk([...used, seatOn('member-4', 'claude')]), ctx);
   assert.equal(fifth.executor, 'codex', 'claude is used twice, so the least used family wins');
-  assert.deepEqual(fifth.provenance.familySpread.value.sharedWith, ['panelist-2']);
+  assert.deepEqual(fifth.provenance.familySpread.value.sharedWith, ['member-2']);
 });
 
 test('bind spread: a family the same provider reaches through another executor counts as used', () => {
   const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
   // native-agent is also a claude-family executor
-  assert.equal(bind(spreadAsk([seatOn('panelist-1', 'native-agent')]), ctx).executor, 'codex');
+  assert.equal(bind(spreadAsk([seatOn('member-1', 'native-agent')]), ctx).executor, 'codex');
 });
 
 test('bind spread: families filtered out by governance are not candidates, so the next best is chosen', () => {
   const runnerConfig = createMockRunnerConfig();
   runnerConfig.governance = { disallowedExecutors: ['codex'] };
-  const res = bind(spreadAsk([seatOn('panelist-1', 'claude')]), { runnerConfig, session: {} });
+  const res = bind(spreadAsk([seatOn('member-1', 'claude')]), { runnerConfig, session: {} });
   assert.equal(res.executor, 'gemini-cli');
 });
 
 test('bind spread: never overrides the hard independence filter', () => {
   const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
-  const res = bind(spreadAsk([seatOn('panelist-1', 'claude')], { independentOf: ['codex', 'gemini-cli', 'claude'] }), ctx);
+  const res = bind(spreadAsk([seatOn('member-1', 'claude')], { independentOf: ['codex', 'gemini-cli', 'claude'] }), ctx);
   assert.equal(res.refused.reason, 'independence');
-  const hardOnly = bind({ unit: SPREAD_UNIT, role: 'reviewer', readOnly: true, independentOf: ['claude'] }, ctx);
+  const hardOnly = bind({ unit: SPREAD_UNIT, ...CHECKER, readOnly: true, independentOf: ['claude'] }, ctx);
   assert.equal(hardOnly.executor, 'codex');
   assert.equal(hardOnly.provenance.familySpread, undefined, 'no spread asked: nothing recorded');
 });
 
 test('bind spread: a human-cli acceptDependence override still applies and is unaffected by spread', () => {
   const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
-  const res = bind(spreadAsk([seatOn('panelist-1', 'claude')], {
+  const res = bind(spreadAsk([seatOn('member-1', 'claude')], {
     independentOf: ['claude'],
-    overrides: [{ scope: { role: 'panelist-9' }, origin: 'human-cli', executor: 'claude', acceptDependence: true }],
+    overrides: [{ scope: { seat: 'member-9' }, origin: 'human-cli', executor: 'claude', acceptDependence: true }],
   }), ctx);
   assert.equal(res.executor, 'claude');
 });
 
 test('bind spread: a provider-limit fallback keeps ranking the remaining candidates by family use', () => {
   const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
-  const ask = spreadAsk([seatOn('panelist-1', 'claude')]);
+  const ask = spreadAsk([seatOn('member-1', 'claude')]);
   const first = bind(ask, ctx);
   assert.equal(first.executor, 'codex');
   assert.equal(nextCandidate(first, ask, ctx).executor, 'gemini-cli');
@@ -670,7 +676,7 @@ test('bind prefer: a filtered unit candidate falls to the capability pool, whose
 
 test('bind prefer: independence filters a unit-preferred executor of the same family', () => {
   const result = bind(
-    preferAsk({ prefer: ['gemini-cli'] }, { role: 'reviewer', readOnly: true, independentOf: ['gemini'] }),
+    preferAsk({ prefer: ['gemini-cli'] }, { ...CHECKER, readOnly: true, independentOf: ['gemini'] }),
     { runnerConfig: createMockRunnerConfig(), session: {} },
   );
   assert.equal(result.executor, 'claude');
@@ -971,19 +977,19 @@ test('bind skills: a live session lead never takes over a unit that needs skills
 
 test('bind skills: checker and panel seats are chosen on independence, not on the producer skills', () => {
   const unit = { id: 'u-skills', capability: 'docs:write', writes: [], skills: ['mermaid'] };
-  const reviewer = bind({ unit, role: 'reviewer', readOnly: true, independentOf: ['claude'] }, { runnerConfig: skillsConfig(), session: { headless: true } });
+  const reviewer = bind({ unit, ...CHECKER, readOnly: true, independentOf: ['claude'] }, { runnerConfig: skillsConfig(), session: { headless: true } });
   assert.equal(reviewer.executor, 'codex');
 });
 
-test('bind: debate roles never run inline or in-process and are not asked for the unit skills', () => {
+test('bind: debate seats never run inline or in-process and are not asked for the unit skills', () => {
   const runnerConfig = createMockRunnerConfig();
   const unit = { id: 'u-debate', capability: 'unknown:verb', writes: [] };
   const ctx = { runnerConfig, session: { headless: false, hasNativeAgent: true, provider: 'claude' } };
-  for (const role of ['thesis', 'antithesis', 'judge']) {
-    assert.ok(bind({ unit, role }, ctx).refused, `${role} is refused rather than falling back to the lead inline`);
+  for (const seat of ['thesis', 'antithesis', 'judge']) {
+    assert.ok(bind({ unit, seat, role: seat === 'judge' ? 'judge' : 'producer', posture: DEBATE_POSTURE }, ctx).refused, `${seat} is refused rather than falling back to the lead inline`);
   }
   const skilled = { id: 'u-skills', capability: 'docs:write', writes: [], skills: ['mermaid'] };
-  const judge = bind({ unit: skilled, role: 'judge', readOnly: true, independentOf: ['claude'] }, { runnerConfig: skillsConfig(), session: { headless: true } });
+  const judge = bind({ unit: skilled, seat: 'judge', role: 'judge', posture: DEBATE_POSTURE, readOnly: true, independentOf: ['claude'] }, { runnerConfig: skillsConfig(), session: { headless: true } });
   assert.equal(judge.executor, 'codex', 'a judge is chosen on independence alone');
   assert.equal(judge.mechanism, 'out-of-process');
 });

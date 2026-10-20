@@ -245,3 +245,18 @@ fn name_input(value: &Value) -> NameInput<'_> {
 fn error_code(error: ConventionError) -> String {
     error.to_string()
 }
+
+#[test]
+fn identifier_cases_are_the_behavior_source() {
+    let fixture: Value = serde_json::from_str(GOLDEN).unwrap();
+    let cases = fixture["identifierCases"].as_array().expect("identifierCases");
+    assert!(!cases.is_empty());
+    for case in cases {
+        let rule = packaged_rules()
+            .identifier(case["rule"].as_str().unwrap())
+            .expect("identifier rule exists");
+        let value = case["value"].as_str().unwrap();
+        let got = rule.check(value).err();
+        assert_eq!(got, case["expectedError"].as_str(), "{value:?}");
+    }
+}

@@ -155,7 +155,9 @@ fn group_key(value: &Value, key: &str) -> String {
     value[key].as_str().unwrap_or("unknown").to_owned()
 }
 
-/// All final panelist seats (not synthesizers or fallback attempts) are voters.
+/// All final panelist seats (not synthesizers or fallback attempts) are voters. A voter is a seat
+/// whose `kind` is `panelist`, never a seat with a given id or role, so summaries written before seats
+/// existed (role-keyed names) and after (`seat` ids, role `producer`) count the same.
 /// Missing/invalid votes stay in the denominator and remain explicit counts:
 /// the threshold is a passive signal, not proof that missing voters dissented.
 /// Without a quorum of valid votes (see `has_quorum`) the unit is unmeasured and only the
@@ -347,7 +349,7 @@ mod tests {
     /// that never votes.
     fn panel(votes: &[Option<&str>]) -> Map<String, Value> {
         let mut seats: Vec<Value> = votes.iter().enumerate().map(|(i, vote)| json!({
-            "role": format!("panelist-{}", i + 1), "kind": "panelist",
+            "seat": format!("member-{}", i + 1), "role": "producer", "kind": "panelist",
             "final": {"stance": match vote {
                 Some(choice) => json!({"status": "valid", "choice": choice, "confidence": 0.8}),
                 None => json!({"status": "missing"}),
@@ -358,6 +360,33 @@ mod tests {
             unreachable!()
         };
         unit
+    }
+
+    #[test]
+    fn a_summary_written_before_seats_existed_counts_the_same_voters() {
+        // Before seats a seat carried only its role-keyed name; the kind alone says who votes.
+        let legacy = |name: &str, kind: &str, choice: Option<&str>| json!({
+            "role": name, "kind": kind,
+            "final": {"stance": match choice {
+                Some(choice) => json!({"status": "valid", "choice": choice, "confidence": 0.8}),
+                None => json!({"status": "missing"}),
+            }},
+        });
+        let Value::Object(unit) = json!({
+            "stanceOptions": ["a", "b"],
+            "seats": [
+                legacy("researcher-1", "panelist", Some("a")),
+                legacy("researcher-2", "panelist", Some("a")),
+                legacy("researcher-3", "panelist", Some("b")),
+                legacy("synthesizer", "synthesizer", None),
+            ],
+        }) else {
+            unreachable!()
+        };
+        let row = agreement(&unit);
+        assert_eq!(row["stanceSeats"], 3);
+        assert_eq!(row["measurement"], "measured");
+        assert_eq!(row["agreement"], 2.0 / 3.0);
     }
 
     #[test]

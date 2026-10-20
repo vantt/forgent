@@ -44,6 +44,7 @@ import { buildAssignment, claimAssignmentId } from './assignment.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
 import { resolveFgosBin } from '../../setup/bin-discovery.mjs';
+import { capabilityRigorOf } from '../execution/seat-resolver.mjs';
 
 // Resolved once at import against THIS MODULE's own location, preferring a
 // tier-0 resolution when present with the same fallback resolveFgosBin
@@ -573,7 +574,7 @@ export async function executeExecutorCli(
   // The literal MODEL is computed via resolveTierModel and handed to the
   // resolver as an already-resolved `cliOverride.model`.
   const capabilityName = anchorCapability ?? capabilityIdentity ?? purpose ?? executorIdArg;
-  const capabilityRigor = capabilityName ? cfg?.capabilities?.[capabilityName]?.rigor : undefined;
+  const capabilityRigor = capabilityRigorOf(cfg, capabilityName);
   if (tierOverride !== undefined && !MODEL_POLICY_TIERS.includes(tierOverride)) {
     throw new RunnerConfigError(`invalid tier "${tierOverride}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
   }

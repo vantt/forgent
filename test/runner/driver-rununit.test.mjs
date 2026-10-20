@@ -464,7 +464,7 @@ test('a resumed declared unit keeps its stored pattern, never the caller pattern
     pattern: { pattern: 'reviewed' },
     repoRoot: repo, cwd: repo, worktree: repo, session: { headless: true, herdrPresent: false },
   });
-  assert.deepEqual(resumed.results.map((r) => r.role).filter((r) => r !== 'producer'), []);
+  assert.deepEqual(resumed.results.map((r) => r.seat).filter((r) => r !== 'producer'), []);
   assert.equal(unitJson(repo, first.unitRunId).pattern, 'solo');
 });
 

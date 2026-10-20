@@ -163,8 +163,8 @@ test('legacy reviewed findings followed by a complete passing round backfill as 
   assert.equal(report.summaries[0].outcome, 'pass');
   const summary = JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8'));
   assert.equal(summary.outcome, 'pass');
-  assert.equal(summary.seats.find((seat) => seat.role === 'reviewer' && seat.round === 1).final.outcome, 'findings');
-  assert.equal(summary.seats.find((seat) => seat.role === 'reviewer' && seat.round === 2).final.outcome, 'pass');
+  assert.equal(summary.seats.find((seat) => seat.seat === 'reviewer' && seat.round === 1).final.outcome, 'findings');
+  assert.equal(summary.seats.find((seat) => seat.seat === 'reviewer' && seat.round === 2).final.outcome, 'pass');
 });
 
 test('legacy reviewed incomplete terminal round or absent verify evidence stays unknown', (t) => {
@@ -184,35 +184,76 @@ test('legacy reviewed incomplete terminal round or absent verify evidence stays 
   assert.equal(buildUnitSummary(dir).outcome, 'pass', 'actual owner completion outranks absent historical verification evidence');
 });
 
-test('panel summary kinds follow the dispatched membership for researcher and arbitrary role labels', async (t) => {
-  for (const pattern of [
-    'research-fan-out',
-    'research-fan-out-gated',
-    { pattern: 'panel', params: { members: 9, role: ['cost-lens', 'synthesizer', 'reviewer'], synthesizeRole: 'researcher-chair' } },
-  ]) {
+test('panel summary kinds follow the dispatched membership for researcher presets', async (t) => {
+  for (const pattern of ['research-fan-out', 'research-fan-out-gated']) {
     const { root, dir, record } = fixture(t, { pattern });
     const dispatched = [];
     const execution = await runPattern(pattern, record.unit, {}, {
-      runRole: async ({ role }) => {
-        dispatched.push(role);
-        result(dir, role, '1', '01');
-        return { role, outcome: 'pass' };
+      runRole: async ({ seat }) => {
+        dispatched.push(seat.seat);
+        result(dir, seat.seat, '1', '01');
+        return { seat: seat.seat, outcome: 'pass' };
       },
     });
     assert.equal(execution.outcome, 'pass');
     const summary = buildUnitSummary(dir);
     assert.equal(summary.outcome, 'pass');
-    const byRole = new Map(summary.seats.map((seat) => [seat.role, seat]));
-    for (const role of dispatched.slice(0, -1)) {
-      assert.equal(byRole.get(role).kind, 'panelist');
-      assert.equal(byRole.get(role).final.stance.status, 'valid');
+    const bySeat = new Map(summary.seats.map((entry) => [entry.seat, entry]));
+    for (const seat of dispatched.slice(0, -1)) {
+      assert.equal(bySeat.get(seat).kind, 'panelist');
+      assert.equal(bySeat.get(seat).role, 'producer');
+      assert.equal(bySeat.get(seat).final.stance.status, 'valid');
     }
-    assert.equal(byRole.get(dispatched.at(-1)).kind, 'synthesizer');
+    assert.equal(bySeat.get(dispatched.at(-1)).kind, 'synthesizer');
+    assert.equal(bySeat.get(dispatched.at(-1)).role, 'synthesizer');
     assert.equal(backfillUnitSummaries({ repoRoot: root }).changed, 1);
     const stored = JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8'));
-    assert.deepEqual(stored.seats.map(({ role, kind }) => ({ role, kind })),
-      summary.seats.map(({ role, kind }) => ({ role, kind })));
+    assert.deepEqual(stored.seats.map(({ seat, role, kind }) => ({ seat, role, kind })),
+      summary.seats.map(({ seat, role, kind }) => ({ seat, role, kind })));
   }
+});
+
+// Golden: a record written before seats existed (no `seatSchema`, role-keyed directories) is summarised
+// through the one legacy read path, with the kinds and roles its pattern gave those names.
+test('a pre-fence panel record is summarised through the legacy read path', (t) => {
+  const { dir } = fixture(t, { pattern: 'panel' });
+  for (const name of ['panelist-1', 'panelist-2', 'panelist-3']) result(dir, name, '1', '01');
+  result(dir, 'synthesizer', '1', '01', { agentClaim: {} });
+  const summary = buildUnitSummary(dir);
+  assert.equal(summary.outcome, 'pass');
+  assert.deepEqual(summary.seats.map(({ seat, role, kind }) => ({ seat, role, kind })), [
+    { seat: 'panelist-1', role: 'producer', kind: 'panelist' },
+    { seat: 'panelist-2', role: 'producer', kind: 'panelist' },
+    { seat: 'panelist-3', role: 'producer', kind: 'panelist' },
+    { seat: 'synthesizer', role: 'synthesizer', kind: 'synthesizer' },
+  ]);
+});
+
+test('a pre-fence panel record with custom role labels keeps its kinds', (t) => {
+  const pattern = { pattern: 'panel', params: { members: 9, role: ['cost-lens', 'synthesizer', 'reviewer'], synthesizeRole: 'researcher-chair' } };
+  const { dir } = fixture(t, { pattern });
+  for (const name of ['cost-lens', 'synthesizer', 'reviewer', 'researcher-chair']) result(dir, name, '1', '01');
+  const summary = buildUnitSummary(dir);
+  assert.equal(summary.outcome, 'pass');
+  const kinds = Object.fromEntries(summary.seats.map((entry) => [entry.seat, entry.kind]));
+  assert.deepEqual(kinds, { 'cost-lens': 'panelist', synthesizer: 'panelist', reviewer: 'panelist', 'researcher-chair': 'synthesizer' });
+});
+
+test('a record that carries its seats is summarised from them, by seat id', (t) => {
+  const seats = [
+    { seat: 'system', role: 'producer', posture: { stance: true } },
+    { seat: 'alternative', role: 'producer', posture: { stance: true } },
+    { seat: 'synthesis', role: 'synthesizer', posture: {} },
+  ];
+  const { dir } = fixture(t, { pattern: 'panel', seatSchema: 1, seats });
+  for (const name of ['system', 'alternative', 'synthesis']) result(dir, name, '1', '01', { agentClaim: {} });
+  const summary = buildUnitSummary(dir);
+  assert.equal(summary.outcome, 'pass');
+  assert.deepEqual(summary.seats.map(({ seat, role, kind }) => ({ seat, role, kind })), [
+    { seat: 'alternative', role: 'producer', kind: 'panelist' },
+    { seat: 'synthesis', role: 'synthesizer', kind: 'synthesizer' },
+    { seat: 'system', role: 'producer', kind: 'panelist' },
+  ]);
 });
 
 test('backfill never settles a passing partial panel or a reviewed producer without its checkers', (t) => {
@@ -316,7 +357,7 @@ test('a finished unit without a recorded pattern is undetermined, never derived 
   assert.deepEqual(summary.seats.map(({ role, kind }) => ({ role, kind })), [
     { role: 'producer', kind: 'unknown' }, { role: 'red-team', kind: 'unknown' }, { role: 'reviewer', kind: 'unknown' },
   ]);
-  assert.equal(summary.seats.find((seat) => seat.role === 'reviewer').final.outcome, 'blocked', 'seat facts stay recorded');
+  assert.equal(summary.seats.find((seat) => seat.seat === 'reviewer').final.outcome, 'blocked', 'seat facts stay recorded');
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8')), summary);
 });
 
@@ -396,6 +437,6 @@ test('a debate summary names each seat by its owner kind and derives the outcome
   result(dir, 'judge', '1', '01', { agentClaim: {} });
   const summary = buildUnitSummary(dir);
   assert.equal(summary.outcome, 'pass');
-  const kinds = Object.fromEntries(summary.seats.filter((seat) => seat.round === 1).map((seat) => [seat.role, seat.kind]));
-  assert.deepEqual(kinds, { antithesis: 'producer', judge: 'judge', thesis: 'producer' });
+  const kinds = Object.fromEntries(summary.seats.filter((seat) => seat.round === 1).map((seat) => [seat.seat, [seat.role, seat.kind]]));
+  assert.deepEqual(kinds, { antithesis: ['producer', 'producer'], judge: ['judge', 'judge'], thesis: ['producer', 'producer'] });
 });

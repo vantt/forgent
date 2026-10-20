@@ -126,7 +126,9 @@ test('fgos run record completes pending inline turn with verified evidence', () 
 
   const pending = {
     unitRunId,
+    seat: 'producer',
     role: 'producer',
+    posture: { inlineAllowed: true },
     round: 1,
     nonce: 'cli-nonce-abc',
   };
