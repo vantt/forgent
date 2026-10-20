@@ -8,7 +8,6 @@
 // again. A conflicted merge stays open for the worker; the open MERGE_HEAD equal to `sha` over
 // `head` and the native operation id identify the owned merge under verified custody.
 
-import fs from 'node:fs';
 import crypto from 'node:crypto';
 
 import { RunnerConfigError } from '../dispatch/config.mjs';
@@ -16,14 +15,11 @@ import { matchesWriteScope } from '../dispatch/write-scope.mjs';
 import { commitOnBranch, finishSyncMerge, resolveSyncBase, startSyncMerge, syncMergeState } from './commit-unit-work.mjs';
 
 /**
- * The sync record of a new unit run, checked before the run exists: the unit must run in a linked
- * worktree (a merge never lands in the main checkout) and its ref must name a commit.
+ * The sync record of a new unit run, checked before the run exists: its ref must name a commit.
+ * A sync unit always writes, so runUnit has already refused the main checkout before this runs.
  */
 export function seedSync(unit, { worktree, mainRoot }) {
   if (unit.syncBase === undefined) return null;
-  if (fs.realpathSync(worktree) === fs.realpathSync(mainRoot)) {
-    throw new RunnerConfigError(`unit.syncBase "${unit.syncBase}" needs a linked worktree: the runner never merges into the main checkout`);
-  }
   const sha = resolveSyncBase({ worktree, repoRoot: mainRoot, ref: unit.syncBase });
   if (!sha) throw new RunnerConfigError(`unit.syncBase "${unit.syncBase}" names no commit in this repository`);
   return { ref: unit.syncBase, sha, status: 'pending' };

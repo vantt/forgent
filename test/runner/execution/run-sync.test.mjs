@@ -399,7 +399,7 @@ test('a sync ref that names no commit, or a sync from the main checkout, is refu
   );
   await assert.rejects(
     () => runUnit({ unitData: { id: 'u', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: repoRoot }),
-    (e) => e instanceof RunnerConfigError && /linked worktree/.test(e.message),
+    (e) => e instanceof RunnerConfigError && /resolves to the main checkout.*must run in a linked git worktree/.test(e.message),
   );
   assert.deepEqual(runs(), []);
 });
