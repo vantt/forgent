@@ -1,0 +1,1500 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-022",
+  "files": [
+    "src/runner/agent-roster.mjs",
+    "src/runner/anti-loop.mjs",
+    "src/runner/claim-liveness.mjs",
+    "src/runner/claim-port.mjs",
+    "src/runner/dispatch/assignment-policy.mjs",
+    "src/runner/dispatch/cli.mjs"
+  ],
+  "joinedSlots": 9,
+  "items": [
+    {
+      "file": "src/runner/agent-roster.mjs",
+      "kind": "complete-source-context",
+      "path": "src/runner/agent-roster.mjs",
+      "startLine": 1,
+      "endLine": 118,
+      "content": "// agent-roster.mjs — reads the real agent-type roster (core/agents/ +\n// domains/<name>/agents/ + legacy agents/) and a task-spec's own header\n// fields, for docs/history/core-foundation-domain-boundary/DISCUSSION.md's D20/D22\n// eligibility-inversion resolution (resolveAgentTypeForTaskSpec, src/runner/dispatch/cli.mjs). LAYER: infra\n// (same tier as dispatch/cli.mjs, which is the runtime consumer this\n// module exists for) -- one-directional-layer forbids dispatch/cli.mjs\n// (infra) importing src/setup/registrations.mjs (use-case, shallower). Both\n// read an agent file through `readAgentDefinition` (agent-definitions.mjs),\n// so the name and skills of an agent have one reader.\n\nimport fs from 'node:fs';\nimport path from 'node:path';\n\nimport { readAgentDefinition } from './agent-definitions.mjs';\n\n/**\n * Every real agent-type's `{name, skills}` across `core/agents/`,\n * `domains/<name>/agents/`, and the legacy `agents/` (D24/D33 precedence:\n * core, then domains in sorted order, then legacy last, first occurrence\n * of a name wins -- same order `registrations.mjs`'s own\n * `allAgentYamlFiles` uses). Sorted directory scans throughout (D32,\n * review finding M2) so the roster is identical on every machine/run.\n * Never throws on a malformed individual file: a file that is unreadable or\n * not valid YAML is left out of the roster and named in `problems`\n * (`<file>: cannot be parsed: <reason> (line L, column C)`), so the caller\n * can surface it instead of losing the agent silently.\n *\n * @returns {{ defs: Array<{ name: string, skills: string[] }>, problems: string[] }}\n */\nexport function loadAgentRoster(cwd) {\n  const files = [];\n  const seen = new Set();\n\n  const scanDir = (dir) => {\n    if (!fs.existsSync(dir)) return;\n    for (const name of fs.readdirSync(dir).sort((a, b) => a.localeCompare(b))) {\n      if (!name.endsWith('.yaml') && !name.endsWith('.yml')) continue;\n      const filePath = path.join(dir, name);\n      if (seen.has(filePath)) continue;\n      seen.add(filePath);\n      files.push(filePath);\n    }\n  };\n\n  scanDir(path.join(cwd, 'core', 'agents'));\n  const domainsDir = path.join(cwd, 'domains');\n  if (fs.existsSync(domainsDir)) {\n    for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {\n      if (entry.isDirectory()) scanDir(path.join(domainsDir, entry.name, 'agents'));\n    }\n  }\n  scanDir(path.join(cwd, 'agents'));\n\n  const defs = [];\n  const problems = [];\n  const namesSeen = new Set();\n  for (const filePath of files) {\n    const rel = path.relative(cwd, filePath).split(path.sep).join('/');\n    let text;\n    try {\n      text = fs.readFileSync(filePath, 'utf8');\n    } catch (error) {\n      problems.push(`${rel}: cannot be read (${error.message})`);\n      continue;\n    }\n    const { error, name: declared, skills } = readAgentDefinition(text, { filename: rel });\n    if (error) {\n      problems.push(`${rel}: ${error}`);\n      continue;\n    }\n    const name = declared ?? path.basename(filePath).replace(/\\.ya?ml$/, '');\n    if (namesSeen.has(name)) continue; // first occurrence wins, D33's own precedence\n    namesSeen.add(name);\n    defs.push({ name, skills });\n  }\n  return { defs, problems };\n}\n\n/**\n * A task-spec markdown file's own header fields (the same `key: value |\n * key: value` line `registrations.mjs`'s `parseTaskSpecHeaderFields`\n * already parses for the doctor check) -- only `agent`/`requires-skill`\n * matter to `resolveAgentTypeForTaskSpec`, always normalized to arrays.\n * Returns `{}` (never throws) when the file is missing, unreadable, or\n * has no `domain:`-led header line -- \"no header content\" is a legitimate\n * \"nothing to resolve from\" input, not an error.\n */\nexport function readTaskSpecHeader(filePath) {\n  let text;\n  try {\n    text = fs.readFileSync(filePath, 'utf8');\n  } catch {\n    return {};\n  }\n  const headerLine = text.split('\\n').find((l) => l.startsWith('domain:'));\n  if (!headerLine) return {};\n  const res = {};\n  for (const part of headerLine.split('|').map((p) => p.trim())) {\n    const colonIdx = part.indexOf(':');\n    if (colonIdx === -1) continue;\n    const key = part.slice(0, colonIdx).trim();\n    const valStr = part.slice(colonIdx + 1).trim();\n    if (key === 'requires-skill' || key === 'agent') {\n      if (valStr.startsWith('[') && valStr.endsWith(']')) {\n        res[key] = valStr.slice(1, -1).split(',').map((s) => s.trim()).filter(Boolean);\n      } else if (valStr.includes(',')) {\n        res[key] = valStr.split(',').map((s) => s.trim()).filter(Boolean);\n      } else if (valStr) {\n        res[key] = [valStr];\n      } else {\n        res[key] = [];\n      }\n    } else {\n      res[key] = valStr;\n    }\n  }\n  return res;\n}\n",
+      "continued": false
+    },
+    {
+      "file": "src/runner/agent-roster.mjs",
+      "kind": "complete-final-record",
+      "categoryA": false,
+      "categoryB": true,
+      "record": {
+        "file": "src/runner/agent-roster.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "bddc69ef02c932c8a05d8486a29c02c4188a3cb7e31f8706cf3ce360cc42ed31",
+        "digest": "bddc69ef02c932c8a05d8486a29c02c4188a3cb7e31f8706cf3ce360cc42ed31",
+        "inventoryEdgeIds": [
+          "class6-l-000249"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000249",
+            "slotKey": "{\"edgeId\":\"class6-l-000249\",\"file\":\"src/runner/agent-roster.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000249\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":3}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000249",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3
+              }
+            ],
+            "consumerFile": "src/runner/agent-roster.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 16,
+                "columnEndExclusive": 74,
+                "text": "docs/history/core-foundation-domain-boundary/DISCUSSION.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 16,
+                "columnEndExclusive": 74,
+                "text": "docs/history/core-foundation-domain-boundary/DISCUSSION.md"
+              }
+            ],
+            "matchedExpression": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+            "logicalReference": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: \"// fields, for docs/history/core-foundation-domain-boundary/DISCUSSION.md's D20/D22\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000249",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3,
+                "matchedExpression": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+                "originalLineText": "// fields, for docs/history/core-foundation-domain-boundary/DISCUSSION.md's D20/D22"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "29c5423ef9c9eb49993d625062345f5c5480bb3310dc1b1142b2754815bc2227",
+              "treeSample": [
+                "docs/history/core-foundation-domain-boundary/DISCUSSION.md"
+              ],
+              "historyCommitCount": 29,
+              "historyCommitsSha256": "fb6dcebbb09e612b7f60ea6c1df6dbfde4c5cf24c9af609f55d45e8a719f23e4",
+              "historySample": [
+                "d99d09cc3f9456124b8b84e92ce022eed06fa53e",
+                "d5caee95f6b52424b158ca6fb8dc232950d8fbef"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-022",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/runner/agent-roster.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "bddc69ef02c932c8a05d8486a29c02c4188a3cb7e31f8706cf3ce360cc42ed31",
+          "bytes": 4721,
+          "lines": 118,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "src/runner/anti-loop.mjs",
+      "kind": "complete-source-context",
+      "path": "src/runner/anti-loop.mjs",
+      "startLine": 1,
+      "endLine": 256,
+      "content": "// anti-loop.mjs — the runner's anti-loop guard (per D2, agent's-discretion\n// note in CONTEXT.md on counter placement): a visit counter derived from the\n// event log, plus an in-memory circuit breaker for consecutive goal-check\n// misses.\n//\n// PURE: no fs import, no child_process import. `visitCount` takes an already\n// -read array of events (as returned by `readEvents`/`foldEvents` upstream)\n// — it never opens `.fgos/events.jsonl` itself. `createMissBreaker`'s state\n// lives only in the closure returned to the caller; nothing here touches\n// disk or a process.\n//\n// EXECUTING-PHASE ONLY (claim-lock, code review finding, superseded by\n// tsk-40m D3): before claim-lock, an item could never reach `doing` before\n// stage `executing` (pick/take were frontier-only), so counting every\n// `to: 'doing'` move was equivalent to counting only real dispatch\n// attempts. Claim-lock let `pick` claim an item at `clarify`/`decompose`\n// too — a claim-then-release cycle there is not a dispatch attempt and\n// must not eat into the SAME budget real executing retries draw from. That\n// scoping used to be reconstructed here by replaying domain+stage per id\n// alongside each `to: 'doing'` move (mirroring frontier.mjs's own\n// executing check). tsk-40m D3 (docs/history/runtime-claim-doing-\n// separation/CONTEXT.md, locked decision — hard migration, no dual-count\n// legacy) retired that reconstruction entirely: `countableDoingMoveIndexes`\n// below now counts `work.attempt(phase:'execute')` events directly —\n// settleClaim (store.mjs) only ever stamps `phase:'execute'` for a real\n// dispatch attempt, so the same scoping is now a fact already recorded at\n// write time, never inferred at read time.\n\n/** Default max times a single item may be re-dispatched (re-enter `doing`)\n * before the runner refuses to pick it up again. Provisional — tuning is\n * deferred to real operation, per the cell's own note. */\nexport const MAX_VISITS = 3;\n\n/**\n * Replay just enough of `events` to know, for each `work.move` event with\n * `payload.to === 'doing'` and `payload.id === id`, whether the item's stage\n * at that exact point in the log already equalled its domain's Execute-mapped\n * stage — i.e. whether it was a real executing-phase dispatch, not a\n * clarify/decompose-phase claim (claim-lock). Returns the Set of matching\n * event indexes (positions in `events`), so both `visitCount` and\n * `visitsSinceLastHumanEvent` below can share one scan.\n *\n * Tracks only `domain` (from this id's one `work.add`) and `stage` (from its\n * `work.add` and any later `work.stage` moves) — the two fields\n * frontier.mjs's own eligibility check reads, nothing else. A missing stage\n * reads as the domain's Execute stage (D8 lazy default), same as\n * frontier.mjs and step-fsm.mjs.\n */\nfunction countableDoingMoveIndexes(events, id) {\n  const indexes = new Set();\n  for (let i = 0; i < events.length; i += 1) {\n    const event = events[i];\n    if (!event || !event.payload) continue;\n    // tsk-40m D3 (docs/history/runtime-claim-doing-separation/CONTEXT.md,\n    // locked decision — \"anti-loop chuyen sang dem durable work.attempt\n    // event (phase:execute) THAY VI work.move->doing... Hard migration --\n    // khong giu dual-count legacy\"): counts work.attempt(phase:'execute')\n    // ONLY, full replacement of the old work.move->doing count, no legacy\n    // fallback for a pre-migration item's OWN old doing-moves either — a\n    // hard cut, not an additive/dual-count transition. `domain`/`stage`\n    // tracking (needed only to scope the OLD work.move->doing fallback to\n    // the Execute stage) is retired along with it; work.attempt's own\n    // `phase:'execute'` field already carries that same scoping directly,\n    // set by settleClaim only for a real dispatch attempt.\n    if (event.type === 'work.attempt' && event.payload.id === id && event.payload.phase === 'execute') {\n      indexes.add(i);\n    }\n  }\n  return indexes;\n}\n\n/** Default number of consecutive goal-check misses (for one item) before\n * the circuit breaker trips. Provisional, same caveat as MAX_VISITS. Inert\n * under shipped defaults: dispatchClaimedItem (loop.mjs) parks an item\n * after at most DEFAULT_MAX_RETRIES (2) retries, so a single item's own\n * streak never reaches this threshold on its own. The breaker only trips\n * when a caller passes an explicit lower `breakerThreshold` to\n * `createMissBreaker` (see its doc comment below) — that path already\n * exists today. */\nexport const BREAKER_MISSES = 3;\n\n/**\n * Count how many times work item `id` has entered `doing` at its executing\n * stage across `events` (claim-lock: a clarify/decompose-phase claim is not\n * a dispatch attempt — see `countableDoingMoveIndexes` above).\n *\n * Derived from the log's existing `work.move` shape (per key_links: no new\n * event type) — a visit is any event with `type === 'work.move'` and\n * `payload.to === 'doing'` for this id, at that point already at the\n * domain's Execute-mapped stage. Lifetime, agent-agnostic count: a\n * human's manual re-dispatch counts exactly like the runner's. This is the\n * shipped metric (loop.mjs's `visits`/`priorVisits` payload fields, fgos.mjs's\n * `priorVisits`) — untouched by human-rounds D1, which reset the runner's own\n * anti-loop GATE only (see `visitsSinceLastHumanEvent` below), never this\n * lifetime tally.\n *\n * SUPERSEDES the comment this replaced (\"there is no privileged writer whose\n * visits don't count\"): that was true only because `role` did not exist yet\n * when it was written. `role` is now stamped on every `work.move` event\n * (store.mjs), and human-rounds D1 gives a human's role-attributed events\n * gate-resetting weight the runner's own never gets — this function still\n * treats every writer identically because it is the lifetime metric, not the\n * gate; the gate's asymmetry lives entirely in `visitsSinceLastHumanEvent`.\n */\nexport function visitCount(events, id) {\n  if (!Array.isArray(events) || typeof id !== 'string' || !id) return 0;\n  return countableDoingMoveIndexes(events, id).size;\n}\n\n/**\n * Count how many times work item `id` has re-entered `doing` SINCE its own\n * last human-attributed event (human-rounds D1) — the anti-loop GATE's own\n * budget, distinct from `visitCount`'s lifetime tally above.\n *\n * Per-item (D1b): only events carrying this exact `id` mark or count.\n *\n * Trigger-set is CLOSED (D1c) and keyed on `role === 'human'` plus payload\n * shape — never on a `from` field:\n *   - `payload.answer !== undefined` — the item left `awaiting-human` via a\n *     human's answer (`answerAwaiting`, status-fsm.mjs's `awaiting-human -> todo`\n *     edge; the only edge `answer` appears on).\n *   - `payload.reason !== undefined` — a human's reject/park-with-reason\n *     (status-fsm.mjs's `awaiting-approval -> todo`/`awaiting-approval -> blocked` edges; the runner's\n *     own reason-carrying parks, e.g. `anti-loop-max-visits`/`breaker-tripped`,\n *     stamp `role: 'runner'`, and `return`/`approve`'s own internal park edges\n *     stamp `role: 'system'` (D30) — neither ever matches here).\n * A bare resume (`blocked -> todo` with no reason) and a human `take`\n * (`blocked -> doing`, `role: 'human'`, no answer/reason) are deliberately\n * NOT triggers — per D1c only the two closed shapes above reset the budget.\n *\n * No qualifying event found for this id → the budget is the item's whole\n * history, i.e. identical to `visitCount(events, id)` (a pure machine loop\n * still dies at the cap — no human event has ever intervened).\n */\nexport function visitsSinceLastHumanEvent(events, id) {\n  if (!Array.isArray(events) || typeof id !== 'string' || !id) return 0;\n  let lastHumanIndex = -1;\n  for (let i = 0; i < events.length; i += 1) {\n    const event = events[i];\n    if (\n      event &&\n      event.type === 'work.move' &&\n      event.payload &&\n      event.payload.id === id &&\n      event.payload.role === 'human' &&\n      (event.payload.answer !== undefined || event.payload.reason !== undefined)\n    ) {\n      lastHumanIndex = i;\n    }\n  }\n  const countable = countableDoingMoveIndexes(events, id);\n  let count = 0;\n  for (const index of countable) {\n    if (index > lastHumanIndex) count += 1;\n  }\n  return count;\n}\n\n/**\n * Has `count` (as returned by `visitCount`) reached or passed the max-visits\n * threshold? At-threshold and past-threshold both block re-dispatch — only\n * strictly-below is still allowed to run again.\n */\nexport function hasExceededMaxVisits(count, max = MAX_VISITS) {\n  return count >= max;\n}\n\n/**\n * Sentinel key `createMissBreaker`'s returned methods key on when the caller\n * passes no item id — this is what keeps the backward-compatible\n * `consecutiveMisses` getter and zero-arg `recordMiss()`/`recordHit()`/\n * `isTripped()` calls (loop.mjs's current call sites) working unchanged. A\n * `Symbol` rather than a string so it can never collide with a real item id.\n */\nconst DEFAULT_ITEM_KEY = Symbol('anti-loop.default-item');\n\n/**\n * Create a fresh consecutive-miss circuit breaker.\n *\n * **Per-item (fan-out-parallel D15):** under Epic 3's batch dispatch,\n * multiple different items run concurrently, so one counter shared across\n * an entire runner run would wrongly conflate item A's goal-check miss with\n * item B's, tripping the breaker on unrelated failures across different\n * items. The breaker is keyed by item id (`Map<id, consecutiveCount>`): an\n * id never explicitly seen before starts at 0/untripped, and two different\n * ids never share or influence each other's streak. `recordMiss(itemId)`\n * increments that item's own streak, `recordHit(itemId)` resets it to 0,\n * and `isTripped(itemId)` reports that item's own trip state at `threshold`.\n *\n * The item id argument is optional and defaults to an internal sentinel key\n * (see `DEFAULT_ITEM_KEY`) — this keeps loop.mjs's existing zero-arg calls\n * (`breaker.recordMiss()`, etc., still one-item-at-a-time as of this cell)\n * behaved exactly as before per-item keying was introduced. The\n * `consecutiveMisses` property stays a plain getter (a getter cannot take\n * an argument) and reads the same sentinel key; `consecutiveMissesFor(id)`\n * is the new method for reading any specific item's streak.\n *\n * Per the reliability-panel revision (D2 note \"d\"): this counter is\n * deliberately NOT event-derived. It is in-memory state scoped to one\n * runner run (matches A1's sequential-once-per-run shape, e.g. a `--once`\n * invocation) — cross-run persistence of consecutive-miss state is out of\n * scope for Phase 2. UPDATED (str7-str8-priority-intent D7/D8/D9): under\n * `--watch`'s `runWatch` (loop.mjs), \"one runner run\" means the WHOLE watch\n * session, not one cycle — `runWatch` creates a single breaker before its\n * loop starts and threads the SAME object into every `runOnce` cycle via\n * `options.breaker`, so this state deliberately persists and accumulates\n * ACROSS cycles for as long as the watch process runs. This is intentional:\n * a persistent daemon should accumulate failure history toward a trip,\n * unlike a single bounded `--once` pass. Cross-PROCESS persistence (surviving\n * a restart) is still out of scope.\n *\n * Because this state exists only in the closure below, replaying or reading\n * the event log never affects it — an unrelated event (e.g. a human writing\n * a `decision`, or another item's `work.move`) that the caller does not\n * report through `recordMiss()`/`recordHit()` leaves the streak untouched.\n *\n * **Reachable under `--watch` (str7-str8-priority-intent D9), NOT inert\n * (supersedes phase2-p1-breaker-inert-fix's \"dead under shipped defaults\"\n * claim for that mode):** with `threshold` at its default (`BREAKER_MISSES`\n * = 3), a single `--once` invocation still can never trip the breaker from\n * one item's own retries alone — `dispatchClaimedItem` (loop.mjs) parks an\n * item after at most `DEFAULT_MAX_RETRIES` (2) failed attempts, one short of\n * tripping, so within ONE `--once` pass the halt branch this feeds\n * (`loop.mjs`'s `if (tripped)`) stays dead under default configuration, not\n * broken. But under `--watch`, the breaker is shared across every cycle of\n * the whole watch session (see the UPDATED note above), so an item that gets\n * re-dispatched and re-misses across multiple SEPARATE cycles (each cycle\n * itself capped at `DEFAULT_MAX_RETRIES`, but the streak no longer resets\n * between cycles) CAN reach the default threshold and trip — the \"inert\n * under shipped defaults\" claim no longer holds once `--watch` is in use. A\n * caller can still pass an explicit lower `threshold` (e.g.\n * `breakerThreshold: 1`) to reach the branch sooner in either mode.\n */\nexport function createMissBreaker(threshold = BREAKER_MISSES) {\n  const streaks = new Map();\n  return {\n    recordMiss(itemId = DEFAULT_ITEM_KEY) {\n      const next = (streaks.get(itemId) || 0) + 1;\n      streaks.set(itemId, next);\n      return next;\n    },\n    recordHit(itemId = DEFAULT_ITEM_KEY) {\n      streaks.set(itemId, 0);\n      return 0;\n    },\n    isTripped(itemId = DEFAULT_ITEM_KEY) {\n      return (streaks.get(itemId) || 0) >= threshold;\n    },\n    consecutiveMissesFor(itemId) {\n      return streaks.get(itemId) || 0;\n    },\n    get consecutiveMisses() {\n      return streaks.get(DEFAULT_ITEM_KEY) || 0;\n    },\n  };\n}\n",
+      "continued": false
+    },
+    {
+      "file": "src/runner/anti-loop.mjs",
+      "kind": "complete-final-record",
+      "categoryA": false,
+      "categoryB": true,
+      "record": {
+        "file": "src/runner/anti-loop.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "d996232d9518a8fcf6f7017f781716f513eb3c0c9f80e17741b9507bda48ae49",
+        "digest": "d996232d9518a8fcf6f7017f781716f513eb3c0c9f80e17741b9507bda48ae49",
+        "inventoryEdgeIds": [
+          "class6-l-000250",
+          "class6-l-000250",
+          "class6-l-000251"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000250",
+            "slotKey": "{\"edgeId\":\"class6-l-000250\",\"file\":\"src/runner/anti-loop.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000250\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":21}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000250",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 21
+              }
+            ],
+            "consumerFile": "src/runner/anti-loop.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 34,
+                "columnEndExclusive": 67,
+                "text": "docs/history/runtime-claim-doing-"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 34,
+                "columnEndExclusive": 67,
+                "text": "docs/history/runtime-claim-doing-"
+              },
+              {
+                "line": 22,
+                "columnStart": 1,
+                "columnEndExclusive": 25,
+                "text": "// separation/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/runtime-claim-doing-\n// separation/CONTEXT.md",
+            "logicalReference": "docs/history/runtime-claim-doing-separation/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// executing check). tsk-40m D3 (docs/history/runtime-claim-doing-\\n// separation/CONTEXT.md, locked decision — hard migration, no dual-count'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/runtime-claim-doing-separation/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000250",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 21,
+                "matchedExpression": "docs/history/runtime-claim-doing-\n// separation/CONTEXT.md",
+                "originalLineText": "// executing check). tsk-40m D3 (docs/history/runtime-claim-doing-"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/runtime-claim-doing-separation/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "0cc7a2cc57bf77d4d82e0c1a60f75a7d3a42ef28e26e86a2fd39b76cc78c4c65",
+              "treeSample": [
+                "docs/history/runtime-claim-doing-separation/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "419c86aed43710a821db4a94a5631d4834f1eb1343f922392f0e855b6cac07da",
+              "historySample": [
+                "835f162efcc39856e1509d8c63ae8f19d9179c1a",
+                "7dffb476ffede2e6d2e15c09ab19d42ec8ac793a"
+              ]
+            }
+          },
+          {
+            "edgeId": "class6-l-000250",
+            "slotKey": "{\"edgeId\":\"class6-l-000250\",\"file\":\"src/runner/anti-loop.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000250\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":22}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000250",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 22
+              }
+            ],
+            "consumerFile": "src/runner/anti-loop.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 22,
+                "columnStart": 1,
+                "columnEndExclusive": 25,
+                "text": "// separation/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 34,
+                "columnEndExclusive": 67,
+                "text": "docs/history/runtime-claim-doing-"
+              },
+              {
+                "line": 22,
+                "columnStart": 1,
+                "columnEndExclusive": 25,
+                "text": "// separation/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/runtime-claim-doing-\n// separation/CONTEXT.md",
+            "logicalReference": "docs/history/runtime-claim-doing-separation/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// executing check). tsk-40m D3 (docs/history/runtime-claim-doing-\\n// separation/CONTEXT.md, locked decision — hard migration, no dual-count'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/runtime-claim-doing-separation/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000250",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 22,
+                "matchedExpression": "docs/history/runtime-claim-doing-\n// separation/CONTEXT.md",
+                "originalLineText": "// separation/CONTEXT.md, locked decision — hard migration, no dual-count"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/runtime-claim-doing-separation/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "0cc7a2cc57bf77d4d82e0c1a60f75a7d3a42ef28e26e86a2fd39b76cc78c4c65",
+              "treeSample": [
+                "docs/history/runtime-claim-doing-separation/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "419c86aed43710a821db4a94a5631d4834f1eb1343f922392f0e855b6cac07da",
+              "historySample": [
+                "835f162efcc39856e1509d8c63ae8f19d9179c1a",
+                "7dffb476ffede2e6d2e15c09ab19d42ec8ac793a"
+              ]
+            }
+          },
+          {
+            "edgeId": "class6-l-000251",
+            "slotKey": "{\"edgeId\":\"class6-l-000251\",\"file\":\"src/runner/anti-loop.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000251\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":54}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000251",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 54
+              }
+            ],
+            "consumerFile": "src/runner/anti-loop.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 54,
+                "columnStart": 20,
+                "columnEndExclusive": 74,
+                "text": "docs/history/runtime-claim-doing-separation/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 54,
+                "columnStart": 20,
+                "columnEndExclusive": 74,
+                "text": "docs/history/runtime-claim-doing-separation/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/runtime-claim-doing-separation/CONTEXT.md",
+            "logicalReference": "docs/history/runtime-claim-doing-separation/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '    // tsk-40m D3 (docs/history/runtime-claim-doing-separation/CONTEXT.md,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/runtime-claim-doing-separation/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000251",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 54,
+                "matchedExpression": "docs/history/runtime-claim-doing-separation/CONTEXT.md",
+                "originalLineText": "    // tsk-40m D3 (docs/history/runtime-claim-doing-separation/CONTEXT.md,"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/runtime-claim-doing-separation/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "0cc7a2cc57bf77d4d82e0c1a60f75a7d3a42ef28e26e86a2fd39b76cc78c4c65",
+              "treeSample": [
+                "docs/history/runtime-claim-doing-separation/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "419c86aed43710a821db4a94a5631d4834f1eb1343f922392f0e855b6cac07da",
+              "historySample": [
+                "835f162efcc39856e1509d8c63ae8f19d9179c1a",
+                "7dffb476ffede2e6d2e15c09ab19d42ec8ac793a"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-022",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/runner/anti-loop.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "d996232d9518a8fcf6f7017f781716f513eb3c0c9f80e17741b9507bda48ae49",
+          "bytes": 13300,
+          "lines": 256,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "src/runner/claim-liveness.mjs",
+      "kind": "complete-source-context",
+      "path": "src/runner/claim-liveness.mjs",
+      "startLine": 1,
+      "endLine": 107,
+      "content": "// D1/D4 (docs/history/session-claim-liveness/CONTEXT.md): the \"is this\n// claim's worktree still being actively touched\" signal -- real file/commit\n// activity, never session/process identity or claim-age. Reused by\n// claim-port.mjs's stale-claim reclaim pre-check (D2/D5).\n\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { execFileSync } from 'node:child_process';\nimport { branchNameFor, findCheckoutPath } from './worktree.mjs';\nimport { STALE_DOING_DEFAULTS } from '../state/graph-metrics.mjs';\nimport { statusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';\n\nfunction git(repoRoot, args) {\n  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });\n}\n\n/**\n * D4: `max(last commit time on the claim's fgw/<id> branch, newest mtime\n * among the files `git status --porcelain` lists in its current worktree)`,\n * epoch ms -- or `null` when the signal is unreadable (branch doesn't\n * exist, no live worktree registered for it, or a git call fails).\n *\n * `null` is deliberately never coerced to 0/Infinity: a caller must treat\n * it as inconclusive (D5), the same as a genuinely recent timestamp --\n * never as \"ancient enough to reclaim\" by accident.\n *\n * The `:!.fgos` status exclusion mirrors `isCheckoutDirty`\n * (`worktree.mjs`) -- ADR0020's own `.fgos` removal on checkout must never\n * look like real activity.\n */\nexport function lastActivityAt(repoRoot, id) {\n  const branch = branchNameFor(id);\n\n  let commitTs;\n  try {\n    const raw = git(repoRoot, ['log', '-1', '--format=%ct', branch]).trim();\n    const seconds = Number.parseInt(raw, 10);\n    if (Number.isFinite(seconds)) commitTs = seconds * 1000;\n  } catch {\n    return null; // branch doesn't exist -- nothing to measure at all\n  }\n\n  let porcelainWorktrees;\n  try {\n    porcelainWorktrees = git(repoRoot, ['worktree', 'list', '--porcelain']);\n  } catch {\n    return commitTs ?? null;\n  }\n\n  const worktreePath = findCheckoutPath(porcelainWorktrees, branch);\n  if (!worktreePath) return commitTs ?? null; // branch exists, no live checkout -- commit time is all there is\n\n  let statusOutput;\n  try {\n    // tsk-f8f: `-z` (NUL-terminated records), not the human-readable\n    // newline format -- `git status --porcelain` (no `-z`) C-style-quotes\n    // any path containing whitespace or other \"unusual\" characters (`??\n    // \"my file.txt\"`), which the old `trimmed.split(/\\s+/).pop()` parse\n    // took literally, yielding a fragment like `file.txt\"` (a lone\n    // trailing quote character) that never matches a real file --\n    // `statSync` fails, the entry is silently skipped, and that file's\n    // mtime never contributes to the activity signal. `-z` mode never\n    // quotes paths at all (verified empirically: a path with spaces comes\n    // through raw, byte-for-byte), so there is no escape/quote format to\n    // parse in the first place.\n    statusOutput = execFileSync('git', ['-C', worktreePath, 'status', '--porcelain=v1', '-z', '--untracked-files=all', '--', ':!.fgos'], {\n      cwd: repoRoot, encoding: 'utf8', shell: false, maxBuffer: GIT_LIST_MAX_BUFFER,\n    });\n  } catch {\n    return commitTs ?? null;\n  }\n\n  let newestMtime;\n  // Parsed by `statusPaths`: a rename or copy gives both halves, and the\n  // source half no longer exists, so its statSync fails and is skipped.\n  for (const filePath of statusPaths(statusOutput)) {\n    try {\n      const mtime = fs.statSync(path.join(worktreePath, filePath)).mtimeMs;\n      if (newestMtime === undefined || mtime > newestMtime) newestMtime = mtime;\n    } catch {\n      // Listed by status but unreadable/deleted between the two calls --\n      // skip it rather than aborting the whole signal over one entry.\n    }\n  }\n\n  const candidates = [commitTs, newestMtime].filter((value) => value !== undefined);\n  return candidates.length > 0 ? Math.max(...candidates) : null;\n}\n\n/**\n * D2/D3: is the claim on `id` conclusively quiet as of `now`? `claimRole`\n * selects the threshold bucket the same way `classifyStaleDoing`\n * (`graph-metrics.mjs`) already does for its own advisory -- `runner` gets\n * the short `agentMs` grace, everything else gets the long `humanMs` grace.\n * D3 reuses `STALE_DOING_DEFAULTS` as-is rather than a separate, more\n * conservative pair.\n *\n * An unreadable signal (`lastActivityAt` returns `null`) is never\n * conclusive -- this returns `false`, the same outcome as genuinely recent\n * activity, so the caller's fallback (refuse exactly as today) covers both.\n */\nexport function isReclaimEligible(repoRoot, id, claimRole, { now = Date.now(), thresholds = STALE_DOING_DEFAULTS } = {}) {\n  const activityAt = lastActivityAt(repoRoot, id);\n  if (activityAt === null) return false;\n  const thresholdMs = claimRole === 'runner' ? thresholds.agentMs : thresholds.humanMs;\n  return now - activityAt > thresholdMs;\n}\n",
+      "continued": false
+    },
+    {
+      "file": "src/runner/claim-liveness.mjs",
+      "kind": "complete-final-record",
+      "categoryA": false,
+      "categoryB": true,
+      "record": {
+        "file": "src/runner/claim-liveness.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "a4a01260422ce8eab25f67be7fcd47f0638230616e1e9237c881e8755ffdb538",
+        "digest": "a4a01260422ce8eab25f67be7fcd47f0638230616e1e9237c881e8755ffdb538",
+        "inventoryEdgeIds": [
+          "class6-l-000252"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000252",
+            "slotKey": "{\"edgeId\":\"class6-l-000252\",\"file\":\"src/runner/claim-liveness.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000252\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000252",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1
+              }
+            ],
+            "consumerFile": "src/runner/claim-liveness.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1,
+                "columnStart": 11,
+                "columnEndExclusive": 57,
+                "text": "docs/history/session-claim-liveness/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1,
+                "columnStart": 11,
+                "columnEndExclusive": 57,
+                "text": "docs/history/session-claim-liveness/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/session-claim-liveness/CONTEXT.md",
+            "logicalReference": "docs/history/session-claim-liveness/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// D1/D4 (docs/history/session-claim-liveness/CONTEXT.md): the \"is this'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/session-claim-liveness/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000252",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1,
+                "matchedExpression": "docs/history/session-claim-liveness/CONTEXT.md",
+                "originalLineText": "// D1/D4 (docs/history/session-claim-liveness/CONTEXT.md): the \"is this"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/session-claim-liveness/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "48122d27b4b7fda87eff262424f39c3511db6e71eacf15c651db43a3964800b4",
+              "treeSample": [
+                "docs/history/session-claim-liveness/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "63f36196f37252720ce3fb1eecc0735a44d94469dff365e2db1aa686e1d79bdb",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "60684d2e272a7d60fd104bf180c67838719e9e5a"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-022",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/runner/claim-liveness.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "a4a01260422ce8eab25f67be7fcd47f0638230616e1e9237c881e8755ffdb538",
+          "bytes": 4830,
+          "lines": 107,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "src/runner/claim-port.mjs",
+      "kind": "complete-source-context",
+      "path": "src/runner/claim-port.mjs",
+      "startLine": 1,
+      "endLine": 313,
+      "content": "// claim-port.mjs — single choke-point for all claim flows (tsk-53f D1).\n//\n// Every claim (CLI take, CLI pick, runner claimItem) goes through this module.\n// Centralizes: main checkout mutex around the .fgos checkpoint only\n// (repo-locks.mjs), the worker-slot ceiling check + acquireClaim in one state\n// transaction (runtime claim only — tsk-40m retired the durable\n// moveWork(to:'doing') claim-time write entirely; doing is derived purely from\n// the active-claim overlay), optional worktree creation with correct baseRef for leaf items.\n//\n// This is the \"one door\" for claiming work — no direct acquireClaim call\n// outside this module except for FSM-internal transitions.\n\nimport { moveWork, addOutcome, addDecision, recordClaimAttempt, readRawEvents, FsmError } from '../state/store.mjs';\nimport { foldEvents } from '../state/replay.mjs';\nimport { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';\nimport { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';\nimport { visitCount } from './anti-loop.mjs';\nimport { withMainCheckout } from './repo-locks.mjs';\nimport { checkpointMainFgos } from './main-fgos-checkpoint.mjs';\nimport { LockScope, HolderLockError } from '../holder-lock/index.mjs';\nimport { createClaimWorktree, branchNameFor, branchExists, currentHead, resolveRefSha } from './worktree.mjs';\nimport { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';\nimport { hasWorkerSlotRoom } from '../state/worker-slots.mjs';\nimport { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';\nimport { acquireClaimTx, releaseClaim, readClaims, readClaim, buildEffectiveView, getItemDurableRevision, withMainState } from '../state/runtime-coordination.mjs';\nimport path from 'node:path';\n\nimport { DEFAULTS } from '../state/work.mjs';\n\n/**\n * Read `releaseTrigger` off the MOST RECENT settle-to-'todo' event for\n * `id` — a `work.move(to: 'todo')`, or (tsk-40m: a same-state settle whose\n * preClaimStatus was already 'todo' writes no work.move at all) a\n * `work.attempt(to: 'todo')` — never off a durable item field, so a later\n * reject/verify-fail-park (which never carries this marker) always wins\n * over an earlier claim-lock §3b release's marker instead of the stale\n * value silently surviving (tsk-2zv). Returns `undefined` when the item\n * has never settled to `todo`, or when its latest such settle didn't carry\n * the marker (reject, verify-fail park, or a genuinely fresh take).\n */\nfunction latestTodoReleaseTrigger(events, id) {\n  let marker;\n  for (const event of events) {\n    if (!event || !event.payload) continue;\n    if (event.payload.id !== id || event.payload.to !== 'todo') continue;\n    if (event.type === 'work.move' || event.type === 'work.attempt') {\n      marker = event.payload.releaseTrigger;\n    }\n  }\n  return marker;\n}\n\n// category (R4, store.mjs's categoryOf contract): 'not-found' mirrors\n// StoreError's own not-found convention ('validation'); 'lock-held'\n// reuses 'lock-timeout' (events.mjs's own category for the\n// same \"couldn't get exclusive access\" class) — without this, an uncategorized\n// ClaimError falls through categoryOf to 'unexpected' and crashes the whole\n// runOnce drain-run instead of a graceful per-item halt (same failure mode\n// store.mjs's own EXIT_CODES comment documents for WorktreeError/MergeError).\nconst CLAIM_ERROR_CATEGORY = Object.freeze({\n  'not-found': 'validation',\n  'lock-held': 'lock-timeout',\n  'deps-not-merged': 'validation',\n  // Same reasoning as 'deps-not-merged': a refused claim is an ordinary,\n  // expected outcome, so the runner must halt this one item gracefully\n  // rather than crash its whole drain-run on an 'unexpected' category.\n  'worker-slot-ceiling': 'validation',\n  // The pre-claim durable-status CAS below (tsk-40m D2: preClaimStatus vs\n  // expectedStatus) reports the same 'conflict' category moveWork's own CAS\n  // always has for \"the state changed since you read it\" — a real,\n  // expected concurrent-claim outcome (exit 3), not a crash.\n  conflict: 'conflict',\n});\n\nexport class ClaimError extends Error {\n  constructor(code, message, details = {}) {\n    super(message);\n    this.name = 'ClaimError';\n    this.code = code;\n    this.category = CLAIM_ERROR_CATEGORY[code] ?? 'unexpected';\n    Object.assign(this, details);\n  }\n}\n\n/**\n * Claim work through the single choke-point.\n *\n * @param {string} dir - .fgos directory\n * @param {Object} opts\n * @param {string} opts.id - work item id\n * @param {string} opts.actor - 'session' | 'runner' | 'human'\n * @param {boolean} opts.isolate - if true, create worktree (pick behavior); if false, no worktree (take behavior)\n * @param {string} [opts.claimTrigger] - optional claim trigger stamp\n * @param {string} [opts.repoRoot] - repo root (defaults to process.cwd())\n * @param {string} [opts.worktreeDir] - custom worktree directory (for runner)\n * @returns {Object} claim result with worktree info if isolated\n */\nexport async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = process.cwd(), worktreeDir, skipOutcome = false, waitMs } = {}) {\n  // Everything that needs a child process happens before the state lock: the\n  // checkout's HEAD is read once, here, and that one answer is both the commit\n  // a fresh worktree forks from and the commit recorded on the claim.\n  const head = currentHead(repoRoot);\n  const scope = new LockScope('claim');\n\n  // The main checkout mutex (rank 50) is held only for the `.fgos` checkpoint.\n  // The ceiling check below no longer leans on it: it runs inside the `state`\n  // transaction, so two claims for the last slot still cannot both pass.\n  try {\n    await withMainCheckout(scope, 'claim', (mainHandle) => checkpointMainFgos(mainHandle, dir, repoRoot), { fgosDir: dir, waitMs });\n  } catch (err) {\n    if (err instanceof HolderLockError && err.code === 'lock-held') {\n      throw new ClaimError('lock-held', `claimWork: ${err.message}`, { holders: err.holders, lock: err.lock, timedOut: err.timedOut });\n    }\n    throw err;\n  }\n\n  // Tầng A (T2/T3): events now live under baseline-0 (.fgos/events.jsonl)\n  // PLUS every per-writer file under .fgos/events/ -- readRawEvents(dir)\n  // is the one door that reads all of it, merged/deduped (TA-D7/TA-D13).\n  const rawEvents = readRawEvents(dir);\n  const durableView = foldEvents(rawEvents);\n  const claims = readClaims(dir);\n  const view = buildEffectiveView(durableView, claims);\n  const item = view.work[id];\n\n  if (!item) {\n    throw new ClaimError('not-found', `claimWork: work \"${id}\" not found.`);\n  }\n\n  const priorVisits = visitCount(rawEvents, id);\n  const branch = branchNameFor(id);\n  const branchAlreadyExists = branchExists(repoRoot, branch);\n\n  const rootId = resolveRoot(view, id);\n  const isLeaf = rootId !== id;\n  const rootBranch = isLeaf ? branchNameFor(rootId) : undefined;\n  const rootBranchExists = isLeaf && branchExists(repoRoot, rootBranch);\n  const baseRef = rootBranchExists ? rootBranch : undefined;\n\n  if (isolate && isLeaf) {\n    const unmergedDeps = (item.deps ?? []).filter((dep) => !isResolvedStatus(view.work[dep]));\n    if (unmergedDeps.length > 0) {\n      throw new ClaimError(\n        'deps-not-merged',\n        `claimWork: leaf \"${id}\" has dep(s) not yet status:done — ${unmergedDeps.join(', ')} — forking from \"${rootBranch}\" now risks missing their content; approve/merge them into \"${rootBranch}\" first.`,\n      );\n    }\n  }\n\n  const activeClaim = claims[id];\n  const effectiveClaimRole = item.claimRole || activeClaim?.claimRole;\n\n  const isPotentialStaleClaimReclaim = isolate\n    && (activeClaim || item.status === 'doing')\n    && (effectiveClaimRole === 'human' || effectiveClaimRole === 'session')\n    && (actor === 'session' || actor === 'human')\n    && isReclaimEligible(repoRoot, id, effectiveClaimRole);\n\n  const ceiling = readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling;\n\n  // tsk-40m (docs/architect/doing-coordination-redesign.md): claim time no\n  // longer writes a durable work.move(->doing), so the ORIGINAL claim's\n  // branchHeadAtTake no longer lands on the item's own sticky top-level\n  // field (that field is only ever set by a work.move payload) — it now\n  // lives on the settle's own work.attempt, folded into item.lastAttempt.\n  const priorBranchHeadAtTake = item.lastAttempt?.branchHeadAtTake;\n  const isClaimLockReclaim = branchAlreadyExists\n    && typeof priorBranchHeadAtTake === 'string'\n    && priorBranchHeadAtTake\n    && latestTodoReleaseTrigger(rawEvents, id) === 'claim-lock-3b';\n\n  let branchHeadAtTake;\n  if (isClaimLockReclaim) {\n    branchHeadAtTake = priorBranchHeadAtTake;\n  } else if (branchAlreadyExists) {\n    branchHeadAtTake = resolveRefSha(repoRoot, branch);\n  } else if (rootBranchExists) {\n    branchHeadAtTake = resolveRefSha(repoRoot, rootBranch);\n  } else {\n    branchHeadAtTake = head;\n  }\n\n  const isBranchTake = item.status === 'blocked' && branchAlreadyExists;\n  const expectedStatus = isBranchTake ? 'blocked' : 'todo';\n  const useBranchSource = isolate || isBranchTake;\n\n  if (\n    isolate\n    && !isBranchTake\n    && (activeClaim || item.status === 'doing')\n    && (effectiveClaimRole === 'human' || effectiveClaimRole === 'session')\n    && (actor === 'session' || actor === 'human')\n    && isReclaimEligible(repoRoot, id, effectiveClaimRole)\n  ) {\n    try {\n      let adminRelease = null;\n      if (activeClaim) {\n        // tsk-40m code-review finding (high, D4/D8): releasing a claim\n        // used to just delete the runtime claim file, with no durable\n        // trace — a reclaimed item read identical to one that never\n        // started. Record the attempt first so attemptCount/lastAttempt\n        // (replay.mjs) can tell \"started then reclaimed\" apart from\n        // \"never started\". `phase` mirrors anti-loop.mjs's own\n        // executing-stage check (claim-lock) so a reclaim of a clarify/\n        // decompose-phase claim never inflates the execute-phase budget.\n        const claimDomain = getDomain(item.domain);\n        const claimPhase = effectiveStep(item, claimDomain) === stepForPhase(claimDomain, 'execute', item.kind)\n          ? 'execute'\n          : (item.workflowStep || 'unknown');\n        recordClaimAttempt(dir, { id, phase: claimPhase, result: 'reclaimed', claimId: activeClaim.claimId, actor: activeClaim.actor });\n        // Another session's claim, past its liveness threshold: released\n        // through the named admin path, never the owner-only default.\n        const rel = releaseClaim(dir, { id, claimId: activeClaim.claimId, adminReason: 'stale-claim-reclaim' });\n        if (rel.admin) adminRelease = { ...rel.admin, claimId: activeClaim.claimId };\n      } else if (item.status === 'doing') {\n        moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });\n      }\n      const activityAt = lastActivityAt(repoRoot, id);\n      addDecision(dir, {\n        id,\n        text: `stale-claim-reclaim: released ${effectiveClaimRole} claim (last activity ${activityAt === null ? 'unknown' : new Date(activityAt).toISOString()})`,\n        source: 'claimWork',\n        kind: 'engine',\n        rationale: `docs/history/session-claim-liveness/CONTEXT.md D2/D4/D5 — worktree activity signal past the ${effectiveClaimRole === 'runner' ? 'agentMs' : 'humanMs'} threshold, reclaimed by a live ${actor} claim attempt`,\n        // Another writer's claim was released: keep who owned it and who released it.\n        ...(adminRelease ? { admin: adminRelease } : {}),\n      });\n    } catch (err) {\n      if (!(err instanceof FsmError) || err.category !== 'conflict') throw err;\n    }\n  }\n\n  // tsk-40m code-review finding (blocker, TOCTOU): everything above took real\n  // wall-clock time with no lock held, long enough for a genuinely DIFFERENT\n  // process to durably move this item or take the last worker slot. So the\n  // fresh read, the status check, the worker-slot ceiling check and the\n  // claim write are one `state` transaction: no other durable write or claim\n  // can land between the read and the claim file being written.\n  const runtimeClaim = withMainState(dir, (tx) => {\n    const freshDurableView = foldEvents(readRawEvents(dir));\n    const freshStatus = freshDurableView.work[id]?.status;\n    if (freshStatus !== expectedStatus) {\n      throw new ClaimError(\n        'conflict',\n        `claimWork: expected \"${id}\" durable status \"${expectedStatus}\" but found \"${freshStatus}\" (durable state changed since read)`,\n      );\n    }\n    const freshRevision = getItemDurableRevision(freshDurableView, id);\n\n    if (!isPotentialStaleClaimReclaim) {\n      const room = hasWorkerSlotRoom(buildEffectiveView(freshDurableView, readClaims(dir)), { ceiling, excludeId: id });\n      if (!room.allowed) {\n        throw new ClaimError(\n          'worker-slot-ceiling',\n          `claimWork: worker-slot ceiling reached — ${room.occupied} of ${room.ceiling} slots in use; finish or park a running item before claiming \"${id}\".`,\n          { occupied: room.occupied, ceiling: room.ceiling },\n        );\n      }\n    }\n\n    return acquireClaimTx(tx, {\n      id,\n      actor,\n      source: useBranchSource ? 'branch' : 'main',\n      branch: useBranchSource ? branch : undefined,\n      branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,\n      headAtTake: useBranchSource ? undefined : head,\n      claimTrigger,\n      preClaimStatus: freshStatus,\n      preClaimRevision: freshRevision,\n      claimRole: actor,\n    });\n  });\n\n  if (!skipOutcome) {\n    addOutcome(dir, {\n      id,\n      predicted: {\n        size: item.size ?? DEFAULTS.size,\n        deps: item.deps?.length ?? 0,\n        priorVisits,\n        role: actor,\n        branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,\n        headAtTake: useBranchSource ? undefined : head,\n      },\n    });\n  }\n\n  const claim = {\n    id,\n    claimId: runtimeClaim.claimId,\n    from: expectedStatus,\n    to: 'doing',\n    role: actor,\n    seq: runtimeClaim.claimId,\n    source: useBranchSource ? 'branch' : 'main',\n    branch: useBranchSource ? branch : undefined,\n    branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,\n    headAtTake: useBranchSource ? undefined : head,\n  };\n\n  if (!isolate) return claim;\n  let worktree;\n  try {\n    // A fresh branch forks from the same commit the claim recorded; the\n    // worktree-admin mutex (rank 40) is taken here, with no other lock held.\n    worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef, startSha: head, scope });\n  } catch (err) {\n    releaseClaim(dir, { id, claimId: runtimeClaim.claimId });\n    throw err;\n  }\n  return { ...claim, worktree };\n}\n",
+      "continued": false
+    },
+    {
+      "file": "src/runner/claim-port.mjs",
+      "kind": "complete-final-record",
+      "categoryA": false,
+      "categoryB": true,
+      "record": {
+        "file": "src/runner/claim-port.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "6e510ae19478f1ba71a2ab900f024d98b0150dd20da9fd255afdd407ae9c50c7",
+        "digest": "6e510ae19478f1ba71a2ab900f024d98b0150dd20da9fd255afdd407ae9c50c7",
+        "inventoryEdgeIds": [
+          "class6-l-000253"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000253",
+            "slotKey": "{\"edgeId\":\"class6-l-000253\",\"file\":\"src/runner/claim-port.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000253\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":161}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000253",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 161
+              }
+            ],
+            "consumerFile": "src/runner/claim-port.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 161,
+                "columnStart": 15,
+                "columnEndExclusive": 60,
+                "text": "docs/architect/doing-coordination-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 161,
+                "columnStart": 15,
+                "columnEndExclusive": 60,
+                "text": "docs/architect/doing-coordination-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/doing-coordination-redesign.md",
+            "logicalReference": "docs/architect/doing-coordination-redesign.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Original implementation/proposal evidence stays literal; source tree retires in Phase 9 without current-authority acceptance. Own source passage: '  // tsk-40m (docs/architect/doing-coordination-redesign.md): claim time no'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/doing-coordination-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000253",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 161,
+                "matchedExpression": "docs/architect/doing-coordination-redesign.md",
+                "originalLineText": "  // tsk-40m (docs/architect/doing-coordination-redesign.md): claim time no"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/architect/doing-coordination-redesign.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "ca3d25989f45b88dc95b41fffd74f55012fcbf8a20f1d4a4517c386663d51f1f",
+              "treeSample": [
+                "docs/architect/doing-coordination-redesign.md"
+              ],
+              "historyCommitCount": 5,
+              "historyCommitsSha256": "13ff5cbacd150dc90e49d5dccc7dd573c2b162bb8392f87375e9427088ff40ff",
+              "historySample": [
+                "76b6cf8e54c750b7626ef861ec24c5e47becc81c",
+                "4104acf477ecb049ec8cf0f061bcc6d2b763146a"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-022",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/runner/claim-port.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "6e510ae19478f1ba71a2ab900f024d98b0150dd20da9fd255afdd407ae9c50c7",
+          "bytes": 14613,
+          "lines": 313,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "edgeId": "class6-l-000254",
+            "consumerFile": "src/runner/claim-port.mjs",
+            "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 67,
+                "columnStart": 21,
+                "line": 224,
+                "text": "docs/history/session-claim-liveness/CONTEXT.md"
+              }
+            ],
+            "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity."
+          }
+        ]
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "src/runner/dispatch/assignment-policy.mjs",
+      "kind": "complete-source-context",
+      "path": "src/runner/dispatch/assignment-policy.mjs",
+      "startLine": 1,
+      "endLine": 535,
+      "content": "// dispatch/assignment-policy.mjs — Dispatch policy resolution for assignments (Step 01 Slice 3a / Step 03).\n//\n// Resolution order:\n// Global defaults -> Domain defaults -> Workflow defaults -> Stage defaults\n// -> Operation / taskSpec defaults -> Role defaults -> Persona defaults\n// -> Work-item policy -> Assignment explicit policy -> Human / CLI explicit override\n// -> Governance gate\n//\n// Invariants:\n// - Constraints accumulate and fail closed.\n// - Tier resolves to the strongest required tier (cannot be weakened).\n// - Literal model names are accepted only from Assignment or human/CLI override (never workflow YAML).\n// - Executor/provider preference uses the most specific value.\n//\n// Step 08 R3 (declared CoordinationProtocol materialization): an optional\n// `cliOverride.policyProvenance` object (`{tier?, persona?, executor?,\n// visibility?}`, each a `{scope, id?}` pair) lets a caller that already\n// composed a full scoped policy stack upstream (runner/definition/operation/\n// role/actor/assignment/cli -- coordination/session-engine.mjs's\n// `dispatchDeclaredOperation`) record which scope actually won, instead of\n// this resolver's own generic `{scope: 'cliOverride'}` label. Existing callers\n// omit `policyProvenance`, so the field is purely additive.\n\nimport { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES, DEFAULT_RIGOR_TO_TIER, assertReasoningEffort } from './config.mjs';\nimport { resolveTierModel, deriveProviderFamily, tierCellMissingDetail } from './resolve.mjs';\nimport { REPEAT_MODE_VALUES } from './execution-contract.mjs';\nimport { checkProviderDisallowed } from './provider-adapter.mjs';\nimport { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';\nimport { deriveOperationCapability } from '../operation-capability.mjs';\nexport const TIER_STRENGTH = Object.freeze({\n  nano: 1,\n  mini: 2,\n  standard: 3,\n  advanced: 4,\n  flagship: 5,\n  frontier: 6,\n});\n\n\nexport { RIGOR_VALUES, RIGOR_RANK };\n\n// Option names that once carried a Work item (or the pieces dispatch used to read off one)\n// into dispatch. Dispatch takes generic inputs only, so a caller still passing one is refused\n// instead of having it silently ignored.\nexport const WORK_ITEM_KEYS = Object.freeze(['work', 'workItem']);\nconst WORK_ITEM_INPUT_KEYS = Object.freeze([...WORK_ITEM_KEYS, 'workExecutorId']);\n\n/**\n * Throws when `params` still carries a Work item input; `where` names the entry point. `keys`\n * narrows the check (a `--work` hint legitimately carries `workExecutorId`).\n */\nexport function refuseWorkItemInput(params, where, keys = WORK_ITEM_INPUT_KEYS) {\n  const found = params && typeof params === 'object' ? keys.filter((key) => Object.hasOwn(params, key)) : [];\n  if (found.length) {\n    throw new RunnerConfigError(\n      `${where} takes no Work item (${found.join(', ')}): pass its demand as generic inputs (assignment rigor/domain, a work hint, capability hints, agent type)`,\n    );\n  }\n}\n\n// Phase 03 (executor-policy-dispatch-seams) — canonical reasoningEffort.\n// Most-specific-wins (design.md §4 field rules table).\n// executor-profile-schema-migration) so `validateExecutorEntryShape`'s new\n// `supports.reasoningEffort` check can reuse the exact same vocabulary\n// without a config.mjs -> assignment-policy.mjs -> config.mjs import cycle;\n// re-exported here unchanged so every existing caller of this module keeps\n// working byte-identically.\nexport { REASONING_EFFORT_VALUES };\n/**\n * The reasoningEffort a resolved policy asks the provider CLI to run at, or\n * undefined when nobody asked: an explicit level (a `--effort` override or an\n * operation policy) is rendered into the launch; one merely derived from rigor\n * is not, because no dispatch has ever been launched with it and turning it on\n * would change every run's cost at once.\n */\nexport function explicitReasoningEffort(policy) {\n  const scope = policy?.provenance?.reasoningEffort?.source?.scope;\n  return scope && scope !== 'derived' ? policy.reasoningEffort : undefined;\n}\n\nexport const REASONING_EFFORT_DEFAULT_FROM_RIGOR = Object.freeze({\n  low: 'low',\n  standard: 'medium',\n  high: 'high',\n  critical: 'max',\n});\n\n// Phase 03's compatibility alias seam (design.md §5.1) is retired\n// (executor-id-consolidation Step 2): every id it keyed off\n// (claude-reviewer/claude-reviewer-herdr/codex-readonly) no longer exists\n// as a registered executor at all, so `primaryExecutor` can never equal\n// one -- the seam had already become permanently unreachable dead code\n// (step 3 below's own registration throw fires first, always). The same\n// personas/reasoningEffort/visibility it used to compatibility-patch are\n// now expressed directly via `actors[].invocation` (a specific\n// `claude`/`codex` invocation already carries `--effort high`/confinement\n// in its own declared args) or capabilities.<name>.prefer's invocation pin\n// -- no resolver-side patching needed any more.\n\n/**\n * Return the stronger of two tiers based on rigor hierarchy.\n *\n * @param {string} tierA\n * @param {string} tierB\n * @returns {string}\n */\nexport function resolveStrongerTier(tierA, tierB) {\n  for (const value of [tierA, tierB]) {\n    if (value !== undefined && value !== null && !MODEL_POLICY_TIERS.includes(value)) {\n      throw new RunnerConfigError(`invalid tier \"${value}\". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);\n    }\n  }\n  if (tierA === undefined || tierA === null) return tierB ?? 'standard';\n  if (tierB === undefined || tierB === null) return tierA;\n  return TIER_STRENGTH[tierB] > TIER_STRENGTH[tierA] ? tierB : tierA;\n}\n\n/**\n * Resolve `primaryExecutor` to its REGISTERED config entry (Phase 00 R6,\n * fixes H2a/H2b) and derive its provider family (Phase 00 R6 fix F1) --\n * extracted verbatim from `resolveAssignmentDispatchPolicy`'s own former\n * inline steps 3b/4 (dispatch-engine-liveness-hardening Phase 7, C3\n * finding) so `cli.mjs`'s `executeExecutorCli` can derive the SAME\n * `resolvedProvider` it needs for governance without running this\n * resolver's entire tier/quality/persona/model computation. Same checks,\n * same order, same throws as before this extraction -- a pure move.\n *\n * @param {object} params\n * @param {object} [params.runnerConfig]\n * @param {string} params.primaryExecutor\n * @param {string} [params.explicitProviderModel] an already-resolved\n *   providerModel override (cliOverride/opPolicy), when the caller has one\n * @param {{disallowedProviders?: string[], disallowedExecutors?: string[]}} [params.options]\n * @returns {{resolvedProvider: string, registeredExecutorEntry: object|undefined}}\n */\nexport function resolveExecutorProvider({ runnerConfig, primaryExecutor, options = {} }) {\n  const hasExecutorRegistry = Boolean(runnerConfig && runnerConfig.executors && typeof runnerConfig.executors === 'object');\n  const hasGovernanceOptions =\n    (Array.isArray(options.disallowedProviders) && options.disallowedProviders.length > 0) ||\n    (Array.isArray(options.disallowedExecutors) && options.disallowedExecutors.length > 0);\n  if (hasGovernanceOptions && !hasExecutorRegistry) {\n    throw new RunnerConfigError(\n      `governance requires \"disallowedProviders\"/\"disallowedExecutors\" but runnerConfig.executors is absent -- provider family cannot be verified for executor \"${primaryExecutor}\"`,\n    );\n  }\n  const registeredExecutorEntry = hasExecutorRegistry ? runnerConfig.executors[primaryExecutor] : undefined;\n  const isImplicitDefaultExecutor = primaryExecutor === 'claude' || primaryExecutor === runnerConfig?.executor?.command || primaryExecutor === runnerConfig?.executor?.invocations?.[0]?.command || primaryExecutor === runnerConfig?.executor?.invocations?.[0]?.id;\n  if (hasExecutorRegistry && !registeredExecutorEntry && !isImplicitDefaultExecutor) {\n    throw new RunnerConfigError(`preferExecutor \"${primaryExecutor}\" is not a registered executor (runnerConfig.executors has no such entry).`);\n  }\n  const registeredExecutorCommand = registeredExecutorEntry?.invocations?.find((inv) => inv.via === 'cli')?.command;\n  const resolvedProvider = registeredExecutorEntry\n    ? deriveProviderFamily(registeredExecutorEntry, registeredExecutorCommand)\n    : isImplicitDefaultExecutor\n      ? deriveProviderFamily({ command: runnerConfig?.executor?.command }, primaryExecutor)\n      : primaryExecutor;\n  return { resolvedProvider, registeredExecutorEntry };\n}\n\n/**\n * Governance gate (Phase 00 R6/F2): reject an already-resolved provider\n * family / executor id pair against `options.disallowedProviders`/\n * `.disallowedExecutors`. Extracted from `resolveAssignmentDispatchPolicy`\n * (dispatch-engine-liveness-hardening Phase 7, C3 finding) so a caller that\n * has already resolved its own provider/executor (e.g. `cli.mjs`'s\n * `executeExecutorCli`/`spawnWorker`, which used to run this resolver's\n * entire tier/quality/persona/model computation only to reach this same\n * check) can run the SAME governance check directly, without a second,\n * redundant resolver call whose rich result it then discarded.\n *\n * @param {object} params\n * @param {string} params.primaryExecutor the resolved executor id\n * @param {string} params.providerModel the resolved provider family\n * @param {{disallowedProviders?: string[], disallowedExecutors?: string[]}} [params.options]\n * @returns {{canonicalProvider: string}}\n */\nexport function resolveExecutorGovernance({ primaryExecutor, providerModel, options = {} }) {\n  const providerGov = checkProviderDisallowed(options.disallowedProviders, providerModel);\n  if (providerGov.disallowed) {\n    throw new RunnerConfigError(`governance gate rejected provider \"${providerGov.canonicalProvider}\": disallowed egress`, {\n      code: 'governance.disallowed-provider',\n    });\n  }\n  if (options.disallowedExecutors && options.disallowedExecutors.includes(primaryExecutor)) {\n    throw new RunnerConfigError(`governance gate rejected executor \"${primaryExecutor}\": disallowed`, {\n      code: 'governance.disallowed-executor',\n    });\n  }\n  return { canonicalProvider: providerGov.canonicalProvider };\n}\n\n/**\n * Resolve effective dispatch policy for an Assignment before execution attempt (Step 03 §3.1).\n *\n * @param {object} params\n * @param {object} params.assignment Assignment object (required). Its own `rigor` and\n *   `domain` are the caller's demand: the Work layer folds an item's rigor and risk into\n *   `rigor` before dispatch sees it, so dispatch never reads a Work item.\n * @param {object} [params.runnerConfig] Runner configuration (optional)\n * @param {object} [params.cliOverride] Human / CLI overrides (optional)\n * @param {object} [params.options] Governance and lookup options\n * @returns {Readonly<object>} Effective dispatch policy\n */\n// M12: `cliOverride` renamed to `policyInputs` -- the merged PolicyPatch a\n// caller wants layered on top of the assignment/work/operation stack was\n// never CLI-specific (session-engine.mjs's own coordination dispatch path\n// builds and passes one with no CLI in sight), so the old name described\n// where the FIRST caller of this function happened to source it from, not\n// what the parameter actually is. `cliOverride` is kept as a working alias\n// for one release rather than a breaking rename -- accepted alongside\n// `policyInputs`, with `policyInputs` winning when a caller (unusually)\n// supplies both.\nexport function resolveAssignmentDispatchPolicy({\n  assignment,\n  runnerConfig,\n  cliOverride = {},\n  policyInputs,\n  options = {},\n}) {\n  // `policyInputs` wins when a caller supplies both; every reference below\n  // stays named `cliOverride` (including provenance's own `{scope:\n  // 'cliOverride'}` stamp -- an internal attribution label, not part of\n  // this rename) since reassigning the one binding here covers all of them\n  // without a large, error-prone rename sweep across this whole function.\n  if (policyInputs !== undefined) cliOverride = policyInputs;\n  refuseWorkItemInput(arguments[0], 'resolveAssignmentDispatchPolicy()');\n  if (!assignment || typeof assignment !== 'object') {\n    throw new RunnerConfigError('resolveAssignmentDispatchPolicy requires an assignment object');\n  }\n\n  const opPolicy = assignment.policy === undefined ? {} : assignment.policy;\n  if (!opPolicy || typeof opPolicy !== 'object' || Array.isArray(opPolicy)) {\n    throw new RunnerConfigError('assignment.policy must be an object when provided');\n  }\n  const retiredMinTier = ['min', 'Tier'].join('');\n  if (Object.prototype.hasOwnProperty.call(opPolicy, retiredMinTier)) {\n    throw new RunnerConfigError(`assignment policy field \"${retiredMinTier}\" was removed; normalize persisted assignments at the load boundary or use \"rigor\"/\"tier\"`);\n  }\n  if (opPolicy._fromYaml && opPolicy.tier !== undefined) {\n    throw new RunnerConfigError('workflow YAML cannot set explicit tier; use rigor, or set tier at actor/assignment/CLI scope');\n  }\n\n  // Reject literal model in operation policy if it was not explicitly stamped as assignment-level\n  if (opPolicy.model && !assignment._allowLiteralModel && !cliOverride.model) {\n    // If model comes from declared operation YAML, it is prohibited\n    if (opPolicy._fromYaml) {\n      throw new RunnerConfigError('workflow YAML cannot pin literal model names; use rigor or persona');\n    }\n  }\n\n  const opId = assignment.operation;\n  const strength = (t) => TIER_STRENGTH[t] ?? 0;\n  const rigorToTier = runnerConfig?.rigorToTier ?? runnerConfig?.runner?.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;\n  const rigorStrength = (r) => RIGOR_RANK[r] ?? 0;\n\n  // 1. Rigor Resolution (demand side, monotonic: highest explicit\n  // requirement wins; the implicit standard is only a final fallback).\n  if (opPolicy.rigor !== undefined && !RIGOR_VALUES.includes(opPolicy.rigor)) {\n    throw new RunnerConfigError(`invalid operation rigor \"${opPolicy.rigor}\". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);\n  }\n  let effectiveRigor = opPolicy.rigor ?? 'standard';\n  let rigorSource = opPolicy.rigor !== undefined ? { scope: 'opPolicy', id: opId } : { scope: 'default' };\n  // The implicit standard is a fallback, not a floor. The first explicit\n  // source may therefore select low; only later explicit sources are\n  // monotonic raise-only.\n  // The caller's own rigor demand (a Work item's rigor or risk, folded by the Work layer).\n  // First explicit source may select it outright; after an operation rigor it only raises.\n  if (assignment.rigor !== undefined) {\n    if (!RIGOR_VALUES.includes(assignment.rigor)) {\n      throw new RunnerConfigError(`invalid assignment rigor \"${assignment.rigor}\". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);\n    }\n    if (rigorSource.scope === 'default' || rigorStrength(assignment.rigor) > rigorStrength(effectiveRigor)) {\n      effectiveRigor = rigorSource.scope === 'default' ? assignment.rigor : resolveStrongerRigor(effectiveRigor, assignment.rigor);\n      rigorSource = { scope: 'assignment', id: assignment.assignmentId ?? assignment.workId ?? null };\n    }\n  }\n\n  // Capability floor (D19). Declared capability wins. For assignments built\n  // from operations without policy.capability, reuse the canonical derivation\n  // shared with coordination binding; never import the verb layer here.\n  const derivedCapability = deriveOperationCapability(\n    { id: assignment.operation, policy: opPolicy, result: assignment.result ?? { kind: assignment.resultKind } },\n    { domain: assignment.domain, primaryCapability: assignment.primaryCapability },\n    runnerConfig,\n  );\n  const targetCap = opPolicy.capability ?? assignment.capability ?? derivedCapability.name;\n  if (targetCap && runnerConfig?.capabilities?.[targetCap]?.rigor !== undefined) {\n    const capRigor = runnerConfig.capabilities[targetCap].rigor;\n    if (!RIGOR_VALUES.includes(capRigor)) {\n      throw new RunnerConfigError(`invalid capability rigor \"${capRigor}\" for \"${targetCap}\". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);\n    }\n    if (rigorSource.scope === 'default' || rigorStrength(capRigor) > rigorStrength(effectiveRigor)) {\n      effectiveRigor = rigorSource.scope === 'default' ? capRigor : resolveStrongerRigor(effectiveRigor, capRigor);\n      rigorSource = { scope: 'capability', id: targetCap };\n    }\n  }\n\n  // Caller/CLI rigor.\n  const cliRigor = cliOverride.rigor;\n  if (cliRigor !== undefined) {\n    if (!RIGOR_VALUES.includes(cliRigor)) {\n      throw new RunnerConfigError(`invalid override rigor \"${cliRigor}\". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);\n    }\n    if (rigorSource.scope === 'default' || rigorStrength(cliRigor) > rigorStrength(effectiveRigor)) {\n      effectiveRigor = rigorSource.scope === 'default' ? cliRigor : resolveStrongerRigor(effectiveRigor, cliRigor);\n      rigorSource = cliOverride.policyProvenance?.rigor ?? { scope: 'cliOverride' };\n    }\n  }\n\n  if (!RIGOR_VALUES.includes(effectiveRigor)) {\n    throw new RunnerConfigError(`unrecognized rigor \"${effectiveRigor}\". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);\n  }\n\n  // 1b. Map rigor -> tier via rigorToTier. Validate before considering any\n  // explicit tier, otherwise a valid override could mask a malformed map.\n  const derivedTier = rigorToTier[effectiveRigor];\n  if (!MODEL_POLICY_TIERS.includes(derivedTier)) {\n    throw new RunnerConfigError(\n      `rigorToTier maps rigor \"${effectiveRigor}\" to invalid tier \"${derivedTier}\". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`,\n    );\n  }\n  let effectiveTier = derivedTier;\n  let tierSource = { scope: 'rigor', id: effectiveRigor };\n\n  // Explicit tiers are independent raise-only inputs. Validate every source\n  // before composition so a stronger source cannot mask a malformed weaker\n  // one.\n\n  const tierOverrideProvenance = cliOverride.policyProvenance?.tier;\n  if (\n    cliOverride.tier !== undefined &&\n    tierOverrideProvenance !== undefined &&\n    !['actor', 'assignment', 'cli', 'cliOverride'].includes(tierOverrideProvenance.scope)\n  ) {\n    throw new RunnerConfigError(\n      `explicit tier provenance scope \"${tierOverrideProvenance.scope}\" is not allowed; tier may be explicit only at actor, assignment, or CLI scope`,\n    );\n  }\n  const explicitTiers = [\n    { value: opPolicy.tier, source: { scope: 'opPolicy', id: opId } },\n    { value: cliOverride.tier, source: cliOverride.policyProvenance?.tier ?? { scope: 'cliOverride' } },\n  ];\n  for (const { value, source } of explicitTiers) {\n    if (value === undefined) continue;\n    if (!MODEL_POLICY_TIERS.includes(value)) {\n      throw new RunnerConfigError(`invalid explicit tier \"${value}\". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);\n    }\n    if (strength(value) > strength(effectiveTier)) {\n      effectiveTier = resolveStrongerTier(effectiveTier, value);\n      tierSource = source;\n    }\n  }\n\n  if (!MODEL_POLICY_TIERS.includes(effectiveTier)) {\n    throw new RunnerConfigError(`unrecognized tier \"${effectiveTier}\". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);\n  }\n\n  // 1c. Executor preference\n  const primaryExecutor =\n    cliOverride.preferExecutor ??\n    opPolicy.preferExecutor ??\n    runnerConfig?.executor?.command ??\n    (runnerConfig?.executor?.invocations?.[0]?.command ?? runnerConfig?.executor?.invocations?.[0]?.id) ??\n    'claude';\n  const executorSource = cliOverride.preferExecutor\n    ? (cliOverride.policyProvenance?.executor ?? { scope: 'cliOverride' })\n    : opPolicy.preferExecutor\n      ? { scope: 'opPolicy', id: opId }\n      : { scope: 'default' };\n\n\n  // Phase 03: canonical reasoningEffort, most-specific-wins.\n  // Precedence mirrors every other field in this resolver:\n  // explicit cliOverride/opPolicy > derived from canonical rigor.\n  const explicitReasoningEffort = cliOverride.reasoningEffort ?? opPolicy.reasoningEffort;\n  let reasoningEffort;\n  let reasoningEffortSource;\n  if (explicitReasoningEffort !== undefined) {\n    reasoningEffort = assertReasoningEffort(explicitReasoningEffort);\n    reasoningEffortSource = cliOverride.reasoningEffort ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId };\n  } else {\n    reasoningEffort = REASONING_EFFORT_DEFAULT_FROM_RIGOR[effectiveRigor] ?? 'medium';\n    reasoningEffortSource = { scope: 'derived', id: `rigor.${effectiveRigor}` };\n  }\n\n  // 2. Persona Resolution\n  const resolvedPersona =\n    cliOverride.preferPersona ??\n    opPolicy.preferPersona ??\n    (assignment.role === 'reviewer' ? 'code-reviewer' : undefined);\n  const personaSource = cliOverride.preferPersona\n    ? (cliOverride.policyProvenance?.persona ?? { scope: 'cliOverride' })\n    : opPolicy.preferPersona\n      ? { scope: 'opPolicy', id: opId }\n      : resolvedPersona\n          ? { scope: 'default', id: assignment.role }\n          // Phase 00 R7/F4: still `{ scope: 'default' }` (no id) rather than\n          // `undefined` when no persona resolves at all -- provenance.persona.source\n          // must always be an object, per the documented shape.\n          : { scope: 'default' };\n\n  // 3. Executor Preference Resolution (registry/governance)\n  const declaredFallbacks = cliOverride.fallbackExecutors ?? opPolicy.fallbackExecutors ?? [];\n  // `fallbackExecutors` is reserved-not-executed (Phase 00 R10): only\n  // `executorList[0]` (primaryExecutor) is ever actually dispatched --\n  // entries beyond it are recorded for future automatic-failover, never\n  // validated for registration and never spawned by this resolver.\n  const executorList = [\n    primaryExecutor,\n    ...declaredFallbacks.filter((e) => e !== primaryExecutor),\n  ];\n\n  // 3b/4 (registry validation, provider derivation): extracted to\n  // `resolveExecutorProvider` (dispatch-engine-liveness-hardening Phase 7,\n  // C3) -- see that function's own doc comment for why, and\n  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the\n  // edge cases its logic still encodes unchanged (pure move, same checks,\n  // same order, same throws). The governance THROWS (disallowedProviders/\n  // disallowedExecutors, step 7 below) stay in their original position,\n  // AFTER quality/persona/visibility/repeatMode/constraints resolution --\n  // error (invalid rigor/repeatMode) that used to throw first for\n  // the same malformed input, a real ordering change this extraction must\n  // not introduce.\n  const { resolvedProvider, registeredExecutorEntry } = resolveExecutorProvider({\n    runnerConfig,\n    primaryExecutor,\n    options,\n  });\n  const providerSource = registeredExecutorEntry\n    ? { scope: 'registeredExecutor', id: primaryExecutor }\n    : executorSource;\n  let resolvedModel = null;\n  // Phase 00 R7/F4: defaults to `{ scope: 'default' }` below when no\n  // override/runnerConfig resolves a source -- provenance.model.source must\n  // always be an object, never `undefined`, per the documented shape.\n  let modelSource = { scope: 'default' };\n\n  if (cliOverride.model) {\n    resolvedModel = cliOverride.model;\n    modelSource = { scope: 'cliOverride' };\n  } else if (opPolicy.model) {\n    resolvedModel = opPolicy.model;\n    modelSource = { scope: 'opPolicy', id: opId };\n  } else if (runnerConfig) {\n    // Direct tier resolution fails closed when the provider/tier pair is\n    // unsupported. The previous fallback repeated the identical lookup and\n    // could never recover from a missing mapping.\n    try {\n      resolvedModel = resolveTierModel(runnerConfig, effectiveTier, resolvedProvider);\n    } catch (err) {\n      throw new RunnerConfigError(`tier-cell-missing: ${tierCellMissingDetail(resolvedProvider, effectiveTier)}`, { code: 'tier-cell-missing' });\n    }\n    modelSource = { scope: 'placement-policy', id: `${resolvedProvider}.${effectiveTier}` };\n  }\n\n  // 5. Visibility Resolution\n  const resolvedVisibility = cliOverride.visibility ?? opPolicy.visibility ?? 'headless';\n  const visibilitySource = cliOverride.visibility\n    ? (cliOverride.policyProvenance?.visibility ?? { scope: 'cliOverride' })\n    : opPolicy.visibility\n      ? { scope: 'opPolicy', id: opId }\n      : { scope: 'default' };\n\n  // 5b. RepeatMode Resolution (Step 09/P03 fallback-and-effect-boundary\n  // contract): declared explicitly on the operation/protocol YAML\n  // (`opPolicy.repeatMode`) or a caller's own `cliOverride.repeatMode` --\n  // NEVER derived from `assignment.mutation`, which this resolver does not\n  // read anywhere in this function. `mutation` and `repeatMode` are\n  // independent axes (mutation: does this dispatch write state; repeatMode:\n  // may ITS OWN declared operation be repeated once an effect has already\n  // reached an external sink) and must stay that way -- undeclared on both\n  // sides simply resolves to `null`, which `dispatch/recovery.mjs`'s\n  // `assess` treats as a config error, never as an inferred value.\n  const resolvedRepeatMode = cliOverride.repeatMode ?? opPolicy.repeatMode;\n  if (resolvedRepeatMode !== undefined && !REPEAT_MODE_VALUES.includes(resolvedRepeatMode)) {\n    throw new RunnerConfigError(`invalid repeatMode \"${resolvedRepeatMode}\". Valid repeatModes: [${REPEAT_MODE_VALUES.join(', ')}]`);\n  }\n  const repeatModeSource = cliOverride.repeatMode\n    ? { scope: 'cliOverride' }\n    : opPolicy.repeatMode\n      ? { scope: 'opPolicy', id: opId }\n      : { scope: 'default' };\n\n  // 6. Constraints Accumulation\n  const skills = Array.isArray(assignment.skills) ? assignment.skills : [];\n  const constraints = {\n    requiresSkills: Object.freeze([...skills]),\n    ...(opPolicy.constraints || {}),\n  };\n  const constraintsSource = { scope: 'assignment', id: assignment.assignmentId };\n\n  // 7. Governance check (Phase 00 R6/F2: `resolvedProvider` and\n  // `primaryExecutor` are checked as two DISTINCT fields, never merged into\n  // one -- `disallowedProviders` names a provider family, never a raw\n  // executor id, per its own option name; `disallowedExecutors` is its\n  // executor-id-keyed counterpart, for governance configs that need to\n  // block one specific registered executor entry even when its declared\n  // provider family is otherwise trusted). Extracted to `resolveExecutorGovernance`\n  // (dispatch-engine-liveness-hardening Phase 7, C3) so `executeExecutorCli`/\n  // `spawnWorker` (cli.mjs) can run the SAME governance check directly\n  // against their own already-resolved provider/executor without paying for\n  // this resolver's full tier/quality/persona/model computation just to\n  // reach these two throws.\n  const { canonicalProvider } = resolveExecutorGovernance({ primaryExecutor, providerModel: resolvedProvider, options });\n  const governanceSource = { scope: 'governance', id: canonicalProvider };\n\n  const effectivePolicy = {\n    role: assignment.role,\n    persona: resolvedPersona,\n    executorPreference: Object.freeze(executorList),\n    executorId: primaryExecutor,\n    providerModel: resolvedProvider,\n    rigor: effectiveRigor,\n    tier: effectiveTier,\n    model: resolvedModel,\n    reasoningEffort,\n    visibility: resolvedVisibility,\n    repeatMode: resolvedRepeatMode ?? null,\n    constraints: Object.freeze(constraints),\n    provenance: Object.freeze({\n      executor: Object.freeze({ value: primaryExecutor, source: Object.freeze(executorSource) }),\n      provider: Object.freeze({ value: resolvedProvider, source: Object.freeze(providerSource) }),\n      model: Object.freeze({ value: resolvedModel, source: modelSource ? Object.freeze(modelSource) : undefined }),\n      rigor: Object.freeze({ value: effectiveRigor, source: Object.freeze(rigorSource) }),\n      tier: Object.freeze({ value: effectiveTier, source: Object.freeze(tierSource) }),\n      reasoningEffort: Object.freeze({ value: reasoningEffort, source: Object.freeze(reasoningEffortSource) }),\n      persona: Object.freeze({ value: resolvedPersona, source: personaSource ? Object.freeze(personaSource) : undefined }),\n      visibility: Object.freeze({ value: resolvedVisibility, source: Object.freeze(visibilitySource) }),\n      repeatMode: Object.freeze({ value: resolvedRepeatMode ?? null, source: Object.freeze(repeatModeSource) }),\n      constraints: Object.freeze({ value: constraints, source: Object.freeze(constraintsSource) }),\n      governance: Object.freeze({ value: 'allowed', source: Object.freeze(governanceSource) }),\n    }),\n  };\n  return Object.freeze(effectivePolicy);\n}\n",
+      "continued": false
+    },
+    {
+      "file": "src/runner/dispatch/assignment-policy.mjs",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "src/runner/dispatch/assignment-policy.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "badc90b011413fbdce40b33a6c474f00c4fc989f295883ea22ba43f684d24b30",
+        "digest": "c0cff9ec45634a9a8164c10dd9cc944145776cbe51d04ccb0a5676419fdf667a",
+        "inventoryEdgeIds": [
+          "class6-l-000255"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000255",
+            "slotKey": "{\"edgeId\":\"class6-l-000255\",\"file\":\"src/runner/dispatch/assignment-policy.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000255\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":416}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000255",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 416
+              }
+            ],
+            "consumerFile": "src/runner/dispatch/assignment-policy.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 416,
+                "columnStart": 7,
+                "columnEndExclusive": 51,
+                "text": "docs/history/executor-policy-dispatch-seams/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 416,
+                "columnStart": 7,
+                "columnEndExclusive": 51,
+                "text": "docs/history/executor-policy-dispatch-seams/"
+              }
+            ],
+            "matchedExpression": "docs/history/executor-policy-dispatch-seams/",
+            "logicalReference": "docs/history/executor-policy-dispatch-seams/",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: L12-62: Dead link: target never existed in git history. Navigation for resolveExecutorProvider H2a/H2b/RT1/F1 edge cases. Non-executable successor note: archive/plans/260915-executor-policy-dispatch-seams/ and docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md are plan/evidence only, not live authority. Own source passage: '  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: L12-62: Dead link: target never existed in git history. Navigation for resolveExecutorProvider H2a/H2b/RT1/F1 edge cases. Non-executable successor note: archive/plans/260915-executor-policy-dispatch-seams/ and docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md are plan/evidence only, not live authority. Own source passage: '  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the'",
+            "dependency": "L12-62: L12-62: Dead link: target never existed in git history. Navigation for resolveExecutorProvider H2a/H2b/RT1/F1 edge cases. Non-executable successor note: archive/plans/260915-executor-policy-dispatch-seams/ and docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md are plan/evidence only, not live authority. Own source passage: '  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the'",
+            "blockedCategory": "dead-link",
+            "dependencyCategory": "dead-link",
+            "legacyPath": "docs/history/executor-policy-dispatch-seams/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000255",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 416,
+                "matchedExpression": "docs/history/executor-policy-dispatch-seams/",
+                "originalLineText": "  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the"
+              }
+            ],
+            "parkSourceQuote": "  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/history/executor-policy-dispatch-seams/",
+              "passage": "  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/history/executor-policy-dispatch-seams/",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "L12-62: L12-62: Dead link: target never existed in git history. Navigation for resolveExecutorProvider H2a/H2b/RT1/F1 edge cases. Non-executable successor note: archive/plans/260915-executor-policy-dispatch-seams/ and docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md are plan/evidence only, not live authority. Own source passage: '  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the'",
+              "hitGroups": [
+                {
+                  "query": "docs/history/executor-policy-dispatch-seams/",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: L12-62: Dead link: target never existed in git history. Navigation for resolveExecutorProvider H2a/H2b/RT1/F1 edge cases. Non-executable successor note: archive/plans/260915-executor-policy-dispatch-seams/ and docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md are plan/evidence only, not live authority. Own source passage: '  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the",
+              "terms": [
+                "F1",
+                "H2b",
+                "RT1",
+                "resolveExecutorProvider"
+              ],
+              "queries": [
+                {
+                  "term": "F1",
+                  "hitCount": 212,
+                  "liveHits": 189,
+                  "hitsSha256": "3b559088a9a7a28a3dfa003975e56c79633d4d80aaa4597c4d684cf4be1d26c4",
+                  "files": {
+                    "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md": {
+                      "live": 7,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/P00.1.md": {
+                      "live": 4,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.1.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 7,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/requests/close.json": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/requests/fix-1.json": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/reviewer-recheck-fix1-findings.json": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 7,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-focused-suite-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 7,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 7,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/doer-report.md": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 7,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/redteam-report.md": {
+                      "live": 7,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/code-implementation-track-policy/p01.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/code-panel-multicell-facade/p00.md": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I05.md": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P02.1.md": {
+                      "live": 13,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P03.1.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/group-thinking-plan-loop/index.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/runtime-recovery/p02h-reopen.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/runtime-recovery/p03.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/runtime-recovery/p05.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p00.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p12.md": {
+                      "live": 4,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md": {
+                      "live": 18,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P00.3/codex-cli-live-proof.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 7,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md": {
+                      "live": 9,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-2-validate-plan-negative.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/git/spec.md": {
+                      "live": 31,
+                      "carriage": 0
+                    },
+                    "docs/platform/holder-lock/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/platform-foundations.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/component-authority-boundary-map.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/proposals/coordination-capability-envelope.md": {
+                      "live": 0,
+                      "carriage": 3
+                    },
+                    "docs/platform/proposals/step-10-coding-domain-adoption.md": {
+                      "live": 0,
+                      "carriage": 5
+                    },
+                    "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md": {
+                      "live": 0,
+                      "carriage": 14
+                    },
+                    "docs/platform/runner/operations/h-51f5cd7279fd.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/work-state/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+                      "line": 140,
+                      "text": "## Confirmed: `tsk-2el` closed the entry-point prose gap (F1d/F1f/F1g/F3)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+                      "line": 145,
+                      "text": "`tsk-2el`, along with the sibling frontmatter/prose fixes (F1f, F1g) and",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+                      "line": 163,
+                      "text": "## Confirmed: `tsk-3zi` fixed the Rust dashboard's blind spot (F1e)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+                      "line": 179,
+                      "text": "## Confirmed: `tsk-31lz` closed the false-pass settlement gate (F1c)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+                      "line": 198,
+                      "text": "invariant (B3) — the two structural gaps behind F1's stuck-item class —",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+                      "line": 213,
+                      "text": "instead of the closed referral loop F1's own audit section described.",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "H2b",
+                  "hitCount": 1,
+                  "liveHits": 1,
+                  "hitsSha256": "a5e76f05b6d2f15bc26c5605e968a3b19f940a793a0cb8b49a752695b7159ec5",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+                      "line": 533,
+                      "text": "  and the value used are identical), so this is not a reopening of H2b —",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "RT1",
+                  "hitCount": 21,
+                  "liveHits": 21,
+                  "hitsSha256": "fba075b13665842e18d85cd96cf36ea833650f31a618523e0727a35ed0aabd77",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md": {
+                      "live": 13,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/index.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 2061,
+                      "text": "✔ resolveAssignmentDispatchPolicy fails closed with a named RunnerConfigError when governance options are present but runnerConfig.executors is absent (Phase 00 R6 fix RT1) (0.326918ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 2063,
+                      "text": "✔ resolveAssignmentDispatchPolicy fails closed with a named RunnerConfigError when governance options are present but runnerConfig.executors is absent (Phase 00 R6 fix RT1) (0.50881ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+                      "line": 2063,
+                      "text": "✔ resolveAssignmentDispatchPolicy fails closed with a named RunnerConfigError when governance options are present but runnerConfig.executors is absent (Phase 00 R6 fix RT1) (0.372966ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+                      "line": 2063,
+                      "text": "✔ resolveAssignmentDispatchPolicy fails closed with a named RunnerConfigError when governance options are present but runnerConfig.executors is absent (Phase 00 R6 fix RT1) (0.466452ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+                      "line": 2063,
+                      "text": "✔ resolveAssignmentDispatchPolicy fails closed with a named RunnerConfigError when governance options are present but runnerConfig.executors is absent (Phase 00 R6 fix RT1) (0.362688ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+                      "line": 369,
+                      "text": "**RT1 (HIGH) — F2's `disallowedProviders`/`disallowedExecutors` governance",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "resolveExecutorProvider",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: L12-62: Dead link: target never existed in git history. Navigation for resolveExecutorProvider H2a/H2b/RT1/F1 edge cases. Non-executable successor note: archive/plans/260915-executor-policy-dispatch-seams/ and docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md are plan/evidence only, not live authority. Own source passage: '  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the'"
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-022",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/runner/dispatch/assignment-policy.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "c0cff9ec45634a9a8164c10dd9cc944145776cbe51d04ccb0a5676419fdf667a",
+          "bytes": 28062,
+          "lines": 535,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p32.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "src/runner/dispatch/cli.mjs",
+      "kind": "complete-source-context",
+      "path": "src/runner/dispatch/cli.mjs",
+      "startLine": 1,
+      "endLine": 1100,
+      "content": "// dispatch/cli.mjs — dispatch behavior + the thin CLI doors over it (D7, tsk-2uf-1):\n// `executeExecutorCli` (the transport step runUnit's assignment runner calls), and the\n// `decide`/`probe-account`/`reconcile` subcommands of `node src/runner/dispatch.mjs`\n// (`runDispatchCli`). One task runs through `fgos run`, planned work through a Workflow;\n// the raw `execute` and `log` subcommands are gone. See `docs/history/dispatch-activation-\n// and-handoff-redesign/CONTEXT.md` D7 for the module split.\n\nimport path from 'node:path';\nimport fs from 'node:fs';\nimport os from 'node:os';\nimport crypto from 'node:crypto';\nimport { fileURLToPath } from 'node:url';\n\nclass StoreError extends Error {\n  constructor(category, message) {\n    super(message);\n    this.name = 'StoreError';\n    this.category = category;\n  }\n}\n\nimport { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';\nimport { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, MODEL_POLICY_TIERS, normalizePreferCandidates, withDefaultExecutor } from './config.mjs';\nimport { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';\nimport { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily, resolveCapabilityDetailsFromHints } from './resolve.mjs';\nimport { WORK_ITEM_KEYS, refuseWorkItemInput, resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';\nimport { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';\nimport { resolveExecutorCommand, DispatchError } from './transport.mjs';\nimport { executeThroughConfinement, buildConfinementAttestation } from './confinement/authority.mjs';\nimport { buildConfinementRequest } from './confinement/request.mjs';\nimport { markRunSettled } from './visibility-session.mjs';\nimport { compileDispatchPlan } from './plan.mjs';\nimport { buildDispatchResult } from './result-ladder.mjs';\nimport { collectModelWarnings } from './provider-adapter.mjs';\nimport { executeAssignment } from './assignment-runner.mjs';\nimport { adoptRun } from '../../run-supervisor/client.mjs';\nimport { runAccountProbe } from './provider-account-probe.mjs';\nimport { createConfinementCredentialRenewal } from './confinement/cleanup.mjs';\nimport { defaultConfinementTempRoots } from './confinement/backend-registry.mjs';\nimport { createRoundTerminalControl } from './terminal-slot.mjs';\nimport { envForSession } from './worker-session.mjs';\nimport { resolveHerdrBin } from './transport.mjs';\nimport { buildAssignment, claimAssignmentId } from './assignment.mjs';\nimport { resolveWriterIdentity } from '../../util/session-identity.mjs';\n\nimport { resolveFgosBin } from '../../setup/bin-discovery.mjs';\n\n// Resolved once at import against THIS MODULE's own location, preferring a\n// tier-0 resolution when present with the same fallback resolveFgosBin\n// itself uses. Known limitation: under this track's linked-worktree\n// topology, a dispatch CLI running from a worktree still resolves tier 0\n// against the module's own checkout root, not the caller's dispatch root\n// -- unreachable from a worktree even when the main checkout has a real\n// workspace installation. Accepted for now (falls back to today's exact\n// behavior); the cutover track can make this resolve per-call against\n// the dispatch root instead.\nconst REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));\nconst BIN_FGOS_PATH = resolveFgosBin(REPO_ROOT)?.path ?? fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));\nexport { watchWritesOutsideWorkspace, strayWriteWarning } from './stray-writes.mjs';\n\n// Work-driven dispatch (`spawnWorker`, the executor a Work item's step resolves to) lives in\n// the Work layer, src/runner/work-dispatch.mjs; this module takes what that layer resolved.\n\n/**\n * Resolve persona/agentType for a given taskSpec header & list of registered agent-types (D20/D21/D22/D32).\n * Tie-break priority (D32):\n * 1. Task-spec declares `agent:` pin -> wins immediately, skipping skill-matching.\n * 2. No pin -> if `currentAgentType` matches all `requires-skill`, stay with `currentAgentType`.\n * 3. Otherwise -> select deterministically by declaration order (first matching agent-type in `agentDefs`).\n */\nexport function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], currentAgentType = null) {\n  if (!taskSpecHeader) return null;\n\n  const pinnedAgents = Array.isArray(taskSpecHeader.agent)\n    ? taskSpecHeader.agent\n    : typeof taskSpecHeader.agent === 'string' && taskSpecHeader.agent.trim()\n      ? [taskSpecHeader.agent.trim()]\n      : [];\n\n  if (pinnedAgents.length > 0) {\n    const found = agentDefs.find((a) => pinnedAgents.includes(a.name));\n    return found ? found.name : null;\n  }\n\n  const requiredSkills = Array.isArray(taskSpecHeader['requires-skill'])\n    ? taskSpecHeader['requires-skill']\n    : typeof taskSpecHeader['requires-skill'] === 'string' && taskSpecHeader['requires-skill'].trim()\n      ? [taskSpecHeader['requires-skill'].trim()]\n      : [];\n\n  if (requiredSkills.length === 0) {\n    return null;\n  }\n\n  if (currentAgentType) {\n    const currentDef = agentDefs.find((a) => a.name === currentAgentType);\n    if (currentDef && Array.isArray(currentDef.skills)) {\n      const hasAllSkills = requiredSkills.every((s) => currentDef.skills.includes(s));\n      if (hasAllSkills) return currentAgentType;\n    }\n  }\n\n  const matching = agentDefs.find(\n    (a) => Array.isArray(a.skills) && requiredSkills.every((s) => a.skills.includes(s)),\n  );\n  if (matching) return matching.name;\n\n  return null;\n}\n\n\n/**\n * Open a run directory under `.fgos/` and record that it is running.\n *\n * Without one, an interactive adapter falls back to a private temp directory.\n * That works and is invisible: the brief, `visibility.json` and the worker's\n * outbox all land somewhere `fgos dispatch show-run`/`watch` do not look, so\n * the run cannot be observed at all -- which is the whole point of dispatching\n * through a pane. Both dispatch doors call this, because a run started through\n * either is a run somebody may want to watch.\n *\n * Returns `{ runDir, closeRun }`. `closeRun` is how the run stops saying\n * `running`: a run this function opened is a run its caller closes, on the\n * failure branch as much as the success one, because a failed round ended and\n * has a named answer. Both are inert when there is no `.fgos/` to write into.\n */\nexport function openRunnerRun({ fgosDir, executorId, cwd }) {\n  const baseDir = fgosDir || path.join(os.tmpdir(), 'fgos-assignments');\n  const assignmentId = `asgn-${executorId || 'run'}-${Date.now()}`;\n  const runDir = path.join(baseDir, 'assignments', assignmentId, 'runs', '01');\n  fs.mkdirSync(runDir, { recursive: true });\n  fs.writeFileSync(path.join(runDir, 'run.json'), `${JSON.stringify({\n    contract: 'run.v1',\n    runId: `${assignmentId}-01`,\n    workId: null,\n    executorId,\n    cwd,\n    startedAt: new Date().toISOString(),\n    status: 'running',\n  }, null, 2)}\\n`);\n\n  return {\n    runDir,\n    closeRun: (status) => {\n      try { markRunSettled(runDir, { status }); } catch { /* a run left open is not worth failing a finished dispatch */ }\n    },\n  };\n}\n\n\n/**\n * A claude REPL in a herdr pane is briefed with a pointer to a file in the run directory,\n * and the run directory lives under the store, which is outside the worker's cwd (its\n * worktree). Claude asks the human before reading outside its working directories, and\n * nobody is there to answer. Blind inputs are copied to assignmentDir/inputs,\n * beside runs/NN, so grant only that directory (when present) and the run\n * directory. This is claude's own prompt; the OS-level posture is unchanged.\n */\nexport function withRunDirReadAccess({ adapter, interactiveMode, args, runDir }) {\n  if (adapter !== 'herdr-spawn' || interactiveMode?.kind !== 'claude' || !runDir) return args;\n  if (!Array.isArray(args)) return args;\n  const run = path.resolve(runDir);\n  const inputs = path.join(path.dirname(path.dirname(run)), 'inputs');\n  const directories = [run, ...(fs.existsSync(inputs) ? [inputs] : [])];\n  // Non-blind handoffs point at settled sibling reports, not copied inputs.\n  const assignmentFile = path.join(path.dirname(path.dirname(run)), 'assignment.json');\n  if (fs.existsSync(assignmentFile)) {\n    const { contextRefs = [] } = JSON.parse(fs.readFileSync(assignmentFile, 'utf8'));\n    for (const ref of contextRefs) {\n      if (typeof ref === 'string' && path.isAbsolute(ref) && fs.existsSync(ref) && fs.statSync(ref).isFile()) {\n        const parent = path.dirname(fs.realpathSync(ref));\n        if (!directories.includes(parent)) directories.push(parent);\n      }\n    }\n  }\n  const existing = args.indexOf('--add-dir');\n  return existing < 0\n    ? [...args, '--add-dir', ...directories]\n    : [...args.slice(0, existing + 1), ...directories, ...args.slice(existing + 1)];\n}\n\nfunction resolveRegisteredCapability(cfg, name) {\n  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};\n  if (Object.hasOwn(capabilities, name)) return name;\n  return Object.keys(capabilities).find((capName) => capabilities[capName]?.aliases?.includes?.(name));\n}\n\n/**\n * The invocation of `executorId` that runs a dispatch for `capabilityName`, or\n * undefined to keep the executor's default: the invocation the capability's\n * `prefer` names for this executor, else the first plain cli invocation that\n * declares no sandbox backend. A confined capability is refused before\n * spawning (see below).\n */\nfunction selectInvocationForCapability(cfg, executorId, executor, capabilityName) {\n  const capability = cfg.capabilities[capabilityName];\n  if (capability.prefer !== undefined) {\n    const pinned = normalizePreferCandidates(capability.prefer, `capabilities.${capabilityName}.prefer`)\n      .find((candidate) => candidate.executor === executorId && candidate.invocation);\n    if (pinned) return pinned.invocation;\n  }\n  const invocations = Array.isArray(executor?.invocations) ? executor.invocations : [];\n  // A native agent runs inside the caller's own session: nothing is spawned,\n  // so there is no invocation to pick and no login to carry. Its confinement\n  // is settled by the in-process branch of executeExecutorCli.\n  if (executor?.agentType && !executor.command && !executor.adapter && !executor.invocations) return undefined;\n  if (capability.confinement?.mode === 'required') {\n    // This door leases no provider account, so a sandboxed worker would start\n    // without its login (or fail writing a refreshed one). Confined read-only\n    // work goes through a Workflow unit, which binds the posture and leases the\n    // account.\n    throw new DispatchError(\n      'posture-needs-assignment',\n      `\"${capabilityName}\" runs confined (${capability.confinement.policy ?? 'required'}), which this door cannot do: it leases no provider account, so the sandboxed worker would start without its login. ${readOnlyDoors(executorId)}`,\n      { executorId, capability: capabilityName },\n    );\n  }\n  const unconfined = invocations.find((inv) => inv?.via === 'cli'\n    && inv.adapter !== 'herdr-spawn'\n    && !(inv.confinement ?? executor.confinement)?.backend\n    && inv.id);\n  return unconfined?.id;\n}\n\n// Confined read-only work goes through runUnit, which binds the posture and leases\n// the account's login for the sandbox.\nfunction readOnlyDoors(executorId) {\n  return `Read-only work runs sandboxed with the account's login through runUnit: \\`fgos run \"<prompt>\" --provider ${executorId}\\` (read-only without --writes), or a Workflow unit with \"writes\": [] (\\`fgos workflow start --units <file>\\`).`;\n}\n\n/**\n * The `fgos run` command a caller uses instead of dispatching `executorId` directly, read from\n * the config at `cwd` without writing it. `--provider` names agent executors only, and only as a\n * preference bind may override; a tool executor has no run door, so the hint says to call the\n * tool itself. `capability` is kept when it is a registered one.\n */\nexport function runDoorHint({ cwd = process.cwd(), executorId, capability } = {}) {\n  let cfg = null;\n  try {\n    cfg = loadRunnerConfigFromDir(resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));\n  } catch { /* no readable config: the hint names no executor */ }\n  const executor = executorId && cfg?.executors && Object.hasOwn(cfg.executors, executorId) ? cfg.executors[executorId] : null;\n  const isAgent = executor !== null && (executor.kind ?? 'agent') === 'agent';\n  const registeredCapability = capability && cfg ? resolveRegisteredCapability(cfg, capability) : undefined;\n  const command = ['fgos run \"<prompt>\"'];\n  if (isAgent) command.push(`--provider ${executorId}`);\n  if (registeredCapability) command.push(`--capability ${registeredCapability}`);\n  command.push('[--writes <paths> --worktree <path>]');\n  const hint = `\\`${command.join(' ')}\\``;\n  if (isAgent) return `${hint} (--provider is a preference: bind may choose another executor that serves the capability)`;\n  if (executor) return `${hint}; \"${executorId}\" is a ${executor.kind} executor, which fgos run cannot name -- call that tool directly instead`;\n  return hint;\n}\n\n/**\n * Run one executor (tsk-5tm-3 D5) — the transport step under runUnit's\n * assignment runner (it once also backed a raw `execute` CLI subcommand): matching marketing-cockpit's `run_task()`\n * contract (`task-executor.py:550-611`) — self-execute for every case that\n * can be, hand back only for the one case that genuinely can't. `resolve`\n * always hands back `{command,args}` for the caller to run itself via\n * Bash, even for a `kind:\"cli\"` executor that `EXECUTOR_ADAPTERS` could\n * already run directly (`EXECUTOR_ADAPTERS['cli-spawn']` was validated at\n * config-load time but, before this item, only ever CALLED by `spawnWorker`\n * — Flow A never called it). This function closes that gap:\n *\n * - **`mechanism: \"in-process\"`** (native, same-family, live session) —\n *   dispatch itself has no Task/Agent tool to call (a passive CLI/library),\n *   so this is the one case that still hands back — a `spawn_instruction`-\n *   shaped result, `{mechanism, agentType, prompt[, executorId]}`, for the\n *   caller to invoke its OWN Agent/Task tool with. Same `agentType`\n *   resolution and `hasLiveTaskAccess` self-declaration contract `decide`\n *   already uses (never probed or inferred here).\n * - **every other case** (`mechanism: \"out-of-process\"`, i.e. whatever\n *   `EXECUTOR_ADAPTERS[adapter]` resolves to for this executor) — self-\n *   executes: calls the adapter directly, the same call `spawnWorker`\n *   already makes for a work item's own dispatch, and returns the REAL\n *   result (`{status,signal,stdout,stderr,tier,model}` from `cliSpawnAdapter`\n *   today, plus `provider`/`command`[, `executorId`] additive, same\n *   shape `spawnWorker`'s own result already carries) — never the bare\n *   `{command,args}` `resolve` hands back for the caller to run through\n *   Bash itself.\n *\n * `resolveExecutorCommand` already throws if the resolved `adapter` names\n * an unregistered `EXECUTOR_ADAPTERS` key (config-load-time validation,\n * `validateExecutorShape`) — by the time this function reaches the\n * self-execute branch, `EXECUTOR_ADAPTERS[adapter]` is guaranteed to\n * exist; the explicit check below is defensive, matching `spawnWorker`'s\n * own belt-and-braces style rather than load-bearing.\n */\nexport async function executeExecutorCli(\n  executorIdArg,\n  {\n    prompt = '',\n    cwd = process.cwd(),\n    repoRoot,\n    runnerConfig,\n    model: modelOverride,\n    // The model the caller asked for, when `model` above is what policy made of\n    // it (an Assignment's redirect can replace it); defaults to `model` itself.\n    requestedModel,\n    // A canonical reasoning-effort level for this one run (`--effort`).\n    reasoningEffort,\n    tier: tierOverride,\n    rigor: rigorOverride,\n    for: purposeArg,\n    carries,\n    hasLiveTaskAccess = false,\n    timeoutMs: timeoutOverride,\n    idleTimeoutMs: idleTimeoutOverride,\n    maxBuffer: maxBufferOverride,\n    onChunk,\n    // Generic inputs the caller resolved (dispatch never looks a Work item's step\n    // up): the capability hints its step implies and the agent type its task spec\n    // resolves to.\n    capabilityHints,\n    agentType,\n    // Where this run's artifacts live. An interactive adapter writes the\n    // brief here and waits for the worker's own files to appear here; a\n    // caller that has no run directory (an ad-hoc `execute`) leaves it unset\n    // and the adapter uses a private temporary one instead.\n    runDir,\n    // Additive (Dispatch Core Contract Normalization follow-up): governance\n    // options (`disallowedProviders`/`disallowedExecutors`) forwarded to\n    // `resolveAssignmentDispatchPolicy` below. Undefined for every existing\n    // caller -- opens a real governance channel this function never had at\n    // all before (it computed tier/model with its own inline logic that\n    // never checked either list), without requiring any caller to opt in.\n    options,\n    // A caller-supplied string naming the batch this dispatch belongs to --\n    // opaque here, meaningful only inside herdr-round.mjs's own batch-tab\n    // registry, which uses it to land every dispatch of one batch (one\n    // coding-panel round, one fanout wave) in the same herdr tab instead of\n    // scattering across whichever tab happens to be focused. Ignored by\n    // every adapter that isn't herdr-backed. Deliberately the only\n    // herdr-shaped thing this generic, adapter-agnostic function accepts --\n    // an explicit anchor pane id is herdr's own vocabulary (\"pane\"), so it\n    // is never threaded through here; a cross-process caller that wants one\n    // sets FGOS_HERDR_ANCHOR_PANE in its own env instead (read directly by\n    // the herdr adapter in transport.mjs, the same door FGOS_HERDR_BIN\n    // already uses for a herdr-only knob this function doesn't carry either).\n    dispatchBatchKey,\n    assignmentLaunchContext,\n    launchCommandId,\n    controlEpoch,\n    controlToken,\n    effectiveContract,\n    // Names which `via:\"cli\"` invocation of the executor runs (bind() pins the\n    // herdr-spawn one when herdr is the transport). Unset keeps the first cli one.\n    invocationId,\n    // The confinement requirement the caller already resolved (an Assignment's\n    // posture). Unset leaves it to the capability/invocation declaration.\n    requirement,\n    // hostRead: blind for this dispatch, and the refs the worker is handed (checked against\n    // what blind hides). A blind dispatch is refused rather than run unblind.\n    blind = false,\n    contextRefs,\n    // Directory the confinement authority treats as the writable workspace when the\n    // requirement grants one; defaults to the main checkout root.\n    workspaceRoot,\n    // The provider account an Assignment run leased. Its credential source is what\n    // the confined driver copies into the worker's private home; without it a\n    // confined pane starts without the account's login.\n    providerCapacity,\n    // The dispatch cannot write the workspace (a read-only posture), so it shares the directory with\n    // other dispatches instead of holding it exclusively.\n    sharedCwd = false,\n  } = {},\n) {\n  refuseWorkItemInput(arguments[1], 'executeExecutorCli()');\n  const purpose = purposeArg;\n  if (!executorIdArg && !purpose) {\n    throw new RunnerConfigError(\n      'executeExecutorCli requires an executorIdArg or a `for` purpose',\n    );\n  }\n  const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);\n  const fgosDir = fgosDirFromRoot(root);\n  let configRoot = root;\n  if (cwd) {\n    try {\n      const wtRoot = resolveRepoRoot(cwd);\n      const mainRoot = resolveMainCheckoutRoot(cwd);\n      if (mainRoot === root && wtRoot !== root && fs.existsSync(path.join(wtRoot, '.fgos', 'config.json'))) {\n        configRoot = wtRoot;\n      }\n    } catch {}\n  }\n  const rawCfg = runnerConfig ?? ensureRunnerConfigForDir(configRoot);\n  const cfg = withDefaultExecutor(rawCfg);\n  const resolvedByPurpose = !executorIdArg;\n  // Resolve through the shared resolver on the supplied capability or\n  // executor id. A capability contributes its rigor floor through the\n  // policy resolver below; executor selection carries no policy override.\n  // The two doors keep their own error contracts: `--for` alone throws when\n  // nothing resolves (\"no executor registered for purpose...\" — guides the\n  // caller to `decide --for` first); a named `executorIdArg` that resolves\n  // to nothing when `!work` fails closed with DispatchError('executor-not-found')\n  // (F4 explicit fail closed). When `work` is present, it falls through to\n  // implicit/global resolution for work-driven execution.\n  let executorId = executorIdArg;\n  let resolvedExecutor;\n  // `realExecutorId`/`executorConfigured` (Dispatch Core Contract\n  // Normalization follow-up): the positional-executorIdArg branch below\n  // deliberately never reassigns `executorId` itself -- it stays as the\n  // caller's raw input (which may be capability-shaped, e.g.\n  // \"fgos-coding-implement\", per the comment above), while\n  // `resolveExecutorConfig` re-resolves it fresh downstream. The new\n  // resolveAssignmentDispatchPolicy() call below needs the REAL resolved\n  // executor id (e.g. \"agy\") for its own `preferExecutor` field, distinct\n  // from `executorId` -- and must never pass one at all when nothing\n  // resolved, since that resolver throws on an unregistered preferExecutor\n  // where THIS function's own contract never has (falls through to the\n  // global executor silently).\n  let realExecutorId;\n  let executorConfigured;\n  if (!executorId) {\n    const resolved = resolveExecutorAndOverrides(cfg, purpose);\n    if (!resolved.executorId) {\n      throw new RunnerConfigError(\n        `no executor registered for purpose \"${purpose}\" — call \"decide --for ${purpose}\" first to check availability before executing.`,\n      );\n    }\n    executorId = resolved.executorId;\n    resolvedExecutor = resolved.executor;\n    realExecutorId = resolved.executorId;\n    executorConfigured = resolved.configured;\n  } else {\n    const resolved = resolveExecutorAndOverrides(cfg, executorId);\n    if (!resolved.configured || !resolved.executor) {\n      throw new DispatchError(\n        'executor-not-found',\n        `no executor registered for id \"${executorIdArg}\"`,\n        { executorId: executorIdArg },\n      );\n    }\n    resolvedExecutor = resolved.executor;\n    realExecutorId = resolved.executorId ?? executorId;\n    executorConfigured = resolved.configured;\n    if (purpose) {\n      // The work names its capability, and the capability owns the posture.\n      const capabilityName = resolveRegisteredCapability(cfg, purpose);\n      if (!capabilityName) {\n        throw new DispatchError(\n          'capability-not-registered',\n          `\"${purpose}\" is not a registered capability (runner.capabilities)`,\n          { executorId: executorIdArg, capability: purpose },\n        );\n      }\n      invocationId ??= selectInvocationForCapability(cfg, realExecutorId, resolvedExecutor, capabilityName);\n    }\n  }\n\n  // Dispatch chokepoint visibility (both branches below): \"capability\" is\n  // the purpose actually requested via --for when purpose-resolved, or —\n  // for a direct executorId call — whichever capabilities that executor\n  // itself declares serving (executor.for, D15), so the line still answers\n  // \"what is this FOR\" even without a --for flag. Diagnostic-only.\n  const capabilityResolution = resolveCapabilityDetailsFromHints({\n    cfg,\n    executorId: executorIdArg,\n    resolvedExecutor,\n    purpose,\n    hints: capabilityHints,\n  });\n  const { capability: capabilityIdentity, anchorCapability } = capabilityResolution;\n  const capabilityLabel = purpose ?? (resolvedExecutor?.for?.join(',') || '(none declared)');\n\n  const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });\n  // R7 (L8): In-process handback is a return value, not an invocation.\n  // The fgOS Dispatch CLI runs as an external command-line process and does not own or hold\n  // the live caller agent session, Task tool, or MCP client of the calling harness. Returning\n  // mechanism='in-process' hands control and metadata (agentType, prompt, attestation) back to\n  // the caller so the calling session can execute the task in-process using its own native capabilities.\n  if (mechanism === 'in-process') {\n    const agentType = resolvedExecutor?.agentType;\n    const stageSkill = executorIdArg;\n    const inProcRunDir = runDir || path.join(os.tmpdir(), 'fgos-in-process', String(executorId), String(Date.now()));\n    let confinementRequest;\n    try {\n      confinementRequest = buildConfinementRequest({\n        capability: capabilityIdentity,\n        stageSkill,\n        executorId,\n        fallbackFrom: anchorCapability,\n        anchorCapability,\n        cfg,\n        // Pre-existing bug fix (unrelated to this track's own scope): `opts`\n        // is not a parameter of `executeExecutorCli` -- this function\n        // destructures its options object directly (no catch-all binding),\n        // and the caller-supplied governance/call options bag is named\n        // `options` (destructured above). Every existing caller already\n        // passes no `providerCapacity` of its own, so this is\n        // value-preserving (still `undefined`) for all of them; it only\n        // stops the `ReferenceError: opts is not defined` crash this\n        // function hit on every call.\n        providerCapacity: providerCapacity ?? options?.providerCapacity,\n        blind,\n        authorityScope: 'external-harness',\n        invocation: {\n          agentType,\n          prompt,\n        },\n        context: {\n          cwd,\n          repoRoot: root,\n          runDir: inProcRunDir,\n          fgosDir,\n        },\n      });\n    } catch (err) {\n      const dispatchId = `disp_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;\n      const refusedAttestation = buildConfinementAttestation({\n        request: {\n          contract: 'confinement-request.v1',\n          dispatchId,\n          capability: capabilityIdentity,\n          stageSkill,\n          executorId,\n          authorityScope: 'external-harness',\n          requirement: { mode: 'required', error: err.message },\n          context: { cwd, runDir: inProcRunDir },\n        },\n        phase: 'refused',\n        outcome: 'refused',\n        error: err,\n      });\n      throw new DispatchError(\n        'confinement-policy-error',\n        err.message,\n        {\n          contract: 'confinement-execution.v1',\n          status: 'refused',\n          dispatchId,\n          capability: capabilityIdentity,\n          stageSkill,\n          executorId,\n          authorityScope: 'external-harness',\n          attestation: refusedAttestation,\n          cause: err,\n        },\n      );\n    }\n\n    const doorResult = await executeThroughConfinement(confinementRequest);\n\n    process.stderr.write(\n      `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=in-process agentType=${agentType ?? '(none)'} provider=n/a model=n/a tier=n/a\\n`,\n    );\n    const base = {\n      mechanism,\n      agentType,\n      prompt,\n      authorityScope: 'external-harness',\n      attestation: doorResult.attestation,\n    };\n    return resolvedByPurpose ? { ...base, executorId } : base;\n  }\n\n  const executor = resolvedExecutor;\n  // Dispatch Core Contract Normalization follow-up, consolidated further\n  // (dispatch-engine-liveness-hardening Phase 7, C3): governance now runs\n  // through the SAME `resolveExecutorProvider`/`resolveExecutorGovernance`\n  // helpers `resolveAssignmentDispatchPolicy` itself uses internally\n  // (assignment-policy.mjs) -- this used to call that entire resolver just\n  // to reach its two governance throws, discarding its whole computed\n  // policy object (tier/quality/persona/reasoningEffort/constraints/\n  // provenance) afterward, a real \"three resolvers, one feeding the output\"\n  // waste the audit named (C3). Calling the two small shared helpers\n  // directly closes the SAME governance gap (`options.disallowedProviders`/\n  // `.disallowedExecutors` are still consulted, unchanged) without paying\n  // for the unused computation.\n  //\n  // The literal MODEL is computed via resolveTierModel and handed to the\n  // resolver as an already-resolved `cliOverride.model`.\n  const capabilityName = anchorCapability ?? capabilityIdentity ?? purpose ?? executorIdArg;\n  const capabilityRigor = capabilityName ? cfg?.capabilities?.[capabilityName]?.rigor : undefined;\n  if (tierOverride !== undefined && !MODEL_POLICY_TIERS.includes(tierOverride)) {\n    throw new RunnerConfigError(`invalid tier \"${tierOverride}\". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);\n  }\n  if (executor?.tier !== undefined && !MODEL_POLICY_TIERS.includes(executor.tier)) {\n    throw new RunnerConfigError(`invalid executor tier \"${executor.tier}\". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);\n  }\n  if (rigorOverride !== undefined && !RIGOR_VALUES.includes(rigorOverride)) {\n    throw new RunnerConfigError(`invalid rigor \"${rigorOverride}\". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);\n  }\n  const effectiveRigor = (rigorOverride && capabilityRigor)\n    ? resolveStrongerRigor(rigorOverride, capabilityRigor)\n    : (rigorOverride ?? capabilityRigor);\n  const derivedTier = effectiveRigor ? cfg?.rigorToTier?.[effectiveRigor] : undefined;\n  const tier = tierOverride\n    ?? resolveStrongerTier(derivedTier ?? 'standard', executor?.tier);\n  const providerFamily = deriveProviderFamily(executor);\n  const fallbackModel = resolveTierModel(cfg, tier, providerFamily);\n  const model = modelOverride ?? executor?.model ?? fallbackModel;\n  // `primaryExecutor`/`explicitProviderModel` mirror exactly what the\n  // former `resolveAssignmentDispatchPolicy({assignment: {policy: {...}}})`\n  // call built for this door: only when a real registered executor\n  // resolved -- an unconfigured executorId must fall through to\n  // `resolveExecutorProvider`'s own global-executor default, exactly like\n  // `resolveExecutorCommand` does downstream, never throw \"not a\n  // registered executor\" for a case this function's own contract has never\n  // thrown for.\n  const primaryExecutor = executorConfigured ? realExecutorId : (cfg?.executor?.command ?? 'claude');\n  const { resolvedProvider } = resolveExecutorProvider({\n    runnerConfig: cfg,\n    primaryExecutor,\n    options,\n  });\n  resolveExecutorGovernance({ primaryExecutor, providerModel: resolvedProvider, options });\n  const resolvedAgentType = agentType ?? null;\n  // Same reason as `spawnWorker`: a confinement the profile declares has to\n  // reach the adapter, or the invariant that accepted the profile is fiction.\n  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, credentialStore, reasoningEffort: effortApplied, modelCheck } = resolveExecutorCommand(cfg, {\n    prompt,\n    model,\n    requestedModel: requestedModel ?? modelOverride,\n    reasoningEffort,\n    tier,\n    executorId,\n    fgosDir,\n    contentCarries: carries,\n    attestRoot: cwd,\n    resolvedAgentType,\n    invocationId,\n  });\n  const timeoutMs = timeoutOverride ?? cfg.timeoutMs;\n  const idleTimeoutMs = idleTimeoutOverride ?? cfg.idleTimeoutMs;\n  const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;\n\n  // This unsupervised transport serves read-only callers. Writers use Assignment custody.\n  if (!sharedCwd) throw new DispatchError('custody-domain-required', 'a mutating producer must run through a supervised Assignment with a declared domain', { cwd, executorId, capability: capabilityIdentity });\n\n  process.stderr.write(\n    `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=${adapter} provider=${provider} model=${model} tier=${tier}\\n`,\n  );\n\n  // A caller may hand us a run directory; when none is given, open one under\n  // `.fgos/` rather than letting the adapter fall back to a private temp\n  // directory. This door used to take that fallback, so a real dispatch\n  // through it left its brief, visibility and outbox somewhere\n  // `fgos dispatch show-run`/`watch` do not look -- observable in principle\n  // and unobservable in practice.\n  const opened = runDir\n    ? { runDir, closeRun: () => {} }\n    : openRunnerRun({ fgosDir, executorId, cwd });\n\n  let confinementRequest;\n  try {\n    confinementRequest = buildConfinementRequest({\n      capability: capabilityIdentity,\n      stageSkill: executorIdArg,\n      executorId,\n      fallbackFrom: anchorCapability,\n      anchorCapability,\n      cfg,\n      assignmentLaunchContext,\n      // Same pre-existing `opts`-is-not-defined fix as the in-process\n      // branch above -- see its comment.\n      providerCapacity: providerCapacity ?? options?.providerCapacity,\n      blind,\n      ...(requirement ? { requirement } : {}),\n      invocation: {\n        command,\n        args: withRunDirReadAccess({ adapter, interactiveMode, args, runDir: opened.runDir }),\n        argsTemplate,\n        prompt,\n        env,\n        liveOutput,\n        interactiveMode,\n        promptDelivery,\n        permissionMode,\n        confinement,\n        adapter,\n        method,\n        url,\n        headers,\n        body,\n        credentialStore,\n      },\n      context: {\n        cwd,\n        repoRoot: workspaceRoot ?? root,\n        runDir: opened.runDir,\n        fgosDir,\n        contextRefs,\n        timeoutMs,\n        idleTimeoutMs,\n        maxBuffer,\n        onChunk,\n        workId: executorId,\n        tier,\n        model,\n        dispatchBatchKey,\n        launchCommandId,\n        controlEpoch,\n        controlToken,\n        effectiveContract,\n      },\n    });\n  } catch (err) {\n    opened.closeRun('settled');\n    const dispatchId = `disp_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;\n    const refusedAttestation = buildConfinementAttestation({\n      request: {\n        contract: 'confinement-request.v1',\n        dispatchId,\n        capability: capabilityIdentity,\n        stageSkill: executorIdArg,\n        executorId,\n        requirement: { mode: 'required', error: err.message },\n        context: { cwd, runDir: opened.runDir },\n      },\n      phase: 'refused',\n      outcome: 'refused',\n      error: err,\n    });\n    throw new DispatchError(\n      'confinement-policy-error',\n      err.message,\n      {\n        contract: 'confinement-execution.v1',\n        status: 'refused',\n        dispatchId,\n        capability: capabilityIdentity,\n        stageSkill: executorIdArg,\n        executorId,\n        attestation: refusedAttestation,\n        cause: err,\n      },\n    );\n  }\n\n  let result;\n  try {\n    result = await executeThroughConfinement(confinementRequest);\n  } catch (err) {\n    opened.closeRun(err?.outcome === 'died' ? 'died' : 'settled');\n    throw err;\n  }\n  opened.closeRun('settled');\n\n  const execResult = result?.result ?? result;\n  const built = buildDispatchResult({ mechanism, result: { ...execResult, attestation: result?.attestation }, provider, command });\n  const modelWarnings = collectModelWarnings(modelCheck, execResult ?? {});\n  const base = {\n    ...built,\n    ...(effortApplied ? { reasoningEffort: effortApplied } : {}),\n    ...(modelWarnings.length > 0 ? { modelWarnings } : {}),\n  };\n  return resolvedByPurpose ? { ...base, executorId } : base;\n\n}\n\n/**\n * `decide <executorId>` CLI subcommand (tsk-3ik-1): lets a task-dispatch\n * consumer skill ask, before choosing whether to `execute` the command or\n * call its own Task tool natively, which mechanism\n * `decideExecutorDispatchMechanism` picks for this executor right now.\n * Prints `{\"mechanism\": \"in-process\"|\"out-of-process\"}` as JSON to stdout — same\n * additive-sibling relationship to `executeExecutorCli` above as\n * `decideExecutorDispatchMechanism` has to `resolveExecutorConfig`: reads\n * the same committed runner config, calls nothing that also feeds\n * `execute`'s own resolution path (tsk-60f D4: the `resolve` CLI subcommand\n * this docblock used to describe here was retired -- 0 production\n * consumers, ~15 tests ported onto `execute`).\n *\n * `--has-live-task-access` is the caller's own self-declaration (never\n * probed or inferred here — same contract `decideDispatchMechanism` itself\n * documents) that this session already has live Agent/Task tool access.\n *\n * `agentType` (tsk-3ik-3, additive): included in the result, alongside\n * `mechanism`, whenever the executor declares one — a `mechanism:\n * \"in-process\"` result is otherwise useless to a consumer skill's own\n * Agent/Task tool call, which needs a concrete `subagent_type` to invoke,\n * not just \"go in-process\" with no target. Omitted (`undefined`, dropped by\n * `JSON.stringify`) for a executor with no `agentType`, e.g. every `kind:\n * \"cli\"` executor — `mechanism` for those always resolves\n * `\"out-of-process\"` anyway (rule 1/3), so no consumer ever needs\n * `agentType` in that case.\n *\n * `workId` (tsk-5tm-6 D4/D12(iii)): a work-item id, resolved by the Work layer (`resolveWork`,\n * handed in by the caller) to a generic hint -- its dispatch executor, agent type, rigor and\n * domain -- before deciding its mechanism -- the\n * lookup `fgos-fanout` needs to consult this protocol per-candidate before\n * firing an Agent, instead of assuming native dispatch unconditionally.\n * Lowest precedence of the three selectors (a real `executorIdArg` always\n * wins, `for` next, matching every pre-D4 caller's byte-identical\n * behavior) since no existing caller ever passes more than one.\n *\n * `needsSoul` (tsk-60f D2): the caller's own self-declaration that it is\n * about to fire its own Agent/Task tool with no executor or work item to\n * name -- the natural fourth signal `decide` never had, distinct from a\n * fourth lookup door (an explicit `--subtask` door was rejected: a\n * sub-task's only natural key is a purpose label, i.e. `for`). Only\n * consulted once every executorId/purpose/work resolution above came up\n * empty (a real match always wins, unchanged): when `needsSoul` is true,\n * that empty resolution defaults to native dispatch\n * (`hasNativeMechanism: true`) instead of `\"unavailable\"` -- the exact\n * generalization of `work`'s own `hasExplicitExecutor === false` branch\n * above, which has hardcoded this same default for every `--work` caller\n * since tsk-5tm-6.\n *\n * `configured` (tsk-60f D3, additive on every returned shape): `true` when\n * the resolved `executorId` names a real `cfg.executors` entry, `false`\n * otherwise -- distinguishing \"nothing registered under this name/purpose\"\n * from \"registered, and its own kind resolves out-of-process\", which today\n * both silently collapse into the same `mechanism: \"out-of-process\"`\n * value. Never a reason to throw (D3): a work item whose own\n * resolved executor has no override configured is `configured:\n * false` by design (tsk-in1 D12), not an error.\n *\n * `mcpTool` (tsk-45f D10, additive, mutually exclusive with `agentType`):\n * MCP hand-back -- a `kind:\"tool\"` executor whose mcp invocation declares a\n * `tools` map (piece 3) with an entry for the requested purpose gets\n * `mechanism` upgraded from `out-of-process` to `in-process`, carrying\n * `mcpTool` instead of `agentType`. Same reasoning as the agent-kind\n * hand-back: dispatch has no MCP client of its own, so the caller calls its\n * OWN MCP tool directly (AGENTS.md's Dispatch section, D12). Never builds\n * an MCP client here, never touches Gate B3 (`resolveExecutorConfig`) --\n * a caller that skips `decide` and calls `execute` directly on an mcp-only\n * executor still hits that gate exactly as before.\n */\nexport async function decideExecutorCli(\n  executorIdArg,\n  {\n    cwd = process.cwd(),\n    repoRoot,\n    hasLiveTaskAccess = false,\n    for: purpose,\n    workId: workIdArg,\n    assignment: assignmentArg,\n    stage: stageArg,\n    needsSoul = false,\n    caller,\n    // Work-layer lookup for `--work`: ({ workId, stage, fgosDir }) -> { workExecutorId,\n    // agentType, rigor, domain } | null. Dispatch holds no Work store of its own.\n    resolveWork,\n  } = {},\n) {\n  refuseWorkItemInput(arguments[1], 'decideExecutorCli()');\n  if (!executorIdArg && !purpose && !workIdArg && !assignmentArg && !needsSoul) {\n    throw new RunnerConfigError(\n      'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',\n    );\n  }\n  const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);\n  let configRoot = root;\n  if (cwd) {\n    try {\n      const wtRoot = resolveRepoRoot(cwd);\n      const mainRoot = resolveMainCheckoutRoot(cwd);\n      if (mainRoot === root && wtRoot !== root && fs.existsSync(path.join(wtRoot, '.fgos', 'config.json'))) {\n        configRoot = wtRoot;\n      }\n    } catch {}\n  }\n  const cfg = ensureRunnerConfigForDir(configRoot);\n\n  let workHint;\n  if (!executorIdArg && workIdArg) {\n    if (typeof resolveWork !== 'function') {\n      throw new RunnerConfigError(\n        `--work needs the Work layer to resolve \"${workIdArg}\" to its dispatch executor; run \"fgos dispatch decide --work ${workIdArg}\" instead of the bare dispatch module.`,\n      );\n    }\n    const resolved = resolveWork({ workId: workIdArg, stage: stageArg, fgosDir: fgosDirFromRoot(root) });\n    if (!resolved) {\n      throw new RunnerConfigError(`no work item \"${workIdArg}\" found -- cannot resolve its dispatch executor.`);\n    }\n    // The executor identity is required (null when the Workflow declares none); a resolver\n    // that leaves it out is refused by the plan instead of falling back to a default executor.\n    refuseWorkItemInput(resolved, 'the --work resolver result', WORK_ITEM_KEYS);\n    workHint = resolved;\n  }\n\n  let assignmentItem;\n  if (!executorIdArg && assignmentArg) {\n    const fgosDir = fgosDirFromRoot(root);\n    const asgnId = typeof assignmentArg === 'string' ? assignmentArg : assignmentArg?.assignmentId;\n    if (asgnId) {\n      const assignmentPath = path.join(fgosDir, 'assignments', asgnId, 'assignment.json');\n      if (fs.existsSync(assignmentPath)) {\n        try {\n          assignmentItem = JSON.parse(fs.readFileSync(assignmentPath, 'utf8'));\n        } catch {\n          assignmentItem = null;\n        }\n      }\n    }\n  }\n\n  const plan = compileDispatchPlan(cfg, {\n    executorId: executorIdArg,\n    for: purpose,\n    workId: workIdArg,\n    assignment: assignmentArg,\n    needsSoul,\n    hasLiveTaskAccess,\n    caller,\n    workHint,\n    assignmentItem,\n  });\n\n  const resolvedIndirectly = !executorIdArg;\n  const base = plan.mcpTool\n    ? {\n        mechanism: 'in-process',\n        mcpTool: plan.mcpTool,\n        configured: plan.configured,\n        reasonCodes: plan.reasonCodes ?? [],\n        ...(plan.blockedReason !== undefined ? { blockedReason: plan.blockedReason } : {}),\n      }\n    : typeof plan.agentType === 'string' && plan.agentType\n      ? {\n          mechanism: plan.mechanism,\n          agentType: plan.agentType,\n          configured: plan.configured,\n          reasonCodes: plan.reasonCodes ?? [],\n          ...(plan.blockedReason !== undefined ? { blockedReason: plan.blockedReason } : {}),\n        }\n      : {\n          mechanism: plan.mechanism,\n          configured: plan.configured,\n          reasonCodes: plan.reasonCodes ?? [],\n          ...(plan.blockedReason !== undefined ? { blockedReason: plan.blockedReason } : {}),\n        };\n\n  return resolvedIndirectly && plan.executorId ? { ...base, executorId: plan.executorId } : base;\n}\n\n/**\n * Guard against --repo-root being passed without --cwd when process.cwd() resolves\n * to a different main-checkout root (or is not a main checkout at all, e.g. a worktree).\n * (tsk-322 / D-ADR0030)\n */\nexport function guardCwdRepoRootDivergence(cwd, repoRoot) {\n  if (repoRoot && !cwd) {\n    const mainRoot = resolveMainCheckoutRoot(process.cwd());\n    const resolvedMain = mainRoot ? path.resolve(mainRoot) : null;\n    const resolvedRepo = path.resolve(repoRoot);\n    if (!resolvedMain || resolvedMain !== resolvedRepo) {\n      const displayMain = mainRoot ? `\"${mainRoot}\"` : 'not a main checkout';\n      throw new RunnerConfigError(\n        `--repo-root (\"${repoRoot}\") passed without --cwd, but process.cwd() main checkout root resolved to ${displayMain} — pass --cwd explicitly.`,\n      );\n    }\n  }\n}\n\n/**\n * Body of `node src/runner/dispatch.mjs <decide|probe-account|reconcile> ...`, called from the\n * barrel's script guard; `fgos dispatch decide|probe-account` reach it with `returnResult`.\n * `resolveWork` is the Work lookup `decide --work` needs, handed in by bin; without it\n * `decide --work` refuses.\n */\nexport async function runDispatchCli(argv = process.argv.slice(2), { returnResult = false, resolveWork } = {}) {\n  const [subcommand, ...afterSubcommand] = argv;\n  // Purpose-based binding (tsk-2c1): a caller with no pre-registered\n  // executorId to name (a gather branch) passes `--for <purpose>` instead\n  // of a positional id — distinguished here by whether the token right\n  // after the subcommand looks like a flag. Every pre-tsk-2c1 invocation\n  // always names a real, non-\"--\"-prefixed executorId positionally, so\n  // this never changes behavior for an existing caller.\n  const executorId = afterSubcommand[0] && !afterSubcommand[0].startsWith('--') ? afterSubcommand[0] : undefined;\n  const rest = executorId ? afterSubcommand.slice(1) : afterSubcommand;\n  const flagValue = (name) => {\n    const i = rest.indexOf(name);\n    return i !== -1 ? rest[i + 1] : undefined;\n  };\n  // Milliseconds flag: absent stays undefined (the config value applies).\n  const positiveIntFlag = (name) => {\n    const raw = flagValue(name);\n    if (raw === undefined) return undefined;\n    const value = Number(raw);\n    if (!/^\\d+$/.test(raw) || !Number.isSafeInteger(value) || value <= 0) {\n      throw new StoreError('validation', `${name} must be a positive integer (milliseconds), got ${JSON.stringify(raw)}`);\n    }\n    return value;\n  };\n  switch (subcommand) {\n    case 'decide': {\n      try {\n        guardCwdRepoRootDivergence(flagValue('--cwd') ?? flagValue('--dir'), flagValue('--repo-root'));\n      } catch (err) {\n        if (returnResult) throw err;\n        process.stderr.write(`${err.message}\\n`);\n        process.exitCode = 1;\n        break;\n      }\n      try {\n        const decided = await decideExecutorCli(executorId, {\n          cwd: flagValue('--cwd') ?? flagValue('--dir'),\n          repoRoot: flagValue('--repo-root'),\n          hasLiveTaskAccess: rest.includes('--has-live-task-access'),\n          for: flagValue('--for'),\n          workId: flagValue('--work'),\n          assignment: flagValue('--assignment'),\n          stage: flagValue('--stage'),\n          needsSoul: rest.includes('--needs-soul'),\n          resolveWork,\n        });\n        if (returnResult) return decided;\n        process.stdout.write(`${JSON.stringify(decided)}\\n`);\n      } catch (err) {\n        if (returnResult) throw err;\n        process.stderr.write(`${err.message}\\n`);\n        process.exitCode = 1;\n      }\n      break;\n    }\n    case 'probe-account': {\n      // Diagnostic: every CLI of one provider account at the same moment, through the real dispatch door.\n      try {\n        const provider = flagValue('--provider');\n        const accountId = flagValue('--account');\n        if (!provider || !accountId) {\n          throw new StoreError('validation', 'dispatch probe-account requires --provider <provider> --account <accountId>');\n        }\n        const cwd = path.resolve(flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd());\n        const repoRoot = path.resolve(flagValue('--repo-root') ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));\n        const assignmentsDir = path.join(fgosDirFromRoot(repoRoot), 'assignments');\n        const fgosDir = fgosDirFromRoot(repoRoot);\n        const invocationFlag = flagValue('--invocation');\n        const herdrBin = resolveHerdrBin();\n        const result = await runAccountProbe({\n          cfg: ensureRunnerConfigForDir(repoRoot),\n          provider,\n          accountId,\n          executorId: flagValue('--executor') ?? null,\n          invocationIds: invocationFlag ? invocationFlag.split(',').map((s) => s.trim()).filter(Boolean) : null,\n          repoRoot,\n          timeoutMs: positiveIntFlag('--timeout-ms'),\n          createAssignment: (contract) => claimAssignmentId(() => buildAssignment({\n            options: { assignmentsDir },\n            provenance: { kind: 'inline', contract, caller: { writerId: String(resolveWriterIdentity(fgosDir).id) } },\n          }), assignmentsDir),\n          dispatch: (assignment, { runnerConfig, cliOverride }) => executeAssignment(assignment, {\n            cwd,\n            repoRoot,\n            runnerConfig,\n            cliOverride,\n            isReadOnlyMode: true,\n            providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),\n          }),\n          closePane: ({ paneId, herdrSession, terminalKey }) => {\n            // A run record that carries no key was written before panes were addressed by key:\n            // nothing proves which pane it was, so it is left open.\n            if (!terminalKey) return false;\n            let closed = false;\n            try {\n              const tc = createRoundTerminalControl({\n                herdrBin, herdrEnv: herdrSession ? envForSession(process.env, herdrSession) : process.env,\n              });\n              // A pane a settled round already closed is not \"closed by the probe\".\n              if (tc.inspect({ key: terminalKey }).pane === 'live') {\n                closed = tc.release({ key: terminalKey, disposition: 'close' }).result === 'released';\n              }\n            } catch { /* a pane that cannot be closed stays open */ }\n            return closed;\n          },\n        });\n        if (returnResult) return result;\n        process.stdout.write(`${JSON.stringify(result)}\\n`);\n      } catch (err) {\n        if (returnResult) throw err;\n        process.stderr.write(`${err.message}\\n`);\n        process.exitCode = 1;\n      }\n      break;\n    }\n    case 'reconcile': {\n      const runDir = executorId ?? flagValue('--run-dir') ?? (typeof positional !== 'undefined' ? positional[1] : undefined);\n      if (!runDir) {\n        const msg = 'dispatch reconcile requires a run directory: node src/runner/dispatch.mjs reconcile <runDir>\\n';\n        if (returnResult) throw new StoreError('validation', msg.trim());\n        process.stderr.write(msg);\n        process.exitCode = 1;\n        break;\n      }\n      try {\n        // The adopt door judges the attempt and finishes what its supervisor left; a run from before the\n        // supervisor answers `legacy-run`.\n        const result = adoptRun(path.resolve(runDir));\n        if (returnResult) return result;\n        process.stdout.write(`${JSON.stringify(result)}\\n`);\n      } catch (err) {\n        if (returnResult) throw err;\n        process.stderr.write(`${err.message}\\n`);\n        process.exitCode = 1;\n      }\n      break;\n    }\n    default: {\n      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]. To run a task: fgos run \"<prompt>\"; decide --work: fgos dispatch decide --work <workId>\\n`;\n      if (returnResult) throw new StoreError('validation', msg.trim());\n      process.stderr.write(msg);\n      process.exitCode = 1;\n    }\n  }\n}\n",
+      "continued": false
+    },
+    {
+      "file": "src/runner/dispatch/cli.mjs",
+      "kind": "complete-final-record",
+      "categoryA": false,
+      "categoryB": true,
+      "record": {
+        "file": "src/runner/dispatch/cli.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "f87f801077619893579bcebeb1643cdff9a32bd09652619e43d81599c2119969",
+        "digest": "f87f801077619893579bcebeb1643cdff9a32bd09652619e43d81599c2119969",
+        "inventoryEdgeIds": [
+          "class6-l-000257",
+          "class6-l-000257"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000257",
+            "slotKey": "{\"edgeId\":\"class6-l-000257\",\"file\":\"src/runner/dispatch/cli.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000257\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":5}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000257",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 5
+              }
+            ],
+            "consumerFile": "src/runner/dispatch/cli.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 5,
+                "columnStart": 59,
+                "columnEndExclusive": 92,
+                "text": "docs/history/dispatch-activation-"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 5,
+                "columnStart": 59,
+                "columnEndExclusive": 92,
+                "text": "docs/history/dispatch-activation-"
+              },
+              {
+                "line": 6,
+                "columnStart": 1,
+                "columnEndExclusive": 35,
+                "text": "// and-handoff-redesign/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/dispatch-activation-\n// and-handoff-redesign/CONTEXT.md",
+            "logicalReference": "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// the raw `execute` and `log` subcommands are gone. See `docs/history/dispatch-activation-\\n// and-handoff-redesign/CONTEXT.md` D7 for the module split.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000257",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 5,
+                "matchedExpression": "docs/history/dispatch-activation-\n// and-handoff-redesign/CONTEXT.md",
+                "originalLineText": "// the raw `execute` and `log` subcommands are gone. See `docs/history/dispatch-activation-"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "11c14e09aa79f94e1cfc462f5b6493292d915406d5987b80a4164d3a3f9d49e7",
+              "treeSample": [
+                "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md"
+              ],
+              "historyCommitCount": 5,
+              "historyCommitsSha256": "19c59828b91dc889205a58418c9d73dd0f4457e9545cd73b87edd6d254b8ad56",
+              "historySample": [
+                "95d5f1d766a0640da693aa0cdc64c9b536b0d458",
+                "aef6946076a85a9df2ee8586d23bbb6859db7a77"
+              ]
+            }
+          },
+          {
+            "edgeId": "class6-l-000257",
+            "slotKey": "{\"edgeId\":\"class6-l-000257\",\"file\":\"src/runner/dispatch/cli.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000257\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":6}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000257",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 6
+              }
+            ],
+            "consumerFile": "src/runner/dispatch/cli.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 6,
+                "columnStart": 1,
+                "columnEndExclusive": 35,
+                "text": "// and-handoff-redesign/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 5,
+                "columnStart": 59,
+                "columnEndExclusive": 92,
+                "text": "docs/history/dispatch-activation-"
+              },
+              {
+                "line": 6,
+                "columnStart": 1,
+                "columnEndExclusive": 35,
+                "text": "// and-handoff-redesign/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/dispatch-activation-\n// and-handoff-redesign/CONTEXT.md",
+            "logicalReference": "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// the raw `execute` and `log` subcommands are gone. See `docs/history/dispatch-activation-\\n// and-handoff-redesign/CONTEXT.md` D7 for the module split.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000257",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 6,
+                "matchedExpression": "docs/history/dispatch-activation-\n// and-handoff-redesign/CONTEXT.md",
+                "originalLineText": "// and-handoff-redesign/CONTEXT.md` D7 for the module split."
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "11c14e09aa79f94e1cfc462f5b6493292d915406d5987b80a4164d3a3f9d49e7",
+              "treeSample": [
+                "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md"
+              ],
+              "historyCommitCount": 5,
+              "historyCommitsSha256": "19c59828b91dc889205a58418c9d73dd0f4457e9545cd73b87edd6d254b8ad56",
+              "historySample": [
+                "95d5f1d766a0640da693aa0cdc64c9b536b0d458",
+                "aef6946076a85a9df2ee8586d23bbb6859db7a77"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-022",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/runner/dispatch/cli.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "f87f801077619893579bcebeb1643cdff9a32bd09652619e43d81599c2119969",
+          "bytes": 51941,
+          "lines": 1100,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

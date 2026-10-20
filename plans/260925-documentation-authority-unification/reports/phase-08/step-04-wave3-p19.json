@@ -1,0 +1,370 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-023",
+  "files": [
+    "src/runner/dispatch/operation-prompt-templates.mjs",
+    "src/runner/dispatch/prepare.mjs"
+  ],
+  "joinedSlots": 2,
+  "items": [
+    {
+      "file": "src/runner/dispatch/operation-prompt-templates.mjs",
+      "kind": "complete-source-context",
+      "path": "src/runner/dispatch/operation-prompt-templates.mjs",
+      "startLine": 1,
+      "endLine": 590,
+      "content": "// dispatch/operation-prompt-templates.mjs — operation prompt-template registry,\n// deterministic resolver, bounded variable renderer, and provenance tracker (Unit I04 / Phase 3),\n// per docs/architect/agent-coordination/contracts/flow-definition.md and\n// plans/260919-coordination-skill-harness-simplification/plan.md.\n//\n// Layer: infra (same layer as src/runner/dispatch/assignment.mjs).\n// Reads only from filesystem during template discovery. Never performs mutations,\n// never writes to session event log or store, never grants or widens authority.\n//\n// Discovery tiers (fixed precedence: project overrides domain, domain overrides core):\n//   1. project: `<cwd>/.fgos/prompt-templates/<templateId>.{md,txt}`\n//   2. domain:  `<packageRoot>/domains/<domain>/prompt-templates/<templateId>.{md,txt}`\n//   3. core:    `<packageRoot>/core/prompt-templates/<templateId>.{md,txt}`\n//\n// Bounded variables:\n// Only variables derived from validated semantic action / ExecutionContract / Assignment\n// are permitted in templates:\n//   - {objective}\n//   - {contextRefs} (and alias {artifactRefs})\n//   - {expectedOutputs}\n//   - {role}\n//   - {constraints} (filtered to strip internal engine stamps such as protocol-operation:*)\n//   - {evidenceContract}\n// Any placeholder outside this bounded set fails loudly with 'template-invalid'.\n\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport crypto from 'node:crypto';\nimport { fileURLToPath } from 'node:url';\nimport { RunnerConfigError } from './config.mjs';\nimport { PROTOCOL_OPERATION_STAMP_PREFIX } from './execution-contract.mjs';\n\nconst THIS_DIR = path.dirname(fileURLToPath(import.meta.url));\nexport const PACKAGE_ROOT = path.resolve(THIS_DIR, '../../../');\n\nexport const CORE_PROMPT_TEMPLATES_DIR = path.join('core', 'prompt-templates');\nexport const DOMAIN_PROMPT_TEMPLATES_SEGMENT = 'prompt-templates';\nexport const PROJECT_PROMPT_TEMPLATES_DIR = path.join('.fgos', 'prompt-templates');\n\nexport const TEMPLATE_FILE_RE = /\\.(md|txt)$/i;\nexport const TEMPLATE_ID_RE = /^[A-Za-z0-9._-]+$/;\n\nexport const BOUNDED_TEMPLATE_VARIABLES = Object.freeze(new Set([\n  'objective',\n  'contextRefs',\n  'artifactRefs',\n  'expectedOutputs',\n  'role',\n  'constraints',\n  'evidenceContract',\n]));\n\nexport class TemplateResolutionError extends RunnerConfigError {\n  /**\n   * @param {string} code - typed error code e.g. 'template-not-found', 'template-ambiguous', 'template-invalid', 'template-path-escape'\n   * @param {string} message\n   * @param {object} [details]\n   */\n  constructor(code, message, details = {}) {\n    super(`operation-prompt-templates [${code}]: ${message}`);\n    this.name = 'TemplateResolutionError';\n    this.code = code;\n    this.details = Object.freeze({ ...details });\n  }\n}\n\nfunction computeSha256Digest(content) {\n  const hash = crypto.createHash('sha256').update(content, 'utf8').digest('hex');\n  return `sha256:${hash}`;\n}\n\nfunction relativeToPackageRoot(filePath, packageRoot = PACKAGE_ROOT) {\n  return path.relative(packageRoot, filePath) || filePath;\n}\n\n/**\n * Path-escape guard: target must resolve strictly inside rootDir.\n */\nfunction assertContained(rootDir, filePath) {\n  const resolvedRoot = fs.existsSync(rootDir) ? fs.realpathSync(rootDir) : path.resolve(rootDir);\n  const resolvedTarget = fs.existsSync(filePath) ? fs.realpathSync(filePath) : path.resolve(filePath);\n  const rel = path.relative(resolvedRoot, resolvedTarget);\n  if (rel === '' || rel.startsWith(`..${path.sep}`) || rel === '..' || path.isAbsolute(rel)) {\n    throw new TemplateResolutionError(\n      'template-path-escape',\n      `template \"${filePath}\" resolves outside its scan root \"${resolvedRoot}\"`,\n      { rootDir, filePath },\n    );\n  }\n}\n\n/**\n * Extract template ID from filename (basename without extension).\n */\nexport function templateIdFromFileName(fileName) {\n  return fileName.replace(TEMPLATE_FILE_RE, '');\n}\n\n/**\n * Validate raw template text against the bounded variable whitelist.\n * Throws TemplateResolutionError('template-invalid') on any unrecognized placeholder.\n *\n * @param {string} rawContent\n * @param {string} [templateId='']\n * @returns {Set<string>} detected valid placeholders\n */\nexport function validateOperationPromptTemplate(rawContent, templateId = '') {\n  if (typeof rawContent !== 'string') {\n    throw new TemplateResolutionError('template-invalid', `template content for \"${templateId}\" must be a string`);\n  }\n\n  const detectedVariables = new Set();\n  const placeholderRegex = /\\{([A-Za-z0-9_-]+)\\}/g;\n  let match;\n  while ((match = placeholderRegex.exec(rawContent)) !== null) {\n    const varName = match[1];\n    if (!BOUNDED_TEMPLATE_VARIABLES.has(varName)) {\n      throw new TemplateResolutionError(\n        'template-invalid',\n        `template \"${templateId}\" references forbidden or unknown variable \"{${varName}}\". Only bounded variables are permitted: ${[...BOUNDED_TEMPLATE_VARIABLES].join(', ')}`,\n        { templateId, variable: varName, allowed: [...BOUNDED_TEMPLATE_VARIABLES] },\n      );\n    }\n    detectedVariables.add(varName);\n  }\n\n  return detectedVariables;\n}\n\n/**\n * Scan one directory for prompt template files (.md, .txt).\n * Rejects duplicate template IDs within the same directory.\n *\n * @param {string} tier\n * @param {string} dir\n * @param {string} source\n * @param {string} [packageRoot]\n * @returns {Array<object>}\n */\nfunction scanTier(tier, dir, source, packageRoot = PACKAGE_ROOT) {\n  if (!fs.existsSync(dir)) return [];\n  const files = fs.readdirSync(dir).filter((name) => TEMPLATE_FILE_RE.test(name)).sort((a, b) => a.localeCompare(b));\n\n  const seenIds = new Map();\n  const entries = [];\n\n  for (const fileName of files) {\n    const filePath = path.join(dir, fileName);\n    assertContained(dir, filePath);\n\n    const templateId = templateIdFromFileName(fileName);\n    if (!TEMPLATE_ID_RE.test(templateId)) {\n      throw new TemplateResolutionError(\n        'template-invalid',\n        `template filename \"${fileName}\" produces invalid template id \"${templateId}\" (must match ${TEMPLATE_ID_RE})`,\n        { fileName, templateId },\n      );\n    }\n\n    if (seenIds.has(templateId)) {\n      const existingFile = seenIds.get(templateId);\n      throw new TemplateResolutionError(\n        'template-ambiguous',\n        `duplicate template id \"${templateId}\" within ${source} (${fileName} conflicts with ${existingFile})`,\n        { templateId, tier, source, fileName, existingFile },\n      );\n    }\n    seenIds.set(templateId, fileName);\n\n    const content = fs.readFileSync(filePath, 'utf8');\n    validateOperationPromptTemplate(content, templateId);\n    const contentDigest = computeSha256Digest(content);\n\n    entries.push(Object.freeze({\n      id: templateId,\n      tier,\n      source,\n      filePath,\n      relativeFilePath: relativeToPackageRoot(filePath, packageRoot),\n      content,\n      contentDigest,\n    }));\n  }\n\n  return entries;\n}\n\n/**\n * Discover all operation prompt templates across project, domain, and core tiers.\n * Precedence: project > domain > core.\n *\n * @param {object} [options]\n * @param {string} [options.cwd]\n * @param {string} [options.packageRoot]\n * @returns {ReadonlyArray<object>}\n */\nexport function discoverOperationPromptTemplates({ cwd = process.cwd(), packageRoot = PACKAGE_ROOT } = {}) {\n  const byId = new Map();\n  const domainTiers = new Map(); // templateId -> domainName for collision check across domains\n\n  // 1. Project tier\n  const projectDir = path.join(cwd, PROJECT_PROMPT_TEMPLATES_DIR);\n  const projectEntries = scanTier('project', projectDir, 'project', packageRoot);\n  for (const entry of projectEntries) {\n    byId.set(entry.id, entry);\n  }\n\n  // 2. Domain tier\n  const domainsRoot = path.join(packageRoot, 'domains');\n  if (fs.existsSync(domainsRoot)) {\n    const domainNames = fs\n      .readdirSync(domainsRoot, { withFileTypes: true })\n      .filter((e) => e.isDirectory())\n      .map((e) => e.name)\n      .sort((a, b) => a.localeCompare(b));\n\n    for (const domainName of domainNames) {\n      const domainDir = path.join(domainsRoot, domainName, DOMAIN_PROMPT_TEMPLATES_SEGMENT);\n      const entries = scanTier('domain', domainDir, `domain:${domainName}`, packageRoot);\n      for (const entry of entries) {\n        if (domainTiers.has(entry.id) && domainTiers.get(entry.id) !== domainName) {\n          throw new TemplateResolutionError(\n            'template-ambiguous',\n            `template id \"${entry.id}\" collides across domains \"${domainTiers.get(entry.id)}\" and \"${domainName}\"`,\n            { templateId: entry.id, domain1: domainTiers.get(entry.id), domain2: domainName },\n          );\n        }\n        domainTiers.set(entry.id, domainName);\n        if (!byId.has(entry.id)) {\n          byId.set(entry.id, entry);\n        }\n      }\n    }\n  }\n\n  // 3. Core tier\n  const coreDir = path.join(packageRoot, CORE_PROMPT_TEMPLATES_DIR);\n  const coreEntries = scanTier('core', coreDir, 'core', packageRoot);\n  for (const entry of coreEntries) {\n    if (!byId.has(entry.id)) {\n      byId.set(entry.id, entry);\n    }\n  }\n\n  return Object.freeze([...byId.values()]);\n}\n\n/**\n * Load and resolve one operation prompt template by id.\n * Precedence: project > domain (if specified, that domain; otherwise any domain) > core.\n *\n * @param {string} templateId\n * @param {object} [options]\n * @param {string} [options.cwd]\n * @param {string} [options.packageRoot]\n * @param {string} [options.domain]\n * @returns {object} resolved template entry\n */\nexport function loadOperationPromptTemplate(templateId, options = {}) {\n  if (!templateId || typeof templateId !== 'string' || !TEMPLATE_ID_RE.test(templateId)) {\n    throw new TemplateResolutionError('template-invalid', `invalid template id \"${templateId}\"`);\n  }\n\n  const cwd = options.cwd ?? process.cwd();\n  const packageRoot = options.packageRoot ?? PACKAGE_ROOT;\n  const targetDomain = options.domain;\n\n  // 1. Check project tier\n  const projectDir = path.join(cwd, PROJECT_PROMPT_TEMPLATES_DIR);\n  if (fs.existsSync(projectDir)) {\n    const projectEntries = scanTier('project', projectDir, 'project', packageRoot);\n    const found = projectEntries.find((e) => e.id === templateId);\n    if (found) return found;\n  }\n\n  // 2. Check domain tier\n  if (targetDomain) {\n    const domainDir = path.join(packageRoot, 'domains', targetDomain, DOMAIN_PROMPT_TEMPLATES_SEGMENT);\n    if (fs.existsSync(domainDir)) {\n      const domainEntries = scanTier('domain', domainDir, `domain:${targetDomain}`, packageRoot);\n      const found = domainEntries.find((e) => e.id === templateId);\n      if (found) return found;\n    }\n  } else {\n    // If no target domain, scan all domains\n    const domainsRoot = path.join(packageRoot, 'domains');\n    if (fs.existsSync(domainsRoot)) {\n      const domainNames = fs\n        .readdirSync(domainsRoot, { withFileTypes: true })\n        .filter((e) => e.isDirectory())\n        .map((e) => e.name)\n        .sort((a, b) => a.localeCompare(b));\n\n      let matchedDomainEntry = null;\n      for (const domainName of domainNames) {\n        const domainDir = path.join(domainsRoot, domainName, DOMAIN_PROMPT_TEMPLATES_SEGMENT);\n        if (!fs.existsSync(domainDir)) continue;\n        const domainEntries = scanTier('domain', domainDir, `domain:${domainName}`, packageRoot);\n        const found = domainEntries.find((e) => e.id === templateId);\n        if (found) {\n          if (matchedDomainEntry) {\n            throw new TemplateResolutionError(\n              'template-ambiguous',\n              `template id \"${templateId}\" collides across domains \"${matchedDomainEntry.source}\" and \"${found.source}\"`,\n              { templateId, source1: matchedDomainEntry.source, source2: found.source },\n            );\n          }\n          matchedDomainEntry = found;\n        }\n      }\n      if (matchedDomainEntry) return matchedDomainEntry;\n    }\n  }\n\n  // 3. Check core tier\n  const coreDir = path.join(packageRoot, CORE_PROMPT_TEMPLATES_DIR);\n  if (fs.existsSync(coreDir)) {\n    const coreEntries = scanTier('core', coreDir, 'core', packageRoot);\n    const found = coreEntries.find((e) => e.id === templateId);\n    if (found) return found;\n  }\n\n  throw new TemplateResolutionError(\n    'template-not-found',\n    `no operation prompt template found for id \"${templateId}\" (searched project, domain, and core tiers)`,\n    { templateId, cwd, domain: targetDomain },\n  );\n}\n\n/**\n * Check if an operation prompt template exists and is valid.\n * Returns true if found and valid.\n * Returns false if not found.\n * Throws TemplateResolutionError if ambiguous, invalid, or path-escaped.\n *\n * @param {string} templateId\n * @param {object} [options]\n * @returns {boolean}\n */\nexport function hasOperationPromptTemplate(templateId, options = {}) {\n  try {\n    loadOperationPromptTemplate(templateId, options);\n    return true;\n  } catch (err) {\n    if (err instanceof TemplateResolutionError && err.code === 'template-not-found') {\n      return false;\n    }\n    throw err;\n  }\n}\n\nfunction formatItemList(items) {\n  if (!Array.isArray(items) || items.length === 0) {\n    return '- (none)';\n  }\n  return items.map((item) => `- ${item}`).join('\\n');\n}\n\n/**\n * Filter out engine-reserved constraints (like protocol-operation:*) so internal\n * engine markers never leak to the model prompt.\n */\nfunction formatConstraints(constraints) {\n  if (!Array.isArray(constraints)) {\n    return '- (none)';\n  }\n  const filtered = constraints.filter(\n    (c) => typeof c === 'string' && !c.startsWith(PROTOCOL_OPERATION_STAMP_PREFIX),\n  );\n  if (filtered.length === 0) {\n    return '- (none)';\n  }\n  return filtered.map((c) => `- ${c}`).join('\\n');\n}\n\n/**\n * Render an operation prompt template with bounded variables.\n *\n * @param {string} templateContent\n * @param {object} variables\n * @returns {string} rendered prompt string\n */\nexport function renderOperationPromptTemplate(templateContent, variables = {}) {\n  validateOperationPromptTemplate(templateContent);\n\n  const objective = variables.objective ?? '';\n  const role = variables.role ?? '';\n  const contextRefs = Array.isArray(variables.contextRefs)\n    ? formatItemList(variables.contextRefs)\n    : (variables.contextRefs ?? '- (none)');\n  const artifactRefs = Array.isArray(variables.artifactRefs)\n    ? formatItemList(variables.artifactRefs)\n    : (variables.artifactRefs ?? contextRefs);\n  const expectedOutputs = Array.isArray(variables.expectedOutputs)\n    ? formatItemList(variables.expectedOutputs)\n    : (variables.expectedOutputs ?? '- (none)');\n  const constraints = Array.isArray(variables.constraints)\n    ? formatConstraints(variables.constraints)\n    : (variables.constraints ?? '- (none)');\n  const evidenceContract = variables.evidenceContract ?? (variables.evidence?.required ?? 'reported');\n\n  return templateContent\n    .replaceAll('{objective}', objective)\n    .replaceAll('{role}', role)\n    .replaceAll('{contextRefs}', contextRefs)\n    .replaceAll('{artifactRefs}', artifactRefs)\n    .replaceAll('{expectedOutputs}', expectedOutputs)\n    .replaceAll('{constraints}', constraints)\n    .replaceAll('{evidenceContract}', evidenceContract);\n}\n\n/**\n * Resolve an operation prompt template and render it for an assignment.\n * Accepts either an assignment object with contractTemplate, or a string templateId with options.variables.\n * Returns the rendered prompt body and complete template provenance.\n *\n * @param {object|string} assignmentOrTemplateId\n * @param {object} [options]\n * @param {string} [options.cwd]\n * @param {string} [options.packageRoot]\n * @param {string} [options.domain]\n * @param {object} [options.variables]\n * @returns {{ renderedBody: string, templateProvenance: object }}\n */\nexport function resolveAndRenderOperationPrompt(assignmentOrTemplateId, options = {}) {\n  let templateId;\n  let target = {};\n  if (typeof assignmentOrTemplateId === 'string') {\n    templateId = assignmentOrTemplateId;\n    target = options.variables || options.assignment || {};\n  } else if (assignmentOrTemplateId && typeof assignmentOrTemplateId === 'object') {\n    target = assignmentOrTemplateId;\n    templateId = assignmentOrTemplateId.contractTemplate;\n  } else {\n    throw new TemplateResolutionError('template-invalid', 'assignment object or templateId string is required');\n  }\n\n  // I04-REV-01 & I04-REV-02: Check for already-pinned template snapshot in provenance or options.\n  // When an assignment already has a pinned template snapshot (from initial resolution or stored\n  // assignment.json), render directly from the pinned snapshot so retry/replay attribution is\n  // strictly deterministic even if the disk template changes or is removed later.\n  // Enforce strict integrity: validate schema, recompute digest of snapshot against contentDigest,\n  // recompute renderedPromptDigest and verify match with stored digest. Fail closed on any corruption\n  // with typed 'template-provenance-mismatch'.\n  const pinnedTemplate = target.provenance?.template ?? options.templateProvenance ?? options.pinnedTemplate;\n  const SHA256_HEX_REGEX = /^sha256:[0-9a-f]{64}$/;\n\n  let templateEntry;\n  if (pinnedTemplate !== undefined && pinnedTemplate !== null) {\n    if (typeof pinnedTemplate !== 'object' || Array.isArray(pinnedTemplate)) {\n      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template provenance must be a non-null object', { pinnedTemplate });\n    }\n    if (typeof pinnedTemplate.templateSnapshot !== 'string' || !pinnedTemplate.templateSnapshot.trim()) {\n      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template provenance contains missing or non-string templateSnapshot', { pinnedTemplate });\n    }\n    if (typeof pinnedTemplate.id !== 'string' || !pinnedTemplate.id.trim()) {\n      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template provenance missing non-empty id', { pinnedTemplate });\n    }\n    if (templateId && pinnedTemplate.id !== templateId) {\n      throw new TemplateResolutionError(\n        'template-provenance-mismatch',\n        `pinned template id \"${pinnedTemplate.id}\" does not match contractTemplate \"${templateId}\"`,\n        { pinnedId: pinnedTemplate.id, templateId },\n      );\n    }\n    templateId = pinnedTemplate.id;\n\n    if (pinnedTemplate.tier !== undefined && (typeof pinnedTemplate.tier !== 'string' || !pinnedTemplate.tier.trim())) {\n      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template tier must be a non-empty string when present', { pinnedTemplate });\n    }\n    if (pinnedTemplate.source !== undefined && (typeof pinnedTemplate.source !== 'string' || !pinnedTemplate.source.trim())) {\n      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template source must be a non-empty string when present', { pinnedTemplate });\n    }\n    if (pinnedTemplate.filePath !== undefined && pinnedTemplate.filePath !== null && (typeof pinnedTemplate.filePath !== 'string' || !pinnedTemplate.filePath.trim())) {\n      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template filePath must be a string or null when present', { pinnedTemplate });\n    }\n\n    const actualContentDigest = computeSha256Digest(pinnedTemplate.templateSnapshot);\n    if (!pinnedTemplate.contentDigest || typeof pinnedTemplate.contentDigest !== 'string') {\n      throw new TemplateResolutionError(\n        'template-provenance-mismatch',\n        'pinned template provenance missing required contentDigest',\n        { pinnedTemplate },\n      );\n    }\n    if (!SHA256_HEX_REGEX.test(pinnedTemplate.contentDigest)) {\n      throw new TemplateResolutionError(\n        'template-provenance-mismatch',\n        `pinned template contentDigest is malformed: \"${pinnedTemplate.contentDigest}\"`,\n        { contentDigest: pinnedTemplate.contentDigest },\n      );\n    }\n    if (pinnedTemplate.contentDigest !== actualContentDigest) {\n      throw new TemplateResolutionError(\n        'template-provenance-mismatch',\n        `pinned template contentDigest mismatch: expected \"${actualContentDigest}\", got \"${pinnedTemplate.contentDigest}\"`,\n        { expectedContentDigest: actualContentDigest, actualContentDigest: pinnedTemplate.contentDigest },\n      );\n    }\n\n    if (!pinnedTemplate.renderedPromptDigest || typeof pinnedTemplate.renderedPromptDigest !== 'string') {\n      throw new TemplateResolutionError(\n        'template-provenance-mismatch',\n        'pinned template provenance missing required renderedPromptDigest',\n        { pinnedTemplate },\n      );\n    }\n    if (!SHA256_HEX_REGEX.test(pinnedTemplate.renderedPromptDigest)) {\n      throw new TemplateResolutionError(\n        'template-provenance-mismatch',\n        `pinned template renderedPromptDigest is malformed: \"${pinnedTemplate.renderedPromptDigest}\"`,\n        { renderedPromptDigest: pinnedTemplate.renderedPromptDigest },\n      );\n    }\n\n    // Re-verify bounded variables on the snapshot to preserve template-invalid invariants\n    validateOperationPromptTemplate(pinnedTemplate.templateSnapshot, templateId);\n\n    templateEntry = {\n      id: pinnedTemplate.id,\n      tier: pinnedTemplate.tier || 'pinned',\n      source: pinnedTemplate.source || 'pinned',\n      relativeFilePath: pinnedTemplate.filePath || null,\n      content: pinnedTemplate.templateSnapshot,\n      contentDigest: actualContentDigest,\n    };\n  } else {\n    if (!templateId || typeof templateId !== 'string') {\n      throw new TemplateResolutionError('template-invalid', 'assignment does not declare valid contractTemplate string');\n    }\n    templateEntry = loadOperationPromptTemplate(templateId, {\n      cwd: options.cwd,\n      packageRoot: options.packageRoot,\n      domain: options.domain || target.domain,\n    });\n  }\n\n  const variables = {\n    objective: target.objective ?? '',\n    role: target.role ?? '',\n    contextRefs: target.contextRefs ?? target.artifactRefs ?? [],\n    artifactRefs: target.artifactRefs ?? target.contextRefs ?? [],\n    expectedOutputs: target.expectedOutputs ?? [],\n    // Neither buildInlineAssignment() nor buildDeclaredAssignment()\n    // (assignment.mjs) promotes constraints to a top-level Assignment\n    // field -- the real values only ever live nested in provenance. Without\n    // this fallback chain, every inline Assignment (every coordination-\n    // session step, including all architecture-advisory-panel-v1\n    // operations) renders \"- (none)\" regardless of its actual constraints.\n    // Same fallback chain assignmentServesOperation() already uses for the\n    // identical problem (legality-facts.mjs).\n    constraints:\n      target.provenance?.inline?.contract?.constraints ??\n      target.provenance?.contract?.constraints ??\n      target.contract?.constraints ??\n      target.constraints ??\n      [],\n    evidenceContract: target.evidenceContract ?? target.evidence?.required ?? 'reported',\n  };\n\n  const renderedBody = renderOperationPromptTemplate(templateEntry.content, variables);\n  const renderedPromptDigest = computeSha256Digest(renderedBody);\n\n  // I04-REV-02: Recompute rendered digest and verify against stored renderedPromptDigest when retry/replay\n  // occurs with immutable Assignment inputs. Fail closed if there is a mismatch.\n  if (pinnedTemplate && pinnedTemplate.renderedPromptDigest !== undefined) {\n    if (pinnedTemplate.renderedPromptDigest !== renderedPromptDigest) {\n      throw new TemplateResolutionError(\n        'template-provenance-mismatch',\n        `rendered prompt digest mismatch for pinned template \"${templateEntry.id}\": expected \"${pinnedTemplate.renderedPromptDigest}\", computed \"${renderedPromptDigest}\"`,\n        {\n          expectedRenderedPromptDigest: pinnedTemplate.renderedPromptDigest,\n          computedRenderedPromptDigest: renderedPromptDigest,\n        },\n      );\n    }\n  }\n\n  const templateProvenance = Object.freeze({\n    id: templateEntry.id,\n    tier: templateEntry.tier,\n    source: templateEntry.source,\n    filePath: templateEntry.relativeFilePath,\n    contentDigest: templateEntry.contentDigest,\n    renderedPromptDigest,\n    templateSnapshot: templateEntry.content,\n  });\n\n  return { renderedBody, templateProvenance };\n}\n",
+      "continued": false
+    },
+    {
+      "file": "src/runner/dispatch/operation-prompt-templates.mjs",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "src/runner/dispatch/operation-prompt-templates.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
+        "digest": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
+        "inventoryEdgeIds": [
+          "class6-l-000273"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000273",
+            "slotKey": "{\"edgeId\":\"class6-l-000273\",\"file\":\"src/runner/dispatch/operation-prompt-templates.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000273\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":3}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000273",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3
+              }
+            ],
+            "consumerFile": "src/runner/dispatch/operation-prompt-templates.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 8,
+                "columnEndExclusive": 70,
+                "text": "docs/architect/agent-coordination/contracts/flow-definition.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 8,
+                "columnEndExclusive": 70,
+                "text": "docs/architect/agent-coordination/contracts/flow-definition.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/contracts/flow-definition.md",
+            "logicalReference": "docs/architect/agent-coordination/contracts/flow-definition.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: original FlowDefinition contract supports operation prompt-template registry, deterministic resolver and bounded provenance renderer. The candidate flow-definition is under agent-coordination/history/retired-engine/files/contracts and cannot establish this live contract; reconcile the exact maintained operation-template claim into a live holder. Own source passage: '// per docs/architect/agent-coordination/contracts/flow-definition.md and'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: original FlowDefinition contract supports operation prompt-template registry, deterministic resolver and bounded provenance renderer. The candidate flow-definition is under agent-coordination/history/retired-engine/files/contracts and cannot establish this live contract; reconcile the exact maintained operation-template claim into a live holder. Own source passage: '// per docs/architect/agent-coordination/contracts/flow-definition.md and'",
+            "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: original FlowDefinition contract supports operation prompt-template registry, deterministic resolver and bounded provenance renderer. The candidate flow-definition is under agent-coordination/history/retired-engine/files/contracts and cannot establish this live contract; reconcile the exact maintained operation-template claim into a live holder. Own source passage: '// per docs/architect/agent-coordination/contracts/flow-definition.md and'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/agent-coordination/contracts/flow-definition.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000273",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3,
+                "matchedExpression": "docs/architect/agent-coordination/contracts/flow-definition.md",
+                "originalLineText": "// per docs/architect/agent-coordination/contracts/flow-definition.md and"
+              }
+            ],
+            "parkSourceQuote": "// per docs/architect/agent-coordination/contracts/flow-definition.md and",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/agent-coordination/contracts/flow-definition.md",
+              "passage": "// per docs/architect/agent-coordination/contracts/flow-definition.md and",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/agent-coordination/contracts/flow-definition.md",
+                  "hitCount": 35,
+                  "liveHitCount": 31,
+                  "hitsSha256": "1a8afbc368a74b7487f59428adaea357c0e28f580445962ec4c3f6ce6973ce8c"
+                }
+              ],
+              "assessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: original FlowDefinition contract supports operation prompt-template registry, deterministic resolver and bounded provenance renderer. The candidate flow-definition is under agent-coordination/history/retired-engine/files/contracts and cannot establish this live contract; reconcile the exact maintained operation-template claim into a live holder. Own source passage: '// per docs/architect/agent-coordination/contracts/flow-definition.md and'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/agent-coordination/contracts/flow-definition.md",
+                  "carriageCount": 4,
+                  "liveCount": 31,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: original FlowDefinition contract supports operation prompt-template registry, deterministic resolver and bounded provenance renderer. The candidate flow-definition is under agent-coordination/history/retired-engine/files/contracts and cannot establish this live contract; reconcile the exact maintained operation-template claim into a live holder. Own source passage: '// per docs/architect/agent-coordination/contracts/flow-definition.md and'",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "// per docs/architect/agent-coordination/contracts/flow-definition.md and",
+              "terms": [
+                "deterministic resolver",
+                "prompt-template registry",
+                "provenance renderer"
+              ],
+              "queries": [
+                {
+                  "term": "deterministic resolver",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                },
+                {
+                  "term": "prompt-template registry",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                },
+                {
+                  "term": "provenance renderer",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: original FlowDefinition contract supports operation prompt-template registry, deterministic resolver and bounded provenance renderer. The candidate flow-definition is under agent-coordination/history/retired-engine/files/contracts and cannot establish this live contract; reconcile the exact maintained operation-template claim into a live holder. Own source passage: '// per docs/architect/agent-coordination/contracts/flow-definition.md and'"
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-023",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/runner/dispatch/operation-prompt-templates.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
+          "bytes": 24048,
+          "lines": 590,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p33.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "src/runner/dispatch/prepare.mjs",
+      "kind": "complete-source-context",
+      "path": "src/runner/dispatch/prepare.mjs",
+      "startLine": 1,
+      "endLine": 49,
+      "content": "// dispatch/prepare.mjs — payload assembly (D7, tsk-2uf-1): `prepareDispatch`\n// (a new, small, named concept — D7's own note: \"a named concept in the\n// middle\"). the worker prompt assembled from a Work item's own\n// fields lives in the Work layer, src/runner/work-compat.mjs, along with its\n// trust invariant: it assumes the Work item was authored by the repo's own user\n// (`verify` is run by the runner as a shell command), never ingested from an\n// untrusted external source.\n//\n// `prepareDispatch` scope for THIS item (tsk-2uf-1) is deliberately narrow:\n// it validates call legality only — that `unit` is a real, addressable\n// dispatch target (a non-empty `id`) — never the dispatch MECHANISM\n// (`tsk-5tm-3` D5 forbids re-deciding that; `dispatch/mechanism.mjs`'s\n// `decideDispatchMechanism`/`decideExecutorDispatchMechanism` already own\n// that judgment and are untouched here). It is additive: no existing\n// caller (`spawnWorker`, `executeExecutorCli`, `decideExecutorCli`) is\n// wired to call it in this item — introducing that wiring would be a\n// behavior change, out of this item's consolidation-only scope. A future\n// item widens its body (claim-ownership/footprint refusal, executor.dispatch\n// auto-logging, `kind`-aware lifecycle-bearing vs. ephemeral routing per D5)\n// once a real caller needs it.\n\nimport { RunnerConfigError } from './config.mjs';\n\n/**\n * Validate that a dispatch call is legal BEFORE any payload is built for\n * it — the \"named concept in the middle\" D7 introduces (`docs/history/\n * dispatch-activation-and-handoff-redesign/CONTEXT.md`). Deliberately\n * narrow for this item: checks call legality only (`unit` is a real,\n * addressable dispatch target — a non-empty `id`), never the dispatch\n * MECHANISM (`tsk-5tm-3` D5 forbids re-deciding that here; `decide`'s own\n * judgment in `dispatch/mechanism.mjs` is untouched and unconsulted by this\n * function). Throws `RunnerConfigError` — the same error vocabulary every\n * other call-legality gate in this module family already uses — for a\n * `unit` with no `id`, rather than silently building a payload for nothing.\n * `opts` is accepted and returned unchanged: no options are validated yet,\n * kept for forward compatibility with the fuller shape a later item may\n * grow into (claim-ownership/footprint refusal, `kind`-aware routing per\n * D5) without changing this function's own call signature again.\n */\nexport function prepareDispatch(unit, opts = {}) {\n  if (!unit || typeof unit !== 'object' || Array.isArray(unit)) {\n    throw new RunnerConfigError('prepareDispatch requires a \"unit\" object (the work item, or ad-hoc task, this dispatch is for).');\n  }\n  const id = unit.id || unit.assignmentId;\n  if (typeof id !== 'string' || !id.trim()) {\n    throw new RunnerConfigError('prepareDispatch requires \"unit.id\" (a non-empty string) — the dispatch target must be addressable.');\n  }\n  return { unit, opts };\n}\n",
+      "continued": false
+    },
+    {
+      "file": "src/runner/dispatch/prepare.mjs",
+      "kind": "complete-final-record",
+      "categoryA": false,
+      "categoryB": true,
+      "record": {
+        "file": "src/runner/dispatch/prepare.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "d2bc4e5bccce5db31c8a56a364d06d88916b4c108cb0191957e8989b44ff90ce",
+        "digest": "d2bc4e5bccce5db31c8a56a364d06d88916b4c108cb0191957e8989b44ff90ce",
+        "inventoryEdgeIds": [
+          "class6-l-000274"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000274",
+            "slotKey": "{\"edgeId\":\"class6-l-000274\",\"file\":\"src/runner/dispatch/prepare.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000274\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":26}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000274",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 26
+              }
+            ],
+            "consumerFile": "src/runner/dispatch/prepare.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 26,
+                "columnStart": 59,
+                "columnEndExclusive": 72,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 26,
+                "columnStart": 59,
+                "columnEndExclusive": 72,
+                "text": "docs/history/"
+              },
+              {
+                "line": 27,
+                "columnStart": 4,
+                "columnEndExclusive": 55,
+                "text": "dispatch-activation-and-handoff-redesign/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/\ndispatch-activation-and-handoff-redesign/CONTEXT.md",
+            "logicalReference": "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; source-bound history/provenance or surviving root; literal spelling conserved. Own source passage: ' * it — the \"named concept in the middle\" D7 introduces (`docs/history/\\n * dispatch-activation-and-handoff-redesign/CONTEXT.md`). Deliberately'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000274",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 26,
+                "matchedExpression": "docs/history/",
+                "originalLineText": " * it — the \"named concept in the middle\" D7 introduces (`docs/history/"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "11c14e09aa79f94e1cfc462f5b6493292d915406d5987b80a4164d3a3f9d49e7",
+              "treeSample": [
+                "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md"
+              ],
+              "historyCommitCount": 5,
+              "historyCommitsSha256": "19c59828b91dc889205a58418c9d73dd0f4457e9545cd73b87edd6d254b8ad56",
+              "historySample": [
+                "95d5f1d766a0640da693aa0cdc64c9b536b0d458",
+                "aef6946076a85a9df2ee8586d23bbb6859db7a77"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-023",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/runner/dispatch/prepare.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "d2bc4e5bccce5db31c8a56a364d06d88916b4c108cb0191957e8989b44ff90ce",
+          "bytes": 2934,
+          "lines": 49,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

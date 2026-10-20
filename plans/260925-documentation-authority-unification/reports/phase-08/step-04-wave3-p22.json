@@ -1,0 +1,1313 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-025",
+  "files": [
+    "src/runner/worktree.mjs"
+  ],
+  "joinedSlots": 12,
+  "items": [
+    {
+      "file": "src/runner/worktree.mjs",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "src/runner/worktree.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "8782458081f0512fb29b323ab1858aebc64adb029228703c8fe9a9f850a05fd9",
+        "digest": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+        "inventoryEdgeIds": [
+          "class6-l-000327",
+          "class6-l-000328",
+          "class6-l-000329",
+          "class6-l-000330",
+          "class6-l-000331",
+          "class6-l-000332",
+          "class6-l-000334",
+          "class6-l-000335",
+          "class6-l-000336",
+          "class6-l-000337",
+          "class6-l-000338",
+          "class6-l-000338"
+        ],
+        "diff": "--- a/src/runner/worktree.mjs\n+++ b/src/runner/worktree.mjs\n@@ -753,7 +753,7 @@\n  * `opts.baseRef` (default: `detectTrunk(repoRoot)`, tsk-386 — no longer a\n  * literal `'main'`; a host project whose trunk is `master` would otherwise\n  * fail `git branch fgw/<id> main` outright on this fallback, per\n- * `docs/distribution-vision.md`'s \"installed into other repos\" story).\n+ * `docs/platform/git/spec.md#7-hardened-git-backend-parsers-and-hook-contract`'s \"No hardcoded trunk\" contract).\n  * Idempotent: if `fgw/<id>` already exists, this is a no-op — it does NOT\n  * move the branch to `baseRef`, mirroring the RETRY-WITHOUT-SELF-COLLISION\n  * discipline above (a retried root-dispatch must not disturb a branch that\n@@ -1048,7 +1048,7 @@\n  * current tip (`git merge-base --is-ancestor` — no commit would be lost),\n  * and the worktree has no real uncommitted changes relative to that same\n  * last-synced commit. Refuses loudly otherwise — never resets blind, the\n- * same discipline `docs/how-to/safely-reset-the-main-checkout.md` already\n+ * same discipline `docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md#before-you-start` already\n  * documents for the main checkout, applied here to a claim worktree\n  * instead (a different protected target — this stays its own guard, not a\n  * reuse of `main-checkout-reset-guard.mjs`). A worktree already at its\n",
+        "edges": [
+          {
+            "edgeId": "class6-l-000327",
+            "slotKey": "{\"edgeId\":\"class6-l-000327\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000327\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":554}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000327",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 554
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 693,
+                "columnStart": 5,
+                "columnEndExclusive": 60,
+                "text": "docs/history/pick-worktree-reclaim-zero-destroy/plan.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 693,
+                "columnStart": 5,
+                "columnEndExclusive": 60,
+                "text": "docs/history/pick-worktree-reclaim-zero-destroy/plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/pick-worktree-reclaim-zero-destroy/plan.md",
+            "logicalReference": "docs/history/pick-worktree-reclaim-zero-destroy/plan.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: ' * `docs/history/pick-worktree-reclaim-zero-destroy/plan.md`\\'s \"Validated'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/pick-worktree-reclaim-zero-destroy/plan.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000327",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 554,
+                "matchedExpression": "docs/history/pick-worktree-reclaim-zero-destroy/plan.md",
+                "originalLineText": " * `docs/history/pick-worktree-reclaim-zero-destroy/plan.md`'s \"Validated"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/pick-worktree-reclaim-zero-destroy/plan.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "0d04df7c0c9040e9f4cb26094fa115eaae86bbe5c1d4af480c97c09c77ebb505",
+              "treeSample": [
+                "docs/history/pick-worktree-reclaim-zero-destroy/plan.md"
+              ],
+              "historyCommitCount": 5,
+              "historyCommitsSha256": "649f0733baff8a6a9e5eaa30520d465bc9f1d4043ee1e6130546972fd98f8d4e",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "8eba4a400a0ef6a47467f8afc8ac8af82b2e3545"
+              ]
+            }
+          },
+          {
+            "edgeId": "class6-l-000328",
+            "slotKey": "{\"edgeId\":\"class6-l-000328\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000328\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":617}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000328",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 617
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 756,
+                "columnStart": 5,
+                "columnEndExclusive": 32,
+                "text": "docs/distribution-vision.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 756,
+                "columnStart": 5,
+                "columnEndExclusive": 32,
+                "text": "docs/distribution-vision.md"
+              }
+            ],
+            "matchedExpression": "docs/distribution-vision.md",
+            "logicalReference": "docs/distribution-vision.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -753,7 +753,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: No hardcoded trunk: host project trunk is detected; G-018 and G-044 explicitly cover createBranchRef. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/git/spec.md",
+            "anchor": "7-hardened-git-backend-parsers-and-hook-contract",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/distribution-vision.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000328",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 617,
+                "matchedExpression": "docs/distribution-vision.md",
+                "originalLineText": " * `docs/distribution-vision.md`'s \"installed into other repos\" story)."
+              }
+            ],
+            "parkSourceQuote": " * `docs/distribution-vision.md`'s \"installed into other repos\" story).",
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": " * `docs/distribution-vision.md`'s \"installed into other repos\" story).",
+              "terms": [
+                "No hardcoded trunk",
+                "createBranchRef",
+                "opts.baseRef"
+              ],
+              "queries": [
+                {
+                  "term": "No hardcoded trunk",
+                  "hitCount": 1,
+                  "liveHits": 1,
+                  "hitsSha256": "ee8c962e75810385c03b1ec455eced3d9ad6f3b1c857079772c9d0483f6740c9",
+                  "files": {
+                    "docs/platform/git/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/git/spec.md",
+                      "line": 315,
+                      "text": "No hardcoded trunk: explicit consumer target, remote default, then validated main attached branch; ambiguity/missing target is named. Full refs/end-of-options prevent tags/options/ranges from changing meaning. Validate commit type. Batch object/path-at-revision returns error distinct from absence.",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "createBranchRef",
+                  "hitCount": 47,
+                  "liveHits": 47,
+                  "hitsSha256": "d7f7a42d776dbd2f58f381afc090bb0af3514c53fb4e0da31a13468daf8447e3",
+                  "files": {
+                    "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-promote-engine-merges-members-instead-of-rebasing-them/why-promote-engine-merges-members-instead-of-rebasing-them.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/platform/git/spec.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/runner/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+                      "line": 22,
+                      "text": "`createBranchRef(repoRoot, rootId, { baseRef: 'main' })` as part of leaf",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+                      "line": 35,
+                      "text": "the early `createBranchRef` call. The first place such a root's branch was",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+                      "line": 40,
+                      "text": "> early `createBranchRef` call. The first time such a root's branch is",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+                      "line": 51,
+                      "text": "`createBranchRef` when the branch doesn't exist, instead of throwing.",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+                      "line": 61,
+                      "text": "`createBranchRef` unconditionally before ever reaching",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+                      "line": 94,
+                      "text": "`createBranchRef` fallback (or an explicit branch-existence guard) at",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "opts.baseRef",
+                  "hitCount": 18,
+                  "liveHits": 18,
+                  "hitsSha256": "2b526efc54b95667a06e322a71148d8f84bbe1305d57ca3e884a8c616755ce8c",
+                  "files": {
+                    "docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/runner/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
+                      "line": 50,
+                      "text": "`opts.baseRef` is never needed — the branch already exists, so",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+                      "line": 25,
+                      "text": "(picking a branch that already exists) ignores `opts.baseRef` entirely —",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6028,
+                      "text": "✔ createWorktree with opts.baseRef forks a new branch from that ref's tip, not from repoRoot's current HEAD (48.521989ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6031,
+                      "text": "✔ createWorktree with opts.baseRef on an existing (reused) branch ignores baseRef and reuses as before (65.126521ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6074,
+                      "text": "✔ createWorktree with opts.baseRef forks a new branch from that ref's tip, not from repoRoot's current HEAD (60.264477ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6077,
+                      "text": "✔ createWorktree with opts.baseRef on an existing (reused) branch ignores baseRef and reuses as before (74.483105ms)",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: No hardcoded trunk: host project trunk is detected; G-018 and G-044 explicitly cover createBranchRef. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            }
+          },
+          {
+            "edgeId": "class6-l-000329",
+            "slotKey": "{\"edgeId\":\"class6-l-000329\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000329\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":787}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000329",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 787
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 926,
+                "columnStart": 29,
+                "columnEndExclusive": 48,
+                "text": "docs/decisions/0022"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 926,
+                "columnStart": 29,
+                "columnEndExclusive": 48,
+                "text": "docs/decisions/0022"
+              }
+            ],
+            "matchedExpression": "docs/decisions/0022",
+            "logicalReference": "docs/decisions/0022",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: '// OPERATION-TYPE WRAPPERS (docs/decisions/0022 candidate #3, ranked-priority' Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md#0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill. L12-62 tree/history: Removed/elided decision id; preserve captured provenance and generated-index comment. Successor notes below; runtime/index parity stays Step 5.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/decisions/0022",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000329",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 787,
+                "matchedExpression": "docs/decisions/0022",
+                "originalLineText": "// OPERATION-TYPE WRAPPERS (docs/decisions/0022 candidate #3, ranked-priority"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/decisions/0022",
+              "state": "never-existed",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 0,
+              "historyCommitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "historySample": [],
+              "exception": "Removed/elided decision id; preserve captured provenance and generated-index comment. Successor notes below; runtime/index parity stays Step 5."
+            }
+          },
+          {
+            "edgeId": "class6-l-000330",
+            "slotKey": "{\"edgeId\":\"class6-l-000330\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000330\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":852}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000330",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 852
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 991,
+                "columnStart": 39,
+                "columnEndExclusive": 72,
+                "text": "docs/history/root-worktree-drift-"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 991,
+                "columnStart": 39,
+                "columnEndExclusive": 72,
+                "text": "docs/history/root-worktree-drift-"
+              },
+              {
+                "line": 992,
+                "columnStart": 4,
+                "columnEndExclusive": 29,
+                "text": "after-child-merge/plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/root-worktree-drift-\nafter-child-merge/plan.md",
+            "logicalReference": "docs/history/root-worktree-drift-after-child-merge/plan.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; source-bound history/provenance or surviving root; literal spelling conserved. Own source passage: \" * untouched (empirically confirmed, `docs/history/root-worktree-drift-\\n * after-child-merge/plan.md`'s Approach section). Returns `null` when the\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/root-worktree-drift-after-child-merge/plan.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000330",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 852,
+                "matchedExpression": "docs/history/root-worktree-drift-",
+                "originalLineText": " * untouched (empirically confirmed, `docs/history/root-worktree-drift-"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/root-worktree-drift-after-child-merge/plan.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "08c951600de337563b11c0e71e4cbe8bd0731cedf9b4b10cea410389b1eb4060",
+              "treeSample": [
+                "docs/history/root-worktree-drift-after-child-merge/plan.md"
+              ],
+              "historyCommitCount": 4,
+              "historyCommitsSha256": "47243f0ee8b22671b16dda8dd305e2fa45a3896773fc506b008c6dd780b25af5",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "ecbd7a7e64382cd2d7368779dab0335a0c2050e9"
+              ]
+            }
+          },
+          {
+            "edgeId": "class6-l-000331",
+            "slotKey": "{\"edgeId\":\"class6-l-000331\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000331\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":898}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000331",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 898
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1037,
+                "columnStart": 15,
+                "columnEndExclusive": 76,
+                "text": "docs/history/root-worktree-drift-after-child-merge/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1037,
+                "columnStart": 15,
+                "columnEndExclusive": 76,
+                "text": "docs/history/root-worktree-drift-after-child-merge/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/root-worktree-drift-after-child-merge/CONTEXT.md",
+            "logicalReference": "docs/history/root-worktree-drift-after-child-merge/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: ' * (tsk-2cd, `docs/history/root-worktree-drift-after-child-merge/CONTEXT.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/root-worktree-drift-after-child-merge/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000331",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 898,
+                "matchedExpression": "docs/history/root-worktree-drift-after-child-merge/CONTEXT.md",
+                "originalLineText": " * (tsk-2cd, `docs/history/root-worktree-drift-after-child-merge/CONTEXT.md`"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/root-worktree-drift-after-child-merge/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "341804cef6a27e4e3316437a5e18187cd10375ad641583dc733a01df56ca68bc",
+              "treeSample": [
+                "docs/history/root-worktree-drift-after-child-merge/CONTEXT.md"
+              ],
+              "historyCommitCount": 3,
+              "historyCommitsSha256": "6b6a4de55c5a9b5a3d04edbb642c93d886f2365c5fd3e29e30e9b3499b3c614c",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "e597084b9b76d1772bd4c59b3489a3518eed0b43"
+              ]
+            }
+          },
+          {
+            "edgeId": "class6-l-000332",
+            "slotKey": "{\"edgeId\":\"class6-l-000332\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000332\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":912}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000332",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 912
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1051,
+                "columnStart": 21,
+                "columnEndExclusive": 66,
+                "text": "docs/how-to/safely-reset-the-main-checkout.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1051,
+                "columnStart": 21,
+                "columnEndExclusive": 66,
+                "text": "docs/how-to/safely-reset-the-main-checkout.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/safely-reset-the-main-checkout.md",
+            "logicalReference": "docs/how-to/safely-reset-the-main-checkout.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -1048,7 +1048,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: The existing guard guidance requires full-tree status before destructive reset. The source explicitly adapts that discipline to a different claim worktree target, without claiming identical guard implementation. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+            "anchor": "before-you-start",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/how-to/safely-reset-the-main-checkout.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000332",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 912,
+                "matchedExpression": "docs/how-to/safely-reset-the-main-checkout.md",
+                "originalLineText": " * same discipline `docs/how-to/safely-reset-the-main-checkout.md` already"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000334",
+            "slotKey": "{\"edgeId\":\"class6-l-000334\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000334\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":960}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000334",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 960
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1099,
+                "columnStart": 13,
+                "columnEndExclusive": 63,
+                "text": "docs/history/stale-worktree-index-guard/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1099,
+                "columnStart": 13,
+                "columnEndExclusive": 63,
+                "text": "docs/history/stale-worktree-index-guard/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "logicalReference": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: ' * tsk-1d7 (docs/history/stale-worktree-index-guard/CONTEXT.md D3): a plain'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000334",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 960,
+                "matchedExpression": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+                "originalLineText": " * tsk-1d7 (docs/history/stale-worktree-index-guard/CONTEXT.md D3): a plain"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "475050752aee5e8679ec5704a65adbe7552399debd3c09b0d18a1dba9dec2a11",
+              "treeSample": [
+                "docs/history/stale-worktree-index-guard/CONTEXT.md"
+              ],
+              "historyCommitCount": 1,
+              "historyCommitsSha256": "5c9dddde25966623e36f97d6b23afe143a58b149bc6d5614e863c6fc68226c82",
+              "historySample": [
+                "b27d2bd5c669846c145639247509ae25be1eda34"
+              ]
+            }
+          },
+          {
+            "edgeId": "class6-l-000335",
+            "slotKey": "{\"edgeId\":\"class6-l-000335\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000335\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":982}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000335",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 982
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1121,
+                "columnStart": 60,
+                "columnEndExclusive": 73,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1121,
+                "columnStart": 60,
+                "columnEndExclusive": 73,
+                "text": "docs/history/"
+              },
+              {
+                "line": 1122,
+                "columnStart": 4,
+                "columnEndExclusive": 41,
+                "text": "stale-worktree-index-guard/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/\nstale-worktree-index-guard/CONTEXT.md",
+            "logicalReference": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; source-bound history/provenance or surviving root; literal spelling conserved. Own source passage: ' * The repair verb behind `fgos resync-worktree` (tsk-1d7, docs/history/\\n * stale-worktree-index-guard/CONTEXT.md D3) -- fixes exactly the failure'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000335",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 982,
+                "matchedExpression": "docs/history/",
+                "originalLineText": " * The repair verb behind `fgos resync-worktree` (tsk-1d7, docs/history/"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "475050752aee5e8679ec5704a65adbe7552399debd3c09b0d18a1dba9dec2a11",
+              "treeSample": [
+                "docs/history/stale-worktree-index-guard/CONTEXT.md"
+              ],
+              "historyCommitCount": 1,
+              "historyCommitsSha256": "5c9dddde25966623e36f97d6b23afe143a58b149bc6d5614e863c6fc68226c82",
+              "historySample": [
+                "b27d2bd5c669846c145639247509ae25be1eda34"
+              ]
+            }
+          },
+          {
+            "edgeId": "class6-l-000336",
+            "slotKey": "{\"edgeId\":\"class6-l-000336\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000336\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1253}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000336",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1253
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1392,
+                "columnStart": 50,
+                "columnEndExclusive": 63,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1392,
+                "columnStart": 50,
+                "columnEndExclusive": 63,
+                "text": "docs/history/"
+              },
+              {
+                "line": 1393,
+                "columnStart": 4,
+                "columnEndExclusive": 60,
+                "text": "merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/\nmerge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md",
+            "logicalReference": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; source-bound history/provenance or surviving root; literal spelling conserved. Own source passage: ' * \"keep\"), clean or dirty, live session or not (docs/history/\\n * merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md D1). This'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000336",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1253,
+                "matchedExpression": "docs/history/",
+                "originalLineText": " * \"keep\"), clean or dirty, live session or not (docs/history/"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "1d2dc46e227443702e8b57621bc35c3223560d4e7dff9cb26620cb8b101f3dc6",
+              "treeSample": [
+                "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "d5a31c23d7e1a666fd0e18fca7fbe17728df88f4e0169921c26f48493dc29591",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "4e1e65f5b931ee28dae2cbddc3ab86b174c82ee3"
+              ]
+            }
+          },
+          {
+            "edgeId": "class6-l-000337",
+            "slotKey": "{\"edgeId\":\"class6-l-000337\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000337\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1265}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000337",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1265
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1404,
+                "columnStart": 33,
+                "columnEndExclusive": 46,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1404,
+                "columnStart": 33,
+                "columnEndExclusive": 46,
+                "text": "docs/history/"
+              },
+              {
+                "line": 1405,
+                "columnStart": 4,
+                "columnEndExclusive": 53,
+                "text": "tsk-6ch-merge-worktree-branch-fallback/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/\ntsk-6ch-merge-worktree-branch-fallback/CONTEXT.md",
+            "logicalReference": "docs/history/tsk-6ch-merge-worktree-branch-fallback/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; source-bound history/provenance or surviving root; literal spelling conserved. Own source passage: ' * first time a merge needs it (docs/history/\\n * tsk-6ch-merge-worktree-branch-fallback/CONTEXT.md). Falling back to'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-6ch-merge-worktree-branch-fallback/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000337",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1265,
+                "matchedExpression": "docs/history/",
+                "originalLineText": " * first time a merge needs it (docs/history/"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/tsk-6ch-merge-worktree-branch-fallback/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "0acb95f945561be1b3060f949c83345114a759338fb98cd6cd9840e6d813e0f3",
+              "treeSample": [
+                "docs/history/tsk-6ch-merge-worktree-branch-fallback/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "ab73505cf52d06f744679ae69c2334ae6b2e512bddbf8c6a548ff50d93612a24",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "cedfde865dcdad64e3c1199d632676a9ce34731d"
+              ]
+            }
+          },
+          {
+            "edgeId": "class6-l-000338",
+            "slotKey": "{\"edgeId\":\"class6-l-000338\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000338\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1340}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000338",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1340
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1479,
+                "columnStart": 30,
+                "columnEndExclusive": 77,
+                "text": "docs/history/merge-ephemeral-branch-force-race/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1479,
+                "columnStart": 30,
+                "columnEndExclusive": 77,
+                "text": "docs/history/merge-ephemeral-branch-force-race/"
+              },
+              {
+                "line": 1480,
+                "columnStart": 1,
+                "columnEndExclusive": 20,
+                "text": "      // CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/merge-ephemeral-branch-force-race/\n      // CONTEXT.md",
+            "logicalReference": "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '      // CAS GUARD (tsk-46a, docs/history/merge-ephemeral-branch-force-race/\\n      // CONTEXT.md D1; hardened tsk-18k): `startCommit` was captured back in'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000338",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1340,
+                "matchedExpression": "docs/history/merge-ephemeral-branch-force-race/\n      // CONTEXT.md",
+                "originalLineText": "      // CAS GUARD (tsk-46a, docs/history/merge-ephemeral-branch-force-race/"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "863b9b11d3bcc919d8aadf82107fd39e5bca98823199600d5b67498f7702f4c2",
+              "treeSample": [
+                "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "48914c301c0f33455c1f61ec755883282ad399649024f2cb7ab1091a64ea953a",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "b8a82847ca73524b7c42e5fe79e77717daae2ae5"
+              ]
+            }
+          },
+          {
+            "edgeId": "class6-l-000338",
+            "slotKey": "{\"edgeId\":\"class6-l-000338\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000338\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1341}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000338",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1341
+              }
+            ],
+            "consumerFile": "src/runner/worktree.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1480,
+                "columnStart": 1,
+                "columnEndExclusive": 20,
+                "text": "      // CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1479,
+                "columnStart": 30,
+                "columnEndExclusive": 77,
+                "text": "docs/history/merge-ephemeral-branch-force-race/"
+              },
+              {
+                "line": 1480,
+                "columnStart": 1,
+                "columnEndExclusive": 20,
+                "text": "      // CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/merge-ephemeral-branch-force-race/\n      // CONTEXT.md",
+            "logicalReference": "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '      // CAS GUARD (tsk-46a, docs/history/merge-ephemeral-branch-force-race/\\n      // CONTEXT.md D1; hardened tsk-18k): `startCommit` was captured back in'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000338",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1341,
+                "matchedExpression": "docs/history/merge-ephemeral-branch-force-race/\n      // CONTEXT.md",
+                "originalLineText": "      // CONTEXT.md D1; hardened tsk-18k): `startCommit` was captured back in"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "863b9b11d3bcc919d8aadf82107fd39e5bca98823199600d5b67498f7702f4c2",
+              "treeSample": [
+                "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "48914c301c0f33455c1f61ec755883282ad399649024f2cb7ab1091a64ea953a",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "b8a82847ca73524b7c42e5fe79e77717daae2ae5"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"class6-l-000332\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000332\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":912}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"class6-l-000328\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000328\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":617}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"class6-l-000332\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000332\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":912}]}": {
+                "sourcePassage": " * same discipline `docs/how-to/safely-reset-the-main-checkout.md` already",
+                "adjacentPassage": "/**\n * Resync a reattached claim worktree to its branch's current tip when safe\n * (tsk-2cd, `docs/history/root-worktree-drift-after-child-merge/CONTEXT.md`\n * D1/D3): `approve`'s leaf→root merge lands via a plain ref update from a\n * DETACHED ephemeral checkout (`withMergeEphemeralWorktree` below) — it\n * never touches any OTHER worktree already checked out on that branch, so\n * a long-lived claim worktree (this function's own caller,\n * `createClaimWorktree`'s reattach path) can silently fall behind: the\n * branch has advanced, but this worktree's files/index stay exactly where\n * they were the last time something ran inside it.\n *\n * Auto-resyncs (`git reset --hard <branchTip>`) only when BOTH hold: the\n * worktree's own last-synced commit is a proven ancestor of the branch's\n * current tip (`git merge-base --is-ancestor` — no commit would be lost),\n * and the worktree has no real uncommitted changes relative to that same\n * last-synced commit. Refuses loudly otherwise — never resets blind, the\n * same discipline `docs/how-to/safely-reset-the-main-checkout.md` already\n * documents for the main checkout, applied here to a claim worktree\n * instead (a different protected target — this stays its own guard, not a\n * reuse of `main-checkout-reset-guard.mjs`). A worktree already at its\n * branch's tip is a no-op before either check runs, so the ordinary\n * dirty-but-not-behind reattach (`createClaimWorktree`'s own reattach\n * exists for exactly this — a session resuming its own in-progress work)\n * is completely unaffected.\n */\nexport function resyncClaimWorktree(repoRoot, worktreePath, branch) {\n  const lastSynced = lastSyncedCommit(repoRoot, worktreePath);\n  if (!lastSynced) {\n    throw new WorktreeError(\n      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — could not read its own HEAD reflog to determine what commit it was last synced to. Inspect \"${worktreePath}\" by hand before claiming \"${branch}\" again.`,\n      { branch, worktreePath },\n    );\n  }",
+                "target": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "ec9f6195763d768c6470a0b3751bf82f3043b5ddd6be7ff88401ed8d2ed4307a",
+                "targetEvidence": [
+                  {
+                    "line": 17,
+                    "text": "## Before you start"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "The existing guard guidance requires full-tree status before destructive reset. The source explicitly adapts that discipline to a different claim worktree target, without claiming identical guard implementation."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "The existing guard guidance requires full-tree status before destructive reset. The source explicitly adapts that discipline to a different claim worktree target, without claiming identical guard implementation."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "The existing guard guidance requires full-tree status before destructive reset. The source explicitly adapts that discipline to a different claim worktree target, without claiming identical guard implementation."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "The existing guard guidance requires full-tree status before destructive reset. The source explicitly adapts that discipline to a different claim worktree target, without claiming identical guard implementation."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "The existing guard guidance requires full-tree status before destructive reset. The source explicitly adapts that discipline to a different claim worktree target, without claiming identical guard implementation."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "The existing guard guidance requires full-tree status before destructive reset. The source explicitly adapts that discipline to a different claim worktree target, without claiming identical guard implementation."
+                  }
+                },
+                "assessment": "The existing guard guidance requires full-tree status before destructive reset. The source explicitly adapts that discipline to a different claim worktree target, without claiming identical guard implementation."
+              },
+              "{\"edgeId\":\"class6-l-000328\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000328\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":617}]}": {
+                "sourcePassage": " * `docs/distribution-vision.md`'s \"installed into other repos\" story).",
+                "adjacentPassage": "/**\n * Create the integration branch `fgw/<id>` (D17: \"nhánh tạo sớm, không cần\n * worktree\") as a REF ONLY — no worktree/checkout is registered for it.\n * `opts.baseRef` (default: `detectTrunk(repoRoot)`, tsk-386 — no longer a\n * literal `'main'`; a host project whose trunk is `master` would otherwise\n * fail `git branch fgw/<id> main` outright on this fallback, per\n * `docs/distribution-vision.md`'s \"installed into other repos\" story).\n * Idempotent: if `fgw/<id>` already exists, this is a no-op — it does NOT\n * move the branch to `baseRef`, mirroring the RETRY-WITHOUT-SELF-COLLISION\n * discipline above (a retried root-dispatch must not disturb a branch that\n * may already carry committed leaf work). Returns `{ branch, created }`,\n * where `created` is `false` when the branch already existed.\n */\nexport function createBranchRef(repoRoot, id, opts = {}) {\n  const branch = branchNameFor(id);\n  const baseRef = opts.baseRef ?? detectTrunk(repoRoot);",
+                "target": "docs/platform/git/spec.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "3534bfd0d0e80ac8faed63ac9fddf61ccf45376517921ca0da5bf94fe5ff5139",
+                "targetEvidence": [
+                  {
+                    "line": 307,
+                    "text": "## 7. Hardened Git backend, parsers and hook contract"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: No hardcoded trunk: host project trunk is detected; G-018 and G-044 explicitly cover createBranchRef."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: No hardcoded trunk: host project trunk is detected; G-018 and G-044 explicitly cover createBranchRef."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: No hardcoded trunk: host project trunk is detected; G-018 and G-044 explicitly cover createBranchRef."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: No hardcoded trunk: host project trunk is detected; G-018 and G-044 explicitly cover createBranchRef."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: No hardcoded trunk: host project trunk is detected; G-018 and G-044 explicitly cover createBranchRef."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: No hardcoded trunk: host project trunk is detected; G-018 and G-044 explicitly cover createBranchRef."
+                  }
+                },
+                "assessment": "L12-62: No hardcoded trunk: host project trunk is detected; G-018 and G-044 explicitly cover createBranchRef."
+              }
+            },
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {
+            "{\"edgeId\":\"class6-l-000332\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000332\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":912}]}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "ec9f6195763d768c6470a0b3751bf82f3043b5ddd6be7ff88401ed8d2ed4307a",
+              "passage": "## Before you start",
+              "targetEvidenceLine": 17,
+              "targetLines": [
+                17
+              ],
+              "targetLineText": [
+                "## Before you start"
+              ],
+              "sourceLocatorTokens": []
+            },
+            "{\"edgeId\":\"class6-l-000328\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000328\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":617}]}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "3534bfd0d0e80ac8faed63ac9fddf61ccf45376517921ca0da5bf94fe5ff5139",
+              "passage": "## 7. Hardened Git backend, parsers and hook contract",
+              "targetEvidenceLine": 307,
+              "targetLines": [
+                307
+              ],
+              "targetLineText": [
+                "## 7. Hardened Git backend, parsers and hook contract"
+              ],
+              "sourceLocatorTokens": []
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"class6-l-000332\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000332\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":912}]}": {
+              "replacement": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md#before-you-start",
+              "resolvedTarget": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"class6-l-000328\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000328\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":617}]}": {
+              "replacement": "docs/platform/git/spec.md#7-hardened-git-backend-parsers-and-hook-contract",
+              "resolvedTarget": "docs/platform/git/spec.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"class6-l-000332\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000332\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":912}]}": {
+              "source": "docs/how-to/safely-reset-the-main-checkout.md",
+              "replacement": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md#before-you-start",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"class6-l-000328\",\"file\":\"src/runner/worktree.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000328\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":617}]}": {
+              "source": "docs/distribution-vision.md",
+              "replacement": "docs/platform/git/spec.md#7-hardened-git-backend-parsers-and-hook-contract",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-025",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/runner/worktree.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+          "bytes": 78643,
+          "lines": 1615,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "edgeId": "class6-l-000333",
+            "consumerFile": "src/runner/worktree.mjs",
+            "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 559,
+                "columnStart": 484,
+                "line": 1088,
+                "text": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
+              }
+            ],
+            "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity."
+          },
+          {
+            "inventory": null,
+            "edgeId": null,
+            "consumerFile": "src/runner/worktree.mjs",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "sourceSpans": [
+              {
+                "line": 1088,
+                "columnStart": 484,
+                "columnEndExclusive": 559,
+                "text": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
+              }
+            ],
+            "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity."
+          }
+        ],
+        "contextEdits": [
+          {
+            "sourceSpans": [
+              {
+                "line": 756,
+                "columnStart": 36,
+                "columnEndExclusive": 70,
+                "text": "\"installed into other repos\" story"
+              }
+            ],
+            "replacement": "\"No hardcoded trunk\" contract",
+            "reason": "L12-62: Make adjacent description agree with the live Git contract."
+          }
+        ]
+      },
+      "targetFilesToRead": [
+        "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+        "docs/platform/git/spec.md"
+      ],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p35.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

@@ -1,0 +1,1485 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-002",
+  "files": [
+    "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
+  ],
+  "joinedSlots": 14,
+  "items": [
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "kind": "complete-source-context",
+      "path": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "startLine": 1,
+      "endLine": 163,
+      "content": "# Verify sync and the mid-planning gap — full mechanics\n\nThe full detail behind SKILL.md's Step 5 (Leave execution alone) and\nStep 6 (Mid-planning CONTEXT.md gap).\n\n## Leave execution alone\n\nPer the locked decision that Execute and its verify already have a\nworking mechanical path (the goal-check the engine runs, and `return`'s\nown re-verify of real progress), this skill does not design or re-plan\nany of that — it only needs to name, for each piece it describes, the one\ncommand that proves it done.\n\nIf a piece touches a skill-prose path (`.claude/skills/**/SKILL.md`,\n`.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read\n`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its\nverify command — it documents the correct `npm test && POSITIVE &&\nNEGATIVE` shape and the standing rebuttal for when the second-pass judge\ndemands proof of prose comprehension, a demand the doc says verify must\nnever be asked to satisfy.\n\n## Sync a pass-through item's own `verify` field\n\nFor a *pass-through* (non-split — Step 4's \"one piece is honestly\nenough\" branch) item only: once the one command above is named, check\nthe item's own current `verify` (`fgos list --id <item-id> --json`'s\n`data.work[id].verify`) against the discovery-stage placeholder\nconstants. If it still reads one of those placeholders, sync that\ncommand onto the item's own current `verify` field before handing off to\n`fgos-coding-validating`:\n\n```bash\nfgos edit \"<item-id>\" --verify \"<the designed proof-surface command>\"\n```\n\nIf the item already carries a real, distinct verify, do nothing — never\noverwrite a value already set deliberately. Split children need no such\nstep: the normalizer already forces a real verify onto each one at\ncreation time. Without this sync, nothing in the standard flow ever\npromotes this step's own designed command into `work.verify` —\n`fgos-coding-validating`'s own gate-approve call only re-records whatever\n`work.verify` already says, and the plan-approve fallback falls straight\nthrough to that same still-placeholder value, which later gets executed\nliterally as a shell command by `fgos return`.\n\nWhenever the verify command you are about to write with `fgos add\n--verify`/`fgos edit --verify` (including the sync step immediately\nabove) contains a backslash-escaped backtick (or any other character an\nouter shell layer could silently strip), read `docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md` first — a lost\nescape is usually still syntactically valid shell, so it fails much\nlater, at `return` time, with a confusing result instead of a clean\nerror.\n\n## Sync a pass-through item's own `action` and `footprint` fields\n\nFor a *pass-through* (non-split — Step 4's \"one piece is honestly\nenough\" branch) item only: once Approach and Shape name the files touched and\nthe directive prose, check the item's own current `action` and `footprint`\nfields (`fgos list --id <item-id> --json`'s `data.work[id].action` and\n`data.work[id].footprint`).\n\n- **Footprint**: If `footprint` is empty or undefined, sync it with the\n  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`\n  plus the files listed in Approach):\n\n  ```bash\n  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\"\n  ```\n\n- **Action**: If `action` is undefined, null, or empty, sync it with a directive\n  sentence citing `plan.md` (or the primary CONTEXT.md decision if applicable):\n\n  ```bash\n  fgos edit \"<item-id>\" --action \"<directive sentence citing plan.md>\"\n  ```\n\nIf the item already carries a real, distinct value for either field, do not\noverwrite it — never overwrite a value set deliberately. Without this sync,\na pass-through item dispatched to `fgos-coding-implement` receives empty\nplaceholders (`(không có)`) for `# Directive` and `# Files to read first` in\nworker prompts, creating a cold-pickup risk for out-of-process workers.\n\n## Sync a split root item's own `verify` field\n\nFor the **root** item of a real split (Step 4's \"several independently\nworkable pieces\" branch) only: once the split is decided, check the root\nitem's own current `verify` (`fgos list --id <item-id> --json`'s\n`data.work[id].verify`) against the discovery-stage placeholder\nconstants, the same way the pass-through check above does. If it still\nreads one of those placeholders, sync a whole-suite regression command\nonto the item's own current `verify` field before handing off to\n`fgos-coding-validating`:\n\n```bash\nfgos edit \"<item-id>\" --verify \"npm test\"\n```\n\nA root item has no single piece-specific proof surface of its own — its\ncorrectness is \"does everything merged still pass\" — so a whole-suite\ncommand is the honest choice here, unlike a pass-through item's own\nnarrower, piece-specific command above. If the item already carries a\nreal, distinct verify, do nothing — never overwrite a value already set\ndeliberately. Without this sync, a decompose root's `verify` stays\nwhatever placeholder `discovery` left behind, and `fgos sync-root`'s own\ngoal-check later executes that placeholder literally as a shell command\n(the tsk-1vc incident this item's own description cites).\n\n### Cases this needs to hold for\n\n- A split root whose `verify` is still the discovery-stage placeholder\n  (the reported failure mode, tsk-1vc) — gets synced to `npm test`.\n- A split root whose `verify` is already real (e.g. `tsk-3ik`'s own\n  informal `node --test 'test/**/*.test.mjs'`) — untouched, no redundant\n  edit.\n- A pass-through (non-split) item — untouched by this change; already\n  covered by the existing pass-through section above it, which tsk-14a\n  already fixed.\n- A split **child** — untouched; already covered by the normalizer forcing\n  a real verify at creation time (unchanged, not this item's gap).\n\n## Mid-planning CONTEXT.md gap\n\nIf, at any step, CONTEXT.md's locked decisions turn out to be silent on\nsomething this plan actually needs, apply the same material/grounded/\nanswerable filter `fgos-coding-exploring` already uses to its own\ncandidate questions:\n\n- **Not material** — the answer would not change scope, behavior, data\n  shape, or acceptance criteria; a genuine implementation-only detail\n  CONTEXT.md correctly left unaddressed. Pin it as a labeled assumption\n  in `plan.md`'s own Assumptions instead of asking anyone —\n  `fgos-coding-validating`'s reality gate already checks every assumption\n  the plan depends on is either proven or flagged as unproven, so this\n  needs no new container.\n- **Material** — the answer would change scope, behavior, data shape, or\n  acceptance criteria. **Record the gap first, then hand back** — before\n  this rule the hand-back wrote nothing at all, so a session that died\n  mid-hand-back lost the gap entirely: the next session to claim the item\n  read a CONTEXT.md that is silent by definition and had no trace that\n  anyone had ever noticed:\n\n  ```bash\n  fgos decision --id \"<item-id>\" \\\n    --text \"planning->exploring hand-back: <the gap, in one line>\" \\\n    --rationale \"material per fgos-coding-planning step 6; tier-A actions already tried: <what was run/read and why it did not close the gap>\" \\\n    --relation none\n  ```\n\n  Name what tier A already tried and why it failed to close the gap —\n  that is what stops the re-entry from re-running a scan this session\n  already ran, and what a later session reads to pick up cold.\n\n  Then hand back to `fgos-coding-exploring` directly, in this same\n  session: invoke its flow (Socratic lock, the same three-test filter,\n  appending a new decision id to CONTEXT.md) while `item.workflowStep` stays\n  `planning` the entire time — there is no `planning -> exploring` edge\n  in the state machine, so never attempt to move the item's stage back.\n  This is the same no-stage-move shape `fgos-coding-validating` already\n  uses when it hands an item back to this skill directly (both stay in\n  `planning`). Never reopen or reinterpret a decision CONTEXT.md already\n  locked — this path exists only for a gap it never addressed, not a\n  second chance to override one it did.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "kind": "complete-render-context",
+      "path": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "startLine": 1,
+      "endLine": 164,
+      "content": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n# Verify sync and the mid-planning gap — full mechanics\n\nThe full detail behind SKILL.md's Step 5 (Leave execution alone) and\nStep 6 (Mid-planning CONTEXT.md gap).\n\n## Leave execution alone\n\nPer the locked decision that Execute and its verify already have a\nworking mechanical path (the goal-check the engine runs, and `return`'s\nown re-verify of real progress), this skill does not design or re-plan\nany of that — it only needs to name, for each piece it describes, the one\ncommand that proves it done.\n\nIf a piece touches a skill-prose path (`.claude/skills/**/SKILL.md`,\n`.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read\n`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its\nverify command — it documents the correct `npm test && POSITIVE &&\nNEGATIVE` shape and the standing rebuttal for when the second-pass judge\ndemands proof of prose comprehension, a demand the doc says verify must\nnever be asked to satisfy.\n\n## Sync a pass-through item's own `verify` field\n\nFor a *pass-through* (non-split — Step 4's \"one piece is honestly\nenough\" branch) item only: once the one command above is named, check\nthe item's own current `verify` (`fgos list --id <item-id> --json`'s\n`data.work[id].verify`) against the discovery-stage placeholder\nconstants. If it still reads one of those placeholders, sync that\ncommand onto the item's own current `verify` field before handing off to\n`fgos-coding-validating`:\n\n```bash\nfgos edit \"<item-id>\" --verify \"<the designed proof-surface command>\"\n```\n\nIf the item already carries a real, distinct verify, do nothing — never\noverwrite a value already set deliberately. Split children need no such\nstep: the normalizer already forces a real verify onto each one at\ncreation time. Without this sync, nothing in the standard flow ever\npromotes this step's own designed command into `work.verify` —\n`fgos-coding-validating`'s own gate-approve call only re-records whatever\n`work.verify` already says, and the plan-approve fallback falls straight\nthrough to that same still-placeholder value, which later gets executed\nliterally as a shell command by `fgos return`.\n\nWhenever the verify command you are about to write with `fgos add\n--verify`/`fgos edit --verify` (including the sync step immediately\nabove) contains a backslash-escaped backtick (or any other character an\nouter shell layer could silently strip), read `docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md` first — a lost\nescape is usually still syntactically valid shell, so it fails much\nlater, at `return` time, with a confusing result instead of a clean\nerror.\n\n## Sync a pass-through item's own `action` and `footprint` fields\n\nFor a *pass-through* (non-split — Step 4's \"one piece is honestly\nenough\" branch) item only: once Approach and Shape name the files touched and\nthe directive prose, check the item's own current `action` and `footprint`\nfields (`fgos list --id <item-id> --json`'s `data.work[id].action` and\n`data.work[id].footprint`).\n\n- **Footprint**: If `footprint` is empty or undefined, sync it with the\n  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`\n  plus the files listed in Approach):\n\n  ```bash\n  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\"\n  ```\n\n- **Action**: If `action` is undefined, null, or empty, sync it with a directive\n  sentence citing `plan.md` (or the primary CONTEXT.md decision if applicable):\n\n  ```bash\n  fgos edit \"<item-id>\" --action \"<directive sentence citing plan.md>\"\n  ```\n\nIf the item already carries a real, distinct value for either field, do not\noverwrite it — never overwrite a value set deliberately. Without this sync,\na pass-through item dispatched to `fgos-coding-implement` receives empty\nplaceholders (`(không có)`) for `# Directive` and `# Files to read first` in\nworker prompts, creating a cold-pickup risk for out-of-process workers.\n\n## Sync a split root item's own `verify` field\n\nFor the **root** item of a real split (Step 4's \"several independently\nworkable pieces\" branch) only: once the split is decided, check the root\nitem's own current `verify` (`fgos list --id <item-id> --json`'s\n`data.work[id].verify`) against the discovery-stage placeholder\nconstants, the same way the pass-through check above does. If it still\nreads one of those placeholders, sync a whole-suite regression command\nonto the item's own current `verify` field before handing off to\n`fgos-coding-validating`:\n\n```bash\nfgos edit \"<item-id>\" --verify \"npm test\"\n```\n\nA root item has no single piece-specific proof surface of its own — its\ncorrectness is \"does everything merged still pass\" — so a whole-suite\ncommand is the honest choice here, unlike a pass-through item's own\nnarrower, piece-specific command above. If the item already carries a\nreal, distinct verify, do nothing — never overwrite a value already set\ndeliberately. Without this sync, a decompose root's `verify` stays\nwhatever placeholder `discovery` left behind, and `fgos sync-root`'s own\ngoal-check later executes that placeholder literally as a shell command\n(the tsk-1vc incident this item's own description cites).\n\n### Cases this needs to hold for\n\n- A split root whose `verify` is still the discovery-stage placeholder\n  (the reported failure mode, tsk-1vc) — gets synced to `npm test`.\n- A split root whose `verify` is already real (e.g. `tsk-3ik`'s own\n  informal `node --test 'test/**/*.test.mjs'`) — untouched, no redundant\n  edit.\n- A pass-through (non-split) item — untouched by this change; already\n  covered by the existing pass-through section above it, which tsk-14a\n  already fixed.\n- A split **child** — untouched; already covered by the normalizer forcing\n  a real verify at creation time (unchanged, not this item's gap).\n\n## Mid-planning CONTEXT.md gap\n\nIf, at any step, CONTEXT.md's locked decisions turn out to be silent on\nsomething this plan actually needs, apply the same material/grounded/\nanswerable filter `fgos-coding-exploring` already uses to its own\ncandidate questions:\n\n- **Not material** — the answer would not change scope, behavior, data\n  shape, or acceptance criteria; a genuine implementation-only detail\n  CONTEXT.md correctly left unaddressed. Pin it as a labeled assumption\n  in `plan.md`'s own Assumptions instead of asking anyone —\n  `fgos-coding-validating`'s reality gate already checks every assumption\n  the plan depends on is either proven or flagged as unproven, so this\n  needs no new container.\n- **Material** — the answer would change scope, behavior, data shape, or\n  acceptance criteria. **Record the gap first, then hand back** — before\n  this rule the hand-back wrote nothing at all, so a session that died\n  mid-hand-back lost the gap entirely: the next session to claim the item\n  read a CONTEXT.md that is silent by definition and had no trace that\n  anyone had ever noticed:\n\n  ```bash\n  fgos decision --id \"<item-id>\" \\\n    --text \"planning->exploring hand-back: <the gap, in one line>\" \\\n    --rationale \"material per fgos-coding-planning step 6; tier-A actions already tried: <what was run/read and why it did not close the gap>\" \\\n    --relation none\n  ```\n\n  Name what tier A already tried and why it failed to close the gap —\n  that is what stops the re-entry from re-running a scan this session\n  already ran, and what a later session reads to pick up cold.\n\n  Then hand back to `fgos-coding-exploring` directly, in this same\n  session: invoke its flow (Socratic lock, the same three-test filter,\n  appending a new decision id to CONTEXT.md) while `item.workflowStep` stays\n  `planning` the entire time — there is no `planning -> exploring` edge\n  in the state machine, so never attempt to move the item's stage back.\n  This is the same no-stage-move shape `fgos-coding-validating` already\n  uses when it hands an item back to this skill directly (both stay in\n  `planning`). Never reopen or reinterpret a decision CONTEXT.md already\n  locked — this path exists only for a gap it never addressed, not a\n  second chance to override one it did.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "kind": "complete-render-context",
+      "path": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "startLine": 1,
+      "endLine": 164,
+      "content": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n# Verify sync and the mid-planning gap — full mechanics\n\nThe full detail behind SKILL.md's Step 5 (Leave execution alone) and\nStep 6 (Mid-planning CONTEXT.md gap).\n\n## Leave execution alone\n\nPer the locked decision that Execute and its verify already have a\nworking mechanical path (the goal-check the engine runs, and `return`'s\nown re-verify of real progress), this skill does not design or re-plan\nany of that — it only needs to name, for each piece it describes, the one\ncommand that proves it done.\n\nIf a piece touches a skill-prose path (`.claude/skills/**/SKILL.md`,\n`.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read\n`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its\nverify command — it documents the correct `npm test && POSITIVE &&\nNEGATIVE` shape and the standing rebuttal for when the second-pass judge\ndemands proof of prose comprehension, a demand the doc says verify must\nnever be asked to satisfy.\n\n## Sync a pass-through item's own `verify` field\n\nFor a *pass-through* (non-split — Step 4's \"one piece is honestly\nenough\" branch) item only: once the one command above is named, check\nthe item's own current `verify` (`fgos list --id <item-id> --json`'s\n`data.work[id].verify`) against the discovery-stage placeholder\nconstants. If it still reads one of those placeholders, sync that\ncommand onto the item's own current `verify` field before handing off to\n`fgos-coding-validating`:\n\n```bash\nfgos edit \"<item-id>\" --verify \"<the designed proof-surface command>\"\n```\n\nIf the item already carries a real, distinct verify, do nothing — never\noverwrite a value already set deliberately. Split children need no such\nstep: the normalizer already forces a real verify onto each one at\ncreation time. Without this sync, nothing in the standard flow ever\npromotes this step's own designed command into `work.verify` —\n`fgos-coding-validating`'s own gate-approve call only re-records whatever\n`work.verify` already says, and the plan-approve fallback falls straight\nthrough to that same still-placeholder value, which later gets executed\nliterally as a shell command by `fgos return`.\n\nWhenever the verify command you are about to write with `fgos add\n--verify`/`fgos edit --verify` (including the sync step immediately\nabove) contains a backslash-escaped backtick (or any other character an\nouter shell layer could silently strip), read `docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md` first — a lost\nescape is usually still syntactically valid shell, so it fails much\nlater, at `return` time, with a confusing result instead of a clean\nerror.\n\n## Sync a pass-through item's own `action` and `footprint` fields\n\nFor a *pass-through* (non-split — Step 4's \"one piece is honestly\nenough\" branch) item only: once Approach and Shape name the files touched and\nthe directive prose, check the item's own current `action` and `footprint`\nfields (`fgos list --id <item-id> --json`'s `data.work[id].action` and\n`data.work[id].footprint`).\n\n- **Footprint**: If `footprint` is empty or undefined, sync it with the\n  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`\n  plus the files listed in Approach):\n\n  ```bash\n  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\"\n  ```\n\n- **Action**: If `action` is undefined, null, or empty, sync it with a directive\n  sentence citing `plan.md` (or the primary CONTEXT.md decision if applicable):\n\n  ```bash\n  fgos edit \"<item-id>\" --action \"<directive sentence citing plan.md>\"\n  ```\n\nIf the item already carries a real, distinct value for either field, do not\noverwrite it — never overwrite a value set deliberately. Without this sync,\na pass-through item dispatched to `fgos-coding-implement` receives empty\nplaceholders (`(không có)`) for `# Directive` and `# Files to read first` in\nworker prompts, creating a cold-pickup risk for out-of-process workers.\n\n## Sync a split root item's own `verify` field\n\nFor the **root** item of a real split (Step 4's \"several independently\nworkable pieces\" branch) only: once the split is decided, check the root\nitem's own current `verify` (`fgos list --id <item-id> --json`'s\n`data.work[id].verify`) against the discovery-stage placeholder\nconstants, the same way the pass-through check above does. If it still\nreads one of those placeholders, sync a whole-suite regression command\nonto the item's own current `verify` field before handing off to\n`fgos-coding-validating`:\n\n```bash\nfgos edit \"<item-id>\" --verify \"npm test\"\n```\n\nA root item has no single piece-specific proof surface of its own — its\ncorrectness is \"does everything merged still pass\" — so a whole-suite\ncommand is the honest choice here, unlike a pass-through item's own\nnarrower, piece-specific command above. If the item already carries a\nreal, distinct verify, do nothing — never overwrite a value already set\ndeliberately. Without this sync, a decompose root's `verify` stays\nwhatever placeholder `discovery` left behind, and `fgos sync-root`'s own\ngoal-check later executes that placeholder literally as a shell command\n(the tsk-1vc incident this item's own description cites).\n\n### Cases this needs to hold for\n\n- A split root whose `verify` is still the discovery-stage placeholder\n  (the reported failure mode, tsk-1vc) — gets synced to `npm test`.\n- A split root whose `verify` is already real (e.g. `tsk-3ik`'s own\n  informal `node --test 'test/**/*.test.mjs'`) — untouched, no redundant\n  edit.\n- A pass-through (non-split) item — untouched by this change; already\n  covered by the existing pass-through section above it, which tsk-14a\n  already fixed.\n- A split **child** — untouched; already covered by the normalizer forcing\n  a real verify at creation time (unchanged, not this item's gap).\n\n## Mid-planning CONTEXT.md gap\n\nIf, at any step, CONTEXT.md's locked decisions turn out to be silent on\nsomething this plan actually needs, apply the same material/grounded/\nanswerable filter `fgos-coding-exploring` already uses to its own\ncandidate questions:\n\n- **Not material** — the answer would not change scope, behavior, data\n  shape, or acceptance criteria; a genuine implementation-only detail\n  CONTEXT.md correctly left unaddressed. Pin it as a labeled assumption\n  in `plan.md`'s own Assumptions instead of asking anyone —\n  `fgos-coding-validating`'s reality gate already checks every assumption\n  the plan depends on is either proven or flagged as unproven, so this\n  needs no new container.\n- **Material** — the answer would change scope, behavior, data shape, or\n  acceptance criteria. **Record the gap first, then hand back** — before\n  this rule the hand-back wrote nothing at all, so a session that died\n  mid-hand-back lost the gap entirely: the next session to claim the item\n  read a CONTEXT.md that is silent by definition and had no trace that\n  anyone had ever noticed:\n\n  ```bash\n  fgos decision --id \"<item-id>\" \\\n    --text \"planning->exploring hand-back: <the gap, in one line>\" \\\n    --rationale \"material per fgos-coding-planning step 6; tier-A actions already tried: <what was run/read and why it did not close the gap>\" \\\n    --relation none\n  ```\n\n  Name what tier A already tried and why it failed to close the gap —\n  that is what stops the re-entry from re-running a scan this session\n  already ran, and what a later session reads to pick up cold.\n\n  Then hand back to `fgos-coding-exploring` directly, in this same\n  session: invoke its flow (Socratic lock, the same three-test filter,\n  appending a new decision id to CONTEXT.md) while `item.workflowStep` stays\n  `planning` the entire time — there is no `planning -> exploring` edge\n  in the state machine, so never attempt to move the item's stage back.\n  This is the same no-stage-move shape `fgos-coding-validating` already\n  uses when it hands an item back to this skill directly (both stay in\n  `planning`). Never reopen or reinterpret a decision CONTEXT.md already\n  locked — this path exists only for a gap it never addressed, not a\n  second chance to override one it did.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "kind": "complete-render-context",
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "startLine": 1,
+      "endLine": 164,
+      "content": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n# Verify sync and the mid-planning gap — full mechanics\n\nThe full detail behind SKILL.md's Step 5 (Leave execution alone) and\nStep 6 (Mid-planning CONTEXT.md gap).\n\n## Leave execution alone\n\nPer the locked decision that Execute and its verify already have a\nworking mechanical path (the goal-check the engine runs, and `return`'s\nown re-verify of real progress), this skill does not design or re-plan\nany of that — it only needs to name, for each piece it describes, the one\ncommand that proves it done.\n\nIf a piece touches a skill-prose path (`.claude/skills/**/SKILL.md`,\n`.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read\n`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its\nverify command — it documents the correct `npm test && POSITIVE &&\nNEGATIVE` shape and the standing rebuttal for when the second-pass judge\ndemands proof of prose comprehension, a demand the doc says verify must\nnever be asked to satisfy.\n\n## Sync a pass-through item's own `verify` field\n\nFor a *pass-through* (non-split — Step 4's \"one piece is honestly\nenough\" branch) item only: once the one command above is named, check\nthe item's own current `verify` (`fgos list --id <item-id> --json`'s\n`data.work[id].verify`) against the discovery-stage placeholder\nconstants. If it still reads one of those placeholders, sync that\ncommand onto the item's own current `verify` field before handing off to\n`fgos-coding-validating`:\n\n```bash\nfgos edit \"<item-id>\" --verify \"<the designed proof-surface command>\"\n```\n\nIf the item already carries a real, distinct verify, do nothing — never\noverwrite a value already set deliberately. Split children need no such\nstep: the normalizer already forces a real verify onto each one at\ncreation time. Without this sync, nothing in the standard flow ever\npromotes this step's own designed command into `work.verify` —\n`fgos-coding-validating`'s own gate-approve call only re-records whatever\n`work.verify` already says, and the plan-approve fallback falls straight\nthrough to that same still-placeholder value, which later gets executed\nliterally as a shell command by `fgos return`.\n\nWhenever the verify command you are about to write with `fgos add\n--verify`/`fgos edit --verify` (including the sync step immediately\nabove) contains a backslash-escaped backtick (or any other character an\nouter shell layer could silently strip), read `docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md` first — a lost\nescape is usually still syntactically valid shell, so it fails much\nlater, at `return` time, with a confusing result instead of a clean\nerror.\n\n## Sync a pass-through item's own `action` and `footprint` fields\n\nFor a *pass-through* (non-split — Step 4's \"one piece is honestly\nenough\" branch) item only: once Approach and Shape name the files touched and\nthe directive prose, check the item's own current `action` and `footprint`\nfields (`fgos list --id <item-id> --json`'s `data.work[id].action` and\n`data.work[id].footprint`).\n\n- **Footprint**: If `footprint` is empty or undefined, sync it with the\n  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`\n  plus the files listed in Approach):\n\n  ```bash\n  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\"\n  ```\n\n- **Action**: If `action` is undefined, null, or empty, sync it with a directive\n  sentence citing `plan.md` (or the primary CONTEXT.md decision if applicable):\n\n  ```bash\n  fgos edit \"<item-id>\" --action \"<directive sentence citing plan.md>\"\n  ```\n\nIf the item already carries a real, distinct value for either field, do not\noverwrite it — never overwrite a value set deliberately. Without this sync,\na pass-through item dispatched to `fgos-coding-implement` receives empty\nplaceholders (`(không có)`) for `# Directive` and `# Files to read first` in\nworker prompts, creating a cold-pickup risk for out-of-process workers.\n\n## Sync a split root item's own `verify` field\n\nFor the **root** item of a real split (Step 4's \"several independently\nworkable pieces\" branch) only: once the split is decided, check the root\nitem's own current `verify` (`fgos list --id <item-id> --json`'s\n`data.work[id].verify`) against the discovery-stage placeholder\nconstants, the same way the pass-through check above does. If it still\nreads one of those placeholders, sync a whole-suite regression command\nonto the item's own current `verify` field before handing off to\n`fgos-coding-validating`:\n\n```bash\nfgos edit \"<item-id>\" --verify \"npm test\"\n```\n\nA root item has no single piece-specific proof surface of its own — its\ncorrectness is \"does everything merged still pass\" — so a whole-suite\ncommand is the honest choice here, unlike a pass-through item's own\nnarrower, piece-specific command above. If the item already carries a\nreal, distinct verify, do nothing — never overwrite a value already set\ndeliberately. Without this sync, a decompose root's `verify` stays\nwhatever placeholder `discovery` left behind, and `fgos sync-root`'s own\ngoal-check later executes that placeholder literally as a shell command\n(the tsk-1vc incident this item's own description cites).\n\n### Cases this needs to hold for\n\n- A split root whose `verify` is still the discovery-stage placeholder\n  (the reported failure mode, tsk-1vc) — gets synced to `npm test`.\n- A split root whose `verify` is already real (e.g. `tsk-3ik`'s own\n  informal `node --test 'test/**/*.test.mjs'`) — untouched, no redundant\n  edit.\n- A pass-through (non-split) item — untouched by this change; already\n  covered by the existing pass-through section above it, which tsk-14a\n  already fixed.\n- A split **child** — untouched; already covered by the normalizer forcing\n  a real verify at creation time (unchanged, not this item's gap).\n\n## Mid-planning CONTEXT.md gap\n\nIf, at any step, CONTEXT.md's locked decisions turn out to be silent on\nsomething this plan actually needs, apply the same material/grounded/\nanswerable filter `fgos-coding-exploring` already uses to its own\ncandidate questions:\n\n- **Not material** — the answer would not change scope, behavior, data\n  shape, or acceptance criteria; a genuine implementation-only detail\n  CONTEXT.md correctly left unaddressed. Pin it as a labeled assumption\n  in `plan.md`'s own Assumptions instead of asking anyone —\n  `fgos-coding-validating`'s reality gate already checks every assumption\n  the plan depends on is either proven or flagged as unproven, so this\n  needs no new container.\n- **Material** — the answer would change scope, behavior, data shape, or\n  acceptance criteria. **Record the gap first, then hand back** — before\n  this rule the hand-back wrote nothing at all, so a session that died\n  mid-hand-back lost the gap entirely: the next session to claim the item\n  read a CONTEXT.md that is silent by definition and had no trace that\n  anyone had ever noticed:\n\n  ```bash\n  fgos decision --id \"<item-id>\" \\\n    --text \"planning->exploring hand-back: <the gap, in one line>\" \\\n    --rationale \"material per fgos-coding-planning step 6; tier-A actions already tried: <what was run/read and why it did not close the gap>\" \\\n    --relation none\n  ```\n\n  Name what tier A already tried and why it failed to close the gap —\n  that is what stops the re-entry from re-running a scan this session\n  already ran, and what a later session reads to pick up cold.\n\n  Then hand back to `fgos-coding-exploring` directly, in this same\n  session: invoke its flow (Socratic lock, the same three-test filter,\n  appending a new decision id to CONTEXT.md) while `item.workflowStep` stays\n  `planning` the entire time — there is no `planning -> exploring` edge\n  in the state machine, so never attempt to move the item's stage back.\n  This is the same no-stage-move shape `fgos-coding-validating` already\n  uses when it hands an item back to this skill directly (both stay in\n  `planning`). Never reopen or reinterpret a decision CONTEXT.md already\n  locked — this path exists only for a gap it never addressed, not a\n  second chance to override one it did.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          },
+          {
+            "path": "step-02l-census-class4.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "51c1701eafb40e09329d9c096f1a757c836663757dee8ecc7877e459dafca62c",
+            "counts": {
+              "dynamicConstructions": 3542,
+              "dynamicFiles": 176,
+              "edgeFiles": 122,
+              "edges": 3334,
+              "files": 225
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+        "digest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+        "inventoryEdgeIds": [
+          "skills-055",
+          "skills-056",
+          "class4-l-000064",
+          "class4-l-000065",
+          "class4-l-000066",
+          "class4-l-002066",
+          "class4-l-002067",
+          "class4-l-002068",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "diff": "--- a/domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\n+++ b/domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\n@@ -13,7 +13,7 @@\n \n If a piece touches a skill-prose path (`.claude/skills/**/SKILL.md`,\n `.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read\n-`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its\n+`docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md` before naming its\n verify command — it documents the correct `npm test && POSITIVE &&\n NEGATIVE` shape and the standing rebuttal for when the second-pass judge\n demands proof of prose comprehension, a demand the doc says verify must\n@@ -46,8 +46,8 @@\n Whenever the verify command you are about to write with `fgos add\n --verify`/`fgos edit --verify` (including the sync step immediately\n above) contains a backslash-escaped backtick (or any other character an\n-outer shell layer could silently strip), read `docs/how-to/preserve-\n-shell-escapes-when-transcribing-a-verify-command.md` first — a lost\n+outer shell layer could silently strip), read `docs/knowledge/how-\n+to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md` first — a lost\n escape is usually still syntactically valid shell, so it fails much\n later, at `return` time, with a confusing result instead of a clean\n error.\n",
+        "edges": [
+          {
+            "edgeId": "skills-055",
+            "slotKey": "{\"edgeId\":\"skills-055\",\"file\":\".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-055\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":65}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-055",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 65
+              }
+            ],
+            "consumerFile": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 65,
+                "columnStart": 48,
+                "columnEndExclusive": 78,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 65,
+                "columnStart": 48,
+                "columnEndExclusive": 78,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/plan.md",
+            "logicalReference": "docs/history/<feature>/plan.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/plan.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-055",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 65,
+                "matchedExpression": "docs/history/<feature>/plan.md",
+                "originalLineText": "  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`"
+              }
+            ],
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":78,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":64,\"text\":\"docs/history/<feature>/plan.md\"}}"
+          },
+          {
+            "edgeId": "skills-056",
+            "slotKey": "{\"edgeId\":\"skills-056\",\"file\":\".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-056\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":69}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-056",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 69
+              }
+            ],
+            "consumerFile": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 69,
+                "columnStart": 38,
+                "columnEndExclusive": 68,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 69,
+                "columnStart": 38,
+                "columnEndExclusive": 68,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/plan.md",
+            "logicalReference": "docs/history/<feature>/plan.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\"'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/plan.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-056",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 69,
+                "matchedExpression": "docs/history/<feature>/plan.md",
+                "originalLineText": "  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\""
+              }
+            ],
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":38,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":68,\"text\":\"docs/history/<feature>/plan.md\"}}"
+          },
+          {
+            "edgeId": "class4-l-000064",
+            "slotKey": "{\"edgeId\":\"class4-l-000064\",\"file\":\".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-000064\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":17}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000064",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 17
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000064",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 17,
+                "matchedExpression": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+                "originalLineText": "`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its"
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 54,
+                "columnStart": 2,
+                "line": 17,
+                "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 54,
+                "columnStart": 2,
+                "line": 17,
+                "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "logicalReference": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "legacyPath": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: patch. Own render passage: '`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its'",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "patch",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":2,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":16,\"text\":\"docs/how-to/write-verify-for-a-skill-prose-change.md\"}}"
+          },
+          {
+            "edgeId": "class4-l-000065",
+            "slotKey": "{\"edgeId\":\"class4-l-000065\",\"file\":\".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-000065\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":50},{\"edgeId\":\"class4-l-000065\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":51}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000065",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 50
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000065",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 51
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000065",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 50,
+                "matchedExpression": "docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md",
+                "originalLineText": "outer shell layer could silently strip), read `docs/how-to/preserve-"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000065",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 51,
+                "matchedExpression": "docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md",
+                "originalLineText": "shell-escapes-when-transcribing-a-verify-command.md` first — a lost"
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 69,
+                "columnStart": 48,
+                "line": 50,
+                "text": "docs/how-to/preserve-"
+              },
+              {
+                "columnEndExclusive": 52,
+                "columnStart": 1,
+                "line": 51,
+                "text": "shell-escapes-when-transcribing-a-verify-command.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 69,
+                "columnStart": 48,
+                "line": 50,
+                "text": "docs/how-to/preserve-"
+              },
+              {
+                "columnEndExclusive": 52,
+                "columnStart": 1,
+                "line": 51,
+                "text": "shell-escapes-when-transcribing-a-verify-command.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md",
+            "logicalReference": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "legacyPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: patch. Own render passage: 'outer shell layer could silently strip), read `docs/how-to/preserve-\\nshell-escapes-when-transcribing-a-verify-command.md` first — a lost'",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "patch",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":49,\"text\":\"docs/how-to/preserve-\"}}"
+          },
+          {
+            "edgeId": "class4-l-000066",
+            "slotKey": "{\"edgeId\":\"class4-l-000066\",\"file\":\".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-000066\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":65}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000066",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 65
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000066",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 65,
+                "matchedExpression": "docs/history/<feature>/plan.md",
+                "originalLineText": "  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`"
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 78,
+                "columnStart": 48,
+                "line": 65,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 78,
+                "columnStart": 48,
+                "line": 65,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/plan.md",
+            "logicalReference": "docs/history/<feature>/plan.md",
+            "legacyPath": "docs/history/<feature>/plan.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":78,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":64,\"text\":\"docs/history/<feature>/plan.md\"}}"
+          },
+          {
+            "edgeId": "class4-l-002066",
+            "slotKey": "{\"edgeId\":\"class4-l-002066\",\"file\":\"plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002066\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":17}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002066",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 17
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002066",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 17,
+                "matchedExpression": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+                "originalLineText": "`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its"
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 54,
+                "columnStart": 2,
+                "line": 17,
+                "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 54,
+                "columnStart": 2,
+                "line": 17,
+                "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "logicalReference": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "legacyPath": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: patch. Own render passage: '`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its'",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "patch",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":2,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":16,\"text\":\"docs/how-to/write-verify-for-a-skill-prose-change.md\"}}"
+          },
+          {
+            "edgeId": "class4-l-002067",
+            "slotKey": "{\"edgeId\":\"class4-l-002067\",\"file\":\"plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002067\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":50},{\"edgeId\":\"class4-l-002067\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":51}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002067",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 50
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002067",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 51
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002067",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 50,
+                "matchedExpression": "docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md",
+                "originalLineText": "outer shell layer could silently strip), read `docs/how-to/preserve-"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002067",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 51,
+                "matchedExpression": "docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md",
+                "originalLineText": "shell-escapes-when-transcribing-a-verify-command.md` first — a lost"
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 69,
+                "columnStart": 48,
+                "line": 50,
+                "text": "docs/how-to/preserve-"
+              },
+              {
+                "columnEndExclusive": 52,
+                "columnStart": 1,
+                "line": 51,
+                "text": "shell-escapes-when-transcribing-a-verify-command.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 69,
+                "columnStart": 48,
+                "line": 50,
+                "text": "docs/how-to/preserve-"
+              },
+              {
+                "columnEndExclusive": 52,
+                "columnStart": 1,
+                "line": 51,
+                "text": "shell-escapes-when-transcribing-a-verify-command.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md",
+            "logicalReference": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "legacyPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: patch. Own render passage: 'outer shell layer could silently strip), read `docs/how-to/preserve-\\nshell-escapes-when-transcribing-a-verify-command.md` first — a lost'",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "patch",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":49,\"text\":\"docs/how-to/preserve-\"}}"
+          },
+          {
+            "edgeId": "class4-l-002068",
+            "slotKey": "{\"edgeId\":\"class4-l-002068\",\"file\":\"plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002068\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":65}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002068",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 65
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002068",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 65,
+                "matchedExpression": "docs/history/<feature>/plan.md",
+                "originalLineText": "  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`"
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 78,
+                "columnStart": 48,
+                "line": 65,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 78,
+                "columnStart": 48,
+                "line": 65,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/plan.md",
+            "logicalReference": "docs/history/<feature>/plan.md",
+            "legacyPath": "docs/history/<feature>/plan.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":78,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":64,\"text\":\"docs/history/<feature>/plan.md\"}}"
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":2,\"file\":\".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":17,\"text\":\"docs/how-to/write-verify-for-a-skill-prose-change.md\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 17,
+                "columnStart": 2,
+                "columnEndExclusive": 54,
+                "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 17,
+                "columnStart": 2,
+                "columnEndExclusive": 54,
+                "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "logicalReference": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "legacyPath": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: patch. Own render passage: '`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its'",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+              "line": 17,
+              "columnStart": 2,
+              "columnEndExclusive": 54,
+              "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "sourceDisposition": "patch",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":2,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":16,\"text\":\"docs/how-to/write-verify-for-a-skill-prose-change.md\"}}"
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":48,\"file\":\".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":50,\"text\":\"docs/how-to/preserve-\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 50,
+                "columnStart": 48,
+                "columnEndExclusive": 69,
+                "text": "docs/how-to/preserve-"
+              },
+              {
+                "line": 51,
+                "columnStart": 1,
+                "columnEndExclusive": 52,
+                "text": "shell-escapes-when-transcribing-a-verify-command.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 50,
+                "columnStart": 48,
+                "columnEndExclusive": 69,
+                "text": "docs/how-to/preserve-"
+              },
+              {
+                "line": 51,
+                "columnStart": 1,
+                "columnEndExclusive": 52,
+                "text": "shell-escapes-when-transcribing-a-verify-command.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md",
+            "logicalReference": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "legacyPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: patch. Own render passage: 'outer shell layer could silently strip), read `docs/how-to/preserve-\\nshell-escapes-when-transcribing-a-verify-command.md` first — a lost'",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+              "line": 50,
+              "columnStart": 48,
+              "columnEndExclusive": 69,
+              "text": "docs/how-to/preserve-"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "sourceDisposition": "patch",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":49,\"text\":\"docs/how-to/preserve-\"}}"
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":2,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":16,\"text\":\"docs/how-to/write-verify-for-a-skill-prose-change.md\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 16,
+                "columnStart": 2,
+                "columnEndExclusive": 54,
+                "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 16,
+                "columnStart": 2,
+                "columnEndExclusive": 54,
+                "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "logicalReference": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "legacyPath": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -13,7 +13,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+              "line": 16,
+              "columnStart": 2,
+              "columnEndExclusive": 54,
+              "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "parkSourceQuote": "`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its",
+            "movedVerbatimWitness": {
+              "fromPath": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+              "historicalSourceCommit": "0c32f343352c304edceaf40af1d91327feeb4386",
+              "historicalDigest": "7dba2a10387fc72b0c7a4270ff869f632ec6238fd5ca7c69dad79b03585536c8",
+              "targetDigest": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+              "comparison": "complete narrative identical after frontmatter removal"
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its",
+              "terms": [
+                "write verify for a skill prose change"
+              ],
+              "queries": [
+                {
+                  "term": "write verify for a skill prose change",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":49,\"text\":\"docs/how-to/preserve-\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 49,
+                "columnStart": 48,
+                "columnEndExclusive": 69,
+                "text": "docs/how-to/preserve-"
+              },
+              {
+                "line": 50,
+                "columnStart": 1,
+                "columnEndExclusive": 52,
+                "text": "shell-escapes-when-transcribing-a-verify-command.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 49,
+                "columnStart": 48,
+                "columnEndExclusive": 69,
+                "text": "docs/how-to/preserve-"
+              },
+              {
+                "line": 50,
+                "columnStart": 1,
+                "columnEndExclusive": 52,
+                "text": "shell-escapes-when-transcribing-a-verify-command.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md",
+            "logicalReference": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "legacyPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -46,8 +46,8 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+              "line": 49,
+              "columnStart": 48,
+              "columnEndExclusive": 69,
+              "text": "docs/how-to/preserve-"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "parkSourceQuote": "outer shell layer could silently strip), read `docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md` first — a lost",
+            "movedVerbatimWitness": {
+              "fromPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+              "historicalSourceCommit": "b1c43ca789355813fc871c7aabb43c43284db008",
+              "historicalDigest": "4a2de3b8e3afd296fa0c1ede9e813c680f84d141e1ba0655ebc131bc1545345d",
+              "targetDigest": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+              "comparison": "complete narrative identical after frontmatter removal"
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "outer shell layer could silently strip), read `docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md` first — a lost",
+              "terms": [
+                "preserve shell escapes when transcribing a verify command"
+              ],
+              "queries": [
+                {
+                  "term": "preserve shell escapes when transcribing a verify command",
+                  "hitCount": 2,
+                  "liveHits": 2,
+                  "hitsSha256": "923a1de12be5931ec210f6d0b2939b9933755d1957843991d292df0db9cefcec",
+                  "files": {
+                    "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md": {
+                      "live": 2,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+                      "line": 3,
+                      "text": "title: How to preserve shell escapes when transcribing a verify command",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+                      "line": 11,
+                      "text": "# How to preserve shell escapes when transcribing a verify command",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":78,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":64,\"text\":\"docs/history/<feature>/plan.md\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 64,
+                "columnStart": 48,
+                "columnEndExclusive": 78,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 64,
+                "columnStart": 48,
+                "columnEndExclusive": 78,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/plan.md",
+            "logicalReference": "docs/history/<feature>/plan.md",
+            "legacyPath": "docs/history/<feature>/plan.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project convention/pattern remains literal under L12-10. Own source passage: '  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-source-counterpart",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+              "line": 64,
+              "columnStart": 48,
+              "columnEndExclusive": 78,
+              "text": "docs/history/<feature>/plan.md"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/history/<feature>/plan.md",
+              "state": "pattern",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 0,
+              "historyCommitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "historySample": []
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":38,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":68,\"text\":\"docs/history/<feature>/plan.md\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 68,
+                "columnStart": 38,
+                "columnEndExclusive": 68,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 68,
+                "columnStart": 38,
+                "columnEndExclusive": 68,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/plan.md",
+            "logicalReference": "docs/history/<feature>/plan.md",
+            "legacyPath": "docs/history/<feature>/plan.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 missing source slot; literal retained history/convention. Own source passage: '  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\"'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+              "line": 68,
+              "columnStart": 38,
+              "columnEndExclusive": 68,
+              "text": "docs/history/<feature>/plan.md"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/history/<feature>/plan.md",
+              "state": "pattern",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 0,
+              "historyCommitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "historySample": []
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":2,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":16,\"text\":\"docs/how-to/write-verify-for-a-skill-prose-change.md\"}}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":49,\"text\":\"docs/how-to/preserve-\"}}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":2,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":16,\"text\":\"docs/how-to/write-verify-for-a-skill-prose-change.md\"}}": {
+                "sourcePassage": "`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its",
+                "adjacentPassage": "If a piece touches a skill-prose path (`.claude/skills/**/SKILL.md`,\n`.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read\n`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its\nverify command — it documents the correct `npm test && POSITIVE &&\nNEGATIVE` shape and the standing rebuttal for when the second-pass judge\ndemands proof of prose comprehension, a demand the doc says verify must\nnever be asked to satisfy.",
+                "target": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+                "targetEvidence": [
+                  {
+                    "line": 1,
+                    "text": "---"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  }
+                },
+                "assessment": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+              },
+              "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":49,\"text\":\"docs/how-to/preserve-\"}}": {
+                "sourcePassage": "outer shell layer could silently strip), read `docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md` first — a lost",
+                "adjacentPassage": "Whenever the verify command you are about to write with `fgos add\n--verify`/`fgos edit --verify` (including the sync step immediately\nabove) contains a backslash-escaped backtick (or any other character an\nouter shell layer could silently strip), read `docs/how-to/preserve-\nshell-escapes-when-transcribing-a-verify-command.md` first — a lost\nescape is usually still syntactically valid shell, so it fails much\nlater, at `return` time, with a confusing result instead of a clean\nerror.",
+                "target": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+                "targetEvidence": [
+                  {
+                    "line": 1,
+                    "text": "---"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  }
+                },
+                "assessment": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+              }
+            },
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {
+            "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":2,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":16,\"text\":\"docs/how-to/write-verify-for-a-skill-prose-change.md\"}}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+              "passage": "---",
+              "targetEvidenceLine": 1,
+              "targetLines": [],
+              "targetLineText": [],
+              "sourceLocatorTokens": [],
+              "wholeFileJustification": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Whole-file pointer spans the complete document."
+            },
+            "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":49,\"text\":\"docs/how-to/preserve-\"}}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+              "passage": "---",
+              "targetEvidenceLine": 1,
+              "targetLines": [],
+              "targetLineText": [],
+              "sourceLocatorTokens": [],
+              "wholeFileJustification": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Whole-file pointer spans the complete document."
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":2,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":16,\"text\":\"docs/how-to/write-verify-for-a-skill-prose-change.md\"}}": {
+              "replacement": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+              "resolvedTarget": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":49,\"text\":\"docs/how-to/preserve-\"}}": {
+              "replacement": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+              "resolvedTarget": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":2,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":16,\"text\":\"docs/how-to/write-verify-for-a-skill-prose-change.md\"}}": {
+              "source": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+              "replacement": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":49,\"text\":\"docs/how-to/preserve-\"}}": {
+              "source": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+              "replacement": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-002",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [
+          {
+            "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "sourceDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+            "renderFiles": [
+              {
+                "path": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+                "digest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+                "sourceDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+                "headerWitnesses": [
+                  {
+                    "line": 1,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "history-009",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-history-plan.json",
+                        "edgeId": "history-009",
+                        "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                        "originalLine": 65
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 65,
+                      "line": 65,
+                      "columnStart": 48,
+                      "columnEndExclusive": 78,
+                      "text": "docs/history/<feature>/plan.md"
+                    }
+                  },
+                  {
+                    "edgeId": "history-010",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-history-plan.json",
+                        "edgeId": "history-010",
+                        "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                        "originalLine": 69
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 69,
+                      "line": 69,
+                      "columnStart": 38,
+                      "columnEndExclusive": 68,
+                      "text": "docs/history/<feature>/plan.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+                "digest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+                "sourceDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+                "headerWitnesses": [
+                  {
+                    "line": 1,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-055",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-055",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 65
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "L12-60-complete-source-line-correspondence",
+                      "oldLine": 65,
+                      "line": 65,
+                      "columnStart": 48,
+                      "columnEndExclusive": 78,
+                      "text": "docs/history/<feature>/plan.md"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-056",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-056",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 69
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "L12-60-complete-source-line-correspondence",
+                      "oldLine": 69,
+                      "line": 69,
+                      "columnStart": 38,
+                      "columnEndExclusive": 68,
+                      "text": "docs/history/<feature>/plan.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+                "digest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+                "sourceDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+                "headerWitnesses": [
+                  {
+                    "line": 1,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "history-038",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-history-plan.json",
+                        "edgeId": "history-038",
+                        "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                        "originalLine": 65
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 65,
+                      "line": 65,
+                      "columnStart": 48,
+                      "columnEndExclusive": 78,
+                      "text": "docs/history/<feature>/plan.md"
+                    }
+                  },
+                  {
+                    "edgeId": "history-039",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-history-plan.json",
+                        "edgeId": "history-039",
+                        "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                        "originalLine": 69
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 69,
+                      "line": 69,
+                      "columnStart": 38,
+                      "columnEndExclusive": 68,
+                      "text": "docs/history/<feature>/plan.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              }
+            ]
+          }
+        ],
+        "wholeFileRead": {
+          "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+          "bytes": 8099,
+          "lines": 163,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": [
+          {
+            "inventory": "step-02-census-history-plan.json",
+            "edgeId": "history-009",
+            "consumerFile": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sourceSpans": [
+              {
+                "line": 65,
+                "columnStart": 48,
+                "columnEndExclusive": 78,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "reason": "L12-10: convention/control census outside original Step 4 slot set; preserve convention; Step 5 confirms reader/writer parity."
+          },
+          {
+            "inventory": "step-02-census-history-plan.json",
+            "edgeId": "history-010",
+            "consumerFile": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sourceSpans": [
+              {
+                "line": 69,
+                "columnStart": 38,
+                "columnEndExclusive": 68,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "reason": "L12-60(1): fenced command/code example; Step 5 evaluates example-string and executable path parity."
+          },
+          {
+            "inventory": "step-02-census-history-plan.json",
+            "edgeId": "history-023",
+            "consumerFile": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sourceSpans": [
+              {
+                "line": 64,
+                "columnStart": 48,
+                "columnEndExclusive": 78,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "reason": "L12-10: convention/control census outside original Step 4 slot set; preserve convention; Step 5 confirms reader/writer parity."
+          },
+          {
+            "inventory": "step-02-census-history-plan.json",
+            "edgeId": "history-024",
+            "consumerFile": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sourceSpans": [
+              {
+                "line": 68,
+                "columnStart": 38,
+                "columnEndExclusive": 68,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "reason": "L12-60(1): fenced command/code example; Step 5 evaluates example-string and executable path parity."
+          },
+          {
+            "inventory": "step-02-census-history-plan.json",
+            "edgeId": "history-038",
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sourceSpans": [
+              {
+                "line": 65,
+                "columnStart": 48,
+                "columnEndExclusive": 78,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "reason": "L12-10: convention/control census outside original Step 4 slot set; preserve convention; Step 5 confirms reader/writer parity."
+          },
+          {
+            "inventory": "step-02-census-history-plan.json",
+            "edgeId": "history-039",
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sourceSpans": [
+              {
+                "line": 69,
+                "columnStart": 38,
+                "columnEndExclusive": 68,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "reason": "L12-60(1): fenced command/code example; Step 5 evaluates example-string and executable path parity."
+          },
+          {
+            "inventory": "step-02l-census-class4.json",
+            "edgeId": "class4-l-000067",
+            "consumerFile": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 68,
+                "columnStart": 38,
+                "line": 69,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "reason": "L12-60(1): fenced command/code example; Step 5 evaluates example-string and executable path parity."
+          },
+          {
+            "inventory": "step-02l-census-class4.json",
+            "edgeId": "class4-l-002069",
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 68,
+                "columnStart": 38,
+                "line": 69,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "reason": "L12-60(1): fenced command/code example; Step 5 evaluates example-string and executable path parity."
+          },
+          {
+            "inventory": null,
+            "edgeId": null,
+            "consumerFile": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "sourceSpans": [
+              {
+                "line": 68,
+                "columnStart": 38,
+                "columnEndExclusive": 68,
+                "text": "docs/history/<feature>/plan.md"
+              }
+            ],
+            "reason": "L12-60(1): fenced command/code example; Step 5 evaluates example-string and executable path parity."
+          }
+        ]
+      },
+      "targetFilesToRead": [
+        "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+        "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md"
+      ],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p03.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

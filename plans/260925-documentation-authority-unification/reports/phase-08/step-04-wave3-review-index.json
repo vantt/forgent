@@ -1,0 +1,405 @@
+[
+  {
+    "part": 1,
+    "set": "step04-001",
+    "files": [
+      "domains/coding/AGENTS.md",
+      "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "domains/coding/skills/fgos-coding-knowledge/SKILL.md"
+    ],
+    "slots": 16,
+    "bytes": 168984,
+    "payload": "step-04-wave3-p01.json",
+    "payloadSha256": "ebe95e3db3db474e050e0e8df54b227dbca71deb2352ac9a1070897b716f4f20",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p01.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 2,
+    "set": "step04-002",
+    "files": [
+      "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
+    ],
+    "slots": 14,
+    "bytes": 118621,
+    "payload": "step-04-wave3-p02.json",
+    "payloadSha256": "ca29a877c3987628f87a77c1a64a2e60213868735112016c343514258536ab93",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p02.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 3,
+    "set": "step04-003",
+    "files": [
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md"
+    ],
+    "slots": 2,
+    "bytes": 15186,
+    "payload": "step-04-wave3-p03.json",
+    "payloadSha256": "553083f250bcc4b33cd2a0414123eec682ad99a406bc7ff8337ea119fb6ed8e3",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p03.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 4,
+    "set": "step04-007",
+    "files": [
+      "archive/plans/260919-coordination-skill-harness-simplification/plan.md"
+    ],
+    "slots": 0,
+    "bytes": 163184,
+    "payload": "step-04-wave3-p04.json",
+    "payloadSha256": "fa083d7637a04f4585a44262b6863d7b0c19d37a3d13af435a83f6908cd44a98",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p04.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 5,
+    "set": "step04-007",
+    "files": [
+      "archive/plans/260919-coordination-skill-harness-simplification/plan.md"
+    ],
+    "slots": 9,
+    "bytes": 135470,
+    "payload": "step-04-wave3-p05.json",
+    "payloadSha256": "b7e4bf0db7743898e16beff90935daa5e7b6a274efefc30f280f050371ca12f6",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p05.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 6,
+    "set": "step04-008",
+    "files": [
+      "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "plugins/fgOS/skills/deliver/SKILL.md",
+      "plugins/fgOS/skills/retro-loop/SKILL.md"
+    ],
+    "slots": 11,
+    "bytes": 93013,
+    "payload": "step-04-wave3-p06.json",
+    "payloadSha256": "6d177c112a5151fb65fcb35b59c8a4531745027597f9fac4b6200d17a7200b4c",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p06.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 7,
+    "set": "step04-009",
+    "files": [
+      "AGENTS.md"
+    ],
+    "slots": 25,
+    "bytes": 279305,
+    "payload": "step-04-wave3-p07.json",
+    "payloadSha256": "1a7f683e362a74ba79a019cc33f4bdf912d24cdf135e463f43512f5c58939e70",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p07.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 8,
+    "set": "step04-010",
+    "files": [
+      "bin/fgos.mjs"
+    ],
+    "slots": 0,
+    "bytes": 163574,
+    "payload": "step-04-wave3-p08.json",
+    "payloadSha256": "3e49632d9384531c3eed5368395c34b607a055a2a93bc07ea4f8fd5aaffa0920",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p08.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 9,
+    "set": "step04-010",
+    "files": [
+      "bin/fgos.mjs"
+    ],
+    "slots": 0,
+    "bytes": 142341,
+    "payload": "step-04-wave3-p09.json",
+    "payloadSha256": "71edd77cb411792c11606682d536fddecdad373eca3c11d4dc82a7bc1ca23763",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p09.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 10,
+    "set": "step04-010",
+    "files": [
+      "bin/fgos.mjs"
+    ],
+    "slots": 36,
+    "bytes": 351726,
+    "payload": "step-04-wave3-p10.json",
+    "payloadSha256": "ae42c4b9e375422b6d1fde0051f696a9400ca8a14492b568998e6cfbd1d98036",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p10.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 11,
+    "set": "step04-012",
+    "files": [
+      "apps/fgos-gateway/src/gateway.rs",
+      "apps/fgos-gateway/web/src/lib/network.ts"
+    ],
+    "slots": 23,
+    "bytes": 272541,
+    "payload": "step-04-wave3-p11.json",
+    "payloadSha256": "c50635535e060ff457d83b1b387461c44cdef2aae58f8615e27c3ff73007b14e",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p11.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 12,
+    "set": "step04-017",
+    "files": [
+      "CHANGELOG.md"
+    ],
+    "slots": 0,
+    "bytes": 161165,
+    "payload": "step-04-wave3-p12.json",
+    "payloadSha256": "616d5a3275cd7b124b72552013851a0c1b45c802af742402261da536e2bd7a5b",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p12.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 13,
+    "set": "step04-017",
+    "files": [
+      "CHANGELOG.md"
+    ],
+    "slots": 0,
+    "bytes": 161397,
+    "payload": "step-04-wave3-p13.json",
+    "payloadSha256": "952005536ccbfa99ab3dbb7587253260893fa139fd19fc920f433782e1d6de0d",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p13.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 14,
+    "set": "step04-017",
+    "files": [
+      "CHANGELOG.md"
+    ],
+    "slots": 4,
+    "bytes": 67634,
+    "payload": "step-04-wave3-p14.json",
+    "payloadSha256": "ee8b73e6982f0a98d1eee27e2173a31fbefb08998af0e296ff964d72d77146ca",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p14.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 15,
+    "set": "step04-019",
+    "files": [
+      "packages/distribution/rust/src/canonical.rs",
+      "packages/distribution/rust/src/init.rs",
+      "packages/distribution/rust/src/manifest.rs",
+      "packages/distribution/rust/src/verify.rs",
+      "packages/distribution/rust/src/workspace.rs"
+    ],
+    "slots": 6,
+    "bytes": 246986,
+    "payload": "step-04-wave3-p15.json",
+    "payloadSha256": "cb7e8931badc71909a13826fce18a35d556094a4d0be225411585a54e5dfdd8a",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p15.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 16,
+    "set": "step04-020",
+    "files": [
+      "packages/herdr-fgos-common/rust/src/fgos.rs"
+    ],
+    "slots": 3,
+    "bytes": 96661,
+    "payload": "step-04-wave3-p16.json",
+    "payloadSha256": "57639814855677f20937b6638d6eafbf5676a3ebeb678260120f444c05b8432b",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p16.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 17,
+    "set": "step04-022",
+    "files": [
+      "src/runner/agent-roster.mjs",
+      "src/runner/anti-loop.mjs",
+      "src/runner/claim-liveness.mjs",
+      "src/runner/claim-port.mjs",
+      "src/runner/dispatch/assignment-policy.mjs",
+      "src/runner/dispatch/cli.mjs"
+    ],
+    "slots": 9,
+    "bytes": 191513,
+    "payload": "step-04-wave3-p17.json",
+    "payloadSha256": "5858586b766991a762bdb587b13a9ce86fe3c6df2d6fb59b3d13afc682e6635b",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p17.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 18,
+    "set": "step04-023",
+    "files": [
+      "src/runner/dispatch/confinement/authority.mjs",
+      "src/runner/dispatch/confinement/backend-registry.mjs",
+      "src/runner/dispatch/confinement/request.mjs",
+      "src/runner/dispatch/execution-contract.mjs",
+      "src/runner/dispatch/herdr-round.mjs",
+      "src/runner/dispatch/mechanism.mjs"
+    ],
+    "slots": 11,
+    "bytes": 381810,
+    "payload": "step-04-wave3-p18.json",
+    "payloadSha256": "15b0643a639ed82a6321511311e3381092863c7f8c75521f0d626d47df088833",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p18.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 19,
+    "set": "step04-023",
+    "files": [
+      "src/runner/dispatch/operation-prompt-templates.mjs",
+      "src/runner/dispatch/prepare.mjs"
+    ],
+    "slots": 2,
+    "bytes": 46198,
+    "payload": "step-04-wave3-p19.json",
+    "payloadSha256": "f896ecac7bf7b102e30048a084f5afd399384f8219599eaacd968813beff68ea",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p19.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 20,
+    "set": "step04-024",
+    "files": [
+      "src/runner/dispatch/run-lock.mjs",
+      "src/runner/dispatch/transport.mjs",
+      "src/runner/dispatch/trust-store.mjs",
+      "src/runner/dispatch/worker-home.mjs",
+      "src/runner/frozen-judge.mjs",
+      "src/runner/goal-check.mjs"
+    ],
+    "slots": 13,
+    "bytes": 233998,
+    "payload": "step-04-wave3-p20.json",
+    "payloadSha256": "c0c5e1343e0e456addb33b66a3f1f648c574c2a354d2843ddbbd91f6850cdeb3",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p20.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 21,
+    "set": "step04-025",
+    "files": [
+      "src/runner/merge.mjs",
+      "src/runner/promote-engine.mjs",
+      "src/runner/promote-preflight.mjs",
+      "src/runner/work-compat.mjs",
+      "src/runner/worktree.mjs"
+    ],
+    "slots": 24,
+    "bytes": 355377,
+    "payload": "step-04-wave3-p21.json",
+    "payloadSha256": "1d60af4f7a8e658e74ed406f4f3a87b35caf0f105fb8736400fbd60d7532846a",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p21.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 22,
+    "set": "step04-025",
+    "files": [
+      "src/runner/worktree.mjs"
+    ],
+    "slots": 12,
+    "bytes": 72525,
+    "payload": "step-04-wave3-p22.json",
+    "payloadSha256": "ed61ca9846ad2557b4c89091c2a9c807206dd84c9fff4630dc281624460e8350",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p22.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 23,
+    "set": "step04-026",
+    "files": [
+      "src/state/knowledge-registry.mjs"
+    ],
+    "slots": 10,
+    "bytes": 188711,
+    "payload": "step-04-wave3-p23.json",
+    "payloadSha256": "a5c3b84f0539518caccf668f5bc4b55ebca2cdffdbb8f98d5c4a94832aeec5b2",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p23.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 24,
+    "set": "step04-027",
+    "files": [
+      "src/state/store.mjs",
+      "src/state/work.mjs"
+    ],
+    "slots": 24,
+    "bytes": 311831,
+    "payload": "step-04-wave3-p24.json",
+    "payloadSha256": "a7d42a205f98e8335c0acd5995bee7f3a2390b672a6242257b3950d6c219c99f",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p24.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 25,
+    "set": "step04-030",
+    "files": [
+      ".claude/skills/ui-spec/SKILL.md",
+      ".claude/skills/ui-spec/references/CONVENTION.md",
+      "core/skills/_shared/citation-format.md",
+      "core/skills/_shared/coding-worker-contract.md",
+      "core/skills/_shared/executor-dispatch-fallback.md"
+    ],
+    "slots": 50,
+    "bytes": 385791,
+    "payload": "step-04-wave3-p25.json",
+    "payloadSha256": "f29709eb7c37aaee3a9956f1b2f413fb6162e0326fb6978fcaff38c0884b9ab4",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p25.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 26,
+    "set": "step04-030",
+    "files": [
+      "core/skills/_shared/executor-dispatch-fallback.md",
+      "core/skills/fgos-clarifying/SKILL.md",
+      "core/skills/fgos-indexing/SKILL.md"
+    ],
+    "slots": 42,
+    "bytes": 348130,
+    "payload": "step-04-wave3-p26.json",
+    "payloadSha256": "1443d4055543afe4fee60956c11b074734b3d9a96d0f0805928f6c7eb71b4ed1",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p26.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 27,
+    "set": "step04-031",
+    "files": [
+      "core/task-specs/fgos-indexing.md",
+      "core/task-specs/fgos-researching.md",
+      "src/runner/prompt-templates/worker-prompt-discovery.txt",
+      "src/runner/prompt-templates/worker-prompt-skill-pointer.txt"
+    ],
+    "slots": 7,
+    "bytes": 93199,
+    "payload": "step-04-wave3-p27.json",
+    "payloadSha256": "b975d00cb6e48d3b163f2c51e8788634786371b88851f992e19f53a1fc3b804f",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p27.md",
+    "reviewStatus": "pending Lead-started review"
+  },
+  {
+    "part": 28,
+    "set": "step04-032",
+    "files": [
+      "core/skills/_shared/ak-cook-worker-contract.md"
+    ],
+    "slots": 3,
+    "bytes": 27369,
+    "payload": "step-04-wave3-p28.json",
+    "payloadSha256": "2963ca5ae034a41690e23193292320948c5cd444eb606e356816b919c6b66ff9",
+    "requiredReviewerOutput": "review-a38-step-04-wave3-p28.md",
+    "reviewStatus": "pending Lead-started review"
+  }
+]

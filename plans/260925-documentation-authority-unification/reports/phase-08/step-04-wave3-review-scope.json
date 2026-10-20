@@ -1,0 +1,1006 @@
+{
+  "authorPin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "categories": {
+    "A_outcome_changed": [
+      "AGENTS.md",
+      "CHANGELOG.md",
+      "apps/fgos-gateway/src/gateway.rs",
+      "apps/fgos-gateway/web/src/lib/network.ts",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "bin/fgos.mjs",
+      "core/skills/_shared/ak-cook-worker-contract.md",
+      "core/skills/_shared/citation-format.md",
+      "core/skills/_shared/executor-dispatch-fallback.md",
+      "core/skills/fgos-clarifying/SKILL.md",
+      "core/skills/fgos-indexing/SKILL.md",
+      "core/task-specs/fgos-indexing.md",
+      "domains/coding/AGENTS.md",
+      "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "packages/distribution/rust/src/canonical.rs",
+      "packages/distribution/rust/src/init.rs",
+      "packages/distribution/rust/src/manifest.rs",
+      "packages/distribution/rust/src/verify.rs",
+      "packages/distribution/rust/src/workspace.rs",
+      "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "plugins/fgOS/skills/deliver/SKILL.md",
+      "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "src/runner/dispatch/assignment-policy.mjs",
+      "src/runner/dispatch/confinement/authority.mjs",
+      "src/runner/dispatch/herdr-round.mjs",
+      "src/runner/dispatch/mechanism.mjs",
+      "src/runner/dispatch/operation-prompt-templates.mjs",
+      "src/runner/dispatch/run-lock.mjs",
+      "src/runner/dispatch/transport.mjs",
+      "src/runner/merge.mjs",
+      "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "src/runner/worktree.mjs",
+      "src/state/knowledge-registry.mjs",
+      "src/state/store.mjs",
+      "src/state/work.mjs"
+    ],
+    "B_expansion_not_previously_reviewed": [
+      ".claude/skills/ui-spec/SKILL.md",
+      ".claude/skills/ui-spec/references/CONVENTION.md",
+      "core/skills/_shared/citation-format.md",
+      "core/skills/_shared/coding-worker-contract.md",
+      "core/skills/fgos-indexing/SKILL.md",
+      "core/task-specs/fgos-researching.md",
+      "packages/distribution/rust/src/verify.rs",
+      "packages/distribution/rust/src/workspace.rs",
+      "src/runner/agent-roster.mjs",
+      "src/runner/anti-loop.mjs",
+      "src/runner/claim-liveness.mjs",
+      "src/runner/claim-port.mjs",
+      "src/runner/dispatch/cli.mjs",
+      "src/runner/dispatch/confinement/backend-registry.mjs",
+      "src/runner/dispatch/confinement/request.mjs",
+      "src/runner/dispatch/execution-contract.mjs",
+      "src/runner/dispatch/herdr-round.mjs",
+      "src/runner/dispatch/mechanism.mjs",
+      "src/runner/dispatch/prepare.mjs",
+      "src/runner/dispatch/transport.mjs",
+      "src/runner/dispatch/trust-store.mjs",
+      "src/runner/dispatch/worker-home.mjs",
+      "src/runner/frozen-judge.mjs",
+      "src/runner/goal-check.mjs",
+      "src/runner/promote-engine.mjs",
+      "src/runner/promote-preflight.mjs",
+      "src/runner/prompt-templates/worker-prompt-discovery.txt",
+      "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "src/runner/work-compat.mjs"
+    ],
+    "A_and_B": [
+      "core/skills/_shared/citation-format.md",
+      "core/skills/fgos-indexing/SKILL.md",
+      "packages/distribution/rust/src/verify.rs",
+      "packages/distribution/rust/src/workspace.rs",
+      "src/runner/dispatch/herdr-round.mjs",
+      "src/runner/dispatch/mechanism.mjs",
+      "src/runner/dispatch/transport.mjs",
+      "src/runner/prompt-templates/worker-prompt-skill-pointer.txt"
+    ],
+    "B_only": [
+      ".claude/skills/ui-spec/SKILL.md",
+      ".claude/skills/ui-spec/references/CONVENTION.md",
+      "core/skills/_shared/coding-worker-contract.md",
+      "core/task-specs/fgos-researching.md",
+      "src/runner/agent-roster.mjs",
+      "src/runner/anti-loop.mjs",
+      "src/runner/claim-liveness.mjs",
+      "src/runner/claim-port.mjs",
+      "src/runner/dispatch/cli.mjs",
+      "src/runner/dispatch/confinement/backend-registry.mjs",
+      "src/runner/dispatch/confinement/request.mjs",
+      "src/runner/dispatch/execution-contract.mjs",
+      "src/runner/dispatch/prepare.mjs",
+      "src/runner/dispatch/trust-store.mjs",
+      "src/runner/dispatch/worker-home.mjs",
+      "src/runner/frozen-judge.mjs",
+      "src/runner/goal-check.mjs",
+      "src/runner/promote-engine.mjs",
+      "src/runner/promote-preflight.mjs",
+      "src/runner/prompt-templates/worker-prompt-discovery.txt",
+      "src/runner/work-compat.mjs"
+    ],
+    "selectedUnion": [
+      ".claude/skills/ui-spec/SKILL.md",
+      ".claude/skills/ui-spec/references/CONVENTION.md",
+      "AGENTS.md",
+      "CHANGELOG.md",
+      "apps/fgos-gateway/src/gateway.rs",
+      "apps/fgos-gateway/web/src/lib/network.ts",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "bin/fgos.mjs",
+      "core/skills/_shared/ak-cook-worker-contract.md",
+      "core/skills/_shared/citation-format.md",
+      "core/skills/_shared/coding-worker-contract.md",
+      "core/skills/_shared/executor-dispatch-fallback.md",
+      "core/skills/fgos-clarifying/SKILL.md",
+      "core/skills/fgos-indexing/SKILL.md",
+      "core/task-specs/fgos-indexing.md",
+      "core/task-specs/fgos-researching.md",
+      "domains/coding/AGENTS.md",
+      "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "packages/distribution/rust/src/canonical.rs",
+      "packages/distribution/rust/src/init.rs",
+      "packages/distribution/rust/src/manifest.rs",
+      "packages/distribution/rust/src/verify.rs",
+      "packages/distribution/rust/src/workspace.rs",
+      "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "plugins/fgOS/skills/deliver/SKILL.md",
+      "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "src/runner/agent-roster.mjs",
+      "src/runner/anti-loop.mjs",
+      "src/runner/claim-liveness.mjs",
+      "src/runner/claim-port.mjs",
+      "src/runner/dispatch/assignment-policy.mjs",
+      "src/runner/dispatch/cli.mjs",
+      "src/runner/dispatch/confinement/authority.mjs",
+      "src/runner/dispatch/confinement/backend-registry.mjs",
+      "src/runner/dispatch/confinement/request.mjs",
+      "src/runner/dispatch/execution-contract.mjs",
+      "src/runner/dispatch/herdr-round.mjs",
+      "src/runner/dispatch/mechanism.mjs",
+      "src/runner/dispatch/operation-prompt-templates.mjs",
+      "src/runner/dispatch/prepare.mjs",
+      "src/runner/dispatch/run-lock.mjs",
+      "src/runner/dispatch/transport.mjs",
+      "src/runner/dispatch/trust-store.mjs",
+      "src/runner/dispatch/worker-home.mjs",
+      "src/runner/frozen-judge.mjs",
+      "src/runner/goal-check.mjs",
+      "src/runner/merge.mjs",
+      "src/runner/promote-engine.mjs",
+      "src/runner/promote-preflight.mjs",
+      "src/runner/prompt-templates/worker-prompt-discovery.txt",
+      "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "src/runner/work-compat.mjs",
+      "src/runner/worktree.mjs",
+      "src/state/knowledge-registry.mjs",
+      "src/state/store.mjs",
+      "src/state/work.mjs"
+    ]
+  },
+  "expansionSetFinalStateLedger": [
+    {
+      "set": "step04-010",
+      "file": "bin/fgos.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p17-19.md",
+        "review-a38-step-04-wave2-p17-19.md",
+        "review-a38-step-04-wave2-p17-19.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-019",
+      "file": "packages/distribution/rust/src/canonical.rs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p29.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-019",
+      "file": "packages/distribution/rust/src/init.rs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p29.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-019",
+      "file": "packages/distribution/rust/src/manifest.rs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p29.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-019",
+      "file": "packages/distribution/rust/src/verify.rs",
+      "wave2Reports": [],
+      "categoryA": true,
+      "categoryB": true,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-019",
+      "file": "packages/distribution/rust/src/workspace.rs",
+      "wave2Reports": [],
+      "categoryA": true,
+      "categoryB": true,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/agent-roster.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/anti-loop.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/claim-liveness.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/claim-port.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/dispatch/assignment-policy.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p32.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/dispatch/assignment-runner.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p32.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/dispatch/cli.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/config.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p33.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/confinement/authority.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p33.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/confinement/policies.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p33.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/confinement/request.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/execution-contract.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/herdr-round.mjs",
+      "wave2Reports": [],
+      "categoryA": true,
+      "categoryB": true,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/mechanism.mjs",
+      "wave2Reports": [],
+      "categoryA": true,
+      "categoryB": true,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/operation-prompt-templates.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p33.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/prepare.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/dispatch/resolve.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p34.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/dispatch/run-lock.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p34.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/dispatch/transport.mjs",
+      "wave2Reports": [],
+      "categoryA": true,
+      "categoryB": true,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/dispatch/trust-store.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/dispatch/worker-home.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/frozen-judge.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/goal-check.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/loop.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p34.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/merge.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p35.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/paths.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p35.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/promote-engine.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/promote-preflight.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/work-compat.mjs",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/worktree.mjs",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p35.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-030",
+      "file": ".claude/skills/ui-spec/CONVENTION.md",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p40-41.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-030",
+      "file": ".claude/skills/ui-spec/SKILL.md",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-030",
+      "file": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/_shared/citation-format.md",
+      "wave2Reports": [],
+      "categoryA": true,
+      "categoryB": true,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/_shared/coding-worker-contract.md",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/distill/references/deep-dive-protocol.md",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p40-41.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/fgos-clarifying/SKILL.md",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p40-41.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/fgos-indexing/SKILL.md",
+      "wave2Reports": [],
+      "categoryA": true,
+      "categoryB": true,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/fgos-run/SKILL.md",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p40-41.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/_shared/capability-catalog.md",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p40-41.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p40-41.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/_shared/planning-capability-awareness.md",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p40-41.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-031",
+      "file": "core/skills/fgos-researching/SKILL.md",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p42.md"
+      ],
+      "categoryA": false,
+      "categoryB": false,
+      "selected": false,
+      "reason": "Already reviewed with unchanged final outcome; witness/record-text additions checked mechanically under L12-55 precedent"
+    },
+    {
+      "set": "step04-031",
+      "file": "core/task-specs/fgos-indexing.md",
+      "wave2Reports": [
+        "review-a38-step-04-wave2-p42.md"
+      ],
+      "categoryA": true,
+      "categoryB": false,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    },
+    {
+      "set": "step04-031",
+      "file": "core/task-specs/fgos-researching.md",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-031",
+      "file": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+      "wave2Reports": [],
+      "categoryA": false,
+      "categoryB": true,
+      "selected": true,
+      "reason": "No prior whole-file verdict, expanded-set review"
+    },
+    {
+      "set": "step04-031",
+      "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "wave2Reports": [],
+      "categoryA": true,
+      "categoryB": true,
+      "selected": true,
+      "reason": "Outcome changed, mandatory final-state review"
+    }
+  ],
+  "priorWave2Reports": {
+    ".claude/skills/ui-spec/CONVENTION.md": [
+      "review-a38-step-04-wave2-p40-41.md"
+    ],
+    ".githooks/pre-commit": [
+      "review-a38-step-04-wave2-p26.md"
+    ],
+    ".github/workflows/ci.yml": [
+      "review-a38-step-04-wave2-p26.md"
+    ],
+    "AGENTS.md": [
+      "review-a38-step-04-wave2-p15.md"
+    ],
+    "CHANGELOG.md": [
+      "review-a38-step-04-wave2-p27.md"
+    ],
+    "CLAUDE.md": [
+      "review-a38-step-04-wave2-p15.md"
+    ],
+    "apps/fgos-gateway/Cargo.toml": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "apps/fgos-gateway/build.rs": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "apps/fgos-gateway/src/cf_access.rs": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "apps/fgos-gateway/src/gateway.rs": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "apps/fgos-gateway/src/mcp.rs": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "apps/fgos-gateway/web/src/App.tsx": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "apps/fgos-gateway/web/src/api/client.ts": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "apps/fgos-gateway/web/src/api/errors.ts": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "apps/fgos-gateway/web/src/api/poll.ts": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "apps/fgos-gateway/web/src/api/types.ts": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "apps/fgos-gateway/web/src/lib/network.ts": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "apps/fgos-gateway/web/src/lib/status.ts": [
+      "review-a38-step-04-wave2-p21.md"
+    ],
+    "bin/fgos.mjs": [
+      "review-a38-step-04-wave2-p17-19.md",
+      "review-a38-step-04-wave2-p17-19.md",
+      "review-a38-step-04-wave2-p17-19.md"
+    ],
+    "core/instructions/design-principles.md": [
+      "review-a38-step-04-wave2-p15.md"
+    ],
+    "core/instructions/platform-laws.md": [
+      "review-a38-step-04-wave2-p16.md"
+    ],
+    "core/skills/_shared/ak-cook-worker-contract.md": [
+      "review-a38-step-04-wave2-p43.md"
+    ],
+    "core/skills/_shared/capability-catalog.md": [
+      "review-a38-step-04-wave2-p40-41.md"
+    ],
+    "core/skills/_shared/executor-dispatch-fallback.md": [
+      "review-a38-step-04-wave2-p40-41.md"
+    ],
+    "core/skills/_shared/planning-capability-awareness.md": [
+      "review-a38-step-04-wave2-p40-41.md"
+    ],
+    "core/skills/distill/references/deep-dive-protocol.md": [
+      "review-a38-step-04-wave2-p40-41.md"
+    ],
+    "core/skills/fgos-clarifying/SKILL.md": [
+      "review-a38-step-04-wave2-p40-41.md"
+    ],
+    "core/skills/fgos-researching/SKILL.md": [
+      "review-a38-step-04-wave2-p42.md"
+    ],
+    "core/skills/fgos-run/SKILL.md": [
+      "review-a38-step-04-wave2-p40-41.md"
+    ],
+    "core/task-specs/fgos-indexing.md": [
+      "review-a38-step-04-wave2-p42.md"
+    ],
+    "domains/coding/AGENTS.md": [
+      "review-a38-step-04-wave2-p01.md"
+    ],
+    "domains/coding/skills/fgos-coding-discovering/SKILL.md": [
+      "review-a38-step-04-wave2-p01.md"
+    ],
+    "domains/coding/skills/fgos-coding-exploring/SKILL.md": [
+      "review-a38-step-04-wave2-p01.md"
+    ],
+    "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md": [
+      "review-a38-step-04-wave2-p01.md"
+    ],
+    "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md": [
+      "review-a38-step-04-wave2-p01.md"
+    ],
+    "domains/coding/skills/fgos-coding-implement/SKILL.md": [
+      "review-a38-step-04-wave2-p02.md"
+    ],
+    "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md": [
+      "review-a38-step-04-wave2-p02.md"
+    ],
+    "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md": [
+      "review-a38-step-04-wave2-p02.md"
+    ],
+    "domains/coding/skills/fgos-coding-knowledge/SKILL.md": [
+      "review-a38-step-04-wave2-p02.md"
+    ],
+    "domains/coding/skills/fgos-coding-planning/SKILL.md": [
+      "review-a38-step-04-wave2-p03.md"
+    ],
+    "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md": [
+      "review-a38-step-04-wave2-p03.md"
+    ],
+    "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md": [
+      "review-a38-step-04-wave2-p03.md"
+    ],
+    "domains/coding/skills/fgos-coding-shaping/SKILL.md": [
+      "review-a38-step-04-wave2-p04.md"
+    ],
+    "domains/coding/skills/fgos-coding-validating/SKILL.md": [
+      "review-a38-step-04-wave2-p04.md"
+    ],
+    "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md": [
+      "review-a38-step-04-wave2-p04.md"
+    ],
+    "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md": [
+      "review-a38-step-04-wave2-p04.md"
+    ],
+    "domains/coding/task-specs/lock-decisions.md": [
+      "review-a38-step-04-wave2-p04.md"
+    ],
+    "domains/coding/task-specs/shape-plan.md": [
+      "review-a38-step-04-wave2-p04.md"
+    ],
+    "herdr-dashboard/src/pane_scan.rs": [
+      "review-a38-step-04-wave2-p28.md"
+    ],
+    "packages/distribution/rust/src/canonical.rs": [
+      "review-a38-step-04-wave2-p29.md"
+    ],
+    "packages/distribution/rust/src/init.rs": [
+      "review-a38-step-04-wave2-p29.md"
+    ],
+    "packages/distribution/rust/src/manifest.rs": [
+      "review-a38-step-04-wave2-p29.md"
+    ],
+    "packages/herdr-fgos-common/rust/src/fgos.rs": [
+      "review-a38-step-04-wave2-p30.md"
+    ],
+    "packages/herdr-fgos-common/rust/src/settings.rs": [
+      "review-a38-step-04-wave2-p30.md"
+    ],
+    "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs": [
+      "review-a38-step-04-wave2-p31.md"
+    ],
+    "plans/261020-1250-debate-pattern-and-judge-role/plan.md": [
+      "review-a38-step-04-wave2-p44.md"
+    ],
+    "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md": [
+      "review-a38-step-04-wave2-p28.md"
+    ],
+    "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md": [
+      "review-a38-step-04-wave2-p44.md"
+    ],
+    "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md": [
+      "review-a38-step-04-wave2-p44.md"
+    ],
+    "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md": [
+      "review-a38-step-04-wave2-p44.md"
+    ],
+    "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md": [
+      "review-a38-step-04-wave2-p44.md"
+    ],
+    "plugins/fgOS/skills/approve/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/cleanup-loop/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/cleanup-next/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/coding-shape-distill/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/coding-shape/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/deliver/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/discover-next/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/discover/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/merge-loop/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/merge-next/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/plan/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/retro-loop/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/retro-next/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/terminal-close/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "plugins/fgOS/skills/terminal/SKILL.md": [
+      "review-a38-step-04-wave2-p14.md"
+    ],
+    "src/cli/command-registry.mjs": [
+      "review-a38-step-04-wave2-p20.md"
+    ],
+    "src/runner/dispatch/assignment-policy.mjs": [
+      "review-a38-step-04-wave2-p32.md"
+    ],
+    "src/runner/dispatch/assignment-runner.mjs": [
+      "review-a38-step-04-wave2-p32.md"
+    ],
+    "src/runner/dispatch/config.mjs": [
+      "review-a38-step-04-wave2-p33.md"
+    ],
+    "src/runner/dispatch/confinement/authority.mjs": [
+      "review-a38-step-04-wave2-p33.md"
+    ],
+    "src/runner/dispatch/confinement/policies.mjs": [
+      "review-a38-step-04-wave2-p33.md"
+    ],
+    "src/runner/dispatch/operation-prompt-templates.mjs": [
+      "review-a38-step-04-wave2-p33.md"
+    ],
+    "src/runner/dispatch/resolve.mjs": [
+      "review-a38-step-04-wave2-p34.md"
+    ],
+    "src/runner/dispatch/run-lock.mjs": [
+      "review-a38-step-04-wave2-p34.md"
+    ],
+    "src/runner/loop.mjs": [
+      "review-a38-step-04-wave2-p34.md"
+    ],
+    "src/runner/merge.mjs": [
+      "review-a38-step-04-wave2-p35.md"
+    ],
+    "src/runner/paths.mjs": [
+      "review-a38-step-04-wave2-p35.md"
+    ],
+    "src/runner/worktree.mjs": [
+      "review-a38-step-04-wave2-p35.md"
+    ],
+    "src/state/events-jsonl-truncation-guard.mjs": [
+      "review-a38-step-04-wave2-p36.md"
+    ],
+    "src/state/gate-bypass.mjs": [
+      "review-a38-step-04-wave2-p36.md"
+    ],
+    "src/state/knowledge-registry.mjs": [
+      "review-a38-step-04-wave2-p36.md"
+    ],
+    "src/state/store.mjs": [
+      "review-a38-step-04-wave2-p37.md"
+    ],
+    "src/state/tool-registry.mjs": [
+      "review-a38-step-04-wave2-p37.md"
+    ],
+    "src/util/format-bytes.mjs": [
+      "review-a38-step-04-wave2-p38.md"
+    ],
+    "src/verbs/merge/approve.mjs": [
+      "review-a38-step-04-wave2-p39.md"
+    ]
+  },
+  "outcomeComparison": "Compare disposition/sourceDisposition, primary/additional targets, anchor, timing, blockedReason, full diff and contextual rewrites against input HEAD. New slots are changed outcomes. Span/witness/wording-only corrections are checker verified under L12-55 precedent.",
+  "reviewedFinalStateLimit": "Earlier review is used only for files with unchanged final outcomes; all outcome-changed files are selected again. No acceptance inferred from author proof."
+}

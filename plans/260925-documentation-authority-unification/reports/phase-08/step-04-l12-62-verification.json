@@ -1,0 +1,94 @@
+{
+  "commands": [
+    {
+      "label": "ratchet",
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 1.21,
+      "log": "step-04-l12-62-ratchet.log",
+      "sha256": "6cbeaa998a4dbca53e4c04e411d654cc715ca13d8113f9bf80dda70669bb5ab2"
+    },
+    {
+      "label": "citation-drift",
+      "command": [
+        "node",
+        "scripts/check-decision-citation-drift.mjs"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.25,
+      "log": "step-04-l12-62-citation-drift.log",
+      "sha256": "a55a98ef3a961181b729bb169cefd37a7a0d63c12438c58c4f8a40902ec998e8"
+    },
+    {
+      "label": "light-tests",
+      "command": [
+        "node",
+        "--test",
+        "test/scripts/doc-link-pass.test.mjs",
+        "test/scripts/check-doc-candidate-status.test.mjs",
+        "test/scripts/check-doc-constitution.test.mjs",
+        "test/scripts/generate-shipped-path-inventory.test.mjs",
+        "test/setup/instruction-registry.test.mjs",
+        "test/setup/instruction-composition.test.mjs",
+        "test/setup/instruction-projections.test.mjs"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 9.038,
+      "log": "step-04-l12-62-light-tests.log",
+      "sha256": "b12402b1911ee4ffb7e0b0f430ecb123105f836369fd2a443cf8e8aa9f8c38e7"
+    },
+    {
+      "label": "checker",
+      "command": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-04-check.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 47.922,
+      "log": "step-04-l12-62-checker.log",
+      "sha256": "780b3af3a4cae20431e3babf2670be2683fae1a059c5ccd72cd1ed9344cc1015"
+    },
+    {
+      "label": "probes",
+      "command": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-62-probes.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 9.221,
+      "log": "step-04-l12-62-probes.log",
+      "sha256": "90f8ba184bee3fb546455dc8bc864412bcaf9760fc9efe7df98cb96c0a5f8376"
+    },
+    {
+      "label": "packet",
+      "command": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave3-packet.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 14.854,
+      "log": "step-04-l12-62-packet.log",
+      "sha256": "1ceceeb06de4f9f914e0024446510693206dd0d1fedd7ce39b4e9134718f79e9"
+    },
+    {
+      "label": "whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.11,
+      "log": "step-04-l12-62-whitespace.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "allPassed": true,
+  "limit": "Author records-only evidence. No consumer application, full npm/cargo suite, installed parity, reviewer acceptance or actual-commit reproduction claim."
+}

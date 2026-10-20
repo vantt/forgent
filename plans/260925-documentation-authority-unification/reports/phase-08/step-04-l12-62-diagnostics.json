@@ -1,0 +1,137 @@
+{
+  "initialFullCheck": {
+    "failureCount": 25,
+    "failures": [
+      {
+        "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "check": "render-disposition-join",
+        "detail": ""
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "check": "render-disposition-join",
+        "detail": ""
+      },
+      {
+        "file": "archive/plans/260905-architecture-advisory-panel/plan.md",
+        "check": "source-spans",
+        "detail": ""
+      },
+      {
+        "file": "core/skills/_shared/citation-format.md",
+        "check": "render-disposition-join",
+        "detail": ""
+      },
+      {
+        "file": "core/skills/_shared/citation-format.md",
+        "check": "render-disposition-join",
+        "detail": ""
+      },
+      {
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "check": "render-disposition-join",
+        "detail": ""
+      },
+      {
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "check": "render-disposition-join",
+        "detail": ""
+      },
+      {
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "check": "render-disposition-join",
+        "detail": ""
+      },
+      {
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "check": "render-disposition-join",
+        "detail": ""
+      },
+      {
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "check": "render-disposition-join",
+        "detail": ""
+      },
+      {
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "check": "render-disposition-join",
+        "detail": ""
+      },
+      {
+        "file": "domains/coding/AGENTS.md",
+        "check": "inherited-step3/projection-source",
+        "detail": ""
+      },
+      {
+        "file": "archive/plans/260905-architecture-advisory-panel/plan.md",
+        "check": "inherited-step3/retiring-preserve-wording",
+        "detail": ""
+      },
+      {
+        "file": "archive/plans/260915-code-panel-multicell-facade/plan.md",
+        "check": "inherited-step3/retiring-preserve-wording",
+        "detail": ""
+      },
+      {
+        "file": "AGENTS.md",
+        "check": "inherited-step3/unit-consistency",
+        "detail": "mixed computed unit lacks a source-bound per-edge distinct-claim reason"
+      },
+      {
+        "file": "AGENTS.md",
+        "check": "inherited-step3/dependency-category",
+        "detail": ""
+      },
+      {
+        "file": "CHANGELOG.md",
+        "check": "inherited-step3/renamed-alias-preserve",
+        "detail": ""
+      },
+      {
+        "file": "src/runner/dispatch/config.mjs",
+        "check": "inherited-step3/retiring-preserve-wording",
+        "detail": ""
+      },
+      {
+        "file": "src/runner/dispatch/mechanism.mjs",
+        "check": "inherited-step3/unit-consistency",
+        "detail": "mixed computed unit lacks a source-bound per-edge distinct-claim reason"
+      },
+      {
+        "file": "src/state/store.mjs",
+        "check": "inherited-step3/retiring-preserve-wording",
+        "detail": ""
+      },
+      {
+        "file": "src/state/work.mjs",
+        "check": "inherited-step3/unit-consistency",
+        "detail": "mixed computed unit lacks a source-bound per-edge distinct-claim reason"
+      },
+      {
+        "file": "src/verbs/merge/approve.mjs",
+        "check": "inherited-step3/removed-decision-narrative-successor",
+        "detail": "removed decision title-collision successor"
+      },
+      {
+        "file": "src/verbs/merge/merge.mjs",
+        "check": "inherited-step3/removed-decision-narrative-successor",
+        "detail": "removed decision title-collision successor"
+      },
+      {
+        "file": "src/verbs/merge/sync-root.mjs",
+        "check": "inherited-step3/removed-decision-narrative-successor",
+        "detail": "removed decision title-collision successor"
+      },
+      {
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "check": "inherited-step3/unit-consistency",
+        "detail": "mixed computed unit lacks a source-bound per-edge distinct-claim reason"
+      }
+    ],
+    "checkerSha256": "8936f5b4b591225ab41328e2d0188a625a578170901beb52228113ee95238cf1"
+  },
+  "resolvedBy": "Exact joins, full spans, source-bound group reasons, dated release-region declaration, title-matched 0032 notes and explicit unmanaged domain-source boundary; no inherited predicate removed.",
+  "initialProbeCorrection": "The initial 19/20 probe run exposed a see-pointer split by a // continuation. The preserve wording predicate now joins that continuation before judging navigation. Final 20/20 result uses the corrected checker.",
+  "finalFailureCount": 0,
+  "finalProbeCount": 20
+}

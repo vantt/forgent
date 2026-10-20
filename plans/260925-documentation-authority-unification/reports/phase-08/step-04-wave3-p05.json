@@ -1,0 +1,750 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-007",
+  "files": [
+    "archive/plans/260919-coordination-skill-harness-simplification/plan.md"
+  ],
+  "joinedSlots": 9,
+  "items": [
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "kind": "complete-source-context",
+      "path": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "startLine": 2261,
+      "endLine": 3660,
+      "content": "    standalone standard-protocol session (any one case) to prove the\n    variant runs end-to-end and to get a real wall-time/dispatch-count\n    reading. For a 4-case corpus: 4 full sessions + 4 extra explanation\n    dispatches + 1 standalone standard session = 5 real sessions total,\n    not 8-10. Still real LLM-backed executors, still real cost — the user's\n    2026-09-28 confirmation to proceed at real cost still holds — but the\n    revised design is both cheaper AND the only one that isolates the\n    variable (see the paired-design decision below). Do not silently\n    shrink further without asking again.\n  decision (Lead, locked, do not reopen — reduction candidate, wording\n    CORRECTED 2026-09-28 after review): of 3 evidence-based reduction\n    candidates investigated (dropping `phase-redteam` entirely; merging\n    `critique-proposals`+`assess-constraints`; capping\n    `phase-dialogue-reopen` at `maxInvocations: 1`), dropping\n    `phase-redteam` is the standard variant's shape — it is the cleanest,\n    most structurally separable cut (1 full graph node, 1 actor, the\n    `flagship`-tier dispatch, and the `distinctProviderFrom` requirement\n    all removed together; confirmed nothing else reads `red-team-packet`\n    except `phase-explanation`'s own gate). CORRECTION: the original\n    rationale's claim that red-team is \"framed as optional\" in the doctrine\n    is FALSE and is retracted — `docs/architect/agent-coordination/\n    playbooks/architecture-advisory-role-doctrine.md` (~L1151-1170) frames\n    it as MANDATORY falsification of the packet and the panel, deliberately\n    on a distinct provider, with no materiality exemption anywhere in that\n    file; prior real evidence (P05.2, both the \"clear\" and \"unclear\" case)\n    shows red-team dissent materially shaped the final explanation in BOTH\n    cases. The honest prior is: a quality regression from dropping\n    red-team is PLAUSIBLE, not unlikely. This unit still tests the\n    candidate — a documented regression is a valid, complete outcome, not\n    a failure of the unit — but must not misstate the doctrine to justify\n    the choice. Do NOT silently skip red-team via skill prose or a\n    conditional — per Phase 5's own wording, \"a standard profile may ship\n    only if it remains a separate registered protocol/preset with clear\n    selection triggers\".\n  decision (Lead, locked, do not reopen — paired measurement design, NEW\n    2026-09-28 per review HIGH-1): an unpaired design (one independent\n    session per profile per case) cannot isolate the variable — 9 of the\n    10 upstream dispatches are identical in both profiles, so two\n    independent LLM-sampled runs differ mostly in upstream sampling noise,\n    swamping the only real signal (whether `explain-recommendation` saw\n    `redteam.md`). Fix: for each case, run the FULL protocol once, then\n    produce a SECOND explanation from the SAME synthesis/redteam context\n    with red-team's finding withheld (one extra `architecture-advisory-panel-v1-explanation`-template\n    dispatch, same synthesis input, minus the redteam.md evidence ref).\n    Compare the two explanations from the SAME upstream chain. Separately,\n    run ONE real standalone standard-protocol session (any single case)\n    end-to-end to prove the new FlowDefinition actually dispatches/closes\n    correctly and to get one real wall-time/dispatch-count data point for\n    the variant as actually deployed (not just the paired-explanation\n    proxy).\n  decision (Lead, locked, do not reopen — scoring methodology, NEW\n    2026-09-28 per review HIGH-2): (a) the scoring rubric must be\n    committed to the experiment's own directory BEFORE the first real\n    call, with its git SHA cited in the final report — never written or\n    adjusted after seeing results. (b) explanations are stripped of any\n    profile-identifying text and scored BLIND, by an executor on a\n    DIFFERENT provider than the panel's own synthesizer/lead-advisor\n    executors, plus a human spot-check of at least one case — the Lead\n    (who knows which explanation is which) must never self-score. (c)\n    \"dissent retention\" is mechanical, not impressionistic: enumerate\n    every distinct material finding in the full run's own `redteam.md`,\n    then mark present/absent BY SUBSTANCE in each of the two explanations;\n    also track whether critique/constraint objections (which exist in\n    both profiles) survive, as a control. (d) factual error is scored ONLY\n    against independently VERIFIED ground truth (see corpus decision\n    below) — never scorer opinion where no ground truth exists.\n  decision (Lead, locked, do not reopen — corpus, CHANGED 2026-09-28 per\n    review MEDIUM-4): use `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`'s\n    two real herdr-gateway cases (one \"clear\", one \"unclear\" — their\n    frozen `intake.md`/`synthesis.md`/`redteam.md` are already on disk) as\n    the CORE corpus, not invented cases — they are the only cases in this\n    repo with INDEPENDENTLY VERIFIED ground truth from real subsequent\n    implementation (the 30.8% false-wrap rate reproduced by a real test\n    run; the Codex cursor-glyph finding confirmed live — see P05.2.md\n    ~L170-200), making them the only cases where factual-error rate can be\n    scored objectively rather than by scorer opinion. Add 1-2 more cases\n    from this track's own real decisions (e.g. I18's rust-host-regen\n    question, I21's executor-pin bypass, I24a's H3 wording, I26's H1/H2\n    reconciliation) for extra materiality spread — these lack independent\n    ground truth, so score decision-quality/dissent-retention on them but\n    do NOT claim a factual-error rate without ground truth to check\n    against.\n  decision (Lead, locked, do not reopen — real-executor cost/safety\n    discipline, NEW 2026-09-28 per review HIGH-3): before any real-cost\n    session: (1) a fake-executor smoke run of the standard variant through\n    the SAME public door the experiment will use (`fgos coordination pack\n    run` or `coordination run`), proving the explanation re-gate and\n    quorum/close actually work end-to-end — the structural YAML-diff test\n    alone does NOT prove dispatch; (2) ONE real cheap-tier canary\n    operation (e.g. `investigate-context` alone) to confirm the real\n    executor path itself works before committing to the batch. Only after\n    both pass does the real batch run. Driver rules for every real\n    session: use a FIXED, deterministic `coordinationId` per (case,\n    profile), recorded in a run manifest before dispatch — a retry MUST\n    resume the same id (the kernel's idempotent resume,\n    `src/runner/coordination/session-engine.mjs` ~L416, reads the linked\n    RunResult instead of re-executing; a freshly-minted id on retry\n    silently re-spends real cost); run `fgos coordination show` before\n    each call to confirm current state; run sessions strictly SERIALLY,\n    never concurrently (this track has a confirmed assignment-id allocator\n    race across concurrent `coordination run` processes); dispatch from a\n    QUIESCENT checkout/worktree that no other session (including Phase 6's\n    own parallel work) is editing — a concurrent git-tree change gets\n    misattributed to the dispatched executor as a false failure, which\n    would re-spend cost on a retry; be aware `aggregateBounds.wallTimeMs`\n    (default 3h, `session-engine.mjs` ~L1996) is a PERMANENT refusal once\n    elapsed — a session that isn't finished within 3 real hours cannot be\n    resumed the next day, so size the corpus/schedule accordingly. Pin\n    identical driver policy across both profiles for every shared step\n    (same objective/contextRefs text, no human turn, no specialist\n    authorization, no reopen, immediate `close-dialogue`) so driver\n    variance is never a second confound alongside the profile itself.\n  scope: (1) Author a new FlowDefinition YAML,\n    `core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml`\n    — the full `architecture-advisory-panel-v1.yaml` (556 lines) with\n    EXACTLY this allowlisted delta, nothing else (this exact list is the\n    stop-condition allowlist below, not a starting suggestion): remove\n    `phase-redteam`'s node, `red-team-actor` (decide whether to also drop\n    it from `spec.roles` — legal either way, pick one and state it in the\n    report), the `red-team-packet` operation, and the `post-redteam-open`\n    window definition (it references `red-team-packet` and schema\n    validation rejects an orphaned reference); change\n    `phase-synthesis.transitions` from `[phase-redteam]` to\n    `[phase-explanation]`; re-gate `phase-explanation` on\n    `post-synthesis-open` directly; update `metadata.id` to\n    `core.coordination-protocol.architecture-advisory-panel-standard-v1`;\n    rewrite the header comment to describe the standard variant honestly\n    (do not leave stale prose narrating red-team/I21 `distinctProviderFrom`\n    for a variant that no longer has it). Every other node/operation/actor\n    byte-identical to the full protocol — never invent new judgment\n    content. (2) Register it in `core/protocol-packs/group-thinking.json`'s\n    `members` array (currently 5 flat `{id, version}` entries — add a\n    6th). (3) Add a new row (or extend the existing `architecture-panel`\n    row) in `docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md`\n    (the CANONICAL copy — NOT `docs/architect/...`, which is a legacy\n    source per that file's own header; edit the legacy copy too only if\n    needed to avoid divergence) with a concrete, evidence-checkable\n    selection trigger. (4) Build an evaluation-corpus driver from scratch\n    (no reusable multi-case runner exists in this repo — confirmed via\n    the design record) — borrow the PATTERN existing single-mechanism\n    proofs use (a driver `.mjs` script + a logged `.md`/`.log` artifact),\n    not any code directly. Corpus: the P05.2 clear + unclear cases (frozen\n    verbatim) plus 1-2 track-decision cases, per the corpus decision above.\n    (5) Follow the pre-flight/safety discipline decision above exactly\n    (smoke → canary → batch; fixed coordinationIds; serial; quiescent\n    checkout; wall-time awareness) before any real-cost batch session. (6)\n    Run the paired design decision above (full session + withheld-redteam\n    explanation per case, plus one standalone standard-protocol session)\n    — never the original unpaired independent-session design. (7) Score\n    per the scoring-methodology decision above (committed rubric, blind\n    cross-provider scoring + human spot-check, mechanical dissent-retention\n    checklist, factual error only against verified ground truth — prompt\n    BYTES and wall time in place of \"prompt tokens\", which no field in\n    this codebase records: grep confirms nothing under `src/` tracks\n    input/prompt token counts). (8) Write up the comparison as a report\n    under `plans/260919-coordination-skill-harness-simplification/reports/`,\n    citing every run's raw evidence (coordination ids, `fgos coordination\n    show` output, timing, the rubric's own git SHA) — never only summary\n    conclusions. Do NOT ship the standard variant as the DEFAULT preset\n    regardless of results — it ships only as a separate, explicitly-\n    selected preset (confirmed: no skill currently routes to it, since\n    I26's own scope forbids editing `fgos-architecture-panel`/`fgos-panel`\n    to add that routing — acceptable for this unit, the driver dispatches\n    both profiles directly via the CLI door, not through a skill); if the\n    comparison shows a real quality regression (plausible per the\n    corrected doctrine reading above), the finding itself, documented, is\n    a valid, complete outcome — this unit is not required to make the\n    standard variant look good.\n  files: core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml\n    (new), core/protocol-packs/group-thinking.json,\n    docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md\n    (canonical; + `docs/architect/...` legacy copy only if needed),\n    test/verbs/coordination-group-thinking-pack-registration.test.mjs\n    (asserts an exact 5-member set/length today — MUST be updated to 6, it\n    will fail otherwise, not just \"still pass\"),\n    test/cli/coordination-pack.test.mjs (its `REAL_PACK_MEMBER_IDS` +\n    `deepEqual` assertion needs the same update),\n    test/runner/flow-definition-protocol-loader.test.mjs (its exact\n    discovered-id list needs the same update), a new corpus/driver script\n    under a dedicated\n    `plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/`\n    subdirectory (keep experiment artifacts out of `core/`/`test/` since\n    they are not permanent product code), the comparison report,\n    CHANGELOG.md. Do NOT touch `architecture-advisory-panel-v1.yaml`\n    itself (the full protocol stays byte-identical), and do NOT touch\n    anything in I26's already-closed scope\n    (`fgos-panel`/`fgos-architecture-panel`/the driver-discipline\n    fragment) or anything in I28/I29's Phase 6 scope.\n  verification: `node --test test/verbs/coordination-group-thinking-pack-registration.test.mjs\n    test/cli/coordination-pack.test.mjs test/runner/flow-definition-protocol-loader.test.mjs`\n    (all 3 updated for the 6th member, then passing); a new structural\n    diff-based test confirming the standard variant equals the full\n    protocol minus EXACTLY the allowlisted delta above, nothing else\n    (parse both YAMLs, diff the parsed structures, assert the delta set);\n    the fake-executor smoke run (before any real spend); the one real\n    cheap-tier canary call (before the batch); the real paired-design\n    experiment runs themselves (not a `npm test` assertion — empirical\n    measurement, the report is the deliverable); `env -u\n    CLAUDE_CODE_SESSION_ID npm test` for the full suite.\n  stop: the standard variant's YAML diverges from the full protocol\n    anywhere OTHER than the exact allowlisted delta above (would\n    invalidate the whole comparison's validity — this is now a precise\n    allowlist, not a vague \"just red-team\" statement); the standard\n    profile becomes reachable as a default or fallback without an\n    explicit, clear selection trigger; the comparison is run with\n    fake/test executors instead of real LLM-backed ones for the actual\n    measurement; an UNPAIRED independent-session design is used instead of\n    the paired design (would waste real spend on an unattributable\n    result); scoring is done by the Lead itself or without blinding;\n    factual-error is claimed for a case with no independently verified\n    ground truth; the fake-executor smoke test or the real cheap-tier\n    canary fails — stop and fix before spending on the batch, do not\n    proceed hoping the batch works anyway; any real session needs a freshly-\n    minted `coordinationId` on retry — stop, report the spend already\n    incurred, and get explicit confirmation before continuing rather than\n    silently re-spending; the report omits raw per-run evidence or the\n    rubric's own git SHA in favor of only summary claims.\n  decision (Lead, 2026-09-28, real-spend incident during the batch):\n    implementer correctly paused per the stop condition above rather than\n    silently re-spending, after the first real paired-design dispatch\n    (P05.2 clear case, withheld-redteam) surfaced two problems. Lead\n    independently confirmed both directly (`git show --stat` on commits\n    `cee081d6f`/`2e1251c87`): (1) a likely false \"failed\" status from the\n    implementer's own concurrent file writes into the same worktree cwd\n    during an in-flight dispatch (same class as `tsk-3yo`) -- accepted;\n    (2) a real, structural contamination pathway: `red-team-packet.md` for\n    both P05.2 cases was committed into this worktree's checked-out tree\n    in `cee081d6f`, BEFORE the withheld-redteam dispatch ran in\n    `2e1251c87` -- bwrap confinement mounts the whole checkout read-only,\n    so that file was physically present and readable by the dispatched\n    agent regardless of any \"don't read X\" instruction. An\n    instruction-only mitigation is rejected as insufficient: the file\n    stays present for every future dispatch on this worktree, and the\n    experiment is specifically measuring behavior under withheld\n    information, so relying on the dispatched agent's own restraint\n    defeats the point. Ruling: (a) the tainted P05.2-clear withheld-explain\n    result is INVALIDATED -- do not score it, mark it\n    `invalidated-methodology` in the manifest, and redo it cleanly once (b)\n    below is in place; (b) structural fix, not instructional: for every\n    remaining case, commit only pre-reveal corpus content (framing through\n    synthesis) durably up front; commit each case's reveal-only content\n    (`red-team-packet.md`, `explain-recommendation.md` -- ground truth\n    needed for scoring, never as dispatch input) ONLY AFTER that case's\n    full-protocol AND withheld-redteam dispatches have both already run.\n    SUPERSEDED same-day: the \"separate disposable worktree\" idea above is\n    WRONG and was never executed for real isolation -- implementer\n    independently verified the actual confinement driver\n    (`src/runner/dispatch/confinement/drivers/bwrap.mjs:356`, confirmed by\n    Lead reading the same line directly) mounts `--ro-bind '/' '/'`: the\n    ENTIRE host filesystem root, read-only, for every dispatch, with\n    `plan.resources` layering only WRITABLE exceptions on top. This\n    confinement model bounds writes, never reads -- any absolute host path\n    (including the primary worktree's already-committed corpus) stays\n    fully readable by a confined dispatch regardless of which worktree its\n    own `--dir`/repoRoot points to. No worktree-boundary trick provides\n    real read isolation here; true blinding would require a genuinely\n    separate host/filesystem, disproportionate new infrastructure for this\n    unit's scope. Revised ruling: (a) for the 2 already-contaminated P05.2\n    cases, redo the withheld probe directly in the primary `unit/I27`\n    worktree (no disposable worktree) with a maximally self-sufficient\n    inline objective (embed everything needed, give no reason to explore\n    beyond the prompt) -- score it, but state plainly in the report that\n    this is risk-reduced, not hard-isolated, given the real confinement\n    read boundary; (b) for the new track-decision case, use the same\n    tight-prompt approach AND keep the reveal-content-commit-after-dispatch\n    ordering from the original fix (still a real, if partial, mitigation --\n    no memorable breadcrumb file exists yet at dispatch time) for the best\n    practical blinding available in this environment; (c) report language\n    must state the confinement-model finding plainly, never imply a\n    stronger isolation guarantee than what's real. Discipline going forward\n    (implementer's own fix, confirmed correct): never touch the dispatch\n    worktree's files while a real dispatch is in flight. Explicitly\n    confirmed: proceed with the remaining real batch under this corrected\n    methodology -- previously-granted real-cost authorization stands; this\n    is an implementation-level integrity fix within that authorization, not\n    a new cost decision requiring a fresh user round-trip.\n  decision (Lead, 2026-09-28, rubric-ordering violation, real but disclosed):\n    implementer self-reported going straight into the canary/batch\n    dispatches without first committing the scoring rubric, violating\n    decision (a) of the locked scoring-methodology block above\n    (\"committed BEFORE the first real call ... never written or adjusted\n    after seeing results\"). Not silently buried -- flagged proactively\n    before any scoring happened. Ruling: irreversible (the real outputs\n    are already read), but NOT fatal -- the actual protection that matters\n    is that whoever operationalizes the rubric's concrete checklist has\n    not been exposed to the real run content, since the implementer\n    dispatching/monitoring the real sessions has necessarily already seen\n    raw output (needed to catch the real codex-OAuth failure, the earlier\n    contamination self-disclosure, etc.). Mitigation, not a paperwork fix:\n    a FRESH agent with zero exposure to any of I27's real run output\n    writes the operational rubric, using ONLY the scoring-methodology\n    decision text above (already locked before any real call existed) as\n    source -- never shown any real corpus/run file. That rubric then\n    still goes to the separately blinded, different-provider scorer per\n    decision (b), unchanged. Re-running the whole real batch to restore a\n    clean before/after ordering was considered and rejected as\n    disproportionate real spend for a rigor nicety, not a correctness bug\n    -- the paired-design/blinding/ground-truth safeguards that actually\n    protect the comparison's validity are untouched by this. Report must\n    state this violation and mitigation plainly, never omit it.\n    Also confirmed correct, no objection: (1) the `req3b` redteam retry\n    (`codex` OAuth dead -- genuine infra failure, not a false-fail; retried\n    under the SAME coordinationId per the driver-safety decision, switched\n    to a distinct-provider fallback executor; kept the resulting real\n    INSUFFICIENT-EVIDENCE verdict as honest evidence rather than re-spending\n    for a cleaner-looking result); (2) the `coordination show`/close\n    snapshot-path cosmetic resolution bug (main-checkout `.fgos/` resolved\n    even with `--dir` set) is correctly filed as a known gap, not fixed --\n    out of I27's file-ownership scope, and the underlying on-disk session\n    state is independently confirmed correct regardless.\n  rubric approved (Lead, 2026-09-28): `rubric-writer-i27` committed\n    `panel-depth-experiment/scoring-rubric.md` at SHA\n    `7421a5e612984082713defd3e3fe43946f42c39e` on `unit/I27`, alone in that\n    commit -- confirmed directly (`git show --stat`). Lead read the full\n    rubric before approving. It operationalizes spec (a)-(d) mechanically\n    (role table with a provider-mismatch check for the blind scorer;\n    itemized redaction list plus a zero-hit grep self-check; a frozen,\n    quote-cited RT/CX/CY finding-enumeration procedure with no partial\n    credit; a GT-1/GT-2-only factual-error procedure explicitly forbidding\n    any factual-error claim on the non-core cases; unblinding-key commit\n    ordered strictly after every mark) and adds no dimension beyond\n    (a)-(d). Its one open question -- narrowing the corpus note's undefined\n    \"decision-quality\" to PRESENT-finding disposition (DISPOSED vs.\n    MENTIONED-ONLY) rather than a new impressionistic scale -- is approved\n    as the correct, conservative reading: it stays mechanical and ties\n    back to the already-frozen finding lists rather than inventing new\n    scorer judgment calls. This SHA is what the final report must cite per\n    the rubric-ordering-violation decision above.\n  process incident (Lead, 2026-09-28, worktree write collision): the\n    rubric commit above landed in the shared `unit/I27` worktree while\n    implementer's own `op_023` standalone-session `critique` dispatch was\n    still in flight there -- same class as this track's own established\n    \"never git-write in a shared cell worktree while in-flight\" lesson,\n    this time from the Lead/dispatcher side rather than a peer session.\n    Lead did not check implementer's live-dispatch status before\n    dispatching the rubric-writer. Consequence: mutation-detection marked\n    `op_023` `failed` despite genuinely substantive, valid content\n    (`\"status\": \"done\"` inside the real result). Disposition: kept as\n    documented evidence with the caveat noted, not re-spent -- consistent\n    with this unit's own established precedent (the `req3b` retry, the\n    earlier false-fail) of preserving honest real evidence over re-spending\n    for a cleaner-looking result. Going forward: Lead will check\n    implementer's dispatch status before any further write into this\n    worktree, and implementer will do the same in reverse.\n  open dependency (Lead, 2026-09-28, human spot-check): the rubric's spec\n    (b) requires a human spot-check on at least one case, and explicitly\n    forbids the Lead from being that human. Implementer correctly flagged\n    this as a real dependency it cannot close itself. RESOLVED same day:\n    all 3 cases are now real blind-scored (commit `9c411dc16`), packets\n    exist -- Lead independently verified the packet structure matches the\n    rubric exactly, the redaction self-check genuinely caught and fixed 3\n    real leaks before a clean second pass (not a rubber-stamped claim),\n    and the provider check correctly reasons `xai` is a legal blind-scorer\n    choice (rubric excludes only synthesizer/lead-advisor providers, and\n    `xai`'s separate use as case-3's red-team fallback doesn't disqualify\n    it). `unblinding-key.md` confirmed still uncommitted on disk, per the\n    rubric's own ordering. Lead is now asking the user directly whether\n    they can spot-check case-1 (a core case, so it also gets factual-error\n    marks) -- USER DECLINED (2026-09-28): \"Bỏ qua, ghi nhận là gap\" --\n    skip the spot-check, record it as a known limitation. Report must\n    state this plainly: the rubric's spec (b) human-spot-check requirement\n    was not satisfied, by explicit user choice, not silently dropped. This\n    does not block closing I27 -- the scorer-mark data and its blinding\n    remain valid on their own; only the second-rater cross-check is\n    missing.\n  decision (Lead, 2026-09-28, standalone standard-protocol session --\n    accept partial): implementer hit a real `claude` CLI session-quota\n    exhaustion (reset ~3pm local, unknown distance) on the standalone\n    session's synthesis dispatch, 7/9-ish real ops already done\n    (interpret, investigate, 3 shapers, critique, assess) across multiple\n    phases/actors -- confirmed via `evidence.json` (gitBefore==gitAfter,\n    changedFiles: []) that this is a clean quota gate, not a content or\n    process failure. Ruling: accept as PARTIAL, do not wait for the reset\n    or switch provider mid-session. Reasoning: this session's sole purpose\n    is proving the new FlowDefinition dispatches end-to-end through the\n    real `fgos coordination` door \"as actually deployed\" -- a structural\n    plumbing proof, not part of the actual paired-comparison measurement,\n    which is already fully collected and scored across all 3 cases.\n    7 real ops spanning 5 distinct phases/actors already discharges that\n    proof; waiting an unknown amount of time or switching provider\n    mid-run (contaminating the \"as actually deployed\" reading with a\n    mixed-provider session) both cost more than the marginal proof value\n    justifies. Report must state this plainly as a documented partial,\n    never imply the standalone session completed.\n\nUpdate (2026-09-28, user-confirmed): the 3 Phase 5 Exit criteria the\ndecomposition review's L4 finding flagged as unowned are now resolved:\n- \"architecture-panel skill within budget\" — CLOSED. See the \"Skill\n  quality\" section above (~line 245): the original 1,500-word ceiling is\n  superseded with a documented reason; 7,969 words is the accepted new\n  baseline.\n- \"≥60% Lead instruction-token reduction without quality regression\" —\n  DEFERRED, not measured (this specific measurement was never separately\n  actioned; it requires a real before/after Lead-prompt-size comparison\n  methodology this track hasn't built). Left open, not blocking.\n- \"panel-depth experiment\" (deep vs. standard protocol comparison) —\n  CLOSED 2026-09-28. Unit I27 merged (integratedSha `1abad5857511`): the\n  standard variant built, registered, and structurally tested; a real,\n  blind-scored 3-case comparison run (2 reused P05.2 cases + 1 new I21-H4\n  case, 29 real LLM-backed dispatches). Genuine, mixed result reported\n  without smoothing — see the unit's own report for the full finding; not\n  a clean \"drop red-team\" mandate either way. Two open items (human\n  spot-check, standalone-session completion) resolved as documented,\n  non-blocking gaps, not silently dropped.\n\n## Phase 6 units\n\n- unit: I28 — build `fgos-code-change`, the merged coding-domain facade (Phase 6 creation half)\n  status: MERGED (2026-09-28). integratedSha 5eea48c3bc83c8a6af46c29bd07b7763a7e74d12,\n    testedSha 4006782dd (unit/I28 fix-round-1 tip), treeIdentical: clean\n    --no-ff auto-merge (ort), no conflicts. Key suites rerun on merged tree:\n    150/150 pass. See\n    plans/260919-coordination-skill-harness-simplification/reports/unit-I28-claude-only-execution-report.md.\n  capability: code:implement\n  depends-on: none (Phase 6 entry gate satisfied: I21/I26 integrated for\n    Phase 5 items 2/7/8; I18 `fgos plan-lint` and I20 `fgos capability\n    match` already integrated)\n  status: not-started\n  design-record: plans/reports/fork-260928-1022-phase6-code-change-merge-design-research-report.md;\n    independent decomposition review (`review-decompose-i28-i29`) found 3\n    HIGH findings (a false premise about an existing fragment's content, a\n    locked word-budget test collision, and an unscoped hard test-migration\n    dependency) plus 7 MEDIUM/LOW — all folded into this revision. Lead\n    independently re-verified H1 and H2 by reading the actual fragment and\n    test files directly before accepting the review.\n  decision (Lead, locked, do not reopen — unit split): mirrors the\n    I24a/I24b and I25/I26 precedent. This unit (I28) only CREATES the new\n    facade — it does not touch or delete `fgos-plan-loop`/`fgos-code-panel`.\n    `fgos-code-panel` alone is 977 lines of real operational doctrine that\n    must be proven to land safely in the new facade BEFORE the old files\n    can become stubs. I29 (dependent) only starts after I28 is merged and\n    verified — and per the H3 fix below, this is now a HARD technical\n    dependency, not just safety ordering: I29's own verification cannot\n    pass unless I28 carries forward specific content this unit names\n    explicitly.\n  decision (Lead, locked, do not reopen — policy-fragment path and content,\n    CORRECTED 2026-09-28 after review H1): the original premise was\n    factually wrong on two counts, both independently re-verified by Lead:\n    (a) the real, existing fragment is at\n    `domains/coding/skills/_shared/coding-cell-policy.md` (a domain-owned\n    path — NOT `core/skills/_shared/...`, which does not exist); (b) its\n    §2 ALREADY has the exact 3-tier proof table (Focused/Affected/\n    Full-Suite Gate) — it was never \"thinner\" or unpromoted, and there is\n    nothing to \"supersede.\" What `fgos-code-panel` actually adds beyond\n    the existing fragment is a named DELTA, confirmed by direct review:\n    the Test-selection/DECISION block + `FULL_TRIGGERS` list; the \"full\n    never twice per (tree, env)\" rule; the proof key with environment\n    fingerprint; reviewer inspect-by-default + judge-sufficiency (R3); the\n    post-merge-verification commit + HEAD re-assert. EXTEND §2/§5 with\n    this delta, written as tersely as the existing fragment's own style —\n    do not verbatim-copy code-panel's ~1,892 words of prose. Also\n    reconcile a real, pre-existing contradiction while extending: the\n    fragment's own §5 says gate proof \"must be re-executed against\n    integratedSha\" while code-panel's own text (its \"run AFFECTED_TESTS...\n    escalate to FULL_TEST if a FULL_TRIGGERS category fired\" rule) is a\n    DIFFERENT policy — state explicitly which one is authoritative for\n    the merged facade (the escalation-trigger rule is more precise;\n    prefer it, and correct §5's wording to match, rather than silently\n    keeping both). §1/§3/§4 and every heading `coordination-phase4-driver-discipline.test.mjs`\n    pins verbatim (confirmed at test ~L252-276, which also forbids `plan.md`\n    and \"track status\" appearing in the fragment) MUST survive unchanged.\n  decision (Lead, locked, do not reopen — word budget, NEW 2026-09-28 per\n    review H2): Lead independently confirmed\n    `test/skills/coordination-phase4-driver-discipline.test.mjs` (~L171-181)\n    hard-asserts `planLoopWords + driverWords + policyWords <= 3300`,\n    currently measured at 1,347+1,192+729=3,268 words — only 32 words of\n    headroom, nowhere near enough for the delta above even written\n    tersely. Do NOT silently blow through 3,300 and let the test fail, and\n    do NOT silently edit the assertion's number without a documented\n    reason. Sequence: write the delta as tersely as possible first,\n    measure the REAL new combined count, THEN decide — if it fits within\n    3,300, no further decision needed; if it doesn't, this is a Phase 4\n    Exit-criterion-superseding decision (the same class of decision this\n    plan already made once for `fgos-architecture-panel`'s own word\n    budget) — record the real new number as the accepted ceiling with the\n    same evidence-based reasoning (a facade covering two merged lifecycles'\n    worth of real safety policy is not the same shape as plan-loop alone\n    was when 3,300 was set), update the test's own assertion, and name\n    this decision in the unit's own report. Do not guess the number now;\n    measure first.\n  decision (Lead, locked, do not reopen — placement path, CORRECTED per\n    review M1): Phase 6's own Work section says \"coding domain\"; repo\n    precedent (`skill-wrappers.test.mjs` ~L385-397) already asserts\n    `fgos-code-panel` lives under `domains/coding/skills/`, not `core/`.\n    Place the new skill at\n    `domains/coding/skills/fgos-code-change/SKILL.md` — NOT\n    `core/skills/...`.\n  decision (Lead, locked, do not reopen — 5 concrete design choices, NEW\n    2026-09-28 per review M2, replacing the vague \"one merged lifecycle\"\n    instruction): (1) **Doors**: semantic doors throughout\n    (`fgos coordination start/operation/authorize-and-dispatch/disposition/close`),\n    matching `fgos-plan-loop`'s own pattern — never code-panel's raw\n    `open.json`/`fix-N.json`/`close.json` request-file pattern (the Phase\n    4 test already bans raw request JSON for the semantic-door facade\n    shape). (2) **Cell identity/worktree**: single-change cells use a\n    NEW, distinct branch/worktree prefix, `code-change--<slug>` (never\n    reuse `code-panel--<slug>` or a bare `<track>--<cell-id>` scheme) —\n    `chain.mjs` (~L27,49-51) groups every `<prefix>--<x>` session as cells\n    of one track, so a deliberately distinct prefix is required to avoid\n    every single-change cell showing up conflated as one fake \"track\" in\n    `chain`/resume. (3) **Fix-round cap**: adopt `fgos-plan-loop`'s own\n    3-round cap with proof-gap escalation uniformly for BOTH single-cell\n    and plan-mode paths (matches this track's own runbook discipline of a\n    3-round cap everywhere else in this session) — never code-panel's\n    unbounded \"repeat with fix-N.json\" pattern. (4) **Post-merge\n    verification**: the post-merge-verification-commit + HEAD-re-assert\n    step becomes POLICY content (part of the `coding-cell-policy.md` §5\n    extension above), not facade-local prose, so both single-cell and\n    plan-mode paths get it from the one shared source. (5) **Plan-mode\n    reference file**: add `domains/coding/skills/fgos-code-change/references/plan-mode.md`,\n    loaded only when the execution target is a plan/phase path or a named\n    track, per Phase 6's own Objective wording (\"plan mode... is a\n    reference file loaded only when...\") — do not inline plan-mode's own\n    cell-selection/status-table/closeout content directly in SKILL.md.\n  decision (Lead, locked, do not reopen — capability-match contract,\n    CORRECTED per review M3): Lead independently read\n    `src/runner/capability-match.mjs` (~L35,121-126) and live-probed it —\n    the design record's own summary was wrong. The real 3-way contract:\n    `form: \"inline\"` (null capability) → no cell opens, work returns to\n    the live session; `form: \"facade\"` (triggers on `hasPlanOrTrack`\n    alone) → plan mode; `form: \"protocol\"` (triggers on\n    `needsIndependentReview`) → the single-cell path opens. In\n    single-change mode, a `facade` result means the request was actually\n    a plan/track request misclassified as single-change — re-route to\n    plan mode, do not force-open a single cell. Only `inline` means \"no\n    cell at all.\"\n  decision (Lead, locked, do not reopen — mode-selection rule survival,\n    NEW 2026-09-28 per review M4): Phase 6's own single rule (plan mode\n    only when a run/implement/resume verb targets a plan/phase path or a\n    uniquely resolvable track; otherwise one cell; ask one question when\n    ambiguous) is authoritative and SUBSUMES code-panel's own\n    M1/A1/A2/CE1-5 named sub-rules — CE2 (negation)/CE3 (phase-path vs.\n    chain mismatch)/CE5 (plans outside `plans/`) are not kept as\n    separately-named rules; their real effect folds into \"ask one question\n    when ambiguous\" under the single rule. The R2 recursive-dispatch guard\n    DOES survive, explicitly: an in-cell worker that is already executing\n    inside an active cell dispatch and encounters what looks like a\n    plan/phase path must still refuse/ask rather than recursively opening\n    a nested track — Phase 6's own single rule does not waive this, and\n    dropping it would be a real regression. The ~78 fixtures in\n    `test/setup/skill-wrappers.test.mjs`'s `classifyCodePanelRequest`\n    (~L1512, R2 at ~L1515-1530) must be retargeted at the new facade's own\n    mode-detection function, not left as phantom tests of a stub skill\n    nobody calls anymore.\n  scope: create `domains/coding/skills/fgos-code-change/SKILL.md` (see\n    placement decision above) from `fgos-plan-loop`'s own cell-operation\n    structure (~L61-181) plus `fgos-code-panel`'s single-change path — ONE\n    merged open/fix/close/worktree lifecycle per the 5 concrete design\n    choices above, covering both single-cell and plan-mode execution, not\n    two independent copies. Link the Phase 4/I15 driver-discipline\n    fragment (`../_shared/coordination-driver.md`) + a 9-slot Facade Hook\n    Values table, following the exact `fgos-plan-loop`/`fgos-panel`/\n    `fgos-architecture-panel` precedent pattern (link, never restate\n    inline). Fill the `open inputs` hook from real doors, not prose: in\n    plan mode, run `fgos plan-lint <phase file> --cell <id>` and refuse to\n    open on `ok: false`; in single-change mode, declare `DemandFacts` and\n    run `fgos capability match --demand` per the corrected 3-way contract\n    above. No default roster: per-node binding comes from I21; a hand\n    roster is an explicit override with provenance. Keep the existing\n    `coding-design-panel` advisory route (inside `fgos-panel/SKILL.md`\n    Route step 3 / Surface Taxonomy row 74 — NOT a separate file) fully\n    untouched and structurally distinct from this facade's own Route step\n    4 / row 75 (which DOES need retargeting — see I29's files list below;\n    I28 itself does not edit `fgos-panel`, only avoids swallowing its\n    step-3 route). For the H3 test-migration dependency: this unit's own\n    new facade must carry forward, with equivalent real content (not just\n    \"we thought about it\" prose) — the \"caveat blocks close\" invariant\n    (Architecture Invariant 7 in code-panel, ~L754,812: a shared-cwd\n    caveat must block a close disposition), the resume-state\n    classification with its refused-vs-pending safety rule (code-panel\n    ~L191-214), the projection-gaps note, and the two-request DAG pattern\n    (code-panel ~L700-746) — OR explicitly document, as a named Lead\n    decision in this unit's own report, that one of these is deliberately\n    dropped and why. Do not silently omit any of them.\n  files: domains/coding/skills/fgos-code-change/SKILL.md (new, + `.agents`/\n    `.claude`/`plugins/fgOS` mirrors via `npm run build:skills`),\n    domains/coding/skills/fgos-code-change/references/plan-mode.md (new),\n    domains/coding/skills/_shared/coding-cell-policy.md (extend §2/§5 per\n    the decision above — this is an EXTENSION, not a replacement),\n    test/setup/skill-wrappers.test.mjs (retarget the ~78\n    `classifyCodePanelRequest` fixtures at the new facade's own\n    mode-detection function; confirm new-skill placement/mirror-identity\n    assertions), test/skills/coordination-phase4-driver-discipline.test.mjs\n    (update the 3,300-word assertion per the word-budget decision above —\n    measure first, then decide whether the number itself needs to change;\n    add assertions for the fragment link + 9-slot hook table, mirroring\n    I26's own pattern in this same file), a new or retargeted test proving\n    the caveat-blocks-close/resume-state/two-request-DAG content survives\n    with equivalent assertions (test/verbs/coordination-dag-driver-skill-contract.test.mjs\n    is the existing home for these assertions against `fgos-code-panel` —\n    coordinate directly with I29, which retargets this same file, so the\n    two units don't clobber each other's edits; land this piece in\n    whichever unit executes first and have the other build on it),\n    CHANGELOG.md. Do NOT touch `fgos-plan-loop/SKILL.md` or\n    `fgos-code-panel/SKILL.md` themselves (I29's job) — read them for\n    reference only. Do NOT touch `fgos-panel/SKILL.md` (I29's job, since\n    its Route-step-4/row-75 retarget only makes sense once code-panel is\n    actually stubbed).\n  verification: node --test test/setup/skill-wrappers.test.mjs\n    test/skills/coordination-phase4-driver-discipline.test.mjs\n    test/verbs/coordination-dag-driver-skill-contract.test.mjs; real CLI\n    probes (not just grepping the skill file) for all 3 `fgos capability\n    match` forms (`inline`/`facade`/`protocol`) proving each routes\n    correctly; a real `fgos plan-lint` run against a fixture with a hard\n    finding, proving the facade actually refuses to open on `ok: false`;\n    at least one negative fixture proving an advisory-only coding request\n    is never captured into a cell (Phase 6's own Exit criterion); env -u\n    CLAUDE_CODE_SESSION_ID npm test.\n  stop: the new facade restates driver-discipline-fragment or\n    coding-cell-policy-fragment rules inline instead of loading them; the\n    merged lifecycle is two parallel copies instead of one shared\n    implementation; raw request-file JSON is used instead of semantic\n    doors; the `coding-design-panel` route (step 3 / row 74) is touched or\n    swallowed; the R2 recursive-dispatch guard is silently dropped; the\n    combined word-budget test is left failing OR its number is changed\n    without a documented reason; any of the caveat-blocks-close/\n    resume-state/two-request-DAG content has no equivalent landing spot\n    and isn't explicitly documented as a deliberate drop.\n  fix-round-1 (2026-09-28, independent test + review, both confirmed by\n    Lead reading the real code directly, not taken on report alone):\n    MUST FIX -- 1. Step 0's single-cell gate branches on `form` alone and\n    never checks the resolved `capability`; a live probe confirmed an\n    advisory demand (`outputKind: decision, mutates: false`) returns\n    `capability: \"advise\"`, `form: \"protocol\"` -- the same form value the\n    gate treats as \"proceed to Step 1\", so an advisory-only request can\n    open a mutating cell, contradicting Non-Goal 3 and swallowing\n    `coding-design-panel` via the back door. Add a capability allowlist\n    (`code:implement`/`code:refactor` only; anything else refuses and\n    returns to the live session) plus the missing negative fixture this\n    unit's own verification list already required. 2. The plan-mode\n    plan-lint gate is vacuous as documented: `fgos plan-lint <phase file>\n    --cell <id>` on a phase file with no matching unit block returns only\n    a `severity: warn` `capability.undeclared` finding, so `ok: true`\n    always -- confirmed live and via `src/report/capability-plan-lint.mjs`\n    (`ok = !findings.some(hard)`). Lint `plan.md` (not the phase file) with\n    `--cell <id>`, and in plan mode treat `capability.undeclared` as\n    blocking. 3. `coding-cell-policy.md` L104 (\"The gate proof must be\n    re-executed against `integratedSha`\", unconditional) still contradicts\n    L105's conditional AFFECTED_TESTS/FULL_TEST escalation rule -- the\n    CHANGELOG's claim that this was resolved is inaccurate; delete/rewrite\n    L104. 4. Step 4's snippet jumps from `git merge --no-ff` straight to\n    `git worktree remove`, omitting the mandatory post-merge record commit\n    and pre-cleanup `HEAD` re-assert coding-cell-policy §5 requires --\n    show them inline or drop the truncated snippet in favor of the prose\n    pointer alone. 5. The R2 recursive-dispatch guard has no precedence\n    over the `form: \"facade\"` re-route: an active R2 context told to\n    \"re-route to plan mode\" would open exactly the nested track R2 exists\n    to forbid -- add one line: under R2, `facade` means refuse, never\n    re-route. 6. SKILL.md's Mode Selection prose disagrees with the actual\n    tested classifier (verb set omits \"implement\"; a bare plan/phase path\n    with no verb resolves plan mode though prose requires a verb; a\n    partial negation resolves plan mode though prose says ask) -- reconcile\n    prose and code to one behavior, and read the SKILL.md's own Mode\n    Selection text into at least one test so a future prose change can\n    fail it (today's classifier tests are self-contained JS and read no\n    skill text). 7. The two-request DAG's auxiliary session ID\n    (`<coordinationId>-inspections`) still starts with the literal\n    `<track>--` prefix `chain.mjs`'s track-membership match uses\n    (confirmed: any entry starting with `<track>--` is grouped) -- in plan\n    mode this risks the read-only auxiliary session being miscounted as an\n    extra cell of the real track during cold-resume cell selection. Rename\n    the pattern so it does not start with `<track>--`, and add a\n    regression test. Also fix the broken `.agents/skills/fgos-code-change/\n    SKILL.md` relative link (4 levels up from `.agents/skills/x` exits the\n    repo; canonical and plugins copies resolve correctly).\n    ACCEPTED AS-IS, NOT FIX-ROUND SCOPE: the 13-fixture parity subset\n    (vs. retargeting all ~78 `classifyCodePanelRequest` fixtures) is kept\n    -- two independent agents confirmed live that both wrappers now call\n    one shared classifier, so coverage is equivalent and duplicating all\n    78 would test the identical branch twice; full retarget stays I29's\n    job. The word-budget ceiling (`COMBINED_LEAD_LOAD_CEILING = 3597`)\n    keeps measuring `fgos-plan-loop` for now -- correct today, since\n    plan-loop is still real, live Lead load until I29 stubs it; I29 must\n    update this same test to measure `fgos-code-change`'s own real word\n    count once plan-loop is stubbed (added to I29's scope below). Cosmetic\n    LOW items (worktree-dir single-dash vs. branch double-dash, R2 guard's\n    slug-charset looseness, trailing-punctuation/imperative-phrase\n    classifier edge cases, premature \"deprecated stubs\" frontmatter wording\n    pending I29) are named here as known, non-blocking, and left for I29 or\n    a later pass -- not re-litigated every round.\n- unit: I29 — convert `fgos-plan-loop`/`fgos-code-panel` into deprecated stubs (Phase 6 stub half)\n  status: MERGED (2026-09-28). integratedSha 4fc1756e88d56c8a6b87d41b6c96d273d69306c0,\n    testedSha 8eff54d0f (unit/I29 tip), clean --no-ff auto-merge (ort), no\n    conflicts. Key suites rerun on merged tree: 156/156 pass. Phase 6 is now\n    fully closed (I28 + I29 both merged). See\n    plans/260919-coordination-skill-harness-simplification/reports/unit-I29-claude-only-execution-report.md.\n  capability: code:implement\n  depends-on: I28 (HARD technical dependency, not just safety ordering —\n    see the H3 fix below: I29's own tests cannot pass unless I28 carried\n    forward specific pinned content first)\n  status: not-started\n  design-record: plans/reports/fork-260928-1022-phase6-code-change-merge-design-research-report.md;\n    independent decomposition review (`review-decompose-i28-i29`) found\n    I29 as originally scoped could not pass its own verification — folded\n    into this revision.\n  decision (Lead, locked, do not reopen — no repo precedent exists): I26's\n    own investigation and this unit's own design-record both independently\n    confirmed NO existing \"deprecated stub\" skill file exists anywhere in\n    this repo today — this unit is the FIRST to establish the pattern, not\n    copy one. Minimum shape for a stub: retain the skill's frontmatter\n    (name/description, REWRITTEN to say \"Deprecated: use fgos-code-change\"\n    and to DROP any `DemandFacts`/trigger-matching phrasing the old\n    description used — per review LOW-2, a host's own routing must stop\n    auto-selecting the stub once it's just a redirect, not treat its old\n    trigger text as still live), a short redirect paragraph naming the\n    replacement skill and the exact door(s) a caller should use instead,\n    and nothing else — no operational content, no duplicated lifecycle\n    prose. Kept loadable (not deleted) only for the Phase 7 compatibility\n    window; Phase 7 owns actually removing the stubs when that window\n    closes.\n  decision (Lead, locked, do not reopen — 3-bucket content disposition,\n    REPLACES the original blanket stop condition, NEW 2026-09-28 per\n    review H3/M7): the original \"ANY orphaned content stops the unit\"\n    instruction was miscalibrated in both directions — it would fire on\n    content Phase 6's own Work section explicitly says to DELETE (the\n    duplicated roster/recovery prose, the raw JSON templates, the herdr\n    variant — none of these need a landing spot, they're intentionally\n    retired), while giving no explicit list for content that genuinely\n    needs one. Classify every real section of both old files into exactly\n    one bucket before converting either to a stub: (a) **Carried forward**\n    — must already exist with equivalent content in I28's new facade\n    (caveat-blocks-close, resume-state classification + refused-vs-pending\n    rule, projection gaps, two-request DAG pattern, the 3-tier proof\n    policy content now in `coding-cell-policy.md`, the semantic-door\n    lifecycle itself) — verify each is actually present, don't assume;\n    (b) **Deliberately deleted per Phase 6's own Work section** — the\n    duplicated open/fix/close JSON templates, the private-worktree recipe\n    prose (now superseded by the shared policy fragment's own §1), the\n    actor/model-tier roster (I21's own per-node binding replaces a\n    hand-written default roster), historical incident/recovery narration\n    — delete these with a one-line note in the unit's own report, no\n    escalation needed. (c) **Unclassified/genuinely orphaned** — only\n    THIS bucket triggers the stop condition below.\n  scope: classify every section of `core/skills/fgos-plan-loop/SKILL.md`\n    and `domains/coding/skills/fgos-code-panel/SKILL.md` per the 3-bucket\n    decision above, then convert both into thin deprecated stubs. Update\n    every real inbound reference: `fgos-panel/SKILL.md`'s own description\n    line, its \"known Phase 5 gap\" paragraph, and Route step 4 (all three\n    currently name `fgos-code-panel` — retarget to `fgos-code-change`;\n    leave Route step 3 / the `coding-design-panel` route and Surface\n    Taxonomy row 74 UNTOUCHED, since that's a different, still-live\n    route — this distinction is itself a stop condition below); both\n    copies of `group-thinking-trigger-surface.md`\n    (`docs/platform/agent-coordination/architecture/...` canonical, and\n    `docs/architect/agent-coordination/architecture/...` legacy) rows\n    75/78. For the wider repo sweep: grep the WHOLE repo for both skill\n    names, but EXEMPT `**/verification/**` paths and any `.log` file —\n    these are historical proof/evidence records, not live references, and\n    rewriting them would falsify the historical record (confirmed via a\n    sample grep: ~69 of ~123 total hits are exactly this class of file).\n    Of the remainder (~29 live references per the design record's own\n    sweep): update `docs/specs/reading-map.md`, `docs/specs/runner.md`,\n    relevant how-to docs, both trigger-surface copies, both\n    master-coordinator/runtime-recovery-design docs, proposal docs, the\n    intent-preservation ledger, the packaging-distribution rollout plan,\n    and `scripts/measure-coordination-baseline.mjs` (note explicitly in\n    the report that this script will measure the STUBS after conversion,\n    not the real skill — either retarget it to `fgos-code-change` in this\n    same unit if cheap, or file it as a named, accepted follow-up gap;\n    don't leave it silently measuring the wrong thing without comment).\n  files: core/skills/fgos-plan-loop/SKILL.md (+ mirrors),\n    domains/coding/skills/fgos-code-panel/SKILL.md (+ mirrors),\n    core/skills/fgos-panel/SKILL.md (description line, \"known Phase 5 gap\"\n    paragraph, Route step 4 ONLY — step 3 untouched, + mirrors),\n    docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md\n    (canonical, row 75/78), docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md\n    (legacy copy, same rows, only if needed to avoid divergence),\n    test/verbs/coordination-dag-driver-skill-contract.test.mjs (retarget\n    the pinned caveat-blocks-close/resume-contract/two-request-DAG\n    assertions at `fgos-code-change` — coordinate with I28 per its own\n    files-list note on this same file, so whichever unit lands second\n    builds on the first's edit rather than reverting it),\n    test/setup/skill-wrappers.test.mjs (the 6 pinned repo-root paths\n    ~L399-428 that must appear inside code-panel's body — retarget or\n    remove per what the stub actually keeps), the other live docs named in\n    scope above, CHANGELOG.md. Do NOT touch anything under\n    `**/verification/**` or any `.log` file (historical record, exempted\n    per the decision above).\n  verification: node --test test/setup/skill-wrappers.test.mjs\n    test/skills/coordination-phase4-driver-discipline.test.mjs\n    test/verbs/coordination-dag-driver-skill-contract.test.mjs (all\n    retargeted at `fgos-code-change` where the content moved, and\n    confirmed passing — not just \"mirrors byte-identical for both stubs\",\n    the ORIGINAL verification claim, which was insufficient); a new test\n    confirming both stubs are genuinely thin (a word-count ceiling well\n    under their pre-stub size) and that both explicitly name\n    `fgos-code-change` as the replacement, with no leftover\n    `DemandFacts`/trigger phrasing; env -u CLAUDE_CODE_SESSION_ID npm test.\n    Also retarget `coordination-phase4-driver-discipline.test.mjs`'s\n    `COMBINED_LEAD_LOAD_CEILING` word-budget assertion itself (I28 fix\n    round 1 decision, 2026-09-28): it still measures `fgos-plan-loop`'s\n    word count, which is correct only until this unit stubs plan-loop —\n    once stubbed, measure `fgos-code-change`'s own SKILL.md +\n    `references/plan-mode.md` (plus the same driver/policy fragments) and\n    set the ceiling to that real measured sum, with the same\n    measure-first-then-decide rationale already used for I28's own number.\n  stop: any bucket-(c) unclassified content has no landing spot in\n    `fgos-code-change` (escalate, don't silently drop — but bucket (b)\n    content is NOT a stop condition, it's an expected, reported deletion);\n    either stub is deleted outright instead of kept loadable; a real\n    inbound reference (outside the exempted `**/verification/**`/`.log`\n    class) is left stale; the `coding-design-panel` route (step 3 / row\n    74) is touched by this unit — that boundary is I28's job to preserve\n    and this unit's job to leave alone; any test this unit retargets is\n    weakened (a passing assertion made to pass by asserting less) rather\n    than genuinely pointed at equivalent new-facade content.\n  bucket-c resolution (Lead, 2026-09-28): implementer correctly escalated\n    one genuine bucket-(c) orphan instead of silently dropping it --\n    `fgos-code-panel/SKILL.md`'s \"Known limits (not enforced by the\n    engine)\" section, first bullet (the coordination schema has no field\n    for proof tier/`FULL_TRIGGERS`/environment fingerprint, and\n    `disposition`/`rationale` accepts any non-empty string). Lead confirmed\n    directly this has no landing spot anywhere in I28's carried-forward\n    content (grepped `coding-cell-policy.md` and `fgos-code-change/\n    SKILL.md`, both come back empty). Approved: add a short paragraph\n    stating this specific engine gap to `coding-cell-policy.md` §2 (Proof\n    Tiers), mirrored the normal way -- narrow, non-invasive, and the\n    correct shared landing spot since both the old (stubbed) and new\n    facade already point there for proof-tier doctrine. The second item\n    the implementer flagged (`fgos-plan-loop`'s \"Session IDs use safe\n    characters\" note) is correctly treated as safe-to-drop, not orphaned\n    -- confirmed redundant with `assertSafeId`'s real engine enforcement,\n    doc or no doc.\n\nParallelism is limited deliberately:\n\n```text\nI00 -> I01 -> I02 -> I03 -------------------------------+\n          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> I15 -> I16 -> I17 -> I19 -> I21 (Phase 5 item 2) ; I19 -> I20 -> I26 (Phase 5 items 7/8)\n                                                             I16 -> I18 (parallel with I17)\n          +-> I06 -----+                                |\n          +-> I07 -----+-> I08 -------------------------+\n                       I02 + I04 + I06 -> I09 -> I10 ----+\n\nI16 -> I22 (Phase 5 item 1) ‖ I23 (Phase 5 item 3, files disjoint from I22)\nI22, I23 -> I24a (Phase 5 item 4 pt.1) -> I24b (Phase 5 items 4 pt.2/5/6)\nI24b -> I25 (Phase 5 items 5/6 narrow remainder) ‖ I26 (Phase 5 items 7/8, files disjoint from I25)\nI26 -> I28 (Phase 6 creation half) -> I29 (Phase 6 stub half, depends on I28)\nI26 -> I27 (panel-depth experiment) ‖ I28/I29 (Phase 6, files disjoint from I27)\n```\n\nI25 and I26 are independent of each other (disjoint files: I25 touches\n`actions-projector.mjs`/test files only, I26 touches `fgos-panel`/\n`fgos-architecture-panel`/`fgos-group-thinking` skill files only) and may\nrun in parallel. Phase 6's own entry gate requires I26 (Phase 5 work items\n7/8) integrated before it opens.\n\nI27 (panel-depth experiment) and I28/I29 (Phase 6) are independent and may\nrun in parallel: I27 touches only `architecture-advisory-panel-standard-v1.yaml`\n(new file), `group-thinking.json`, the trigger-surface doc, and its own\nexperiment/report artifacts; I28/I29 touch only `fgos-code-change`,\n`fgos-plan-loop`, `fgos-code-panel`, and `coding-cell-policy.md` — fully\ndisjoint from I27's files. I29 is sequential after I28 (not parallel):\nI29 deletes content I28 must first prove has a safe landing spot in the\nnew facade.\n\nI22/I23 run in parallel (Files disjoint). I24a runs after I22/I23 close out —\nsequential, not parallel, despite low measured textual-overlap risk on\n`fgos-architecture-panel/SKILL.md` with I22, because this track's own history\n(I18, I21) shows overlapping-worktree/overlapping-file races cost more than\nthe serialization they'd save. I24b depends on I24a's request-step door and\nalso touches `bin/fgos.mjs`/`command-registry.mjs`, the same files I23\ntouches — never run I24b concurrently with I23 either.\n\nI04, I06, and I07 may proceed in parallel only from the identical I01\nbaseline. I09 waits for result truth, template resolution, and dispatch policy\nbecause it consumes all three. Documentation-only preparation may proceed\nearlier, but no unit may claim implementation completion before its dependency\ngate.\n\nI30 ‖ I31 (files disjoint: I30 touches the CLI status envelope and the\ncanonical `flow-definition.md`; I31 touches `capability-plan-lint.mjs` and\nthe how-to doc). I32 runs after both close (investigation-only, low risk,\nbut its conclusion — real migration vs. \"no action, document why\" — should\nland before I33's rename touches adjacent config surface). I33 (protocol\nrename) is highest blast radius in this phase and gets its own dedicated\ndecomposition review before any implementer touches it, same discipline as\nI27 and I28/I29. I34 (drift-test completion) runs only after I30-I33 close,\nsince it audits the phase's own finished state. I35 (doc sweep + before/after\nreport) is last, depends on all of I30-I34.\n\n## Phase 7 units\n\nDesign record for all 6 units below:\n`plans/reports/fork-260928-1540-phase7-decomposition-research-report.md`\n(read-only research fork) AND an independent decomposition review\n(`review-decompose-i30-i35`, delivered via message 2026-09-28, not a\nseparate file — its 5 HIGH findings are folded into the decisions below).\nALL 5 HIGH findings were independently re-confirmed by Lead reading the\nreal source directly before this revision: a real Phase-0 baseline\nartifact the research fork missed; the CLI envelope already partially\nversioned; the wrong plan-lint line/path; no alias mechanism in\n`protocol-loader.mjs`; a merged, tested raw-JSON carve-out in\n`fgos-code-change`. This revision corrects all 5 plus the MEDIUM/LOW\nfindings worth fixing before dispatch — the exact \"research fork alone is\nnot enough, an independent review still\nfinds real flaws\" pattern this track has now hit on every multi-unit\ndecomposition (I22-I26, I27, I28-I29, and now I30-I35).\n\n- unit: I30 — data-level contract version on `show`/`chain`; port BOTH missing PolicyPatch fields into the canonical FlowDefinition contract doc (Phase 7 items 1, 4b)\n  status: MERGED (2026-09-28). integratedSha 638cf13320d26883ea053b4cbdb0e19d1b06ecf3,\n    testedSha 51ce544f2 (unit/I30 tip, amended once to add I32's ported\n    clarification sentence), clean --no-ff auto-merge (ort), no conflicts.\n    Key suites rerun on merged tree: 68/68 pass. Minted new sibling contract\n    versions (`coordination-show.v1`, `coordination-chain.v1`) rather than\n    reusing `coordination-actions.v1` -- `status`'s own field untouched.\n    Incidental finding, deliberately out of scope, not silently dropped:\n    `preferInvocation`/`repeatMode` PolicyPatch fields are undocumented in\n    BOTH the canonical and legacy contract docs -- flagged as a follow-up\n    candidate. See\n    plans/260919-coordination-skill-harness-simplification/reports/unit-I30-claude-only-execution-report.md.\n  capability: code:implement\n  depends-on: none (Phase 7 entry: Phase 5/6 both merged, I27 merged)\n  decision (Lead, 2026-09-28, corrects review H2/M1): item 1 is ALREADY\n    mostly done, confirmed live: every CLI `--json` output is wrapped in\n    `{\"contract\":\"fgos.v1\",...}` (`src/state/envelope.mjs:6`), and `fgos\n    coordination status <id> --json` already returns a data-level\n    `contractVersion: \"coordination-actions.v1\"` (`src/verbs/coordination/\n    status.mjs:28`, sourced from `actions-projector.mjs:521`). Only `show`\n    and `chain`'s OWN data lack a data-level version marker — that is the\n    ENTIRE remaining scope of item 1, not a full envelope-versioning\n    project. Item 4b's original scope also undercounted the gap: the\n    canonical `docs/platform/agent-coordination/contracts/flow-definition.md`\n    is missing BOTH `policy.capability` AND `distinctProviderFrom` (0 hits\n    for either, confirmed live) — the legacy copy documents both\n    (`docs/architect/.../flow-definition.md` ~L579-580, 598, 607). Port\n    both, not just one.\n  scope: add a `contractVersion` field (reuse `\"coordination-actions.v1\"`\n    if `show`/`chain`'s data shape is compatible with the actions\n    projection's versioning intent, or mint a new sibling version string\n    following the same naming convention if the data shapes genuinely\n    differ — implementer's own judgment call, evidenced in the unit's\n    report) to `show` and `chain`'s own top-level data envelope. Port both\n    missing PolicyPatch fields into the canonical `flow-definition.md`, but\n    verify the ported content against `src/runner/definitions/schema.mjs`'s\n    real exported field definitions as the SOURCE OF TRUTH — not copied\n    verbatim from the legacy doc's prose, which may itself have drifted\n    from current code.\n  files: `src/verbs/coordination/show.mjs`, `src/verbs/coordination/\n    chain.mjs` (or wherever their data envelopes are assembled — confirm\n    exact location before editing), `docs/platform/agent-coordination/\n    contracts/flow-definition.md`, CHANGELOG.md (coordinate with I31's own\n    CHANGELOG entry — trivial merge conflict expected if both land close\n    together, resolve by keeping both entries).\n  verification: a real CLI probe (`fgos coordination show`/`chain --json`)\n    confirming the new version field is present; a drift test asserting\n    the canonical `flow-definition.md`'s PolicyPatch section content\n    matches `schema.mjs`'s real exported field list (not the legacy doc —\n    that's an oracle-of-convenience, not the source of truth); env -u\n    CLAUDE_CODE_SESSION_ID npm test.\n  stop: the new version field is added somewhere that ALREADY has one\n    (verify `status`'s own `contractVersion` isn't touched or duplicated —\n    it's correct as-is); the ported doc content is copied from the legacy\n    doc without checking it against current `schema.mjs` first.\n\n- unit: I32 — read-only binding source: investigate before deciding (Phase 7 item 4c)\n  status: CLOSED (2026-09-28), outcome (a) — genuinely orthogonal, NO config\n    migration. Real evidence chain (Lead independently re-verified the two\n    most load-bearing citations directly against source before accepting):\n    `capability.prefer` resolves at bind time in `binding.mjs:bindOperations`\n    and only counts through the `bindingSource === 'capability.prefer'`\n    branch (H1 red-team fix, `binding.mjs:240-263`, confirmed direct read);\n    `readOnlyRedirects` fires at real dispatch time in\n    `assignment-runner.mjs:1388`'s `redirectAttempted` guard, which only\n    engages when the resolved executor is STILL the literal default\n    `'claude'` (confirmed direct read, exact line match) — the two are\n    structurally mutually exclusive per dispatch, layered primary +\n    dispatch-time safety net, not competing. Live config's identical target\n    for both is intentional defense-in-depth, not a race. Zero commits on\n    `unit/I32` (pure investigation, no code changed). Report:\n    plans/reports/impl-i32-260928-1556-readonly-redirect-vs-capability-prefer-orthogonality.md.\n    Deliverable applied by Lead: the proposed one-sentence clarification\n    added to the LEGACY `flow-definition.md`'s `capability` bullet\n    (~L598-606) directly on main. I30 must port this SAME sentence into the\n    canonical copy alongside its own PolicyPatch port, to avoid introducing\n    fresh canonical/legacy drift on day one of fixing the existing drift.\n  capability: code:review\n  depends-on: none (file-disjoint from I30 — may run in parallel; read-only,\n    no conflict risk)\n  status: not-started\n  decision (Lead, 2026-09-28, corrects review M2/M3): the original draft's\n    framing pre-biased toward \"these two mechanisms are probably\n    orthogonal\" — struck. Investigate neutrally. Real, confirmed evidence\n    both ways: `placementPolicy.readOnlyRedirects` is keyed by SOURCE\n    EXECUTOR with operation-id sub-keys (live shape:\n    `placementPolicy.readOnlyRedirects.claude.{default,\n    operations.{review-candidate, red-team-candidate}}`), applied at\n    dispatch time (`placement-policy.mjs:351,370`,\n    `assignment-runner.mjs:263`) — NOT merely an \"unbound actor safety\n    net\" as the first draft claimed. `capabilities.code:review.prefer` is\n    a capability-keyed prefer binding. Both mechanisms currently map\n    `review-candidate`/`red-team-candidate` to the SAME openai/codex\n    target — real, observable overlap, not obviously orthogonal. Decide\n    from the actual call sites, not from either draft's framing.\n  scope: re-read both mechanisms' real call sites directly. Produce one of\n    two outcomes: (a) genuinely orthogonal once fully understood — document\n    why plainly (in `flow-definition.md` or wherever ambiguous), close with\n    NO config migration; (b) real overlap/competition confirmed — do NOT\n    execute the migration in this unit (see capability note below); instead\n    produce a concrete migration DECISION (which mechanism wins, why, exact\n    config diff) as this unit's own deliverable, and open it as a\n    dependency for a follow-up `code:implement` unit.\n  capability note (corrects review M3): this unit's own capability is\n    `code:review` (investigation/decision only) because the live capability\n    catalog confines `code:review` to `host-write-denied`/`mutates:false`.\n    If outcome (b) is reached, the actual config migration is OUT OF SCOPE\n    for this unit — it requires a separate `code:implement` unit consuming\n    this one's decision, never a mid-unit capability escalation.\n  files: read-only; writes only a decision record (this unit's own report,\n    plus a `flow-definition.md` note if outcome (a)). No other file touched\n    regardless of outcome.\n  verification: a written decision record citing the real call sites read\n    directly (file:line), not summarized from either research report.\n  stop: uncertain which mechanism actually governs a real production\n    binding path — escalate, don't guess; outcome (b) is declared without\n    first ruling out outcome (a).\n\n- unit: I31 — promote `capability.undeclared` to a hard `plan-lint` refusal, scoped to the `--cell` branch (Phase 7 item 4d)\n  status: MERGED (2026-09-28). integratedSha 2dbc7c8de6b8b87ccb4011f8f1d44e123515f10b,\n    testedSha 378d1df (unit/I31 tip, includes Lead's own trivial fix for a\n    stale command-registry.mjs doc-string), clean --no-ff auto-merge (ort),\n    no conflicts. Key suites rerun on merged tree: 41/41 pass. `--cell` miss\n    now exit 1/ok:false (live-probed by Lead independently); `capability.\n    unresolved` and the no-`--cell` path both confirmed untouched.\n    fgos-code-change's Step 0 workaround correctly simplified (not just\n    left redundant -- the old carve-out sentence became factually wrong\n    once the engine itself enforces this). See\n    plans/260919-coordination-skill-harness-simplification/reports/unit-I31-claude-only-execution-report.md.\n  capability: code:implement\n  depends-on: none (file-disjoint from I30/I32; may run after either closes\n    to avoid a CHANGELOG merge conflict, not a hard technical dependency)\n  status: not-started\n  decision (Lead, 2026-09-28, corrects review H3 — a real wrong-line, wrong-path error in the first draft): `capability-plan-lint.mjs:~136` is\n    `capability.unresolved` (an explicitly-marked `(unresolved)` capability\n    — per `core/skills/_shared/planning-capability-awareness.md` ~L109,\n    this is meant to stay `warn`/resolve-before-merge, NOT be hardened).\n    `capability.undeclared` is emitted at exactly ONE site (~L324, the\n    `--cell` no-match branch) — that is the ONLY code this unit touches.\n    Also confirmed live: without `--cell`, a plan with zero declarations\n    returns `ok: true` with an EMPTY findings list — there is no warn to\n    promote on that path, so this unit's scope is inherently `--cell`-only,\n    matching item 4d's own \"at cell open\" wording (cell open always passes\n    `--cell`). The original stop condition (\"any currently-passing plan\n    fails\") was miscalibrated: 20 of 33 `plans/*/plan.md` have no `- unit:`\n    blocks or Product Gates and would trigger this immediately on a\n    whole-file interpretation — that's expected/correct once scoped to\n    `--cell`, not a bug.\n  scope: change `capability.undeclared`'s severity from `warn` to `hard` at\n    its one real emission site (`capability-plan-lint.mjs` ~L324) — leave\n    `capability.unresolved` (~L136) untouched. Confirm `fgos-code-change`'s\n    own Step 0 prose workaround (added in I28's fix-round-1, which\n    special-cased this exact warn code at the skill-prose level) becomes\n    redundant once this lands; simplify it or explicitly document why it\n    stays as defense-in-depth — Lead's call during this unit's own\n    execution, not pre-decided here.\n  files: `src/report/capability-plan-lint.mjs`, `test/cli/plan-lint.test.mjs`\n    (~L174-184 currently asserts the OLD warn/`ok:true`/exit-0 behavior for\n    this exact code — must be updated, will otherwise break), CHANGELOG.md\n    (user-visible behavior change), `domains/coding/skills/fgos-code-change/\n    SKILL.md` (only if the Step 0 workaround is simplified).\n  verification: a real `plan-lint --cell <id>` run against a fixture with\n    an undeclared capability now returns `ok: false`/exit 1 (live CLI\n    probe, not just a grep); every existing `--cell`-scoped fixture in the\n    real test suite that previously relied on the warn-only behavior is\n    checked and updated; a WITHOUT-`--cell` run against the same fixture is\n    confirmed to still behave as before (this unit does not touch that\n    path); env -u CLAUDE_CODE_SESSION_ID npm test.\n  stop: `capability.unresolved` (~L136) is touched (locked distinction\n    above); this unit hardens the no-`--cell` path (out of scope, item 4d\n    is specifically about cell-open behavior); any `--cell`-scoped\n    production plan/phase fixture that legitimately declares its\n    capability through a path this unit didn't check (verify both `-\n    unit:` blocks AND Product Gates `Capability` column) now fails.\n\n- unit: I33 — reclassify the `group-thinking` protocol pack; defer the protocol-id rename and stub removal as documented, out-of-scope future work (Phase 7 item 4a, narrowed)\n  status: MERGED (2026-09-28). integratedSha 5f4ed37b82445f3e50debe3e2a1d6ec7fc27432b,\n    testedSha 045ec8150 (unit/I33 tip), clean --no-ff auto-merge (ort), no\n    conflicts. Chose a per-member `kind` field on the SAME pack file over a\n    physical split, evidenced against real consumer code\n    (`group-thinking-pack.mjs`'s hardcoded single-pack-path, and\n    `fgos-architecture-panel`'s genuine live dispatch through this exact\n    gate) -- Lead independently reproduced all 6 members' CLI resolution\n    (genuine full FlowDefinition data, not stub output) before merging.\n    `fgos-group-thinking` confirmed untouched (empty diff). See\n    plans/260919-coordination-skill-harness-simplification/reports/unit-I33-claude-only-execution-report.md.\n  capability: code:implement\n  depends-on: I32 (sequenced after the binding-source question settles;\n    otherwise file-disjoint)\n  status: not-started\n  decision (Lead, locked, do not reopen — corrects a confirmed factual\n    error in the phase text, 2026-09-28, independently re-confirmed by two\n    separate passes: the research fork and the decomposition review, both\n    citing I26's own unit report and a direct read of the live file): the\n    phase text's own item 4a lists `fgos-group-thinking` among \"the\n    deprecated ... stubs\" to remove. This is WRONG.\n    `core/skills/fgos-group-thinking/SKILL.md` is 1,609 words of live,\n    full operational content (the core-facing protocol-pack selection\n    gate) — Unit I26 already settled this exact question and LOCKED the\n    reversal (\"do not stub\"). Only `fgos-plan-loop` and `fgos-code-panel`\n    (stubbed by I29, 73 and 90 words respectively) belong in any removal\n    list. `fgos-group-thinking` is OUT of this unit's scope entirely,\n    forward and backward — this is a non-negotiable, automatic stop\n    condition if violated.\n  decision (Lead, 2026-09-28, corrects review H4 — the rename as originally\n    scoped is NOT SAFELY EXECUTABLE and is DEFERRED): independently\n    confirmed `protocol-loader.mjs` has NO alias concept — duplicate\n    `metadata.id`s within a tier are hard-rejected\n    (`registerTierEntries`, throws `FlowDefinitionError('duplicate-id',\n    ...)`), and `loadCoordinationProtocol` resolves exactly one id per\n    lookup. The originally-proposed \"additive alias\" therefore means\n    either (a) duplicating the ~220-line YAML body under a new id — two\n    bodies that WILL drift over time, a real maintenance liability this\n    track's own RUL11 doctrine (\"tùm lum, không phải nặng\" — gather\n    scattered/duplicated things, don't create more) explicitly argues\n    against — or (b) building genuine alias support in\n    `protocol-loader.mjs`, a new engine capability entirely absent from\n    the original file list. Compounding this: `launch-master-loop.mjs`\n    hardcodes the OLD id (`MASTER_LOOP_PROTOCOL_ID`, consumed at ~L78,\n    128) with no mechanism to also recognize a new one without its own\n    edit; `fgos-code-change/SKILL.md` references the old id in 4 places,\n    not 1 (the YAML path, two prose mentions, and inside the DAG-mode raw\n    JSON block); and roughly 120 doc files across the repo reference the\n    id with no unit currently owning that sweep. Ruling: the actual\n    protocol-id rename to `produce-review-revise` is DEFERRED, out of this\n    track's Phase 7 scope — not silently dropped, but explicitly recorded\n    as a future initiative requiring either accepted YAML-body duplication\n    or new `protocol-loader.mjs` alias-engine work, neither of which is\n    proportionate to a closeout phase. Reasoning ties to this track's own\n    product priority order (D-ADR0030): a rename that requires new engine\n    capability and a ~120-file doc sweep is a much larger investment than\n    \"closeout\" implies, and forcing it in now would be scope-creep against\n    \"Ship Faster\"/DoD-over-polish. The OLD id\n    (`standalone-master-coordination-loop`) remains canonical and fully\n    supported; `fgos-code-change` keeps referencing it unchanged.\n  decision (Lead, 2026-09-28, corrects review M4 — stub removal also\n    deferred, with an explicit trigger recorded rather than silently\n    dropped): `fgos-plan-loop`/`fgos-code-panel`'s actual removal (item\n    4a's \"remove ... when the compatibility window closes\") is likewise\n    deferred out of this unit's scope. Recorded trigger for a future unit:\n    removal is safe once (1) the protocol-id question above is resolved\n    (removing the stubs while old-id sessions might still reference them\n    indirectly compounds the same risk), and (2) a replay-compatibility\n    check confirms no committed session/replay artifact in this repo's own\n    history still requires either stub's presence to replay correctly.\n    Neither condition is evaluated by this unit — recording the trigger is\n    the deliverable, not evaluating it.\n  scope: (1) reclassify the `group-thinking` protocol pack per item 4a's\n    own \"gated registered protocols\" wording (`core/protocol-packs/\n    group-thinking.json` currently lists 6 members including\n    non-discussion protocols like `standalone-master-coordination-loop`\n    and both architecture-advisory-panel variants alongside the 3 genuine\n    `group-thinking-*-lite` discussion protocols) — decide and implement\n    a concrete classification scheme (e.g., splitting the pack, or adding\n    a per-member `kind`/`gated` field) evidenced against real pack\n    registration/consumption code, not guessed here; (2) fix the stale\n    `skill-package-distribution.md` label — `fgos:code-panel` is still\n    marked `implemented` in its adapter-mapping table (~L131) despite now\n    being a deprecated stub; relabel accurately; (3) write the deferred-\n    rename and deferred-stub-removal decisions above into a durable record\n    (this unit's own report at minimum; a `docs/decisions/` entry if this\n    repo's convention calls for one at this level).\n  files: `core/protocol-packs/group-thinking.json` (or a split/new pack\n    file, per the classification scheme chosen), `docs/platform/\n    packaging-distribution/contracts/skill-package-distribution.md`\n    (~L131 label fix only).\n  verification: real CLI probe confirming pack registration/resolution\n    still works for every existing member after reclassification; env -u\n    CLAUDE_CODE_SESSION_ID npm test.\n  stop: `fgos-group-thinking` is touched, stubbed, or removed (automatic,\n    non-negotiable per the locked decision above); this unit attempts the\n    actual protocol-id rename or stub removal despite both being\n    explicitly deferred; the pack reclassification breaks any existing\n    member's resolution.\n\n- unit: I34 — complete the drift-test suite, allowlisting the accepted raw-JSON carve-out (Phase 7 item 5)\n  status: MERGED (2026-09-28). integratedSha baed9b22e7295e87b7b7823b1427fc0abfd0646d,\n    testedSha dc7d2bc9a (unit/I34 tip), clean --no-ff auto-merge (ort), no\n    conflicts. Key suites rerun on merged tree: 45/45 pass. 6 of the 9 (+1)\n    named drift checks confirmed already covered (verified directly, not\n    inherited); 3 genuine gaps got new tests (raw-JSON allowlist,\n    keyword-trigger reversal, contract-template resolution). Real,\n    significant NEW finding: 9 of 13 registered CoordinationProtocols have\n    zero authored prompt templates for any operation, silently falling\n    back to a legacy prompt path -- allowlisted with an honesty companion\n    test (catches regression on the 4 working protocols without masking\n    the other 9), filed as a real follow-up candidate below, not silently\n    dropped. See\n    plans/260919-coordination-skill-harness-simplification/reports/unit-I34-claude-only-execution-report.md.\n  capability: code:test\n  depends-on: I30, I31, I32, I33 (audits the phase's own finished state;\n    sequenced last among the code units on purpose)\n  status: not-started\n  decision (Lead, 2026-09-28, corrects review H5 — a real contradiction\n    with already-merged, tested design): \"runtime skills contain no raw\n    request JSON\" as a blanket, repo-wide check is FALSE against current\n    reality and must not be written that way. `fgos-code-change/SKILL.md`\n    (~L121-131) intentionally embeds raw `declared-protocol` JSON for its\n    Optional Concurrent Read-Only Fan-Out (Two-Request DAG Mode) — this\n    was a deliberate, reviewed design choice (I28), and\n    `test/skills/coordination-phase4-driver-discipline.test.mjs` (~L326-330)\n    already contains an explicit comment stating \"forbid raw JSON entirely\n    does not carry over\" from `fgos-plan-loop`'s fully-semantic design to\n    this merged facade. Write the drift test as an ALLOWLISTED check\n    instead: no raw `declared-protocol`/request JSON appears ANYWHERE\n    except inside that specific, already-documented DAG-mode block —\n    catching new raw-JSON creep without contradicting accepted design.\n  context: several of the phase text's 9 named drift checks are already\n    covered — confirm with a fresh, direct check in THIS unit (don't just\n    cite another unit's context secondhand, a chain-of-custody the review\n    correctly flagged as unverified): \"generated skill projections are\n    byte-identical to canonical sources\" (`test/install-packaging.test.mjs`,\n    `coordination-schema.test.mjs`); \"facades restate no rule owned by the\n    driver-discipline fragment\" (`test/skills/coordination-phase4-driver-\n    discipline.test.mjs`); \"every registered capability declares a valid\n    `serves` set ... every protocol operation's `policy.capability`\n    resolves\" (`src/setup/registrations.mjs`'s `capability-serves-valid`\n    and `operation-capability-resolves` doctor checks — verify these\n    directly in this unit, not assumed from I30's context). The real guard\n    for \"no portable FlowDefinition carries an executor pin\" is\n    `binding.mjs`'s H1 guard (~L242-277), NOT `assertNoPortableExecutorPin`\n    (which only inspects `preferExecutor` — a different, narrower check) —\n    verify which one the phase text's intent actually needs before writing\n    a test against the wrong guard. \"None triggers on keyword matching of\n    implement/code\" has NO existing test with an actual keyword/trigger\n    assertion despite 3 plausible-sounding files being cited by earlier\n    research — confirm this is a genuine gap, don't assume coverage from a\n    file name alone.\n  scope: for each of the phase text's 9 named drift checks, directly\n    verify existing coverage (or its absence) in THIS unit — don't inherit\n    an unverified claim from another unit's context. Write new tests only\n    for confirmed genuine gaps, respecting the raw-JSON allowlist decision\n    above. Report which of the 9 were found already covered (cite the real\n    test file directly checked) vs. genuinely new.\n  files: whichever `test/` files result from the gap analysis (not guessed\n    here — this unit's own first deliverable is the gap list).\n  verification: env -u CLAUDE_CODE_SESSION_ID npm test with all new/\n    confirmed drift tests passing.\n  stop: a \"new\" test duplicates existing coverage under different\n    vocabulary; a written test is weaker than the phase text's own stated\n    check; the raw-JSON test contradicts the accepted DAG-mode carve-out\n    instead of allowlisting it.\n\n- unit: I35 — doc/CHANGELOG sweep, command-registry gap, and before/after report using the real Phase-0 baseline (Phase 7 items 3, 6, 7)\n  status: MERGED (2026-09-28). integratedSha 9dfb5b8f4dde64e27c2d0599810f7fb3c0120649,\n    testedSha 71f490979 (unit/I35 tip), clean --no-ff auto-merge (ort), no\n    conflicts. **FINAL UNIT OF THE ENTIRE TRACK — Phase 7 and the whole\n    `coordination-skill-harness-simplification` track are now CLOSED.**\n    Real before/after numbers, both independently reproduced by Lead:\n    fgos-plan-loop+fgos-code-panel combined 12,209 -> fgos-code-change\n    2,314 words (-81.05%); fgos-architecture-panel 9,006 -> 7,969 words\n    (-11.51%); inputTokens:null in both, no token claim made. Replay-corpus\n    comparison 10/10 pass, semanticDigest identical to Phase 0's. See the\n    \"Track Closure Summary\" section near the top of this file for the full\n    phase-by-phase breakdown and the 7 explicitly-deferred follow-up items;\n    implementer's own report at\n    plans/260919-coordination-skill-harness-simplification/reports/unit-I35-claude-only-execution-report.md,\n    Lead's own verification log at\n    plans/260919-coordination-skill-harness-simplification/reports/unit-I35-lead-verification-and-track-closeout-report.md.\n  capability: execute\n  depends-on: I30, I31, I32, I33, I34 (last unit in the track — its own\n    \"after\" measurement must reflect the finished phase)\n  status: not-started\n  decision (Lead, 2026-09-28, corrects review H1 — the original draft's\n    \"before\" baseline decision rested on a false premise and is\n    SUPERSEDED): a real, checked-in Phase-0 baseline artifact already\n    exists — `plans/260919-coordination-skill-harness-simplification/\n    reports/phase-00-unit-0c-baseline-replay-measurement.json`\n    (`contractVersion: coordination-baseline.v1`, source commit\n    `7853e4d7`, committed `ca854f443` on 2026-09-21) — the original\n    research fork's \"no stored before-baseline exists anywhere in plans/\"\n    claim was wrong; Phase 0's own stated job was exactly this\n    (\"Baseline metrics exist before optimization begins\"). Its real\n    numbers: `fgos-plan-loop` 5,160 words, `fgos-architecture-panel` 9,006\n    words, `fgos-code-panel` 7,049 words. The original \"reconstruct from a\n    pre-Phase-4 git ref\" plan was ALSO wrong on its own terms:\n    `fgos-code-change` did not exist at any pre-Phase-4 ref, so the\n    \"after\" skill it needs to compare against has no pre-Phase-4 baseline\n    to reconstruct in the first place; anchoring at pre-Phase-4 was also\n    the wrong point since Phases 0-3 were already part of the\n    simplification effort. Corrected plan: use the checked-in Phase-0\n    artifact (commit `7853e4d7`) as \"before\" directly — no reconstruction\n    needed. Map old→new: before = `fgos-plan-loop` + `fgos-code-panel`\n    (both now stubs, replaced); after = `fgos-code-change` (the facade\n    that absorbed both), measured fresh on current main via\n    `measure-coordination-baseline.mjs`. Note `inputTokens` is null in the\n    Phase-0 artifact, so no token-reduction claim can be made from this\n    data alone — report word counts only, and state the token-claim\n    limitation plainly rather than omit it silently.\n  context: item 3's remaining scope is narrower than the phase text\n    implies — I29 already swept the wide majority of live inbound\n    references. Its own report names ONE explicit remaining gap:\n    `skill-package-distribution.md`'s intent-mapping table has no\n    `/fgos:code-change` row. Note (corrects review M5): this table covers\n    SKILL SLASH-COMMANDS (`/fgos:code-panel` etc.), a DIFFERENT surface\n    from `src/cli/command-registry.mjs`'s CLI verbs — I34's \"documented\n    commands equal command registry\" check is CLI-verb-only and does not\n    cover this row; adding the row here does not retroactively satisfy or\n    conflict with I34's own check. (I33 already fixes this same table's\n    stale `fgos:code-panel` \"implemented\" label — coordinate, don't\n    duplicate that edit if I33 lands first.)\n  scope: add the `/fgos:code-change` row to `skill-package-distribution.md`'s\n    intent-mapping table; run `measure-coordination-baseline.mjs` fresh\n    against current main for the \"after\" `fgos-code-change` number; use\n    the existing Phase-0 artifact (commit `7853e4d7`) as \"before\" per the\n    decision above — no reconstruction; add one line to this unit's own\n    verification confirming whether `distinctProviderFrom` has a doctor\n    check (research/review found none in `registrations.mjs` — either\n    accept as a documented known gap or add one, don't leave it\n    unconfirmed); run the replay-corpus comparison explicitly (item 6);\n    publish the before/after comparison report (a new file under\n    `plans/260919-coordination-skill-harness-simplification/reports/`);\n    final CHANGELOG.md entry closing out the track.\n  files: `docs/platform/packaging-distribution/contracts/\n    skill-package-distribution.md`, a new before/after report file,\n    CHANGELOG.md.\n  verification: the before/after report cites the exact git refs/commits\n    for both measurements (`7853e4d7` for before, current `main` HEAD for\n    after), the exact command run, and the raw numbers — not a summary\n    claim; explicitly states the `inputTokens: null` limitation rather\n    than implying a token measurement exists; a replay-corpus run is\n    executed and its result cited; env -u CLAUDE_CODE_SESSION_ID npm test\n    one final time on the fully-integrated tree.\n  stop: the \"before\" number is anything other than the real checked-in\n    Phase-0 artifact (no re-reconstruction — that path was already shown\n    unworkable); the report claims a token-count reduction the data\n    doesn't support; the report claims a qualitative improvement without\n    the raw before/after numbers.\n\n## Risk map\n\n| Risk | Level | Proof point |\n|---|---|---|\n| Action projection becomes a second policy engine | high | property/negative tests compare every projected action against kernel refusal/acceptance; projector remains read-only |\n| Stale action races with another writer | high | event-sequence/digest-bound action key and concurrency tests |\n| Prompt resolver changes effective authority | high | template cannot modify execution contract; provenance/digest tests and malicious-template attacks |\n| Legacy replay or session close changes | high | before/after corpus replay plus 583-session migration evidence where available |\n| Plan-loop facade creates a second lifecycle ledger | high | status reconstructed only from plan + session logs; static and behavioral tests forbid new persisted track state |\n| Skill shrink removes useful judgment | high | fixed-case quality eval and adversarial review of role outputs before deletion |\n| Architecture “standard” profile launders a shallow panel as full | high | distinct protocol/preset identity and explicit selection rules; never dynamic omission from the full graph |\n| Semantic verbs multiply maintenance surface | medium | one shared composer/action contract; registry-to-doc drift test |\n| Template/project override becomes prompt injection | high | trust-tier/narrowing policy, immutable provenance, malicious override tests |\n| Stale DAG branch restores an obsolete execution/store seam | high | forward-port from clean baseline; semantic conflict resolution; no merge of conflicted worktree |\n| Dispatch provider/redirect policy diverges from Assignment provenance | high | one provider-family vocabulary, explicit cross-provider schema, combined dispatch-plan tests |\n| plan-loop becomes the de facto universal loop engine | high | driver-discipline fragment carries zero domain vocabulary; architecture-panel consumes it unchanged in Phase 5; one coding facade in Phase 6 instead of code-panel importing plan-loop |\n| Skill renames break existing callers or replay | medium | deprecated stubs for old skill names and old protocol id loadable until the Phase 7 compatibility window closes; replay corpus comparison |\n| Phase 09 refactor races ahead of active consumers | high | Phase 3C/I11 gate before any boundary move; behavior projection must remain identical |\n| Corrupt RunResult satisfies DAG/quorum/close | high | `interpretRunResult`-only acceptance plus corrupt-evidence replay and close-refusal tests |\n| Metrics unavailable from some providers | medium | prompt bytes and wall time are mandatory fallback denominators; unavailable token/cost is explicit |\n\n## Likely touch areas\n\nExact symbols require impact analysis before editing. Expected areas:\n\n- `src/verbs/coordination/{schema,run,show,chain,close}.mjs`\n- new or existing coordination action/status/composer modules\n- `src/runner/coordination/{session-engine,replay,read-evaluators}.mjs`\n- `src/runner/definitions/{schema,protocol-loader}.mjs`\n- prompt-template registry/rendering and Assignment provenance paths\n- `src/runner/dispatch/{assignment-runner,assignment-policy,resolve,plan,cli,config,transport}.mjs`\n- dispatch runtime inspection, reconciliation, confinement, Herdr, provider\n  capacity, setup/doctor, and component-boundary modules\n- DAG declaration/compiler/scheduler plus coordination schema/store/replay,\n  reconciled against current kernel rather than copied from the old branch\n- `src/cli/command-registry.mjs` and `bin/fgos.mjs`\n- `core/coordination-protocols/**`\n- canonical `core/skills/fgos-{plan-loop,architecture-panel,panel,group-thinking}`\n- `domains/coding/skills/fgos-code-panel`\n- setup/doctor only if new config/assets are required\n- coordination, CLI, protocol-conformance, projection, packaging, and replay\n  tests\n- platform Agent Coordination specs/contracts/how-to docs and changelog\n\n## Verification strategy\n\nEach phase receives focused positive, refusal, concurrency/idempotency, and\ncold-resume tests. Final verification must include:\n\n```sh\nnpm test\n```\n\nplus a version-controlled measurement command/report and the session replay\ncorpus comparison. Skill changes additionally require positive and negative\nbehavioral fixtures; word-count reduction alone is not proof of comprehension\nor quality.\n\n## Outstanding questions and explicit gates\n\n- Phase 2 candidate `43fdd378` is independently approved. I01 must still stop\n  if the candidate or current `main` changes before integration; a newer\n  candidate requires a fresh review.\n- Dispatch Phase 05 R5/R6/R7 are design gates, not mechanical leftovers:\n  provider lookup separation, `crossProvider:true`, and PlacementPolicy\n  ownership must be settled against current source before I06 edits them.\n- Phase 01 R5 must be implemented or discharged with direct current-source\n  evidence during I02; old plan narration is insufficient.\n- Whether an architecture `standard` profile should ship remains an empirical\n  Phase 5 consumer gate, not an assumption in this plan.\n- No outstanding question permits Phase 09/I12 to start before combined review\n  I11 approves the integrated runtime.\n",
+      "continued": false
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+        "digest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+        "inventoryEdgeIds": [
+          "evidence-114",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-114",
+            "slotKey": "{\"edgeId\":\"evidence-114\",\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-114\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":2328}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-114",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 2328
+              }
+            ],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2328,
+                "columnStart": 42,
+                "columnEndExclusive": 74,
+                "text": "agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2328,
+                "columnStart": 42,
+                "columnEndExclusive": 74,
+                "text": "agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "agent-coordination/verification/",
+            "logicalReference": "agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Lexical substring inside an existing docs/platform verification path in dated evidence; not a retiring-root reference. Own source passage: \"    review MEDIUM-4): use `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`'s\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-114",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 2328,
+                "matchedExpression": [
+                  "agent-coordination/verification/"
+                ],
+                "originalLineText": "    review MEDIUM-4): use `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`'s"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "agent-coordination/verification",
+              "state": "external-or-example",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 0,
+              "historyCommitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "historySample": []
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":55,\"columnStart\":43,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":1785,\"text\":\"docs/how-to/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1785,
+                "columnStart": 43,
+                "columnEndExclusive": 55,
+                "text": "docs/how-to/"
+              },
+              {
+                "line": 1786,
+                "columnStart": 5,
+                "columnEndExclusive": 31,
+                "text": "use-fgos-group-thinking.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1785,
+                "columnStart": 43,
+                "columnEndExclusive": 55,
+                "text": "docs/how-to/"
+              },
+              {
+                "line": 1786,
+                "columnStart": 5,
+                "columnEndExclusive": 31,
+                "text": "use-fgos-group-thinking.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/\nuse-fgos-group-thinking.md",
+            "logicalReference": "docs/how-to/use-fgos-group-thinking.md",
+            "legacyPath": "docs/how-to/use-fgos-group-thinking.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: '    blocks with the new CLI invocations; `docs/how-to/\\n    use-fgos-group-thinking.md` (also has a `node -e` block, L25 — same'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+              "line": 1785,
+              "columnStart": 43,
+              "columnEndExclusive": 55,
+              "text": "docs/how-to/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/how-to/use-fgos-group-thinking.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "75b2719bc6f0bafa0379ef0668927ce982db0f7700ba90ed670c0d767da69d3c",
+              "treeSample": [
+                "docs/how-to/use-fgos-group-thinking.md"
+              ],
+              "historyCommitCount": 6,
+              "historyCommitsSha256": "2be9f75bb722995cf497d9ad8d22a6ab0dd73a161d8ad58d87afdfe223914901",
+              "historySample": [
+                "09fe3ab32e8e1735e6b84ef5a008380e83494373",
+                "0c23a176d72548e445755d7db5dad2fb43122d03"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":61,\"columnStart\":17,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":1837,\"text\":\"docs/architect/agent-coordination/contracts/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1837,
+                "columnStart": 17,
+                "columnEndExclusive": 61,
+                "text": "docs/architect/agent-coordination/contracts/"
+              },
+              {
+                "line": 1838,
+                "columnStart": 5,
+                "columnEndExclusive": 28,
+                "text": "coordination-session.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1837,
+                "columnStart": 17,
+                "columnEndExclusive": 61,
+                "text": "docs/architect/agent-coordination/contracts/"
+              },
+              {
+                "line": 1838,
+                "columnStart": 5,
+                "columnEndExclusive": 28,
+                "text": "coordination-session.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/contracts/\ncoordination-session.md",
+            "logicalReference": "docs/architect/agent-coordination/contracts/coordination-session.md",
+            "legacyPath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: '    bypass #4 (`docs/architect/agent-coordination/contracts/\\n    coordination-session.md`\\'s \"Group-Thinking Protocol Pack\" § \"Five'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+              "line": 1837,
+              "columnStart": 17,
+              "columnEndExclusive": 61,
+              "text": "docs/architect/agent-coordination/contracts/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "abe6c6e2d94f11bdd4150c8435466649cc5b8b73e3655a7821154f8173d663ae",
+              "treeSample": [
+                "docs/architect/agent-coordination/contracts/coordination-session.md"
+              ],
+              "historyCommitCount": 22,
+              "historyCommitsSha256": "222b7d518ced1e6c8e377600ac1cf49ab689859f33d5ca4ac315bd13becc3e7d",
+              "historySample": [
+                "88691f6468981c1e2124acc79fcd521f1767c3b2",
+                "6b0420295e367c93bc19896d3bb2acb350438fde"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":72,\"columnStart\":28,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":1884,\"text\":\"docs/architect/agent-coordination/contracts/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1884,
+                "columnStart": 28,
+                "columnEndExclusive": 72,
+                "text": "docs/architect/agent-coordination/contracts/"
+              },
+              {
+                "line": 1885,
+                "columnStart": 5,
+                "columnEndExclusive": 28,
+                "text": "coordination-session.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1884,
+                "columnStart": 28,
+                "columnEndExclusive": 72,
+                "text": "docs/architect/agent-coordination/contracts/"
+              },
+              {
+                "line": 1885,
+                "columnStart": 5,
+                "columnEndExclusive": 28,
+                "text": "coordination-session.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/contracts/\ncoordination-session.md",
+            "logicalReference": "docs/architect/agent-coordination/contracts/coordination-session.md",
+            "legacyPath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: '    (header comment only), docs/architect/agent-coordination/contracts/\\n    coordination-session.md (confirm bypass-#4 wording still accurate — do'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+              "line": 1884,
+              "columnStart": 28,
+              "columnEndExclusive": 72,
+              "text": "docs/architect/agent-coordination/contracts/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "abe6c6e2d94f11bdd4150c8435466649cc5b8b73e3655a7821154f8173d663ae",
+              "treeSample": [
+                "docs/architect/agent-coordination/contracts/coordination-session.md"
+              ],
+              "historyCommitCount": 22,
+              "historyCommitsSha256": "222b7d518ced1e6c8e377600ac1cf49ab689859f33d5ca4ac315bd13becc3e7d",
+              "historySample": [
+                "88691f6468981c1e2124acc79fcd521f1767c3b2",
+                "6b0420295e367c93bc19896d3bb2acb350438fde"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":7,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":2210,\"text\":\"docs/architect/agent-coordination/architecture/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2210,
+                "columnStart": 7,
+                "columnEndExclusive": 54,
+                "text": "docs/architect/agent-coordination/architecture/"
+              },
+              {
+                "line": 2211,
+                "columnStart": 5,
+                "columnEndExclusive": 38,
+                "text": "group-thinking-trigger-surface.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2210,
+                "columnStart": 7,
+                "columnEndExclusive": 54,
+                "text": "docs/architect/agent-coordination/architecture/"
+              },
+              {
+                "line": 2211,
+                "columnStart": 5,
+                "columnEndExclusive": 38,
+                "text": "group-thinking-trigger-surface.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/architecture/\ngroup-thinking-trigger-surface.md",
+            "logicalReference": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md",
+            "legacyPath": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: '    (`docs/architect/agent-coordination/architecture/\\n    group-thinking-trigger-surface.md`, `docs/specs/runner.md`,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+              "line": 2210,
+              "columnStart": 7,
+              "columnEndExclusive": 54,
+              "text": "docs/architect/agent-coordination/architecture/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "83c506a12bc2883b10fc78323457e1a7a9ca3772cc6971f1baf98fc3d1d9e46d",
+              "treeSample": [
+                "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md"
+              ],
+              "historyCommitCount": 6,
+              "historyCommitsSha256": "d0f2073360faeecef8cd0a9ec74b50595eea145617e3be0cd053e56b7b1216b7",
+              "historySample": [
+                "09fe3ab32e8e1735e6b84ef5a008380e83494373",
+                "1abad5857511cec1302b092208202ead8a303acb"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":34,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":2281,\"text\":\"docs/architect/agent-coordination/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2281,
+                "columnStart": 34,
+                "columnEndExclusive": 68,
+                "text": "docs/architect/agent-coordination/"
+              },
+              {
+                "line": 2282,
+                "columnStart": 5,
+                "columnEndExclusive": 53,
+                "text": "playbooks/architecture-advisory-role-doctrine.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2281,
+                "columnStart": 34,
+                "columnEndExclusive": 68,
+                "text": "docs/architect/agent-coordination/"
+              },
+              {
+                "line": 2282,
+                "columnStart": 5,
+                "columnEndExclusive": 53,
+                "text": "playbooks/architecture-advisory-role-doctrine.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/\nplaybooks/architecture-advisory-role-doctrine.md",
+            "logicalReference": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+            "legacyPath": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: '    is FALSE and is retracted — `docs/architect/agent-coordination/\\n    playbooks/architecture-advisory-role-doctrine.md` (~L1151-1170) frames'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+              "line": 2281,
+              "columnStart": 34,
+              "columnEndExclusive": 68,
+              "text": "docs/architect/agent-coordination/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "562ab73d0444f3968239951336e3995cf30c47956dbf4ead71e01e1ca08c1aed",
+              "treeSample": [
+                "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md"
+              ],
+              "historyCommitCount": 4,
+              "historyCommitsSha256": "25f4dae11b8526f53c9d94882ef581045dc53ccb1f6da70fac570c43fd8ec086",
+              "historySample": [
+                "9818f25a877756a81dceab990602b50646c8610f",
+                "ba1c68d59d8ecedc61cb11a5f74786c369359911"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":71,\"columnStart\":38,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":3201,\"text\":\"docs/platform/agent-coordination/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3201,
+                "columnStart": 38,
+                "columnEndExclusive": 71,
+                "text": "docs/platform/agent-coordination/"
+              },
+              {
+                "line": 3202,
+                "columnStart": 5,
+                "columnEndExclusive": 33,
+                "text": "contracts/flow-definition.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3201,
+                "columnStart": 38,
+                "columnEndExclusive": 71,
+                "text": "docs/platform/agent-coordination/"
+              },
+              {
+                "line": 3202,
+                "columnStart": 5,
+                "columnEndExclusive": 33,
+                "text": "contracts/flow-definition.md"
+              }
+            ],
+            "matchedExpression": "docs/platform/agent-coordination/\ncontracts/flow-definition.md",
+            "logicalReference": "docs/platform/agent-coordination/contracts/flow-definition.md",
+            "legacyPath": "docs/platform/agent-coordination/contracts/flow-definition.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: \"    exact location before editing), `docs/platform/agent-coordination/\\n    contracts/flow-definition.md`, CHANGELOG.md (coordinate with I31's own\" L12-62: absent at author pin; historical path only. Captured provenance/runtime-index spelling preserved; no live destination claim.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+              "line": 3201,
+              "columnStart": 38,
+              "columnEndExclusive": 71,
+              "text": "docs/platform/agent-coordination/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/platform/agent-coordination/contracts/flow-definition.md",
+              "state": "history",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 8,
+              "historyCommitsSha256": "15adaba3a5465b539a32e4abe6731a49dfe38a98f6664f67028f8357e8292611",
+              "historySample": [
+                "9134ff4e531bb7e75b188ed272188f6efbfe430d",
+                "20a7c2514f9ac767b53d45b770d1a2e1e1ddce57"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":65,\"columnStart\":51,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":3423,\"text\":\"docs/platform/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3423,
+                "columnStart": 51,
+                "columnEndExclusive": 65,
+                "text": "docs/platform/"
+              },
+              {
+                "line": 3424,
+                "columnStart": 5,
+                "columnEndExclusive": 67,
+                "text": "packaging-distribution/contracts/skill-package-distribution.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3423,
+                "columnStart": 51,
+                "columnEndExclusive": 65,
+                "text": "docs/platform/"
+              },
+              {
+                "line": 3424,
+                "columnStart": 5,
+                "columnEndExclusive": 67,
+                "text": "packaging-distribution/contracts/skill-package-distribution.md"
+              }
+            ],
+            "matchedExpression": "docs/platform/\npackaging-distribution/contracts/skill-package-distribution.md",
+            "logicalReference": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+            "legacyPath": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: '    file, per the classification scheme chosen), `docs/platform/\\n    packaging-distribution/contracts/skill-package-distribution.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+              "line": 3423,
+              "columnStart": 51,
+              "columnEndExclusive": 65,
+              "text": "docs/platform/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "9cb49821428a1c5b5843cdb7ea70f6dc99ef5e580fc2c63842b9b217738191f1",
+              "treeSample": [
+                "docs/platform/packaging-distribution/contracts/skill-package-distribution.md"
+              ],
+              "historyCommitCount": 10,
+              "historyCommitsSha256": "20f2c6ce5b2b85b34f447a777033bb4d7df272b2fe4e40d7e47f92d83c2ec1b4",
+              "historySample": [
+                "fa7f63868c7b046aa6133749c942aa5f4ae87ad9",
+                "3f4697bd2303406299ed2d8330b447db076dde9f"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":58,\"columnStart\":11,\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/plan.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":3573,\"text\":\"docs/platform/packaging-distribution/contracts/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3573,
+                "columnStart": 11,
+                "columnEndExclusive": 58,
+                "text": "docs/platform/packaging-distribution/contracts/"
+              },
+              {
+                "line": 3574,
+                "columnStart": 5,
+                "columnEndExclusive": 34,
+                "text": "skill-package-distribution.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3573,
+                "columnStart": 11,
+                "columnEndExclusive": 58,
+                "text": "docs/platform/packaging-distribution/contracts/"
+              },
+              {
+                "line": 3574,
+                "columnStart": 5,
+                "columnEndExclusive": 34,
+                "text": "skill-package-distribution.md"
+              }
+            ],
+            "matchedExpression": "docs/platform/packaging-distribution/contracts/\nskill-package-distribution.md",
+            "logicalReference": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+            "legacyPath": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: '  files: `docs/platform/packaging-distribution/contracts/\\n    skill-package-distribution.md`, a new before/after report file,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+              "line": 3573,
+              "columnStart": 11,
+              "columnEndExclusive": 58,
+              "text": "docs/platform/packaging-distribution/contracts/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "9cb49821428a1c5b5843cdb7ea70f6dc99ef5e580fc2c63842b9b217738191f1",
+              "treeSample": [
+                "docs/platform/packaging-distribution/contracts/skill-package-distribution.md"
+              ],
+              "historyCommitCount": 10,
+              "historyCommitsSha256": "20f2c6ce5b2b85b34f447a777033bb4d7df272b2fe4e40d7e47f92d83c2ec1b4",
+              "historySample": [
+                "fa7f63868c7b046aa6133749c942aa5f4ae87ad9",
+                "3f4697bd2303406299ed2d8330b447db076dde9f"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-007",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+          "bytes": 256055,
+          "lines": 3660,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

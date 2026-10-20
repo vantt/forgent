@@ -19,9 +19,26 @@ def step4_carriage(body,line,path=''):
   lines=body.splitlines();start=next((i for i,l in enumerate(lines,1) if l.startswith('## Luật nền platform forgent')),None)
   end=next((i for i,l in enumerate(lines,1) if start and i>start and l.startswith('## ')),len(lines)+1)
   if start and start<=line<end:return False
+ # L12-62 cli-006 binding ruling: RUL9 and its enclosing Business Rules
+ # heading are eligible for this passage, although under retained source detail.
+ if path=='docs/platform/packaging-distribution/spec.md':
+  ls=body.splitlines();rule=next(i for i,l in enumerate(ls,1) if l.startswith('- **RUL9 ('))
+  heading=max(i for i,l in enumerate(ls[:rule],1) if l.startswith('#'))
+  if line==heading or rule<=line<next(i for i,l in enumerate(ls[rule:],rule+1) if l.startswith('- **RUL10')):return False
  return _original_carriage(body,line,path)
 m.resolver.carriage=step4_carriage
+_original_removed_holders=m.removed_decision_holders
+def step4_removed_holders(commit,edge,legacy):
+ result=_original_removed_holders(commit,edge,legacy)
+ if not result and legacy=='docs/decisions/0032':
+  file=edge.get('consumerFile',getattr(m,'_step4_consumer',None));assert file
+  context=m.adjacent_passage(m.blob(commit,file).decode(),edge['sourceSpans']).lower()
+  if 'iron' in context or 'trunk' in context:
+   result=tuple(h for h in m.decision_narrative_holders(commit,'0032') if 'cổng-iron-law-' in h)
+ return result
+m.removed_decision_holders=step4_removed_holders
 ROOT=m.ROOT
+vs=importlib.util.spec_from_file_location('l1262',P/'step-04-l12-62-lib.py');v=importlib.util.module_from_spec(vs);vs.loader.exec_module(v)
 
 @functools.lru_cache(None)
 def read(n):return json.loads((P/n).read_text())
@@ -144,6 +161,55 @@ def census_coverage(r):
   assert v['reason'] and v['inputCommit']==x['inputCommit'] and v['sourceSpans']==z.relocate(x['inputCommit'],PIN,x['file'],x['spans']),'invalid exclusion witness: '+str(key)
  return True
 
+def coverage_union(es,file,ss):
+ return all(any(e['consumerFile']==file and any(t['line']==s['line'] and t['columnStart']<=s['columnStart'] and s['columnEndExclusive']<=t['columnEndExclusive'] for t in e['sourceSpans']) for e in es) for s in ss)
+
+def wrapped_coverage(r):
+ files={r['file']}|{e['consumerFile'] for e in r['edges']}|{x['path'] for j in r['sourceRenderProvenance'] for x in j['renderFiles']}
+ for f in files:
+  for hit in v.wrapped_paths(z.blob(PIN,f)):
+   assert coverage_union(r['edges']+r['stepFiveExcluded'],f,hit['spans']), 'uncovered wrapped path: '+f+':'+str(hit['spans'][0]['line'])
+ return True
+
+def preserved_existence(e,before):
+ w=e['preservedPathWitness'];actual=v.existence(PIN,e['legacyPath'])
+ assert {k:w[k] for k in actual}==actual,'preserved path tree/history witness differs'
+ if actual['state']=='never-existed':
+  assert w.get('exception'),'never-existing preserve needs explicit wording judgment'
+  context=m.adjacent_passage(before,e['sourceSpans'])
+  context=re.sub(r'\n\s*(?://[/!]?|\*)?\s*',' ',context)
+  if not z.history(e['consumerFile']):
+   assert not re.search(r'(?i)\bsee\s+`?'+re.escape(e['legacyPath']),context),'never-existing see-pointer must park as dead link'
+ return True
+
+def passage_search(e,before):
+ w=e['passageSearchWitness'];assert w.get('assessment')
+ actual=v.search(PIN,before,e['sourceSpans'],w['terms'],m.resolver)
+ assert {k:w[k] for k in actual}==actual,'content search witness differs from replay'
+ return True
+
+def comment_context_edits(r,before):
+ expected={
+ 'packages/distribution/rust/src/manifest.rs':[(3,'//! Matches `docs/platform/packaging-distribution/contracts/release-manifest.md`','//! Frozen release manifest types and field invariants.'),(4,'//! and ','//! See '),(4,' §5.','.')],
+ 'src/runner/dispatch/confinement/authority.mjs':[(2,' §1, §5.2, §6.6, §6.9',' §1, §5.2; docs/platform/agent-confinement/contracts/confinement-authority-v1.md#6-canonical-contracts §6.6, §6.9')],
+ 'src/runner/worktree.mjs':[(756,'"installed into other repos" story','"No hardcoded trunk" contract')]}
+ edits=r.get('contextEdits',[])
+ if edits:
+  assert r['file'] in expected,'unapproved contextual rewrite'
+  assert [(x['sourceSpans'][0]['line'],x['sourceSpans'][0]['text'],x['replacement']) for x in edits]==expected[r['file']],'context rewrite differs from binding L12-62'
+  for x in edits:
+   assert len(x['sourceSpans'])==1 and m.spans_text(before,x['sourceSpans'])==x['sourceSpans'][0]['text'] and x['reason'].startswith('L12-62:')
+   n=x['sourceSpans'][0]['line'];assert before.splitlines()[n-1].lstrip().startswith(('//','*'))
+ if r['file']=='src/runner/dispatch/confinement/authority.mjs':
+  e=next(x for x in r['edges'] if x['edgeId']=='class6-l-000263');extra=e['additionalTargets'];assert len(extra)==1
+  x=extra[0];target=x['path'];tb=z.blob(PIN,target)
+  assert target=='docs/platform/agent-confinement/contracts/confinement-authority-v1.md' and x['targetDigest']==m.sha(tb)
+  hh=m.heading_sections(PIN,target);h=next(h for h in hh if h['anchor']==x['anchor'])
+  assert all(h['startLine']<=n<=h['sectionEndLine'] and not m.resolver.carriage(tb,n,target) for n in x['targetEvidenceLines'])
+  assert any(tb.splitlines()[n-1].startswith('### 6.6 ') for n in x['targetEvidenceLines']) and any(tb.splitlines()[n-1].startswith('### 6.9 ') for n in x['targetEvidenceLines'])
+  assert edits,'both holders must occur in actual replacement'
+ return True
+
 class Checker:
  def __init__(self):
   self.tree=set(m.git('ls-tree','-r','--name-only',PIN).decode().splitlines());self.failures=[]
@@ -167,6 +233,10 @@ class Checker:
   for inp in r['inventoryInputs']:
    ck('census-artifact-pin',lambda inp=inp:m.sha((P/inp['path']).read_bytes())==inp['sha256'] and (P/inp['path']).read_bytes()==m.blob(PIN,str(m.REL/inp['path'])))
   ck('census-edge-slot-or-step5',lambda: census_coverage(r))
+  if f=='domains/coding/AGENTS.md':ck('domain-instruction-source-range',lambda:all(s['line']<next(i for i,l in enumerate(ls,1) if '<!-- gitnexus:start -->' in l) for e in r['edges'] if e['disposition']=='patch' for s in e['sourceSpans']))
+  ck('wrapped-path-coverage',lambda:wrapped_coverage(r))
+  ck('comment-context-edits',lambda:comment_context_edits(r,body))
+  for x in r.get('contextEdits',[]):changes.extend(m.replacement_changes(body,x['sourceSpans'],x['replacement']))
   for e in r['edges']:
    key=e['slotKey'];row=ROWS.get(key);file=e['consumerFile'];before=m.blob(PIN,file).decode();bsp=e['sourceSpans']
    ck('slot-join',lambda e=e,row=row:row is not None and row['file']==e['consumerFile'] and slotkey({**e,'file':e['consumerFile']})==key and record_owner(row)==f and row['edgeId']==e['edgeId'] and row['inventoryRefs']==e['inventoryRefs'] and (bool(e['inventoryRefs']) or (row.get('populationGap') and e.get('supplementalOccurrenceKey')==row['supplementalOccurrenceKey'] and e['edgeId'] is None and e.get('censusAdmission','').startswith('L12-60') and row.get('censusAdmission','').startswith('L12-60'))) and e['renderOnly']==isrender(row))
@@ -187,8 +257,10 @@ class Checker:
      assert old[tup['columnStart']-1:tup['columnEndExclusive']-1]==tup['text']
      assert e['supplementalOccurrenceKey']==tup
     ck('supplemental-occurrence-binding',supplemental_binding)
+   for ref in e.get('externalCensusRefs',[]):
+    ck('external-wrapped-census',lambda ref=ref,e=e: any(x['edgeId']==ref['edgeId'] and x['consumerPath']==e['consumerFile'] and x['physicalSpans']==ref['spans'] and all(s in e['sourceSpans'] for s in ref['spans']) for x in read(ref['inventory'])['newEdges']))
    ck('slot-original-spans',lambda e=e,row=row:e['slotSourceSpans']==spans(row))
-   ck('source-spans',lambda e=e,before=before:m.spans_text(before,e['sourceSpans'])==e['matchedExpression'] and all(s in e['sourceSpans'] for s in e['slotSourceSpans']))
+   ck('source-spans',lambda e=e,before=before:m.spans_text(before,e['sourceSpans'])==e['matchedExpression'] and coverage_union([e],e['consumerFile'],e['slotSourceSpans']))
    ck('disposition',lambda e=e:e['disposition'] in ['patch','preserve','parked','phase9-row-flip','render-join'] and e['reason'] and 'L12-' in e['reason'])
    ck('zero-apply-now',lambda e=e:e['timing']==('Phase 9' if (e.get('sourceDisposition') if e['renderOnly'] else e['disposition']) in ('patch','phase9-row-flip') else 'none'))
    ck('record-text-history',lambda e=e:m.factual_reason(PIN,e,re.sub(r':\d+(?:-\d+)?$','',e.get('legacyPath',''))))
@@ -197,14 +269,19 @@ class Checker:
     ck('render-join-not-patch',lambda e=e:e['disposition']=='render-join' and e.get('sourceDisposition') in ['patch','preserve','parked','phase9-row-flip'])
     ck('render-path-diff-rejected',lambda e=e:e['diffHunk'] is None and e.get('replacement') is None and e['target'] is None and e['anchor'] is None)
     ck('render-canonical-slot-present',lambda e=e:bool(e.get('sourceSlotKey')))
+    ck('render-equal-source-passage',lambda e=e:any(x['slotKey']==e.get('sourceSlotKey') and not x['renderOnly'] and v.passage_equal(m.resolver,PIN,r,e,x) for x in r['edges']))
     if e.get('sourceSlotKey'):
      ck('render-disposition-join',lambda e=e:any(x['slotKey']==e['sourceSlotKey'] and not x['renderOnly'] and x['logicalReference']==e['logicalReference'] and x['disposition']==e['sourceDisposition'] for x in r['edges']))
     ck('render-source-correspondence',lambda e=e:any(e['consumerFile']==x['path'] for j in r['sourceRenderProvenance'] for x in j['renderFiles']))
     continue
-   if e['disposition']=='preserve':ck('preserve-no-patch',lambda e=e:e['diffHunk'] is None and e['target'] is None)
+   if e['disposition']=='preserve':
+    ck('removed-decision-successor',lambda e=e:m.removed_decision_successor(PIN,f,e,e['legacyPath']))
+    ck('preserve-no-patch',lambda e=e:e['diffHunk'] is None and e['target'] is None)
+    ck('preserved-tree-history',lambda e=e,before=before:preserved_existence(e,before))
    if e['disposition']=='phase9-row-flip':ck('whole-row',lambda e=e:e.get('rowReplacement') and e['dependency'] and e['target'] is None and e['diffHunk'] is None)
    if e['disposition']=='parked':
     ck('park-own-source-quote',lambda e=e,before=before:park_own_quote(e,before))
+    ck('park-passage-content-search',lambda e=e,before=before:passage_search(e,before))
     ck('park-search-witness',lambda e=e,before=before:m.verify_witness(e['searchWitness'],PIN,e['legacyPath'],m.resolver.passage(before,e['sourceSpans'])))
     ck('park-no-diff',lambda e=e:e['target'] is None and e['diffHunk'] is None and e['blockedReason'] and e['dependency'])
    if e['disposition']!='patch':continue
@@ -244,11 +321,25 @@ class Checker:
     v['inventoryInputCommit']=PIN;v['inventoryFileDigest']=r['digest'];v['inventoryEdgeIds']=[e['slotKey'] for e in source]
     v['edges']=[{k:copy.deepcopy(e[k]) for k in m.EDGE_FIELDS|{'searchWitness','targetFacts','unitId','unitDispositionReason','historyRegion'} if k in e} for e in source]
     for x,e in zip(v['edges'],source):x['edgeId']=e['slotKey']
+    # Context edits are a separately checked comment boundary. The unchanged
+    # Step 3 core proves ordinary path substitutions on their own exact diff;
+    # Step 4 above proves the final combined diff including all context edits.
+    if r.get('contextEdits'):
+     before=z.blob(PIN,r['file']);changes=[]
+     for e in source:
+      if e['disposition']=='patch':changes+=m.replacement_changes(before,e['sourceSpans'],r['checks']['relativeResolution'][e['slotKey']]['replacement'])
+     after=before
+     for lo,hi,value in reversed(sorted(set(changes))):after=after[:lo]+value+after[hi:]
+     v['diff']=m.make_diff(r['file'],before,after)
+     for x,e in zip(v['edges'],source):
+      if e['disposition']=='patch':
+       n=e['sourceSpans'][0]['line'];x['diffHunk']=next(h.splitlines()[0] for h in m.hunks(v['diff']) if (lambda a,c:a<=n<a+c)(*map(int,re.match(r'@@ -(\d+)(?:,(\d+))?',h).groups(default='1'))))
     core.entries={e['slotKey']:{'edgeId':e['slotKey'],'consumerPath':r['file'],'physicalSpans':e['sourceSpans'],'matchedExpression':e['matchedExpression'],'normalizedReference':e['legacyPath'],'locatorTokens':[]} for e in source}
     core.files={r['file']:{'sha256':r['digest'],'edgeIds':v['inventoryEdgeIds']}}
+    m._step4_consumer=r['file']
     failures=core.check_record(v,apply=False)
     for failure in failures:
-     if failure['check']=='projection-source' and r['file']=='AGENTS.md':
+     if failure['check']=='projection-source' and r['file'] in ('AGENTS.md','domains/coding/AGENTS.md'):
       # Step 3 forbids all root-file diffs. Step 4 explicitly owns unmanaged
       # root prose; the stricter line-boundary predicate above replaces that
       # class-3-only file gate. Managed root spans still cannot get a diff.
@@ -273,4 +364,4 @@ class Checker:
   finally:PIN=original_pin
   return {'authorInputCommit':PIN,'recordAuthorPins':dict(collections.Counter(r['authorInputCommit'] for r in rs)),'checkedBatches':ids,'files':len(rs),'consumerFiles':len({e['consumerFile'] for r in rs for e in r['edges']}),'edges':sum(len(r['edges']) for r in rs),'dispositions':dict(collections.Counter(e['disposition'] for r in rs for e in r['edges'])),'failureCount':len(self.failures),'failures':self.failures,'openLeadRulingEdges':[{'set':r['reviewSet'],'file':r['file'],'edgeId':e['edgeId'],'slotKey':e['slotKey']} for r in rs for e in r['edges'] if e['blockedCategory']=='lead-ruling'],'checkerSha256':m.sha(pathlib.Path(__file__).read_bytes()),'reusedStep3Sha256':m.sha((P/'step-03-check.py').read_bytes())}
 if __name__=='__main__':
- out=Checker().all(load());out['recordFileHashes']={f.name:m.sha(f.read_bytes()) for f in sorted((P/'step-04-records').glob('*.jsonl'))};out['dependencyHashes']={n:m.sha((P/n).read_bytes()) for n in ['step-03-check.py','step-03-resolve.py','step-04-l12-60-lib.py','step-04-population.json','step-04-batches.json','step-04-source-render-provenance.json']};save('step-04-wave2-check-result.json',out);save('step-04-l12-60-check-result.json',out);print(json.dumps(out,ensure_ascii=False));raise SystemExit(bool(out['failureCount']))
+ out=Checker().all(load());out['recordFileHashes']={f.name:m.sha(f.read_bytes()) for f in sorted((P/'step-04-records').glob('*.jsonl'))};out['dependencyHashes']={n:m.sha((P/n).read_bytes()) for n in ['step-03-check.py','step-03-resolve.py','step-04-l12-60-lib.py','step-04-l12-62-lib.py','step-04-population.json','step-04-batches.json','step-04-source-render-provenance.json']};save('step-04-l12-62-check-result.json',out);print(json.dumps(out,ensure_ascii=False));raise SystemExit(bool(out['failureCount']))

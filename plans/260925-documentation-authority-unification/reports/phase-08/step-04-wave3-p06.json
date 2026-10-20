@@ -1,0 +1,1324 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-008",
+  "files": [
+    "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+    "plugins/fgOS/skills/deliver/SKILL.md",
+    "plugins/fgOS/skills/retro-loop/SKILL.md"
+  ],
+  "joinedSlots": 11,
+  "items": [
+    {
+      "file": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "kind": "complete-source-context",
+      "path": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "startLine": 1,
+      "endLine": 92,
+      "content": "---\nname: cleanup-loop\ndescription: >-\n  Use when the user wants every TTL-ready fgOS work item at status:cleanup\n  cleaned up in sequence, unattended, until the pool is empty or a safety\n  condition trips — invoked as /fgOS:cleanup-loop. Wraps the existing\n  /loop skill around /fgOS:cleanup-next, encoding the stop rules (pool\n  empty, lock-timeout) and the per-item block-skip rule so a person never\n  has to restate them by hand. Example: \"/fgOS:cleanup-loop\", \"clean up\n  everything that's ready\", \"sweep the cleanup pool\".\n---\n\n# fgOS cleanup-loop\n\nWraps the existing `loop` skill (invoked as `/loop`) around the existing\n`/fgOS:cleanup-next` skill so a person can clean up every TTL-ready\n`status:cleanup` item in sequence without hand-typing `/loop\n/fgOS:cleanup-next` and re-deriving its stop rules every time. Never writes\n`.fgos/` state directly, never re-implements `cleanup` mechanics, and never\nadds a new CLI verb — `fgos cleanup <id>` and its harness stay exactly as\nthey are (`docs/history/fgos-cleanup-loop/CONTEXT.md`'s own scope\nboundary).\n\nNot `ck-loop`: that is a separate, unrelated skill for mechanical-metric\noptimization (`Goal`/`Scope`/`Verify`-single-number/`Guard` config,\ngit-commit-then-measure per iteration). This skill has no metric to\noptimize — only a repeat-until-a-named-stop-condition task — so it\nrecurses into the plain `loop` skill instead, the one built for \"run a\nprompt on a recurring interval... omit the interval to let the model\nself-pace\" (same precedent `merge-loop`/`discover-loop` already establish;\nsee `docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).\n\n## Steps\n\n1. **Ignore `$ARGUMENTS`.** Neither `/loop` nor `/fgOS:cleanup-next` takes\n   an id or any other argument for this flow — do not read, parse, or\n   forward anything from the slash command's argument text.\n\n2. **Reset the running counters, in this conversation's own context\n   only** — never written to any file or `.fgos/` state: `cleaned = 0`\n   (items that closed to `done`), `skipped = 0` (items whose\n   `fgos cleanup <id>` call parked them `blocked` — content missing or\n   merge no longer resolves, per D2 below — plus any per-item CAS\n   conflict `/fgOS:cleanup-next` reports).\n\n3. **Start the loop.** Invoke the `loop` skill with `prompt:\n   \"/fgOS:cleanup-next\"`, and no fixed interval — let it self-pace\n   dynamically. Each `/fgOS:cleanup-next` call runs a real, but bounded,\n   mechanical check (TTL/content/merge-ancestry) plus a real git cleanup\n   when the item passes — it carries no LLM-judgment cost, so a fixed\n   short interval would either hammer the next call before the previous\n   one could possibly matter, or sit idle needlessly long. Never write a\n   bespoke timer/scheduling mechanism in this skill's own place of `/loop`\n   — that would duplicate a working mechanism instead of reusing it.\n\n4. **Read each iteration's result and decide whether to continue.** Every\n   time `/fgOS:cleanup-next` runs, read what it reported (per its own step\n   5 classification) and update the counters:\n\n   - **\"pool empty\"** — stop the loop cleanly (docs/history/\n     fgos-cleanup-loop/CONTEXT.md D3). Nothing to report as a problem; skip\n     straight to step 5's summary.\n   - **`done`** — increment `cleaned`. Continue to the next iteration.\n   - **`blocked`** (content-missing or merge-no-longer-resolves — the\n     picker already guaranteed TTL had elapsed, so this is never a TTL\n     block) — **D2**: scoped to this one item, never a systemic problem.\n     Increment `skipped` and continue to the next iteration. The item\n     stays visibly parked `blocked` for a person to look at later; never\n     stop the loop for it, and never attempt to fix it yourself here (that\n     is a person's or a later session's call, same as any other `blocked`\n     item).\n   - **skipped (a per-item CAS conflict or other one-off error)** —\n     increment `skipped`. Continue — this is scoped to the one item that\n     hit it, never evidence a different item is at risk.\n   - **lock-timeout** — stop the loop immediately, regardless of how much\n     of the pool is left. This is the one systemic condition:\n     `.fgos/events.jsonl`'s lock is shared by every item, so continuing\n     would very likely hit the same stuck lock on the next pick too.\n     Report which iteration it happened on.\n\n5. **No iteration cap (D3).** Unlike `/fgOS:discover-loop`'s cap-of-15,\n   this loop never stops on an iteration count — each iteration's cost is\n   a deterministic mechanical check, not a per-call LLM judgment, so there\n   is no per-iteration cost to bound the way `discover-loop` needed to.\n   The only stop conditions are pool-empty and lock-timeout, above.\n\n6. **Report on stop.** Whichever condition ended the loop, print a plain\n   summary: `cleaned` count, `skipped` count, and the stop reason named\n   explicitly (pool empty / lock-timeout) so the person reading it never\n   has to infer it from the counts alone. When `skipped > 0`, say plainly\n   that those items are sitting `blocked` and need a person to look at\n   them — `fgos list --id <id>` shows the recorded block reason.\n",
+      "continued": false
+    },
+    {
+      "file": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          },
+          {
+            "path": "step-02l-census-class4.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "51c1701eafb40e09329d9c096f1a757c836663757dee8ecc7877e459dafca62c",
+            "counts": {
+              "dynamicConstructions": 3542,
+              "dynamicFiles": 176,
+              "edgeFiles": 122,
+              "edges": 3334,
+              "files": 225
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "952474402b90ec3582ad8b55e1c5a03cfc98c11630c3b7c522bb244a235ed871",
+        "digest": "952474402b90ec3582ad8b55e1c5a03cfc98c11630c3b7c522bb244a235ed871",
+        "inventoryEdgeIds": [
+          "skills-133",
+          "skills-134",
+          "class4-l-002026"
+        ],
+        "diff": "--- a/plugins/fgOS/skills/cleanup-loop/SKILL.md\n+++ b/plugins/fgOS/skills/cleanup-loop/SKILL.md\n@@ -28,7 +28,7 @@\n recurses into the plain `loop` skill instead, the one built for \"run a\n prompt on a recurring interval... omit the interval to let the model\n self-pace\" (same precedent `merge-loop`/`discover-loop` already establish;\n-see `docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).\n+see `docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md`).\n \n ## Steps\n \n",
+        "edges": [
+          {
+            "edgeId": "skills-133",
+            "slotKey": "{\"edgeId\":\"skills-133\",\"file\":\"plugins/fgOS/skills/cleanup-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-133\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":21},{\"edgeId\":\"class4-l-002025\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":21}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-133",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 21
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002025",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 21
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 12,
+                "columnEndExclusive": 53,
+                "text": "docs/history/fgos-cleanup-loop/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 12,
+                "columnEndExclusive": 53,
+                "text": "docs/history/fgos-cleanup-loop/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+            "logicalReference": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: \"they are (`docs/history/fgos-cleanup-loop/CONTEXT.md`'s own scope\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-133",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 21,
+                "matchedExpression": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+                "originalLineText": "they are (`docs/history/fgos-cleanup-loop/CONTEXT.md`'s own scope"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002025",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 21,
+                "matchedExpression": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+                "originalLineText": "they are (`docs/history/fgos-cleanup-loop/CONTEXT.md`'s own scope"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "1709c272ddf0e52aa7cd2756dcb835264baccf1103944f5551079d22f1b864ca",
+              "treeSample": [
+                "docs/history/fgos-cleanup-loop/CONTEXT.md"
+              ],
+              "historyCommitCount": 3,
+              "historyCommitsSha256": "35dcc7ef0cd5abb2eee24e6eebf7f2415c8459e29ada7811152dd1ef9146716e",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "8eba4a400a0ef6a47467f8afc8ac8af82b2e3545"
+              ]
+            }
+          },
+          {
+            "edgeId": "skills-134",
+            "slotKey": "{\"edgeId\":\"skills-134\",\"file\":\"plugins/fgOS/skills/cleanup-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-134\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":60},{\"edgeId\":\"class4-l-002027\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":60}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-134",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 60
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002027",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 60
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 60,
+                "columnStart": 48,
+                "columnEndExclusive": 61,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 60,
+                "columnStart": 48,
+                "columnEndExclusive": 61,
+                "text": "docs/history/"
+              },
+              {
+                "line": 61,
+                "columnStart": 6,
+                "columnEndExclusive": 34,
+                "text": "fgos-cleanup-loop/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/\nfgos-cleanup-loop/CONTEXT.md",
+            "logicalReference": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; source-bound history/provenance or surviving root; literal spelling conserved. Own source passage: '   - **\"pool empty\"** — stop the loop cleanly (docs/history/\\n     fgos-cleanup-loop/CONTEXT.md D3). Nothing to report as a problem; skip'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-134",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 60,
+                "matchedExpression": "docs/history/",
+                "originalLineText": "   - **\"pool empty\"** — stop the loop cleanly (docs/history/"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002027",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 60,
+                "matchedExpression": "docs/history/",
+                "originalLineText": "   - **\"pool empty\"** — stop the loop cleanly (docs/history/"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "1709c272ddf0e52aa7cd2756dcb835264baccf1103944f5551079d22f1b864ca",
+              "treeSample": [
+                "docs/history/fgos-cleanup-loop/CONTEXT.md"
+              ],
+              "historyCommitCount": 3,
+              "historyCommitsSha256": "35dcc7ef0cd5abb2eee24e6eebf7f2415c8459e29ada7811152dd1ef9146716e",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "8eba4a400a0ef6a47467f8afc8ac8af82b2e3545"
+              ]
+            }
+          },
+          {
+            "edgeId": "class4-l-002026",
+            "slotKey": "{\"edgeId\":\"class4-l-002026\",\"file\":\"plugins/fgOS/skills/cleanup-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002026\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":31}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002026",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 31
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002026",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 31,
+                "matchedExpression": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+                "originalLineText": "see `docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`)."
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 71,
+                "columnStart": 6,
+                "line": 31,
+                "text": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 71,
+                "columnStart": 6,
+                "line": 31,
+                "text": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md"
+              }
+            ],
+            "matchedExpression": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+            "logicalReference": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+            "legacyPath": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -28,7 +28,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "parkSourceQuote": "see `docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).",
+            "movedVerbatimWitness": {
+              "fromPath": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+              "historicalSourceCommit": "a9f3007a6c5ae7b3d69d3c03b05c7ea3a5200b08",
+              "historicalDigest": "4b8bc5105e1443672820044cd9d1552024d840b1b056736d53d2a416b4a4480e",
+              "targetDigest": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+              "comparison": "complete narrative identical after frontmatter removal"
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "see `docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).",
+              "terms": [
+                "why merge loop recurses into loop not ck loop"
+              ],
+              "queries": [
+                {
+                  "term": "why merge loop recurses into loop not ck loop",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"class4-l-002026\",\"file\":\"plugins/fgOS/skills/cleanup-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002026\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":31}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"class4-l-002026\",\"file\":\"plugins/fgOS/skills/cleanup-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002026\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":31}]}": {
+                "sourcePassage": "see `docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).",
+                "adjacentPassage": "Not `ck-loop`: that is a separate, unrelated skill for mechanical-metric\noptimization (`Goal`/`Scope`/`Verify`-single-number/`Guard` config,\ngit-commit-then-measure per iteration). This skill has no metric to\noptimize — only a repeat-until-a-named-stop-condition task — so it\nrecurses into the plain `loop` skill instead, the one built for \"run a\nprompt on a recurring interval... omit the interval to let the model\nself-pace\" (same precedent `merge-loop`/`discover-loop` already establish;\nsee `docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).",
+                "target": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+                "targetEvidence": [
+                  {
+                    "line": 1,
+                    "text": "---"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  }
+                },
+                "assessment": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+              }
+            },
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {
+            "{\"edgeId\":\"class4-l-002026\",\"file\":\"plugins/fgOS/skills/cleanup-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002026\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":31}]}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+              "passage": "---",
+              "targetEvidenceLine": 1,
+              "targetLines": [],
+              "targetLineText": [],
+              "sourceLocatorTokens": [],
+              "wholeFileJustification": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Whole-file pointer spans the complete document."
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"class4-l-002026\",\"file\":\"plugins/fgOS/skills/cleanup-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002026\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":31}]}": {
+              "replacement": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+              "resolvedTarget": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"class4-l-002026\",\"file\":\"plugins/fgOS/skills/cleanup-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002026\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":31}]}": {
+              "source": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+              "replacement": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-008",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "952474402b90ec3582ad8b55e1c5a03cfc98c11630c3b7c522bb244a235ed871",
+          "bytes": 5165,
+          "lines": 92,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [
+        "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md"
+      ],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p14.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "plugins/fgOS/skills/deliver/SKILL.md",
+      "kind": "complete-source-context",
+      "path": "plugins/fgOS/skills/deliver/SKILL.md",
+      "startLine": 1,
+      "endLine": 196,
+      "content": "---\nname: deliver\ndescription: >-\n  Use when the user wants a free-text task driven end-to-end through fgOS's\n  whole lifecycle in one session — submit, discovery, planning, real\n  implementation, and return — invoked as /fgOS:deliver <free-text task\n  description>. Each dev-skill gate (fgos-coding-exploring's context gate,\n  fgos-coding-validating's single merged plan/proof gate) auto-approves\n  when the repo's configured gate-bypass level covers it, otherwise pauses\n  for real human approval — auto-\n  implements at position executing, and stops once the item (and every\n  child it split into) reaches status awaiting-approval — final merge\n  review always stays a human decision, never auto-approved, regardless\n  of gate-bypass. Examples: \"/fgOS:deliver add pagination to the list view\",\n  \"/fgOS:deliver fix the flaky retry test\".\n---\n\n# fgOS deliver\n\nDrives a task from a single sentence to a real, verified, `awaiting-approval`\nchange — chaining the same verbs and dev-skills a person would use one at a\ntime (`submit` → `fgos-coding-exploring` → `fgos-coding-planning`/`fgos-coding-validating` →\nreal implementation → `return`), so the user doesn't have to drive each\nstep by hand. Every state transition goes through the `fgos` CLI (one-door-\nwrite, CTR001) — this skill never writes `.fgos/` state directly, and it\nnever re-implements a dev-skill's substance inline; it invokes them.\nAn item's position is its workflow step while live and its status once\nfrozen, the same words `fgos-coding-driving` uses; Work itself carries no\n`stage`.\n\n## Hard rules\n\n- **Never bypass a gate beyond what its own dev-skill already permits.**\n  `fgos-coding-exploring`'s CONTEXT.md gate and `fgos-coding-validating`'s\n  single merged plan/proof gate (the one gate at position `planning`, per\n  `docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1 —\n  `fgos-coding-planning` itself has no gate) each check the repo's\n  configured gate-bypass level themselves (`canAutoApprove`/\n  `canAutoApproveMergedGate`, `docs/history/gate-bypass/CONTEXT.md` D1-D6,\n  superseded by `coding-planning-validating-gate-redesign/CONTEXT.md`\n  D9-D11) and only skip their own question when that check returns true —\n  this skill's driver invokes those dev-skills unchanged either way (see\n  step 2 below) and never second-guesses, forces, or fakes an\n  auto-approve/human-approve record on its own authority. When a gate's\n  own check does NOT clear it, that gate asks a real question — answer it\n  for real, wait for it, and never skip it because the answer \"seems\n  obvious.\"\n- **Stop at `awaiting-approval`, never merge.** Once `fgos return <id>` succeeds the\n  id is `awaiting-approval`. That is the finish line for this skill — never call\n  `fgos approve`/`fgos reject`/`fgos review` yourself; the internal PR\n  review gate is a human decision, always.\n- **This skill now claims before handing an id to the driver, one id at a\n  time** — `fgos-coding-driving`'s own claim-timing hard rule (tsk-19j-4)\n  still only claims a worktree right before the `executing`-position skill\n  when the caller hasn't already claimed it, but nothing forces a caller\n  to wait that long: without an earlier claim, every position before\n  `executing` (`discovery`/`exploring`/`planning`) writes and commits its\n  own docs (`CONTEXT.md`, `plan.md`) straight onto whatever checkout this\n  skill was invoked from, dirtying it the same way\n  `fgos-coding-shaping`'s own branch-isolation fix found and closed for\n  its caller. Step 2 below claims (`fgos pick <id>` + `EnterWorktree`)\n  before its FIRST `fgos-coding-driving` invocation for the id at the\n  front of the queue — the same pattern `/fgOS:pick`'s own step 2/4 and\n  `fgos-coding-shaping`'s own claim step already use — so the driver's own\n  claim-timing rule reads `status: doing` on its first check and skips its\n  own claim, exactly as it already does whenever `/fgOS:pick` claims\n  first. `take`/`pick` both accept an explicit `--id` claim on a\n  pre-`executing` item too (`choke-point-take-vs-pick-claim-eligibility`\n  fixed the prior disagreement between the two verbs — see \"Known gap\"\n  below).\n- **Reuse, never duplicate.** `fgos-coding-exploring`, `fgos-coding-planning`,\n  `fgos-coding-validating`, and `fgos-coding-driving` (tsk-19j-4) already define\n  the Socratic/shaping/proving/driving substance — invoke them (Skill tool)\n  for their real work; this skill only owns the id QUEUE the driver has no\n  concept of, one id at a time, never split into concurrent flows.\n  `fgos-fanout` is a real capability (`fgos-coding-driving`'s own \"Caller\n  contract\" section says a caller MAY opt into it for concurrency) but this\n  skill deliberately never opts in — one item, one queue, one flow, so the\n  person driving `/fgOS:deliver` never has to reason about what several\n  concurrent Agents did to the backlog while it ran (see step 2).\n- **Never bypass the driver's own claim step with a raw `git checkout\n  <fgw/branch>` on the main checkout** (tsk-4hk: `docs/journals/260803-1612-\n  main-checkout-direct-branch-checkout-tsk-4hk.md`) — the main checkout is\n  the one shared working tree every session's `fgos <verb>` call resolves\n  against; checking a work branch out there instead of letting the driver's\n  claim step (`fgos pick <id>` + `EnterWorktree`) isolate it mixes that\n  branch's tree with whatever else is in flight elsewhere in the backlog.\n- **Never run a raw `git reset --hard` on the main checkout without a full\n  `git status` first** (tsk-3au: `docs/history/main-checkout-destructive-\n  git-safety-net/CONTEXT.md`) — checking only the files you meant to touch\n  can silently discard another in-flight session's uncommitted work, with\n  no stash/reflog/blob to recover it. Use `fgos main-checkout-reset --sha\n  <sha> [--confirm]` instead — it shows the full whole-repo status and\n  refuses without `--confirm` when the tree is dirty.\n\n## Steps\n\n1. **Submit.** Follow the exact same protocol as the `submit` skill\n   (`plugins/fgOS/skills/submit/SKILL.md`) against the free-text argument:\n   scan `fgos list --all --json` for a textually-grounded dependency candidate,\n   present it and require an explicit confirm/edit/reject before attaching\n   anything, then call `fgos submit \"<text>\" [--deps <ids>]`. Capture the\n   returned id as the root id and push it onto a work queue.\n\n2. **Drain the queue, one id at a time, via `fgos-coding-driving`\n   (tsk-19j-4).** While the queue is non-empty, take the id at its front.\n   Before this id's FIRST `fgos-coding-driving` invocation this pass —\n   never before a later re-invocation of the SAME id after a\n   person-shaped stop, the claim already holds by then — claim it\n   (`fgos pick <id>`) and `EnterWorktree` into the returned\n   `data.worktree.path`, the same claim+enter pattern `/fgOS:pick`'s own\n   step 2/4 and `fgos-coding-shaping`'s own claim step already use. If\n   `EnterWorktree` is unavailable or refuses, fall back exactly the way\n   `/fgOS:pick`'s own step 4 does: print the worktree path and tell the\n   user to open a new session there, rather than failing or retrying. Only\n   once claimed and (when the fallback didn't fire) switched into the\n   worktree, invoke the `fgos-coding-driving` skill for it, no `ceiling` (omit it —\n   the driver's own implicit stops already cover everything this step used\n   to hand-roll: `awaiting-approval`, an anchor by open children, a\n   person-shaped stop, or a no-progress read). This skill never re-derives\n   which skill a position maps to, never applies a position/status transition\n   itself, and never decides claim-timing on its own — the driver already\n   owns all three (its own hard rules: registry-only position lookup, \"engine's\n   verb always wins\", \"claim right before the first `executing`-position\n   invocation, never earlier\"). This step's whole job is the QUEUE the\n   driver itself has no concept of — one id at a time, front to back — and\n   relaying the driver's stop reason:\n\n   - **`awaiting-approval` reached** — the id is done for this pass. Pop it\n     off the queue and continue draining.\n   - **anchored by open children** — the driver just reports which child\n     ids are open (it never resolves this itself, by design).\n     `fgos-coding-driving`'s own \"Caller contract: what to do with an\n     anchored-by-open-children report\" section makes concurrency\n     (`fgos-fanout`) an OPTION a caller may take, never a requirement —\n     this skill does not take it. Push every reported open child id onto\n     the FRONT of the queue (in the order reported), then push the\n     anchoring parent id back onto the queue directly after them, and\n     continue draining. Each child then runs through this same step's\n     dispatch on its own later turn — one id at a time, front to back,\n     never concurrently and never through `fgos-fanout`. Once every child a\n     parent anchored on reaches a terminal status, that parent's own anchor\n     clears on the fresh read its queued turn does, and it proceeds\n     normally from there — the same as any other id's turn, no special\n     case.\n   - **a person-shaped stop (`status: awaiting-human`)** — read the parked\n     question (`data.work[id]`'s own gate, or `data.discovery[\"<id>\"]`'s\n     latest entry) and ask the user directly in this chat. Get a real\n     answer, then `fgos answer <id> --text \"<answer>\"`, and invoke the\n     driver again for the SAME id (never skip it or move on) — this is\n     this skill's own approval-gate contract (see Hard rules): the driver\n     stops at every real question, it never answers on the user's behalf.\n   - **a real block (`status: blocked`)** — stop and report this to the\n     user rather than silently retrying; this mirrors the old `invalid`\n     outcome's own stop (a judgment or a verify that came back unusable is\n     never something to route around).\n   - **no-progress** — same treatment as a real block: stop, report, let a\n     person look at it.\n\n   Every real gate a position's skill hits along the way (`fgos-coding-exploring`'s\n   \"Approve CONTEXT.md?\", `fgos-coding-planning`'s \"Approve before execution?\",\n   `fgos-coding-validating`'s \"Approve moving to executing?\") still surfaces\n   exactly as before — the driver invokes those skills unchanged, it does\n   not swallow or pre-answer their own gates. The `planning`→`executing`\n   edge itself releases the claim this step took above back to `todo`\n   (`releaseClaimOnExecuting`, claim-lock §3b) the moment the item reaches\n   `executing` — so the driver's own claim-timing rule re-claims\n   (`fgos pick <id>` + `EnterWorktree`) right before its own first\n   `fgos-coding-implement` invocation, exactly the point this step used to\n   do it by hand before this fix, unaffected by the earlier claim above.\n   `fgos-coding-implement` then implements, verifies, and calls\n   `fgos return <id>` itself — never taking anyone's word for real progress,\n   the same \"measures real progress itself\" contract this step always\n   relied on.\n\n3. **Report.** Once the queue is empty, summarize every id touched and its\n   final status (`awaiting-approval`), list every `CONTEXT.md`/`plan.md` path written\n   along the way, and tell the user the review gate\n   (`fgos review`/`fgos approve`/`fgos reject`) is theirs to run next — this\n   skill never calls it.\n\n## Known gap (fixed)\n\n`fgos-routing`'s own \"Claim\" section states an item still at\n`discovery`/`exploring`/`planning` can be claimed directly with `fgos take\n--id <id>`.\nThat prose used to be wrong — `take --id <id>` on a pre-`executing` item\nwas rejected outright (\"not in the frontier yet (stage/deps/lineage)\"),\nwhile `pick --id <id>` accepted the same claim. `choke-point-\ntake-vs-pick-claim-eligibility` closed that gap: `take`'s explicit `--id`\nbranch now checks deps-done + no-open-descendant only, the same\nposition-independent stance `pick` already took, so the prose is accurate\nagain. This skill's own sequencing now uses that same `take`/`pick`\neligibility directly — it claims before position `executing` too (see the\nhard rule above), the fix this file's own branch-isolation follow-up\nmade, not a workaround for a broken `take`.\n",
+      "continued": false
+    },
+    {
+      "file": "plugins/fgOS/skills/deliver/SKILL.md",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "plugins/fgOS/skills/deliver/SKILL.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          },
+          {
+            "path": "step-02l-census-class4.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "51c1701eafb40e09329d9c096f1a757c836663757dee8ecc7877e459dafca62c",
+            "counts": {
+              "dynamicConstructions": 3542,
+              "dynamicFiles": 176,
+              "edgeFiles": 122,
+              "edges": 3334,
+              "files": 225
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "55ea600a67fb3de0c179bedba1c9c843dbe9df85fd18cba8c555e42ed722ea50",
+        "digest": "55ea600a67fb3de0c179bedba1c9c843dbe9df85fd18cba8c555e42ed722ea50",
+        "inventoryEdgeIds": [
+          "skills-140",
+          "skills-141",
+          "skills-142",
+          "class4-l-002035",
+          null
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "skills-140",
+            "slotKey": "{\"edgeId\":\"skills-140\",\"file\":\"plugins/fgOS/skills/deliver/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-140\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":36},{\"edgeId\":\"class4-l-002033\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":36}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-140",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 36
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002033",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 36
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/deliver/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 36,
+                "columnStart": 4,
+                "columnEndExclusive": 68,
+                "text": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 36,
+                "columnStart": 4,
+                "columnEndExclusive": 68,
+                "text": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "logicalReference": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '  `docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1 —'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-140",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 36,
+                "matchedExpression": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+                "originalLineText": "  `docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1 —"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002033",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 36,
+                "matchedExpression": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+                "originalLineText": "  `docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1 —"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "2cf5b4f445cab4c5f515dbb8756506683d295ec7a7398e57c39aebf562452123",
+              "treeSample": [
+                "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "1e4b262c3900c53d35c4f2b63de3481e41004a937b0550b684ad5c855f3f96cc",
+              "historySample": [
+                "75ef0bf862d8acef36318b190d7a4a3daaa2126e",
+                "a4f05a6ba81f15ec44be502cc81761232fac716d"
+              ]
+            }
+          },
+          {
+            "edgeId": "skills-141",
+            "slotKey": "{\"edgeId\":\"skills-141\",\"file\":\"plugins/fgOS/skills/deliver/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-141\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":39},{\"edgeId\":\"class4-l-002034\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":39}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-141",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 39
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002034",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 39
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/deliver/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 39,
+                "columnStart": 32,
+                "columnEndExclusive": 67,
+                "text": "docs/history/gate-bypass/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 39,
+                "columnStart": 32,
+                "columnEndExclusive": 67,
+                "text": "docs/history/gate-bypass/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+            "logicalReference": "docs/history/gate-bypass/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '  `canAutoApproveMergedGate`, `docs/history/gate-bypass/CONTEXT.md` D1-D6,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/gate-bypass/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-141",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 39,
+                "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+                "originalLineText": "  `canAutoApproveMergedGate`, `docs/history/gate-bypass/CONTEXT.md` D1-D6,"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002034",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 39,
+                "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+                "originalLineText": "  `canAutoApproveMergedGate`, `docs/history/gate-bypass/CONTEXT.md` D1-D6,"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/gate-bypass/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "458d13f17a813bc9edfdda3d9500a536c195fbd0f9d5459d4ea56eca54c78442",
+              "treeSample": [
+                "docs/history/gate-bypass/CONTEXT.md"
+              ],
+              "historyCommitCount": 5,
+              "historyCommitsSha256": "80eb04374cc8f63f300cc8d7e98410a400d54878e00d8eeff9ecb64b0e47d6da",
+              "historySample": [
+                "0057ac04cd49f473fdadfb4bfaeeaa806bbfb1e4",
+                "79261896ebef8a2d7471240fe92e06f544d27526"
+              ]
+            }
+          },
+          {
+            "edgeId": "skills-142",
+            "slotKey": "{\"edgeId\":\"skills-142\",\"file\":\"plugins/fgOS/skills/deliver/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-142\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":89}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-142",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 89
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/deliver/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 89,
+                "columnStart": 35,
+                "columnEndExclusive": 74,
+                "text": "docs/history/main-checkout-destructive-"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 89,
+                "columnStart": 35,
+                "columnEndExclusive": 74,
+                "text": "docs/history/main-checkout-destructive-"
+              }
+            ],
+            "matchedExpression": "docs/history/main-checkout-destructive-",
+            "logicalReference": "docs/history/main-checkout-destructive-",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '  `git status` first** (tsk-3au: `docs/history/main-checkout-destructive-' L12-62 tree/history: L12-10/49: literal example/adversarial path, paired sibling filenames or external-project convention; not a see-pointer.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/main-checkout-destructive-",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-142",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 89,
+                "matchedExpression": "docs/history/main-checkout-destructive-",
+                "originalLineText": "  `git status` first** (tsk-3au: `docs/history/main-checkout-destructive-"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/main-checkout-destructive-",
+              "state": "never-existed",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 0,
+              "historyCommitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "historySample": [],
+              "exception": "L12-10/49: literal example/adversarial path, paired sibling filenames or external-project convention; not a see-pointer."
+            }
+          },
+          {
+            "edgeId": "class4-l-002035",
+            "slotKey": "{\"edgeId\":\"class4-l-002035\",\"file\":\"plugins/fgOS/skills/deliver/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002035\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":89},{\"edgeId\":\"class4-l-002035\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":90}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002035",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 89
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002035",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 90
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002035",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 89,
+                "matchedExpression": "docs/history/main-checkout-destructive-\n  git-safety-net/CONTEXT.md",
+                "originalLineText": "  `git status` first** (tsk-3au: `docs/history/main-checkout-destructive-"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002035",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 90,
+                "matchedExpression": "docs/history/main-checkout-destructive-\n  git-safety-net/CONTEXT.md",
+                "originalLineText": "  git-safety-net/CONTEXT.md`) — checking only the files you meant to touch"
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/deliver/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 74,
+                "columnStart": 35,
+                "line": 89,
+                "text": "docs/history/main-checkout-destructive-"
+              },
+              {
+                "columnEndExclusive": 28,
+                "columnStart": 1,
+                "line": 90,
+                "text": "  git-safety-net/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 74,
+                "columnStart": 35,
+                "line": 89,
+                "text": "docs/history/main-checkout-destructive-"
+              },
+              {
+                "columnEndExclusive": 28,
+                "columnStart": 1,
+                "line": 90,
+                "text": "  git-safety-net/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/main-checkout-destructive-\n  git-safety-net/CONTEXT.md",
+            "logicalReference": "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md",
+            "legacyPath": "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native reference exists at the author pin; no authority route change. Own source passage: '  `git status` first** (tsk-3au: `docs/history/main-checkout-destructive-\\n  git-safety-net/CONTEXT.md`) — checking only the files you meant to touch'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "preservedPathWitness": {
+              "path": "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "59d00deef9d0d9a0d4ef1308b22a25e5bbbc5ea0cf5d531047bd71731b04dd38",
+              "treeSample": [
+                "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "22e6e4d0068d7422eadae1d2bcc8287ec62aaf49616a96905f9f83a2ad185313",
+              "historySample": [
+                "b2f9ce9d22a1d4d9f04603ee3b709953ef93645a",
+                "ac8f9c1d9acb96d1c12bb95efcdfa1128a75105e"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"plugins/fgOS/skills/deliver/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":77,\"columnStart\":51,\"file\":\"plugins/fgOS/skills/deliver/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":82,\"text\":\"docs/journals/260803-1612-\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "plugins/fgOS/skills/deliver/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 82,
+                "columnStart": 51,
+                "columnEndExclusive": 77,
+                "text": "docs/journals/260803-1612-"
+              },
+              {
+                "line": 83,
+                "columnStart": 3,
+                "columnEndExclusive": 50,
+                "text": "main-checkout-direct-branch-checkout-tsk-4hk.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 82,
+                "columnStart": 51,
+                "columnEndExclusive": 77,
+                "text": "docs/journals/260803-1612-"
+              },
+              {
+                "line": 83,
+                "columnStart": 3,
+                "columnEndExclusive": 50,
+                "text": "main-checkout-direct-branch-checkout-tsk-4hk.md"
+              }
+            ],
+            "matchedExpression": "docs/journals/260803-1612-\nmain-checkout-direct-branch-checkout-tsk-4hk.md",
+            "logicalReference": "docs/journals/260803-1612-main-checkout-direct-branch-checkout-tsk-4hk.md",
+            "legacyPath": "docs/journals/260803-1612-main-checkout-direct-branch-checkout-tsk-4hk.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: '  <fgw/branch>` on the main checkout** (tsk-4hk: `docs/journals/260803-1612-\\n  main-checkout-direct-branch-checkout-tsk-4hk.md`) — the main checkout is'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "plugins/fgOS/skills/deliver/SKILL.md",
+              "line": 82,
+              "columnStart": 51,
+              "columnEndExclusive": 77,
+              "text": "docs/journals/260803-1612-"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "externalCensusRefs": [
+              {
+                "inventory": "step-02d-wrapped-citation-rescan.json",
+                "edgeId": "wrapped-0106",
+                "spans": [
+                  {
+                    "line": 82,
+                    "columnStart": 51,
+                    "columnEndExclusive": 77,
+                    "text": "docs/journals/260803-1612-"
+                  },
+                  {
+                    "line": 83,
+                    "columnStart": 3,
+                    "columnEndExclusive": 50,
+                    "text": "main-checkout-direct-branch-checkout-tsk-4hk.md"
+                  }
+                ]
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/journals/260803-1612-main-checkout-direct-branch-checkout-tsk-4hk.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "aaac6fd5d960eb786975e57b39ea11244912a5f072387ed894a77423757aa970",
+              "treeSample": [
+                "docs/journals/260803-1612-main-checkout-direct-branch-checkout-tsk-4hk.md"
+              ],
+              "historyCommitCount": 1,
+              "historyCommitsSha256": "b4190abaa23010ec8e6c03b9b524e545f657875f1582c85b83803dd03cedfb34",
+              "historySample": [
+                "2b25cc6712bed204acc57a34869df6a991b314bd"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-008",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "plugins/fgOS/skills/deliver/SKILL.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "55ea600a67fb3de0c179bedba1c9c843dbe9df85fd18cba8c555e42ed722ea50",
+          "bytes": 12234,
+          "lines": 196,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p14.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "kind": "complete-source-context",
+      "path": "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "startLine": 1,
+      "endLine": 98,
+      "content": "---\nname: retro-loop\ndescription: >-\n  Use when the user wants every status:retrospective fgOS work item\n  synthesized in sequence, inside an interactive/visible agent session,\n  until nothing is left or a safety condition trips — invoked as\n  /fgOS:retro-loop. Wraps the existing /loop skill around\n  /fgOS:retro-next, encoding its stop rules (pool empty, lock-timeout, or\n  an iteration cap) so a person never has to restate them by hand.\n  Example: \"/fgOS:retro-loop\", \"clear out the retrospective backlog\",\n  \"synthesize everything ready\".\n---\n\n# fgOS retro-loop\n\nWraps the existing `loop` skill (invoked as `/loop`) around the existing\n`/fgOS:retro-next` skill so a person can process every\n`status:retrospective` item in sequence, visibly, inside this same\nconversation — without hand-typing `/loop /fgOS:retro-next` and\nre-deriving its stop rules every time. Never writes `.fgos/` state\ndirectly, never re-implements `fgos-coding-compounding`'s synthesis or the\n`retrospective`/`cleanup` verbs, and never adds a new CLI verb\n(`docs/history/fgos-retro-loop/CONTEXT.md`'s own scope boundary).\n\nNot `fgos-runner`'s `--watch` daemon: that is a separate, always-running\nbackground process whose progress is only visible by tailing a log file.\nThis skill exists specifically so the same retrospective sweep is driven\nturn-by-turn in an open, interactive session instead.\n\nNot `ck-loop`: that is a separate, unrelated skill for mechanical-metric\noptimization. This skill has no metric to optimize — only a\nrepeat-until-a-named-stop-condition task — so it recurses into the plain\n`loop` skill instead, the one built for \"run a prompt on a recurring\ninterval... omit the interval to let the model self-pace\" (same\nprecedent `merge-loop`/`discover-loop` already establish; see\n`docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).\n\n**Not `cleanup-loop`'s shape, even though this item mirrors its files**:\n`cleanup-next`'s own per-item step is a purely mechanical\nTTL/content/merge check, so `cleanup-loop` never needed an iteration cap\n(`docs/history/fgos-cleanup-loop/CONTEXT.md` D3). `retro-next`'s own\nper-item step runs `fgos-coding-compounding` — real LLM judgment, the same cost\nprofile `discover-loop`'s cap-of-15 exists to bound. This skill follows\n`discover-loop`'s stop-rule shape, not `cleanup-loop`'s.\n\n## Steps\n\n1. **Ignore `$ARGUMENTS`.** Neither `/loop` nor `/fgOS:retro-next` takes an\n   id or any other argument for this flow.\n\n2. **Reset the running counters, in this conversation's own context\n   only** — never written to any file or `.fgos/` state: `synthesized = 0`\n   (items that moved to `cleanup`), `skipped = 0` (items whose\n   `fgos-coding-compounding` synthesis did not confirm complete, or a per-item\n   CAS conflict `/fgOS:retro-next` reports), and an iteration counter\n   against a cap. Default cap: **15** — same number `discover-loop` uses,\n   for the same reason (bounding real LLM-judge cost per run). The user\n   may name a different cap in their invocation of this command; read it\n   from their own words if given, otherwise use 15.\n\n3. **Start the loop.** Invoke the `loop` skill with `prompt:\n   \"/fgOS:retro-next\"`, and no fixed interval — let it self-pace\n   dynamically, same rationale `discover-loop`/`merge-loop` already give\n   (a real `fgos-coding-compounding` synthesis call's cost varies per item; a\n   fixed short interval would either hammer the next call too early or\n   sit idle needlessly long).\n\n4. **Read each iteration's report and decide whether to continue.** Every\n   time `/fgOS:retro-next` runs, read what it reported (per its own step 6\n   classification) and update the counters:\n\n   - **\"pool empty\"** — stop the loop cleanly. Nothing to report as a\n     problem; skip straight to step 5's summary.\n   - **moved to `cleanup`** — increment `synthesized`. Continue.\n   - **skipped** (synthesis didn't confirm complete, or a per-item CAS\n     conflict) — increment `skipped` and continue to the next iteration.\n     Scoped to this one item, never a systemic problem; never attempt to\n     fix it yourself here (that is a person's or a later session's call).\n   - **lock-timeout** — stop the loop immediately, regardless of how many\n     iterations are left under the cap. This is the one systemic\n     condition: `.fgos/events.jsonl`'s lock is shared by every item, so\n     continuing would very likely hit the same stuck lock on the next\n     pick too. Report which iteration it happened on.\n   - **iteration counter reaches the cap** — stop the loop. This is a\n     safety valve, not a discovered problem — say so plainly in the\n     summary, distinct from the other stop reasons.\n\n5. **Report on stop.** Whichever condition ended the loop, print a plain\n   summary: `synthesized` count, `skipped` count, and the stop reason\n   named explicitly (pool empty / lock-timeout / iteration cap) so the\n   person reading it never has to infer it from the counts alone. When\n   `skipped > 0`, say plainly that those items are still sitting\n   `retrospective` and need a person to look at them — `fgos list --id\n   <id>` shows the item; retrying `/fgOS:retro-next` (or this loop) picks\n   them up again once whatever blocked their synthesis is resolved. When\n   the stop reason was the iteration cap, name how many pool items are\n   estimated to remain (re-run the picker's own count, or say \"unknown,\n   re-run to check\" if that is not readily available).\n",
+      "continued": false
+    },
+    {
+      "file": "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "plugins/fgOS/skills/retro-loop/SKILL.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          },
+          {
+            "path": "step-02l-census-class4.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "51c1701eafb40e09329d9c096f1a757c836663757dee8ecc7877e459dafca62c",
+            "counts": {
+              "dynamicConstructions": 3542,
+              "dynamicFiles": 176,
+              "edgeFiles": 122,
+              "edges": 3334,
+              "files": 225
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "b134815fe10d13c4351a4d5f11b5e18db796b086afacc2767a062c218f7c892d",
+        "digest": "b134815fe10d13c4351a4d5f11b5e18db796b086afacc2767a062c218f7c892d",
+        "inventoryEdgeIds": [
+          "skills-184",
+          "skills-185",
+          "class4-l-002095"
+        ],
+        "diff": "--- a/plugins/fgOS/skills/retro-loop/SKILL.md\n+++ b/plugins/fgOS/skills/retro-loop/SKILL.md\n@@ -33,7 +33,7 @@\n `loop` skill instead, the one built for \"run a prompt on a recurring\n interval... omit the interval to let the model self-pace\" (same\n precedent `merge-loop`/`discover-loop` already establish; see\n-`docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).\n+`docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md`).\n \n **Not `cleanup-loop`'s shape, even though this item mirrors its files**:\n `cleanup-next`'s own per-item step is a purely mechanical\n",
+        "edges": [
+          {
+            "edgeId": "skills-184",
+            "slotKey": "{\"edgeId\":\"skills-184\",\"file\":\"plugins/fgOS/skills/retro-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-184\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":23},{\"edgeId\":\"class4-l-002094\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":23}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-184",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 23
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002094",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 23
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/retro-loop/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 23,
+                "columnStart": 3,
+                "columnEndExclusive": 42,
+                "text": "docs/history/fgos-retro-loop/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 23,
+                "columnStart": 3,
+                "columnEndExclusive": 42,
+                "text": "docs/history/fgos-retro-loop/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/fgos-retro-loop/CONTEXT.md",
+            "logicalReference": "docs/history/fgos-retro-loop/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: \"(`docs/history/fgos-retro-loop/CONTEXT.md`'s own scope boundary).\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/fgos-retro-loop/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-184",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 23,
+                "matchedExpression": "docs/history/fgos-retro-loop/CONTEXT.md",
+                "originalLineText": "(`docs/history/fgos-retro-loop/CONTEXT.md`'s own scope boundary)."
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002094",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 23,
+                "matchedExpression": "docs/history/fgos-retro-loop/CONTEXT.md",
+                "originalLineText": "(`docs/history/fgos-retro-loop/CONTEXT.md`'s own scope boundary)."
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/fgos-retro-loop/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "f9ebac09441c0127357f79ebf6e6c3e3a779d9d28cd398ccd9b58a19a93970a3",
+              "treeSample": [
+                "docs/history/fgos-retro-loop/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "e87413b98542bd6131c0dcec5021781640bbee4707cdc3a080fc2fdedeaf459a",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "05150c6c65cf1a878c712fd170212f06181c7a64"
+              ]
+            }
+          },
+          {
+            "edgeId": "skills-185",
+            "slotKey": "{\"edgeId\":\"skills-185\",\"file\":\"plugins/fgOS/skills/retro-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-185\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":41},{\"edgeId\":\"class4-l-002096\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":41}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-185",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 41
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002096",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 41
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/retro-loop/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 41,
+                "columnStart": 3,
+                "columnEndExclusive": 44,
+                "text": "docs/history/fgos-cleanup-loop/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 41,
+                "columnStart": 3,
+                "columnEndExclusive": 44,
+                "text": "docs/history/fgos-cleanup-loop/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+            "logicalReference": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: \"(`docs/history/fgos-cleanup-loop/CONTEXT.md` D3). `retro-next`'s own\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-185",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 41,
+                "matchedExpression": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+                "originalLineText": "(`docs/history/fgos-cleanup-loop/CONTEXT.md` D3). `retro-next`'s own"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002096",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 41,
+                "matchedExpression": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+                "originalLineText": "(`docs/history/fgos-cleanup-loop/CONTEXT.md` D3). `retro-next`'s own"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "1709c272ddf0e52aa7cd2756dcb835264baccf1103944f5551079d22f1b864ca",
+              "treeSample": [
+                "docs/history/fgos-cleanup-loop/CONTEXT.md"
+              ],
+              "historyCommitCount": 3,
+              "historyCommitsSha256": "35dcc7ef0cd5abb2eee24e6eebf7f2415c8459e29ada7811152dd1ef9146716e",
+              "historySample": [
+                "79261896ebef8a2d7471240fe92e06f544d27526",
+                "8eba4a400a0ef6a47467f8afc8ac8af82b2e3545"
+              ]
+            }
+          },
+          {
+            "edgeId": "class4-l-002095",
+            "slotKey": "{\"edgeId\":\"class4-l-002095\",\"file\":\"plugins/fgOS/skills/retro-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002095\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":36}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002095",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 36
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002095",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 36,
+                "matchedExpression": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+                "originalLineText": "`docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`)."
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/retro-loop/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 67,
+                "columnStart": 2,
+                "line": 36,
+                "text": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 67,
+                "columnStart": 2,
+                "line": 36,
+                "text": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md"
+              }
+            ],
+            "matchedExpression": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+            "logicalReference": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+            "legacyPath": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -33,7 +33,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "parkSourceQuote": "`docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).",
+            "movedVerbatimWitness": {
+              "fromPath": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+              "historicalSourceCommit": "a9f3007a6c5ae7b3d69d3c03b05c7ea3a5200b08",
+              "historicalDigest": "4b8bc5105e1443672820044cd9d1552024d840b1b056736d53d2a416b4a4480e",
+              "targetDigest": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+              "comparison": "complete narrative identical after frontmatter removal"
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "`docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).",
+              "terms": [
+                "why merge loop recurses into loop not ck loop"
+              ],
+              "queries": [
+                {
+                  "term": "why merge loop recurses into loop not ck loop",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"class4-l-002095\",\"file\":\"plugins/fgOS/skills/retro-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002095\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":36}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"class4-l-002095\",\"file\":\"plugins/fgOS/skills/retro-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002095\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":36}]}": {
+                "sourcePassage": "`docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).",
+                "adjacentPassage": "Not `ck-loop`: that is a separate, unrelated skill for mechanical-metric\noptimization. This skill has no metric to optimize — only a\nrepeat-until-a-named-stop-condition task — so it recurses into the plain\n`loop` skill instead, the one built for \"run a prompt on a recurring\ninterval... omit the interval to let the model self-pace\" (same\nprecedent `merge-loop`/`discover-loop` already establish; see\n`docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).",
+                "target": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+                "targetEvidence": [
+                  {
+                    "line": 1,
+                    "text": "---"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  }
+                },
+                "assessment": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+              }
+            },
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {
+            "{\"edgeId\":\"class4-l-002095\",\"file\":\"plugins/fgOS/skills/retro-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002095\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":36}]}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+              "passage": "---",
+              "targetEvidenceLine": 1,
+              "targetLines": [],
+              "targetLineText": [],
+              "sourceLocatorTokens": [],
+              "wholeFileJustification": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Whole-file pointer spans the complete document."
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"class4-l-002095\",\"file\":\"plugins/fgOS/skills/retro-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002095\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":36}]}": {
+              "replacement": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+              "resolvedTarget": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"class4-l-002095\",\"file\":\"plugins/fgOS/skills/retro-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002095\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":36}]}": {
+              "source": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+              "replacement": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-008",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "plugins/fgOS/skills/retro-loop/SKILL.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "b134815fe10d13c4351a4d5f11b5e18db796b086afacc2767a062c218f7c892d",
+          "bytes": 5455,
+          "lines": 98,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [
+        "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md"
+      ],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p14.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

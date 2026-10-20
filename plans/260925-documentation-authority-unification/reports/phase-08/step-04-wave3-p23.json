@@ -1,0 +1,2405 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-026",
+  "files": [
+    "src/state/knowledge-registry.mjs"
+  ],
+  "joinedSlots": 10,
+  "items": [
+    {
+      "file": "src/state/knowledge-registry.mjs",
+      "kind": "complete-source-context",
+      "path": "src/state/knowledge-registry.mjs",
+      "startLine": 1,
+      "endLine": 812,
+      "content": "// src/state/knowledge-registry.mjs\n// Pure domain model, reducer, and invariants for the Knowledge Registry.\n\nexport class KnowledgeValidationError extends Error {\n  constructor(message) {\n    super(message);\n    this.name = 'KnowledgeValidationError';\n    this.category = 'validation';\n  }\n}\n\nexport const VALID_DOC_LIFECYCLE = Object.freeze([\n  'reserved',\n  'provisional',\n  'active',\n  'superseded',\n  'retired',\n]);\n\n// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\n// is a registered framework today, and its 4 modes are a closed set --\n// growing either list is a real product decision (a new writing framework,\n// or a new Diataxis mode), never a typo a reducer should silently accept.\nexport const VALID_FRAMEWORKS = Object.freeze(['diataxis']);\nexport const DIATAXIS_MODES = Object.freeze(['tutorial', 'how-to', 'reference', 'explanation']);\n\n/**\n * A doc is \"live\" (still the authoritative slot occupant) when it is\n * neither 'retired' nor 'superseded' -- doc.supersede already moved\n * \"current\" to supersededBy, so a superseded doc is excluded the same way\n * a retired one is, even though it isn't retired itself. This is the ONE\n * definition every reader of docLifecycle liveness shares: resolveDocId\n * below, src/report/knowledge-resolver.mjs's own resolution logic, and the\n * knowledge doctor checks in src/setup/registrations.mjs -- previously\n * re-implemented independently in each of those three places, free to\n * silently drift apart on a future lifecycle change.\n */\nexport function isLiveDocLifecycle(docLifecycle) {\n  return docLifecycle !== 'retired' && docLifecycle !== 'superseded';\n}\n\n// A single safe path SEGMENT: no '/' or '\\', can't start with '.' (rules\n// out '.', '..', and hidden-file-style segments in one regex), non-empty.\n// topicId/purposeSlug/role all become filesystem path segments downstream\n// (scripts/knowledge-migration.mjs builds `docs/${purposeSlug}/${role}.md`\n// directly from registry-accepted values) -- nothing before this validated\n// that, so `purposeSlug: '../../evil'` or `role: '../escape'` reached the\n// reducer, and from there the filesystem, unchecked.\nconst SAFE_SLUG_RE = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;\n\nfunction assertSafeSlug(value, label) {\n  if (typeof value !== 'string' || !SAFE_SLUG_RE.test(value)) {\n    throw new KnowledgeValidationError(\n      `${label} must be a safe single path segment (letters/digits, then letters/digits/./-/_, never '/', '\\\\', or starting with '.'): got ${JSON.stringify(value)}`\n    );\n  }\n}\n\n// A repo-relative doc path that must stay under docs/ -- rejects an\n// absolute path, a backslash, and any '.'/'..'/empty path segment (the\n// literal path-traversal shape: 'docs/../evil/guide.md',\n// 'docs/ok/../escape.md'). Deliberately string-only (no `node:path`\n// import) to keep this module's own \"pure domain model\" contract --\n// normalizing '..' segments manually is enough to prove the path can never\n// climb out of docs/, without adding a filesystem-adjacent dependency to a\n// module that has none today.\nfunction assertSafeDocPath(value, label) {\n  if (typeof value !== 'string' || value.length === 0) {\n    throw new KnowledgeValidationError(`${label} must be a non-empty string`);\n  }\n  if (value.includes('\\\\')) {\n    throw new KnowledgeValidationError(`${label} must not contain backslashes: got ${JSON.stringify(value)}`);\n  }\n  if (value.startsWith('/') || /^[A-Za-z]:/.test(value)) {\n    throw new KnowledgeValidationError(`${label} must be repo-relative, never absolute: got ${JSON.stringify(value)}`);\n  }\n  if (!value.startsWith('docs/')) {\n    throw new KnowledgeValidationError(`${label} must live under 'docs/': got ${JSON.stringify(value)}`);\n  }\n  const segments = value.split('/');\n  if (segments.some((seg) => seg === '.' || seg === '..' || seg === '')) {\n    throw new KnowledgeValidationError(`${label} must not contain '.', '..', or empty path segments: got ${JSON.stringify(value)}`);\n  }\n}\n\n/**\n * Enforces the narrow, mechanical slice of the closed role/framework/mode\n * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1\n * already states unconditionally: framework must be a registered one, mode\n * must be one of that framework's own modes, and role must never equal a\n * mode name (\"a role name must not equal any framework mode name\"). This\n * does NOT enforce a closed set of *role* values -- that needs a registered\n * per-role vocabulary (meaning/defaultFramework/defaultMode/lifecyclePolicy\n * per §7.2) seeded from a real reclassification of the corpus, a product\n * decision beyond this mechanical guard's scope.\n */\nfunction assertFrameworkModeRoleValid({ framework, mode, role }) {\n  if (!VALID_FRAMEWORKS.includes(framework)) {\n    throw new KnowledgeValidationError(\n      `Invalid framework: '${framework}' — registered frameworks are: ${VALID_FRAMEWORKS.join(', ')}.`\n    );\n  }\n  if (framework === 'diataxis') {\n    if (!DIATAXIS_MODES.includes(mode)) {\n      throw new KnowledgeValidationError(\n        `Invalid mode: '${mode}' for framework 'diataxis' — valid modes are: ${DIATAXIS_MODES.join(', ')}.`\n      );\n    }\n    if (DIATAXIS_MODES.includes(role)) {\n      throw new KnowledgeValidationError(\n        `Invalid role: '${role}' — a role name must not equal a Diataxis mode name (${DIATAXIS_MODES.join(', ')}).`\n      );\n    }\n  }\n}\n\n/**\n * Return all active docs matching (topicId, role) in view.\n */\nexport function getActiveDocs(view, topicId, role) {\n  if (!view || !view.docs) return [];\n  return Object.values(view.docs).filter(\n    (doc) => doc.topicId === topicId && doc.role === role && doc.docLifecycle === 'active'\n  );\n}\n\n/**\n * Assert that activeDoc(topicId, role) <= 1 for the given topicId and role.\n * Throws KnowledgeValidationError if violation exists.\n */\nexport function assertActiveDocCardinality(view, topicId, role) {\n  const activeDocs = getActiveDocs(view, topicId, role);\n  if (activeDocs.length > 1) {\n    throw new KnowledgeValidationError(\n      `Invariant violation: activeDoc(${topicId}, ${role}) count is ${activeDocs.length}, max allowed is 1.`\n    );\n  }\n}\n\n/**\n * Refuses `currentPath` when a DIFFERENT non-retired doc already claims it\n * as its own currentPath -- resolveDocPath's \"direct match on currentPath\"\n * step (src/report/knowledge-resolver.mjs) can only ever return one doc for\n * a given path; two docs silently sharing one currentPath means a caller\n * (knowledge attest, the legacy compound gate) resolves an ambiguous\n * `[doc, otherDoc]` array and picks `[0]` without knowing it -- exactly the\n * \"capture attaches to the wrong doc\" shape a fail-closed check must catch\n * at write time instead.\n */\nfunction assertCurrentPathUnique(view, id, currentPath) {\n  for (const doc of Object.values(view.docs)) {\n    if (doc.docId !== id && doc.currentPath === currentPath && doc.docLifecycle !== 'retired') {\n      throw new KnowledgeValidationError(\n        `currentPath \"${currentPath}\" is already claimed by doc '${doc.docId}' — currentPath must be unique among non-retired docs.`\n      );\n    }\n  }\n}\n\n/**\n * Refuses a NEW docId for (topicId, role) while a different doc already\n * occupies that slot in a still-live state -- otherwise `doc.reserve`/\n * `doc.register` with distinct `--doc-id` values is an escape hatch around\n * `assertActiveDocCardinality` (which only ever looks at 'active' rows):\n * two 'provisional' docs for the same role would sail through unnoticed.\n * 'retired' and 'superseded' free the slot on purpose -- `doc.promote`'s own\n * error message tells callers to supersede the existing active doc before\n * registering its replacement, so a superseded row must not still block.\n * A second doc for the same role is only legitimate after `topic.split`\n * gives it a distinct topicId with real lineage.\n */\nfunction assertDocSlotAvailable(view, id, topicId, role) {\n  for (const doc of Object.values(view.docs)) {\n    if (\n      doc.docId !== id &&\n      doc.topicId === topicId &&\n      doc.role === role &&\n      doc.docLifecycle !== 'retired' &&\n      doc.docLifecycle !== 'superseded'\n    ) {\n      throw new KnowledgeValidationError(\n        `doc slot (${topicId}, ${role}) is already occupied by doc '${doc.docId}' (${doc.docLifecycle}) — retire or supersede it first, or use \"fgos topic split\" to give the new doc its own topicId with lineage.`\n      );\n    }\n  }\n}\n\n/**\n * Refuses a doc write targeting a topic whose status is 'retired' -- reserve/\n * register/mark-rendered/promote must never let a doc keep advancing under a\n * topic that was retired directly (`fgos topic retire`) while the doc itself\n * was left in place (unlike `topic.split`/`topic.merge`, which always move a\n * doc's own topicId onto a still-active successor as part of the same event,\n * so a doc can never be stranded under a retired topic through those paths).\n * doc.supersede/doc.retire/doc.path-move are exempt on purpose: those are\n * exit-lifecycle or physical-relocation operations, never new content.\n */\nfunction assertTopicWritable(view, topicId, verb) {\n  const topic = view.topics[topicId];\n  if (topic && topic.status === 'retired') {\n    throw new KnowledgeValidationError(\n      `${verb}: topic '${topicId}' is retired — no new doc content may be written into a retired topic; migrate this doc to a live topic (via \"fgos topic split\"/\"fgos topic merge\") first.`\n    );\n  }\n}\n\n/**\n * Resolves a doc's identity from an explicit docId, or by searching for the\n * doc whose (topicId, role) match -- never by reconstructing `${topicId}:\n * ${role}` as a string. docId is a durable identity (docs/architect/\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never\n * rewrites even though it does move the doc's own topicId onto the successor\n * -- so a caller holding only (topicId, role) after a split must look the\n * doc up by field, or it silently misses every doc whose id predates the\n * split. When more than one doc shares (topicId, role) -- a live doc plus a\n * retired/superseded predecessor sharing the slot on purpose -- the live one\n * wins.\n */\nexport function resolveDocId(view, { docId, topicId, role }) {\n  if (docId) return docId;\n  if (!topicId || !role) return null;\n  const matches = Object.values(view.docs).filter((d) => d.topicId === topicId && d.role === role);\n  if (matches.length === 0) return null;\n  const live = matches.find((d) => isLiveDocLifecycle(d.docLifecycle));\n  return (live ?? matches[0]).docId;\n}\n\n/**\n * Apply a single knowledge event (topic.* or doc.*) onto view.\n * view = { topics: {...}, docs: {...}, ... }\n */\nexport function applyKnowledgeEvent(view, event) {\n  if (!view.topics) view.topics = {};\n  if (!view.docs) view.docs = {};\n\n  const payload = event.payload ?? {};\n\n  switch (event.type) {\n    case 'topic.register': {\n      const { topicId, purposeSlug, purposeTitle, entities } = payload;\n      if (!topicId || !purposeSlug) {\n        throw new KnowledgeValidationError('topic.register requires topicId and purposeSlug');\n      }\n      assertSafeSlug(topicId, 'topic.register: topicId');\n      assertSafeSlug(purposeSlug, 'topic.register: purposeSlug');\n      if (view.topics[topicId]) {\n        throw new KnowledgeValidationError(\n          `topic.register: topic '${topicId}' already exists (${view.topics[topicId].status}) — register is create-only; use \"fgos topic rename\"/\"fgos topic split\"/\"fgos topic merge\" to change an existing topic.`\n        );\n      }\n      view.topics[topicId] = {\n        topicId,\n        purposeSlug,\n        purposeTitle: purposeTitle ?? purposeSlug,\n        entities: Array.isArray(entities) ? [...entities] : [],\n        status: 'active',\n        lineage: null,\n        createdAt: event.ts ?? Date.now(),\n        updatedAt: event.ts ?? Date.now(),\n      };\n      break;\n    }\n\n    case 'topic.rename': {\n      const { topicId, newPurposeSlug, newPurposeTitle } = payload;\n      const topic = view.topics[topicId];\n      if (!topic) {\n        throw new KnowledgeValidationError(`topic.rename: topic '${topicId}' not found`);\n      }\n      topic.lineage = {\n        ...(topic.lineage ?? {}),\n        renamedFrom: topic.purposeSlug,\n      };\n      if (newPurposeSlug) {\n        assertSafeSlug(newPurposeSlug, 'topic.rename: newPurposeSlug');\n        topic.purposeSlug = newPurposeSlug;\n      }\n      if (newPurposeTitle) topic.purposeTitle = newPurposeTitle;\n      topic.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'topic.split': {\n      const { topicId, newTopics } = payload;\n      const oldTopic = view.topics[topicId];\n      if (!oldTopic) {\n        throw new KnowledgeValidationError(`topic.split: old topic '${topicId}' not found`);\n      }\n      if (oldTopic.status !== 'active') {\n        throw new KnowledgeValidationError(`topic.split: source topic '${topicId}' is '${oldTopic.status}', must be 'active'`);\n      }\n      if (!Array.isArray(newTopics) || newTopics.length < 2) {\n        throw new KnowledgeValidationError('topic.split requires at least 2 successor topics -- a single-successor split is a rename (\"fgos topic rename\"), not a split');\n      }\n\n      // Validate the WHOLE newTopics array before mutating anything: a\n      // successor id equal to the source would un-retire the source topic\n      // right after this case retires it (and its lineage.splitFrom would\n      // point at itself); a successor id repeated within one split call\n      // means only the last one's metadata survives, silently discarding\n      // the others'; a successor id that already names an existing topic\n      // (active or retired) would silently overwrite that topic's own\n      // history/status.\n      const seenSuccessors = new Set();\n      for (const nt of newTopics) {\n        const newTopicId = nt?.topicId;\n        if (!newTopicId || !nt?.purposeSlug) {\n          throw new KnowledgeValidationError('topic.split new topic requires topicId and purposeSlug');\n        }\n        assertSafeSlug(newTopicId, 'topic.split: successor topicId');\n        assertSafeSlug(nt.purposeSlug, 'topic.split: successor purposeSlug');\n        if (newTopicId === topicId) {\n          throw new KnowledgeValidationError(`topic.split: successor topicId '${newTopicId}' cannot equal the source topicId`);\n        }\n        if (seenSuccessors.has(newTopicId)) {\n          throw new KnowledgeValidationError(`topic.split: successor topicId '${newTopicId}' listed more than once in newTopics`);\n        }\n        seenSuccessors.add(newTopicId);\n        if (view.topics[newTopicId]) {\n          throw new KnowledgeValidationError(`topic.split: successor topicId '${newTopicId}' already exists (${view.topics[newTopicId].status}) -- topic ids are create-only`);\n        }\n      }\n\n      // Every LIVE doc under the source topic must land under exactly one\n      // successor via rolesToMove -- checked BEFORE any mutation, same\n      // fail-nothing-mutates discipline as the successor checks above.\n      // Without this: a role missing from every successor's rolesToMove\n      // stays on the OLD topicId, which this case is about to retire --\n      // stranding a live doc under a retired topic, the exact invariant\n      // this whole item's other fixes (doc.demote's assertTopicWritable,\n      // migration's topic-liveness preflight) already treat as a real\n      // problem. A role listed in MORE than one successor's rolesToMove\n      // would silently land the doc under whichever successor processes\n      // last, discarding the caller's real intent with no error.\n      const liveDocsUnderSource = Object.values(view.docs).filter(\n        (d) => d.topicId === topicId && isLiveDocLifecycle(d.docLifecycle)\n      );\n      const roleAssignedTo = new Map();\n      for (const nt of newTopics) {\n        if (!Array.isArray(nt.rolesToMove)) continue;\n        for (const role of nt.rolesToMove) {\n          if (roleAssignedTo.has(role)) {\n            throw new KnowledgeValidationError(\n              `topic.split: role '${role}' is listed in more than one successor's rolesToMove (both '${roleAssignedTo.get(role)}' and '${nt.topicId}') -- a role can only move to exactly one successor`\n            );\n          }\n          roleAssignedTo.set(role, nt.topicId);\n        }\n      }\n      const strandedDocs = liveDocsUnderSource.filter((d) => !roleAssignedTo.has(d.role));\n      if (strandedDocs.length > 0) {\n        throw new KnowledgeValidationError(\n          `topic.split: ${strandedDocs.length} live doc(s) under source topic '${topicId}' are not assigned to any successor's rolesToMove (${strandedDocs.map((d) => `${d.docId} (role '${d.role}')`).join(', ')}) -- every live doc must move to a successor, or be explicitly retired/superseded first`\n        );\n      }\n\n      // Mark old topic as retired\n      oldTopic.status = 'retired';\n      oldTopic.updatedAt = event.ts ?? Date.now();\n\n      const oldDocs = Object.values(view.docs).filter((d) => d.topicId === topicId);\n\n      for (const nt of newTopics) {\n        const { topicId: newTopicId, purposeSlug, purposeTitle, entities, rolesToMove } = nt;\n        view.topics[newTopicId] = {\n          topicId: newTopicId,\n          purposeSlug,\n          purposeTitle: purposeTitle ?? purposeSlug,\n          entities: Array.isArray(entities) ? [...entities] : (oldTopic.entities ?? []),\n          status: 'active',\n          lineage: { splitFrom: topicId },\n          createdAt: event.ts ?? Date.now(),\n          updatedAt: event.ts ?? Date.now(),\n        };\n\n        if (Array.isArray(rolesToMove)) {\n          for (const doc of oldDocs) {\n            if (rolesToMove.includes(doc.role)) {\n              doc.topicId = newTopicId;\n              doc.updatedAt = event.ts ?? Date.now();\n            }\n          }\n        }\n      }\n      break;\n    }\n\n    case 'topic.merge': {\n      const { sourceTopicIds, targetTopicId } = payload;\n      if (!Array.isArray(sourceTopicIds) || !targetTopicId) {\n        throw new KnowledgeValidationError('topic.merge requires sourceTopicIds and targetTopicId');\n      }\n      const targetTopic = view.topics[targetTopicId];\n      if (!targetTopic) {\n        throw new KnowledgeValidationError(`topic.merge: target topic '${targetTopicId}' not found`);\n      }\n      if (targetTopic.status !== 'active') {\n        throw new KnowledgeValidationError(`topic.merge: target topic '${targetTopicId}' is '${targetTopic.status}', must be 'active'`);\n      }\n\n      // Fail-closed on the source list itself before the role-collision check\n      // or any mutation: a source equal to targetTopicId means srcTopic and\n      // targetTopic are the SAME object below, so the mutation loop would\n      // retire the target right after giving it a lineage.mergedFrom entry\n      // pointing at itself; a source that doesn't exist would otherwise be\n      // silently recorded into lineage.mergedFrom by the spread below without\n      // ever being retired or moving any docs; a non-active source (already\n      // retired, or mid-merge as some other merge's own target) means its\n      // docs were already supposed to have moved elsewhere.\n      const seenSources = new Set();\n      for (const sId of sourceTopicIds) {\n        if (sId === targetTopicId) {\n          throw new KnowledgeValidationError(`topic.merge: source '${sId}' cannot equal targetTopicId`);\n        }\n        if (seenSources.has(sId)) {\n          throw new KnowledgeValidationError(`topic.merge: source '${sId}' listed more than once in sourceTopicIds`);\n        }\n        seenSources.add(sId);\n        const srcTopic = view.topics[sId];\n        if (!srcTopic) {\n          throw new KnowledgeValidationError(`topic.merge: source topic '${sId}' not found`);\n        }\n        if (srcTopic.status !== 'active') {\n          throw new KnowledgeValidationError(`topic.merge: source topic '${sId}' is '${srcTopic.status}', must be 'active'`);\n        }\n      }\n\n      // Validate BEFORE mutating anything: merge moves doc.topicId directly,\n      // never through doc.register's own assertDocSlotAvailable check, so\n      // this is the only place a merge's own (targetTopicId, role) collision\n      // gets caught. A whole-merge failure here (nothing mutated yet) beats\n      // silently landing two live docs on the same role.\n      const roleOccupants = new Map();\n      for (const doc of Object.values(view.docs)) {\n        if (doc.docLifecycle === 'retired' || doc.docLifecycle === 'superseded') continue;\n        if (doc.topicId !== targetTopicId && !sourceTopicIds.includes(doc.topicId)) continue;\n        const priorDocId = roleOccupants.get(doc.role);\n        if (priorDocId && priorDocId !== doc.docId) {\n          throw new KnowledgeValidationError(\n            `topic.merge: role '${doc.role}' would have two live docs under target '${targetTopicId}' after merge ('${priorDocId}' and '${doc.docId}') — supersede or retire one first.`\n          );\n        }\n        roleOccupants.set(doc.role, doc.docId);\n      }\n\n      targetTopic.lineage = {\n        ...(targetTopic.lineage ?? {}),\n        mergedFrom: Array.isArray(targetTopic.lineage?.mergedFrom)\n          ? [...targetTopic.lineage.mergedFrom, ...sourceTopicIds]\n          : [...sourceTopicIds],\n      };\n      targetTopic.updatedAt = event.ts ?? Date.now();\n\n      for (const sId of sourceTopicIds) {\n        const srcTopic = view.topics[sId];\n        if (srcTopic) {\n          srcTopic.status = 'retired';\n          srcTopic.updatedAt = event.ts ?? Date.now();\n        }\n        for (const doc of Object.values(view.docs)) {\n          if (doc.topicId === sId) {\n            doc.topicId = targetTopicId;\n            doc.updatedAt = event.ts ?? Date.now();\n          }\n        }\n      }\n      break;\n    }\n\n    case 'topic.retire': {\n      const { topicId } = payload;\n      const topic = view.topics[topicId];\n      if (!topic) {\n        throw new KnowledgeValidationError(`topic.retire: topic '${topicId}' not found`);\n      }\n      topic.status = 'retired';\n      topic.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'doc.reserve': {\n      const { topicId, role, currentPath, framework, mode, docId } = payload;\n      if (!topicId || !role || !currentPath) {\n        throw new KnowledgeValidationError('doc.reserve requires topicId, role, and currentPath');\n      }\n      if (!view.topics[topicId]) {\n        throw new KnowledgeValidationError(`doc.reserve: topicId \"${topicId}\" is not registered — run \"fgos topic register\" first`);\n      }\n      assertSafeSlug(role, 'doc.reserve: role');\n      assertSafeDocPath(currentPath, 'doc.reserve: currentPath');\n      assertTopicWritable(view, topicId, 'doc.reserve');\n      const resolvedFramework = framework ?? 'diataxis';\n      const resolvedMode = mode ?? 'explanation';\n      assertFrameworkModeRoleValid({ framework: resolvedFramework, mode: resolvedMode, role });\n      const id = docId ?? `${topicId}:${role}`;\n      if (view.docs[id]) {\n        throw new KnowledgeValidationError(\n          `doc.reserve: doc '${id}' already exists (${view.docs[id].docLifecycle}) — reserve is create-only; use \"fgos doc register\" for an explicit update.`\n        );\n      }\n      assertDocSlotAvailable(view, id, topicId, role);\n      assertCurrentPathUnique(view, id, currentPath);\n      view.docs[id] = {\n        docId: id,\n        topicId,\n        role,\n        framework: resolvedFramework,\n        mode: resolvedMode,\n        docLifecycle: 'reserved',\n        currentPath,\n        aliases: [],\n        sourceCaptureIds: [],\n        createdAt: event.ts ?? Date.now(),\n        updatedAt: event.ts ?? Date.now(),\n      };\n      break;\n    }\n\n    case 'doc.register': {\n      const { topicId, role, currentPath, framework, mode, docLifecycle, aliases, sourceCaptureIds, docId } = payload;\n      if (!topicId || !role || !currentPath) {\n        throw new KnowledgeValidationError('doc.register requires topicId, role, and currentPath');\n      }\n      if (!view.topics[topicId]) {\n        throw new KnowledgeValidationError(`doc.register: topicId \"${topicId}\" is not registered — run \"fgos topic register\" first`);\n      }\n      assertSafeSlug(role, 'doc.register: role');\n      assertSafeDocPath(currentPath, 'doc.register: currentPath');\n      assertTopicWritable(view, topicId, 'doc.register');\n      const id = docId ?? `${topicId}:${role}`;\n      const existing = view.docs[id];\n      if (existing && (existing.topicId !== topicId || existing.role !== role || existing.currentPath !== currentPath)) {\n        throw new KnowledgeValidationError(\n          `doc.register: doc '${id}' already exists with topicId='${existing.topicId}', role='${existing.role}', currentPath='${existing.currentPath}' — register cannot change a doc's identity or path. Use \"fgos topic split\"/\"fgos topic merge\" to change topicId/role (with lineage), or \"fgos doc move-path\" to change currentPath (preserves the old path as an alias).`\n        );\n      }\n      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is\n      // the sole provisional->active gate, doc.supersede/doc.retire are the\n      // sole way out of 'active'. Re-registering an EXISTING docId must\n      // never itself move the lifecycle beyond one narrow, already-tested\n      // bridge: defaulting to 'provisional' on a bare re-register (no\n      // --lifecycle given) would silently demote an already-'active' doc,\n      // and accepting an arbitrary explicit docLifecycle would resurrect a\n      // 'retired'/'superseded' doc back to 'active' through this side door.\n      // The one legitimate register-driven transition is 'reserved' ->\n      // 'provisional': \"doc reserve\" creates the empty slot, \"doc register\"\n      // with real content is how that slot gets its first draft, and that\n      // flow is exercised end-to-end by knowledge-verbs/knowledge-attest-\n      // gate tests. Anything else -- an explicit lifecycle that disagrees\n      // with the current one, outside that one bridge -- is refused.\n      let lifecycle;\n      if (existing) {\n        if (docLifecycle === undefined || docLifecycle === existing.docLifecycle) {\n          lifecycle = existing.docLifecycle;\n        } else if (existing.docLifecycle === 'reserved' && docLifecycle === 'provisional') {\n          lifecycle = 'provisional';\n        } else {\n          throw new KnowledgeValidationError(\n            `doc.register: doc '${id}' already exists with docLifecycle='${existing.docLifecycle}' — register cannot change lifecycle to '${docLifecycle}'; use \"fgos doc promote\"/\"fgos doc supersede\"/\"fgos doc retire\" instead.`\n          );\n        }\n      } else {\n        lifecycle = docLifecycle ?? 'provisional';\n        if (lifecycle === 'draft' || !VALID_DOC_LIFECYCLE.includes(lifecycle)) {\n          throw new KnowledgeValidationError(`Invalid docLifecycle: '${lifecycle}'`);\n        }\n      }\n      const resolvedFramework = framework ?? existing?.framework ?? 'diataxis';\n      const resolvedMode = mode ?? existing?.mode ?? 'explanation';\n      assertFrameworkModeRoleValid({ framework: resolvedFramework, mode: resolvedMode, role });\n      if (lifecycle === 'active') {\n        const activeDocs = getActiveDocs(view, topicId, role);\n        if (activeDocs.length > 0 && activeDocs[0].docId !== id) {\n          throw new KnowledgeValidationError(\n            `activeDoc(${topicId}, ${role}) already exists: '${activeDocs[0].currentPath}'`\n          );\n        }\n      }\n      assertDocSlotAvailable(view, id, topicId, role);\n      assertCurrentPathUnique(view, id, currentPath);\n      view.docs[id] = {\n        docId: id,\n        topicId,\n        role,\n        framework: resolvedFramework,\n        mode: resolvedMode,\n        docLifecycle: lifecycle,\n        currentPath,\n        aliases: Array.isArray(aliases) ? [...aliases] : (existing?.aliases ?? []),\n        sourceCaptureIds: Array.isArray(sourceCaptureIds) ? [...sourceCaptureIds] : (existing?.sourceCaptureIds ?? []),\n        createdAt: existing?.createdAt ?? event.ts ?? Date.now(),\n        updatedAt: event.ts ?? Date.now(),\n      };\n      assertActiveDocCardinality(view, topicId, role);\n      break;\n    }\n\n    case 'doc.mark-rendered': {\n      const { docId, topicId, role } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.mark-rendered: doc '${id}' not found`);\n      }\n      assertTopicWritable(view, doc.topicId, 'doc.mark-rendered');\n      if (doc.docLifecycle !== 'reserved') {\n        throw new KnowledgeValidationError(\n          `doc.mark-rendered: doc '${id}' is '${doc.docLifecycle}', must be 'reserved'`\n        );\n      }\n      doc.docLifecycle = 'provisional';\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'doc.promote': {\n      const { docId, topicId, role } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.promote: doc '${id}' not found`);\n      }\n      assertTopicWritable(view, doc.topicId, 'doc.promote');\n      if (doc.docLifecycle === 'reserved') {\n        throw new KnowledgeValidationError(\n          `doc.promote: cannot promote doc '${id}' from 'reserved' state (must mark-rendered/provisional first)`\n        );\n      }\n      if (doc.docLifecycle !== 'provisional') {\n        throw new KnowledgeValidationError(\n          `doc.promote: doc '${id}' is in '${doc.docLifecycle}' state, must be 'provisional'`\n        );\n      }\n      const activeDocs = getActiveDocs(view, doc.topicId, doc.role);\n      if (activeDocs.length > 0 && activeDocs[0].docId !== id) {\n        throw new KnowledgeValidationError(\n          `doc.promote: activeDoc(${doc.topicId}, ${doc.role}) already exists: '${activeDocs[0].currentPath}'`\n        );\n      }\n      doc.docLifecycle = 'active';\n      doc.updatedAt = event.ts ?? Date.now();\n      assertActiveDocCardinality(view, doc.topicId, doc.role);\n      break;\n    }\n\n    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration\n    // \"leaves every migrated document provisional unless explicitly\n    // promoted\" -- an active doc whose content moved out from under it\n    // needs re-verification before it counts as authoritative again, but\n    // nothing in the reducer could legitimately move active -> provisional\n    // before this event existed (doc.register's own lifecycle guard\n    // deliberately refuses that exact transition as a silent-demote\n    // vector). doc.demote is the explicit, auditable door for it -- the\n    // mirror image of doc.promote, never inferred from any other event.\n    case 'doc.demote': {\n      const { docId, topicId, role } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.demote: doc '${id}' not found`);\n      }\n      assertTopicWritable(view, doc.topicId, 'doc.demote');\n      if (doc.docLifecycle !== 'active') {\n        throw new KnowledgeValidationError(\n          `doc.demote: doc '${id}' is '${doc.docLifecycle}', must be 'active'`\n        );\n      }\n      doc.docLifecycle = 'provisional';\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'doc.supersede': {\n      const { docId, topicId, role, supersededBy } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.supersede: doc '${id}' not found`);\n      }\n      // supersededBy is a lineage pointer other readers (the resolver's\n      // fallback, doctors, end-user doc indexing) can follow forward from a\n      // dead doc to its replacement -- an unvalidated value (a docId that\n      // doesn't exist, points back at itself, or points at another already-\n      // dead doc) would corrupt that lineage silently instead of failing at\n      // write time where the mistake is still cheap to catch.\n      if (supersededBy) {\n        if (supersededBy === id) {\n          throw new KnowledgeValidationError(`doc.supersede: doc '${id}' cannot be supersededBy itself`);\n        }\n        const successor = view.docs[supersededBy];\n        if (!successor) {\n          throw new KnowledgeValidationError(`doc.supersede: supersededBy doc '${supersededBy}' not found`);\n        }\n        if (!isLiveDocLifecycle(successor.docLifecycle)) {\n          throw new KnowledgeValidationError(\n            `doc.supersede: supersededBy doc '${supersededBy}' is '${successor.docLifecycle}' — must be a live doc, not another dead one`\n          );\n        }\n        // src/report/knowledge-resolver.mjs's own definition of \"live\" is\n        // doc-live AND topic-active -- a successor whose OWN topic is\n        // retired would pass the docLifecycle check above yet never be\n        // treated as a valid resolution target by any reader (the\n        // resolver's isLive, doctor's isLiveDocLifecycle-based checks).\n        // Writing a supersededBy pointer the read side can never honor is\n        // the same \"registry accepts something no reader can use\" shape\n        // this reducer's other guards (assertTopicWritable, the topic-\n        // active checks on topic.merge/split) already close elsewhere.\n        const successorTopic = view.topics[successor.topicId];\n        if (!successorTopic || successorTopic.status !== 'active') {\n          throw new KnowledgeValidationError(\n            `doc.supersede: supersededBy doc '${supersededBy}' is under topic '${successor.topicId}', which is '${successorTopic?.status ?? 'missing'}' (not active) — the successor's own topic must be active for any reader to ever resolve this pointer`\n          );\n        }\n        doc.supersededBy = supersededBy;\n      }\n      doc.docLifecycle = 'superseded';\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'doc.retire': {\n      const { docId, topicId, role } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.retire: doc '${id}' not found`);\n      }\n      doc.docLifecycle = 'retired';\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation\n    // links a capture to a document slot ... the precise replacement for\n    // the old 'compound stores docType/docPath' meaning.\" Modeled as\n    // accumulating into the SAME `sourceCaptureIds` field `doc.register`\n    // already seeds from bootstrap (docs/architect/...md §7.2's own\n    // example schema) -- one array of every capture that has ever\n    // justified this doc's content, never overwritten, mirroring\n    // an accumulate-never-replace fold rule.\n    case 'doc.attest': {\n      const { docId, topicId, role, captureId } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.attest: doc '${id}' not found`);\n      }\n      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation\n      // rejects retired topics and retired documents\". This must live here,\n      // in the reducer, not only in the CLI's resolveDocPath-based\n      // pre-check -- any caller using the write facade directly (attest-\n      // DocStore) would otherwise bypass that check entirely. 'superseded'\n      // is rejected the same way retired is: a superseded doc is no longer\n      // the authoritative slot occupant (doc.supersede already moved that\n      // role to supersededBy), so a capture attested here would silently\n      // attach to a doc nothing points at as current anymore.\n      if (doc.docLifecycle === 'retired' || doc.docLifecycle === 'superseded') {\n        throw new KnowledgeValidationError(`doc.attest: doc '${id}' is ${doc.docLifecycle}`);\n      }\n      assertTopicWritable(view, doc.topicId, 'doc.attest');\n      if (!captureId || typeof captureId !== 'string' || !captureId.trim()) {\n        throw new KnowledgeValidationError('doc.attest requires captureId');\n      }\n      if (!Array.isArray(doc.sourceCaptureIds)) doc.sourceCaptureIds = [];\n      if (!doc.sourceCaptureIds.includes(captureId)) {\n        doc.sourceCaptureIds.push(captureId);\n      }\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'doc.path-move': {\n      const { docId, topicId, role, newPath } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.path-move: doc '${id}' not found`);\n      }\n      if (!newPath) {\n        throw new KnowledgeValidationError('doc.path-move requires newPath');\n      }\n      assertSafeDocPath(newPath, 'doc.path-move: newPath');\n      assertCurrentPathUnique(view, id, newPath);\n      if (doc.currentPath && doc.currentPath !== newPath && !doc.aliases.includes(doc.currentPath)) {\n        doc.aliases.push(doc.currentPath);\n      }\n      doc.currentPath = newPath;\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    default:\n      break;\n  }\n}\n\n/**\n * Fold knowledge events into a view object.\n */\nexport function foldKnowledgeEvents(events, seedView) {\n  const view = seedView ? { ...seedView } : { topics: {}, docs: {} };\n  if (!view.topics) view.topics = {};\n  if (!view.docs) view.docs = {};\n\n  for (const event of events) {\n    if (event.type.startsWith('topic.') || event.type.startsWith('doc.')) {\n      applyKnowledgeEvent(view, event);\n    }\n  }\n\n  return { topics: view.topics, docs: view.docs };\n}\n",
+      "continued": false
+    },
+    {
+      "file": "src/state/knowledge-registry.mjs",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "src/state/knowledge-registry.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+        "digest": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+        "inventoryEdgeIds": [
+          "class6-l-000438",
+          "class6-l-000439",
+          "class6-l-000440",
+          "class6-l-000441",
+          "class6-l-000442",
+          "class6-l-000443",
+          "class6-l-000444",
+          "class6-l-000445",
+          null,
+          null
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000438",
+            "slotKey": "{\"edgeId\":\"class6-l-000438\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000438\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":20}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000438",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 20
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 20,
+                "columnStart": 4,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 20,
+                "columnStart": 4,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+            "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000438",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 20,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'"
+              }
+            ],
+            "parkSourceQuote": "// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§5.5/§14.1: only 'diataxis'",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§5.5/§14.1: only 'diataxis'",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+                  "category": "dead"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'",
+              "terms": [
+                "docLifecycle",
+                "sourceCaptureIds"
+              ],
+              "queries": [
+                {
+                  "term": "docLifecycle",
+                  "hitCount": 8,
+                  "liveHits": 8,
+                  "hitsSha256": "3a4be149483da2f7d285cb0d8d0829d61163dc75771a2462dab5f1bb5be041b1",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/documentation-system-unification.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7400,
+                      "text": "✔ docLifecycle rejects draft (0.32377ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7448,
+                      "text": "✔ docLifecycle rejects draft (0.281909ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.30415ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+                      "line": 7437,
+                      "text": "✔ docLifecycle rejects draft (0.320416ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.329027ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+                      "line": 5317,
+                      "text": "✔ docLifecycle rejects draft (0.435993ms)",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "sourceCaptureIds",
+                  "hitCount": 23,
+                  "liveHits": 22,
+                  "hitsSha256": "0b15166987120c61c151eb991aa7e1b3e35e127969ad89e2e258da6ec565d6b9",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/git/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6518,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (27.810586ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6520,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (30.275983ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7395,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (3.833207ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6566,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (30.423849ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6568,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (27.121291ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7443,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (2.561447ms)",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\""
+            }
+          },
+          {
+            "edgeId": "class6-l-000439",
+            "slotKey": "{\"edgeId\":\"class6-l-000439\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000439\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":88}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000439",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 88
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 88,
+                "columnStart": 20,
+                "columnEndExclusive": 65,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 88,
+                "columnStart": 20,
+                "columnEndExclusive": 65,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+            "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000439",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 88,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": " * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1"
+              }
+            ],
+            "parkSourceQuote": " * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": " * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§7.2 rule 1",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§7.2 rule 1",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": " * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1",
+              "terms": [
+                "docLifecycle",
+                "sourceCaptureIds"
+              ],
+              "queries": [
+                {
+                  "term": "docLifecycle",
+                  "hitCount": 8,
+                  "liveHits": 8,
+                  "hitsSha256": "3a4be149483da2f7d285cb0d8d0829d61163dc75771a2462dab5f1bb5be041b1",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/documentation-system-unification.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7400,
+                      "text": "✔ docLifecycle rejects draft (0.32377ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7448,
+                      "text": "✔ docLifecycle rejects draft (0.281909ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.30415ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+                      "line": 7437,
+                      "text": "✔ docLifecycle rejects draft (0.320416ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.329027ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+                      "line": 5317,
+                      "text": "✔ docLifecycle rejects draft (0.435993ms)",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "sourceCaptureIds",
+                  "hitCount": 23,
+                  "liveHits": 22,
+                  "hitsSha256": "0b15166987120c61c151eb991aa7e1b3e35e127969ad89e2e258da6ec565d6b9",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/git/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6518,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (27.810586ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6520,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (30.275983ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7395,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (3.833207ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6566,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (30.423849ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6568,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (27.121291ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7443,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (2.561447ms)",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'"
+            }
+          },
+          {
+            "edgeId": "class6-l-000440",
+            "slotKey": "{\"edgeId\":\"class6-l-000440\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000440\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":210}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000440",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 210
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 210,
+                "columnStart": 55,
+                "columnEndExclusive": 70,
+                "text": "docs/architect/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 210,
+                "columnStart": 55,
+                "columnEndExclusive": 70,
+                "text": "docs/architect/"
+              },
+              {
+                "line": 211,
+                "columnStart": 4,
+                "columnEndExclusive": 34,
+                "text": "knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/\nknowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/\\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/\\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never'",
+            "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/\\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000440",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 210,
+                "matchedExpression": "docs/architect/",
+                "originalLineText": " * ${role}` as a string. docId is a durable identity (docs/architect/"
+              }
+            ],
+            "parkSourceQuote": " * ${role}` as a string. docId is a durable identity (docs/architect/\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": " * ${role}` as a string. docId is a durable identity (docs/architect/\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§7.3",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/\\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/\\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§7.3",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/\\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": " * ${role}` as a string. docId is a durable identity (docs/architect/\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never",
+              "terms": [
+                "docLifecycle",
+                "sourceCaptureIds"
+              ],
+              "queries": [
+                {
+                  "term": "docLifecycle",
+                  "hitCount": 8,
+                  "liveHits": 8,
+                  "hitsSha256": "3a4be149483da2f7d285cb0d8d0829d61163dc75771a2462dab5f1bb5be041b1",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/documentation-system-unification.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7400,
+                      "text": "✔ docLifecycle rejects draft (0.32377ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7448,
+                      "text": "✔ docLifecycle rejects draft (0.281909ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.30415ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+                      "line": 7437,
+                      "text": "✔ docLifecycle rejects draft (0.320416ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.329027ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+                      "line": 5317,
+                      "text": "✔ docLifecycle rejects draft (0.435993ms)",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "sourceCaptureIds",
+                  "hitCount": 23,
+                  "liveHits": 22,
+                  "hitsSha256": "0b15166987120c61c151eb991aa7e1b3e35e127969ad89e2e258da6ec565d6b9",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/git/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6518,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (27.810586ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6520,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (30.275983ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7395,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (3.833207ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6566,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (30.423849ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6568,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (27.121291ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7443,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (2.561447ms)",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/\\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never'"
+            }
+          },
+          {
+            "edgeId": "class6-l-000441",
+            "slotKey": "{\"edgeId\":\"class6-l-000441\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000441\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":537}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000441",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 537
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 537,
+                "columnStart": 10,
+                "columnEndExclusive": 55,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 537,
+                "columnStart": 10,
+                "columnEndExclusive": 55,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+            "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000441",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 537,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is"
+              }
+            ],
+            "parkSourceQuote": "      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§7.3: doc.promote is",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§7.3: doc.promote is",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is",
+              "terms": [
+                "docLifecycle",
+                "sourceCaptureIds"
+              ],
+              "queries": [
+                {
+                  "term": "docLifecycle",
+                  "hitCount": 8,
+                  "liveHits": 8,
+                  "hitsSha256": "3a4be149483da2f7d285cb0d8d0829d61163dc75771a2462dab5f1bb5be041b1",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/documentation-system-unification.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7400,
+                      "text": "✔ docLifecycle rejects draft (0.32377ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7448,
+                      "text": "✔ docLifecycle rejects draft (0.281909ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.30415ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+                      "line": 7437,
+                      "text": "✔ docLifecycle rejects draft (0.320416ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.329027ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+                      "line": 5317,
+                      "text": "✔ docLifecycle rejects draft (0.435993ms)",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "sourceCaptureIds",
+                  "hitCount": 23,
+                  "liveHits": 22,
+                  "hitsSha256": "0b15166987120c61c151eb991aa7e1b3e35e127969ad89e2e258da6ec565d6b9",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/git/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6518,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (27.810586ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6520,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (30.275983ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7395,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (3.833207ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6566,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (30.423849ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6568,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (27.121291ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7443,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (2.561447ms)",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'"
+            }
+          },
+          {
+            "edgeId": "class6-l-000442",
+            "slotKey": "{\"edgeId\":\"class6-l-000442\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000442\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":646}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000442",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 646
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 646,
+                "columnStart": 8,
+                "columnEndExclusive": 53,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 646,
+                "columnStart": 8,
+                "columnEndExclusive": 53,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+            "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000442",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 646,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration"
+              }
+            ],
+            "parkSourceQuote": "    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§13.5 rule 6: migration",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§13.5 rule 6: migration",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration",
+              "terms": [
+                "docLifecycle",
+                "sourceCaptureIds"
+              ],
+              "queries": [
+                {
+                  "term": "docLifecycle",
+                  "hitCount": 8,
+                  "liveHits": 8,
+                  "hitsSha256": "3a4be149483da2f7d285cb0d8d0829d61163dc75771a2462dab5f1bb5be041b1",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/documentation-system-unification.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7400,
+                      "text": "✔ docLifecycle rejects draft (0.32377ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7448,
+                      "text": "✔ docLifecycle rejects draft (0.281909ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.30415ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+                      "line": 7437,
+                      "text": "✔ docLifecycle rejects draft (0.320416ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.329027ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+                      "line": 5317,
+                      "text": "✔ docLifecycle rejects draft (0.435993ms)",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "sourceCaptureIds",
+                  "hitCount": 23,
+                  "liveHits": 22,
+                  "hitsSha256": "0b15166987120c61c151eb991aa7e1b3e35e127969ad89e2e258da6ec565d6b9",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/git/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6518,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (27.810586ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6520,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (30.275983ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7395,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (3.833207ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6566,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (30.423849ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6568,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (27.121291ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7443,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (2.561447ms)",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'"
+            }
+          },
+          {
+            "edgeId": "class6-l-000443",
+            "slotKey": "{\"edgeId\":\"class6-l-000443\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000443\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":733}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000443",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 733
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 733,
+                "columnStart": 8,
+                "columnEndExclusive": 53,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 733,
+                "columnStart": 8,
+                "columnEndExclusive": 53,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+            "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000443",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 733,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation"
+              }
+            ],
+            "parkSourceQuote": "    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§7.4: \"Attestation",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§7.4: \"Attestation",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation",
+              "terms": [
+                "docLifecycle",
+                "sourceCaptureIds"
+              ],
+              "queries": [
+                {
+                  "term": "docLifecycle",
+                  "hitCount": 8,
+                  "liveHits": 8,
+                  "hitsSha256": "3a4be149483da2f7d285cb0d8d0829d61163dc75771a2462dab5f1bb5be041b1",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/documentation-system-unification.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7400,
+                      "text": "✔ docLifecycle rejects draft (0.32377ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7448,
+                      "text": "✔ docLifecycle rejects draft (0.281909ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.30415ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+                      "line": 7437,
+                      "text": "✔ docLifecycle rejects draft (0.320416ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.329027ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+                      "line": 5317,
+                      "text": "✔ docLifecycle rejects draft (0.435993ms)",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "sourceCaptureIds",
+                  "hitCount": 23,
+                  "liveHits": 22,
+                  "hitsSha256": "0b15166987120c61c151eb991aa7e1b3e35e127969ad89e2e258da6ec565d6b9",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/git/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6518,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (27.810586ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6520,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (30.275983ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7395,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (3.833207ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6566,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (30.423849ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6568,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (27.121291ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7443,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (2.561447ms)",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'"
+            }
+          },
+          {
+            "edgeId": "class6-l-000444",
+            "slotKey": "{\"edgeId\":\"class6-l-000444\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000444\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":737}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000444",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 737
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 737,
+                "columnStart": 38,
+                "columnEndExclusive": 58,
+                "text": "docs/architect/...md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 737,
+                "columnStart": 38,
+                "columnEndExclusive": 58,
+                "text": "docs/architect/...md"
+              }
+            ],
+            "matchedExpression": "docs/architect/...md",
+            "logicalReference": "docs/architect/...md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+            "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/...md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000444",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 737,
+                "matchedExpression": "docs/architect/...md",
+                "originalLineText": "    // already seeds from bootstrap (docs/architect/...md §7.2's own"
+              }
+            ],
+            "parkSourceQuote": "    // already seeds from bootstrap (docs/architect/...md §7.2's own",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/...md",
+              "passage": "    // already seeds from bootstrap (docs/architect/...md §7.2's own",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/...md",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                },
+                {
+                  "query": "§7.2's own",
+                  "hitCount": 2,
+                  "liveHitCount": 2,
+                  "hitsSha256": "6b9b6d3c53765528d67974c1c478f211ab9d4aaae17f68b41831b15cc1d24107"
+                }
+              ],
+              "assessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/...md",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+                  "category": "dead"
+                },
+                {
+                  "query": "§7.2's own",
+                  "carriageCount": 0,
+                  "liveCount": 2,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "    // already seeds from bootstrap (docs/architect/...md §7.2's own",
+              "terms": [
+                "sourceCaptureIds"
+              ],
+              "queries": [
+                {
+                  "term": "sourceCaptureIds",
+                  "hitCount": 23,
+                  "liveHits": 22,
+                  "hitsSha256": "0b15166987120c61c151eb991aa7e1b3e35e127969ad89e2e258da6ec565d6b9",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/git/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6518,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (27.810586ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6520,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (30.275983ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7395,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (3.833207ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6566,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (30.423849ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6568,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (27.121291ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7443,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (2.561447ms)",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\""
+            }
+          },
+          {
+            "edgeId": "class6-l-000445",
+            "slotKey": "{\"edgeId\":\"class6-l-000445\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000445\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":748}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000445",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 748
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 748,
+                "columnStart": 10,
+                "columnEndExclusive": 55,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 748,
+                "columnStart": 10,
+                "columnEndExclusive": 55,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+            "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000445",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 748,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation"
+              }
+            ],
+            "parkSourceQuote": "      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§14.3: \"attestation",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§14.3: \"attestation",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation",
+              "terms": [
+                "docLifecycle",
+                "sourceCaptureIds"
+              ],
+              "queries": [
+                {
+                  "term": "docLifecycle",
+                  "hitCount": 8,
+                  "liveHits": 8,
+                  "hitsSha256": "3a4be149483da2f7d285cb0d8d0829d61163dc75771a2462dab5f1bb5be041b1",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/documentation-system-unification.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7400,
+                      "text": "✔ docLifecycle rejects draft (0.32377ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7448,
+                      "text": "✔ docLifecycle rejects draft (0.281909ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.30415ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+                      "line": 7437,
+                      "text": "✔ docLifecycle rejects draft (0.320416ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.329027ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+                      "line": 5317,
+                      "text": "✔ docLifecycle rejects draft (0.435993ms)",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "sourceCaptureIds",
+                  "hitCount": 23,
+                  "liveHits": 22,
+                  "hitsSha256": "0b15166987120c61c151eb991aa7e1b3e35e127969ad89e2e258da6ec565d6b9",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/git/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6518,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (27.810586ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6520,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (30.275983ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7395,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (3.833207ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6566,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (30.423849ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6568,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (27.121291ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7443,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (2.561447ms)",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'"
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":56,\"columnStart\":35,\"file\":\"src/state/knowledge-registry.mjs\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":61,\"text\":\"docs/../evil/guide.md\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 61,
+                "columnStart": 35,
+                "columnEndExclusive": 56,
+                "text": "docs/../evil/guide.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 61,
+                "columnStart": 35,
+                "columnEndExclusive": 56,
+                "text": "docs/../evil/guide.md"
+              }
+            ],
+            "matchedExpression": "docs/../evil/guide.md",
+            "logicalReference": "docs/../evil/guide.md",
+            "legacyPath": "docs/../evil/guide.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Literal adversarial path example or paired sibling artifact names in a comment; not a navigation destination. Step 5 owns matcher behavior. Own source passage: \"// literal path-traversal shape: 'docs/../evil/guide.md',\" L12-62 tree/history: L12-10/49: literal example/adversarial path, paired sibling filenames or external-project convention; not a see-pointer.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "src/state/knowledge-registry.mjs",
+              "line": 61,
+              "columnStart": 35,
+              "columnEndExclusive": 56,
+              "text": "docs/../evil/guide.md"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/../evil/guide.md",
+              "state": "never-existed",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 0,
+              "historyCommitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "historySample": [],
+              "exception": "L12-10/49: literal example/adversarial path, paired sibling filenames or external-project convention; not a see-pointer."
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":25,\"columnStart\":5,\"file\":\"src/state/knowledge-registry.mjs\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":62,\"text\":\"docs/ok/../escape.md\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 62,
+                "columnStart": 5,
+                "columnEndExclusive": 25,
+                "text": "docs/ok/../escape.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 62,
+                "columnStart": 5,
+                "columnEndExclusive": 25,
+                "text": "docs/ok/../escape.md"
+              }
+            ],
+            "matchedExpression": "docs/ok/../escape.md",
+            "logicalReference": "docs/ok/../escape.md",
+            "legacyPath": "docs/ok/../escape.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Literal adversarial path example or paired sibling artifact names in a comment; not a navigation destination. Step 5 owns matcher behavior. Own source passage: \"// 'docs/ok/../escape.md'). Deliberately string-only (no `node:path`\" L12-62 tree/history: L12-10/49: literal example/adversarial path, paired sibling filenames or external-project convention; not a see-pointer.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "src/state/knowledge-registry.mjs",
+              "line": 62,
+              "columnStart": 5,
+              "columnEndExclusive": 25,
+              "text": "docs/ok/../escape.md"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/ok/../escape.md",
+              "state": "never-existed",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 0,
+              "historyCommitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "historySample": [],
+              "exception": "L12-10/49: literal example/adversarial path, paired sibling filenames or external-project convention; not a see-pointer."
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-026",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/state/knowledge-registry.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+          "bytes": 37623,
+          "lines": 812,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p36.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

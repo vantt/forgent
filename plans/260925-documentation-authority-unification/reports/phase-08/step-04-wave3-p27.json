@@ -1,0 +1,1394 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-031",
+  "files": [
+    "core/task-specs/fgos-indexing.md",
+    "core/task-specs/fgos-researching.md",
+    "src/runner/prompt-templates/worker-prompt-discovery.txt",
+    "src/runner/prompt-templates/worker-prompt-skill-pointer.txt"
+  ],
+  "joinedSlots": 7,
+  "items": [
+    {
+      "file": "core/task-specs/fgos-indexing.md",
+      "kind": "complete-source-context",
+      "path": "core/task-specs/fgos-indexing.md",
+      "startLine": 1,
+      "endLine": 26,
+      "content": "# task-spec: fgos-indexing\n\ndomain: core | role: indexer | scope: enduser-docs | requires-skill: fgos-indexing\n\n## Input\n- End-user markdown documents located under `docs/<quadrant>/` (`how-to`, `tutorials`, `reference`, `explanation`).\n- `QUADRANT_META` definitions in `src/report/enduser-index.mjs`.\n- Resolved main checkout root directory (`--dir \"$root\"`).\n\n## Output\n- Regenerated catalog `docs/enduser-docs-index.json`.\n- Pointer in `docs/specs/reading-map.md` verified/updated for `docs/enduser-docs-index.json`.\n\n## Gates\n- Soft: Idempotent regeneration — skips disk write when index content is unchanged.\n- Hard: Reads `purpose`/`audience` strictly from `QUADRANT_META` in `src/report/enduser-index.mjs`; never hand-edits `docs/enduser-docs-index.json`. Does not write or classify documents itself (that belongs to `fgos-coding-compounding`).\n\n## Verify-template\n- Verification check `fgos doctor` (check `enduser-docs-index-stale`).\n\n## Collaboration\n\n| Trigger | Call | To | Reason | Bóng về mang |\n|---|---|---|---|---|\n| End-user doc added or modified by compounding | index-refresh (sync) | fgos-indexing | regenerate | updated `docs/enduser-docs-index.json` |\n| No trigger matches | — regenerate index from disk — | | | |\n",
+      "continued": false
+    },
+    {
+      "file": "core/task-specs/fgos-indexing.md",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "core/task-specs/fgos-indexing.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+        "digest": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+        "inventoryEdgeIds": [
+          "skills-088",
+          null
+        ],
+        "diff": "--- a/core/task-specs/fgos-indexing.md\n+++ b/core/task-specs/fgos-indexing.md\n@@ -9,7 +9,7 @@\n \n ## Output\n - Regenerated catalog `docs/enduser-docs-index.json`.\n-- Pointer in `docs/specs/reading-map.md` verified/updated for `docs/enduser-docs-index.json`.\n+- Pointer in `docs/reading-map.md#5-detailed-product-and-source-map` verified/updated for `docs/enduser-docs-index.json`.\n \n ## Gates\n - Soft: Idempotent regeneration — skips disk write when index content is unchanged.\n",
+        "edges": [
+          {
+            "edgeId": "skills-088",
+            "slotKey": "{\"edgeId\":\"skills-088\",\"file\":\"core/task-specs/fgos-indexing.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-088\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":12}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-088",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 12
+              }
+            ],
+            "consumerFile": "core/task-specs/fgos-indexing.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 12,
+                "columnStart": 15,
+                "columnEndExclusive": 40,
+                "text": "docs/specs/reading-map.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 12,
+                "columnStart": 15,
+                "columnEndExclusive": 40,
+                "text": "docs/specs/reading-map.md"
+              }
+            ],
+            "matchedExpression": "docs/specs/reading-map.md",
+            "logicalReference": "docs/specs/reading-map.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -9,7 +9,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/reading-map.md",
+            "anchor": "5-detailed-product-and-source-map",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/specs/reading-map.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-088",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 12,
+                "matchedExpression": "docs/specs/reading-map.md",
+                "originalLineText": "- Pointer in `docs/specs/reading-map.md` verified/updated for `docs/enduser-docs-index.json`."
+              }
+            ],
+            "parkSourceQuote": "- Pointer in `docs/specs/reading-map.md` verified/updated for `docs/enduser-docs-index.json`.",
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "- Pointer in `docs/specs/reading-map.md` verified/updated for `docs/enduser-docs-index.json`.",
+              "terms": [
+                "Detailed Product And Source Map",
+                "enduser-docs-index.json"
+              ],
+              "queries": [
+                {
+                  "term": "Detailed Product And Source Map",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                },
+                {
+                  "term": "enduser-docs-index.json",
+                  "hitCount": 44,
+                  "liveHits": 40,
+                  "hitsSha256": "e677ab2c15ba483af23237316f4f654cba11c237b9bb9b9bd71bfd91d8ffe4d0",
+                  "files": {
+                    "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md": {
+                      "live": 4,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is/docs-index-preserves-prior-id-when-the-store-is-unreachable.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/P04.2.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/doer-report.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/reviewer-report.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/code-implementation-track-policy/p01.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P07.1.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/config-precedence/doctor-output-under-fake-global-home.json": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md": {
+                      "live": 0,
+                      "carriage": 2
+                    },
+                    "docs/platform/packaging-distribution/spec.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/runner/decisions/h-36d872fbb0e5.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/work-state/spec.md": {
+                      "live": 2,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+                      "line": 57,
+                      "text": "`docs/enduser-docs-index.json`, a real file outside `.fgos/`; it should",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+                      "line": 135,
+                      "text": "- scan and write `docs/enduser-docs-index.json` inside the **worktree's",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+                      "line": 14,
+                      "text": "`docs/enduser-docs-index.json` as a side effect of `npm test`.",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+                      "line": 79,
+                      "text": "docs/enduser-docs-index.json` (or any similar guard) failing on the very",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+                      "line": 267,
+                      "text": "constraint, not a preference: `.fgos/docs/enduser-docs-index.json`'s",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+                      "line": 3,
+                      "text": "title: Why docs/enduser-docs-index.json needed a doctor check, not just a regenerate skill",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"core/task-specs/fgos-indexing.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":62,\"columnStart\":46,\"file\":\"core/task-specs/fgos-indexing.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":6,\"text\":\"docs/<quadrant>/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "core/task-specs/fgos-indexing.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 6,
+                "columnStart": 46,
+                "columnEndExclusive": 62,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 6,
+                "columnStart": 46,
+                "columnEndExclusive": 62,
+                "text": "docs/<quadrant>/"
+              }
+            ],
+            "matchedExpression": "docs/<quadrant>/",
+            "logicalReference": "docs/<quadrant>/",
+            "legacyPath": "docs/<quadrant>/",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: L12-62: Retiring four-quadrant input layout; Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on docs/knowledge layout before changing this input contract. Own source passage: '- End-user markdown documents located under `docs/<quadrant>/` (`how-to`, `tutorials`, `reference`, `explanation`).'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: L12-62: Retiring four-quadrant input layout; Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on docs/knowledge layout before changing this input contract. Own source passage: '- End-user markdown documents located under `docs/<quadrant>/` (`how-to`, `tutorials`, `reference`, `explanation`).'",
+            "dependency": "L12-62: L12-62: Retiring four-quadrant input layout; Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on docs/knowledge layout before changing this input contract. Own source passage: '- End-user markdown documents located under `docs/<quadrant>/` (`how-to`, `tutorials`, `reference`, `explanation`).'",
+            "blockedCategory": "description-rewrite",
+            "dependencyCategory": "description-rewrite",
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "core/task-specs/fgos-indexing.md",
+              "line": 6,
+              "columnStart": 46,
+              "columnEndExclusive": 62,
+              "text": "docs/<quadrant>/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "parkSourceQuote": "- End-user markdown documents located under `docs/<quadrant>/` (`how-to`, `tutorials`, `reference`, `explanation`).",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/<quadrant>/",
+              "passage": "- End-user markdown documents located under `docs/<quadrant>/` (`how-to`, `tutorials`, `reference`, `explanation`).",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/<quadrant>/",
+                  "hitCount": 6,
+                  "liveHitCount": 5,
+                  "hitsSha256": "278765d9e5f8995e1cbbdb672ce7daab07fb43ca283b6c25ed27ade3f1bb744c"
+                }
+              ],
+              "assessment": "L12-62: L12-62: Retiring four-quadrant input layout; Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on docs/knowledge layout before changing this input contract. Own source passage: '- End-user markdown documents located under `docs/<quadrant>/` (`how-to`, `tutorials`, `reference`, `explanation`).'",
+              "hitGroups": [
+                {
+                  "query": "docs/<quadrant>/",
+                  "carriageCount": 1,
+                  "liveCount": 5,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: L12-62: Retiring four-quadrant input layout; Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on docs/knowledge layout before changing this input contract. Own source passage: '- End-user markdown documents located under `docs/<quadrant>/` (`how-to`, `tutorials`, `reference`, `explanation`).'",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "- End-user markdown documents located under `docs/<quadrant>/` (`how-to`, `tutorials`, `reference`, `explanation`).",
+              "terms": [
+                "<quadrant>"
+              ],
+              "queries": [
+                {
+                  "term": "<quadrant>",
+                  "hitCount": 13,
+                  "liveHits": 12,
+                  "hitsSha256": "4a181588e43debf2e3959d1c33777c5f2febe405579ad8a6b4d641e144a8e5b4",
+                  "files": {
+                    "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/work-state/spec.md": {
+                      "live": 3,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+                      "line": 75,
+                      "text": "5. `fgos compound <root-id> --doc-type <quadrant> --doc-path ...` — same",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+                      "line": 170,
+                      "text": "6. `fgos compound <milestone-id> --doc-type <quadrant> --doc-path ...` —",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+                      "line": 164,
+                      "text": "fgos compound <id> --doc-type <quadrant> --doc-path docs/<quadrant>/<file>.md",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+                      "line": 165,
+                      "text": "fgos doc-sources docs/<quadrant>/<file>.md    # gather every linked capture first",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
+                      "line": 60,
+                      "text": "git -C \"$root\" add \"docs/<quadrant>/<file>.md\"",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+                      "line": 44,
+                      "text": "`fgos compound <id> --doc-type <quadrant> --doc-path <path>` — called a",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: L12-62: Retiring four-quadrant input layout; Phase 9 description rewrite and Step 5 index scanner/writer parity must agree on docs/knowledge layout before changing this input contract. Own source passage: '- End-user markdown documents located under `docs/<quadrant>/` (`how-to`, `tutorials`, `reference`, `explanation`).'"
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"skills-088\",\"file\":\"core/task-specs/fgos-indexing.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-088\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":12}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"skills-088\",\"file\":\"core/task-specs/fgos-indexing.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-088\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":12}]}": {
+                "sourcePassage": "- Pointer in `docs/specs/reading-map.md` verified/updated for `docs/enduser-docs-index.json`.",
+                "adjacentPassage": "- Pointer in `docs/specs/reading-map.md` verified/updated for `docs/enduser-docs-index.json`.",
+                "target": "docs/reading-map.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+                "targetEvidence": [
+                  {
+                    "line": 122,
+                    "text": "## 5. Detailed Product And Source Map"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+                  }
+                },
+                "assessment": "L12-62: Maintained detailed map names end-user read-by-tag index; Phase 9 first conserves remaining reading-map source under accepted Step 3 carry."
+              }
+            },
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {
+            "{\"edgeId\":\"skills-088\",\"file\":\"core/task-specs/fgos-indexing.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-088\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":12}]}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+              "passage": "## 5. Detailed Product And Source Map",
+              "targetEvidenceLine": 122,
+              "targetLines": [
+                122
+              ],
+              "targetLineText": [
+                "## 5. Detailed Product And Source Map"
+              ],
+              "sourceLocatorTokens": []
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"skills-088\",\"file\":\"core/task-specs/fgos-indexing.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-088\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":12}]}": {
+              "replacement": "docs/reading-map.md#5-detailed-product-and-source-map",
+              "resolvedTarget": "docs/reading-map.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"skills-088\",\"file\":\"core/task-specs/fgos-indexing.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-088\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":12}]}": {
+              "source": "docs/specs/reading-map.md",
+              "replacement": "docs/reading-map.md#5-detailed-product-and-source-map",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-031",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "core/task-specs/fgos-indexing.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+          "bytes": 1246,
+          "lines": 26,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [
+        "docs/reading-map.md"
+      ],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p42.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "core/task-specs/fgos-researching.md",
+      "kind": "complete-source-context",
+      "path": "core/task-specs/fgos-researching.md",
+      "startLine": 1,
+      "endLine": 29,
+      "content": "# task-spec: fgos-researching\n\ndomain: core | role: researcher | scope: stage-agnostic | requires-skill: fgos-researching\n\n## Input\n- Specific question or research goal to investigate.\n- Existing context (item description, prior Q&A, prior verdicts, `view.discovery[id]`).\n\n## Output\n- Grounded research findings with concrete `file:line` or URL citations.\n- Accumulating log entries appended under dated sections in `docs/history/<feature>/RESEARCH.md`.\n- Verdict object `{clear: true, verify?: string}` OR `{clear: false, question: string}` returned directly to caller.\n- **No state write** — verdict returned directly to calling skill/verb.\n\n## Gates\n- Soft: Search repository (`rg`) first; external search (`WebSearch`/`WebFetch`) only for terms not found in repo. Parallel independent sub-queries dispatched as 6-field contracted units via Task-tool.\n- Hard: Stage-agnostic (never assumes or reads caller stage). Never decides scope, architecture, or code changes; never overwrites `RESEARCH.md`.\n\n## Verify-template\n- When `clear: true`: Runnable verify command string when goal calls for one.\n- When `clear: false`: N/A.\n\n## Collaboration\n\n| Trigger | Call | To | Reason | Bóng về mang |\n|---|---|---|---|---|\n| Independent research sub-query needs parallel branch | dispatch-branch (sync) | helper task | contracted-task | grounded findings digest |\n| Research round completed | verdict (sync) | caller | research-verdict | `{clear, verify?, question?}` |\n| No trigger matches | — record findings in RESEARCH.md and return verdict — | | | |\n",
+      "continued": false
+    },
+    {
+      "file": "core/task-specs/fgos-researching.md",
+      "kind": "complete-final-record",
+      "categoryA": false,
+      "categoryB": true,
+      "record": {
+        "file": "core/task-specs/fgos-researching.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "e0ddb50a83351347eeb60d3b345cd1ad9d7e827485ded1cb65aad134ee0f9226",
+        "digest": "e0ddb50a83351347eeb60d3b345cd1ad9d7e827485ded1cb65aad134ee0f9226",
+        "inventoryEdgeIds": [
+          "skills-089"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "skills-089",
+            "slotKey": "{\"edgeId\":\"skills-089\",\"file\":\"core/task-specs/fgos-researching.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-089\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":11}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-089",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 11
+              }
+            ],
+            "consumerFile": "core/task-specs/fgos-researching.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 11,
+                "columnStart": 62,
+                "columnEndExclusive": 96,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 11,
+                "columnStart": 62,
+                "columnEndExclusive": 96,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+            "logicalReference": "docs/history/<feature>/RESEARCH.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '- Accumulating log entries appended under dated sections in `docs/history/<feature>/RESEARCH.md`.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/RESEARCH.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-089",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 11,
+                "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+                "originalLineText": "- Accumulating log entries appended under dated sections in `docs/history/<feature>/RESEARCH.md`."
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/<feature>/RESEARCH.md",
+              "state": "pattern",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 0,
+              "historyCommitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "historySample": []
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-031",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "core/task-specs/fgos-researching.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "e0ddb50a83351347eeb60d3b345cd1ad9d7e827485ded1cb65aad134ee0f9226",
+          "bytes": 1558,
+          "lines": 29,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+      "kind": "complete-source-context",
+      "path": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+      "startLine": 1,
+      "endLine": 67,
+      "content": "# Goal\nResearch for: {title} (kind: {kind})\n\n# Agent skill\nYou are a fgOS agent for domain {domain} at the discovery stage. Before doing\nanything else, read {skillPath} in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this research must be done.\n\n# Description\n{description}\n{feedbackSection}\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: {refs}.\n\n# How to finish\nResearch the goal above per the skill's own flow: search this repo first,\nlook up anything not found in it externally, record every round in\n`docs/history/<feature>/RESEARCH.md` (accumulate, never overwrite), and\nleave that file in this checkout (the runner commits it). Once you are done recording your findings,\nreport your verdict as DATA ONLY by emitting exactly one fenced block:\n\n```fgos-verdict\n{\"clear\": true, \"verify\": \"<a real, runnable command that proves the goal>\", \"size\": \"<optional>\", \"rigor\": \"<optional>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\"}\n```\n\n`size`/`rigor`/`kind`/`risk` are optional (Phase 3): when the skill's own\nflow judged them from the same evidence, report them here as DATA so the\nrunner can apply them — you still MUST NOT call `fgos edit` yourself. Pick\n`kind`/`risk` from the domain's own declared vocabulary\n(`classificationVocabulary(domain, field)`,\n`src/state/workflow-stage-graphs.mjs`), `size` from the global `SIZES`\n(`src/state/work.mjs`), and `rigor` from the global `RIGOR_VALUES`\n(`src/runner/rigor.mjs`) — never invent a value outside either list, and\nomit a field entirely rather than guess when the evidence does not\nsupport a judgment for it.\n\nor, if you could not resolve the goal from the evidence you gathered:\n\n```fgos-verdict\n{\"clear\": false, \"question\": \"<the one concrete gap that is blocking you>\"}\n```\n\nThis is a report, not a write — you still MUST NOT call `fgos` or touch\n`.fgos/`. The runner reads this block after you finish and applies the\nverdict itself.\n\n# Constraints\nNever call `fgos` yourself and never write to `.fgos/` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun `git add`/`git commit` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while researching — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern\nunrelated to the goal above), you MAY surface it as DATA ONLY by emitting\none fenced block per discovery in your output:\n\n```fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n```\n\n`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n",
+      "continued": false
+    },
+    {
+      "file": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+      "kind": "complete-final-record",
+      "categoryA": false,
+      "categoryB": true,
+      "record": {
+        "file": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          },
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "c343469a6d604920e84a426dc1d72872d067b8aa83b5be6f420f9d580a06b9cb",
+        "digest": "c343469a6d604920e84a426dc1d72872d067b8aa83b5be6f420f9d580a06b9cb",
+        "inventoryEdgeIds": [
+          "skills-198"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "skills-198",
+            "slotKey": "{\"edgeId\":\"skills-198\",\"file\":\"src/runner/prompt-templates/worker-prompt-discovery.txt\",\"inventoryRefs\":[{\"edgeId\":\"skills-198\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":21},{\"edgeId\":\"class6-l-000322\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":21}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-198",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 21
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000322",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 21
+              }
+            ],
+            "consumerFile": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 2,
+                "columnEndExclusive": 36,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 2,
+                "columnEndExclusive": 36,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+            "logicalReference": "docs/history/<feature>/RESEARCH.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '`docs/history/<feature>/RESEARCH.md` (accumulate, never overwrite), and'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/RESEARCH.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-198",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 21,
+                "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+                "originalLineText": "`docs/history/<feature>/RESEARCH.md` (accumulate, never overwrite), and"
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000322",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 21,
+                "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+                "originalLineText": "`docs/history/<feature>/RESEARCH.md` (accumulate, never overwrite), and"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/<feature>/RESEARCH.md",
+              "state": "pattern",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 0,
+              "historyCommitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "historySample": []
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-031",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "c343469a6d604920e84a426dc1d72872d067b8aa83b5be6f420f9d580a06b9cb",
+          "bytes": 3507,
+          "lines": 67,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "kind": "complete-source-context",
+      "path": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "startLine": 1,
+      "endLine": 96,
+      "content": "# Goal\n{title} (kind: {kind})\n\n# Agent skill\nYou are a fgOS agent for domain {domain} at the executing stage. Before doing\nanything else, read {skillPath} in your own checkout — it is the same skill\nan interactive fgOS session loads for this exact domain and stage, and it\ngoverns how this work item must be done.\n\n# Description\n{description}\n{feedbackSection}\n# Directive\n{action}\n\n# Files to read first\n{readFirst}\n{docsRefPointer}\n\n# Worktree boundary\nYou are running on an isolated git worktree, checked out on its own branch for\nthis work item only. Stay inside this checkout — never touch the main\nworking tree, another branch, or another worktree. Relevant refs: {refs}.\n\n# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):\n\n```bash\nnode --input-type=module -e \"\nimport { execFileSync } from 'node:child_process';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nconst id = process.argv[1];\nconst description = process.argv[2];\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\0').filter(Boolean)), description })));\n\" \"<your item id — your current branch name, `git branch --show-current`, with the fgw/ prefix stripped>\" \"<your item's own Description text, verbatim, from the Description section above>\"\n```\n\nIf the result's `required` is `false`, do nothing further. If\n`required` is `true`, you must produce real failing-test-first proof\nbefore reporting `[DONE]` — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\nfor the full recipe: identify the test file(s) covering your change, `git\nstash push --` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), `git stash apply`\n(never `pop`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n`docs/history/<your item id>/iron-law-evidence.md` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting `[DONE]`. Skipping or fabricating this evidence when\n`required` is `true` is not a valid way to finish.\n\n# How to finish\nReport your completion status through a fixed token in your output — your\ncaller reads this token mechanically, not free prose:\n\n- `[DONE]` — the work described in your boundary is complete and left in this\n  checkout (the runner commits it).\n- `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed\n  because required context is missing, a file is outside your boundary, or a\n  real mid-work blocker stopped you. Never leave this bare.\n\nExiting without printing either token is not a valid end state — your caller\nhas nothing mechanical to read and will treat your outcome as unsignaled.\n\n# Expected proof\nYour work is judged only by this verify command, which the runner runs\nitself after you finish (your own report is never trusted on its own):\n{verify}\n\n# Constraints\nNever call `fgos` yourself and never write to `.fgos/` directly — the\nrunner is the sole writer through that door during this dispatch. Never\nrun `git add`/`git commit` — leave your changes in this checkout (the runner\ncommits them after you return) and report; do not merge, push, or approve your\nown work.\n\n# Reporting discovered work (report, not write)\nIf — while doing this item — you discover a NEW unit of work that deserves its\nown work item (a follow-up, a newly surfaced dependency, a separable concern),\nyou MAY surface it as DATA ONLY by emitting one fenced block per discovery in\nyour output:\n\n```fgos-discovered\n{\"title\": \"<one-line title>\", \"kind\": \"<optional>\", \"risk\": \"<optional>\", \"description\": \"<optional>\"}\n```\n\n`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.\n",
+      "continued": false
+    },
+    {
+      "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": true,
+      "record": {
+        "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          },
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+        "digest": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+        "inventoryEdgeIds": [
+          "skills-199",
+          "class6-l-000323",
+          "class6-l-000324"
+        ],
+        "diff": "--- a/src/runner/prompt-templates/worker-prompt-skill-pointer.txt\n+++ b/src/runner/prompt-templates/worker-prompt-skill-pointer.txt\n@@ -28,7 +28,7 @@\n — proof a fix was validated against a real failing test before it existed.\n AFTER your implementation is written in this checkout (running this BEFORE\n your edits exist reads an empty diff and gives a false \"not required\" — see\n-`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n+`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n \"Watch out for\" section), classify your own diff (the runner commits later, so\n the changed files come from the working tree, not from a branch diff):\n \n@@ -45,7 +45,7 @@\n If the result's `required` is `false`, do nothing further. If\n `required` is `true`, you must produce real failing-test-first proof\n before reporting `[DONE]` — see\n-`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\n+`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\n for the full recipe: identify the test file(s) covering your change, `git\n stash push --` the IMPLEMENTATION files only (never the test files), run\n the same test command and capture the real failing output (red — paste the\n",
+        "edges": [
+          {
+            "edgeId": "skills-199",
+            "slotKey": "{\"edgeId\":\"skills-199\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"skills-199\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":55},{\"edgeId\":\"class6-l-000325\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":55}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-199",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 55
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000325",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 55
+              }
+            ],
+            "consumerFile": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 55,
+                "columnStart": 2,
+                "columnEndExclusive": 50,
+                "text": "docs/history/<your item id>/iron-law-evidence.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 55,
+                "columnStart": 2,
+                "columnEndExclusive": 50,
+                "text": "docs/history/<your item id>/iron-law-evidence.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<your item id>/iron-law-evidence.md",
+            "logicalReference": "docs/history/<your item id>/iron-law-evidence.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project artifact under docs/history/<id>/, including iron-law evidence; L12-10 keeps that writer convention literal. Own source passage: '`docs/history/<your item id>/iron-law-evidence.md` with the matched'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<your item id>/iron-law-evidence.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-199",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 55,
+                "matchedExpression": "docs/history/<your item id>/iron-law-evidence.md",
+                "originalLineText": "`docs/history/<your item id>/iron-law-evidence.md` with the matched"
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000325",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 55,
+                "matchedExpression": "docs/history/<your",
+                "originalLineText": "`docs/history/<your item id>/iron-law-evidence.md` with the matched"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/<your item id>/iron-law-evidence.md",
+              "state": "pattern",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 0,
+              "historyCommitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "historySample": []
+            }
+          },
+          {
+            "edgeId": "class6-l-000323",
+            "slotKey": "{\"edgeId\":\"class6-l-000323\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000323\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":31}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000323",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 31
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000323",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 31,
+                "matchedExpression": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                "originalLineText": "`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s"
+              }
+            ],
+            "consumerFile": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 76,
+                "columnStart": 2,
+                "line": 31,
+                "text": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 76,
+                "columnStart": 2,
+                "line": 31,
+                "text": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "logicalReference": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "legacyPath": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -28,7 +28,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "parkSourceQuote": "`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s",
+            "movedVerbatimWitness": {
+              "fromPath": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "historicalSourceCommit": "989d0c7fa87ddcbab61b29b4f3e17b6fea6d430d",
+              "historicalDigest": "30ef480aa0a00886c42da6002d306ed5befdd36e9bb4fe53d9a3ffba74fb69cc",
+              "targetDigest": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+              "comparison": "complete narrative identical after frontmatter removal"
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s",
+              "terms": [
+                "MODULE_RULES",
+                "produce failing test first proof for an iron law gated diff"
+              ],
+              "queries": [
+                {
+                  "term": "MODULE_RULES",
+                  "hitCount": 9,
+                  "liveHits": 9,
+                  "hitsSha256": "06813ad70cbf2692e55077b9bc750c929d6f9460ee8d01d1e93fed671af5cffa",
+                  "files": {
+                    "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/decisions-index/decision-record.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/runner/decisions/h-36d872fbb0e5.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+                      "line": 143,
+                      "text": "(`src/evolve/iron-law.mjs`'s `MODULE_RULES`). Capture the failing-test-first",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/decisions-index/decision-record.md",
+                      "line": 21,
+                      "text": "| platform-foundations | D-ADR0035: Xác lập ranh giới sứ mệnh -- fgOS tồn tại để phát triển project khác (mission #1) và vận hành business base workflow (mission #2), tự-phát-triển-chính-nó (mission #3) là dogfood cần thiết lúc xây, không phải lý do tồn tại; config key mission (self-dev\\|host) khai báo một lần lúc setup, tsk-1js là consumer thi công đầu tiên (Iron Law MODULE_RULES đọc theo mission) | narrative di dời sang docs/specs/platform-foundations.md (tsk-1lv, hoàn tất round review-fix sau khi 0035 landed trên main giữa lúc tsk-1lv đang chạy -- 0035 tự thân định vị sống ở docs/decisions/0035 nhưng corpus đó đã retired trước khi record này thi công thật, áp quy ước tsk-1lv-4 cho 34 record trước); ADR gốc: docs/decisions/0035-xac-lap-ranh-gioi-su-menh-fgos.md (retired) | 2026-08-17T15:23:30.570Z |",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                      "line": 9,
+                      "text": "(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) — so `fgos approve` refused",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                      "line": 110,
+                      "text": "`src/evolve/iron-law.mjs`'s `MODULE_RULES` list.",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                      "line": 156,
+                      "text": "actually on `src/evolve/iron-law.mjs`'s `MODULE_RULES` list. The gate",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md",
+                      "line": 29,
+                      "text": "`MODULE_RULES` in `src/evolve/iron-law.mjs`. But `classifyIronLaw` run",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "produce failing test first proof for an iron law gated diff",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            }
+          },
+          {
+            "edgeId": "class6-l-000324",
+            "slotKey": "{\"edgeId\":\"class6-l-000324\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000324\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":48}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000324",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 48
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000324",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 48,
+                "matchedExpression": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                "originalLineText": "`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`"
+              }
+            ],
+            "consumerFile": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 76,
+                "columnStart": 2,
+                "line": 48,
+                "text": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 76,
+                "columnStart": 2,
+                "line": 48,
+                "text": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "logicalReference": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "legacyPath": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -45,7 +45,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "parkSourceQuote": "`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`",
+            "movedVerbatimWitness": {
+              "fromPath": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "historicalSourceCommit": "989d0c7fa87ddcbab61b29b4f3e17b6fea6d430d",
+              "historicalDigest": "30ef480aa0a00886c42da6002d306ed5befdd36e9bb4fe53d9a3ffba74fb69cc",
+              "targetDigest": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+              "comparison": "complete narrative identical after frontmatter removal"
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`",
+              "terms": [
+                "produce failing test first proof for an iron law gated diff"
+              ],
+              "queries": [
+                {
+                  "term": "produce failing test first proof for an iron law gated diff",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"class6-l-000323\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000323\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":31}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"class6-l-000324\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000324\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":48}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"class6-l-000323\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000323\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":31}]}": {
+                "sourcePassage": "`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s",
+                "adjacentPassage": "# Iron Law evidence\nThis repo is self-modifying: fix any of its own runner/evolve/state modules\n(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies\n— proof a fix was validated against a real failing test before it existed.\nAFTER your implementation is written in this checkout (running this BEFORE\nyour edits exist reads an empty diff and gives a false \"not required\" — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s\n\"Watch out for\" section), classify your own diff (the runner commits later, so\nthe changed files come from the working tree, not from a branch diff):",
+                "target": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+                "targetEvidence": [
+                  {
+                    "line": 1,
+                    "text": "---"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  }
+                },
+                "assessment": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+              },
+              "{\"edgeId\":\"class6-l-000324\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000324\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":48}]}": {
+                "sourcePassage": "`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`",
+                "adjacentPassage": "If the result's `required` is `false`, do nothing further. If\n`required` is `true`, you must produce real failing-test-first proof\nbefore reporting `[DONE]` — see\n`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`\nfor the full recipe: identify the test file(s) covering your change, `git\nstash push --` the IMPLEMENTATION files only (never the test files), run\nthe same test command and capture the real failing output (red — paste the\nactual stderr/assertion text, never a paraphrase), `git stash apply`\n(never `pop`, until green is reconfirmed) to restore your fix, rerun the\nsame command and confirm it passes (green), then write\n`docs/history/<your item id>/iron-law-evidence.md` with the matched\nflags/modules from the classification above and the real red/green\ntranscript excerpts, and leave it in this checkout (the runner commits it with\nthe rest) before reporting `[DONE]`. Skipping or fabricating this evidence when\n`required` is `true` is not a valid way to finish.",
+                "target": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+                "targetEvidence": [
+                  {
+                    "line": 1,
+                    "text": "---"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  }
+                },
+                "assessment": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+              }
+            },
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {
+            "{\"edgeId\":\"class6-l-000323\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000323\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":31}]}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+              "passage": "---",
+              "targetEvidenceLine": 1,
+              "targetLines": [],
+              "targetLineText": [],
+              "sourceLocatorTokens": [],
+              "wholeFileJustification": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Whole-file pointer spans the complete document."
+            },
+            "{\"edgeId\":\"class6-l-000324\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000324\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":48}]}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+              "passage": "---",
+              "targetEvidenceLine": 1,
+              "targetLines": [],
+              "targetLineText": [],
+              "sourceLocatorTokens": [],
+              "wholeFileJustification": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Whole-file pointer spans the complete document."
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"class6-l-000323\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000323\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":31}]}": {
+              "replacement": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "resolvedTarget": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"class6-l-000324\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000324\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":48}]}": {
+              "replacement": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "resolvedTarget": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"class6-l-000323\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000323\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":31}]}": {
+              "source": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "replacement": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"class6-l-000324\",\"file\":\"src/runner/prompt-templates/worker-prompt-skill-pointer.txt\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000324\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":48}]}": {
+              "source": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "replacement": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-031",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+          "bytes": 5196,
+          "lines": 96,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [
+        "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+      ],
+      "priorWave2Reports": [],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

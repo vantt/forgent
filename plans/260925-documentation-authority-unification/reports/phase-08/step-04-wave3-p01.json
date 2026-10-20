@@ -1,0 +1,2210 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-001",
+  "files": [
+    "domains/coding/AGENTS.md",
+    "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+    "domains/coding/skills/fgos-coding-knowledge/SKILL.md"
+  ],
+  "joinedSlots": 16,
+  "items": [
+    {
+      "file": "domains/coding/AGENTS.md",
+      "kind": "complete-source-context",
+      "path": "domains/coding/AGENTS.md",
+      "startLine": 1,
+      "endLine": 89,
+      "content": "## fgOS Workflow\n\nA session opening in this repo to work an item through its lifecycle loads\n`fgos-routing` first (`.claude/skills/fgos-routing/SKILL.md`): it orients\non open work, claims one item through the pull door, then points to\n`fgos-coding-discovering`, `fgos-coding-exploring`, `fgos-coding-planning`,\nor `fgos-coding-validating` based on where that item's `stage` puts it.\n\n**Never run a raw `git reset --hard` on the main checkout without a full\n`git status` first** (tsk-3au: `docs/history/main-checkout-destructive-\ngit-safety-net/CONTEXT.md`) — the main checkout is the one shared working\ntree every session's `fgos <verb>` call resolves against; checking only the\nfiles you meant to touch instead of the whole tree can silently discard\nanother in-flight session's uncommitted work, with no stash/reflog/blob to\nrecover it. Use `fgos main-checkout-reset --sha <sha> [--confirm]` instead\n— it prints the full whole-repo status and refuses without `--confirm`\nwhen the tree is dirty.\n\n**Never `git add -A` inside a linked worktree (`fgos pick`'s `fgw/<id>`\ncheckout) without checking `git status` first** (tsk-56u:\n`docs/history/commit-time-fgos-deletion-guard/`) — a worktree never keeps a\nworking-tree copy of `.fgos/` (ADR0020 strips it right after `git worktree\nadd`, without ever `git rm`-ing it from the index), so `-A` stages every\n`.fgos/` file as deleted. Committing that silently destroys the live event\nlog once the branch merges back. `.githooks/pre-commit` now refuses this\ncommit outright (a staged `.fgos/` deletion, checked unconditionally, not\nonly \"at home\" in the main checkout) — if you hit that refusal, `git\nrestore --staged .fgos` before committing again.\n\n**Never `git stash` in the main checkout to clear a dirty tree without\nchecking what it swept up** (tsk-56u, same history folder) — the stash\nstack is shared across every session and worktree, and stashing\n`.fgos/events.jsonl` along with everything else doesn't just hide the\nfile: it rolls the whole repository's `.fgos` state back to an older\ncommit for as long as the stash is held. This has already caused a real\nincident: an `approve` run misread an item's status as `doing` when it was\nreally `awaiting-approval`, because the live event log was sitting in a\nstash — recovered by applying the stash back by SHA rather than popping\nit, but the same move can silently strand another session's reads too.\nThere is no mechanical guard against this (git has no hook that can\nrefuse a stash) — stash selectively, or use `fgos main-checkout-reset`\nabove instead of stash-and-reset as a shortcut.\n\n**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.\n\n<!-- gitnexus:start -->\n# GitNexus — Code Intelligence\n\nThis project is indexed by GitNexus as **forgent** (19129 symbols, 26811 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.\n\n> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).\n\n## Always Do\n\n- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: \"symbolName\", direction: \"upstream\"})` and report the blast radius (direct callers, affected processes, risk level) to the user.\n- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: \"compare\", base_ref: \"main\"})`.\n- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.\n- When exploring unfamiliar code, use `query({search_query: \"concept\"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.\n- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: \"symbolName\"})`.\n- For security review, `explain({target: \"fileOrSymbol\"})` lists taint findings (source→sink flows; needs `analyze --pdg`).\n\n## Never Do\n\n- NEVER edit a function, class, or method without first running `impact` on it.\n- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.\n- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.\n- NEVER commit changes without running `detect_changes()` to check affected scope.\n\n## Resources\n\n| Resource | Use for |\n|----------|---------|\n| `gitnexus://repo/forgent/context` | Codebase overview, check index freshness |\n| `gitnexus://repo/forgent/clusters` | All functional areas |\n| `gitnexus://repo/forgent/processes` | All execution flows |\n| `gitnexus://repo/forgent/process/{name}` | Step-by-step execution trace |\n\n## CLI\n\n| Task | Read this skill file |\n|------|---------------------|\n| Understand architecture / \"How does X work?\" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |\n| Blast radius / \"What breaks if I change X?\" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |\n| Trace bugs / \"Why is X failing?\" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |\n| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |\n| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |\n| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |\n\n<!-- gitnexus:end -->\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/AGENTS.md",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "domains/coding/AGENTS.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-instructions.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "dceafd6fe7ff4d9ca6d045a2f92850a321fb6a23ec688ed112e08153250bc187",
+            "edges": 87
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "f0b4079e790b0c85f56be179670e2c8bf0026b8759e4db602a8006bef469a924",
+        "digest": "f0b4079e790b0c85f56be179670e2c8bf0026b8759e4db602a8006bef469a924",
+        "inventoryEdgeIds": [
+          "instructions-051",
+          "instructions-052",
+          "instructions-056",
+          null,
+          null
+        ],
+        "diff": "--- a/domains/coding/AGENTS.md\n+++ b/domains/coding/AGENTS.md\n@@ -41,7 +41,7 @@\n refuse a stash) — stash selectively, or use `fgos main-checkout-reset`\n above instead of stash-and-reset as a shortcut.\n \n-**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.\n+**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.\n \n <!-- gitnexus:start -->\n # GitNexus — Code Intelligence\n",
+        "edges": [
+          {
+            "edgeId": "instructions-051",
+            "slotKey": "{\"edgeId\":\"instructions-051\",\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-051\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":21}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-051",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 21
+              }
+            ],
+            "consumerFile": "domains/coding/AGENTS.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 2,
+                "columnEndExclusive": 47,
+                "text": "docs/history/commit-time-fgos-deletion-guard/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 2,
+                "columnEndExclusive": 47,
+                "text": "docs/history/commit-time-fgos-deletion-guard/"
+              }
+            ],
+            "matchedExpression": "docs/history/commit-time-fgos-deletion-guard/",
+            "logicalReference": "docs/history/commit-time-fgos-deletion-guard/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '`docs/history/commit-time-fgos-deletion-guard/`) — a worktree never keeps a'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/commit-time-fgos-deletion-guard/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-051",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 21,
+                "matchedExpression": "docs/history/commit-time-fgos-deletion-guard/",
+                "originalLineText": "`docs/history/commit-time-fgos-deletion-guard/`) — a worktree never keeps a"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/commit-time-fgos-deletion-guard",
+              "state": "tree",
+              "treeMatchCount": 2,
+              "treeMatchesSha256": "7094f5d3c5894d3ccd0f2d3fbab619d6ed9b04175230ec96a63c45bc495a06b8",
+              "treeSample": [
+                "docs/history/commit-time-fgos-deletion-guard/RESEARCH.md",
+                "docs/history/commit-time-fgos-deletion-guard/plan.md"
+              ],
+              "historyCommitCount": 1,
+              "historyCommitsSha256": "7f79f9de20365f0058edd225939e8706a8b0167ee98a179a2493f0a3f747ec25",
+              "historySample": [
+                "5aa283f9c89aab689cb0d5cebfab0a4fa7fd5d85"
+              ]
+            }
+          },
+          {
+            "edgeId": "instructions-052",
+            "slotKey": "{\"edgeId\":\"instructions-052\",\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-052\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":44}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-052",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 44
+              }
+            ],
+            "consumerFile": "domains/coding/AGENTS.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 44,
+                "columnStart": 115,
+                "columnEndExclusive": 171,
+                "text": "docs/history/worktree-manual-merge-fgos-blob-safety-net/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 44,
+                "columnStart": 115,
+                "columnEndExclusive": 171,
+                "text": "docs/history/worktree-manual-merge-fgos-blob-safety-net/"
+              }
+            ],
+            "matchedExpression": "docs/history/worktree-manual-merge-fgos-blob-safety-net/",
+            "logicalReference": "docs/history/worktree-manual-merge-fgos-blob-safety-net/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: \"**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/worktree-manual-merge-fgos-blob-safety-net/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-052",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 44,
+                "matchedExpression": "docs/history/worktree-manual-merge-fgos-blob-safety-net/",
+                "originalLineText": "**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules."
+              }
+            ],
+            "unitDispositionReason": "{\"edgeId\":\"instructions-052\",\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-052\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":44}]} Distinct claim: docs/history/worktree-manual-merge-fgos-blob-safety-net/ A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: \"**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.\"",
+            "preservedPathWitness": {
+              "path": "docs/history/worktree-manual-merge-fgos-blob-safety-net",
+              "state": "tree",
+              "treeMatchCount": 2,
+              "treeMatchesSha256": "c6522d61d889c80a1642dedf755859b9092382c05794b012b0bdff80b9bfb58a",
+              "treeSample": [
+                "docs/history/worktree-manual-merge-fgos-blob-safety-net/RESEARCH.md",
+                "docs/history/worktree-manual-merge-fgos-blob-safety-net/plan.md"
+              ],
+              "historyCommitCount": 3,
+              "historyCommitsSha256": "04b05a5944775efc84113e8bc21b49985e65bc46e30de11f168eb1a967649cdd",
+              "historySample": [
+                "8e19431fff5f0b842a67ae1c1292589ee3546379",
+                "d236a5f258b7083bab63de0dfdf919096960c125"
+              ]
+            }
+          },
+          {
+            "edgeId": "instructions-056",
+            "slotKey": "{\"edgeId\":\"instructions-056\",\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-056\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":10}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-056",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 10
+              }
+            ],
+            "consumerFile": "domains/coding/AGENTS.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 10,
+                "columnStart": 33,
+                "columnEndExclusive": 72,
+                "text": "docs/history/main-checkout-destructive-"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 10,
+                "columnStart": 33,
+                "columnEndExclusive": 72,
+                "text": "docs/history/main-checkout-destructive-"
+              },
+              {
+                "line": 11,
+                "columnStart": 1,
+                "columnEndExclusive": 26,
+                "text": "git-safety-net/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/main-checkout-destructive-\ngit-safety-net/CONTEXT.md",
+            "logicalReference": "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; source-bound history/provenance or surviving root; literal spelling conserved. Own source passage: '`git status` first** (tsk-3au: `docs/history/main-checkout-destructive-\\ngit-safety-net/CONTEXT.md`) — the main checkout is the one shared working'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-056",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 10,
+                "matchedExpression": "docs/history/main-checkout-destructive-",
+                "originalLineText": "`git status` first** (tsk-3au: `docs/history/main-checkout-destructive-"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "59d00deef9d0d9a0d4ef1308b22a25e5bbbc5ea0cf5d531047bd71731b04dd38",
+              "treeSample": [
+                "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "22e6e4d0068d7422eadae1d2bcc8287ec62aaf49616a96905f9f83a2ad185313",
+              "historySample": [
+                "b2f9ce9d22a1d4d9f04603ee3b709953ef93645a",
+                "ac8f9c1d9acb96d1c12bb95efcdfa1128a75105e"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":593,\"columnStart\":543,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/fix-fgos-write-rejected-merge-block.md\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "domains/coding/AGENTS.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 44,
+                "columnStart": 543,
+                "columnEndExclusive": 593,
+                "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 44,
+                "columnStart": 543,
+                "columnEndExclusive": 593,
+                "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "logicalReference": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "legacyPath": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -41,7 +41,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "domains/coding/AGENTS.md",
+              "line": 44,
+              "columnStart": 543,
+              "columnEndExclusive": 593,
+              "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "parkSourceQuote": "**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.",
+            "movedVerbatimWitness": {
+              "fromPath": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+              "historicalSourceCommit": "7557f0f887f56787b5f76b4a62f4689075919841",
+              "historicalDigest": "f2bb5e2bc4a314ddaf5dca473fcd208b2a09788cd74a594c018c46afdb1f34c1",
+              "targetDigest": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+              "comparison": "complete narrative identical after frontmatter removal"
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.",
+              "terms": [
+                "fix fgos write rejected merge block"
+              ],
+              "queries": [
+                {
+                  "term": "fix fgos write rejected merge block",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            },
+            "unitDispositionReason": "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":593,\"columnStart\":543,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/fix-fgos-write-rejected-merge-block.md\"}} Distinct claim: docs/how-to/fix-fgos-write-rejected-merge-block.md A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":735,\"columnStart\":682,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/resolve-an-events-jsonl-merge-conflict.md\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "domains/coding/AGENTS.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 44,
+                "columnStart": 682,
+                "columnEndExclusive": 735,
+                "text": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 44,
+                "columnStart": 682,
+                "columnEndExclusive": 735,
+                "text": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md",
+            "logicalReference": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md",
+            "legacyPath": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -41,7 +41,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "domains/coding/AGENTS.md",
+              "line": 44,
+              "columnStart": 682,
+              "columnEndExclusive": 735,
+              "text": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "parkSourceQuote": "**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.",
+            "movedVerbatimWitness": {
+              "fromPath": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md",
+              "historicalSourceCommit": "e7475b18347084fb54cfd68aa0035c0e46bd92c5",
+              "historicalDigest": "c3d3e9b47785566c1c6bb6159840abd0837e248de78b121e485ad2c6853c6707",
+              "targetDigest": "580077e82919d354ca2e905d5ee54e0c40f86fd1b745c3163a53384c5951ff2c",
+              "comparison": "complete narrative identical after frontmatter removal"
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.",
+              "terms": [
+                "resolve an events jsonl merge conflict"
+              ],
+              "queries": [
+                {
+                  "term": "resolve an events jsonl merge conflict",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            },
+            "unitDispositionReason": "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":735,\"columnStart\":682,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/resolve-an-events-jsonl-merge-conflict.md\"}} Distinct claim: docs/how-to/resolve-an-events-jsonl-merge-conflict.md A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":593,\"columnStart\":543,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/fix-fgos-write-rejected-merge-block.md\"}}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":735,\"columnStart\":682,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/resolve-an-events-jsonl-merge-conflict.md\"}}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":593,\"columnStart\":543,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/fix-fgos-write-rejected-merge-block.md\"}}": {
+                "sourcePassage": "**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.",
+                "adjacentPassage": "**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.",
+                "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+                "targetEvidence": [
+                  {
+                    "line": 1,
+                    "text": "---"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  }
+                },
+                "assessment": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+              },
+              "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":735,\"columnStart\":682,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/resolve-an-events-jsonl-merge-conflict.md\"}}": {
+                "sourcePassage": "**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.",
+                "adjacentPassage": "**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.",
+                "target": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "580077e82919d354ca2e905d5ee54e0c40f86fd1b745c3163a53384c5951ff2c",
+                "targetEvidence": [
+                  {
+                    "line": 1,
+                    "text": "---"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  }
+                },
+                "assessment": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+              }
+            },
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {
+            "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":593,\"columnStart\":543,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/fix-fgos-write-rejected-merge-block.md\"}}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+              "passage": "---",
+              "targetEvidenceLine": 1,
+              "targetLines": [],
+              "targetLineText": [],
+              "sourceLocatorTokens": [],
+              "wholeFileJustification": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Whole-file pointer spans the complete document."
+            },
+            "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":735,\"columnStart\":682,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/resolve-an-events-jsonl-merge-conflict.md\"}}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "580077e82919d354ca2e905d5ee54e0c40f86fd1b745c3163a53384c5951ff2c",
+              "passage": "---",
+              "targetEvidenceLine": 1,
+              "targetLines": [],
+              "targetLineText": [],
+              "sourceLocatorTokens": [],
+              "wholeFileJustification": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Whole-file pointer spans the complete document."
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":593,\"columnStart\":543,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/fix-fgos-write-rejected-merge-block.md\"}}": {
+              "replacement": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+              "resolvedTarget": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":735,\"columnStart\":682,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/resolve-an-events-jsonl-merge-conflict.md\"}}": {
+              "replacement": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+              "resolvedTarget": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":593,\"columnStart\":543,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/fix-fgos-write-rejected-merge-block.md\"}}": {
+              "source": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+              "replacement": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":null,\"file\":\"domains/coding/AGENTS.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":735,\"columnStart\":682,\"file\":\"domains/coding/AGENTS.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":44,\"text\":\"docs/how-to/resolve-an-events-jsonl-merge-conflict.md\"}}": {
+              "source": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md",
+              "replacement": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-001",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "domains/coding/AGENTS.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "f0b4079e790b0c85f56be179670e2c8bf0026b8759e4db602a8006bef469a924",
+          "bytes": 6305,
+          "lines": 89,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [
+        "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+        "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md"
+      ],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p01.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "kind": "complete-source-context",
+      "path": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "startLine": 1,
+      "endLine": 73,
+      "content": "# Verify, Commit, and Iron Law evidence — full mechanics\n\nThe full detail behind SKILL.md's Step 3 and Step 4.\n\n## Step 3: Verify — proof, not assertion\n\n**Skip this step entirely when mechanism was `out-of-process`** — the\nworker already ran verify itself per the Hard rule; re-running it here\nwould be redundant at best and misleading at worst if the workspace has\nsince changed. Otherwise (you did the work yourself), run the item's own\n`verify` command exactly as recorded on the item (`fgos metrics outcomes <id>` or\n`fgos list --json` shows it). A prose description instead of a runnable\ncommand is not this skill's problem to invent a substitute for — that is\na shaping defect from `fgos-coding-planning`; park the item and say so\nrather than inventing a check. On failure, fix the root cause and rerun\nthe exact command — never weaken the command or swap in an easier one to\nmake it pass. If the failure is a confusing \"command not found\"/\nwrong-output result rather than a clean test failure or a clean shell\nsyntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md` — a backslash-escaped backtick lost during an\nearlier hand-transcription is a common, quiet cause.\n\n## Step 4: Commit, then check Iron Law evidence\n\nThe Iron Law gate's own file-set computation (`changedFiles`,\n`src/runner/merge.mjs`) diffs `trunk...branch` — COMMITTED history only,\nthe exact same committed-ref shape `approve`/`sync-root`'s own gate\ndiffs at merge time (the trigger must reuse the real classifier against\nthe real diff, never an early-prediction heuristic). Running this check\nbefore committing the implementation is a false negative, not a skip —\nthe diff sees only whatever was already committed (typically just the\nearlier plan.md/CONTEXT.md commits), so the classification comes back\n`{required:false}` even when the real diff would trip the gate, silently\nskipping `iron-law-evidence.md` and forcing a retroactive scramble to\nreconstruct proof once `approve` correctly catches it later. So:\n\nCommit the real implementation (and its now-passing verify from Step 3)\nFIRST — for an `out-of-process` mechanism run through `fgos run` the\nrunner already committed the worker's edits (`data.results[-1].commit.status`\n`committed`), so skip the commit and classify against that commit; commit\nby hand only what this session itself changed afterwards —\n\n```bash\ngit add <files this item actually changed>\ngit commit -m \"<conventional-commit message, item id included>\"\n```\n\n— THEN compute the exact file set the gate itself uses and classify it\nthe same way (`classifyIronLaw`, `src/evolve/iron-law.mjs`), against that\nnow-real committed diff:\n\n```bash\nroot=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)\nnode --input-type=module -e \"\nimport { changedFiles } from './src/runner/merge.mjs';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nimport { listWork } from './src/state/store.mjs';\nconst item = listWork(process.argv[2]).work[process.argv[1]];\nconst filesChanged = changedFiles(process.argv[3], item);\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged, description: item.description })));\n\" \"<id>\" \"$root/.fgos\" \"$root\"\n```\n\nWhen the result's `required` is `true`, write\n`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules\nfrom that same result, the test command Step 3 already ran, and its real\nfailing-before/passing-after transcript excerpts (the failing-test-first\nproof) — and commit it as its own follow-up commit (the implementation\nalready landed in its own commit above; the \"one commit per item\" rule\nis about the implementation itself, not a ban on this small additive\nevidence commit that necessarily comes after it). When `required` is\n`false`, write nothing; this cost is only paid for the items the gate\nwill actually apply to.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "kind": "complete-render-context",
+      "path": ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "startLine": 1,
+      "endLine": 74,
+      "content": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n# Verify, Commit, and Iron Law evidence — full mechanics\n\nThe full detail behind SKILL.md's Step 3 and Step 4.\n\n## Step 3: Verify — proof, not assertion\n\n**Skip this step entirely when mechanism was `out-of-process`** — the\nworker already ran verify itself per the Hard rule; re-running it here\nwould be redundant at best and misleading at worst if the workspace has\nsince changed. Otherwise (you did the work yourself), run the item's own\n`verify` command exactly as recorded on the item (`fgos metrics outcomes <id>` or\n`fgos list --json` shows it). A prose description instead of a runnable\ncommand is not this skill's problem to invent a substitute for — that is\na shaping defect from `fgos-coding-planning`; park the item and say so\nrather than inventing a check. On failure, fix the root cause and rerun\nthe exact command — never weaken the command or swap in an easier one to\nmake it pass. If the failure is a confusing \"command not found\"/\nwrong-output result rather than a clean test failure or a clean shell\nsyntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md` — a backslash-escaped backtick lost during an\nearlier hand-transcription is a common, quiet cause.\n\n## Step 4: Commit, then check Iron Law evidence\n\nThe Iron Law gate's own file-set computation (`changedFiles`,\n`src/runner/merge.mjs`) diffs `trunk...branch` — COMMITTED history only,\nthe exact same committed-ref shape `approve`/`sync-root`'s own gate\ndiffs at merge time (the trigger must reuse the real classifier against\nthe real diff, never an early-prediction heuristic). Running this check\nbefore committing the implementation is a false negative, not a skip —\nthe diff sees only whatever was already committed (typically just the\nearlier plan.md/CONTEXT.md commits), so the classification comes back\n`{required:false}` even when the real diff would trip the gate, silently\nskipping `iron-law-evidence.md` and forcing a retroactive scramble to\nreconstruct proof once `approve` correctly catches it later. So:\n\nCommit the real implementation (and its now-passing verify from Step 3)\nFIRST — for an `out-of-process` mechanism run through `fgos run` the\nrunner already committed the worker's edits (`data.results[-1].commit.status`\n`committed`), so skip the commit and classify against that commit; commit\nby hand only what this session itself changed afterwards —\n\n```bash\ngit add <files this item actually changed>\ngit commit -m \"<conventional-commit message, item id included>\"\n```\n\n— THEN compute the exact file set the gate itself uses and classify it\nthe same way (`classifyIronLaw`, `src/evolve/iron-law.mjs`), against that\nnow-real committed diff:\n\n```bash\nroot=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)\nnode --input-type=module -e \"\nimport { changedFiles } from './src/runner/merge.mjs';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nimport { listWork } from './src/state/store.mjs';\nconst item = listWork(process.argv[2]).work[process.argv[1]];\nconst filesChanged = changedFiles(process.argv[3], item);\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged, description: item.description })));\n\" \"<id>\" \"$root/.fgos\" \"$root\"\n```\n\nWhen the result's `required` is `true`, write\n`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules\nfrom that same result, the test command Step 3 already ran, and its real\nfailing-before/passing-after transcript excerpts (the failing-test-first\nproof) — and commit it as its own follow-up commit (the implementation\nalready landed in its own commit above; the \"one commit per item\" rule\nis about the implementation itself, not a ban on this small additive\nevidence commit that necessarily comes after it). When `required` is\n`false`, write nothing; this cost is only paid for the items the gate\nwill actually apply to.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "kind": "complete-render-context",
+      "path": ".claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "startLine": 1,
+      "endLine": 74,
+      "content": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n# Verify, Commit, and Iron Law evidence — full mechanics\n\nThe full detail behind SKILL.md's Step 3 and Step 4.\n\n## Step 3: Verify — proof, not assertion\n\n**Skip this step entirely when mechanism was `out-of-process`** — the\nworker already ran verify itself per the Hard rule; re-running it here\nwould be redundant at best and misleading at worst if the workspace has\nsince changed. Otherwise (you did the work yourself), run the item's own\n`verify` command exactly as recorded on the item (`fgos metrics outcomes <id>` or\n`fgos list --json` shows it). A prose description instead of a runnable\ncommand is not this skill's problem to invent a substitute for — that is\na shaping defect from `fgos-coding-planning`; park the item and say so\nrather than inventing a check. On failure, fix the root cause and rerun\nthe exact command — never weaken the command or swap in an easier one to\nmake it pass. If the failure is a confusing \"command not found\"/\nwrong-output result rather than a clean test failure or a clean shell\nsyntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md` — a backslash-escaped backtick lost during an\nearlier hand-transcription is a common, quiet cause.\n\n## Step 4: Commit, then check Iron Law evidence\n\nThe Iron Law gate's own file-set computation (`changedFiles`,\n`src/runner/merge.mjs`) diffs `trunk...branch` — COMMITTED history only,\nthe exact same committed-ref shape `approve`/`sync-root`'s own gate\ndiffs at merge time (the trigger must reuse the real classifier against\nthe real diff, never an early-prediction heuristic). Running this check\nbefore committing the implementation is a false negative, not a skip —\nthe diff sees only whatever was already committed (typically just the\nearlier plan.md/CONTEXT.md commits), so the classification comes back\n`{required:false}` even when the real diff would trip the gate, silently\nskipping `iron-law-evidence.md` and forcing a retroactive scramble to\nreconstruct proof once `approve` correctly catches it later. So:\n\nCommit the real implementation (and its now-passing verify from Step 3)\nFIRST — for an `out-of-process` mechanism run through `fgos run` the\nrunner already committed the worker's edits (`data.results[-1].commit.status`\n`committed`), so skip the commit and classify against that commit; commit\nby hand only what this session itself changed afterwards —\n\n```bash\ngit add <files this item actually changed>\ngit commit -m \"<conventional-commit message, item id included>\"\n```\n\n— THEN compute the exact file set the gate itself uses and classify it\nthe same way (`classifyIronLaw`, `src/evolve/iron-law.mjs`), against that\nnow-real committed diff:\n\n```bash\nroot=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)\nnode --input-type=module -e \"\nimport { changedFiles } from './src/runner/merge.mjs';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nimport { listWork } from './src/state/store.mjs';\nconst item = listWork(process.argv[2]).work[process.argv[1]];\nconst filesChanged = changedFiles(process.argv[3], item);\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged, description: item.description })));\n\" \"<id>\" \"$root/.fgos\" \"$root\"\n```\n\nWhen the result's `required` is `true`, write\n`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules\nfrom that same result, the test command Step 3 already ran, and its real\nfailing-before/passing-after transcript excerpts (the failing-test-first\nproof) — and commit it as its own follow-up commit (the implementation\nalready landed in its own commit above; the \"one commit per item\" rule\nis about the implementation itself, not a ban on this small additive\nevidence commit that necessarily comes after it). When `required` is\n`false`, write nothing; this cost is only paid for the items the gate\nwill actually apply to.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "kind": "complete-render-context",
+      "path": "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "startLine": 1,
+      "endLine": 74,
+      "content": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n# Verify, Commit, and Iron Law evidence — full mechanics\n\nThe full detail behind SKILL.md's Step 3 and Step 4.\n\n## Step 3: Verify — proof, not assertion\n\n**Skip this step entirely when mechanism was `out-of-process`** — the\nworker already ran verify itself per the Hard rule; re-running it here\nwould be redundant at best and misleading at worst if the workspace has\nsince changed. Otherwise (you did the work yourself), run the item's own\n`verify` command exactly as recorded on the item (`fgos metrics outcomes <id>` or\n`fgos list --json` shows it). A prose description instead of a runnable\ncommand is not this skill's problem to invent a substitute for — that is\na shaping defect from `fgos-coding-planning`; park the item and say so\nrather than inventing a check. On failure, fix the root cause and rerun\nthe exact command — never weaken the command or swap in an easier one to\nmake it pass. If the failure is a confusing \"command not found\"/\nwrong-output result rather than a clean test failure or a clean shell\nsyntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md` — a backslash-escaped backtick lost during an\nearlier hand-transcription is a common, quiet cause.\n\n## Step 4: Commit, then check Iron Law evidence\n\nThe Iron Law gate's own file-set computation (`changedFiles`,\n`src/runner/merge.mjs`) diffs `trunk...branch` — COMMITTED history only,\nthe exact same committed-ref shape `approve`/`sync-root`'s own gate\ndiffs at merge time (the trigger must reuse the real classifier against\nthe real diff, never an early-prediction heuristic). Running this check\nbefore committing the implementation is a false negative, not a skip —\nthe diff sees only whatever was already committed (typically just the\nearlier plan.md/CONTEXT.md commits), so the classification comes back\n`{required:false}` even when the real diff would trip the gate, silently\nskipping `iron-law-evidence.md` and forcing a retroactive scramble to\nreconstruct proof once `approve` correctly catches it later. So:\n\nCommit the real implementation (and its now-passing verify from Step 3)\nFIRST — for an `out-of-process` mechanism run through `fgos run` the\nrunner already committed the worker's edits (`data.results[-1].commit.status`\n`committed`), so skip the commit and classify against that commit; commit\nby hand only what this session itself changed afterwards —\n\n```bash\ngit add <files this item actually changed>\ngit commit -m \"<conventional-commit message, item id included>\"\n```\n\n— THEN compute the exact file set the gate itself uses and classify it\nthe same way (`classifyIronLaw`, `src/evolve/iron-law.mjs`), against that\nnow-real committed diff:\n\n```bash\nroot=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)\nnode --input-type=module -e \"\nimport { changedFiles } from './src/runner/merge.mjs';\nimport { classifyIronLaw } from './src/evolve/iron-law.mjs';\nimport { listWork } from './src/state/store.mjs';\nconst item = listWork(process.argv[2]).work[process.argv[1]];\nconst filesChanged = changedFiles(process.argv[3], item);\nconsole.log(JSON.stringify(classifyIronLaw({ filesChanged, description: item.description })));\n\" \"<id>\" \"$root/.fgos\" \"$root\"\n```\n\nWhen the result's `required` is `true`, write\n`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules\nfrom that same result, the test command Step 3 already ran, and its real\nfailing-before/passing-after transcript excerpts (the failing-test-first\nproof) — and commit it as its own follow-up commit (the implementation\nalready landed in its own commit above; the \"one commit per item\" rule\nis about the implementation itself, not a ban on this small additive\nevidence commit that necessarily comes after it). When `required` is\n`false`, write nothing; this cost is only paid for the items the gate\nwill actually apply to.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          },
+          {
+            "path": "step-02l-census-class4.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "51c1701eafb40e09329d9c096f1a757c836663757dee8ecc7877e459dafca62c",
+            "counts": {
+              "dynamicConstructions": 3542,
+              "dynamicFiles": 176,
+              "edgeFiles": 122,
+              "edges": 3334,
+              "files": 225
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+        "digest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+        "inventoryEdgeIds": [
+          "skills-029",
+          "skills-050",
+          "skills-103",
+          "skills-162",
+          "class4-l-000055",
+          "class4-l-002057",
+          null,
+          null
+        ],
+        "diff": "--- a/domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\n+++ b/domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\n@@ -16,8 +16,8 @@\n the exact command — never weaken the command or swap in an easier one to\n make it pass. If the failure is a confusing \"command not found\"/\n wrong-output result rather than a clean test failure or a clean shell\n-syntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\n-a-verify-command.md` — a backslash-escaped backtick lost during an\n+syntax error, read `docs/knowledge/how-to-preserve-shell-escapes-when-\n+transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md` — a backslash-escaped backtick lost during an\n earlier hand-transcription is a common, quiet cause.\n \n ## Step 4: Commit, then check Iron Law evidence\n",
+        "edges": [
+          {
+            "edgeId": "skills-029",
+            "slotKey": "{\"edgeId\":\"skills-029\",\"file\":\".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-029\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":66},{\"edgeId\":\"class4-l-000056\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":66}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-029",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 66
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000056",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 66
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 66,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 66,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+            "logicalReference": "docs/history/<id>/iron-law-evidence.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<id>/iron-law-evidence.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-029",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 66,
+                "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+                "originalLineText": "`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000056",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 66,
+                "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+                "originalLineText": "`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules"
+              }
+            ],
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":\"skills-103\",\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-103\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":65}]}"
+          },
+          {
+            "edgeId": "skills-050",
+            "slotKey": "{\"edgeId\":\"skills-050\",\"file\":\".claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-050\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":66}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-050",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 66
+              }
+            ],
+            "consumerFile": ".claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 66,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 66,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+            "logicalReference": "docs/history/<id>/iron-law-evidence.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<id>/iron-law-evidence.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-050",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 66,
+                "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+                "originalLineText": "`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules"
+              }
+            ],
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":\"skills-103\",\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-103\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":65}]}"
+          },
+          {
+            "edgeId": "skills-103",
+            "slotKey": "{\"edgeId\":\"skills-103\",\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-103\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":65}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-103",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 65
+              }
+            ],
+            "consumerFile": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 65,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 65,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+            "logicalReference": "docs/history/<id>/iron-law-evidence.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project artifact under docs/history/<id>/, including iron-law evidence; L12-10 keeps that writer convention literal. Own source passage: '`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<id>/iron-law-evidence.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-103",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 65,
+                "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+                "originalLineText": "`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/<id>/iron-law-evidence.md",
+              "state": "pattern",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 0,
+              "historyCommitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "historySample": []
+            }
+          },
+          {
+            "edgeId": "skills-162",
+            "slotKey": "{\"edgeId\":\"skills-162\",\"file\":\"plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-162\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":66},{\"edgeId\":\"class4-l-002058\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":66}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-162",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 66
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002058",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 66
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 66,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 66,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+            "logicalReference": "docs/history/<id>/iron-law-evidence.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: preserve. Own render passage: '`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<id>/iron-law-evidence.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-162",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 66,
+                "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+                "originalLineText": "`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002058",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 66,
+                "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+                "originalLineText": "`docs/history/<id>/iron-law-evidence.md` — the matched flags/modules"
+              }
+            ],
+            "sourceDisposition": "preserve",
+            "sourceSlotKey": "{\"edgeId\":\"skills-103\",\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-103\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":65}]}"
+          },
+          {
+            "edgeId": "class4-l-000055",
+            "slotKey": "{\"edgeId\":\"class4-l-000055\",\"file\":\".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-000055\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":20},{\"edgeId\":\"class4-l-000055\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":21}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000055",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 20
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000055",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 21
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000055",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 20,
+                "matchedExpression": "docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md",
+                "originalLineText": "syntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000055",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 21,
+                "matchedExpression": "docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md",
+                "originalLineText": "a-verify-command.md` — a backslash-escaped backtick lost during an"
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 74,
+                "columnStart": 21,
+                "line": 20,
+                "text": "docs/how-to/preserve-shell-escapes-when-transcribing-"
+              },
+              {
+                "columnEndExclusive": 20,
+                "columnStart": 1,
+                "line": 21,
+                "text": "a-verify-command.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 74,
+                "columnStart": 21,
+                "line": 20,
+                "text": "docs/how-to/preserve-shell-escapes-when-transcribing-"
+              },
+              {
+                "columnEndExclusive": 20,
+                "columnStart": 1,
+                "line": 21,
+                "text": "a-verify-command.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md",
+            "logicalReference": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "legacyPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: patch. Own render passage: 'syntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\\na-verify-command.md` — a backslash-escaped backtick lost during an'",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "patch",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":74,\"columnStart\":21,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":19,\"text\":\"docs/how-to/preserve-shell-escapes-when-transcribing-\"}}"
+          },
+          {
+            "edgeId": "class4-l-002057",
+            "slotKey": "{\"edgeId\":\"class4-l-002057\",\"file\":\"plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002057\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":20},{\"edgeId\":\"class4-l-002057\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":21}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002057",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 20
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002057",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 21
+              }
+            ],
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002057",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 20,
+                "matchedExpression": "docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md",
+                "originalLineText": "syntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002057",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 21,
+                "matchedExpression": "docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md",
+                "originalLineText": "a-verify-command.md` — a backslash-escaped backtick lost during an"
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "columnEndExclusive": 74,
+                "columnStart": 21,
+                "line": 20,
+                "text": "docs/how-to/preserve-shell-escapes-when-transcribing-"
+              },
+              {
+                "columnEndExclusive": 20,
+                "columnStart": 1,
+                "line": 21,
+                "text": "a-verify-command.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 74,
+                "columnStart": 21,
+                "line": 20,
+                "text": "docs/how-to/preserve-shell-escapes-when-transcribing-"
+              },
+              {
+                "columnEndExclusive": 20,
+                "columnStart": 1,
+                "line": 21,
+                "text": "a-verify-command.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md",
+            "logicalReference": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "legacyPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: patch. Own render passage: 'syntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\\na-verify-command.md` — a backslash-escaped backtick lost during an'",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-census-prose",
+            "sourceDisposition": "patch",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":74,\"columnStart\":21,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":19,\"text\":\"docs/how-to/preserve-shell-escapes-when-transcribing-\"}}"
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\".claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":74,\"columnStart\":21,\"file\":\".claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":20,\"text\":\"docs/how-to/preserve-shell-escapes-when-transcribing-\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": ".claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 20,
+                "columnStart": 21,
+                "columnEndExclusive": 74,
+                "text": "docs/how-to/preserve-shell-escapes-when-transcribing-"
+              },
+              {
+                "line": 21,
+                "columnStart": 1,
+                "columnEndExclusive": 20,
+                "text": "a-verify-command.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 20,
+                "columnStart": 21,
+                "columnEndExclusive": 74,
+                "text": "docs/how-to/preserve-shell-escapes-when-transcribing-"
+              },
+              {
+                "line": 21,
+                "columnStart": 1,
+                "columnEndExclusive": 20,
+                "text": "a-verify-command.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md",
+            "logicalReference": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "legacyPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: patch. Own render passage: 'syntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\\na-verify-command.md` — a backslash-escaped backtick lost during an'",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": ".claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+              "line": 20,
+              "columnStart": 21,
+              "columnEndExclusive": 74,
+              "text": "docs/how-to/preserve-shell-escapes-when-transcribing-"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "sourceDisposition": "patch",
+            "sourceSlotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":74,\"columnStart\":21,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":19,\"text\":\"docs/how-to/preserve-shell-escapes-when-transcribing-\"}}"
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":74,\"columnStart\":21,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":19,\"text\":\"docs/how-to/preserve-shell-escapes-when-transcribing-\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 19,
+                "columnStart": 21,
+                "columnEndExclusive": 74,
+                "text": "docs/how-to/preserve-shell-escapes-when-transcribing-"
+              },
+              {
+                "line": 20,
+                "columnStart": 1,
+                "columnEndExclusive": 20,
+                "text": "a-verify-command.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 19,
+                "columnStart": 21,
+                "columnEndExclusive": 74,
+                "text": "docs/how-to/preserve-shell-escapes-when-transcribing-"
+              },
+              {
+                "line": 20,
+                "columnStart": 1,
+                "columnEndExclusive": 20,
+                "text": "a-verify-command.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md",
+            "logicalReference": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "legacyPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -16,8 +16,8 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+              "line": 19,
+              "columnStart": 21,
+              "columnEndExclusive": 74,
+              "text": "docs/how-to/preserve-shell-escapes-when-transcribing-"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "parkSourceQuote": "syntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md` — a backslash-escaped backtick lost during an",
+            "movedVerbatimWitness": {
+              "fromPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+              "historicalSourceCommit": "b1c43ca789355813fc871c7aabb43c43284db008",
+              "historicalDigest": "4a2de3b8e3afd296fa0c1ede9e813c680f84d141e1ba0655ebc131bc1545345d",
+              "targetDigest": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+              "comparison": "complete narrative identical after frontmatter removal"
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "syntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md` — a backslash-escaped backtick lost during an",
+              "terms": [
+                "preserve shell escapes when transcribing a verify command"
+              ],
+              "queries": [
+                {
+                  "term": "preserve shell escapes when transcribing a verify command",
+                  "hitCount": 2,
+                  "liveHits": 2,
+                  "hitsSha256": "923a1de12be5931ec210f6d0b2939b9933755d1957843991d292df0db9cefcec",
+                  "files": {
+                    "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md": {
+                      "live": 2,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+                      "line": 3,
+                      "text": "title: How to preserve shell escapes when transcribing a verify command",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+                      "line": 11,
+                      "text": "# How to preserve shell escapes when transcribing a verify command",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":74,\"columnStart\":21,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":19,\"text\":\"docs/how-to/preserve-shell-escapes-when-transcribing-\"}}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":74,\"columnStart\":21,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":19,\"text\":\"docs/how-to/preserve-shell-escapes-when-transcribing-\"}}": {
+                "sourcePassage": "syntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md` — a backslash-escaped backtick lost during an",
+                "adjacentPassage": "**Skip this step entirely when mechanism was `out-of-process`** — the\nworker already ran verify itself per the Hard rule; re-running it here\nwould be redundant at best and misleading at worst if the workspace has\nsince changed. Otherwise (you did the work yourself), run the item's own\n`verify` command exactly as recorded on the item (`fgos metrics outcomes <id>` or\n`fgos list --json` shows it). A prose description instead of a runnable\ncommand is not this skill's problem to invent a substitute for — that is\na shaping defect from `fgos-coding-planning`; park the item and say so\nrather than inventing a check. On failure, fix the root cause and rerun\nthe exact command — never weaken the command or swap in an easier one to\nmake it pass. If the failure is a confusing \"command not found\"/\nwrong-output result rather than a clean test failure or a clean shell\nsyntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-\na-verify-command.md` — a backslash-escaped backtick lost during an\nearlier hand-transcription is a common, quiet cause.",
+                "target": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+                "targetEvidence": [
+                  {
+                    "line": 1,
+                    "text": "---"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  }
+                },
+                "assessment": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+              }
+            },
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {
+            "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":74,\"columnStart\":21,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":19,\"text\":\"docs/how-to/preserve-shell-escapes-when-transcribing-\"}}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+              "passage": "---",
+              "targetEvidenceLine": 1,
+              "targetLines": [],
+              "targetLineText": [],
+              "sourceLocatorTokens": [],
+              "wholeFileJustification": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Whole-file pointer spans the complete document."
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":74,\"columnStart\":21,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":19,\"text\":\"docs/how-to/preserve-shell-escapes-when-transcribing-\"}}": {
+              "replacement": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+              "resolvedTarget": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":74,\"columnStart\":21,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":19,\"text\":\"docs/how-to/preserve-shell-escapes-when-transcribing-\"}}": {
+              "source": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+              "replacement": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-001",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [
+          {
+            "sourcePath": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+            "sourceDigest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+            "renderFiles": [
+              {
+                "path": ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+                "digest": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+                "sourceDigest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+                "headerWitnesses": [
+                  {
+                    "line": 1,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-029",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-029",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 66
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "L12-60-complete-source-line-correspondence",
+                      "oldLine": 66,
+                      "line": 66,
+                      "columnStart": 2,
+                      "columnEndExclusive": 40,
+                      "text": "docs/history/<id>/iron-law-evidence.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": ".claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+                "digest": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+                "sourceDigest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+                "headerWitnesses": [
+                  {
+                    "line": 1,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-050",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-050",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 66
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "L12-60-complete-source-line-correspondence",
+                      "oldLine": 66,
+                      "line": 66,
+                      "columnStart": 2,
+                      "columnEndExclusive": 40,
+                      "text": "docs/history/<id>/iron-law-evidence.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+                "digest": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+                "sourceDigest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+                "headerWitnesses": [
+                  {
+                    "line": 1,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-162",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-162",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 66
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "L12-60-complete-source-line-correspondence",
+                      "oldLine": 66,
+                      "line": 66,
+                      "columnStart": 2,
+                      "columnEndExclusive": 40,
+                      "text": "docs/history/<id>/iron-law-evidence.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              }
+            ]
+          }
+        ],
+        "wholeFileRead": {
+          "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+          "bytes": 3867,
+          "lines": 73,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [
+        "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md"
+      ],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p02.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "kind": "complete-source-context",
+      "path": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "startLine": 1,
+      "endLine": 66,
+      "content": "---\nname: fgos-coding-knowledge\nuser-invocable: false\ndescription: >-\n  Synthesize retrospective knowledge into registry-backed end-user documents.\n  Use once a claimed item's status reads `retrospective` — driven by the retrospective loop\n  (/fgOS:retro-next).\n---\n\n# fgos-coding-knowledge\n\nRuns while a work item sits at status `retrospective`. This skill turns the item's outcome/friction capture into a registry-backed knowledge document in `docs/<purposeSlug>/<role>.md`.\n\n## Hard rules\n\n- Do not write prose directly to disk without reserving/checking registry first.\n- Do not create a document outside `docs/<purposeSlug>/<role>.md` matching the registry `currentPath`.\n- Write and commit first, tag and attest second.\n- Do not automatically promote documents to `active` state — promotion MUST be done explicitly via `fgos doc promote`.\n- Do not auto-open new topics quietly. Topic creation MUST go through `fgos topic register`.\n- Do not splice item titles/descriptions raw into shell commands.\n\n## Flow\n\n1. **Resolve topic + role.** Ask registry for `(topicId, role, docId)` based on the capture's topic.\n   - **Re-attest branch (tsk-555):** if an ACTIVE doc for this `(topicId, role)` already\n     covers the capture and no new doc is needed, skip steps 2-3 entirely — go straight\n     to step 4, attesting the EXISTING `currentPath`. Never close a re-attest judgment\n     with only a closing report (`fgos report`/driver stop reason) and no `fgos knowledge\n     attest` call — a report alone is `kind:'engine'` bookkeeping, indistinguishable from\n     an item that was never retrospected at all, and the item parks at `cleanup ->\n     blocked` forever (`checkRetrospectiveContent`, src/state/cleanup-harness.mjs) even\n     though the judgment was real.\n2. **Reserve doc slot if new.** Run:\n   ```bash\n   fgos doc reserve <topicId> <role> <currentPath>\n   ```\n3. **Write & commit file.** Write document at `currentPath` and commit to git HEAD:\n   ```bash\n   git add <currentPath>\n   git commit -m \"docs(<id>): retrospective synthesis\"\n   ```\n4. **Attest document.** Links this item's own capture to the doc slot\n   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a\n   freshly-written doc and a re-attest of an existing one. Run:\n   ```bash\n   fgos knowledge attest --doc-path <currentPath> --capture-id <id>\n   ```\n5. **Mark rendered.** Update lifecycle from `reserved` to `provisional`:\n   ```bash\n   fgos doc mark-rendered --topic-id <topicId> --role <role>\n   ```\n6. **Promote when ready.** Run explicit promotion:\n   ```bash\n   fgos doc promote <topicId> <role>\n   ```\n7. **Move item to cleanup.** Move item to cleanup:\n   ```bash\n   fgos move <id> --to cleanup\n   ```\n\n## Red flags\n\n- Inventing a file path instead of asking registry.\n- Automatic promotion to active instead of using explicit `fgos doc promote`.\n- Writing file without reserving first.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "kind": "complete-render-context",
+      "path": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+      "startLine": 1,
+      "endLine": 67,
+      "content": "---\nname: fgos-coding-knowledge\nuser-invocable: false\ndescription: >-\n  Synthesize retrospective knowledge into registry-backed end-user documents.\n  Use once a claimed item's status reads `retrospective` — driven by the retrospective loop\n  (/fgOS:retro-next).\n---\n<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-knowledge/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n\n# fgos-coding-knowledge\n\nRuns while a work item sits at status `retrospective`. This skill turns the item's outcome/friction capture into a registry-backed knowledge document in `docs/<purposeSlug>/<role>.md`.\n\n## Hard rules\n\n- Do not write prose directly to disk without reserving/checking registry first.\n- Do not create a document outside `docs/<purposeSlug>/<role>.md` matching the registry `currentPath`.\n- Write and commit first, tag and attest second.\n- Do not automatically promote documents to `active` state — promotion MUST be done explicitly via `fgos doc promote`.\n- Do not auto-open new topics quietly. Topic creation MUST go through `fgos topic register`.\n- Do not splice item titles/descriptions raw into shell commands.\n\n## Flow\n\n1. **Resolve topic + role.** Ask registry for `(topicId, role, docId)` based on the capture's topic.\n   - **Re-attest branch (tsk-555):** if an ACTIVE doc for this `(topicId, role)` already\n     covers the capture and no new doc is needed, skip steps 2-3 entirely — go straight\n     to step 4, attesting the EXISTING `currentPath`. Never close a re-attest judgment\n     with only a closing report (`fgos report`/driver stop reason) and no `fgos knowledge\n     attest` call — a report alone is `kind:'engine'` bookkeeping, indistinguishable from\n     an item that was never retrospected at all, and the item parks at `cleanup ->\n     blocked` forever (`checkRetrospectiveContent`, src/state/cleanup-harness.mjs) even\n     though the judgment was real.\n2. **Reserve doc slot if new.** Run:\n   ```bash\n   fgos doc reserve <topicId> <role> <currentPath>\n   ```\n3. **Write & commit file.** Write document at `currentPath` and commit to git HEAD:\n   ```bash\n   git add <currentPath>\n   git commit -m \"docs(<id>): retrospective synthesis\"\n   ```\n4. **Attest document.** Links this item's own capture to the doc slot\n   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a\n   freshly-written doc and a re-attest of an existing one. Run:\n   ```bash\n   fgos knowledge attest --doc-path <currentPath> --capture-id <id>\n   ```\n5. **Mark rendered.** Update lifecycle from `reserved` to `provisional`:\n   ```bash\n   fgos doc mark-rendered --topic-id <topicId> --role <role>\n   ```\n6. **Promote when ready.** Run explicit promotion:\n   ```bash\n   fgos doc promote <topicId> <role>\n   ```\n7. **Move item to cleanup.** Move item to cleanup:\n   ```bash\n   fgos move <id> --to cleanup\n   ```\n\n## Red flags\n\n- Inventing a file path instead of asking registry.\n- Automatic promotion to active instead of using explicit `fgos doc promote`.\n- Writing file without reserving first.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "kind": "complete-render-context",
+      "path": ".claude/skills/fgos-coding-knowledge/SKILL.md",
+      "startLine": 1,
+      "endLine": 12,
+      "content": "---\nname: fgos-coding-knowledge\nuser-invocable: false\ndescription: >-\n  Synthesize retrospective knowledge into registry-backed end-user documents.\n  Use once a claimed item's status reads `retrospective` — driven by the retrospective loop\n  (/fgOS:retro-next).\n---\n\nThis is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.\nThe real skill content lives at `../../../.agents/skills/fgos-coding-knowledge/SKILL.md`, an assembled projection whose generated header identifies its canonical source.\nRead that file and follow it directly.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "kind": "complete-render-context",
+      "path": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+      "startLine": 1,
+      "endLine": 67,
+      "content": "---\nname: fgos-coding-knowledge\nuser-invocable: false\ndescription: >-\n  Synthesize retrospective knowledge into registry-backed end-user documents.\n  Use once a claimed item's status reads `retrospective` — driven by the retrospective loop\n  (/fgOS:retro-next).\n---\n<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-knowledge/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n\n# fgos-coding-knowledge\n\nRuns while a work item sits at status `retrospective`. This skill turns the item's outcome/friction capture into a registry-backed knowledge document in `docs/<purposeSlug>/<role>.md`.\n\n## Hard rules\n\n- Do not write prose directly to disk without reserving/checking registry first.\n- Do not create a document outside `docs/<purposeSlug>/<role>.md` matching the registry `currentPath`.\n- Write and commit first, tag and attest second.\n- Do not automatically promote documents to `active` state — promotion MUST be done explicitly via `fgos doc promote`.\n- Do not auto-open new topics quietly. Topic creation MUST go through `fgos topic register`.\n- Do not splice item titles/descriptions raw into shell commands.\n\n## Flow\n\n1. **Resolve topic + role.** Ask registry for `(topicId, role, docId)` based on the capture's topic.\n   - **Re-attest branch (tsk-555):** if an ACTIVE doc for this `(topicId, role)` already\n     covers the capture and no new doc is needed, skip steps 2-3 entirely — go straight\n     to step 4, attesting the EXISTING `currentPath`. Never close a re-attest judgment\n     with only a closing report (`fgos report`/driver stop reason) and no `fgos knowledge\n     attest` call — a report alone is `kind:'engine'` bookkeeping, indistinguishable from\n     an item that was never retrospected at all, and the item parks at `cleanup ->\n     blocked` forever (`checkRetrospectiveContent`, src/state/cleanup-harness.mjs) even\n     though the judgment was real.\n2. **Reserve doc slot if new.** Run:\n   ```bash\n   fgos doc reserve <topicId> <role> <currentPath>\n   ```\n3. **Write & commit file.** Write document at `currentPath` and commit to git HEAD:\n   ```bash\n   git add <currentPath>\n   git commit -m \"docs(<id>): retrospective synthesis\"\n   ```\n4. **Attest document.** Links this item's own capture to the doc slot\n   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a\n   freshly-written doc and a re-attest of an existing one. Run:\n   ```bash\n   fgos knowledge attest --doc-path <currentPath> --capture-id <id>\n   ```\n5. **Mark rendered.** Update lifecycle from `reserved` to `provisional`:\n   ```bash\n   fgos doc mark-rendered --topic-id <topicId> --role <role>\n   ```\n6. **Promote when ready.** Run explicit promotion:\n   ```bash\n   fgos doc promote <topicId> <role>\n   ```\n7. **Move item to cleanup.** Move item to cleanup:\n   ```bash\n   fgos move <id> --to cleanup\n   ```\n\n## Red flags\n\n- Inventing a file path instead of asking registry.\n- Automatic promotion to active instead of using explicit `fgos doc promote`.\n- Writing file without reserving first.\n",
+      "continued": false
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          },
+          {
+            "path": "step-02l-census-class4.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "51c1701eafb40e09329d9c096f1a757c836663757dee8ecc7877e459dafca62c",
+            "counts": {
+              "dynamicConstructions": 3542,
+              "dynamicFiles": 176,
+              "edgeFiles": 122,
+              "edges": 3334,
+              "files": 225
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+        "digest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+        "inventoryEdgeIds": [
+          "skills-031",
+          "skills-105",
+          "skills-164"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "skills-031",
+            "slotKey": "{\"edgeId\":\"skills-031\",\"file\":\".agents/skills/fgos-coding-knowledge/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-031\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":45},{\"edgeId\":\"class4-l-000058\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":45}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-031",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 45
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000058",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 45
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 5,
+                "columnEndExclusive": 50,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 5,
+                "columnEndExclusive": 50,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: parked. Own render passage: '   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-031",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 45,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-000058",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 45,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a"
+              }
+            ],
+            "sourceDisposition": "parked",
+            "sourceSlotKey": "{\"edgeId\":\"skills-105\",\"file\":\"domains/coding/skills/fgos-coding-knowledge/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-105\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":44}]}"
+          },
+          {
+            "edgeId": "skills-105",
+            "slotKey": "{\"edgeId\":\"skills-105\",\"file\":\"domains/coding/skills/fgos-coding-knowledge/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-105\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":44}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-105",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 44
+              }
+            ],
+            "consumerFile": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 44,
+                "columnStart": 5,
+                "columnEndExclusive": 50,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 44,
+                "columnStart": 5,
+                "columnEndExclusive": 50,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias. Own source passage: '   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias. Own source passage: '   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a'",
+            "dependency": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias. Own source passage: '   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-105",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 44,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a"
+              }
+            ],
+            "parkSourceQuote": "   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a",
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§7.4",
+                  "hitCount": 20,
+                  "liveHitCount": 20,
+                  "hitsSha256": "8f820d9cab993df022aac70c89e845510f2dd19bd3458d1357e924d147b6b4df"
+                }
+              ],
+              "assessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias. Own source passage: '   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias. Own source passage: '   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§7.4",
+                  "carriageCount": 0,
+                  "liveCount": 20,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "L12-62: A51, L12-30/31/32/58: Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias. Own source passage: '   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a'",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a",
+              "terms": [
+                "Attestation",
+                "docLifecycle",
+                "sourceCaptureIds"
+              ],
+              "queries": [
+                {
+                  "term": "Attestation",
+                  "hitCount": 63,
+                  "liveHits": 60,
+                  "hitsSha256": "1bde3c460f89f09362e122e2f507ec29d04692b27c56c83919df11a3fc8f38af",
+                  "files": {
+                    "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-confinement/contracts/confinement-authority-v1.md": {
+                      "live": 7,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-confinement/history/rollout-and-settled-facts.md": {
+                      "live": 0,
+                      "carriage": 1
+                    },
+                    "docs/platform/agent-confinement/spec.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/confinement-authority-implementation/P03.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/confinement-authority-implementation/P07.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 2
+                    },
+                    "docs/platform/runner/decisions/h-36d872fbb0e5.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md",
+                      "line": 62,
+                      "text": "- **`captureDispatchAttestation` snapshotted the wrong `HEAD`.**",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md",
+                      "line": 65,
+                      "text": "  `captureDispatchAttestation` (`dispatch.mjs`) captured main's tip, not",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md",
+                      "line": 162,
+                      "text": "## Fourth follow-up (`tsk-34o5`): Attestation level 2 — enforcement halt at reap/return/approve",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+                      "line": 588,
+                      "text": "### 6.6 `ConfinementAttestation`",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+                      "line": 610,
+                      "text": "interface ConfinementAttestationV1 {",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+                      "line": 734,
+                      "text": "      attestation: ConfinementAttestationV1;",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "docLifecycle",
+                  "hitCount": 8,
+                  "liveHits": 8,
+                  "hitsSha256": "3a4be149483da2f7d285cb0d8d0829d61163dc75771a2462dab5f1bb5be041b1",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/documentation-system-unification.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7400,
+                      "text": "✔ docLifecycle rejects draft (0.32377ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7448,
+                      "text": "✔ docLifecycle rejects draft (0.281909ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.30415ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+                      "line": 7437,
+                      "text": "✔ docLifecycle rejects draft (0.320416ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+                      "line": 7447,
+                      "text": "✔ docLifecycle rejects draft (0.329027ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+                      "line": 5317,
+                      "text": "✔ docLifecycle rejects draft (0.435993ms)",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "sourceCaptureIds",
+                  "hitCount": 23,
+                  "liveHits": 22,
+                  "hitsSha256": "0b15166987120c61c151eb991aa7e1b3e35e127969ad89e2e258da6ec565d6b9",
+                  "files": {
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/git/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/proposals/knowledge-registry-redesign.md": {
+                      "live": 0,
+                      "carriage": 1
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6518,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (27.810586ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 6520,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (30.275983ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7395,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (3.833207ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6566,
+                      "text": "✔ knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere (30.423849ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 6568,
+                      "text": "✔ knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds) (27.121291ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+                      "line": 7443,
+                      "text": "✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (2.561447ms)",
+                      "carriage": false
+                    }
+                  ]
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58/60: L12-62: A51, L12-30/31/32/58/60: Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias. Own source passage: '   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a'"
+            }
+          },
+          {
+            "edgeId": "skills-164",
+            "slotKey": "{\"edgeId\":\"skills-164\",\"file\":\"plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-164\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":45},{\"edgeId\":\"class4-l-002060\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":45}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-164",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 45
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002060",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 45
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 5,
+                "columnEndExclusive": 50,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 5,
+                "columnEndExclusive": 50,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "render-join",
+            "diffHunk": null,
+            "reason": "L12-62: exact equal-passage canonical source join; no render diff. Source outcome: parked. Own render passage: '   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-164",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 45,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a"
+              },
+              {
+                "inventory": "step-02l-census-class4.json",
+                "edgeId": "class4-l-002060",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 45,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a"
+              }
+            ],
+            "sourceDisposition": "parked",
+            "sourceSlotKey": "{\"edgeId\":\"skills-105\",\"file\":\"domains/coding/skills/fgos-coding-knowledge/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-105\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":44}]}"
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-001",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [
+          {
+            "sourcePath": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+            "sourceDigest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+            "renderFiles": [
+              {
+                "path": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+                "digest": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+                "sourceDigest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+                "headerWitnesses": [
+                  {
+                    "line": 9,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-knowledge/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-031",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-031",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 45
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "L12-60-complete-source-line-correspondence",
+                      "oldLine": 45,
+                      "line": 45,
+                      "columnStart": 5,
+                      "columnEndExclusive": 50,
+                      "text": "docs/architect/knowledge-registry-redesign.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": ".claude/skills/fgos-coding-knowledge/SKILL.md",
+                "digest": "9d97f09093a9d1b29acb2188251be121cf05e9956dff5e2fb4de29994cda8668",
+                "sourceDigest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+                "headerWitnesses": [],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+                "existingEdgeJoins": [],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null,
+                "generatorDoor": "npm run build:skills",
+                "wrapperProvenance": "L12-60(6): thin wrappers are build:skills outputs."
+              },
+              {
+                "path": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+                "digest": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+                "sourceDigest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+                "headerWitnesses": [
+                  {
+                    "line": 9,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-knowledge/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-164",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-164",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 45
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "L12-60-complete-source-line-correspondence",
+                      "oldLine": 45,
+                      "line": 45,
+                      "columnStart": 5,
+                      "columnEndExclusive": 50,
+                      "text": "docs/architect/knowledge-registry-redesign.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              }
+            ]
+          }
+        ],
+        "wholeFileRead": {
+          "file": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+          "bytes": 2905,
+          "lines": 66,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p02.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

@@ -1,0 +1,226 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-003",
+  "files": [
+    "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md"
+  ],
+  "joinedSlots": 2,
+  "items": [
+    {
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "kind": "complete-source-context",
+      "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "startLine": 1,
+      "endLine": 84,
+      "content": "# Doer Report — P02.2 (Step 09, Phase 02 R5-R6, closes Phase 02)\n\n## Scope\n\nR5: launcher next-action messaging + `show` disposition/authorization\nrendering. R6: setup/doctor discipline (conditional — verified nothing new\nwas introduced).\n\n## What changed\n\n- `src/verbs/coordination/launch-master-loop.mjs`: `launchMasterLoopUseCase`'s\n  return value now always carries `nextAction`, a plain-text message naming\n  the coordination id and the concrete next step (`fgos coordination show\n  <id>`), plus — when the session closed with a refusal reason — a\n  plain-terms explanation that a driver-authorized step is pending and\n  requires separate human authorization. Computed by a new, pure, exported\n  `describeNextAction` function. Never implies a resume door exists.\n- `src/verbs/coordination/show.mjs`: `showCoordinationUseCase` now also\n  calls `replaySession` (wrapped in try/catch so a corrupt/inconsistent\n  session degrades gracefully instead of breaking the pre-existing\n  manifest/quorum/phase view) and renders four new fields:\n  `authorizations`, `ignoredAuthorizations`, `dispositions` (each marked\n  `postTerminal` and with ref-ownership booleans), and\n  `pendingDriverAuthorizations` (declared driver-authorized bindings with\n  no matching authorization yet; `null` for an agent-led session or an\n  unloadable definition). Honors both rendering constraints named in the\n  cell contract: no recheck-lineage hard-edge claim, and a byte-for-byte\n  mirror of `store.mjs`'s own (unexported) `assertDispositionRefOwnedBySession`\n  reimplemented as a boolean render-time check.\n- `src/cli/command-registry.mjs`: updated the `coordination` command's\n  description to match the extended `show`/`launch-master-loop` behavior.\n- `CHANGELOG.md`: one new `### Added` bullet (no prior entry existed for\n  `launch-master-loop` at all — see Gaps).\n- `docs/how-to/run-a-coordination-session.md`: documented the new `show`\n  fields and added a `launch-master-loop` usage section.\n- Tests: extended `test/verbs/coordination-launch-master-loop.test.mjs`\n  (nextAction assertions on the existing live/CLI tests, plus two new unit\n  tests for `describeNextAction`'s branches) and\n  `test/verbs/coordination-run-driver-steps.test.mjs` (four new tests:\n  authorizations/dispositions/pending rendering, post-terminal disposition\n  marking via a hand-crafted log — mirroring the existing post-terminal\n  `operation-authorized` test pattern — cross-session ref-ownership\n  marking, and agent-led `pendingDriverAuthorizations: null`).\n\n## Verification\n\n```\nFGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/verbs/coordination*.test.mjs'\n-> 47 pass, 0 fail\n\nFGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'\n-> 5185 tests, 5178 pass, 1 fail (test/cli/fgos-intake-4.test.mjs:318 — the\n   documented pre-existing baseline failure; re-confirmed failing in\n   isolation, unrelated to this cell's files)\n```\n\n## R6\n\nNothing new introduced — grep-verified (no new `process.env`/`readFileSync`/\nconfig-path reads; the only new filesystem checks reuse the exact paths\n`store.mjs`'s own ownership-check pattern already uses; `loadCoordinationProtocol`\nis an existing, already-registered loader called elsewhere too). Full\nevidence in `P02.2.md` §4.\n\n## Full trace\n\n`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.2.md`\n\n## Gaps (see P02.2.md §7 for full detail)\n\n- Did not update `docs/architect/agent-coordination/contracts/\n  coordination-session.md` — this cell is display-only, no new event\n  shape/invariant.\n- CHANGELOG bullet documents `launch-master-loop`'s full current behavior\n  (R1-R6), not just R5-R6, because P02.1 never added one and no earlier\n  entry existed to append to.\n- No engine internal touched (`src/runner/coordination/{session-engine,\n  store,replay,schema}.mjs` untouched, per Do Not Touch).\n\nStatus: DONE\nSummary: R5 (launcher `nextAction` + `show` authorization/disposition/\npending-authorization rendering, both rendering constraints honored) and\nR6 (nothing new to register, evidenced) both closed; full suite green\nexcept the documented pre-existing baseline failure.\n",
+      "continued": false
+    },
+    {
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "6dc3d867871c2957d9860e9a9e37d93628b67c5e4d6259fb404e15f0dba120c1",
+        "digest": "6dc3d867871c2957d9860e9a9e37d93628b67c5e4d6259fb404e15f0dba120c1",
+        "inventoryEdgeIds": [
+          "evidence-042",
+          null
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-042",
+            "slotKey": "{\"edgeId\":\"evidence-042\",\"file\":\"archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-042\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":67}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-042",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 67
+              }
+            ],
+            "consumerFile": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 67,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 67,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Dated/archive evidence keeps its original citation identity. Own source passage: '`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.2.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-042",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 67,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.2.md`"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/architect/agent-coordination/verification",
+              "state": "tree",
+              "treeMatchCount": 868,
+              "treeMatchesSha256": "1f268d0eb14459b841d932f2ce41ca0152c791a96d433fb76b72ca9103fc10d9",
+              "treeSample": [
+                "docs/architect/agent-coordination/verification/README.md",
+                "docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md"
+              ],
+              "historyCommitCount": 350,
+              "historyCommitsSha256": "e03f626095b7abaf079a47546847f69111ce0b6b3a288b356edf2a702fad17e7",
+              "historySample": [
+                "9818f25a877756a81dceab990602b50646c8610f",
+                "fc25949821fcc8f2894f8b05d0e25d87afbd6949"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":63,\"columnStart\":19,\"file\":\"archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":71,\"text\":\"docs/architect/agent-coordination/contracts/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 71,
+                "columnStart": 19,
+                "columnEndExclusive": 63,
+                "text": "docs/architect/agent-coordination/contracts/"
+              },
+              {
+                "line": 72,
+                "columnStart": 3,
+                "columnEndExclusive": 26,
+                "text": "coordination-session.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 71,
+                "columnStart": 19,
+                "columnEndExclusive": 63,
+                "text": "docs/architect/agent-coordination/contracts/"
+              },
+              {
+                "line": 72,
+                "columnStart": 3,
+                "columnEndExclusive": 26,
+                "text": "coordination-session.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/contracts/\ncoordination-session.md",
+            "logicalReference": "docs/architect/agent-coordination/contracts/coordination-session.md",
+            "legacyPath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: '- Did not update `docs/architect/agent-coordination/contracts/\\n  coordination-session.md` — this cell is display-only, no new event'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+              "line": 71,
+              "columnStart": 19,
+              "columnEndExclusive": 63,
+              "text": "docs/architect/agent-coordination/contracts/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "preservedPathWitness": {
+              "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "abe6c6e2d94f11bdd4150c8435466649cc5b8b73e3655a7821154f8173d663ae",
+              "treeSample": [
+                "docs/architect/agent-coordination/contracts/coordination-session.md"
+              ],
+              "historyCommitCount": 22,
+              "historyCommitsSha256": "222b7d518ced1e6c8e377600ac1cf49ab689859f33d5ca4ac315bd13becc3e7d",
+              "historySample": [
+                "88691f6468981c1e2124acc79fcd521f1767c3b2",
+                "6b0420295e367c93bc19896d3bb2acb350438fde"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-003",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "6dc3d867871c2957d9860e9a9e37d93628b67c5e4d6259fb404e15f0dba120c1",
+          "bytes": 4146,
+          "lines": 84,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

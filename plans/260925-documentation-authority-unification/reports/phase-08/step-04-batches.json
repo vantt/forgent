@@ -1,13 +1,13 @@
 {
   "inputHEAD": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
-  "state": "All 33 sets authored under L12-60; independent wave2 review pending",
+  "state": "All 33 sets reworked under L12-62; independent wave3 review pending",
   "pairEstimateAssumption": "5 report paths per author batch: records, frozen manifest, request, verification receipt, progress; no consumer/render change authorized. Actual git commit/path pairs from real runner commit replace this estimate before L12-11 accounting. 2 accounting manifest files belong to the following accounting Unit, never fabricated into author pairs. Both exception literals reviewed for every pair.",
   "summary": {
     "batches": 33,
     "sourceRecords": 275,
-    "slots": 914,
+    "slots": 933,
     "openLeadRulingSlots": 0,
-    "reviewRequest": "step-04-wave2-review-request.md"
+    "reviewRequest": "step-04-wave3-review-request.md"
   },
   "batches": [
     {
@@ -91,9 +91,9 @@
       "edges": 63,
       "classes": {
         "preserve": 17,
-        "parked": 4,
+        "patch": 4,
         "render-join": 41,
-        "patch": 1
+        "parked": 1
       },
       "edgeRefs": [
         {
@@ -1026,7 +1026,7 @@
         }
       ],
       "currentSourceBytes": 62869,
-      "censusMetadataBytes": 83373,
+      "censusMetadataBytes": 83376,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -1043,7 +1043,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-002",
@@ -1087,14 +1087,14 @@
         "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md"
       ],
       "sourceFiles": [
-        "domains/coding/skills/fgos-coding-planning/SKILL.md",
         "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
         "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
         "domains/coding/skills/fgos-coding-shaping/SKILL.md",
-        "domains/coding/skills/fgos-coding-validating/SKILL.md",
         "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
         "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
         "domains/coding/task-specs/lock-decisions.md",
+        "domains/coding/skills/fgos-coding-planning/SKILL.md",
+        "domains/coding/skills/fgos-coding-validating/SKILL.md",
         "domains/coding/task-specs/shape-plan.md"
       ],
       "renderFiles": [
@@ -1118,12 +1118,11 @@
         "plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
         "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md"
       ],
-      "edges": 71,
+      "edges": 72,
       "classes": {
         "render-join": 50,
-        "preserve": 18,
-        "parked": 2,
-        "patch": 1
+        "preserve": 19,
+        "patch": 3
       },
       "edgeRefs": [
         {
@@ -1464,6 +1463,19 @@
             "line": 64,
             "columnStart": 48,
             "columnEndExclusive": 78,
+            "text": "docs/history/<feature>/plan.md"
+          }
+        },
+        {
+          "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+            "line": 68,
+            "columnStart": 38,
+            "columnEndExclusive": 68,
             "text": "docs/history/<feature>/plan.md"
           }
         },
@@ -2111,7 +2123,7 @@
         }
       ],
       "currentSourceBytes": 70509,
-      "censusMetadataBytes": 90185,
+      "censusMetadataBytes": 91508,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [
         "domains/coding/task-specs/shape-plan.md"
@@ -2130,7 +2142,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-003",
@@ -2274,9 +2286,9 @@
         "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.2-dogfood-handoff-report.md"
       ],
       "renderFiles": [],
-      "edges": 58,
+      "edges": 59,
       "classes": {
-        "preserve": 58
+        "preserve": 59
       },
       "edgeRefs": [
         {
@@ -2904,6 +2916,19 @@
           ]
         },
         {
+          "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+            "line": 71,
+            "columnStart": 19,
+            "columnEndExclusive": 63,
+            "text": "docs/architect/agent-coordination/contracts/"
+          }
+        },
+        {
           "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P03.1-role-execution-policy-report.md",
           "edgeId": "evidence-043",
           "inventoryRefs": [
@@ -2977,7 +3002,7 @@
         }
       ],
       "currentSourceBytes": 265336,
-      "censusMetadataBytes": 79423,
+      "censusMetadataBytes": 81006,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -2990,7 +3015,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-004",
@@ -3802,7 +3827,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-005",
@@ -4569,7 +4594,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-006",
@@ -5348,7 +5373,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-007",
@@ -5366,9 +5391,9 @@
         "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md"
       ],
       "renderFiles": [],
-      "edges": 2,
+      "edges": 10,
       "classes": {
-        "preserve": 2
+        "preserve": 10
       },
       "edgeRefs": [
         {
@@ -5384,6 +5409,110 @@
           ]
         },
         {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "line": 1785,
+            "columnStart": 43,
+            "columnEndExclusive": 55,
+            "text": "docs/how-to/"
+          }
+        },
+        {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "line": 1837,
+            "columnStart": 17,
+            "columnEndExclusive": 61,
+            "text": "docs/architect/agent-coordination/contracts/"
+          }
+        },
+        {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "line": 1884,
+            "columnStart": 28,
+            "columnEndExclusive": 72,
+            "text": "docs/architect/agent-coordination/contracts/"
+          }
+        },
+        {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "line": 2210,
+            "columnStart": 7,
+            "columnEndExclusive": 54,
+            "text": "docs/architect/agent-coordination/architecture/"
+          }
+        },
+        {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "line": 2281,
+            "columnStart": 34,
+            "columnEndExclusive": 68,
+            "text": "docs/architect/agent-coordination/"
+          }
+        },
+        {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "line": 3201,
+            "columnStart": 38,
+            "columnEndExclusive": 71,
+            "text": "docs/platform/agent-coordination/"
+          }
+        },
+        {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "line": 3423,
+            "columnStart": 51,
+            "columnEndExclusive": 65,
+            "text": "docs/platform/"
+          }
+        },
+        {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+            "line": 3573,
+            "columnStart": 11,
+            "columnEndExclusive": 58,
+            "text": "docs/platform/packaging-distribution/contracts/"
+          }
+        },
+        {
           "file": "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md",
           "edgeId": "evidence-115",
           "inventoryRefs": [
@@ -5397,7 +5526,7 @@
         }
       ],
       "currentSourceBytes": 272048,
-      "censusMetadataBytes": 2604,
+      "censusMetadataBytes": 14269,
       "mandatoryFiles": [
         {
           "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
@@ -5416,7 +5545,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-008",
@@ -5473,10 +5602,10 @@
         "plugins/fgOS/skills/terminal/SKILL.md"
       ],
       "renderFiles": [],
-      "edges": 41,
+      "edges": 42,
       "classes": {
-        "preserve": 39,
-        "parked": 2
+        "preserve": 40,
+        "patch": 2
       },
       "edgeRefs": [
         {
@@ -5706,6 +5835,19 @@
               "originalLine": 90
             }
           ]
+        },
+        {
+          "file": "plugins/fgOS/skills/deliver/SKILL.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "plugins/fgOS/skills/deliver/SKILL.md",
+            "line": 82,
+            "columnStart": 51,
+            "columnEndExclusive": 77,
+            "text": "docs/journals/260803-1612-"
+          }
         },
         {
           "file": "plugins/fgOS/skills/discover-next/SKILL.md",
@@ -6147,7 +6289,7 @@
         }
       ],
       "currentSourceBytes": 103036,
-      "censusMetadataBytes": 51063,
+      "censusMetadataBytes": 52374,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -6160,7 +6302,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-009",
@@ -6186,11 +6328,11 @@
       "renderFiles": [
         "AGENTS.md"
       ],
-      "edges": 51,
+      "edges": 52,
       "classes": {
         "preserve": 12,
         "patch": 19,
-        "parked": 7,
+        "parked": 8,
         "render-join": 13
       },
       "edgeRefs": [
@@ -6481,6 +6623,19 @@
               "originalLine": 151
             }
           ]
+        },
+        {
+          "file": "AGENTS.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "AGENTS.md",
+            "line": 74,
+            "columnStart": 5,
+            "columnEndExclusive": 20,
+            "text": "docs/decisions/"
+          }
         },
         {
           "file": "CLAUDE.md",
@@ -6808,7 +6963,7 @@
         }
       ],
       "currentSourceBytes": 35389,
-      "censusMetadataBytes": 71916,
+      "censusMetadataBytes": 72906,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -6824,7 +6979,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 7,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-010",
@@ -6841,9 +6996,9 @@
       "renderFiles": [],
       "edges": 36,
       "classes": {
-        "parked": 5,
-        "preserve": 29,
-        "patch": 2
+        "parked": 4,
+        "patch": 3,
+        "preserve": 29
       },
       "edgeRefs": [
         {
@@ -7310,7 +7465,7 @@
         }
       ],
       "currentSourceBytes": 298883,
-      "censusMetadataBytes": 38055,
+      "censusMetadataBytes": 38057,
       "mandatoryFiles": [
         {
           "file": "bin/fgos.mjs",
@@ -7331,7 +7486,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 6,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-011",
@@ -7392,7 +7547,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 6,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-012",
@@ -8093,7 +8248,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-013",
@@ -8167,7 +8322,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-014",
@@ -8214,7 +8369,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-015",
@@ -8523,7 +8678,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-016",
@@ -8609,7 +8764,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-017",
@@ -8624,9 +8779,9 @@
         "CHANGELOG.md"
       ],
       "renderFiles": [],
-      "edges": 1,
+      "edges": 4,
       "classes": {
-        "preserve": 1
+        "preserve": 4
       },
       "edgeRefs": [
         {
@@ -8640,10 +8795,49 @@
               "originalLine": 928
             }
           ]
+        },
+        {
+          "file": "CHANGELOG.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "CHANGELOG.md",
+            "line": 1343,
+            "columnStart": 54,
+            "columnEndExclusive": 69,
+            "text": "docs/decisions/"
+          }
+        },
+        {
+          "file": "CHANGELOG.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "CHANGELOG.md",
+            "line": 1433,
+            "columnStart": 17,
+            "columnEndExclusive": 66,
+            "text": "docs/history/agy-permission-capability-allowlist/"
+          }
+        },
+        {
+          "file": "CHANGELOG.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "CHANGELOG.md",
+            "line": 1879,
+            "columnStart": 19,
+            "columnEndExclusive": 71,
+            "text": "docs/how-to/recover-approve-sync-root-from-inside-a-"
+          }
         }
       ],
       "currentSourceBytes": 368613,
-      "censusMetadataBytes": 1428,
+      "censusMetadataBytes": 5045,
       "mandatoryFiles": [
         {
           "file": "CHANGELOG.md",
@@ -8662,7 +8856,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-018",
@@ -8901,7 +9095,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-019",
@@ -9033,7 +9227,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 10,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-020",
@@ -9053,8 +9247,7 @@
       "renderFiles": [],
       "edges": 4,
       "classes": {
-        "patch": 1,
-        "parked": 1,
+        "patch": 2,
         "preserve": 2
       },
       "edgeRefs": [
@@ -9108,7 +9301,7 @@
         }
       ],
       "currentSourceBytes": 52852,
-      "censusMetadataBytes": 4611,
+      "censusMetadataBytes": 4613,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -9121,7 +9314,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-021",
@@ -9168,7 +9361,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-022",
@@ -9203,7 +9396,8 @@
       "renderFiles": [],
       "edges": 10,
       "classes": {
-        "preserve": 10
+        "preserve": 9,
+        "parked": 1
       },
       "edgeRefs": [
         {
@@ -9328,7 +9522,7 @@
         }
       ],
       "currentSourceBytes": 254714,
-      "censusMetadataBytes": 11001,
+      "censusMetadataBytes": 10997,
       "mandatoryFiles": [
         {
           "file": "src/runner/dispatch/assignment-runner.mjs",
@@ -9349,7 +9543,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 6,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-023",
@@ -9393,9 +9587,9 @@
       "renderFiles": [],
       "edges": 21,
       "classes": {
-        "preserve": 14,
-        "parked": 4,
-        "patch": 3
+        "preserve": 13,
+        "patch": 5,
+        "parked": 3
       },
       "edgeRefs": [
         {
@@ -9691,7 +9885,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 12,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-024",
@@ -9730,7 +9924,7 @@
       "edges": 23,
       "classes": {
         "preserve": 21,
-        "parked": 2
+        "patch": 2
       },
       "edgeRefs": [
         {
@@ -10023,7 +10217,7 @@
         }
       ],
       "currentSourceBytes": 234155,
-      "censusMetadataBytes": 27415,
+      "censusMetadataBytes": 27419,
       "mandatoryFiles": [
         {
           "file": "src/runner/loop.mjs",
@@ -10046,7 +10240,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-025",
@@ -10076,11 +10270,11 @@
         "src/runner/worktree.mjs"
       ],
       "renderFiles": [],
-      "edges": 36,
+      "edges": 37,
       "classes": {
-        "preserve": 29,
-        "patch": 6,
-        "parked": 1
+        "parked": 1,
+        "patch": 7,
+        "preserve": 29
       },
       "edgeRefs": [
         {
@@ -10300,6 +10494,19 @@
           ]
         },
         {
+          "file": "src/runner/merge.mjs",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "src/runner/merge.mjs",
+            "line": 215,
+            "columnStart": 70,
+            "columnEndExclusive": 75,
+            "text": "docs/"
+          }
+        },
+        {
           "file": "src/runner/paths.mjs",
           "edgeId": "class6-l-000318",
           "inventoryRefs": [
@@ -10517,7 +10724,7 @@
         }
       ],
       "currentSourceBytes": 200305,
-      "censusMetadataBytes": 38506,
+      "censusMetadataBytes": 39653,
       "mandatoryFiles": [
         {
           "file": "src/runner/merge.mjs",
@@ -10544,7 +10751,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 7,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-026",
@@ -11295,7 +11502,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 10,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-027",
@@ -11319,10 +11526,10 @@
         "src/state/worker-slots.mjs"
       ],
       "renderFiles": [],
-      "edges": 28,
+      "edges": 29,
       "classes": {
-        "preserve": 26,
-        "parked": 2
+        "preserve": 28,
+        "parked": 1
       },
       "edgeRefs": [
         {
@@ -11627,6 +11834,19 @@
           }
         },
         {
+          "file": "src/state/work.mjs",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "src/state/work.mjs",
+            "line": 132,
+            "columnStart": 66,
+            "columnEndExclusive": 71,
+            "text": "docs/"
+          }
+        },
+        {
           "file": "src/state/worker-slots.mjs",
           "edgeId": "class6-l-000476",
           "inventoryRefs": [
@@ -11664,7 +11884,7 @@
         }
       ],
       "currentSourceBytes": 179754,
-      "censusMetadataBytes": 29982,
+      "censusMetadataBytes": 31093,
       "mandatoryFiles": [
         {
           "file": "src/state/store.mjs",
@@ -11685,7 +11905,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 6,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-028",
@@ -11771,7 +11991,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-029",
@@ -12019,7 +12239,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 5,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-030",
@@ -12067,15 +12287,15 @@
         ".claude/skills/ui-spec/CONVENTION.md",
         ".claude/skills/ui-spec/SKILL.md",
         ".claude/skills/ui-spec/references/CONVENTION.md",
-        "core/skills/_shared/capability-catalog.md",
         "core/skills/_shared/citation-format.md",
         "core/skills/_shared/coding-worker-contract.md",
-        "core/skills/_shared/executor-dispatch-fallback.md",
-        "core/skills/_shared/planning-capability-awareness.md",
         "core/skills/distill/references/deep-dive-protocol.md",
         "core/skills/fgos-clarifying/SKILL.md",
         "core/skills/fgos-indexing/SKILL.md",
-        "core/skills/fgos-run/SKILL.md"
+        "core/skills/fgos-run/SKILL.md",
+        "core/skills/_shared/capability-catalog.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/planning-capability-awareness.md"
       ],
       "renderFiles": [
         ".agents/skills/_shared/capability-catalog.md",
@@ -12094,12 +12314,12 @@
         "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
         "plugins/fgOS/skills/fgos-indexing/SKILL.md"
       ],
-      "edges": 100,
+      "edges": 101,
       "classes": {
-        "preserve": 28,
+        "preserve": 29,
         "render-join": 63,
-        "parked": 8,
-        "patch": 1
+        "parked": 6,
+        "patch": 3
       },
       "edgeRefs": [
         {
@@ -13485,6 +13705,19 @@
           }
         },
         {
+          "file": "core/skills/_shared/executor-dispatch-fallback.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "core/skills/_shared/executor-dispatch-fallback.md",
+            "line": 224,
+            "columnStart": 2,
+            "columnEndExclusive": 47,
+            "text": "docs/history/two-layer-dispatch/DISCUSSION.md"
+          }
+        },
+        {
           "file": ".agents/skills/_shared/planning-capability-awareness.md",
           "edgeId": "class4-l-000025",
           "inventoryRefs": [
@@ -13523,7 +13756,7 @@
         }
       ],
       "currentSourceBytes": 107545,
-      "censusMetadataBytes": 120342,
+      "censusMetadataBytes": 121619,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [
         "core/skills/fgos-run/SKILL.md"
@@ -13542,7 +13775,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     },
     {
       "batch": "step04-031",
@@ -13574,12 +13807,12 @@
         ".agents/skills/fgos-researching/SKILL.md",
         "plugins/fgOS/skills/fgos-researching/SKILL.md"
       ],
-      "edges": 12,
+      "edges": 13,
       "classes": {
         "render-join": 4,
         "preserve": 4,
-        "patch": 1,
-        "parked": 3
+        "patch": 4,
+        "parked": 1
       },
       "edgeRefs": [
         {
@@ -13691,6 +13924,19 @@
           ]
         },
         {
+          "file": "core/task-specs/fgos-indexing.md",
+          "edgeId": null,
+          "inventoryRefs": [],
+          "supplementalOccurrenceKey": {
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "file": "core/task-specs/fgos-indexing.md",
+            "line": 6,
+            "columnStart": 46,
+            "columnEndExclusive": 62,
+            "text": "docs/<quadrant>/"
+          }
+        },
+        {
           "file": "core/task-specs/fgos-researching.md",
           "edgeId": "skills-089",
           "inventoryRefs": [
@@ -13764,7 +14010,7 @@
         }
       ],
       "currentSourceBytes": 19932,
-      "censusMetadataBytes": 14747,
+      "censusMetadataBytes": 15839,
       "mandatoryFiles": [],
       "zeroEdgeOwners": [],
       "pendingCensusAdmission": false,
@@ -13781,7 +14027,7 @@
         "conditionalPhase9PairsIncludingFiveReportPaths": 8,
         "conditionalPhase9AccountingParts": 1
       },
-      "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+      "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
     }
   ],
   "mainMergeSupplement": {
@@ -13866,7 +14112,7 @@
         ],
         "currentSourceBytes": 2584,
         "censusMetadataBytes": 3779,
-        "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+        "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
       },
       {
         "batch": "step04-033",
@@ -14000,7 +14246,7 @@
         "renderFiles": [],
         "currentSourceBytes": 65277,
         "censusMetadataBytes": 8862,
-        "reviewVolume": "Actual bounded review parts are in step-04-wave2-review-index.json; no separate report-only pair-accounting parts under L12-58(4)."
+        "reviewVolume": "Final wave3 scope/parts: step-04-wave3-review-scope.json and step-04-wave3-review-index.json. Unchanged final outcomes retain independently reviewed wave2 custody; new outcomes never carry approval."
       }
     ]
   },

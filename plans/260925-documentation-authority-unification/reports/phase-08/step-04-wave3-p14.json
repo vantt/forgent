@@ -1,0 +1,398 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-017",
+  "files": [
+    "CHANGELOG.md"
+  ],
+  "joinedSlots": 4,
+  "items": [
+    {
+      "file": "CHANGELOG.md",
+      "kind": "complete-source-context",
+      "path": "CHANGELOG.md",
+      "startLine": 1286,
+      "endLine": 2057,
+      "content": "  so this was always a false conflict, not a real content dispute.\n- The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)\n  now spawns every executor `detached: true` and kills its whole process\n  GROUP on timeout/maxBuffer (`process.kill(-pid, ...)`), not just the\n  directly-spawned pid — an executor CLI that shells out further (a\n  grandchild process) no longer survives its own parent being killed.\n- **Breaking (store schema):** the coding `roleGraph`'s `human-advisor`\n  role was renamed to `advisor` (D16). Replay now normalizes the retired\n  literal for any pre-rename `work.handoff` event already committed to an\n  existing `events.jsonl` — without this, an item still parked with\n  `holder: \"human-advisor\"` from before the rename would be permanently\n  stuck (any further write to it throws `WorkValidationError`, since the\n  current roleGraph vocabulary no longer accepts the old name). Run\n  `fgos rebuild` after upgrading if any item was parked at the old role —\n  `state.json`'s own incremental-snapshot fast path does not re-apply a\n  code-only fix to already-replayed history on its own.\n- `agents/*.yaml`'s eligibility field was inverted from `claims` to\n  `skills` (D20) with no migration note — any existing `agents/*.yaml`\n  still carrying `claims:` now has it silently ignored at projection\n  time. Update `agents/*.yaml` (and `core/agents/`, `domains/<name>/agents/`)\n  to declare `skills:` instead.\n- `materializeSkillsIntoProject` (`fgos setup`'s external-project\n  materialize path) no longer crashes when `packageRoot` (a real global\n  npm install can be root-owned or read-only) can't be written to during\n  its `assembleSkills` re-render step — degrades to using the\n  already-shipped, committed `.agents/skills` instead.\n- `package.json`'s `files` array now includes `core/` — a packed/published\n  install was missing `core/task-specs/`, `core/skills/`, and\n  `core/agents/` entirely, contradicting the new `core/` vs `domains/`\n  authoring split the moment fgOS is installed rather than checked out.\n\n### Added\n\n- `runner.executors.claude` in `.fgos/config.json` — claude is now\n  addressable by name in dispatch (`decide claude`, `executors.claude`)\n  the same way `agy`/`codex`/`pi` already are, instead of only being\n  reachable through the anonymous top-level `runner.executor` default.\n  Same command/args as that default; no behavior change for existing\n  callers.\n- Three new read-only verbs: `fgos decision-index [--check]` generates\n  `docs/decisions/index.md`, a projection of every platform/repo-wide\n  decision (`fgos decision --scope <area>`) from `state.decisions`;\n  `fgos context-render <id>` renders an item's `CONTEXT.md` \"## Locked\n  decisions\" table from `state.decisions` in place, so the table is never\n  hand-typed; `fgos authoritative-match --quadrant <docs/quadrant-dir>\n  --topic \"...\"` (or `--check-duplicates`) skeleton-matches a topic\n  against docs' own `authoritative_for` frontmatter, so a growing skill\n  finds an existing doc to update instead of guessing a second path.\n- `fgos decision --relation none|supersedes:<id>|touches:<id>` — every\n  decision write now declares its relation to prior decisions explicitly;\n  a `supersedes` relation runs a write-time sweep across `docs/`, `src/`,\n  `plugins/` for citations of the superseded id that don't also\n  acknowledge the new one, surfaced as `danglingCitations` on the write's\n  own response.\n- `fgos decision --scope <area>` — a platform/repo-wide decision (no\n  `--id`) that shows up in the generated `docs/decisions/index.md`.\n- `fgos doctor`/`fgos doctor --fix` gained a `decision-index-stale`\n  check+fix pair: reports and repairs drift between `docs/decisions/\n  index.md` and `state.decisions`.\n- The hand-authored `docs/decisions/000N-*.md` ADR corpus (34 files) has\n  been retired: `state.decisions` (via `fgos decision --scope`) is now the\n  source of truth for platform decisions, with full narrative migrated\n  verbatim into the relevant `docs/specs/<area>.md`'s own \"Lịch sử quyết\n  định\" section. `docs/decisions/index.md` (generated) replaces the old\n  hand-written `0000-index.md`.\n- `runner.capabilities` — a curated catalog of capability names, shared\n  between the tool-registry's own `capability` field and\n  `capacities.<id>.for`. Each entry is `{description?, aliases?}`. This\n  repo's own `.fgos/config.json` declares `impact-analysis`/`pane-labeling`.\n- A one-line `fgos: dispatch capability=... capacity=... via=... provider=...\n  model=... tier=...` diagnostic prints to stderr at every real dispatch\n  chokepoint — `spawnWorker` (the runner's own worker dispatch) and both\n  branches of `executeCapacityCli` (`execute`/`execute --for`'s in-process\n  hand-back and out-of-process real spawn) — right before the capacity is\n  actually invoked, so a human watching the terminal can see which\n  capability was requested, which capacity answered it, through which\n  mechanism/provider/model/tier. Diagnostic-only, never read back by any\n  caller.\n- Multi-role team harness, first slice (coding domain): work items gain an\n  optional third axis, `holder` — orthogonal to `status` and `stage`, opt-in\n  per-domain via a new `roleGraph` declaration that names the legal\n  role-handoff edges for a domain/stage. Two new verbs, `fgos handoff <id>\n  --to <role> --reason <advise|assist|review|consult>` and `fgos\n  handoff-return <id>`, let a session make a guarded role-to-role call\n  between an implementer and a researcher/helper/reviewer/human-advisor\n  (consult a researcher, get something reviewed, ask a human, hand off a\n  scoped subtask) and record it in the event log — a call outside the\n  domain's declared graph is refused with the legal edges named in the\n  error, and a call outside a domain that declares no `roleGraph` at all is\n  refused just as cleanly. Every existing item and every existing log\n  replays byte-for-byte unaffected — `holder` and the two new event kinds\n  are both fully optional/lazy, never present unless actually used.\n- `runner.executors.pi` — `pi` (`@earendil-works/pi-coding-agent`)\n  registered as a second `agent`-kind executor alongside `agy`, via\n  `fgos setup`'s existing config-default merge (no manual `.fgos/\n  config.json` edit needed). Invocation shape: `pi --provider openai-codex\n  --model gpt-5.5 --tools <allowlist> --mode json --approve -p <prompt>`,\n  confirmed live against the coding-domain worker contract (a genuinely\n  disposable work item, both a correct cold-pickup refusal and a correct\n  commit-and-`[DONE]` completion) — see\n  `docs/history/pi-executor-runtime-capacity/RESEARCH.md`.\n\n- `codex` (OpenAI Codex CLI) wired as a new out-of-process dispatch\n  executor (`.fgos/config.json`'s `runner.executors.codex`), using\n  `codex exec --dangerously-bypass-approvals-and-sandbox` — an\n  unconditional bypass, deliberately no OS sandbox boundary. Unlike\n  `agy`'s own entry, this is not a lesser-but-real boundary: research\n  (`docs/history/codex-permission-capability-boundary/RESEARCH.md`,\n  branch `fgw/tsk-4kh`) proved `codex`'s real sandbox\n  (`-s workspace-write`) blocks the worker contract's own `git commit`\n  step outright, because this repo's `.githooks/pre-commit` spawns a\n  nested `git` subprocess the sandbox refuses with `EPERM` — a decision,\n  not an oversight, accepted explicitly after reviewing that trade-off\n  (`docs/history/codex-bypass-executor/`).\n\n### Changed\n\n- Explicit verify cadence rule added to `.agents/skills/_shared/coding-worker-contract.md` Layer 2 rule 2: out-of-process workers are now instructed to run the item's `verify` command once, near the end, when they believe the work is actually done — never as a per-edit habit.\n\n### Fixed\n\n- The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)\n  now spawns every executor with `stdin: 'ignore'` instead of the\n  default open pipe. `codex` (unlike `agy`) checks for piped stdin on\n  startup (\"Reading additional input from stdin...\") and blocks\n  indefinitely on a pipe nothing ever writes to or closes — found live\n  wiring `codex` as an executor (`docs/history/codex-bypass-executor/`).\n- The same stdin-pipe hang also affected `runCommand`\n  (`src/runner/goal-check.mjs`), the shared verify runner behind `fgos\n  return`/`approve`/merge/dispatch's own re-verify — a `codex`-based\n  `verify` command timed out there too until the same `stdin: 'ignore'`\n  fix was applied.\n- `fgos decision` now requires `--text` explicitly. Before this, a call\n  with no `--text` silently fell back to joining whatever positional\n  arguments were left over (e.g. `fgos decision write \"...\"` stored\n  \"write ...\" as the decision text) instead of refusing — the CLI now\n  refuses cleanly (exit 4) rather than storing corrupted decision text.\n- The `agy` (Antigravity Cli) executor no longer dispatches with\n  `--dangerously-skip-permissions` (`.fgos/config.json`'s\n  `runner.executors.agy`, now `--mode accept-edits`). `fgos doctor`/`fgos\n  setup` provision a real command-permission boundary in agy's own\n  settings.json instead (`agy-permissions-configured` check,\n  `src/setup/agy-permissions.mjs`): `toolPermission: \"always-proceed\"`\n  plus a `permissions.deny` list blocking destructive/exfiltration-prone\n  commands (`rm -rf`, `sudo`, force-push, `git reset --hard`, `git stash`,\n  raw `curl`/`wget`). This is a denylist (default-allow, explicit-deny),\n  not a true default-deny allowlist — `agy`'s headless (`-p`) mode was\n  live-proven (`docs/history/agy-permission-capability-allowlist/\n  RESEARCH.md` Round 4) to blanket-deny every command-type tool call under\n  its `strict`/`request-review` modes regardless of `permissions.allow`\n  content, so a real allowlist is not reachable there today — still\n  strictly narrower than the unconditional bypass it replaces.\n- `fgos decision` gains an optional `--kind` flag. Before this, every\n  write through the CLI verb defaulted to `addDecision`'s own `'design'`\n  kind — including `fgos-coding-validating`'s own audit line for an\n  auto-approved gate — which the retrospective/cleanup gate\n  (`checkRetrospectiveContent`) read as a human reflecting on the work,\n  letting an item satisfy that gate with no retrospective document behind\n  it. `fgos-coding-validating` now passes `--kind engine` on that line.\n\n### Changed\n\n- `capacities.<id>.kind` is now the `agent`/`tool` axis (WHAT a capacity\n  is — a live persona, potentially native-dispatchable, vs a mechanical,\n  presence-only tool), separate from `invocations[].via` (HOW it's\n  invoked — `cli`/`task`/`mcp`, widened from `cli`-only). `capacities.<id>.for`\n  is now a non-empty array (was a single value) — one executor can serve\n  multiple capabilities at once, each validated against the\n  `runner.capabilities` catalog above (replaces the old, narrower\n  `CAPACITY_PURPOSES` enum). Cross-provider governance\n  (`allowCrossProvider`) now applies regardless of `kind` — only an\n  `agentType`-resolved capacity is exempt (previously any `kind:\"task\"`\n  capacity was, even one with its own real, non-Claude command).\n  **Not yet applied to this repo's own live `.fgos/config.json`** — this\n  is a breaking `kind`-vocabulary change (unlike the two entries above),\n  so it lands together with the code that reads it, not as a separate\n  advance commit. (`docs/specs/runner.md` RUL65,\n  `docs/reference/forgentx-tool-registry-configuration.md`)\n- `EXECUTOR_ADAPTERS`' adapter function signature is generalized from\n  `(command, args, cwd, opts)` to `(invocation, opts)` — each adapter now\n  reads whatever fields its own invocation shape needs (`cliSpawnAdapter`\n  reads `command`/`args`; the new `httpAdapter` reads\n  `method`/`url`/`headers`/`body`) instead of every adapter being forced\n  through a CLI-argv-shaped call. A real second adapter is now registered:\n  `EXECUTOR_ADAPTERS.http`, making a real HTTP request via `fetch` (timeout\n  aborts the request; a non-2xx status is a normal result, never a thrown\n  error, matching `cli-spawn`'s own \"non-zero exit is not an error\"\n  stance). `INVOCATION_VIA` gets `'api'` back (dropped earlier for 0\n  historical producers; now backed by this real adapter) —\n  `capacities.<id>.invocations[]` may declare `{via: \"api\", url: \"...\"}`.\n  `resolveExecutorConfig` still only ever selects/spawns a `via:\"cli\"`\n  invocation — this is a pluggability precedent, not a new production\n  dispatch path; 0 capacities register `via:\"api\"` today.\n  (`docs/specs/runner.md` RUL66,\n  `docs/reference/forgentx-tool-registry-configuration.md`)\n- A `capacities.<id>` capacity that is **cli-spawn-shaped** (declares its\n  own `command`/`adapter`, or an `invocations[].via === \"cli\"` entry —\n  e.g. an `agy`-backed capacity) now dispatches out-of-process whenever it\n  is configured, even when the caller already has live Task-tool access.\n  Previously a live/interactive session with Task access always won\n  in-process, silently never invoking the configured command at all. A\n  capacity that is **agentType-shaped** (only `agentType`, no command of\n  its own) is unaffected — `hasLiveTaskAccess` still decides there, since\n  resolving it in-process already means honoring the configured target.\n  (`docs/decisions/0033-cli-spawn-shaped-capacity-thang-hasLiveTaskAccess.md`,\n  narrows `docs/decisions/0026` rule 2)\n- The per-tier `runner.executors.<tier>` config override is retired (0\n  live entries; had already caused a real bug — a non-tier key silently\n  fell through to the global executor with no error). A `capacities.<id>`\n  entry naming no `command`/`adapter`/`agentType` of its own now resolves\n  straight to the global `runner.executor`, with no intermediate stop.\n  (`docs/specs/runner.md` RUL41/RUL63)\n- `fgos tool register`/`fgos tool remove` are retired. A tool provider\n  (e.g. `gitnexus`, `herdr`) is now declared directly in\n  `runner.capacities.<id>` in `.fgos/config.json` — a `capability` field\n  on the entry, config-edited like every other capacity, no longer through\n  the event log. `fgos tool check`/`fgos tool query` are unchanged in\n  shape and behavior, now sourced from config instead of `view.tools`.\n  `.fgos/tool-status.local.json` (the local, gitignored presence overlay)\n  is unaffected. (`docs/reference/forgentx-tool-registry-configuration.md`)\n- The Iron Law gate now asks only where the answer can still matter: at the\n  **trunk boundary**. A leaf merging into `fgw/<root>`, and a root\n  `sync-root`-ing into its parent branch, go straight through — the gate\n  fires only when the merge actually lands on trunk. Nothing about the\n  classification itself changed (same `classifyIronLaw`, same\n  matched-flags/matched-modules evidence); what changed is where it runs.\n  Merge sweeps also no longer stall on a held item: an item the gate holds\n  is recorded, walked past, and reported once at the end of the run, while\n  it stays at `awaiting-approval`.\n  (`docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md`,\n  which supersedes the always-hard-refuse clause of `D16/D17\n  self-improve-loop`; `docs/specs/runner.md` RUL34/RUL37/RUL64.)\n- The fgOS plugin ships as `1.2.0`. `resolveWriterIdentity` moved from\n  `src/runner/session-identity.mjs` to `src/util/session-identity.mjs`, and\n  the plugin's `terminal/rename.sh` follows it there — a cached copy of the\n  plugin at `1.1.0` would otherwise keep loading the old path and silently\n  stop resolving the fgOS session id in pane labels. Nothing else about the\n  command surface changes: this is an internal boundary cleanup that cuts\n  every `src/state/` → `src/runner/` import, collapses three copies of the\n  Iron Law check into one `src/runner/iron-law-gate.mjs`, and moves\n  `detectTrunk`/`isMainWorktree` to `src/runner/worktree.mjs`.\n  (`docs/history/state-runner-merge-boundary/CONTEXT.md` D1/D2)\n- Stage `planning` now asks a person **once**, not twice. The\n  `planApprove` gate is gone from `fgos-coding-planning`; the single\n  remaining gate lives in `fgos-coding-validating`, immediately before\n  split children are created. It also asks a different kind of question:\n  the agent first exhausts every action within reach, then weighs what a\n  wrong answer would cost to repair, and only stops when one of three\n  concrete triggers fires — presenting the specific thing it is stuck on\n  and its own attempt so far, rather than the whole plan plus\n  \"approve?\". When nothing is stuck it proceeds and posts a non-blocking\n  note. Split children are no longer created during planning: their specs\n  are written into `plan.md` and materialized in one step at that gate via\n  `fgos plan --verdict decompose --children`, so a cut that turns out\n  wrong costs nothing to change, and children arrive at `executing` with\n  no gate of their own. A mid-planning hand-back to `fgos-coding-exploring`\n  now records the gap it found, so the re-entry closes only that gap\n  instead of re-running a full exploring pass.\n  (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md`;\n  supersedes `docs/history/gate-bypass/CONTEXT.md` D6, D4, and D2's\n  never-self-report clause, and replaces the `canAutoApproveValidate`\n  export with `canAutoApproveMergedGate`.)\n\n### Added\n\n- New config key `ironLaw.level` in `.fgos/config.json`, with two values:\n  `ask` (the default — the gate refuses until a person acknowledges) and\n  `warn` (opt-in — the gate prints what it matched, records one engine\n  decision entry, and lets the merge through). Anything that is not exactly\n  `warn` reads as `ask`, including a missing key or a malformed config, so\n  the permissive level is never reached by accident. `fgos doctor` reports a\n  missing or unrecognized level and `fgos doctor --fix` writes the `ask`\n  default. Deliberately its own key, never folded into `gateBypass`, whose\n  floor is documented as never touching the Iron Law.\n- New `/fgOS:approve <id>` skill: one command covers both `fgos approve` and\n  `fgos sync-root`, inferring which verb the id actually needs, and always\n  showing the blast radius — which verb, which target branch, how many items\n  ride along — before asking anything. When the Iron Law gate holds an item,\n  it shows `docs/history/<id>/iron-law-evidence.md` verbatim, asks once, and\n  runs the command itself on a real yes instead of handing over a line to\n  type. It never adds `--acknowledge-iron-law` on its own authority.\n- `README.md`'s `## Install` now recommends installing a tagged release\n  (`npm install -g github:vantt/forgent#vX.Y.Z`) instead of always\n  resolving to whatever commit is currently on `main` — the bare `main`\n  command is kept as a documented bleeding-edge option. New how-to:\n  `docs/how-to/cut-a-fgos-release-tag.md`, the manual (repo-owner-judgment)\n  procedure for cutting a release.\n- `fgos submit --backlog` creates an item directly at the `backlog` status —\n  an idea not yet committed to — instead of the default `todo`, so marking\n  something as not-yet-ready no longer means submitting it and then moving\n  it. A `backlog` item carries its own `backlog` status category, so it is\n  excluded from the ready frontier until a person promotes it to `todo`.\n  The default is unchanged: a flagless `fgos submit`, and `fgos add` in all\n  cases, still create items at `todo`.\n- herdr TUI: a `BACKLOG` tab, first in the Work Items tab strip, showing\n  items at the new `backlog` status. It is its own tab rather than a marker\n  inside `TODO`, so nothing reads a backlog item as ready, and the strip\n  renders the label even while the bucket is empty — promoting `backlog` to\n  `todo` is a person's own call, and an invisible bucket never gets one. The\n  landing tab is still `TODO`; unattended auto-discover continues to skip\n  backlog items.\n- Delivered-event merge provenance: `fgos approve`'s real merge paths (local\n  root-into-main, local leaf-into-root, GitHub PR merge) now record\n  `mergedSha`/`mergedInto` on the `work.move → delivered` event and the\n  item's own folded view — the sha and branch a change actually landed on,\n  readable straight through `fgos show`/`fgos list` instead of inferred\n  from git after the fact. `fgos move --to delivered` now refuses when\n  `fgw/<id>` exists and is not yet reachable from trunk (no merge evidence\n  to record), unless `--override-reason \"<why>\"` is given — the override is\n  logged to the item's decision log before the move proceeds. A verify-only\n  pull-door delivery, or an item with no `fgw/<id>` branch at all, is\n  unaffected either way.\n\n- Worker slots: a ceiling on how many work items may run at once. `fgos\n  slots` reports execution-lane occupancy, whether there is room, and the\n  admin lane's fixed reservation — it is the door launchers (herdr-plugin,\n  fgos-fanout) pre-check before standing a worker up. The same ceiling is\n  enforced inside every claim path (`take`, `pick`, and the runner alike),\n  which refuses with `worker-slot ceiling reached` once the lane is full.\n  Occupancy is derived from work items already at `doing`; nothing new is\n  recorded to get it. The ceiling ships UNARMED and stays that way until a\n  person sets it: `fgos setup` writes `workerSlots.ceiling: null`, which\n  refuses nothing, and a project is capped only once someone replaces that\n  with a real count. It is deliberately not armed on your behalf — `fgos\n  doctor` asks every project to run `fgos setup` as routine maintenance, so\n  a number written there would cap a repo that never asked to be capped, and\n  freeze its backlog if it was already running more items than the cap.\n- `fgos doctor` gained a `worker-slots-ceiling-usable` check. A\n  `workerSlots.ceiling` that is not a positive integer — `\"8\"` as a string,\n  `8.5`, `0`, `-1` — enforces nothing at all, so a project could believe it\n  was capped while running uncapped. The check names that, and reports the\n  deliberate `null` as \"unarmed\" rather than as a problem.\n- `fgos report <id> --text \"...\" [--stop-reason ...]` records a driver's\n  closing report on the item, so a result can be read with `fgos show <id>`\n  instead of by watching a terminal pane. `fgos-coding-driving` now records\n  one at every stop, which is what makes a finished worker pane safe for the\n  cockpit to reuse: the result no longer lives only on a screen somebody has\n  to guard.\n\n### Fixed\n\n- The Claude Code plugin (`plugins/fgOS/`) now ships all 14 coding-domain\n  dev-skills (`fgos-coding-driving`, `fgos-routing`, `fgos-clarifying`,\n  and the rest) alongside its existing CLI-wrapper skills. Previously\n  they existed only in this repo's own `.claude/skills/`, so any project\n  that installed fgOS solely as a plugin (no forgent checkout anywhere)\n  got \"Unknown skill\" the moment `/fgOS:cook`/`/fgOS:discover`/\n  `/fgOS:plan`/`/fgOS:pick` tried to dispatch into one — even though the\n  `fgos` CLI itself was fully reachable the whole time. A new\n  `fgos doctor` check, `plugin-dev-skills-packaged`, catches a maintainer\n  who forgets to keep the plugin's copies in sync before a release ships.\n\n### Changed\n\n- `fgos-runner` and `fgos-fanout` now ask for a worker slot before standing\n  a worker up, instead of each enforcing a ceiling of its own. The runner's\n  `runner.parallel.maxRoots`/`maxLeavesPerRoot` and fan-out's cap of 5 keep\n  their values but change role: they bound how large a batch that launcher\n  may propose, while the shared ceiling decides whether the batch runs at\n  all — so the real limit on a machine is one number rather than the sum of\n  three. A batch is trimmed to the number of free slots: the ceiling is hard,\n  and anything fired past it would be refused at the claim door anyway, so a\n  launcher stands up only what the engine granted and defers the rest to the\n  next wave. With no `workerSlots.ceiling` configured, both behave exactly\n  as before. A runner that finds the lane full now ends its run cleanly\n  (`idle`, exit 0) rather than halting with a non-zero exit, and an item\n  refused for lack of room is simply left for a later poll.\n- The runner's discovery sweep now asks for a worker slot too. It stands a\n  real research worker up but never claims the item, so that process was\n  invisible to the ceiling and ran even when the lane was full — the machine\n  could carry more workers than the configured total while `fgos slots`\n  reported fewer.\n- A runner that dispatched nothing now says which of the two happened.\n  \"Frontier empty — nothing to do\" and \"the lane is full, work is waiting\"\n  previously printed the same line and returned the same envelope; the idle\n  result now carries `reason` (`frontier-empty` or `worker-slot-ceiling`),\n  and a refusal names the item ids currently holding the slots, so a lane\n  wedged by an abandoned claim is visible instead of looking like an empty\n  backlog.\n- `fgos doctor` gained a `delivered-not-on-trunk` check: it names any item\n  whose status says its work was handed over (`delivered`, `retrospective`,\n  `cleanup`, `done`) while its own `fgw/<id>` branch is still not reachable\n  from the trunk. `delivered` is reachable through a bare `fgos move`, which\n  merges nothing and asks for no proof that anything merged, so real tested\n  work could sit outside `main` with nothing reporting it — `root-drift`\n  only walks root items, and `fgos stale` waits a three-day TTL and then\n  says \"forgotten\", not \"unmerged\". The check separates the two causes: a\n  branch that merged nowhere needs its content landed, while one that landed\n  on a root branch that has not synced needs `fgos sync-root` on the root\n  instead.\n- `fgos discover` and `fgos plan` no longer send the reader to each other\n  when neither serves the item's stage. Each gate now checks whether its\n  sibling would actually accept the item; when neither does, both say so\n  plainly and point at `fgos doctor`'s stage-vocabulary check, instead of\n  forming a closed referral loop with no way out.\n\n- The `decompose` stage/verb/launcher family is renamed to `plan`: the CLI\n  verb `fgos decompose` is now `fgos plan`, the slash command\n  `/fgOS:decompose` is now `/fgOS:plan`, and the stage a coding-domain item\n  sits at while being shaped is now called `planning`. The verdict values\n  (`pass-through` / `need-human` / `decompose`) are unchanged — they name\n  an outcome, not a stage. `decompose` itself survives as a legacy,\n  drain-only stage alias so items already parked there before this change\n  keep advancing through their existing edges; no new item can land on it.\n  Five stage skills gain a `coding-` prefix to match the domain-prefix\n  convention every other stage skill already follows:\n  `fgos-exploring`→`fgos-coding-exploring`, `fgos-planning`→\n  `fgos-coding-planning`, `fgos-validating`→`fgos-coding-validating`,\n  `fgos-compounding`→`fgos-coding-compounding`, `fgos-code-implement`→\n  `fgos-coding-implement`.\n- The `clarify` stage is retired entirely — it is no longer a stage at\n  all. The understand-the-ask pass it used to run moved to an Init-time\n  helper (`fgos-clarifying`) that `/fgOS:submit` calls BEFORE the item is\n  created, so an item is now born with the cleaned-up title/description\n  and its domain already settled. Unlike `decompose`, no drain-only alias\n  is kept: every item still open on `clarify` was migrated onto a real\n  stage first, so nothing is stranded. `discovery` is now the coding\n  domain's first stage, and no item can be created at, or moved to,\n  `clarify` anymore.\n- A `discovery` verdict now picks WHICH EDGE the item takes, instead of\n  every item walking one fixed chain. `clear` skips `exploring` entirely\n  and lands the item straight on `planning`; `unclear` advances it to\n  `exploring` and parks it there for a person, so whoever answers resumes\n  already sitting at the stage where the Socratic pass happens instead of\n  looping back through discovery on the same unresolved question.\n  Previously an unclear verdict parked the item in place, at whatever\n  stage it was already on.\n- `tier`/`kind`/`risk` are no longer judged from the raw submit text. The\n  `fgos submit` verb still stamps its mechanical keyword-derived values,\n  but those are now explicitly a temporary placeholder: stage\n  `discovery`'s own skill (`fgos-coding-discovering`) makes the real call\n  once, on the research evidence it just gathered, reading each domain's\n  declared `kind`/`risk` vocabulary rather than a hardcoded list. No\n  caller re-judges them at intake anymore — a wrong placeholder is\n  corrected later by discovery's own judgment, not earlier by guessing\n  harder at the ask. The `submit-assist-classify` capacity is retired\n  outright, with no migration: it only ever described how to call a\n  helper, never held a judgment that needed handing over.\n- `/fgOS:retro-next` is now a launcher in the strict sense: it sweeps,\n  picks one item, and hands it to `fgos-coding-driving` with an explicit\n  `ceiling: status:cleanup`, relaying whatever the driver reports. It no\n  longer resolves the synthesis skill, invokes it, moves the item, or reads\n  a subprocess exit code itself. Observable behavior is unchanged —\n  synthesis runs, the item lands at `cleanup`, the run stops there — but it\n  now inherits the driver's park/anchor handling and its\n  `stop-reason: lock-timeout` relay instead of duplicating thinner versions.\n- `fgos-coding-driving` now resolves each iteration's next step from the\n  item's **position** rather than always from `stage`: `stage` while it is\n  live, `status` once it freezes at `awaiting-approval`. This makes the\n  driver able to carry an item through the post-merge chain\n  (`retrospective` → `cleanup`) that previously needed hand-rolled\n  sequencing in each launcher. No registry or code change was required —\n  `skillMap` has mixed stage and status keys since decision `0027` D5.\n- `/fgOS:cleanup-next` now reports a stuck shared lock with the same\n  `stop-reason: lock-timeout` marker line every other launcher and the\n  driver already use, instead of describing that condition only in prose —\n  so `/fgOS:cleanup-loop` reads the one loop-stopping category off a line\n  rather than inferring it. Its exit-code classification is unchanged and\n  documented as deliberate: unlike `/fgOS:retro-next`, it runs a real CLI\n  subprocess, so an exit code genuinely exists to read.\n- `awaiting-approval` changes from an unconditional stop into the driver's\n  **default, overridable ceiling**. A caller that supplies no ceiling stops\n  there exactly as before, so existing behavior is unchanged; a caller that\n  deliberately passes a further `status:*` ceiling can drive past it. The\n  merge gate stays a human decision, now protected by a named launcher\n  convention (no launcher ships a default ceiling past `awaiting-approval`)\n  rather than by the driver refusing structurally.\n\n### Fixed\n\n- An item whose root branch was ever synced (`fgos sync-root`), or that was\n  converged into a component (`fgos promote-to-component`), could reach\n  `done` without a retrospective ever having produced anything. Both verbs\n  recorded their merge on the item as a decision but never said it was\n  machine-written, and an untagged decision defaults to `design` — so the\n  cleanup gate read a routine branch merge as someone's reflection on the\n  work and passed the item through. Both records are now tagged as engine\n  bookkeeping. They remain fully visible in `fgos show`; they simply no\n  longer stand in for a retrospective document. **Forward-only** (tsk-33w9):\n  the event log is append-only and replay folds each decision exactly as it\n  was written, so every `sync-root`/`promote-to-component` decision recorded\n  BEFORE this fix keeps `kind: design` forever — this change stops new\n  records from falsely satisfying the gate, it does not retag or re-flip\n  anything already on disk. Whether pre-existing falsely-tagged records get\n  a one-off migration, a text-based gate refusal, or are left as-is remains\n  an open decision.\n\n- `checkRetrospectiveContent` (the `cleanup -> done` retrospective-content\n  gate) missed two legitimate forms of retrospective content, both\n  false-negatives that permanently parked an item at `cleanup` regardless\n  of TTL: a genuine re-attest judgment (\"no new doc needed, an existing doc\n  already covers this\"), recorded only through `fgos knowledge attest`\n  (never a decision or `outcome.docType`/`docPath`); and a leaf item whose\n  retrospective content was recorded against its ROOT id instead of its\n  own (the knowledge skill runs once per split group). The gate now\n  recognizes a knowledge-registry attestation naming the item's id, and\n  falls back to the item's root when the leaf itself has no evidence of\n  its own — a no-op for any root/standalone item.\n\n- Parallel fan-out no longer refuses to dispatch anything when the\n  worker-slot ceiling is unarmed — which is how every project starts, since\n  `fgos setup` writes `workerSlots.ceiling: null` on purpose. In that state\n  `fgos slots` reports room available but no numeric limit\n  (`free: null`), and the fan-out launcher trimmed its batch against that\n  number anyway, reading \"no limit\" as \"no slots\" and firing nothing while\n  the machine was completely idle. It now fires the whole batch when no\n  ceiling is armed, and trims only against a real one.\n- `fgos check`'s entropy report no longer under-counts the backlog waiting\n  at the front of the lifecycle. The signal filtered on the literal stage\n  name `clarify`, which the coding domain retired entirely, so it reported\n  0 forever while every open item genuinely parked at the domain's real\n  entry stage (`discovery`) went uncounted. It now resolves each item's own\n  domain entry stage, and the row is labelled `stage-entry` instead of\n  `stage-clarify` to match what it actually counts.\n\n### Changed\n\n- **`cleanup`'s TTL delay now anchors to `delivered` (release), not to the\n  later `retrospective -> cleanup` transition.** The original anchor's\n  justification — protecting a still-reusable worktree during the delay —\n  is stale in practice: the worktree is normally torn down far earlier than\n  `cleanup`, so by the time an item reaches `cleanup` there is usually\n  nothing left at that anchor to protect. What the delay actually protects\n  is a real post-merge incident window on the shipped artifact, which\n  starts at release, not at whatever later moment retrospective happens to\n  finish (a slow retrospective was silently extending the window past what\n  was intended). Does not weaken \"must retrospective before cleanup\" —\n  that stays a structural property of the `delivered -> retrospective ->\n  cleanup` chain itself, independent of the TTL clock.\n\n### Removed\n\n- `npm run check:decision-supersession` — the `docs/decisions/NNNN-*.md` +\n  `0000-index.md` pointer-pair format it validated is retired for good\n  along with the hand-authored ADR corpus (see Added, ADR retirement).\n  `scripts/check-decision-supersession.mjs`'s pure functions stay real and\n  unit-tested against synthetic fixtures; only the real-repo CLI mode had\n  nothing left to run against.\n- The `orchestrator` word ban (`test/docs/launcher-vocabulary-guard.test.mjs`\n  and its 28-entry allowlist) is retired, per decision `0031`. Decision\n  `0028` banned the term while it carried no meaning; decision `0029` D17\n  then assigned it one — the T0 aggregate layer (N units, stays engaged),\n  the role `/fgOS:*-loop` and `fgos-fanout` actually play. The guard was\n  left blocking fgOS's own current vocabulary, and a word-level grep cannot\n  tell the retired sense from the assigned one. Writing `orchestrator` in\n  that assigned sense no longer fails the suite. `launcher` remains the only\n  correct name for the one-unit, fire-and-forget role — that half of `0028`\n  stands.\n\n### Added\n\n- New `fgos version` verb: reports this build's own `package.json` version,\n  git commit (when resolvable), and its full dispatched verb set — a\n  hook-safe, scriptable way to tell an old globally-installed `fgos` apart\n  from a current checkout without reading `node_modules` directly. `fgos\n  doctor` gained a matching `cli-version-visible` check that surfaces the\n  same info in its own report.\n\n- `fgos discover` accepts `--tier`, `--kind`, and `--risk` alongside\n  `--verdict clear`, so an interactive session can record the classification\n  it just judged in the same call that resolves discovery, instead of\n  remembering a separate `fgos edit`. This is the same data contract a\n  headless worker already had through its `fgos-verdict` block, and both\n  paths now run it through one shared guard: nothing is applied unless the\n  discovery outcome actually resolves clear, so an unclear verdict or a\n  parked verify dispute still changes no classification. A value outside the\n  item's own domain vocabulary is refused as a validation error (exit 4)\n  before the item moves at all, and omitting a flag leaves that field\n  untouched.\n- Repo-invariant checks now run alongside an item's own `verify`, at both\n  `fgos return` and the post-merge gate of `fgos approve`. The commands are\n  declared per project in `.fgos/config.json` under `invariantChecks.commands`\n  (this repo's default: `node --test test/architecture.test.mjs`), registered\n  into `fgos setup`'s config-merge and visible to `fgos doctor` as the new\n  `invariant-checks-configured` check. They are a hard gate: a red invariant\n  blocks the return and aborts the merge, naming the command that failed.\n  A project with no `invariantChecks` section behaves exactly as before —\n  nothing runs, nothing changes. This closes the gap where a repo-wide\n  invariant broken by one item could land on main and stay red across later\n  merges, because no item's own narrow `verify` happened to touch it.\n\n- `fgos doctor` gained a `work-stage-vocabulary` check: it names any open\n  item sitting at a stage its own domain no longer registers. Until now\n  only `risk`/`kind` drift was surfaced this way, so an item stranded on a\n  retired stage — which no `fgos edit` can correct, since `stage` has no\n  editable door — stayed invisible until some other command tripped over\n  it. The `discover` pool now derives its candidate stages from the same\n  source the `fgos discover` verb checks against, so it can no longer offer\n  an item that the verb would then refuse.\n\n- `fgos promote-to-component` gained an opt-in `--trust-dir` flag: with an\n  explicit `--dir` also passed, it can now run from inside a linked\n  worktree instead of refusing outright. Default behavior (no flag) is\n  unchanged. See `docs/how-to/recover-approve-sync-root-from-inside-a-\n  worktree-with-trust-dir.md`'s new `promote-to-component` section.\n\n### Changed\n\n- `fgos approve` no longer re-runs an item's checks when the tree it is about\n  to merge is provably the exact tree `return` already verified green (main\n  has not advanced past the fork, and the branch tip still matches the SHA\n  recorded at return). In that case both the item's `verify` and the\n  invariant checks are skipped, and the merge report says so explicitly.\n  Whenever main HAS advanced, the merged tree is genuinely different and\n  every check runs as before.\n\n- `fgos doctor` gained a new check, `events-jsonl-contiguous`: the shared\n  `.fgos/events.jsonl` is now checked for seq breaks/duplicates that an\n  ordinary git merge can leave behind (a new `.gitattributes` entry routes\n  it through git's built-in `union` merge driver, closing the underlying\n  merge-conflict-hand-resolution class of event loss). `fgos doctor --fix`\n  repairs a found break by deduping exact-duplicate lines and renumbering\n  `seq` contiguously — no event is ever dropped by the fix.\n\n- Work-item `kind` and `risk` now have a per-domain vocabulary, declared by\n  the domain itself (`DOMAINS.<domain>.classification`) and enforced at the\n  write door alongside the existing `tier` enum. Coding declares\n  `kind: bug|chore|design|docs|feature|task` and\n  `risk: light|standard|heavy`. A domain that declares no vocabulary is\n  unaffected — any non-empty string still passes, exactly as before.\n\n- `pick`/`take` now transparently reclaim a `doing` item whose `human`/\n  `session` claim has genuinely gone quiet — no new verb or flag. When a\n  claim conflict would otherwise refuse unconditionally, the existing\n  claim's worktree/branch activity (real commit + file-edit signal, not\n  session/process identity) is checked first; past a conservative\n  threshold (same `agentMs`/`humanMs` split `/fgOS:stale` already uses),\n  the stale claim is released and the new claim reattaches to the\n  existing branch (never force-removed). Runner claims stay untouched\n  (`startupReap`'s own domain), and only a live `pick` attempt (never\n  `take`, never a `runner` caller) can trigger it. Every other case —\n  recent activity, or unreadable evidence — refuses exactly as before.\n\n- The shared config file gains a `herdrOrchestrator: {autoDiscover,\n  autoMerge, autoRetro, autoCleanup}` section (all off by default,\n  fail-closed on a missing or malformed value) for the herdr-plugin\n  dashboard's future auto-launch toggles. Surfaced by `fgos doctor`'s new\n  `herdr-launcher-configured` check and merged in by `fgos setup`, same\n  as every other registered config default.\n\n- The herdr-plugin dashboard auto-launches a guarded agent pane running\n  `/fgOS:discover <id>` for the first `discovery`-stage, `todo`-status\n  item it finds, once per poll tick, when `herdrOrchestrator.autoDiscover` is\n  on (off by default). Guarded against double-launching the same item via\n  a dedicated pane label, kept separate from the dashboard's existing\n  In-Process pane tracking so it never shows up there as a phantom task.\n\n- The herdr-plugin dashboard also auto-launches into the fixed\n  `fg:operation` tab when `herdrOrchestrator.autoMerge`/`autoRetro`/\n  `autoCleanup` are on (all off by default): the left pane runs\n  `/fgOS:merge-loop`, the right pane runs `/fgOS:retro-loop` or\n  `/fgOS:cleanup-loop`, alternating by priority. Guarded against\n  double-launching via a dedicated fixed pane title per toggle, same as\n  auto-discover.\n\n### Changed\n\n- `/fgOS:submit` run from a live session now clarifies the ask before the\n  item is created: `fgos-clarifying` reads the raw text and hands back the\n  cleaned-up title/description and the domain, and `fgos submit` is called\n  with those. It never judges `tier`/`kind`/`risk` itself — stage\n  `discovery` does that, once, on real evidence. Any question it needs to\n  ask is asked while you are still in the conversation, rather than days\n  later at a discovery sweep. The `fgos submit` verb itself is unchanged — still mechanical,\n  still no model call — so a bare shell, cron, another agent, or the\n  dogfood fixture replay all behave exactly as before.\n\n### Fixed\n\n- An item parked for a person after being judged NOT clear at `discovery`\n  was still recorded in the settlement channel as having passed, because\n  the settlement record keyed only on the item leaving `discovery` — which\n  an unclear verdict now also does. Where the item had no real verify yet,\n  the record's detail read as the literal \"chưa xác định — bổ sung thủ\n  công\" placeholder. A settlement is now recorded only when the verdict\n  that drove the move was clear. Records already written for real clear\n  passes are unaffected; nothing is re-derived or silenced retroactively.\n- Items could be stored with a `risk` value nothing in the system reads\n  (`low`/`medium`/`high`), which silently disabled two behaviors rather\n  than failing: the human-confirmation gate that fires before a\n  `risk: heavy` root is split, and the risk discount in the priority\n  formula (which fell back to its `standard` weighting). Such a value is\n  now rejected when written. Items already stored with one keep replaying\n  and stay editable; only a write that actually touches the field is held\n  to the vocabulary.\n\n- Merging could fail for reasons that had nothing to do with the work being\n  merged. The event-log concurrency test queued 800 serialized lock\n  acquisitions against a 2s per-acquisition budget, so under the load of a\n  full test run it could exceed that budget and fail — and because that run\n  is what `fgos approve`/`fgos return` use to verify a merge, the merge was\n  rolled back and an innocent item was parked in `blocked`. Observed three\n  times in one day on two unrelated items. The test now queues an amount\n  the budget was actually documented for, and still fails loudly if the\n  append lock itself regresses.\n\n### Removed\n\n- The standalone `fgos-submit-assist` skill. Its own steps had no reason\n  left to exist on their own: title derivation always lived in the\n  `submit` verb itself, and its tier/kind/risk classification now happens\n  once at stage `discovery`, on real research evidence, for every item\n  regardless of which caller created it. Use `/fgOS:submit` directly; it\n  now does strictly more than this skill did.\n- The `resolve` CLI subcommand (`node src/runner/dispatch.mjs resolve`)\n  and `resolveCapacityCli`. 0 production consumers (confirmed via impact\n  analysis); `execute` already covers everything `resolve` did, and\n  actually runs the command instead of handing back `{command,args}` for\n  the caller to run itself through Bash.\n\n### Added\n\n- `decide` gains a `--needs-soul` flag: the caller's own self-declaration\n  that it is about to fire its own Agent/Task tool with no capacity or\n  work item to name. When every other lookup (capacity id, `--for`,\n  `--work`) comes up empty, `--needs-soul` defaults the answer to native\n  dispatch instead of `\"unavailable\"` — the same default `--work` already\n  applied for a work item with no registered capacity override, now\n  available to a bare Agent/Task call too.\n- Every `decide` result now carries `configured: true|false` — `false`\n  means nothing is registered under that name/purpose (the answer came\n  from the default); `true` means a real `capacities.<id>` entry was\n  found, whatever mechanism it resolves to. Lets a caller tell \"typo'd or\n  never configured\" apart from \"configured, and it happens to run\n  out-of-process\" — today both silently read the same\n  `mechanism: \"out-of-process\"`.\n- A `PreToolUse` hook (`scripts/dispatch-decide-hook.mjs`) now enforces\n  that every Agent/Task tool call goes through `decide` first: it runs\n  `decide --for <subagent_type> --needs-soul --has-live-task-access` on\n  the caller's behalf and refuses the call when the answer is anything\n  other than `in-process`, pointing at `execute` instead. Wired into\n  `.claude/settings.json` by `fgos setup` (fill-only — a pre-existing\n  `hooks.SessionStart` entry, or any other content, is left untouched);\n  reported by a new `dispatch-decide-hook-wired` `fgos doctor` check. Fails\n  open on any internal error (empty/malformed stdin, `decide` itself\n  erroring) — never a second point of failure on top of a working dispatch\n  surface.\n- `capacities.<id>.capability` (the tool-registry's own free-text field) is\n  now catalog-validated the same way `for` already was — a typo'd or\n  undeclared value used to silently make a tool invisible to `fgos tool\n  query --capability ...` with no error anywhere; it now fails config load\n  with a clear message naming the missing catalog entry.\n- `decide` hands back `mcpTool` (mutually exclusive with `agentType`) for a\n  `kind:\"tool\"` capacity whose `mcp` invocation declares a `tools` map\n  (`capability -> MCP tool identifier`) covering the requested purpose —\n  `mechanism` is upgraded from `out-of-process` to `in-process` in that\n  case, since dispatch has no MCP client of its own and hands the call back\n  to the caller's own live one, the same reasoning `agentType` hand-back\n  already uses for a live Agent/Task tool. Fixes a real gap: `decide --for\n  impact-analysis` used to answer `unavailable` even though `gitnexus` was\n  fully registered, because `toolsFromCapacities` (`fgos tool query`) and\n  `resolveCapacityIdForPurpose` (`decide`) read two different fields.\n\n### Changed\n\n- `toolsFromCapacities` now prefers `capacities.<id>.for[0]` over\n  `capacities.<id>.capability` when both are present, folding the two\n  previously-separate capability fields into one read path — `capability`\n  stays accepted as a tolerant fallback for a not-yet-migrated capacity,\n  never removed by this change alone.\n\n## [0.1.0]\n\nBaseline snapshot of the public surface as of this entry.\n\n### Added\n\n- `fgos` CLI with 49 verbs covering the work-item lifecycle (submit,\n  clarify/decompose/execute, review/merge, and maintenance operations).\n- `fgos-runner` bin entry for the automated runner loop.\n- Install/setup/doctor/uninstall story: `fgos setup` (global/project config\n  merge), `fgos doctor` (check registry), and their uninstall counterpart.\n",
+      "continued": false
+    },
+    {
+      "file": "CHANGELOG.md",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "CHANGELOG.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "2d6b8914070caaee205433924bdf0bc63c44579166e51e0fe4b16c5e17c5446a",
+        "digest": "062f9fdd3601883b474bc5f0980b444366e8b10fafb6dc490ac8bd5fee00e8e9",
+        "inventoryEdgeIds": [
+          "evidence-001",
+          null,
+          null,
+          null
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-001",
+            "slotKey": "{\"edgeId\":\"evidence-001\",\"file\":\"CHANGELOG.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-001\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":928}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-001",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 928
+              }
+            ],
+            "consumerFile": "CHANGELOG.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1040,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1040,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Dated/archive evidence keeps its original citation identity. Own source passage: '  `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-001",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 928,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "  `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`."
+              }
+            ],
+            "historyRegion": {
+              "heading": "[v0.1.0] - 2026-09-18",
+              "line": 802,
+              "marker": "  `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`."
+            },
+            "preservedPathWitness": {
+              "path": "docs/architect/agent-coordination/verification",
+              "state": "tree",
+              "treeMatchCount": 868,
+              "treeMatchesSha256": "1f268d0eb14459b841d932f2ce41ca0152c791a96d433fb76b72ca9103fc10d9",
+              "treeSample": [
+                "docs/architect/agent-coordination/verification/README.md",
+                "docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md"
+              ],
+              "historyCommitCount": 350,
+              "historyCommitsSha256": "e03f626095b7abaf079a47546847f69111ce0b6b3a288b356edf2a702fad17e7",
+              "historySample": [
+                "9818f25a877756a81dceab990602b50646c8610f",
+                "fc25949821fcc8f2894f8b05d0e25d87afbd6949"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"CHANGELOG.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":54,\"file\":\"CHANGELOG.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":1343,\"text\":\"docs/decisions/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "CHANGELOG.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1343,
+                "columnStart": 54,
+                "columnEndExclusive": 69,
+                "text": "docs/decisions/"
+              },
+              {
+                "line": 1344,
+                "columnStart": 3,
+                "columnEndExclusive": 11,
+                "text": "index.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1343,
+                "columnStart": 54,
+                "columnEndExclusive": 69,
+                "text": "docs/decisions/"
+              },
+              {
+                "line": 1344,
+                "columnStart": 3,
+                "columnEndExclusive": 11,
+                "text": "index.md"
+              }
+            ],
+            "matchedExpression": "docs/decisions/\nindex.md",
+            "logicalReference": "docs/decisions/index.md",
+            "legacyPath": "docs/decisions/index.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: '  check+fix pair: reports and repairs drift between `docs/decisions/\\n  index.md` and `state.decisions`.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "CHANGELOG.md",
+              "line": 1343,
+              "columnStart": 54,
+              "columnEndExclusive": 69,
+              "text": "docs/decisions/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "historyRegion": {
+              "heading": "[v0.1.0] - 2026-09-18",
+              "line": 802,
+              "marker": "  check+fix pair: reports and repairs drift between `docs/decisions/"
+            },
+            "preservedPathWitness": {
+              "path": "docs/decisions/index.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "d9a1d7574ba318f7e2c2ff1a16ba6bb9c851bd07a0f24cc39d280ea48c80a07d",
+              "treeSample": [
+                "docs/decisions/index.md"
+              ],
+              "historyCommitCount": 22,
+              "historyCommitsSha256": "2a0bdc6404b93d6aeafe1193f421fbae70c70097e7bfe723a4d3f5ffa2bf8956",
+              "historySample": [
+                "8b810140f9bac9a51c14a67d0c1681fe873b6bf8",
+                "f5974ff0d99bd3a1ff0a95a03c43861a48978368"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"CHANGELOG.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":66,\"columnStart\":17,\"file\":\"CHANGELOG.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":1433,\"text\":\"docs/history/agy-permission-capability-allowlist/\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "CHANGELOG.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1433,
+                "columnStart": 17,
+                "columnEndExclusive": 66,
+                "text": "docs/history/agy-permission-capability-allowlist/"
+              },
+              {
+                "line": 1434,
+                "columnStart": 3,
+                "columnEndExclusive": 14,
+                "text": "RESEARCH.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1433,
+                "columnStart": 17,
+                "columnEndExclusive": 66,
+                "text": "docs/history/agy-permission-capability-allowlist/"
+              },
+              {
+                "line": 1434,
+                "columnStart": 3,
+                "columnEndExclusive": 14,
+                "text": "RESEARCH.md"
+              }
+            ],
+            "matchedExpression": "docs/history/agy-permission-capability-allowlist/\nRESEARCH.md",
+            "logicalReference": "docs/history/agy-permission-capability-allowlist/RESEARCH.md",
+            "legacyPath": "docs/history/agy-permission-capability-allowlist/RESEARCH.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: '  live-proven (`docs/history/agy-permission-capability-allowlist/\\n  RESEARCH.md` Round 4) to blanket-deny every command-type tool call under'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "CHANGELOG.md",
+              "line": 1433,
+              "columnStart": 17,
+              "columnEndExclusive": 66,
+              "text": "docs/history/agy-permission-capability-allowlist/"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "historyRegion": {
+              "heading": "[v0.1.0] - 2026-09-18",
+              "line": 802,
+              "marker": "  live-proven (`docs/history/agy-permission-capability-allowlist/"
+            },
+            "preservedPathWitness": {
+              "path": "docs/history/agy-permission-capability-allowlist/RESEARCH.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "683951a997467b69fd8906420cec8d1587f1bd967355141c93b4d3036cd5ad36",
+              "treeSample": [
+                "docs/history/agy-permission-capability-allowlist/RESEARCH.md"
+              ],
+              "historyCommitCount": 4,
+              "historyCommitsSha256": "6f4d14fee4d71fadf92d90e4117e346cb017c06b6ad7a252e0d92570598b9d4e",
+              "historySample": [
+                "e017a89132cfd037415f27d53743268217f5e8cb",
+                "4c5e1205cd9dd59c79447883a17c3da9a5d6aec6"
+              ]
+            }
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"CHANGELOG.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":71,\"columnStart\":19,\"file\":\"CHANGELOG.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":1879,\"text\":\"docs/how-to/recover-approve-sync-root-from-inside-a-\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "CHANGELOG.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1879,
+                "columnStart": 19,
+                "columnEndExclusive": 71,
+                "text": "docs/how-to/recover-approve-sync-root-from-inside-a-"
+              },
+              {
+                "line": 1880,
+                "columnStart": 3,
+                "columnEndExclusive": 29,
+                "text": "worktree-with-trust-dir.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1879,
+                "columnStart": 19,
+                "columnEndExclusive": 71,
+                "text": "docs/how-to/recover-approve-sync-root-from-inside-a-"
+              },
+              {
+                "line": 1880,
+                "columnStart": 3,
+                "columnEndExclusive": 29,
+                "text": "worktree-with-trust-dir.md"
+              }
+            ],
+            "matchedExpression": "docs/how-to/recover-approve-sync-root-from-inside-a-\nworktree-with-trust-dir.md",
+            "logicalReference": "docs/how-to/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md",
+            "legacyPath": "docs/how-to/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; original design/history provenance stays literal under L12-47 and ruling 2; no new current authority asserted. Own source passage: \"  unchanged. See `docs/how-to/recover-approve-sync-root-from-inside-a-\\n  worktree-with-trust-dir.md`'s new `promote-to-component` section.\" L12-62: absent at author pin; historical path only. Captured provenance/runtime-index spelling preserved; no live destination claim.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-62-complete-passage-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "CHANGELOG.md",
+              "line": 1879,
+              "columnStart": 19,
+              "columnEndExclusive": 71,
+              "text": "docs/how-to/recover-approve-sync-root-from-inside-a-"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true,
+            "historyRegion": {
+              "heading": "[v0.1.0] - 2026-09-18",
+              "line": 802,
+              "marker": "  unchanged. See `docs/how-to/recover-approve-sync-root-from-inside-a-"
+            },
+            "preservedPathWitness": {
+              "path": "docs/how-to/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md",
+              "state": "history",
+              "treeMatchCount": 0,
+              "treeMatchesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "treeSample": [],
+              "historyCommitCount": 3,
+              "historyCommitsSha256": "0cc84e519dfb6b2f458f42545c4fe1424c841f6c04c9a431a83a7a6e2b705ccf",
+              "historySample": [
+                "edf7431c910e19ca49e279115a806c8d6cb3d86e",
+                "cb3b8b3948b44f5b4dd7801416fb878f834e1ece"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-017",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "CHANGELOG.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "062f9fdd3601883b474bc5f0980b444366e8b10fafb6dc490ac8bd5fee00e8e9",
+          "bytes": 368613,
+          "lines": 2057,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p27.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

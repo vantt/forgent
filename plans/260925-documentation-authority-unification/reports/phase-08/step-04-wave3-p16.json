@@ -1,0 +1,809 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author/packet scripts. Read complete source, all record slots, diff and target passages; one final verdict per whole source file across any streamed parts.",
+  "set": "step04-020",
+  "files": [
+    "packages/herdr-fgos-common/rust/src/fgos.rs"
+  ],
+  "joinedSlots": 3,
+  "items": [
+    {
+      "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "kind": "complete-source-context",
+      "path": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "startLine": 1,
+      "endLine": 1119,
+      "content": "use std::io;\nuse std::path::{Path, PathBuf};\nuse std::process::Command;\n\nuse serde::Deserialize;\n\nuse crate::ports::WorkItemSource;\n\n/// One row from `fgos triage --json`'s `data` array — already sorted by\n/// `rankImpact` (D5), so this module never re-sorts it.\n#[derive(Debug, Clone, Deserialize, PartialEq)]\npub struct TriageRow {\n    pub id: String,\n    pub title: String,\n    #[serde(rename = \"goalTier\")]\n    pub goal_tier: Option<String>,\n    /// tsk-1e3 D4: the detail modal's Discover button is only enabled at\n    /// `\"clarify\"` — carried through from `rankImpact`'s own `workflowStep` field\n    /// (`src/state/impact.mjs`, defaults to `\"executing\"` when the item\n    /// carries none), never re-derived here.\n    #[serde(rename = \"workflowStep\")]\n    pub stage: String,\n    /// tsk-64z D1: the Work Items panel's Status column and tab filter\n    /// (TODO/DOING/REVIEW/DONE) both key off this raw literal\n    /// (`docs/reference/triage-table-columns.md`'s own \"rendered as-is\").\n    pub status: String,\n    /// tsk-64z D1: \"Blocked By\" column — ids of OTHER still-open items\n    /// this row directly waits on (`rankImpact`'s own `blockedBy`,\n    /// `src/state/impact.mjs`). Comma-joined at render time, never here.\n    #[serde(rename = \"blockedBy\")]\n    pub blocked_by: Vec<String>,\n    /// tsk-64z D1: \"Blocks\" column — count of OTHER still-open items that\n    /// directly wait on this one.\n    pub blocks: u32,\n    /// tsk-64z D2: sort key, ASCENDING (smaller number = higher priority —\n    /// `src/state/priority-formula.mjs`'s inverted scale). `None` when the\n    /// item never had `computePriority` run on it yet (e.g. still at\n    /// `todo`, pre-`discover`).\n    pub priority: Option<i64>,\n}\n\n#[derive(Debug, Deserialize)]\nstruct TriageEnvelope {\n    data: Vec<TriageRow>,\n}\n\n/// One row from `fgos list --all --json`'s `data.work` map, kept only when\n/// `status` is `doing` or `awaiting-approval` (tsk-4vo D1, amending\n/// tsk-19y's original D4 — never herdr's own `agent_status` either way).\n#[derive(Debug, Clone, Deserialize, PartialEq)]\npub struct DoingRow {\n    pub id: String,\n    pub title: String,\n    pub status: String,\n    pub stage: String,\n}\n\n#[derive(Debug, Deserialize)]\nstruct WorkItemRaw {\n    title: String,\n    status: String,\n    /// tsk-1pg D1: real state can carry no `workflowStep` at all (an item with no\n    /// step field, e.g. `status: wontfix`) — `Option` so one such item\n    /// in the map doesn't fail `serde_json::from_str::<ListEnvelope>` for\n    /// every other item alongside it. Defaulted to `\"executing\"` at each\n    /// read site, matching the JS engine's own lazy default of the execute\n    /// step (`effectiveStep`, `src/state/domain-registry.mjs`).\n    #[serde(rename = \"workflowStep\")]\n    stage: Option<String>,\n    #[serde(rename = \"parkReason\")]\n    park_reason: Option<String>,\n    #[serde(rename = \"statusCategory\")]\n    status_category: Option<String>,\n}\n\n/// tsk-4vo D2: Tier A (`awaiting-approval`, closest to done) sorts first;\n/// Tier B (`doing`) sub-sorts by stage in pipeline order — `executing`\n/// (closest to `compound-learn`) before `planning` before `exploring`\n/// before `discovery`.\n///\n/// The arms mirror the coding Workflow's steps (`domains/coding/workflows/feature.yaml`)\n/// read back-to-front, so a step the engine can actually hand this dashboard always\n/// ranks. The engine maps the older step name `decompose` onto `planning` before it\n/// reaches the wire, so no arm is kept for it.\nfn doing_tier(status: &str, stage: &str) -> u8 {\n    if status == \"awaiting-approval\" {\n        return 0;\n    }\n    match stage {\n        \"executing\" => 1,\n        \"planning\" => 2,\n        \"exploring\" => 3,\n        \"discovery\" => 4,\n        _ => 5,\n    }\n}\n\n#[derive(Debug, Deserialize)]\nstruct ListEnvelope {\n    data: ListData,\n}\n\n#[derive(Debug, Deserialize)]\nstruct ListData {\n    work: std::collections::BTreeMap<String, WorkItemRaw>,\n}\n\n/// tsk-417 D3: NEED ANSWER box row — `status` is `\"blocked\"` (ERR,\n/// `parkReason: system-error`) or `\"awaiting-human\"` (ASK, `parkReason:\n/// human-question`), one box, distinct sub-tag per `status`.\n#[derive(Debug, Clone, Deserialize, PartialEq)]\npub struct NeedAnswerRow {\n    pub id: String,\n    pub title: String,\n    pub status: String,\n}\n\n/// tsk-417 D3: AFTER DELIVER box row — `status` is `\"retrospective\"` (RTR)\n/// or `\"cleanup\"` (POL), one box, distinct sub-tag per `status`. Neither\n/// status carries a `statusCategory` (the tail chain's own documented\n/// gap, `domain-registry.mjs`), so this filters on the literal\n/// `status` string, same as `NeedAnswerRow` above.\n#[derive(Debug, Clone, Deserialize, PartialEq)]\npub struct AfterDeliverRow {\n    pub id: String,\n    pub title: String,\n    pub status: String,\n}\n\n/// tsk-59b: one node of `fgos merge list --json`'s `tree` field\n/// (`mergeTree`, `src/state/graph-harness.mjs` — tsk-2x9k). Recursive:\n/// `children` nests leaf-to-root items under their real parent, sorted by\n/// the same `blocks`-descending order the JS engine already computed\n/// (CONTEXT.md D3/D4 — this struct never re-sorts, only reflects). `status`\n/// is one of `ready`/`waiting`/`blocked-sync`/`conflicted`/`superseded`/\n/// `container` (a real ancestor item that is not itself a merge candidate,\n/// existing purely so its children have somewhere to nest — D2/D3).\n/// `reason` is present only on `blocked-sync`/`conflicted`/`superseded`\n/// nodes, naming the specific cause and counterpart item (D7) — absent\n/// (not empty-string) on every other status, matching the JS side's own\n/// `reason?: string` optionality.\n#[derive(Debug, Clone, Default, Deserialize, PartialEq)]\npub struct MergeTreeNode {\n    pub id: String,\n    pub title: String,\n    pub status: String,\n    pub reason: Option<String>,\n    #[serde(default)]\n    pub children: Vec<MergeTreeNode>,\n}\n\n/// tsk-59b: total node count across the whole tree, recursively — the MERGE\n/// LIST box title's `(N)` count (was `ready.len() + waiting.len() +\n/// blocked_on_sync.len()` before the tree existed; every id in those three\n/// buckets is a node somewhere in `tree`, so this is the same count).\npub fn merge_tree_node_count(nodes: &[MergeTreeNode]) -> usize {\n    nodes\n        .iter()\n        .map(|n| 1 + merge_tree_node_count(&n.children))\n        .sum()\n}\n\n/// tsk-59b: total RENDERED LINE count across the whole tree — one line per\n/// node plus one extra line for each node that carries a `reason` (D7).\n/// Distinct from `merge_tree_node_count` because `Paragraph::scroll`\n/// scrolls by rendered line, not by node — the scroll bound must match\n/// what is actually on screen.\npub fn merge_tree_line_count(nodes: &[MergeTreeNode]) -> usize {\n    nodes\n        .iter()\n        .map(|n| 1 + usize::from(n.reason.is_some()) + merge_tree_line_count(&n.children))\n        .sum()\n}\n\n/// tsk-417 D3: MERGE LIST box source — mirrors `fgos merge list --json`'s\n/// own `ready`/`waiting`/`blockedOnSync` id lists directly (D3: \"map\n/// thẳng fgos merge list --json, không filter tự chế\"). `conflicts`/\n/// `mergeSets`/`mergeTier`/`supersededOut` are real fields on that same\n/// response this box doesn't need — `serde` silently ignores them (no\n/// `deny_unknown_fields`), so this struct only names what it uses.\n/// `tree` (tsk-59b) is the one exception to \"flat id lists only\": it is\n/// the nested view of the SAME data the flat lists already carry, meant to\n/// replace them in rendering (never re-derived here — see `MergeTreeNode`\n/// above).\n#[derive(Debug, Clone, Default, PartialEq)]\npub struct MergeListSummary {\n    pub ready: Vec<String>,\n    pub waiting: Vec<String>,\n    pub blocked_on_sync: Vec<String>,\n    pub tree: Vec<MergeTreeNode>,\n}\n\n#[derive(Debug, Deserialize)]\nstruct MergeListEnvelope {\n    data: MergeListData,\n}\n\n#[derive(Debug, Deserialize)]\nstruct MergeListData {\n    ready: Vec<String>,\n    waiting: Vec<String>,\n    #[serde(rename = \"blockedOnSync\")]\n    blocked_on_sync: Vec<String>,\n    /// `#[serde(default)]`: defensive against a version-skewed fgOS CLI\n    /// that predates tsk-2x9k's `tree` field — an empty tree parses\n    /// cleanly instead of failing the whole envelope.\n    #[serde(default)]\n    tree: Vec<MergeTreeNode>,\n}\n\n#[derive(Debug)]\npub enum FgosError {\n    Io(io::Error),\n    ExitStatus(String),\n    Parse(serde_json::Error),\n}\n\nimpl std::fmt::Display for FgosError {\n    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n        match self {\n            FgosError::Io(err) => write!(f, \"fgos CLI spawn failed: {err}\"),\n            FgosError::ExitStatus(detail) => write!(f, \"fgos CLI exited non-zero: {detail}\"),\n            FgosError::Parse(err) => write!(f, \"fgos CLI output parse failed: {err}\"),\n        }\n    }\n}\n\nimpl From<io::Error> for FgosError {\n    fn from(err: io::Error) -> Self {\n        FgosError::Io(err)\n    }\n}\n\n/// Parse `fgos triage --json`'s stdout. tsk-64z D2: re-sorts by `priority`\n/// ASCENDING (`priority-formula.mjs`'s inverted scale — smaller number =\n/// higher priority), overriding `rankImpact`'s own default tier/blocks/\n/// component order (the order tsk-4vo originally asked to preserve\n/// byte-for-byte — see `parse_triage_preserves_rank_impact_order`, still\n/// pinned for the CLI's own `--all`-less order, just no longer what this\n/// function returns). An absent `priority` (`None` — an item that never\n/// had `computePriority` run, e.g. still at `todo`) sorts LAST, same\n/// absent-sorts-last convention `docs/reference/triage-table-columns.md`\n/// already documents for `goalTier`.\npub fn parse_triage(json: &str) -> Result<Vec<TriageRow>, serde_json::Error> {\n    let envelope: TriageEnvelope = serde_json::from_str(json)?;\n    let mut rows = envelope.data;\n    rows.sort_by_key(|row| row.priority.unwrap_or(i64::MAX));\n    Ok(rows)\n}\n\n/// Parse `fgos list --all --json`'s stdout, keeping items whose `parkReason`\n/// is absent (actively worked, the `doing`-equivalent case) or\n/// `\"natural-finish\"` (the `awaiting-approval`-equivalent case) AND whose\n/// `statusCategory` is `\"in-progress\"` or `\"review\"` (tsk-1hb D2/D4,\n/// replacing tsk-4vo D1's literal-status membership: no parallel\n/// status-literal fallback is kept). The `statusCategory` half excludes\n/// `todo`/`wontfix`/`done`/`delivered`/`retrospective`/`cleanup` -- every\n/// status besides `doing`/`blocked`/`awaiting-human`/`awaiting-approval`\n/// also has no `parkReason`, so `parkReason` alone can't tell them apart\n/// (D4). Sorted by D2's tier (id ascending breaks ties within a tier, for\n/// determinism); `status`/`stage` stay available on `DoingRow` for\n/// display/sort, just no longer used for pane membership.\npub fn parse_doing(json: &str) -> Result<Vec<DoingRow>, serde_json::Error> {\n    let envelope: ListEnvelope = serde_json::from_str(json)?;\n    let mut rows: Vec<DoingRow> = envelope\n        .data\n        .work\n        .into_iter()\n        .filter(|(_, item)| {\n            matches!(item.park_reason.as_deref(), None | Some(\"natural-finish\"))\n                && matches!(\n                    item.status_category.as_deref(),\n                    Some(\"in-progress\") | Some(\"review\")\n                )\n        })\n        .map(|(id, item)| DoingRow {\n            id,\n            title: item.title,\n            status: item.status,\n            stage: item.stage.unwrap_or_else(|| \"executing\".to_string()),\n        })\n        .collect();\n    rows.sort_by(|a, b| {\n        doing_tier(&a.status, &a.stage)\n            .cmp(&doing_tier(&b.status, &b.stage))\n            .then_with(|| a.id.cmp(&b.id))\n    });\n    Ok(rows)\n}\n\n/// tsk-417 D3: parse `fgos list --all --json`'s stdout, keeping items\n/// whose `status` is `\"blocked\"` or `\"awaiting-human\"` — the NEED ANSWER\n/// box's own bucket, real `status`/`parkReason` literals (`workflow-\n/// stage-graphs.mjs`), never a second copy of `parse_doing`'s exclusion\n/// logic.\npub fn parse_need_answer(json: &str) -> Result<Vec<NeedAnswerRow>, serde_json::Error> {\n    let envelope: ListEnvelope = serde_json::from_str(json)?;\n    let mut rows: Vec<NeedAnswerRow> = envelope\n        .data\n        .work\n        .into_iter()\n        .filter(|(_, item)| matches!(item.status.as_str(), \"blocked\" | \"awaiting-human\"))\n        .map(|(id, item)| NeedAnswerRow {\n            id,\n            title: item.title,\n            status: item.status,\n        })\n        .collect();\n    rows.sort_by(|a, b| a.id.cmp(&b.id));\n    Ok(rows)\n}\n\n/// tsk-417 D3: same shape as `parse_need_answer`, filtered to AFTER\n/// DELIVER's own bucket — `\"retrospective\"` or `\"cleanup\"`.\npub fn parse_after_deliver(json: &str) -> Result<Vec<AfterDeliverRow>, serde_json::Error> {\n    let envelope: ListEnvelope = serde_json::from_str(json)?;\n    let mut rows: Vec<AfterDeliverRow> = envelope\n        .data\n        .work\n        .into_iter()\n        .filter(|(_, item)| matches!(item.status.as_str(), \"retrospective\" | \"cleanup\"))\n        .map(|(id, item)| AfterDeliverRow {\n            id,\n            title: item.title,\n            status: item.status,\n        })\n        .collect();\n    rows.sort_by(|a, b| a.id.cmp(&b.id));\n    Ok(rows)\n}\n\n/// tsk-417 D3: parse `fgos merge list --json`'s stdout — a direct field\n/// mapping, never a re-derived filter (D3's own \"map thẳng\" instruction).\npub fn parse_merge_list(json: &str) -> Result<MergeListSummary, serde_json::Error> {\n    let envelope: MergeListEnvelope = serde_json::from_str(json)?;\n    Ok(MergeListSummary {\n        ready: envelope.data.ready,\n        waiting: envelope.data.waiting,\n        blocked_on_sync: envelope.data.blocked_on_sync,\n        tree: envelope.data.tree,\n    })\n}\n\n/// Resolve the main fgOS checkout root (never a linked worktree's own\n/// checkout — ADR0020) via `git rev-parse --git-common-dir`, the same\n/// resolution every fgOS skill in this repo uses.\npub fn repo_root() -> io::Result<PathBuf> {\n    let output = Command::new(\"git\")\n        .args([\"rev-parse\", \"--path-format=absolute\", \"--git-common-dir\"])\n        .output()?;\n    if !output.status.success() {\n        return Err(io::Error::other(format!(\n            \"git rev-parse --git-common-dir failed: {}\",\n            String::from_utf8_lossy(&output.stderr)\n        )));\n    }\n    let common_dir = String::from_utf8_lossy(&output.stdout).trim().to_string();\n    let common_dir_path = Path::new(&common_dir);\n    let root = common_dir_path\n        .parent()\n        .ok_or_else(|| io::Error::other(\"git-common-dir has no parent directory\"))?;\n    Ok(root.to_path_buf())\n}\n\n#[cfg(unix)]\nfn is_executable(path: &Path) -> bool {\n    use std::os::unix::fs::PermissionsExt;\n    path.metadata()\n        .map(|meta| meta.is_file() && (meta.permissions().mode() & 0o111 != 0))\n        .unwrap_or(false)\n}\n\n#[cfg(not(unix))]\nfn is_executable(path: &Path) -> bool {\n    path.is_file()\n}\n\n/// True when `path` is confined under `root` after resolving symlinks --\n/// `is_executable`'s `metadata()` call follows a symlink chain\n/// transparently, so a tier-0 shim that is itself a symlink pointing\n/// outside the installation root would otherwise be accepted as valid.\n/// Matches the same realpath-confinement discipline the Node resolver\n/// (`resolveWorkspaceInstallationBin`) and the shell integration\n/// (`fgos()`) both apply.\nfn is_confined(path: &Path, root: &Path) -> bool {\n    let (real_path, real_root) = match (path.canonicalize(), root.canonicalize()) {\n        (Ok(p), Ok(r)) => (p, r),\n        _ => return false,\n    };\n    real_path == real_root || real_path.starts_with(&real_root)\n}\n\n/// Resolves fgos binary via tier 0 (workspace shim `<root>/.fgos/installation/bin/fgos` if present, executable,\n/// and confined under the installation root) with fallback to `<root>/bin/fgos.mjs` (run via node).\npub fn resolve_fgos(root: &Path) -> Result<PathBuf, io::Error> {\n    let tier_zero = root\n        .join(\".fgos\")\n        .join(\"installation\")\n        .join(\"bin\")\n        .join(\"fgos\");\n    let install_root = root.join(\".fgos\").join(\"installation\");\n    if is_executable(&tier_zero) && is_confined(&tier_zero, &install_root) {\n        return Ok(tier_zero);\n    }\n    Ok(root.join(\"bin/fgos.mjs\"))\n}\n\npub fn is_tier_zero(root: &Path, resolved: &Path) -> bool {\n    resolved\n        == root\n            .join(\".fgos\")\n            .join(\"installation\")\n            .join(\"bin\")\n            .join(\"fgos\")\n}\n\nfn run_fgos(root: &Path, args: &[&str]) -> Result<String, FgosError> {\n    let fgos_bin = resolve_fgos(root)?;\n    let output = if is_tier_zero(root, &fgos_bin) {\n        let mut cmd_args: Vec<String> = args.iter().map(|s| s.to_string()).collect();\n        cmd_args.push(\"--dir\".to_string());\n        cmd_args.push(root.to_string_lossy().to_string());\n\n        Command::new(&fgos_bin).args(&cmd_args).output()?\n    } else {\n        let mut cmd_args: Vec<String> = vec![fgos_bin.to_string_lossy().to_string()];\n        cmd_args.extend(args.iter().map(|s| s.to_string()));\n        cmd_args.push(\"--dir\".to_string());\n        cmd_args.push(root.to_string_lossy().to_string());\n\n        Command::new(\"node\").args(&cmd_args).output()?\n    };\n    if !output.status.success() {\n        return Err(FgosError::ExitStatus(\n            String::from_utf8_lossy(&output.stderr).to_string(),\n        ));\n    }\n    Ok(String::from_utf8_lossy(&output.stdout).to_string())\n}\n\n/// Fetch the impact-sorted work list via `fgos triage --json` (D5).\npub fn fetch_triage(root: &Path) -> Result<Vec<TriageRow>, FgosError> {\n    let stdout = run_fgos(root, &[\"triage\", \"--json\"])?;\n    parse_triage(&stdout).map_err(FgosError::Parse)\n}\n\n/// Fetch the in-process (`status: doing`) list via `fgos list --all --json` (D4).\npub fn fetch_doing(root: &Path) -> Result<Vec<DoingRow>, FgosError> {\n    let stdout = run_fgos(root, &[\"list\", \"--all\", \"--json\"])?;\n    parse_doing(&stdout).map_err(FgosError::Parse)\n}\n\n/// tsk-417 D3: NEED ANSWER box's data source — `fgos list --all --json`,\n/// same subprocess shape as `fetch_doing`, filtered by `parse_need_answer`.\npub fn fetch_need_answer(root: &Path) -> Result<Vec<NeedAnswerRow>, FgosError> {\n    let stdout = run_fgos(root, &[\"list\", \"--all\", \"--json\"])?;\n    parse_need_answer(&stdout).map_err(FgosError::Parse)\n}\n\n/// tsk-417 D3: AFTER DELIVER box's data source.\npub fn fetch_after_deliver(root: &Path) -> Result<Vec<AfterDeliverRow>, FgosError> {\n    let stdout = run_fgos(root, &[\"list\", \"--all\", \"--json\"])?;\n    parse_after_deliver(&stdout).map_err(FgosError::Parse)\n}\n\n/// tsk-417 D3: MERGE LIST box's data source — `fgos merge list --json`,\n/// a distinct CLI verb from every other fetch function here.\npub fn fetch_merge_list(root: &Path) -> Result<MergeListSummary, FgosError> {\n    let stdout = run_fgos(root, &[\"merge\", \"list\", \"--json\"])?;\n    parse_merge_list(&stdout).map_err(FgosError::Parse)\n}\n\n/// The `WorkItemSource` adapter (tsk-3t9 D1): the concrete fgOS-CLI\n/// implementation of the port `app.rs`'s domain depends on. Holds `root`\n/// so the composition root (`main.rs`) resolves it once, not per call.\npub struct FgosCliSource {\n    pub root: PathBuf,\n}\n\nimpl WorkItemSource for FgosCliSource {\n    fn fetch_triage(&self) -> Result<Vec<TriageRow>, FgosError> {\n        fetch_triage(&self.root)\n    }\n\n    fn fetch_doing(&self) -> Result<Vec<DoingRow>, FgosError> {\n        fetch_doing(&self.root)\n    }\n\n    fn fetch_need_answer(&self) -> Result<Vec<NeedAnswerRow>, FgosError> {\n        fetch_need_answer(&self.root)\n    }\n\n    fn fetch_after_deliver(&self) -> Result<Vec<AfterDeliverRow>, FgosError> {\n        fetch_after_deliver(&self.root)\n    }\n\n    fn fetch_merge_list(&self) -> Result<MergeListSummary, FgosError> {\n        fetch_merge_list(&self.root)\n    }\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n\n    const TRIAGE_FIXTURE: &str = r#\"{\n        \"contract\": \"fgos.v1\",\n        \"generated_at\": \"2026-07-29T15:41:13.319Z\",\n        \"data_hash\": \"abc\",\n        \"data\": [\n            {\n                \"id\": \"tsk-mvp-test-1\",\n                \"title\": \"MVP goalTier test item\",\n                \"status\": \"wontfix\",\n                \"blocks\": 0,\n                \"blockedBy\": [],\n                \"workflowStep\": \"executing\",\n                \"goalTier\": \"mvp\",\n                \"priority\": 300,\n                \"componentId\": 4,\n                \"componentSize\": 1,\n                \"isIsolated\": true\n            },\n            {\n                \"id\": \"tsk-19y-2\",\n                \"title\": \"Wire real fgOS data into the dashboard\",\n                \"status\": \"doing\",\n                \"blocks\": 2,\n                \"blockedBy\": [\"tsk-mvp-test-1\"],\n                \"workflowStep\": \"executing\",\n                \"goalTier\": null,\n                \"priority\": 100,\n                \"componentId\": 27,\n                \"componentSize\": 3,\n                \"isIsolated\": false\n            },\n            {\n                \"id\": \"choke-point-createworktree-callsite-wrapper\",\n                \"title\": \"Choke-point: createWorktree's 6 call sites\",\n                \"status\": \"doing\",\n                \"blocks\": 1,\n                \"blockedBy\": [],\n                \"workflowStep\": \"executing\",\n                \"goalTier\": null,\n                \"priority\": 200,\n                \"componentId\": 31,\n                \"componentSize\": 4,\n                \"isIsolated\": false\n            },\n            {\n                \"id\": \"tsk-no-priority-yet\",\n                \"title\": \"Never discovered, no priority computed yet\",\n                \"status\": \"todo\",\n                \"blocks\": 0,\n                \"blockedBy\": [],\n                \"workflowStep\": \"clarify\",\n                \"goalTier\": null,\n                \"priority\": null,\n                \"componentId\": 5,\n                \"componentSize\": 1,\n                \"isIsolated\": true\n            }\n        ]\n    }\"#;\n\n    const LIST_FIXTURE: &str = r#\"{\n        \"contract\": \"fgos.v1\",\n        \"generated_at\": \"2026-07-29T15:41:13.319Z\",\n        \"data_hash\": \"abc\",\n        \"data\": {\n            \"work\": {\n                \"tsk-19y-2\": {\n                    \"title\": \"Wire real fgOS data into the dashboard\",\n                    \"status\": \"doing\",\n                    \"workflowStep\": \"executing\",\n                    \"statusCategory\": \"in-progress\"\n                },\n                \"tsk-done-item\": {\n                    \"title\": \"Already finished\",\n                    \"status\": \"done\",\n                    \"workflowStep\": \"compound-learn\"\n                },\n                \"choke-point-createworktree-callsite-wrapper\": {\n                    \"title\": \"Choke-point: createWorktree's 6 call sites\",\n                    \"status\": \"doing\",\n                    \"workflowStep\": \"executing\",\n                    \"statusCategory\": \"in-progress\"\n                }\n            }\n        }\n    }\"#;\n\n    /// tsk-4vo D1/D2: one `awaiting-approval` row, plus `doing` rows at\n    /// every pipeline stage, deliberately listed out of sort order in the\n    /// raw JSON to prove `parse_doing` does the sorting itself. The stages\n    /// here are the ones the coding domain actually declares today\n    /// (the coding Workflow, `domains/coding/workflows/feature.yaml`) —\n    /// `discovery`/`exploring`/`planning`/`executing` — plus the drain-only\n    /// legacy alias `decompose` that a few pre-rename items still hold.\n    const TIER_SORT_FIXTURE: &str = r#\"{\n        \"contract\": \"fgos.v1\",\n        \"generated_at\": \"2026-07-29T15:41:13.319Z\",\n        \"data_hash\": \"abc\",\n        \"data\": {\n            \"work\": {\n                \"tsk-exploring\": {\n                    \"title\": \"Still fuzzy\",\n                    \"status\": \"doing\",\n                    \"workflowStep\": \"exploring\",\n                    \"statusCategory\": \"in-progress\"\n                },\n                \"tsk-approval\": {\n                    \"title\": \"Awaiting approval\",\n                    \"status\": \"awaiting-approval\",\n                    \"workflowStep\": \"executing\",\n                    \"statusCategory\": \"review\",\n                    \"parkReason\": \"natural-finish\"\n                },\n                \"tsk-executing\": {\n                    \"title\": \"Building\",\n                    \"status\": \"doing\",\n                    \"workflowStep\": \"executing\",\n                    \"statusCategory\": \"in-progress\"\n                },\n                \"tsk-discovery\": {\n                    \"title\": \"Machine-alone research\",\n                    \"status\": \"doing\",\n                    \"workflowStep\": \"discovery\",\n                    \"statusCategory\": \"in-progress\"\n                },\n                \"tsk-planning\": {\n                    \"title\": \"Shaping\",\n                    \"status\": \"doing\",\n                    \"workflowStep\": \"planning\",\n                    \"statusCategory\": \"in-progress\"\n                },\n                \"tsk-blocked\": {\n                    \"title\": \"Not in-process\",\n                    \"status\": \"blocked\",\n                    \"workflowStep\": \"executing\",\n                    \"statusCategory\": \"in-progress\",\n                    \"parkReason\": \"system-error\"\n                }\n            }\n        }\n    }\"#;\n\n    /// tsk-64z D2: priority ASCENDING drives the order, overriding\n    /// `rankImpact`'s own given order — the fixture's raw array order is\n    /// deliberately `[mvp-test-1 (300), 19y-2 (100), choke-point (200),\n    /// no-priority (null)]`, none of which is priority-ascending, so a\n    /// passing assertion here proves a real re-sort happened, not a\n    /// coincidental preserve. `None` priority (never `computePriority`'d)\n    /// sorts last.\n    #[test]\n    fn parse_triage_sorts_by_priority_ascending_overriding_rank_impact_order() {\n        let rows = parse_triage(TRIAGE_FIXTURE).expect(\"fixture should parse\");\n        let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();\n        assert_eq!(\n            ids,\n            vec![\n                \"tsk-19y-2\",\n                \"choke-point-createworktree-callsite-wrapper\",\n                \"tsk-mvp-test-1\",\n                \"tsk-no-priority-yet\",\n            ]\n        );\n        assert_eq!(rows[0].priority, Some(100));\n        assert_eq!(rows.last().unwrap().priority, None);\n    }\n\n    /// tsk-64z D1: `status`/`blockedBy`/`blocks`/`stage` all parse through\n    /// unchanged from `rankImpact`'s own field names — grounds the Work\n    /// Items panel's Status/BlockedBy/Blocks columns in real parsed data.\n    #[test]\n    fn triage_row_carries_status_stage_blocked_by_blocks_priority() {\n        let rows = parse_triage(TRIAGE_FIXTURE).expect(\"fixture should parse\");\n        let by_id = |id: &str| rows.iter().find(|r| r.id == id).expect(\"row present\");\n        let wired = by_id(\"tsk-19y-2\");\n        assert_eq!(wired.status, \"doing\");\n        assert_eq!(wired.stage, \"executing\");\n        assert_eq!(wired.blocked_by, vec![\"tsk-mvp-test-1\".to_string()]);\n        assert_eq!(wired.blocks, 2);\n        assert_eq!(wired.priority, Some(100));\n    }\n\n    #[test]\n    fn parse_doing_excludes_done_items() {\n        let rows = parse_doing(LIST_FIXTURE).expect(\"fixture should parse\");\n        let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();\n        assert_eq!(\n            ids,\n            vec![\"choke-point-createworktree-callsite-wrapper\", \"tsk-19y-2\"]\n        );\n        assert!(rows.iter().all(|r| r.title != \"Already finished\"));\n    }\n\n    #[test]\n    fn sort_status_tier_ranks_awaiting_approval_first_then_stage_order() {\n        let rows = parse_doing(TIER_SORT_FIXTURE).expect(\"fixture should parse\");\n        let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();\n        // D2: awaiting-approval first, then doing sub-sorted in reverse\n        // pipeline order — executing -> planning -> exploring -> discovery,\n        // A row at a step this dashboard doesn't know sorts after all of them.\n        // \"blocked\" status never appears (D4's combined\n        // parkReason+statusCategory predicate excludes it via\n        // parkReason == \"system-error\").\n        assert_eq!(\n            ids,\n            vec![\n                \"tsk-approval\",\n                \"tsk-executing\",\n                \"tsk-planning\",\n                \"tsk-exploring\",\n                \"tsk-discovery\",\n            ]\n        );\n        assert!(rows.iter().all(|r| r.id != \"tsk-blocked\"));\n    }\n\n    /// tsk-1hb D2/D4 (docs/history/herdr-plugin-parkreason-pane-filter/\n    /// CONTEXT.md), superseding tsk-4ot's own `parse_doing_pins_literal_\n    /// status_membership`: pins `parse_doing`'s `parkReason`+`statusCategory`\n    /// combined membership. `blocked`/`awaiting-human` deliberately share the\n    /// coding domain's `\"in-progress\"` `statusCategory` with `doing`\n    /// (`DOMAINS.coding.statusLabels`, `src/state/domain-registry.mjs`)\n    /// — this is exactly why `statusCategory` alone is insufficient and\n    /// `parkReason` (`\"system-error\"`/`\"human-question\"`) is still needed to\n    /// split them out; `tsk-todo` (no `statusCategory` entry) pins the D4\n    /// half of the fix (a `parkReason`-only filter would wrongly include it,\n    /// same failure shape as `tsk-done-item` in `parse_doing_excludes_done_\n    /// items` above).\n    const STATUS_MEMBERSHIP_FIXTURE: &str = r#\"{\n        \"contract\": \"fgos.v1\",\n        \"generated_at\": \"2026-07-29T15:41:13.319Z\",\n        \"data_hash\": \"abc\",\n        \"data\": {\n            \"work\": {\n                \"tsk-doing\": {\n                    \"title\": \"Actively worked\",\n                    \"status\": \"doing\",\n                    \"workflowStep\": \"executing\",\n                    \"statusCategory\": \"in-progress\"\n                },\n                \"tsk-awaiting-approval\": {\n                    \"title\": \"Ready for review\",\n                    \"status\": \"awaiting-approval\",\n                    \"workflowStep\": \"executing\",\n                    \"statusCategory\": \"review\",\n                    \"parkReason\": \"natural-finish\"\n                },\n                \"tsk-blocked\": {\n                    \"title\": \"Parked, not actively worked\",\n                    \"status\": \"blocked\",\n                    \"workflowStep\": \"executing\",\n                    \"statusCategory\": \"in-progress\",\n                    \"parkReason\": \"system-error\"\n                },\n                \"tsk-awaiting-human\": {\n                    \"title\": \"Parked on a question\",\n                    \"status\": \"awaiting-human\",\n                    \"workflowStep\": \"clarify\",\n                    \"statusCategory\": \"in-progress\",\n                    \"parkReason\": \"human-question\"\n                },\n                \"tsk-todo\": {\n                    \"title\": \"Not started\",\n                    \"status\": \"todo\",\n                    \"workflowStep\": \"clarify\",\n                    \"statusCategory\": \"todo\"\n                }\n            }\n        }\n    }\"#;\n\n    #[test]\n    fn parse_doing_filters_by_park_reason_and_status_category() {\n        let rows = parse_doing(STATUS_MEMBERSHIP_FIXTURE).expect(\"fixture should parse\");\n        let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();\n        assert_eq!(\n            ids.len(),\n            2,\n            \"only doing/awaiting-approval belong in the in-process pane\"\n        );\n        assert!(ids.contains(&\"tsk-doing\"));\n        assert!(ids.contains(&\"tsk-awaiting-approval\"));\n        assert!(!ids.contains(&\"tsk-blocked\"));\n        assert!(!ids.contains(&\"tsk-awaiting-human\"));\n        assert!(!ids.contains(&\"tsk-todo\"));\n    }\n\n    /// tsk-417 D3: NEED ANSWER = `blocked` + `awaiting-human`, nothing\n    /// else — reuses `STATUS_MEMBERSHIP_FIXTURE` (already has both, plus\n    /// `doing`/`awaiting-approval`/`todo` as real negative cases).\n    #[test]\n    fn fetch_need_answer_includes_blocked_and_awaiting_human() {\n        let rows = parse_need_answer(STATUS_MEMBERSHIP_FIXTURE).expect(\"fixture should parse\");\n        let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();\n        assert_eq!(ids, vec![\"tsk-awaiting-human\", \"tsk-blocked\"]);\n        assert!(rows\n            .iter()\n            .all(|r| r.status == \"blocked\" || r.status == \"awaiting-human\"));\n    }\n\n    /// tsk-1pg D1: real shape from `.fgos/` — `tsk-mvp-test-1` (`status:\n    /// wontfix`) carries no `stage` field at all. Mixed alongside a real\n    /// NEED ANSWER row (`tsk-awaiting-human`) and a real AFTER DELIVER row\n    /// (`tsk-cleanup`) so a passing parse proves the stage-less item no\n    /// longer fails `serde_json::from_str::<ListEnvelope>` for the whole\n    /// map, not just that an empty map happens to parse.\n    const MISSING_STAGE_FIXTURE: &str = r#\"{\n        \"contract\": \"fgos.v1\",\n        \"generated_at\": \"2026-08-06T05:28:45.827Z\",\n        \"data_hash\": \"abc\",\n        \"data\": {\n            \"work\": {\n                \"tsk-mvp-test-1\": {\n                    \"title\": \"MVP goalTier test item\",\n                    \"status\": \"wontfix\"\n                },\n                \"tsk-awaiting-human\": {\n                    \"title\": \"Parked on a question\",\n                    \"status\": \"awaiting-human\",\n                    \"workflowStep\": \"clarify\",\n                    \"statusCategory\": \"in-progress\",\n                    \"parkReason\": \"human-question\"\n                },\n                \"tsk-cleanup\": {\n                    \"title\": \"TTL-bounded worktree park\",\n                    \"status\": \"cleanup\",\n                    \"workflowStep\": \"executing\"\n                },\n                \"tsk-no-stage-doing\": {\n                    \"title\": \"Actively worked, no stage field either\",\n                    \"status\": \"doing\",\n                    \"statusCategory\": \"in-progress\"\n                }\n            }\n        }\n    }\"#;\n\n    #[test]\n    fn need_answer_survives_missing_stage() {\n        let need_answer = parse_need_answer(MISSING_STAGE_FIXTURE)\n            .expect(\"stage-less item must not fail the whole map's parse\");\n        let ids: Vec<&str> = need_answer.iter().map(|r| r.id.as_str()).collect();\n        assert_eq!(ids, vec![\"tsk-awaiting-human\"]);\n\n        let after_deliver = parse_after_deliver(MISSING_STAGE_FIXTURE)\n            .expect(\"stage-less item must not fail the whole map's parse\");\n        let ids: Vec<&str> = after_deliver.iter().map(|r| r.id.as_str()).collect();\n        assert_eq!(ids, vec![\"tsk-cleanup\"]);\n\n        // D1: a stage-less `doing` row defaults to \"executing\", matching\n        // the JS engine's own `item.stage ?? 'executing'` convention.\n        let doing = parse_doing(MISSING_STAGE_FIXTURE)\n            .expect(\"stage-less item must not fail the whole map's parse\");\n        let row = doing\n            .iter()\n            .find(|r| r.id == \"tsk-no-stage-doing\")\n            .expect(\"row present\");\n        assert_eq!(row.stage, \"executing\");\n    }\n\n    const AFTER_DELIVER_FIXTURE: &str = r#\"{\n        \"contract\": \"fgos.v1\",\n        \"generated_at\": \"2026-07-29T15:41:13.319Z\",\n        \"data_hash\": \"abc\",\n        \"data\": {\n            \"work\": {\n                \"tsk-retro\": {\n                    \"title\": \"Batched learning-synthesis\",\n                    \"status\": \"retrospective\",\n                    \"workflowStep\": \"executing\"\n                },\n                \"tsk-cleanup\": {\n                    \"title\": \"TTL-bounded worktree park\",\n                    \"status\": \"cleanup\",\n                    \"workflowStep\": \"executing\"\n                },\n                \"tsk-delivered\": {\n                    \"title\": \"Merged, not yet retrospective\",\n                    \"status\": \"delivered\",\n                    \"workflowStep\": \"executing\"\n                },\n                \"tsk-done\": {\n                    \"title\": \"Fully closed out\",\n                    \"status\": \"done\",\n                    \"workflowStep\": \"executing\"\n                }\n            }\n        }\n    }\"#;\n\n    /// tsk-417 D3: AFTER DELIVER = `retrospective` + `cleanup` only —\n    /// `delivered` (not yet retrospective) and `done` (already fully\n    /// closed) are real negative cases, not this box's job.\n    #[test]\n    fn fetch_after_deliver_includes_retrospective_and_cleanup() {\n        let rows = parse_after_deliver(AFTER_DELIVER_FIXTURE).expect(\"fixture should parse\");\n        let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();\n        assert_eq!(ids, vec![\"tsk-cleanup\", \"tsk-retro\"]);\n        assert!(rows\n            .iter()\n            .all(|r| r.status == \"retrospective\" || r.status == \"cleanup\"));\n    }\n\n    /// tsk-417 D3: real `fgos merge list --json` response shape, captured\n    /// live this session (the same call used to check tsk-48i/tsk-1hb\n    /// mergeability) — `conflicts`/`mergeSets`/`mergeTier`/`supersededOut`\n    /// are real fields on the response this fixture includes but\n    /// `MergeListSummary` doesn't parse, proving the \"map thẳng, không\n    /// filter tự chế\" field selection is deliberate, not an oversight.\n    const MERGE_LIST_FIXTURE: &str = r#\"{\n        \"contract\": \"fgos.v1\",\n        \"generated_at\": \"2026-08-06T01:38:50.426Z\",\n        \"data_hash\": \"fe7572c554271846ce3926e9358e91ef0370431fc1ac1c14ff256911a8345828\",\n        \"data\": {\n            \"ready\": [\"tsk-2ig\", \"tsk-3c7\"],\n            \"waiting\": [\"tsk-blocked-dep\"],\n            \"conflicts\": [],\n            \"mergeSets\": [\n                {\n                    \"items\": [\"tsk-2ig\", \"tsk-3c7\"],\n                    \"order\": [\"tsk-2ig\", \"tsk-3c7\"],\n                    \"reason\": \"shared-root\"\n                }\n            ],\n            \"blockedOnSync\": [\"tsk-stale-root\"],\n            \"mergeTier\": {\"tsk-3c7\": \"leaf-to-root\", \"tsk-2ig\": \"leaf-to-root\"},\n            \"supersededOut\": [],\n            \"tree\": [\n                {\n                    \"id\": \"tsk-root\",\n                    \"title\": \"Root item\",\n                    \"status\": \"container\",\n                    \"children\": [\n                        {\"id\": \"tsk-2ig\", \"title\": \"Leaf 2ig\", \"status\": \"ready\", \"children\": []},\n                        {\"id\": \"tsk-3c7\", \"title\": \"Leaf 3c7\", \"status\": \"ready\", \"children\": []}\n                    ]\n                },\n                {\n                    \"id\": \"tsk-stale-root\",\n                    \"title\": \"Stale root\",\n                    \"status\": \"blocked-sync\",\n                    \"reason\": \"root cần sync: fgw/tsk-stale-root lệch 3 ahead / 2 behind main\",\n                    \"children\": []\n                }\n            ]\n        }\n    }\"#;\n\n    #[test]\n    fn fetch_merge_list_mirrors_fgos_merge_list_json() {\n        let summary = parse_merge_list(MERGE_LIST_FIXTURE).expect(\"fixture should parse\");\n        assert_eq!(\n            summary.ready,\n            vec![\"tsk-2ig\".to_string(), \"tsk-3c7\".to_string()]\n        );\n        assert_eq!(summary.waiting, vec![\"tsk-blocked-dep\".to_string()]);\n        assert_eq!(summary.blocked_on_sync, vec![\"tsk-stale-root\".to_string()]);\n    }\n\n    /// tsk-59b: the tree parses as a real nested structure, not flattened —\n    /// a container node (not itself a merge candidate, D2/D3) holding two\n    /// ready leaves, sibling to a blocked-sync node carrying a real reason\n    /// string (D7).\n    #[test]\n    fn fetch_merge_list_parses_the_nested_tree_field() {\n        let summary = parse_merge_list(MERGE_LIST_FIXTURE).expect(\"fixture should parse\");\n        assert_eq!(summary.tree.len(), 2);\n\n        let root = &summary.tree[0];\n        assert_eq!(root.id, \"tsk-root\");\n        assert_eq!(root.status, \"container\");\n        assert_eq!(root.reason, None);\n        assert_eq!(root.children.len(), 2);\n        assert_eq!(root.children[0].id, \"tsk-2ig\");\n        assert_eq!(root.children[0].status, \"ready\");\n        assert!(root.children[0].children.is_empty());\n\n        let stale_root = &summary.tree[1];\n        assert_eq!(stale_root.id, \"tsk-stale-root\");\n        assert_eq!(stale_root.status, \"blocked-sync\");\n        assert_eq!(\n            stale_root.reason.as_deref(),\n            Some(\"root cần sync: fgw/tsk-stale-root lệch 3 ahead / 2 behind main\")\n        );\n    }\n\n    /// tsk-59b: a response with no `tree` field at all (a version-skewed\n    /// fgOS CLI predating tsk-2x9k) still parses cleanly via\n    /// `#[serde(default)]` — an empty tree, not a parse failure.\n    #[test]\n    fn fetch_merge_list_tolerates_a_missing_tree_field() {\n        let json = r#\"{\n            \"data\": {\n                \"ready\": [],\n                \"waiting\": [],\n                \"conflicts\": [],\n                \"mergeSets\": [],\n                \"blockedOnSync\": [],\n                \"mergeTier\": {},\n                \"supersededOut\": []\n            }\n        }\"#;\n        let summary = parse_merge_list(json).expect(\"missing tree field should still parse\");\n        assert!(summary.tree.is_empty());\n    }\n\n    #[test]\n    fn resolve_fgos_resolves_tier_0_when_present_and_executable() {\n        let root = std::env::temp_dir().join(format!(\n            \"fgos-resolve-test-t0-{}-{}\",\n            std::process::id(),\n            line!()\n        ));\n        let _ = std::fs::remove_dir_all(&root);\n        let bin_dir = root.join(\".fgos\").join(\"installation\").join(\"bin\");\n        std::fs::create_dir_all(&bin_dir).expect(\"create_dir_all\");\n        let shim = bin_dir.join(\"fgos\");\n        std::fs::write(&shim, \"#!/bin/sh\\nexit 0\\n\").expect(\"write shim\");\n\n        #[cfg(unix)]\n        {\n            use std::os::unix::fs::PermissionsExt;\n            let mut perms = std::fs::metadata(&shim).expect(\"metadata\").permissions();\n            perms.set_mode(0o755);\n            std::fs::set_permissions(&shim, perms).expect(\"set_permissions\");\n        }\n\n        let resolved = resolve_fgos(&root).expect(\"resolve_fgos\");\n        assert_eq!(resolved, shim);\n        assert!(is_tier_zero(&root, &resolved));\n        let _ = std::fs::remove_dir_all(&root);\n    }\n\n    #[test]\n    fn resolve_fgos_falls_back_when_tier_0_is_absent() {\n        let root = std::env::temp_dir().join(format!(\n            \"fgos-resolve-test-fallback-{}-{}\",\n            std::process::id(),\n            line!()\n        ));\n        let _ = std::fs::remove_dir_all(&root);\n        let resolved = resolve_fgos(&root).expect(\"resolve_fgos\");\n        assert_eq!(resolved, root.join(\"bin/fgos.mjs\"));\n        assert!(!is_tier_zero(&root, &resolved));\n    }\n\n    #[test]\n    #[cfg(unix)]\n    fn resolve_fgos_falls_back_when_tier_0_is_not_executable() {\n        use std::os::unix::fs::PermissionsExt;\n        let root = std::env::temp_dir().join(format!(\n            \"fgos-resolve-test-noexec-{}-{}\",\n            std::process::id(),\n            line!()\n        ));\n        let _ = std::fs::remove_dir_all(&root);\n        let bin_dir = root.join(\".fgos\").join(\"installation\").join(\"bin\");\n        std::fs::create_dir_all(&bin_dir).expect(\"create_dir_all\");\n        let shim = bin_dir.join(\"fgos\");\n        std::fs::write(&shim, \"#!/bin/sh\\nexit 0\\n\").expect(\"write shim\");\n\n        let mut perms = std::fs::metadata(&shim).expect(\"metadata\").permissions();\n        perms.set_mode(0o644);\n        std::fs::set_permissions(&shim, perms).expect(\"set_permissions\");\n\n        let resolved = resolve_fgos(&root).expect(\"resolve_fgos\");\n        assert_eq!(resolved, root.join(\"bin/fgos.mjs\"));\n        assert!(!is_tier_zero(&root, &resolved));\n        let _ = std::fs::remove_dir_all(&root);\n    }\n\n    /// Regression: an executable tier-0 shim that is itself a symlink\n    /// whose real target escapes the installation root was accepted --\n    /// `is_executable`'s `metadata()` call follows the symlink chain\n    /// transparently, with no containment check on the real target.\n    #[test]\n    #[cfg(unix)]\n    fn resolve_fgos_falls_back_when_tier_0_is_a_symlink_escaping_the_install_root() {\n        let root = std::env::temp_dir().join(format!(\n            \"fgos-resolve-test-symlink-escape-{}-{}\",\n            std::process::id(),\n            line!()\n        ));\n        let _ = std::fs::remove_dir_all(&root);\n        let bin_dir = root.join(\".fgos\").join(\"installation\").join(\"bin\");\n        std::fs::create_dir_all(&bin_dir).expect(\"create_dir_all\");\n\n        let outside_dir = std::env::temp_dir().join(format!(\n            \"fgos-resolve-test-outside-{}-{}\",\n            std::process::id(),\n            line!()\n        ));\n        let _ = std::fs::remove_dir_all(&outside_dir);\n        std::fs::create_dir_all(&outside_dir).expect(\"create_dir_all outside\");\n        let outside_target = outside_dir.join(\"sh-stub\");\n        std::fs::write(&outside_target, \"#!/bin/sh\\nexit 0\\n\").expect(\"write outside target\");\n        {\n            use std::os::unix::fs::PermissionsExt;\n            let mut perms = std::fs::metadata(&outside_target)\n                .expect(\"metadata\")\n                .permissions();\n            perms.set_mode(0o755);\n            std::fs::set_permissions(&outside_target, perms).expect(\"set_permissions\");\n        }\n\n        let shim = bin_dir.join(\"fgos\");\n        std::os::unix::fs::symlink(&outside_target, &shim).expect(\"symlink\");\n\n        let resolved = resolve_fgos(&root).expect(\"resolve_fgos\");\n        assert_eq!(resolved, root.join(\"bin/fgos.mjs\"));\n        assert!(!is_tier_zero(&root, &resolved));\n        let _ = std::fs::remove_dir_all(&root);\n        let _ = std::fs::remove_dir_all(&outside_dir);\n    }\n}\n",
+      "continued": false
+    },
+    {
+      "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "kind": "complete-final-record",
+      "categoryA": true,
+      "categoryB": false,
+      "record": {
+        "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "fcaaaa8f0beabf43e8d9e312da0dac0d2392d7bd52c38d5eaa8ee4a37bc286a9",
+        "digest": "fcaaaa8f0beabf43e8d9e312da0dac0d2392d7bd52c38d5eaa8ee4a37bc286a9",
+        "inventoryEdgeIds": [
+          "class6-l-000200",
+          "class6-l-000201",
+          "class6-l-000202"
+        ],
+        "diff": "--- a/packages/herdr-fgos-common/rust/src/fgos.rs\n+++ b/packages/herdr-fgos-common/rust/src/fgos.rs\n@@ -22,7 +22,7 @@\n     pub stage: String,\n     /// tsk-64z D1: the Work Items panel's Status column and tab filter\n     /// (TODO/DOING/REVIEW/DONE) both key off this raw literal\n-    /// (`docs/reference/triage-table-columns.md`'s own \"rendered as-is\").\n+    /// (`docs/knowledge/fgos-triage-table-columns/triage-table-columns.md#fgostriage-table-columns`'s own \"rendered as-is\").\n     pub status: String,\n     /// tsk-64z D1: \"Blocked By\" column — ids of OTHER still-open items\n     /// this row directly waits on (`rankImpact`'s own `blockedBy`,\n@@ -239,7 +239,7 @@\n /// pinned for the CLI's own `--all`-less order, just no longer what this\n /// function returns). An absent `priority` (`None` — an item that never\n /// had `computePriority` run, e.g. still at `todo`) sorts LAST, same\n-/// absent-sorts-last convention `docs/reference/triage-table-columns.md`\n+/// absent-sorts-last convention `docs/knowledge/fgos-triage-table-columns/triage-table-columns.md`\n /// already documents for `goalTier`.\n pub fn parse_triage(json: &str) -> Result<Vec<TriageRow>, serde_json::Error> {\n     let envelope: TriageEnvelope = serde_json::from_str(json)?;\n",
+        "edges": [
+          {
+            "edgeId": "class6-l-000200",
+            "slotKey": "{\"edgeId\":\"class6-l-000200\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000200\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":25}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000200",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 25
+              }
+            ],
+            "consumerFile": "packages/herdr-fgos-common/rust/src/fgos.rs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 25,
+                "columnStart": 11,
+                "columnEndExclusive": 49,
+                "text": "docs/reference/triage-table-columns.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 25,
+                "columnStart": 11,
+                "columnEndExclusive": 49,
+                "text": "docs/reference/triage-table-columns.md"
+              }
+            ],
+            "matchedExpression": "docs/reference/triage-table-columns.md",
+            "logicalReference": "docs/reference/triage-table-columns.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -22,7 +22,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: The renamed reference explicitly says raw status is rendered as-is. This proves the raw-literal field claim, without adding any status/column behavior. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+            "anchor": "fgostriage-table-columns",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/reference/triage-table-columns.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000200",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 25,
+                "matchedExpression": "docs/reference/triage-table-columns.md",
+                "originalLineText": "    /// (`docs/reference/triage-table-columns.md`'s own \"rendered as-is\")."
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000201",
+            "slotKey": "{\"edgeId\":\"class6-l-000201\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000201\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":242}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000201",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 242
+              }
+            ],
+            "consumerFile": "packages/herdr-fgos-common/rust/src/fgos.rs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 242,
+                "columnStart": 35,
+                "columnEndExclusive": 73,
+                "text": "docs/reference/triage-table-columns.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 242,
+                "columnStart": 35,
+                "columnEndExclusive": 73,
+                "text": "docs/reference/triage-table-columns.md"
+              }
+            ],
+            "matchedExpression": "docs/reference/triage-table-columns.md",
+            "logicalReference": "docs/reference/triage-table-columns.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -239,7 +239,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/reference/triage-table-columns.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000201",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 242,
+                "matchedExpression": "docs/reference/triage-table-columns.md",
+                "originalLineText": "/// absent-sorts-last convention `docs/reference/triage-table-columns.md`"
+              }
+            ],
+            "parkSourceQuote": "/// absent-sorts-last convention `docs/reference/triage-table-columns.md`",
+            "movedVerbatimWitness": {
+              "fromPath": "docs/reference/triage-table-columns.md",
+              "historicalSourceCommit": "126a8ae518a3390b40179d050b2452e23143ebb7",
+              "historicalDigest": "1a68535e7eed3ef0e4ea809f4aad50e685bbf5b127e6b25db588fc36e2339b5c",
+              "targetDigest": "4911e8f2a96eb1af83e107184211d9ad3e02a74f082ff45fe9e9907c67d87e5d",
+              "comparison": "complete narrative identical after frontmatter removal"
+            },
+            "passageSearchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform/**",
+                "docs/knowledge/**"
+              ],
+              "sourcePassage": "/// absent-sorts-last convention `docs/reference/triage-table-columns.md`",
+              "terms": [
+                "absent-sorts-last",
+                "computePriority",
+                "goalTier",
+                "parse_triage_preserves_rank_impact_order",
+                "rankImpact",
+                "triage table",
+                "triage table columns"
+              ],
+              "queries": [
+                {
+                  "term": "absent-sorts-last",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                },
+                {
+                  "term": "computePriority",
+                  "hitCount": 45,
+                  "liveHits": 45,
+                  "hitsSha256": "6988aa5257b490f4e3afb3971f65bae031e027f4e48522e29938dd7589517186",
+                  "files": {
+                    "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 6,
+                      "carriage": 0
+                    },
+                    "docs/platform/work-state/spec.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+                      "line": 20,
+                      "text": "  priority (`priority-formula.mjs`'s inverted scale, `computePriority` =",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+                      "line": 34,
+                      "text": "  `computePriority` (`src/state/priority-formula.mjs:75-80`) computes",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7486,
+                      "text": "✔ computePriority: higher impact yields a strictly smaller stored priority (all else equal) (1.569367ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7487,
+                      "text": "✔ computePriority: higher urgency yields a strictly smaller stored priority (all else equal) (1.136113ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7488,
+                      "text": "✔ computePriority: higher effort yields a strictly LARGER stored priority (all else equal — effort divides, never boosts) (0.221459ms)",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+                      "line": 7489,
+                      "text": "✔ computePriority: higher risk (as a pure discount, no blast radius) yields a strictly LARGER stored priority (never a boost) (0.19464ms)",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "goalTier",
+                  "hitCount": 127,
+                  "liveHits": 122,
+                  "hitsSha256": "491d12838c7b6df3c90e482b807c2dfbb81cce07c06b9dd43d8f520d7a1aacbd",
+                  "files": {
+                    "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md": {
+                      "live": 4,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md": {
+                      "live": 12,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/poll-fgos-cli-data-from-a-rust-plugin/poll-fgos-cli-data-from-a-rust-plugin.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/rankimpact-s-real-sort-key-order/rankimpact-sort-key-order.md": {
+                      "live": 5,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-merge-standardization-tsk-4j9-reuses-existing-mechanisms/why-merge-standardization-reuses-existing-mechanisms.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 13,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 13,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 13,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 13,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 13,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 13,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 13,
+                      "carriage": 0
+                    },
+                    "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/platform/packaging-distribution/history/distribution-vision.md": {
+                      "live": 0,
+                      "carriage": 5
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+                      "line": 24,
+                      "text": "| `tier` | `goalTier` | `mvp` \\| `milestone` \\| `-` when the item declares no tier |",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+                      "line": 56,
+                      "text": "4. If the item is a `goalTier` milestone/MVP, read `targetDoneCount`/",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+                      "line": 92,
+                      "text": "`goalTier` milestone, so it has no `targets` either.",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+                      "line": 96,
+                      "text": "Same command against a real `goalTier: milestone` item (`tsk-u9k`), which",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+                      "line": 138,
+                      "text": "- **`targets`** (`targets` field, `goalTier` milestone/MVP) never go through",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+                      "line": 3,
+                      "text": "title: How to close out a goalTier milestone/MVP item once all its targets are done",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "parse_triage_preserves_rank_impact_order",
+                  "hitCount": 1,
+                  "liveHits": 1,
+                  "hitsSha256": "aff96f6651ffc407df4cec86e62d46ad8173178a288ce7df439a06c78b2b7806",
+                  "files": {
+                    "docs/knowledge/poll-fgos-cli-data-from-a-rust-plugin/poll-fgos-cli-data-from-a-rust-plugin.md": {
+                      "live": 1,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/poll-fgos-cli-data-from-a-rust-plugin/poll-fgos-cli-data-from-a-rust-plugin.md",
+                      "line": 96,
+                      "text": "fn parse_triage_preserves_rank_impact_order() {",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "rankImpact",
+                  "hitCount": 262,
+                  "liveHits": 262,
+                  "hitsSha256": "098e3988d48f7044dd9c96152d0599108855b52b1f8005b4e9206e9014567678",
+                  "files": {
+                    "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/picknextdiscoveritem-s-real-sort-key-order/discover-pool-pick-next-sort-key-order.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/poll-fgos-cli-data-from-a-rust-plugin/poll-fgos-cli-data-from-a-rust-plugin.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/rankimpact-s-real-sort-key-order/rankimpact-sort-key-order.md": {
+                      "live": 4,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-merge-standardization-tsk-4j9-reuses-existing-mechanisms/why-merge-standardization-reuses-existing-mechanisms.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-mergesets-groups-conflicts-instead-of-dropping-them-from/why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready.md": {
+                      "live": 2,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/why-wontfix-had-to-join-done-at-every-is-this-resolved-check/wontfix-terminal-status-filter-consistency.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md": {
+                      "live": 1,
+                      "carriage": 0
+                    },
+                    "docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md": {
+                      "live": 3,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log": {
+                      "live": 34,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log": {
+                      "live": 34,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log": {
+                      "live": 34,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log": {
+                      "live": 34,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log": {
+                      "live": 34,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log": {
+                      "live": 34,
+                      "carriage": 0
+                    },
+                    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log": {
+                      "live": 34,
+                      "carriage": 0
+                    },
+                    "docs/platform/work-state/architecture/implementation-pointers.md": {
+                      "live": 2,
+                      "carriage": 0
+                    }
+                  },
+                  "sample": [
+                    {
+                      "file": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+                      "line": 14,
+                      "text": "triage --json` → `rankImpact` in `src/state/impact.mjs`) renders every",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+                      "line": 22,
+                      "text": "  `resolveDiscovery`/`resolveDecompose`). This replaces `rankImpact`'s",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md",
+                      "line": 98,
+                      "text": "> `triage`'s `rankImpact` (`src/state/impact.mjs:59`) filters `status !==",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/picknextdiscoveritem-s-real-sort-key-order/discover-pool-pick-next-sort-key-order.md",
+                      "line": 53,
+                      "text": "`blocks` comes from `rankImpact` (dependency-graph-structural, no LLM",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/picknextdiscoveritem-s-real-sort-key-order/discover-pool-pick-next-sort-key-order.md",
+                      "line": 89,
+                      "text": "| clarify | 1 | `blocks` | descending | from `rankImpact`, structural, no LLM needed |",
+                      "carriage": false
+                    },
+                    {
+                      "file": "docs/knowledge/poll-fgos-cli-data-from-a-rust-plugin/poll-fgos-cli-data-from-a-rust-plugin.md",
+                      "line": 75,
+                      "text": "`rankImpact` order) — don't re-sort it in the plugin; just render the rows",
+                      "carriage": false
+                    }
+                  ]
+                },
+                {
+                  "term": "triage table",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                },
+                {
+                  "term": "triage table columns",
+                  "hitCount": 0,
+                  "liveHits": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                  "files": {},
+                  "sample": []
+                }
+              ],
+              "assessment": "A51, L12-7/30/31/32/58: L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Phase 9 exact patch specification; current operative route remains unchanged until cutover."
+            }
+          },
+          {
+            "edgeId": "class6-l-000202",
+            "slotKey": "{\"edgeId\":\"class6-l-000202\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000202\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":721}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000202",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 721
+              }
+            ],
+            "consumerFile": "packages/herdr-fgos-common/rust/src/fgos.rs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 721,
+                "columnStart": 24,
+                "columnEndExclusive": 73,
+                "text": "docs/history/herdr-plugin-parkreason-pane-filter/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 721,
+                "columnStart": 24,
+                "columnEndExclusive": 73,
+                "text": "docs/history/herdr-plugin-parkreason-pane-filter/"
+              },
+              {
+                "line": 722,
+                "columnStart": 9,
+                "columnEndExclusive": 19,
+                "text": "CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/herdr-plugin-parkreason-pane-filter/\nCONTEXT.md",
+            "logicalReference": "docs/history/herdr-plugin-parkreason-pane-filter/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: L12-62 complete wrapped reference; source-bound history/provenance or surviving root; literal spelling conserved. Own source passage: \"    /// tsk-1hb D2/D4 (docs/history/herdr-plugin-parkreason-pane-filter/\\n    /// CONTEXT.md), superseding tsk-4ot's own `parse_doing_pins_literal_\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/herdr-plugin-parkreason-pane-filter/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000202",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 721,
+                "matchedExpression": "docs/history/herdr-plugin-parkreason-pane-filter/",
+                "originalLineText": "    /// tsk-1hb D2/D4 (docs/history/herdr-plugin-parkreason-pane-filter/"
+              }
+            ],
+            "preservedPathWitness": {
+              "path": "docs/history/herdr-plugin-parkreason-pane-filter/CONTEXT.md",
+              "state": "tree",
+              "treeMatchCount": 1,
+              "treeMatchesSha256": "b33166ced7e1387a13ac58dce4257805be2ce61b351342e83144056fc417502e",
+              "treeSample": [
+                "docs/history/herdr-plugin-parkreason-pane-filter/CONTEXT.md"
+              ],
+              "historyCommitCount": 2,
+              "historyCommitsSha256": "49b77e1886b109c0c043c67a8939aab02dee5ea99493eb6b3e81cf76c9b1047a",
+              "historySample": [
+                "3af1cb637656f91e77e13a71376ef5ae57e6d638",
+                "c9f8c749d0ecfecc1759408d86055826792aa34e"
+              ]
+            }
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"class6-l-000200\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000200\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":25}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"class6-l-000201\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000201\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":242}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"class6-l-000200\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000200\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":25}]}": {
+                "sourcePassage": "    /// (`docs/reference/triage-table-columns.md`'s own \"rendered as-is\").",
+                "adjacentPassage": "/// One row from `fgos triage --json`'s `data` array — already sorted by\n/// `rankImpact` (D5), so this module never re-sorts it.\n#[derive(Debug, Clone, Deserialize, PartialEq)]\npub struct TriageRow {\n    pub id: String,\n    pub title: String,\n    #[serde(rename = \"goalTier\")]\n    pub goal_tier: Option<String>,\n    /// tsk-1e3 D4: the detail modal's Discover button is only enabled at\n    /// `\"clarify\"` — carried through from `rankImpact`'s own `workflowStep` field\n    /// (`src/state/impact.mjs`, defaults to `\"executing\"` when the item\n    /// carries none), never re-derived here.\n    #[serde(rename = \"workflowStep\")]\n    pub stage: String,\n    /// tsk-64z D1: the Work Items panel's Status column and tab filter\n    /// (TODO/DOING/REVIEW/DONE) both key off this raw literal\n    /// (`docs/reference/triage-table-columns.md`'s own \"rendered as-is\").\n    pub status: String,\n    /// tsk-64z D1: \"Blocked By\" column — ids of OTHER still-open items\n    /// this row directly waits on (`rankImpact`'s own `blockedBy`,\n    /// `src/state/impact.mjs`). Comma-joined at render time, never here.\n    #[serde(rename = \"blockedBy\")]\n    pub blocked_by: Vec<String>,\n    /// tsk-64z D1: \"Blocks\" column — count of OTHER still-open items that\n    /// directly wait on this one.\n    pub blocks: u32,\n    /// tsk-64z D2: sort key, ASCENDING (smaller number = higher priority —\n    /// `src/state/priority-formula.mjs`'s inverted scale). `None` when the\n    /// item never had `computePriority` run on it yet (e.g. still at\n    /// `todo`, pre-`discover`).\n    pub priority: Option<i64>,\n}",
+                "target": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "4911e8f2a96eb1af83e107184211d9ad3e02a74f082ff45fe9e9907c67d87e5d",
+                "targetEvidence": [
+                  {
+                    "line": 20,
+                    "text": "| `status` | `status` | raw status (`todo` \\| `doing` \\| `blocked` \\| `awaiting-approval` \\| `delivered` \\| `retrospective` \\| `cleanup` \\| `done` \\| `awaiting-human` \\| `wontfix`), rendered as-is |"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed reference explicitly says raw status is rendered as-is. This proves the raw-literal field claim, without adding any status/column behavior."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed reference explicitly says raw status is rendered as-is. This proves the raw-literal field claim, without adding any status/column behavior."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed reference explicitly says raw status is rendered as-is. This proves the raw-literal field claim, without adding any status/column behavior."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed reference explicitly says raw status is rendered as-is. This proves the raw-literal field claim, without adding any status/column behavior."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed reference explicitly says raw status is rendered as-is. This proves the raw-literal field claim, without adding any status/column behavior."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed reference explicitly says raw status is rendered as-is. This proves the raw-literal field claim, without adding any status/column behavior."
+                  }
+                },
+                "assessment": "The renamed reference explicitly says raw status is rendered as-is. This proves the raw-literal field claim, without adding any status/column behavior."
+              },
+              "{\"edgeId\":\"class6-l-000201\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000201\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":242}]}": {
+                "sourcePassage": "/// absent-sorts-last convention `docs/reference/triage-table-columns.md`",
+                "adjacentPassage": "/// Parse `fgos triage --json`'s stdout. tsk-64z D2: re-sorts by `priority`\n/// ASCENDING (`priority-formula.mjs`'s inverted scale — smaller number =\n/// higher priority), overriding `rankImpact`'s own default tier/blocks/\n/// component order (the order tsk-4vo originally asked to preserve\n/// byte-for-byte — see `parse_triage_preserves_rank_impact_order`, still\n/// pinned for the CLI's own `--all`-less order, just no longer what this\n/// function returns). An absent `priority` (`None` — an item that never\n/// had `computePriority` run, e.g. still at `todo`) sorts LAST, same\n/// absent-sorts-last convention `docs/reference/triage-table-columns.md`\n/// already documents for `goalTier`.\npub fn parse_triage(json: &str) -> Result<Vec<TriageRow>, serde_json::Error> {\n    let envelope: TriageEnvelope = serde_json::from_str(json)?;\n    let mut rows = envelope.data;\n    rows.sort_by_key(|row| row.priority.unwrap_or(i64::MAX));\n    Ok(rows)\n}",
+                "target": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "4911e8f2a96eb1af83e107184211d9ad3e02a74f082ff45fe9e9907c67d87e5d",
+                "targetEvidence": [
+                  {
+                    "line": 1,
+                    "text": "---"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+                  }
+                },
+                "assessment": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair."
+              }
+            },
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {
+            "{\"edgeId\":\"class6-l-000200\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000200\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":25}]}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "4911e8f2a96eb1af83e107184211d9ad3e02a74f082ff45fe9e9907c67d87e5d",
+              "passage": "| `status` | `status` | raw status (`todo` \\| `doing` \\| `blocked` \\| `awaiting-approval` \\| `delivered` \\| `retrospective` \\| `cleanup` \\| `done` \\| `awaiting-human` \\| `wontfix`), rendered as-is |",
+              "targetEvidenceLine": 20,
+              "targetLines": [
+                20
+              ],
+              "targetLineText": [
+                "| `status` | `status` | raw status (`todo` \\| `doing` \\| `blocked` \\| `awaiting-approval` \\| `delivered` \\| `retrospective` \\| `cleanup` \\| `done` \\| `awaiting-human` \\| `wontfix`), rendered as-is |"
+              ],
+              "sourceLocatorTokens": []
+            },
+            "{\"edgeId\":\"class6-l-000201\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000201\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":242}]}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "4911e8f2a96eb1af83e107184211d9ad3e02a74f082ff45fe9e9907c67d87e5d",
+              "passage": "---",
+              "targetEvidenceLine": 1,
+              "targetLines": [],
+              "targetLineText": [],
+              "sourceLocatorTokens": [],
+              "wholeFileJustification": "L12-62: Same-basename moved-verbatim knowledge holder; complete historical source text conserved. Ruling 1 permits this Phase 9 repair. Whole-file pointer spans the complete document."
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"class6-l-000200\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000200\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":25}]}": {
+              "replacement": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md#fgostriage-table-columns",
+              "resolvedTarget": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"class6-l-000201\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000201\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":242}]}": {
+              "replacement": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+              "resolvedTarget": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"class6-l-000200\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000200\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":25}]}": {
+              "source": "docs/reference/triage-table-columns.md",
+              "replacement": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md#fgostriage-table-columns",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"class6-l-000201\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000201\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":242}]}": {
+              "source": "docs/reference/triage-table-columns.md",
+              "replacement": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-020",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60",
+          "L12-62"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "fcaaaa8f0beabf43e8d9e312da0dac0d2392d7bd52c38d5eaa8ee4a37bc286a9",
+          "bytes": 45009,
+          "lines": 1119,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetFilesToRead": [
+        "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md"
+      ],
+      "priorWave2Reports": [
+        "review-a38-step-04-wave2-p30.md"
+      ],
+      "instruction": "Read every slot and full diff in this final record. Target evidence/anchor proof and content/tree/history witnesses are embedded; independently read actual target passages at author pin. A streamed source remains one whole-file verdict."
+    }
+  ]
+}

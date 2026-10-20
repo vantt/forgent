@@ -70,8 +70,8 @@
       }
     }
   },
-  "rawSlots": 3184,
-  "uniqueSlots": 2914,
+  "rawSlots": 3203,
+  "uniqueSlots": 2933,
   "byBucket": {
     "L12-10": {
       "files": 22,
@@ -89,12 +89,12 @@
     },
     "step4": {
       "files": 331,
-      "edges": 914,
+      "edges": 933,
       "sourceOwners": 273,
       "classes": {
-        "preserve": 640,
-        "phase9": 42,
-        "park": 59,
+        "preserve": 655,
+        "phase9": 61,
+        "park": 44,
         "render-join": 173
       }
     },
@@ -110,13 +110,14 @@
   },
   "step4BySurface": {
     "L12-60-prose-sweep": {
-      "files": 50,
-      "edges": 95,
-      "sourceOwners": 26,
+      "files": 56,
+      "edges": 114,
+      "sourceOwners": 32,
       "classes": {
         "render-join": 51,
-        "park": 16,
-        "preserve": 28
+        "phase9": 10,
+        "preserve": 46,
+        "park": 7
       }
     },
     "domain-skills-task-specs": {
@@ -153,9 +154,9 @@
       "edges": 320,
       "sourceOwners": 92,
       "classes": {
-        "park": 30,
-        "preserve": 271,
-        "phase9": 19
+        "park": 26,
+        "phase9": 26,
+        "preserve": 268
       }
     },
     "render-joins": {
@@ -174,8 +175,8 @@
       "classes": {
         "render-join": 16,
         "preserve": 22,
-        "park": 5,
-        "phase9": 2
+        "park": 3,
+        "phase9": 4
       }
     }
   },
@@ -6292,7 +6293,7 @@
           "text": "docs/specs/reading-map.md"
         }
       ],
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": ".agents/skills/fgos-researching/SKILL.md",
@@ -7883,7 +7884,7 @@
       "surface": "shared-skills-prompts",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "Writer/default/read contract requires Step 5 parity or explicit external-project convention proof; no alias used as destination.",
       "edgeId": "skills-085",
       "inventoryRefs": [
@@ -8000,7 +8001,7 @@
       "surface": "shared-skills-prompts",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "Writer/default/read contract requires Step 5 parity or explicit external-project convention proof; no alias used as destination.",
       "edgeId": "skills-088",
       "inventoryRefs": [
@@ -11787,7 +11788,7 @@
           "text": "docs/specs/reading-map.md"
         }
       ],
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": "plugins/fgOS/skills/fgos-researching/SKILL.md",
@@ -16922,7 +16923,7 @@
       "surface": "maintained-comments-help",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "Authority-sensitive navigation/comment into retained current or retiring source; keep true before flip. Exact holder/locator resolution belongs to per-file Phase 9 authoring, not mechanical replacement.",
       "edgeId": "cli-006",
       "inventoryRefs": [
@@ -386958,7 +386959,7 @@
       "surface": "maintained-comments-help",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "Retained current navigation/evidence path; no safe current-owner navigation change demonstrated by this census. Verify target/role in whole-file authoring.",
       "edgeId": "class6-l-000201",
       "inventoryRefs": [
@@ -389063,7 +389064,7 @@
       "surface": "maintained-comments-help",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "preserve",
+      "advisoryClass": "park",
       "rule": "Retained current navigation/evidence path; no safe current-owner navigation change demonstrated by this census. Verify target/role in whole-file authoring.",
       "edgeId": "class6-l-000255",
       "inventoryRefs": [
@@ -389596,7 +389597,7 @@
       "surface": "maintained-comments-help",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "Authority-sensitive navigation/comment into retained current or retiring source; keep true before flip. Exact holder/locator resolution belongs to per-file Phase 9 authoring, not mechanical replacement.",
       "edgeId": "class6-l-000263",
       "inventoryRefs": [
@@ -389791,7 +389792,7 @@
       "surface": "maintained-comments-help",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "Authority-sensitive navigation/comment into retained current or retiring source; keep true before flip. Exact holder/locator resolution belongs to per-file Phase 9 authoring, not mechanical replacement.",
       "edgeId": "class6-l-000268",
       "inventoryRefs": [
@@ -389908,7 +389909,7 @@
       "surface": "maintained-comments-help",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "preserve",
+      "advisoryClass": "park",
       "rule": "Retained current navigation/evidence path; no safe current-owner navigation change demonstrated by this census. Verify target/role in whole-file authoring.",
       "edgeId": "class6-l-000270",
       "inventoryRefs": [
@@ -390368,7 +390369,7 @@
       "surface": "maintained-comments-help",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "Authority-sensitive navigation/comment into retained current or retiring source; keep true before flip. Exact holder/locator resolution belongs to per-file Phase 9 authoring, not mechanical replacement.",
       "edgeId": "class6-l-000279",
       "inventoryRefs": [
@@ -390524,7 +390525,7 @@
       "surface": "maintained-comments-help",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "Authority-sensitive navigation/comment into retained current or retiring source; keep true before flip. Exact holder/locator resolution belongs to per-file Phase 9 authoring, not mechanical replacement.",
       "edgeId": "class6-l-000282",
       "inventoryRefs": [
@@ -391082,7 +391083,7 @@
       "surface": "maintained-comments-help",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "preserve",
+      "advisoryClass": "park",
       "rule": "Retained current navigation/evidence path; no safe current-owner navigation change demonstrated by this census. Verify target/role in whole-file authoring.",
       "edgeId": "class6-l-000293",
       "inventoryRefs": [
@@ -392057,7 +392058,7 @@
       "surface": "maintained-comments-help",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "Authority-sensitive navigation/comment into retained current or retiring source; keep true before flip. Exact holder/locator resolution belongs to per-file Phase 9 authoring, not mechanical replacement.",
       "edgeId": "class6-l-000328",
       "inventoryRefs": [
@@ -398829,7 +398830,7 @@
       ],
       "currentFileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
       "ownerSurface": "L12-60 sweep",
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
@@ -399009,7 +399010,7 @@
       ],
       "currentFileDigest": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
       "ownerSurface": "L12-60 sweep",
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": ".agents/skills/fgos-coding-planning/SKILL.md",
@@ -399126,7 +399127,7 @@
       ],
       "currentFileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
       "ownerSurface": "L12-60 sweep",
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
@@ -399177,7 +399178,7 @@
       ],
       "currentFileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
       "ownerSurface": "L12-60 sweep",
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
@@ -399813,7 +399814,7 @@
       ],
       "currentFileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
       "ownerSurface": "L12-60 sweep",
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
@@ -399900,7 +399901,7 @@
       "surface": "L12-60-prose-sweep",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "L12-60 first-class census join or author-added occurrence, records only",
       "edgeId": "class4-l-002026",
       "inventoryRefs": [
@@ -400281,7 +400282,7 @@
       ],
       "currentFileDigest": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
       "ownerSurface": "L12-60 sweep",
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
@@ -400398,7 +400399,7 @@
       ],
       "currentFileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
       "ownerSurface": "L12-60 sweep",
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
@@ -400449,7 +400450,7 @@
       ],
       "currentFileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
       "ownerSurface": "L12-60 sweep",
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
@@ -400920,7 +400921,7 @@
       "surface": "L12-60-prose-sweep",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "L12-60 first-class census join or author-added occurrence, records only",
       "edgeId": "class4-l-002095",
       "inventoryRefs": [
@@ -400958,7 +400959,7 @@
       "surface": "L12-60-prose-sweep",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "L12-60 first-class census join or author-added occurrence, records only",
       "edgeId": "class6-l-000323",
       "inventoryRefs": [
@@ -400996,7 +400997,7 @@
       "surface": "L12-60-prose-sweep",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "L12-60 first-class census join or author-added occurrence, records only",
       "edgeId": "class6-l-000324",
       "inventoryRefs": [
@@ -401074,7 +401075,7 @@
         "text": "docs/how-to/preserve-shell-escapes-when-transcribing-"
       },
       "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
@@ -401117,7 +401118,7 @@
         "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
       },
       "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
@@ -401166,7 +401167,7 @@
         "text": "docs/how-to/preserve-"
       },
       "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
-      "sourceDisposition": "parked"
+      "sourceDisposition": "patch"
     },
     {
       "file": "core/skills/_shared/executor-dispatch-fallback.md",
@@ -401223,7 +401224,7 @@
       "surface": "L12-60-prose-sweep",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "L12-60 first-class census join or author-added occurrence, records only",
       "edgeId": null,
       "inventoryRefs": [],
@@ -401355,7 +401356,7 @@
       "surface": "L12-60-prose-sweep",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "L12-60 first-class census join or author-added occurrence, records only",
       "edgeId": null,
       "inventoryRefs": [],
@@ -401397,7 +401398,7 @@
       "surface": "L12-60-prose-sweep",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "L12-60 first-class census join or author-added occurrence, records only",
       "edgeId": null,
       "inventoryRefs": [],
@@ -401439,7 +401440,7 @@
       "surface": "L12-60-prose-sweep",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "L12-60 first-class census join or author-added occurrence, records only",
       "edgeId": null,
       "inventoryRefs": [],
@@ -401487,7 +401488,7 @@
       "surface": "L12-60-prose-sweep",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "L12-60 first-class census join or author-added occurrence, records only",
       "edgeId": null,
       "inventoryRefs": [],
@@ -401529,7 +401530,7 @@
       "surface": "L12-60-prose-sweep",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "phase9",
       "rule": "L12-60 first-class census join or author-added occurrence, records only",
       "edgeId": null,
       "inventoryRefs": [],
@@ -401757,7 +401758,7 @@
       "surface": "L12-60-prose-sweep",
       "renderOnly": false,
       "bucket": "step4",
-      "advisoryClass": "park",
+      "advisoryClass": "preserve",
       "rule": "L12-60 first-class census join or author-added occurrence, records only",
       "edgeId": null,
       "inventoryRefs": [],
@@ -402553,6 +402554,894 @@
         "text": "docs/history/<feature>/plan.md"
       },
       "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "CHANGELOG.md",
+      "sourceOwner": "CHANGELOG.md",
+      "sourcePath": "CHANGELOG.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/decisions/\nindex.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 1343,
+        "columnStart": 54,
+        "columnEndExclusive": 69,
+        "text": "docs/decisions/"
+      },
+      "currentSpans": [
+        {
+          "line": 1343,
+          "columnStart": 54,
+          "columnEndExclusive": 69,
+          "text": "docs/decisions/"
+        },
+        {
+          "line": 1344,
+          "columnStart": 3,
+          "columnEndExclusive": 11,
+          "text": "index.md"
+        }
+      ],
+      "currentFileDigest": "062f9fdd3601883b474bc5f0980b444366e8b10fafb6dc490ac8bd5fee00e8e9",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "CHANGELOG.md",
+        "line": 1343,
+        "columnStart": 54,
+        "columnEndExclusive": 69,
+        "text": "docs/decisions/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "CHANGELOG.md",
+      "sourceOwner": "CHANGELOG.md",
+      "sourcePath": "CHANGELOG.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/history/agy-permission-capability-allowlist/\nRESEARCH.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 1433,
+        "columnStart": 17,
+        "columnEndExclusive": 66,
+        "text": "docs/history/agy-permission-capability-allowlist/"
+      },
+      "currentSpans": [
+        {
+          "line": 1433,
+          "columnStart": 17,
+          "columnEndExclusive": 66,
+          "text": "docs/history/agy-permission-capability-allowlist/"
+        },
+        {
+          "line": 1434,
+          "columnStart": 3,
+          "columnEndExclusive": 14,
+          "text": "RESEARCH.md"
+        }
+      ],
+      "currentFileDigest": "062f9fdd3601883b474bc5f0980b444366e8b10fafb6dc490ac8bd5fee00e8e9",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "CHANGELOG.md",
+        "line": 1433,
+        "columnStart": 17,
+        "columnEndExclusive": 66,
+        "text": "docs/history/agy-permission-capability-allowlist/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "CHANGELOG.md",
+      "sourceOwner": "CHANGELOG.md",
+      "sourcePath": "CHANGELOG.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/how-to/recover-approve-sync-root-from-inside-a-\nworktree-with-trust-dir.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 1879,
+        "columnStart": 19,
+        "columnEndExclusive": 71,
+        "text": "docs/how-to/recover-approve-sync-root-from-inside-a-"
+      },
+      "currentSpans": [
+        {
+          "line": 1879,
+          "columnStart": 19,
+          "columnEndExclusive": 71,
+          "text": "docs/how-to/recover-approve-sync-root-from-inside-a-"
+        },
+        {
+          "line": 1880,
+          "columnStart": 3,
+          "columnEndExclusive": 29,
+          "text": "worktree-with-trust-dir.md"
+        }
+      ],
+      "currentFileDigest": "062f9fdd3601883b474bc5f0980b444366e8b10fafb6dc490ac8bd5fee00e8e9",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "CHANGELOG.md",
+        "line": 1879,
+        "columnStart": 19,
+        "columnEndExclusive": 71,
+        "text": "docs/how-to/recover-approve-sync-root-from-inside-a-"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "sourceOwner": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/architect/agent-coordination/contracts/\ncoordination-session.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 71,
+        "columnStart": 19,
+        "columnEndExclusive": 63,
+        "text": "docs/architect/agent-coordination/contracts/"
+      },
+      "currentSpans": [
+        {
+          "line": 71,
+          "columnStart": 19,
+          "columnEndExclusive": 63,
+          "text": "docs/architect/agent-coordination/contracts/"
+        },
+        {
+          "line": 72,
+          "columnStart": 3,
+          "columnEndExclusive": 26,
+          "text": "coordination-session.md"
+        }
+      ],
+      "currentFileDigest": "6dc3d867871c2957d9860e9a9e37d93628b67c5e4d6259fb404e15f0dba120c1",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+        "line": 71,
+        "columnStart": 19,
+        "columnEndExclusive": 63,
+        "text": "docs/architect/agent-coordination/contracts/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourceOwner": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/how-to/\nuse-fgos-group-thinking.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 1785,
+        "columnStart": 43,
+        "columnEndExclusive": 55,
+        "text": "docs/how-to/"
+      },
+      "currentSpans": [
+        {
+          "line": 1785,
+          "columnStart": 43,
+          "columnEndExclusive": 55,
+          "text": "docs/how-to/"
+        },
+        {
+          "line": 1786,
+          "columnStart": 5,
+          "columnEndExclusive": 31,
+          "text": "use-fgos-group-thinking.md"
+        }
+      ],
+      "currentFileDigest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "line": 1785,
+        "columnStart": 43,
+        "columnEndExclusive": 55,
+        "text": "docs/how-to/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourceOwner": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/architect/agent-coordination/contracts/\ncoordination-session.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 1837,
+        "columnStart": 17,
+        "columnEndExclusive": 61,
+        "text": "docs/architect/agent-coordination/contracts/"
+      },
+      "currentSpans": [
+        {
+          "line": 1837,
+          "columnStart": 17,
+          "columnEndExclusive": 61,
+          "text": "docs/architect/agent-coordination/contracts/"
+        },
+        {
+          "line": 1838,
+          "columnStart": 5,
+          "columnEndExclusive": 28,
+          "text": "coordination-session.md"
+        }
+      ],
+      "currentFileDigest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "line": 1837,
+        "columnStart": 17,
+        "columnEndExclusive": 61,
+        "text": "docs/architect/agent-coordination/contracts/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourceOwner": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/architect/agent-coordination/contracts/\ncoordination-session.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 1884,
+        "columnStart": 28,
+        "columnEndExclusive": 72,
+        "text": "docs/architect/agent-coordination/contracts/"
+      },
+      "currentSpans": [
+        {
+          "line": 1884,
+          "columnStart": 28,
+          "columnEndExclusive": 72,
+          "text": "docs/architect/agent-coordination/contracts/"
+        },
+        {
+          "line": 1885,
+          "columnStart": 5,
+          "columnEndExclusive": 28,
+          "text": "coordination-session.md"
+        }
+      ],
+      "currentFileDigest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "line": 1884,
+        "columnStart": 28,
+        "columnEndExclusive": 72,
+        "text": "docs/architect/agent-coordination/contracts/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourceOwner": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/architect/agent-coordination/architecture/\ngroup-thinking-trigger-surface.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 2210,
+        "columnStart": 7,
+        "columnEndExclusive": 54,
+        "text": "docs/architect/agent-coordination/architecture/"
+      },
+      "currentSpans": [
+        {
+          "line": 2210,
+          "columnStart": 7,
+          "columnEndExclusive": 54,
+          "text": "docs/architect/agent-coordination/architecture/"
+        },
+        {
+          "line": 2211,
+          "columnStart": 5,
+          "columnEndExclusive": 38,
+          "text": "group-thinking-trigger-surface.md"
+        }
+      ],
+      "currentFileDigest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "line": 2210,
+        "columnStart": 7,
+        "columnEndExclusive": 54,
+        "text": "docs/architect/agent-coordination/architecture/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourceOwner": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/architect/agent-coordination/\nplaybooks/architecture-advisory-role-doctrine.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 2281,
+        "columnStart": 34,
+        "columnEndExclusive": 68,
+        "text": "docs/architect/agent-coordination/"
+      },
+      "currentSpans": [
+        {
+          "line": 2281,
+          "columnStart": 34,
+          "columnEndExclusive": 68,
+          "text": "docs/architect/agent-coordination/"
+        },
+        {
+          "line": 2282,
+          "columnStart": 5,
+          "columnEndExclusive": 53,
+          "text": "playbooks/architecture-advisory-role-doctrine.md"
+        }
+      ],
+      "currentFileDigest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "line": 2281,
+        "columnStart": 34,
+        "columnEndExclusive": 68,
+        "text": "docs/architect/agent-coordination/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourceOwner": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/platform/agent-coordination/\ncontracts/flow-definition.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 3201,
+        "columnStart": 38,
+        "columnEndExclusive": 71,
+        "text": "docs/platform/agent-coordination/"
+      },
+      "currentSpans": [
+        {
+          "line": 3201,
+          "columnStart": 38,
+          "columnEndExclusive": 71,
+          "text": "docs/platform/agent-coordination/"
+        },
+        {
+          "line": 3202,
+          "columnStart": 5,
+          "columnEndExclusive": 33,
+          "text": "contracts/flow-definition.md"
+        }
+      ],
+      "currentFileDigest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "line": 3201,
+        "columnStart": 38,
+        "columnEndExclusive": 71,
+        "text": "docs/platform/agent-coordination/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourceOwner": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/platform/\npackaging-distribution/contracts/skill-package-distribution.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 3423,
+        "columnStart": 51,
+        "columnEndExclusive": 65,
+        "text": "docs/platform/"
+      },
+      "currentSpans": [
+        {
+          "line": 3423,
+          "columnStart": 51,
+          "columnEndExclusive": 65,
+          "text": "docs/platform/"
+        },
+        {
+          "line": 3424,
+          "columnStart": 5,
+          "columnEndExclusive": 67,
+          "text": "packaging-distribution/contracts/skill-package-distribution.md"
+        }
+      ],
+      "currentFileDigest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "line": 3423,
+        "columnStart": 51,
+        "columnEndExclusive": 65,
+        "text": "docs/platform/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourceOwner": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/platform/packaging-distribution/contracts/\nskill-package-distribution.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 3573,
+        "columnStart": 11,
+        "columnEndExclusive": 58,
+        "text": "docs/platform/packaging-distribution/contracts/"
+      },
+      "currentSpans": [
+        {
+          "line": 3573,
+          "columnStart": 11,
+          "columnEndExclusive": 58,
+          "text": "docs/platform/packaging-distribution/contracts/"
+        },
+        {
+          "line": 3574,
+          "columnStart": 5,
+          "columnEndExclusive": 34,
+          "text": "skill-package-distribution.md"
+        }
+      ],
+      "currentFileDigest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "line": 3573,
+        "columnStart": 11,
+        "columnEndExclusive": 58,
+        "text": "docs/platform/packaging-distribution/contracts/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "plugins/fgOS/skills/deliver/SKILL.md",
+      "sourceOwner": "plugins/fgOS/skills/deliver/SKILL.md",
+      "sourcePath": "plugins/fgOS/skills/deliver/SKILL.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/journals/260803-1612-\nmain-checkout-direct-branch-checkout-tsk-4hk.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 82,
+        "columnStart": 51,
+        "columnEndExclusive": 77,
+        "text": "docs/journals/260803-1612-"
+      },
+      "currentSpans": [
+        {
+          "line": 82,
+          "columnStart": 51,
+          "columnEndExclusive": 77,
+          "text": "docs/journals/260803-1612-"
+        },
+        {
+          "line": 83,
+          "columnStart": 3,
+          "columnEndExclusive": 50,
+          "text": "main-checkout-direct-branch-checkout-tsk-4hk.md"
+        }
+      ],
+      "currentFileDigest": "55ea600a67fb3de0c179bedba1c9c843dbe9df85fd18cba8c555e42ed722ea50",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "plugins/fgOS/skills/deliver/SKILL.md",
+        "line": 82,
+        "columnStart": 51,
+        "columnEndExclusive": 77,
+        "text": "docs/journals/260803-1612-"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "sourceOwner": "src/runner/merge.mjs",
+      "sourcePath": "src/runner/merge.mjs",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/\narchitect/doing-coordination-redesign.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 215,
+        "columnStart": 70,
+        "columnEndExclusive": 75,
+        "text": "docs/"
+      },
+      "currentSpans": [
+        {
+          "line": 215,
+          "columnStart": 70,
+          "columnEndExclusive": 75,
+          "text": "docs/"
+        },
+        {
+          "line": 216,
+          "columnStart": 4,
+          "columnEndExclusive": 44,
+          "text": "architect/doing-coordination-redesign.md"
+        }
+      ],
+      "currentFileDigest": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "src/runner/merge.mjs",
+        "line": 215,
+        "columnStart": 70,
+        "columnEndExclusive": 75,
+        "text": "docs/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "src/state/work.mjs",
+      "sourceOwner": "src/state/work.mjs",
+      "sourcePath": "src/state/work.mjs",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/\nplatform-foundations.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 132,
+        "columnStart": 66,
+        "columnEndExclusive": 71,
+        "text": "docs/"
+      },
+      "currentSpans": [
+        {
+          "line": 132,
+          "columnStart": 66,
+          "columnEndExclusive": 71,
+          "text": "docs/"
+        },
+        {
+          "line": 133,
+          "columnStart": 4,
+          "columnEndExclusive": 27,
+          "text": "platform-foundations.md"
+        }
+      ],
+      "currentFileDigest": "ae5f1599cf36963602efd1e8b13ee2ac883997ea747cd99877364d0162c05059",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "src/state/work.mjs",
+        "line": 132,
+        "columnStart": 66,
+        "columnEndExclusive": 71,
+        "text": "docs/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "AGENTS.md",
+      "sourceOwner": "AGENTS.md",
+      "sourcePath": "AGENTS.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "park",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/decisions/",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 74,
+        "columnStart": 5,
+        "columnEndExclusive": 20,
+        "text": "docs/decisions/"
+      },
+      "currentSpans": [
+        {
+          "line": 74,
+          "columnStart": 5,
+          "columnEndExclusive": 20,
+          "text": "docs/decisions/"
+        }
+      ],
+      "currentFileDigest": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "AGENTS.md",
+        "line": 74,
+        "columnStart": 5,
+        "columnEndExclusive": 20,
+        "text": "docs/decisions/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "sourceOwner": "core/skills/_shared/executor-dispatch-fallback.md",
+      "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/history/two-layer-dispatch/DISCUSSION.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 224,
+        "columnStart": 2,
+        "columnEndExclusive": 47,
+        "text": "docs/history/two-layer-dispatch/DISCUSSION.md"
+      },
+      "currentSpans": [
+        {
+          "line": 224,
+          "columnStart": 2,
+          "columnEndExclusive": 47,
+          "text": "docs/history/two-layer-dispatch/DISCUSSION.md"
+        }
+      ],
+      "currentFileDigest": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "core/skills/_shared/executor-dispatch-fallback.md",
+        "line": 224,
+        "columnStart": 2,
+        "columnEndExclusive": 47,
+        "text": "docs/history/two-layer-dispatch/DISCUSSION.md"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "sourceOwner": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "preserve",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/history/<feature>/plan.md",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 68,
+        "columnStart": 38,
+        "columnEndExclusive": 68,
+        "text": "docs/history/<feature>/plan.md"
+      },
+      "currentSpans": [
+        {
+          "line": 68,
+          "columnStart": 38,
+          "columnEndExclusive": 68,
+          "text": "docs/history/<feature>/plan.md"
+        }
+      ],
+      "currentFileDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "line": 68,
+        "columnStart": 38,
+        "columnEndExclusive": 68,
+        "text": "docs/history/<feature>/plan.md"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
+    },
+    {
+      "file": "core/task-specs/fgos-indexing.md",
+      "sourceOwner": "core/task-specs/fgos-indexing.md",
+      "sourcePath": "core/task-specs/fgos-indexing.md",
+      "surface": "L12-60-prose-sweep",
+      "renderOnly": false,
+      "bucket": "step4",
+      "advisoryClass": "park",
+      "rule": "L12-60 first-class census join or author-added occurrence, records only",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "matchedExpression": "docs/<quadrant>/",
+      "kind": "L12-62-complete-passage-scan",
+      "binding": {
+        "status": "L12-60-content-bound",
+        "line": 6,
+        "columnStart": 46,
+        "columnEndExclusive": 62,
+        "text": "docs/<quadrant>/"
+      },
+      "currentSpans": [
+        {
+          "line": 6,
+          "columnStart": 46,
+          "columnEndExclusive": 62,
+          "text": "docs/<quadrant>/"
+        }
+      ],
+      "currentFileDigest": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+      "ownerSurface": "L12-60 sweep",
+      "populationGap": true,
+      "authorAddedEdge": true,
+      "supplementalOccurrenceKey": {
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "file": "core/task-specs/fgos-indexing.md",
+        "line": 6,
+        "columnStart": 46,
+        "columnEndExclusive": 62,
+        "text": "docs/<quadrant>/"
+      },
+      "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted"
     }
   ],
   "overlapJoinCount": 270,
@@ -402633,12 +403522,12 @@
     {
       "sourceOwner": "AGENTS.md",
       "files": 1,
-      "edges": 24,
+      "edges": 25,
       "sourceOwners": 1,
       "classes": {
         "preserve": 10,
         "phase9": 7,
-        "park": 7
+        "park": 8
       },
       "consumerFiles": [
         "AGENTS.md"
@@ -402647,10 +403536,10 @@
     {
       "sourceOwner": "CHANGELOG.md",
       "files": 1,
-      "edges": 1,
+      "edges": 4,
       "sourceOwners": 1,
       "classes": {
-        "preserve": 1
+        "preserve": 4
       },
       "consumerFiles": [
         "CHANGELOG.md"
@@ -403333,10 +404222,10 @@
     {
       "sourceOwner": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
       "files": 1,
-      "edges": 1,
+      "edges": 2,
       "sourceOwners": 1,
       "classes": {
-        "preserve": 1
+        "preserve": 2
       },
       "consumerFiles": [
         "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md"
@@ -404197,10 +405086,10 @@
     {
       "sourceOwner": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
       "files": 1,
-      "edges": 1,
+      "edges": 9,
       "sourceOwners": 1,
       "classes": {
-        "preserve": 1
+        "preserve": 9
       },
       "consumerFiles": [
         "archive/plans/260919-coordination-skill-harness-simplification/plan.md"
@@ -404224,9 +405113,9 @@
       "edges": 36,
       "sourceOwners": 1,
       "classes": {
-        "park": 5,
-        "preserve": 29,
-        "phase9": 2
+        "park": 4,
+        "phase9": 3,
+        "preserve": 29
       },
       "consumerFiles": [
         "bin/fgos.mjs"
@@ -404324,12 +405213,13 @@
     {
       "sourceOwner": "core/skills/_shared/executor-dispatch-fallback.md",
       "files": 3,
-      "edges": 20,
+      "edges": 21,
       "sourceOwners": 1,
       "classes": {
         "render-join": 14,
-        "park": 3,
-        "preserve": 3
+        "park": 2,
+        "phase9": 1,
+        "preserve": 4
       },
       "consumerFiles": [
         ".agents/skills/_shared/executor-dispatch-fallback.md",
@@ -404389,7 +405279,7 @@
       "sourceOwners": 1,
       "classes": {
         "render-join": 10,
-        "park": 1,
+        "phase9": 1,
         "preserve": 4
       },
       "consumerFiles": [
@@ -404417,9 +405307,10 @@
     {
       "sourceOwner": "core/task-specs/fgos-indexing.md",
       "files": 1,
-      "edges": 1,
+      "edges": 2,
       "sourceOwners": 1,
       "classes": {
+        "phase9": 1,
         "park": 1
       },
       "consumerFiles": [
@@ -404469,7 +405360,7 @@
       "sourceOwners": 1,
       "classes": {
         "preserve": 3,
-        "park": 2
+        "phase9": 2
       },
       "consumerFiles": [
         "domains/coding/AGENTS.md"
@@ -404561,7 +405452,7 @@
       "classes": {
         "render-join": 6,
         "preserve": 1,
-        "park": 1
+        "phase9": 1
       },
       "consumerFiles": [
         ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
@@ -404635,12 +405526,12 @@
     {
       "sourceOwner": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
       "files": 4,
-      "edges": 13,
+      "edges": 14,
       "sourceOwners": 1,
       "classes": {
         "render-join": 10,
-        "park": 2,
-        "preserve": 1
+        "phase9": 2,
+        "preserve": 2
       },
       "consumerFiles": [
         ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
@@ -404803,8 +405694,7 @@
       "edges": 3,
       "sourceOwners": 1,
       "classes": {
-        "phase9": 1,
-        "park": 1,
+        "phase9": 2,
         "preserve": 1
       },
       "consumerFiles": [
@@ -404986,7 +405876,7 @@
       "sourceOwners": 1,
       "classes": {
         "preserve": 2,
-        "park": 1
+        "phase9": 1
       },
       "consumerFiles": [
         "plugins/fgOS/skills/cleanup-loop/SKILL.md"
@@ -405031,10 +405921,10 @@
     {
       "sourceOwner": "plugins/fgOS/skills/deliver/SKILL.md",
       "files": 1,
-      "edges": 4,
+      "edges": 5,
       "sourceOwners": 1,
       "classes": {
-        "preserve": 4
+        "preserve": 5
       },
       "consumerFiles": [
         "plugins/fgOS/skills/deliver/SKILL.md"
@@ -405107,7 +405997,7 @@
       "sourceOwners": 1,
       "classes": {
         "preserve": 2,
-        "park": 1
+        "phase9": 1
       },
       "consumerFiles": [
         "plugins/fgOS/skills/retro-loop/SKILL.md"
@@ -405301,7 +406191,7 @@
       "edges": 1,
       "sourceOwners": 1,
       "classes": {
-        "preserve": 1
+        "park": 1
       },
       "consumerFiles": [
         "src/runner/dispatch/assignment-policy.mjs"
@@ -405349,7 +406239,7 @@
       "edges": 1,
       "sourceOwners": 1,
       "classes": {
-        "park": 1
+        "phase9": 1
       },
       "consumerFiles": [
         "src/runner/dispatch/confinement/authority.mjs"
@@ -405409,7 +406299,7 @@
       "edges": 1,
       "sourceOwners": 1,
       "classes": {
-        "park": 1
+        "phase9": 1
       },
       "consumerFiles": [
         "src/runner/dispatch/herdr-round.mjs"
@@ -405421,8 +406311,8 @@
       "edges": 6,
       "sourceOwners": 1,
       "classes": {
-        "preserve": 5,
-        "park": 1
+        "preserve": 4,
+        "park": 2
       },
       "consumerFiles": [
         "src/runner/dispatch/mechanism.mjs"
@@ -405470,7 +406360,7 @@
       "edges": 1,
       "sourceOwners": 1,
       "classes": {
-        "park": 1
+        "phase9": 1
       },
       "consumerFiles": [
         "src/runner/dispatch/run-lock.mjs"
@@ -405483,7 +406373,7 @@
       "sourceOwners": 1,
       "classes": {
         "preserve": 3,
-        "park": 1
+        "phase9": 1
       },
       "consumerFiles": [
         "src/runner/dispatch/transport.mjs"
@@ -405552,11 +406442,12 @@
     {
       "sourceOwner": "src/runner/merge.mjs",
       "files": 1,
-      "edges": 18,
+      "edges": 19,
       "sourceOwners": 1,
       "classes": {
-        "preserve": 13,
-        "phase9": 5
+        "park": 1,
+        "phase9": 5,
+        "preserve": 13
       },
       "consumerFiles": [
         "src/runner/merge.mjs"
@@ -405617,7 +406508,7 @@
       "sourceOwners": 1,
       "classes": {
         "preserve": 1,
-        "park": 2
+        "phase9": 2
       },
       "consumerFiles": [
         "src/runner/prompt-templates/worker-prompt-skill-pointer.txt"
@@ -405642,8 +406533,7 @@
       "sourceOwners": 1,
       "classes": {
         "preserve": 10,
-        "park": 1,
-        "phase9": 1
+        "phase9": 2
       },
       "consumerFiles": [
         "src/runner/worktree.mjs"
@@ -405872,11 +406762,10 @@
     {
       "sourceOwner": "src/state/work.mjs",
       "files": 1,
-      "edges": 12,
+      "edges": 13,
       "sourceOwners": 1,
       "classes": {
-        "preserve": 11,
-        "park": 1
+        "preserve": 13
       },
       "consumerFiles": [
         "src/state/work.mjs"
@@ -406558,5 +407447,23 @@
   "zeroEdgeOwners": [
     "domains/coding/task-specs/shape-plan.md",
     "core/skills/fgos-run/SKILL.md"
-  ]
+  ],
+  "L12-62": {
+    "authorPin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+    "records": 275,
+    "slots": 933,
+    "dispositions": {
+      "preserve": 655,
+      "patch": 61,
+      "render-join": 173,
+      "parked": 44
+    },
+    "parkedContentSearches": 64,
+    "preservedExistenceWitnesses": 655,
+    "wrappedHits": 123,
+    "patchAnchorWitnesses": 61,
+    "changedOutcomeFiles": 39,
+    "successorNotesAdded": 3,
+    "witnesses": "step-04-l12-62-sweep.json"
+  }
 }
