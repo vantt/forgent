@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos doctor` check `git-mutation-one-door` reads the release's `packages/git/contracts/mutation-census.v1.json`, which the release build writes from `scripts/git-one-door-scan.mjs`. The check fails when the census lists any `git` or hook spawn outside the fgos-git driver, or was not built from the payload it ships in. `npm test` also fails when product code (`src`, `bin`, `scripts`) starts `git` or a hook while the suite runs, and names the call site. Today the census is not empty: the open sites are listed in the phase 07 unit 20 report.
+
+- `fgos return` verifies a branch in a checkout made and removed through the Worktree port. A checkout that still holds bytes after verify is kept and named instead of force-removed. `fgos preflight`, `resync-worktree`, `compound --doc-path` and `knowledge attest` read Git through Inspect. `resync-worktree` run where no branch is checked out now asks for `--branch`.
+
+- `scripts/install-git-hooks.mjs` reports a RepositoryConfig refusal (for example `git-fence-missing` in a checkout that was never activated) as one line with exit 1, not a stack trace. The shell integration's `fgos` and `fgos-runner` functions find the main checkout from the `.git` layout on disk instead of running `git`.
+
+- The activation gate (`fgctl`) and `fgos events migrate` stop check also scan processes working in the workspace's linked worktrees.
+
 - Workflow integration merges through Land and skips work the target already has.
 
 - `fgos uninstall` leaves a `core.hooksPath` that fgOS did not record setting.

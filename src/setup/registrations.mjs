@@ -1,5 +1,5 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
-import { checkGit, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
+import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
@@ -5150,7 +5150,7 @@ function checkActiveReleaseMatchesCheckout(dir) {
     for (const declared of Array.isArray(pkg.files) ? pkg.files : []) {
       doctorDriftPath(checkout, declared);
     }
-    const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>
+    const sourceFiles = listLegacyNodeSourceFiles(checkout, () => createGitInspect(gitPortOptions(checkout))).filter((relative) =>
       relative !== 'node_modules' && !relative.startsWith('node_modules/'));
     const sourceSet = new Set(sourceFiles);
     const releaseSources = new Map();
@@ -6413,7 +6413,7 @@ function conventionWorkingTreeRoot(cwd) {
  * Whether `relativePath` names an entry at `revision`. A blob larger than the
  * read budget still exists; any other unreadable answer throws.
  */
-function pathExistsAt(root, revision, relativePath) {
+export function pathExistsAt(root, revision, relativePath) {
   const [entry] = createGitInspect(gitPortOptions(root)).pathsAtRevision({ revision, paths: [[...Buffer.from(relativePath)]], maxBlobBytes: 1 });
   if (!entry) throw new Error(`no answer for ${relativePath}`);
   if (entry.value.kind === 'error' && entry.value.cause !== 'blob-too-large') throw new Error(`${relativePath} at ${revision}: ${entry.value.cause}`);
@@ -6421,7 +6421,7 @@ function pathExistsAt(root, revision, relativePath) {
 }
 
 /** The commit `name` resolves to; throws when it names none. */
-function commitAt(root, name) {
+export function commitAt(root, name) {
   const oid = createGitInspect(gitPortOptions(root)).resolveCommit({ name });
   if (!oid) throw new Error(`${name} is not a commit`);
   return oid;
@@ -6662,6 +6662,11 @@ for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-tran
     'git-durability-capability': 'Measured Git durability guarantees',
   }[id], check: (cwd) => checkGit(cwd, id) });
 }
+registerCheck({
+  id: 'git-mutation-one-door',
+  description: 'The release mutation census lists no Git or hook spawn outside the fgos-git driver and matches the payload it was built from',
+  check: () => checkMutationOneDoor(),
+});
 // Workflow case bindings (docs/specs/workflow.md RUL-WF-27): the binding records are a view of each
 // case's ledger. Bodies live in workflow-case-checks.mjs.
 registerCheck({

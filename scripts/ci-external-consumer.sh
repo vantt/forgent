@@ -136,15 +136,16 @@ if [ ! -x "$FGCTL_BIN" ]; then
 fi
 
 # Fresh git init temp project. Named sandbox class (Git spec §13, external-consumer CI):
-# the only repository this script's git touches is the one it creates here under $TMP_BASE.
+# the only repository this script's git touches is the one it creates here under $TMP_BASE,
+# through the sandbox door (scripts/lib/sandbox-git.mjs), which refuses any path outside it.
 TEMP_PROJECT="$TMP_BASE/project"
 mkdir -p "$TEMP_PROJECT"
 
+SANDBOX_GIT="$SCRIPT_DIR/lib/sandbox-git.mjs"
 (
-  cd "$TEMP_PROJECT" &&
-  git init -q &&
-  git config user.name "CI Consumer" &&
-  git config user.email "consumer@example.com"
+  node "$SANDBOX_GIT" --root "$TMP_BASE" -- init -q "$TEMP_PROJECT" &&
+  node "$SANDBOX_GIT" --root "$TMP_BASE" -- -C "$TEMP_PROJECT" config user.name "CI Consumer" &&
+  node "$SANDBOX_GIT" --root "$TMP_BASE" -- -C "$TEMP_PROJECT" config user.email "consumer@example.com"
 ) || {
   echo "Step failed: git init in fresh temp project" >&2
   exit 1

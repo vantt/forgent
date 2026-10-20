@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import { parseYaml } from '../src/util/yaml.mjs';
-import { lexSource } from './helpers/js-source-lexer.mjs';
+import { lexSource } from '../scripts/lib/js-source-lexer.mjs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 

@@ -24,7 +24,8 @@
     "docs/how-to",
     "docs/explanation",
     "docs/enduser-docs-index.json",
-    "packages/event-store/contracts"
+    "packages/event-store/contracts",
+    "packages/git/contracts/mutation-census.v1.json"
   ],
   "scripts": {
     "test": "node scripts/run-tests.mjs",

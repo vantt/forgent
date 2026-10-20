@@ -422,7 +422,7 @@ function environment(root, inspect) {
     kernel: os.release(), memoryGiB: Math.round(os.totalmem() / 2 ** 30),
     filesystem: execFileSync('findmnt', ['-T', root, '-n', '-o', 'SOURCE,FSTYPE,OPTIONS'], { encoding: 'utf8' }).trim(),
     device: read('/sys/block/nvme0n1/device/model'),
-    git: gitVersion(), node: process.version, rustc: execFileSync('rustc', ['--version'], { encoding: 'utf8' }).trim(),
+    git: gitVersion(root), node: process.version, rustc: execFileSync('rustc', ['--version'], { encoding: 'utf8' }).trim(),
     loadavg: os.loadavg(), checkoutHead: inspect.resolveCommit({ name: 'HEAD' }), at: new Date().toISOString(),
   };
 }

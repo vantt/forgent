@@ -101,27 +101,32 @@ test('real hook rejection restores baseline-only inputs and rerun uses a fresh W
 
 // Real OS process classification and refusal, using a waiting Node payload so the
 // process stays observable independently of migration/ScopedCommit availability.
-test('a process working inside the fixture workspace blocks migrate before any Git or ref effect', async t => {
+// A linked worktree lives outside the main root, so only the listing of the
+// repository's worktrees attributes a process working there to this workspace.
+test('a process working inside the fixture workspace or one of its linked worktrees blocks migrate before any Git or ref effect', async t => {
   const f = fixture(t); trackedLegacy(f);
-  if (!hostScan(t, checkStopped({ workspaces: [f.repo], hostBin: scopedHost }))) return;
+  const linked = path.join(f.temp, 'linked');
+  f.git('worktree', 'add', '-q', '--detach', linked);
+  if (!hostScan(t, checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin: scopedHost }))) return;
   const head = f.git('rev-parse', 'HEAD');
-  const child = spawn(process.execPath, ['-e', "process.stdout.write('ready\\n'); setInterval(() => {}, 1000)", path.join(root, 'bin/fgos.mjs'), 'events', 'migrate'], { cwd: f.repo, stdio: ['ignore', 'pipe', 'pipe'] });
-  try {
-    await once(child.stdout, 'data');
-    const scan = checkStopped({ workspaces: [f.repo], hostBin: scopedHost });
-    assert.equal(scan.status, 'blocked', JSON.stringify(scan));
-    assert.ok(scan.blockers.some(p => p.pid === child.pid), JSON.stringify(scan));
-    await assert.rejects(migrateUseCase({ ...f.ctx, hostBin: scopedHost, writer: 'fixture' }), error => {
-      assert.equal(error.code, 'event-store-writers-active');
-      assert.ok(error.message.includes(String(child.pid)), error.message);
-      return true;
-    });
-    assert.equal(f.git('rev-parse', 'HEAD'), head);
-    assert.equal(f.git('for-each-ref', 'refs/fgos/legacy'), '');
-    assert.equal(fs.existsSync(path.join(f.repo, '.fgos/events.jsonl')), true);
-  } finally { child.kill(); await once(child, 'exit'); }
+  for (const cwd of [f.repo, linked]) {
+    const child = spawn(process.execPath, ['-e', "process.stdout.write('ready\\n'); setInterval(() => {}, 1000)", path.join(root, 'bin/fgos.mjs'), 'events', 'migrate'], { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+    try {
+      await once(child.stdout, 'data');
+      const scan = checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin: scopedHost });
+      assert.equal(scan.status, 'blocked', JSON.stringify(scan));
+      assert.ok(scan.blockers.some(p => p.pid === child.pid), JSON.stringify(scan));
+      await assert.rejects(migrateUseCase({ ...f.ctx, hostBin: scopedHost, writer: 'fixture' }), error => {
+        assert.equal(error.code, 'event-store-writers-active', cwd);
+        assert.ok(error.message.includes(String(child.pid)), error.message);
+        return true;
+      });
+      assert.equal(f.git('rev-parse', 'HEAD'), head);
+      assert.equal(f.git('for-each-ref', 'refs/fgos/legacy'), '');
+      assert.equal(fs.existsSync(path.join(f.repo, '.fgos/events.jsonl')), true);
+    } finally { child.kill(); await once(child, 'exit'); }
+  }
 });
-
 
 test('pre-commit filesystem failure restores deleted inputs without naming a Git record', { skip: typeof gitPorts.createGitScopedCommit !== 'function' ? 'Requires Git 05 merge and activated release; no substitute Git writer' : false }, async t => {
   const f = fixture(t); const files = trackedLegacy(f);

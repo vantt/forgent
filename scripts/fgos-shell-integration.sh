@@ -25,7 +25,8 @@
 # existed (docs/history/global-project-config-awareness/CONTEXT.md D2).
 #
 # Still requires being inside SOME git repository to resolve tier 1 at all
-# (git-common-dir is how the root is found, worktree-aware) -- a pure
+# (the common dir, read from the .git layout on disk without a git child, is
+# how the root is found, worktree-aware) -- a pure
 # global npm install never needs this wrapper function in the first place,
 # since npm's own bin-linking already puts a real `fgos` executable on
 # PATH unconditionally, in any directory. This wrapper's job is the
@@ -56,11 +57,35 @@ _fgos_tier3_cached_bin() {
 }
 
 fgos() {
-  local root real_bin real_root common_dir tier2 tier3 has_dir=0 arg
-  common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
+  local root real_bin real_root common_dir dir git_dir tier2 tier3 has_dir=0 arg
+  # The repository's common dir, read from the layout Git keeps on disk (no git
+  # child; same reading as scripts/lib/git-dir-layout.mjs repositoryDirs): walk
+  # up from the physical cwd to the first .git -- a directory is the common dir;
+  # a file names "gitdir: <path>" (relative to its directory unless absolute),
+  # whose commondir file, when present, names the common dir relative to it.
+  # Inlined in each function on purpose: a sourced-shell snapshot drops
+  # _-prefixed helpers (tsk-3k2).
+  common_dir="" dir=$(pwd -P)
+  while :; do
+    if [ -d "$dir/.git" ]; then common_dir="$dir/.git"; break; fi
+    if [ -f "$dir/.git" ]; then
+      git_dir=$(sed -n 's/^gitdir:[[:space:]]*\(.*[^[:space:]]\)[[:space:]]*$/\1/p' "$dir/.git" 2>/dev/null | head -n 1)
+      [ -n "$git_dir" ] || break
+      case "$git_dir" in /*) ;; *) git_dir="$dir/$git_dir" ;; esac
+      common_dir="$git_dir"
+      if [ -f "$git_dir/commondir" ]; then
+        common_dir=$(head -n 1 "$git_dir/commondir")
+        case "$common_dir" in /*) ;; *) common_dir="$git_dir/$common_dir" ;; esac
+      fi
+      break
+    fi
+    [ "$dir" = "/" ] && break
+    dir=$(dirname "$dir")
+  done
+  if [ -z "$common_dir" ] || [ ! -d "$common_dir" ] || ! common_dir=$(readlink -f "$common_dir" 2>/dev/null); then
     echo "fgos: not a git repository" >&2
     return 1
-  }
+  fi
   root=$(dirname "$common_dir")
   for arg in "$@"; do
     case "$arg" in
@@ -128,11 +153,35 @@ fgos() {
 }
 
 fgos-runner() {
-  local root real_bin common_dir tier2
-  common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
+  local root real_bin common_dir dir git_dir tier2
+  # The repository's common dir, read from the layout Git keeps on disk (no git
+  # child; same reading as scripts/lib/git-dir-layout.mjs repositoryDirs): walk
+  # up from the physical cwd to the first .git -- a directory is the common dir;
+  # a file names "gitdir: <path>" (relative to its directory unless absolute),
+  # whose commondir file, when present, names the common dir relative to it.
+  # Inlined in each function on purpose: a sourced-shell snapshot drops
+  # _-prefixed helpers (tsk-3k2).
+  common_dir="" dir=$(pwd -P)
+  while :; do
+    if [ -d "$dir/.git" ]; then common_dir="$dir/.git"; break; fi
+    if [ -f "$dir/.git" ]; then
+      git_dir=$(sed -n 's/^gitdir:[[:space:]]*\(.*[^[:space:]]\)[[:space:]]*$/\1/p' "$dir/.git" 2>/dev/null | head -n 1)
+      [ -n "$git_dir" ] || break
+      case "$git_dir" in /*) ;; *) git_dir="$dir/$git_dir" ;; esac
+      common_dir="$git_dir"
+      if [ -f "$git_dir/commondir" ]; then
+        common_dir=$(head -n 1 "$git_dir/commondir")
+        case "$common_dir" in /*) ;; *) common_dir="$git_dir/$common_dir" ;; esac
+      fi
+      break
+    fi
+    [ "$dir" = "/" ] && break
+    dir=$(dirname "$dir")
+  done
+  if [ -z "$common_dir" ] || [ ! -d "$common_dir" ] || ! common_dir=$(readlink -f "$common_dir" 2>/dev/null); then
     echo "fgos-runner: not a git repository" >&2
     return 1
-  }
+  fi
   root=$(dirname "$common_dir")
   if [ -f "$root/bin/fgos-runner.mjs" ]; then
     node "$root/bin/fgos-runner.mjs" "$@"

@@ -6,6 +6,9 @@ import { randomUUID } from 'node:crypto';
 import { loadNativeAddon } from '../git/native.mjs';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import fs from 'node:fs';
+import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
+import { verifyCensus } from '../../scripts/git-one-door-scan.mjs';
 
 const transportRemedy = 'For actions/checkout use persist-credentials: false, remove its repo-local http.<url>.extraheader, and configure a trusted global credential helper or GIT_CONFIG_GLOBAL-level setting. Doctor never moves credentials automatically.';
 
@@ -53,6 +56,12 @@ export function checkGit(cwd, kind, loaderOptions) {
   } catch (err) {
     if (kind === 'git-transport-config' && /repository-config-untrusted: credential\.helper/.test(err.message)) return { passed: false, message: `${err.message}; ${transportRemedy}` };
     return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel until M10' : err.message }; }
+}
+/** The release's mutation census (built from its own payload) lists no Git spawn outside the driver. */
+export function checkMutationOneDoor(payloadRoot = OWN_PAYLOAD_ROOT) {
+  let doc = null;
+  try { doc = JSON.parse(fs.readFileSync(path.join(payloadRoot, 'packages/git/contracts/mutation-census.v1.json'), 'utf8')); } catch { /* reported below */ }
+  return verifyCensus(doc, payloadRoot);
 }
 /** The Git binary fgos-git runs and its floor verdict; Git is only ever spawned by the driver. */
 export function gitFloor(cwd, loaderOptions) {

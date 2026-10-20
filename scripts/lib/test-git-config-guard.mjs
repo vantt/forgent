@@ -16,6 +16,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
+import { repositoryDirs } from './git-dir-layout.mjs';
 
 const READ_FLAGS = new Set([
   '--get', '--get-all', '--get-regexp', '--get-urlmatch', '--get-color', '--get-colorbool',
@@ -69,10 +70,9 @@ function isInside(child, parent) {
 
 /**
  * Builds the check. `protectedCommonDir` is the git common dir of the checkout that must keep its
- * own config; `rawExecFileSync` is the unwrapped child_process.execFileSync used to ask git where a
- * directory's repository lives.
+ * own config; which repository a directory belongs to is read from its Git layout on disk.
  */
-export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, tempRoots = defaultTempRoots(), env = process.env }) {
+export function createGitConfigGuard({ protectedCommonDir, tempRoots = defaultTempRoots(), env = process.env }) {
   const protectedDir = realpathOrSelf(protectedCommonDir);
 
   const known = new Map();
@@ -82,16 +82,7 @@ export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, temp
   }
 
   function lookupCommonDir(dir) {
-    // A directory holding its own `.git` directory is a repository of its own: no linked worktree has one.
-    try {
-      if (fs.statSync(path.join(dir, '.git')).isDirectory()) return realpathOrSelf(path.join(dir, '.git'));
-    } catch { /* no .git here: ask git */ }
-    try {
-      const out = rawExecFileSync('git', ['-C', dir, 'rev-parse', '--path-format=absolute', '--git-common-dir'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-      return realpathOrSelf(String(out).trim());
-    } catch {
-      return null; // not a repository: git config would fail on its own
-    }
+    return repositoryDirs(dir)?.commonDir ?? null; // not a repository: git config would fail on its own
   }
 
   function globalConfigIsDisposable() {
@@ -162,14 +153,9 @@ const CHECKOUT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)),
 
 /** The preload entry: protect the checkout this file belongs to. */
 export function installForCheckout(root = CHECKOUT_ROOT) {
-  const rawExecFileSync = childProcess.execFileSync;
-  let common;
-  try {
-    common = String(rawExecFileSync('git', ['-C', root, 'rev-parse', '--path-format=absolute', '--git-common-dir'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })).trim();
-  } catch {
-    return false; // an unpacked copy with no repository has nothing to protect
-  }
-  installGitConfigGuard(childProcess, createGitConfigGuard({ protectedCommonDir: common, rawExecFileSync }));
+  const common = repositoryDirs(root)?.commonDir;
+  if (!common) return false; // an unpacked copy with no repository has nothing to protect
+  installGitConfigGuard(childProcess, createGitConfigGuard({ protectedCommonDir: common }));
   module.syncBuiltinESMExports();
   return true;
 }

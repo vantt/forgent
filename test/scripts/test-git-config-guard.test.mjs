@@ -38,7 +38,6 @@ function protectedRepo() {
 function guardFor(repo, extra = {}) {
   return createGitConfigGuard({
     protectedCommonDir: repo.common,
-    rawExecFileSync: execFileSync,
     tempRoots: [fs.realpathSync(os.tmpdir())],
     env: { HOME: tempDir('fgos-guard-home-') },
     ...extra,
@@ -129,6 +128,7 @@ test('preloaded with --import from a checkout, the guard stops a fixture that fo
   fs.mkdirSync(path.join(checkout, 'scripts', 'lib'), { recursive: true });
   const guardCopy = path.join(checkout, 'scripts', 'lib', 'test-git-config-guard.mjs');
   fs.copyFileSync(GUARD_SOURCE, guardCopy);
+  fs.copyFileSync(path.join(path.dirname(GUARD_SOURCE), 'git-dir-layout.mjs'), path.join(checkout, 'scripts', 'lib', 'git-dir-layout.mjs'));
   const probe = path.join(tempDir('fgos-guard-probe-'), 'probe.mjs');
   fs.writeFileSync(probe, `
 import { execFileSync } from 'node:child_process';

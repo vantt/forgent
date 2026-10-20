@@ -153,6 +153,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'git-native-locks',
       'git-publication-refspecs',
       'git-durability-capability',
+      'git-mutation-one-door',
       'terminal-config',
       'terminal-allocations',
       'trust-store-readable',

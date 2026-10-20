@@ -7,6 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 // tsk-jgs -- reproduces and closes the bug this item was filed against:
 // `fgos resync-worktree` run bare (no --dir) from inside a stale linked
@@ -47,6 +48,8 @@ function initMainAndWorktree() {
   fs.writeFileSync(stateJsonPath, '{}\n');
   execFileSync('git', ['add', 'seed.txt', '.fgos/cache/state.json'], { cwd: mainRoot });
   execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: mainRoot });
+  // The native ports require an activated checkout; production keeps the refusal.
+  activateGitFixture(mainRoot);
 
   const worktreeParent = mkTempDir('fgos-tsk-jgs-worktree-parent-');
   const worktreeRoot = path.join(worktreeParent, 'worktree');

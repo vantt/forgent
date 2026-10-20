@@ -142,7 +142,8 @@ test('development host carries and loads the addon from its per-invocation manif
   try {
     const repo = path.join(temp, 'checkout');
     fs.cpSync(path.join(root, 'src'), path.join(repo, 'src'), {recursive: true});
-    for (const file of ['scripts/run-rust-dev-host.mjs', 'scripts/build-rust-distribution.mjs', 'Cargo.lock']) {
+    // The distribution builder and the libraries it imports (its one-door census step among them).
+    for (const file of ['scripts/run-rust-dev-host.mjs', 'scripts/build-rust-distribution.mjs', 'scripts/git-one-door-scan.mjs', 'scripts/lib/js-source-lexer.mjs', 'scripts/lib/git-spawn-match.mjs', 'scripts/lib/git-dir-layout.mjs', 'Cargo.lock']) {
       fs.mkdirSync(path.dirname(path.join(repo, file)), {recursive: true});
       fs.copyFileSync(path.join(root, file), path.join(repo, file));
     }

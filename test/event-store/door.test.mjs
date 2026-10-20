@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { lexSource } from '../helpers/js-source-lexer.mjs';
+import { lexSource } from '../../scripts/lib/js-source-lexer.mjs';
 
 const dangerous = /(['"`])(?:update-ref|push|fetch|commit)\1|refs\/fgos/;
 const retiredReader = /['"](?:\.fgos\/)?events\.jsonl['"]|['"]\.fgos\/events(?:\/[^'"]*)?['"]|\bjoin\([^\n]*['"]events['"]|\b(?:readAllEventsFromDir|readEventsFromByte)\b/;

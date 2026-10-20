@@ -52,7 +52,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { lexSource } from '../helpers/js-source-lexer.mjs';
+import { lexSource } from '../../scripts/lib/js-source-lexer.mjs';
 
 const root = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const LAYOUT_OWNER = 'src/runner/dispatch/assignment-layout.mjs';

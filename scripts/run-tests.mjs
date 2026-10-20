@@ -27,6 +27,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
 import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
+import { configEntries, repositoryDirs } from './lib/git-dir-layout.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DEFAULT_TEST_ROOT = path.join(REPO_ROOT, 'test');
@@ -183,10 +184,28 @@ export function discoverTestFiles(root = DEFAULT_TEST_ROOT) {
  */
 export const GIT_CONFIG_GUARD_PATH = path.join(REPO_ROOT, 'scripts', 'lib', 'test-git-config-guard.mjs');
 
+export const GIT_SPAWN_SPY_PATH = path.join(REPO_ROOT, 'test', 'helpers', 'git-spawn-spy.mjs');
+export const GIT_SPAWN_SPY_LOG_ENV = 'FGOS_GIT_SPAWN_SPY_LOG';
+
 export function buildTestArgv(files, forwardedArgs = []) {
   // The guard is preloaded into every test file's process: a `git config` write that would land in
   // this checkout's own repository is refused there, before it can rewrite the owner's identity.
-  return ['--test', `--import=${pathToFileURL(GIT_CONFIG_GUARD_PATH).href}`, ...forwardedArgs, ...files];
+  // The spy records every `git` or hook spawn product code (src, bin, scripts) starts (one-door gate).
+  return ['--test', `--import=${pathToFileURL(GIT_CONFIG_GUARD_PATH).href}`, `--import=${pathToFileURL(GIT_SPAWN_SPY_PATH).href}`, ...forwardedArgs, ...files];
+}
+
+/** The product Git/hook spawns the spy recorded during a run, one entry per distinct site. */
+export function readGitSpawnLog(file) {
+  let text = '';
+  try { text = fs.readFileSync(file, 'utf8'); } catch { return []; }
+  const sites = new Map();
+  for (const line of text.split('\n').filter(Boolean)) {
+    const entry = JSON.parse(line);
+    const key = `${entry.frame} ${entry.target} ${entry.file} ${entry.args?.[0] ?? ''}`;
+    if (!sites.has(key)) sites.set(key, { ...entry, count: 0 });
+    sites.get(key).count += 1;
+  }
+  return [...sites.values()];
 }
 
 /**
@@ -288,18 +307,17 @@ function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, log }) 
  * not this checkout's. Empty when `cwd` is not a repository.
  */
 export const GIT_IDENTITY_KEYS = '^(user|author|committer)\\.';
-export function snapshotGitIdentity(cwd, exec = execFileSync) {
-  const read = (args) => {
-    try {
-      return String(exec('git', ['-C', cwd, 'config', ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })).split('\n').filter(Boolean);
-    } catch {
-      return []; // No such key (git exits 1) or not a repository: nothing held in this scope.
-    }
-  };
-  const scopes = ['--local'];
-  // Without extensions.worktreeConfig, `--worktree` is just `--local` again.
-  if (read(['--local', '--type=bool', '--get', 'extensions.worktreeConfig'])[0] === 'true') scopes.push('--worktree');
-  return scopes.flatMap((scope) => read([scope, '--get-regexp', GIT_IDENTITY_KEYS]).map((line) => `${scope.slice(2)}: ${line}`)).sort();
+export function snapshotGitIdentity(cwd) {
+  const dirs = repositoryDirs(cwd);
+  if (!dirs) return [];
+  const pattern = new RegExp(GIT_IDENTITY_KEYS);
+  const shared = path.join(dirs.commonDir, 'config');
+  const lines = configEntries(shared, pattern).map((line) => `local: ${line}`);
+  // Without extensions.worktreeConfig, a checkout's config.worktree is not read at all.
+  if (configEntries(shared, /^extensions\.worktreeconfig$/).at(-1)?.split(' ')[1] === 'true') {
+    lines.push(...configEntries(path.join(dirs.gitDir, 'config.worktree'), pattern).map((line) => `worktree: ${line}`));
+  }
+  return lines.sort();
 }
 
 /** What changed between two `snapshotGitIdentity` results: `{ added, removed, changed }`. */
@@ -475,10 +493,14 @@ export function runSelectedTests(files, {
   const supervisor = watchdog && runTemp
     ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, log })
     : null;
+  const spawnLog = path.join(runTemp ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-test-spy-')), 'git-spawn-spy.jsonl');
+  childEnv[GIT_SPAWN_SPY_LOG_ENV] = spawnLog;
+  let gitSpawns = [];
   try {
     const started = Date.now();
     const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
     result = { status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000 };
+    gitSpawns = readGitSpawnLog(spawnLog);
   } finally {
     if (supervisor) timedOut = supervisor.stop();
     for (const root of [runTemp, fixtureRoot]) {
@@ -519,6 +541,14 @@ export function runSelectedTests(files, {
     log('run-tests: ERROR: test suite left temporary directories behind (name prefix: count):');
     for (const [prefix, count] of Object.entries(tempLeftovers).sort()) log(`  ${prefix}*: ${count}`);
     log('  A test file must import test/helpers/process-tmp-root.mjs first; a killed file leaves its own tree.');
+    result.status = result.status !== 0 ? result.status : 1;
+  }
+
+  result.gitSpawns = gitSpawns;
+  if (gitSpawns.length) {
+    log('run-tests: ERROR: product code started git or a hook outside the fgos-git driver (Git spec §12, one door):');
+    for (const s of gitSpawns) log(`  ${s.frame}: ${s.target} ${s.file} ${(s.args ?? []).join(' ')} (${s.count}x)`);
+    log('  Route the call through a typed Git port (src/git/*); a sandbox repository goes through scripts/lib/sandbox-git.mjs.');
     result.status = result.status !== 0 ? result.status : 1;
   }
 

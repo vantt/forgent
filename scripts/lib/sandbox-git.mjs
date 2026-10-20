@@ -7,10 +7,16 @@
 // repository, an `init` target, a linked checkout, a path remote -- must sit inside the sandbox root.
 // GIT_* variables that pick a repository are dropped so nothing can redirect a call outside it. The checkout
 // the script runs from is read through Inspect (scripts/lib/git-ports.mjs), never through here.
+//
+// A shell script reaches the same door as `node scripts/lib/sandbox-git.mjs --root <sandbox root> --
+// <git args...>`; the call is checked exactly as `sandboxGit(root)(args)` checks it, so the git args
+// still name the repository (`-C <path>` or an absolute `init` path) inside that root.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { SANDBOX_DOOR } from './git-spawn-match.mjs';
+import { isMainModule } from './is-main-module.mjs';
 
 function realOrPending(value) {
   let ancestor = value;
@@ -41,12 +47,30 @@ export function sandboxGit(root, { env = process.env } = {}) {
     if (checked.length === 0) throw new Error(`sandbox-git: name the sandbox repository (-C, --git-dir, cwd or an absolute init path) for git ${args.join(' ')}`);
     const outside = checked.filter((value) => !inside(value));
     if (outside.length) throw new Error(`sandbox-git: ${outside.join(', ')} is outside the sandbox root ${realRoot}`);
-    const out = execFileSync('git', args, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], ...opts, env: sandboxEnv(opts.env ?? env) });
+    // The marker names this door to the one-door gate (scan and test spy), which re-checks the paths.
+    const out = execFileSync('git', args, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], ...opts, env: sandboxEnv(opts.env ?? env), [SANDBOX_DOOR]: realRoot });
     return typeof out === 'string' ? out.trim() : out;
   };
 }
 
-/** The `git` binary's version line, for a benchmark's environment record; it names no repository. */
-export function gitVersion() {
-  return execFileSync('git', ['--version'], { encoding: 'utf8', env: sandboxEnv(process.env) }).trim();
+/** The `git` binary's version line, for a benchmark's environment record, run from the sandbox `root`. */
+export function gitVersion(root) {
+  const realRoot = fs.realpathSync(root);
+  return execFileSync('git', ['--version'], { cwd: realRoot, encoding: 'utf8', env: sandboxEnv(process.env), [SANDBOX_DOOR]: realRoot }).trim();
+}
+
+if (isMainModule(import.meta.url)) {
+  const argv = process.argv.slice(2);
+  const split = argv.indexOf('--');
+  if (argv[0] !== '--root' || !argv[1] || split !== 2 || argv.length === 3) {
+    process.stderr.write('usage: node scripts/lib/sandbox-git.mjs --root <sandbox root> -- <git args...>\n');
+    process.exit(2);
+  }
+  try {
+    const out = sandboxGit(argv[1])(argv.slice(3));
+    if (out) process.stdout.write(`${out}\n`);
+  } catch (error) {
+    process.stderr.write(`${error.stderr || error.message}`.replace(/\n?$/, '\n'));
+    process.exit(typeof error.status === 'number' && error.status > 0 ? error.status : 1);
+  }
 }
