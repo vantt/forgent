@@ -1,0 +1,26 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/platform/session-identity/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9300,
+      "lines": 98,
+      "sha256": "f304413c7ac40d0511e69fa9e00a986b6ae0c7c8dd6bd84dce73e8bee62573e9",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a2e080024efa26bd6627fc3af0b97f6972ef933e432def246e308bce1be0fab9"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 98,
+          "sha256": "68ad9e1d78522766da6c181ad8022637a9f371ba9f99a1ff48e3dfc39eb0a819"
+        }
+      ]
+    }
+  ],
+  "method": "Full pinned source-byte traversal, exact inventory spans, supplemental scan and per-edge context assessment. Author traversal is not independent review."
+}

@@ -1,0 +1,41 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/platform/run-supervisor/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 58576,
+      "lines": 367,
+      "sha256": "90d112cb30010365840d3e303fb7e86fcff2a10274a9576ec85ad39fcb42c0c8",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8b220cb6a03c665797639d955e0ae7ecba7c590d742cf2865392c04ebd8c7a9c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e0b39ad81841ec7cd9d5ad33c1f1b60926c962faba5f7dd036bc490739b32a67"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "86ec1d8fb2122bb3a5dab41448937d015f1fe458db3a32c754529b26e3b621b8"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "e6a4283371ba2ea35cdb013a5bf28a220c2f6c5925a815efb1db6e353e525b1c"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 367,
+          "sha256": "1e3ce2fe9f2eb4a8511c1aa7652f0e5faf24c468960072f45311f69d0c82bbd6"
+        }
+      ]
+    }
+  ],
+  "method": "Full pinned source-byte traversal, exact inventory spans, supplemental scan and per-edge context assessment. Author traversal is not independent review."
+}

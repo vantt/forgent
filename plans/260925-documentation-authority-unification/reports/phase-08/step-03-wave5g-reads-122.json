@@ -1,0 +1,241 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 25347,
+      "lines": 58,
+      "sha256": "5b8b4d25f4b5526f3228d36433d426eb99f5ba5717e427207bac17b65f9bd244",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 58,
+          "sha256": "e89b74aa5c4b5bcb28172d7749565c19417f953072a41ada3ddbf13a870b0966"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 31773,
+      "lines": 449,
+      "sha256": "a8bb798b7a717c66a41427065d17c4ba261a81c42faf14d0e06895330ef5f68e",
+      "inventoryEdges": 16,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f7a8a771eeeafe665b0586f091d61cd528c76aa701ae50c18e857cb9f49bb9f8"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "40982775451f6a550c29d873f57285417e5065afdeb0853d64594a2c6f877324"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "94fc1b1d26eed72faea0cbaffdf2706a0882fd9c6d818e3227c7c9437315ce7e"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "4950d7ad8820006ad473d8a94b6e7d1d718bc025053385877a947c9a2f0cf079"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "f0d09f74858bd1bcbd36f0e776098ed0b5e70ddd5501abbcda27b7f3ce86bf2a"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 449,
+          "sha256": "885f1dbbe6f28c254cb0a485975b3f79e79084cc56737d91dd1c2fe6236a340a"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 66707,
+      "lines": 945,
+      "sha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+      "inventoryEdges": 15,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d5e42aaff3efd53ce9f935dff119c2ad11f2680ae72ccb48d28a37dec49d8805"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "5bdbd3d9f69ade64884bf266d2512f88686c3a4e41eba19d81f8d8054389c53a"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "baa4bb75e61e6e3a2b7b982fd060a656b8a4c6263764c74c97ac49b66cb6f70a"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "bbfa583aeddd2abfebefa8d3d1aa343a8cbcccbaf19e77d87ee308b686c1dea9"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "373bbd437df4085bdc6330685cd71b1d4743fc89defc4d06fc06a0cbaf6e3d0b"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "963e2b1c44fd533b0a2d06ef341620a8ffc6c0b7f040c8012970176ffa22ae26"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "3c8b9c471d07e00ea449580678ac3bdecac0770d59ad1ca36da63cbf307796ad"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "ebb3f8607a9a08f5b3eab785d3590404d5751e1eb7198dbacf14b14cc2d3ccb1"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "955af541857425bdcc22ab23e248e508e041ea3d857a726d5f4d4e7d3098fb7b"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "78bcc57d3fa76f211634fd2417e8a6b886c218afc52b453f7dc9d52bb40b8720"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "f0b1f6ed94588237ee1bbd52cacb49afce95ce2585ce8a9151869499fb86cea1"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 945,
+          "sha256": "a338b815ad0242a7378468299f4b6a38806f200dbcffe5825757e0fe502b723d"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5375,
+      "lines": 92,
+      "sha256": "d434c42e3baae4705783125cfb2d91f34f66cb1573e36f8da6d72fb596dee2e7",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "261b9f9231dba23883576d82ea0d23e06c22cc6961bee8c48b37b491b219379d"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 92,
+          "sha256": "07ff4faa634e97a1417874caafd45323250f49e3e6a7729e41bc0e8be530d44c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/work-state/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 218051,
+      "lines": 1204,
+      "sha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+      "inventoryEdges": 17,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "09b24c1e56e80a775768d453a8480cf4373f3d5e35cb07ca472a6ee24b7482c7"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "48cec8c7836dcbac5f49c2603c2530642447fd88e9dabeeb1efbe971ac537ea7"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "c3278f693865b2a0a532950bc0ec2ecd7866a34996def93e4bf0db8db711acd5"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "5a308cf83e48c817ff8ca3984618c8a5640def8a272fa8186bec8973c1d5243b"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "ade0b7ad3a0aaa3de268d4e04868d66021ef680f5f9b9eb53b38186e46c6b653"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "77daa8998a4c291a7407f84c931f21287e5da3f88badbdd6a53faf3ae9d847c7"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "15ddeb68e0770a1bdfa758b53856334eb4f573c5e098a7d5cbcc387593603f81"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "b2606140dc396278927732a3b4ea9d11a018ae2122d60ac1184fbb2e2906f6fd"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "a39147ef39583cabe49ac07e1d0219cbe04901eba9139a6733755961f68350f9"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "fb708dd1b28413772d64002e0d72a1a0e30724138348022f27897c1d2e524351"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "7570ca420d252220b5408a108886f0ef1a00fdffac1ca4139b29536a8c127d22"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "dba0d9be5f313a8e54e9cb952ce15205f87cb0efbe050124ee50b8492cc3d795"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "e7ff87df2edafd80e3064d6e6b48efca6dfa50236c98496047d8fb2d463f8b3b"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "e6e9b52a6c99924215ccd124236b596a7694c37a6f7acb9e9edc7cb4697534b3"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "ea34252e17444cbcad21b2ca2dfc3c7a17433d6b1a7d65cd3d8c5b612f658cf9"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1204,
+          "sha256": "7764169bc597b084dfff7022f0c209112d2c2ddc578818e9d9df2aa8eabe0e2a"
+        }
+      ]
+    }
+  ],
+  "method": "Full pinned source-byte traversal, exact inventory spans, supplemental scan and per-edge context assessment. Author traversal is not independent review."
+}

@@ -1,0 +1,1013 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "newBatches": [
+    "122",
+    "121",
+    "120",
+    "119",
+    "118",
+    "117",
+    "116",
+    "115",
+    "114"
+  ],
+  "manifest": "step-03-wave5g-manifest.json",
+  "selectedFiles": 21,
+  "selectedEdges": 253,
+  "perSet": [
+    {
+      "set": "batch-122",
+      "allFiles": 5,
+      "patchedPopulation": 2,
+      "patchedSeeded": 1,
+      "mandatory": 2,
+      "patchedAndMandatoryDistinct": 3,
+      "unpatchedEligible": 1,
+      "unpatchedSeeded": 1,
+      "leadRulingSupplements": 0,
+      "locatorSupplements": 0,
+      "distinctSelected": 4,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "strata": {
+        "patched": {
+          "selected": [
+            "docs/platform/work-state/contracts/cli-io-contract.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "mandatory": {
+          "selected": [
+            "docs/platform/work-state/decisions/retired-decision-history.md",
+            "docs/platform/work-state/spec.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "unpatched": {
+          "selected": [
+            "docs/platform/work-state/architecture/implementation-pointers.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        }
+      }
+    },
+    {
+      "set": "batch-121",
+      "allFiles": 1,
+      "patchedPopulation": 0,
+      "patchedSeeded": 0,
+      "mandatory": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligible": 1,
+      "unpatchedSeeded": 1,
+      "leadRulingSupplements": 0,
+      "locatorSupplements": 0,
+      "distinctSelected": 1,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "strata": {
+        "patched": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "mandatory": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "unpatched": {
+          "selected": [
+            "docs/platform/vision.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        }
+      }
+    },
+    {
+      "set": "batch-120",
+      "allFiles": 17,
+      "patchedPopulation": 12,
+      "patchedSeeded": 2,
+      "mandatory": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligible": 5,
+      "unpatchedSeeded": 1,
+      "leadRulingSupplements": 0,
+      "locatorSupplements": 0,
+      "distinctSelected": 3,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "strata": {
+        "patched": {
+          "selected": [
+            "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+            "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "mandatory": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "unpatched": {
+          "selected": [
+            "docs/platform/ui-spec/operations/F02-approve-a-merge.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        }
+      }
+    },
+    {
+      "set": "batch-119",
+      "allFiles": 1,
+      "patchedPopulation": 1,
+      "patchedSeeded": 1,
+      "mandatory": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "leadRulingSupplements": 0,
+      "locatorSupplements": 0,
+      "distinctSelected": 1,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "strata": {
+        "patched": {
+          "selected": [
+            "docs/platform/terminal-control/spec.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "mandatory": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "unpatched": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        }
+      }
+    },
+    {
+      "set": "batch-118",
+      "allFiles": 1,
+      "patchedPopulation": 1,
+      "patchedSeeded": 1,
+      "mandatory": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "leadRulingSupplements": 0,
+      "locatorSupplements": 0,
+      "distinctSelected": 1,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "strata": {
+        "patched": {
+          "selected": [
+            "docs/platform/system-overview/spec.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "mandatory": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "unpatched": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        }
+      }
+    },
+    {
+      "set": "batch-117",
+      "allFiles": 5,
+      "patchedPopulation": 1,
+      "patchedSeeded": 1,
+      "mandatory": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligible": 4,
+      "unpatchedSeeded": 1,
+      "leadRulingSupplements": 1,
+      "locatorSupplements": 0,
+      "distinctSelected": 3,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "strata": {
+        "patched": {
+          "selected": [
+            "docs/platform/system-architecture/architecture/architecture-intent.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "mandatory": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "unpatched": {
+          "selected": [
+            "docs/platform/system-architecture/architecture/workspace-topology-audit.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        }
+      }
+    },
+    {
+      "set": "batch-116",
+      "allFiles": 1,
+      "patchedPopulation": 1,
+      "patchedSeeded": 1,
+      "mandatory": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "leadRulingSupplements": 0,
+      "locatorSupplements": 0,
+      "distinctSelected": 1,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "strata": {
+        "patched": {
+          "selected": [
+            "docs/platform/session-identity/spec.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "mandatory": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "unpatched": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        }
+      }
+    },
+    {
+      "set": "batch-115",
+      "allFiles": 17,
+      "patchedPopulation": 16,
+      "patchedSeeded": 3,
+      "mandatory": 4,
+      "patchedAndMandatoryDistinct": 5,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "leadRulingSupplements": 0,
+      "locatorSupplements": 1,
+      "distinctSelected": 6,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "strata": {
+        "patched": {
+          "selected": [
+            "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+            "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+            "docs/platform/runner/operations/h-51f5cd7279fd.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "mandatory": {
+          "selected": [
+            "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+            "docs/platform/runner/operations/h-51f5cd7279fd.md",
+            "docs/platform/runner/spec.md",
+            "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "unpatched": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        }
+      }
+    },
+    {
+      "set": "batch-114",
+      "allFiles": 1,
+      "patchedPopulation": 1,
+      "patchedSeeded": 1,
+      "mandatory": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligible": 0,
+      "unpatchedSeeded": 0,
+      "leadRulingSupplements": 0,
+      "locatorSupplements": 0,
+      "distinctSelected": 1,
+      "reviewedFileDenominator": 0,
+      "reworkNumerator": "pending",
+      "strata": {
+        "patched": {
+          "selected": [
+            "docs/platform/run-supervisor/spec.md"
+          ],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "mandatory": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        },
+        "unpatched": {
+          "selected": [],
+          "reviewed": 0,
+          "rework": "pending"
+        }
+      }
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave5g-p01.md",
+      "files": [
+        {
+          "file": "docs/platform/work-state/architecture/implementation-pointers.md",
+          "set": "batch-122",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 7,
+          "inventoryEdges": 7,
+          "recordSha256": "2941be2343fcb77394371e3c46fe6e3387cee45657762cb480e09cc5769b1beb",
+          "sourceDigest": "5b8b4d25f4b5526f3228d36433d426eb99f5ba5717e427207bac17b65f9bd244",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 37429,
+          "sourceBytes": 25347,
+          "contextPlusRecordBytes": 62776
+        },
+        {
+          "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+          "set": "batch-122",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 16,
+          "inventoryEdges": 16,
+          "recordSha256": "7987c1994724983e84fb0fa99070b0925d18fcf1fefcf8afa46a18195315bd1f",
+          "sourceDigest": "a8bb798b7a717c66a41427065d17c4ba261a81c42faf14d0e06895330ef5f68e",
+          "diffSha256": "db2d3c2fff58bc5eb966bf73a5721791bf4ce9dda21d9ecbc374bfb2b259a6cd",
+          "recordBytes": 266886,
+          "sourceBytes": 31773,
+          "contextPlusRecordBytes": 298659
+        }
+      ],
+      "fileCount": 2,
+      "edges": 23,
+      "sourcePlusRecordBytes": 361435,
+      "indivisibleOversize": false,
+      "readingPages": [
+        {
+          "file": "docs/platform/work-state/architecture/implementation-pointers.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 7
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 16
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        }
+      ]
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave5g-p02.md",
+      "files": [
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "set": "batch-122",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 15,
+          "inventoryEdges": 15,
+          "recordSha256": "22f64647f1d9baa69e6e5dcb8dde59eaf7f9b78725b78e7d629f9213073f6c2e",
+          "sourceDigest": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 22129,
+          "sourceBytes": 66707,
+          "contextPlusRecordBytes": 88836
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "set": "batch-122",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 17,
+          "inventoryEdges": 17,
+          "recordSha256": "a155e0ba83ba1fc6c1505abd78c5712292e178b635b466eb4b0d991b8d56675c",
+          "sourceDigest": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 32979,
+          "sourceBytes": 218051,
+          "contextPlusRecordBytes": 251030
+        },
+        {
+          "file": "docs/platform/vision.md",
+          "set": "batch-121",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 4,
+          "inventoryEdges": 4,
+          "recordSha256": "330cd96994a31bd68a1105f77e861ca78fd93732f3487c922a8d69ddcca62ada",
+          "sourceDigest": "682192b6df66b26feb445963d59a39ac3a366439923838e8904189056c91cb17",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 7001,
+          "sourceBytes": 10544,
+          "contextPlusRecordBytes": 17545
+        },
+        {
+          "file": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+          "set": "batch-120",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "inventoryEdges": 3,
+          "recordSha256": "bb50b919b6afc89207bf65a761258c630da2e2e9ab64876c9f18d102a2bc16b5",
+          "sourceDigest": "02a74857d6f7a0cd1f69e4ec38c54489d3b918e110764edb267306e250b4a6cf",
+          "diffSha256": "83b865bb93b8f54581456ca6593b8c3a42c619332ad02c2ca46168a078410856",
+          "recordBytes": 11492,
+          "sourceBytes": 4764,
+          "contextPlusRecordBytes": 16256
+        },
+        {
+          "file": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+          "set": "batch-120",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "inventoryEdges": 3,
+          "recordSha256": "6a67222e81a88d4202cae770f29795451a92749bfa9f49f2f08b2dfbc6633d2a",
+          "sourceDigest": "56968d7d764d9519bd62f61a20b975dcd3a38407c092c55a684095ab97f87b81",
+          "diffSha256": "1e33b2be29fe8627c48954f170f0e2f17d2d9295ec4ea2fa84733fb63edb50d2",
+          "recordBytes": 17792,
+          "sourceBytes": 4549,
+          "contextPlusRecordBytes": 22341
+        }
+      ],
+      "fileCount": 5,
+      "edges": 42,
+      "sourcePlusRecordBytes": 396008,
+      "indivisibleOversize": false,
+      "readingPages": [
+        {
+          "file": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 15
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/work-state/spec.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 17
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/vision.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        }
+      ]
+    },
+    {
+      "part": 3,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave5g-p03.md",
+      "files": [
+        {
+          "file": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+          "set": "batch-120",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "inventoryEdges": 2,
+          "recordSha256": "f7f59ece2b425a21661ea731cd0e3252ee941c1e48d5fb6bc591f195089dd8ab",
+          "sourceDigest": "f21c7e948d0a6223c351316c38515db1daf89f28388c1c6bb5b3d92360f9937b",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2580,
+          "sourceBytes": 3260,
+          "contextPlusRecordBytes": 5840
+        },
+        {
+          "file": "docs/platform/terminal-control/spec.md",
+          "set": "batch-119",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 2,
+          "inventoryEdges": 2,
+          "recordSha256": "523e4f21f0d4525332b7325da10e3adb3e9005264257db6e2031af988af9f8d1",
+          "sourceDigest": "549bd92fb431256653c1e3d52f608c8462592c9c9210dceb323a467e3c7b9096",
+          "diffSha256": "5b71acfc7a3f819c397a7558bbeb195f421914f12baaff44c09a6b3c4f3d458b",
+          "recordBytes": 13517,
+          "sourceBytes": 23597,
+          "contextPlusRecordBytes": 37114
+        },
+        {
+          "file": "docs/platform/system-overview/spec.md",
+          "set": "batch-118",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 21,
+          "inventoryEdges": 11,
+          "recordSha256": "935cb9a46ea1911ce058a418a091eefb3769525cd0c49432ab69fa935cf29380",
+          "sourceDigest": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+          "diffSha256": "2473941d7a06368c29eaa897e4c526e4e17d629ff27869dd8061fd45b56c290a",
+          "recordBytes": 144631,
+          "sourceBytes": 19993,
+          "contextPlusRecordBytes": 164624
+        },
+        {
+          "file": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "set": "batch-117",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 14,
+          "inventoryEdges": 13,
+          "recordSha256": "051274b7a0858e4a51681dbc731299c1c8a6959dadb2f86acf6e5b3a89c4857e",
+          "sourceDigest": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+          "diffSha256": "41e0f385ef7a73a988fdec7d89ad12584a207b8e0273f137b5a1ed4dc6d6b0e4",
+          "recordBytes": 81016,
+          "sourceBytes": 41130,
+          "contextPlusRecordBytes": 122146
+        },
+        {
+          "file": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+          "set": "batch-117",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 5,
+          "inventoryEdges": 3,
+          "recordSha256": "ebd502a14fe36184b33b063b3e272614367d2a9c4eaf92d60a0c832cc972f0b3",
+          "sourceDigest": "9ee4f29458ce8631cb9df0818b3d27ef17d715ea18f631248676e868ccd4f8c0",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 20242,
+          "sourceBytes": 13062,
+          "contextPlusRecordBytes": 33304
+        },
+        {
+          "file": "docs/platform/system-architecture/history/architect-readme.md",
+          "set": "batch-117",
+          "strata": [
+            "open-lead-ruling-whole-file-supplement"
+          ],
+          "edges": 18,
+          "inventoryEdges": 18,
+          "recordSha256": "f03e465ac855cd0ea1e21b881c7a726ff9a1b57f10571aba898474cf3b4fab2e",
+          "sourceDigest": "c5f844433fb08effcc472c7e251e8389f6edc3022fc9e1daf4a8011be08c903b",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 16536,
+          "sourceBytes": 4417,
+          "contextPlusRecordBytes": 20953
+        }
+      ],
+      "fileCount": 6,
+      "edges": 62,
+      "sourcePlusRecordBytes": 383981,
+      "indivisibleOversize": false,
+      "readingPages": [
+        {
+          "file": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/terminal-control/spec.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/system-overview/spec.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 21
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 14
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 5
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/system-architecture/history/architect-readme.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 18
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        }
+      ]
+    },
+    {
+      "part": 4,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave5g-p04.md",
+      "files": [
+        {
+          "file": "docs/platform/session-identity/spec.md",
+          "set": "batch-116",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "inventoryEdges": 3,
+          "recordSha256": "8ae756a8cd98f418150c2f5f59afe96019c667158ee2c064ce20e59b94e95bbd",
+          "sourceDigest": "f304413c7ac40d0511e69fa9e00a986b6ae0c7c8dd6bd84dce73e8bee62573e9",
+          "diffSha256": "e75b75fd1106ad650649695ef1e978862bc9f452b07f4d8769b92639f2389e75",
+          "recordBytes": 8286,
+          "sourceBytes": 9300,
+          "contextPlusRecordBytes": 17586
+        },
+        {
+          "file": "docs/platform/runner/contracts/routing-handoff.md",
+          "set": "batch-115",
+          "strata": [
+            "ADR-prefix-locator-whole-file-supplement"
+          ],
+          "edges": 7,
+          "inventoryEdges": 7,
+          "recordSha256": "1fd28a3113e5347bbb70f46712bf9e0b7d32ef19095d073c953c32feee68bf14",
+          "sourceDigest": "97b9a2cb6f1bc3acad1ec1a882b32660fda06538e008d66d57a2029cb0ae325d",
+          "diffSha256": "62fd9f53a00b76b229e014e4db2143140298f90fb655699eb6119106053649f5",
+          "recordBytes": 70491,
+          "sourceBytes": 7764,
+          "contextPlusRecordBytes": 78255
+        }
+      ],
+      "fileCount": 2,
+      "edges": 10,
+      "sourcePlusRecordBytes": 95841,
+      "indivisibleOversize": false,
+      "readingPages": [
+        {
+          "file": "docs/platform/session-identity/spec.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/runner/contracts/routing-handoff.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 7
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        }
+      ]
+    },
+    {
+      "part": 5,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave5g-p05.md",
+      "files": [
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "set": "batch-115",
+          "strata": [
+            "patched-seeded",
+            "mandatory-threshold",
+            "open-lead-ruling-whole-file-supplement"
+          ],
+          "edges": 70,
+          "inventoryEdges": 68,
+          "recordSha256": "746bbd79cecde7c7e15ba0422d5f570d2aa7c5a71f9095052335646ec19e0faa",
+          "sourceDigest": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "diffSha256": "a3468681d9c8d0d667f13309ed17e9dfc7589fb61fa692a57e0d1ac85a1cafaa",
+          "recordBytes": 159676,
+          "sourceBytes": 182676,
+          "contextPlusRecordBytes": 342352
+        }
+      ],
+      "fileCount": 1,
+      "edges": 70,
+      "sourcePlusRecordBytes": 342352,
+      "indivisibleOversize": false,
+      "readingPages": [
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 70
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        }
+      ]
+    },
+    {
+      "part": 6,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave5g-p06.md",
+      "files": [
+        {
+          "file": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+          "set": "batch-115",
+          "strata": [
+            "patched-seeded",
+            "mandatory-threshold"
+          ],
+          "edges": 4,
+          "inventoryEdges": 3,
+          "recordSha256": "99f7bddd2ca183884deb4aa3b536e98d39d1b6fb598768d685a39b641ddc62a7",
+          "sourceDigest": "e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b",
+          "diffSha256": "4ec0e7a60201d962d3dc15beec188e571f3166c13b80f63fb92d76b5a5cf8f28",
+          "recordBytes": 12779,
+          "sourceBytes": 92419,
+          "contextPlusRecordBytes": 105198
+        },
+        {
+          "file": "docs/platform/runner/spec.md",
+          "set": "batch-115",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 16,
+          "inventoryEdges": 15,
+          "recordSha256": "2ce58b34e2dc4846bd5f106cc6589d1eca683f27f2ec01964c726710429f22cb",
+          "sourceDigest": "e99f04b005e41adab13ff07aa37c124cfc9d916d612f064ecf6d963641d13306",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 15799,
+          "sourceBytes": 78257,
+          "contextPlusRecordBytes": 94056
+        },
+        {
+          "file": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+          "set": "batch-115",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "inventoryEdges": 2,
+          "recordSha256": "d97a880896433074ad19ba5fd7a173f0ae279aa40d085b0c066d21d7276c4846",
+          "sourceDigest": "9e962ffb591b13247736df9a62938cbced70ba9c5c8cc5314d9a6bdd21632171",
+          "diffSha256": "61f02dd0b45142fb3f830d6278a84bbe6b8d286b3f849412857e6c7a5d6f1a15",
+          "recordBytes": 8933,
+          "sourceBytes": 15890,
+          "contextPlusRecordBytes": 24823
+        }
+      ],
+      "fileCount": 3,
+      "edges": 23,
+      "sourcePlusRecordBytes": 224077,
+      "indivisibleOversize": false,
+      "readingPages": [
+        {
+          "file": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/runner/spec.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 16
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        },
+        {
+          "file": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        }
+      ]
+    },
+    {
+      "part": 7,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave5g-p07.md",
+      "files": [
+        {
+          "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "set": "batch-115",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 17,
+          "inventoryEdges": 16,
+          "recordSha256": "a21aba8d1f81c4a7b80838c461258d0071d77cfa955be93dc56ea3653566db90",
+          "sourceDigest": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+          "diffSha256": "7483ac715d2706c35a3df039d1e3e0944ae960d6bfd5edc1856be7013123635a",
+          "recordBytes": 192039,
+          "sourceBytes": 180961,
+          "contextPlusRecordBytes": 373000
+        }
+      ],
+      "fileCount": 1,
+      "edges": 17,
+      "sourcePlusRecordBytes": 373000,
+      "indivisibleOversize": false,
+      "readingPages": [
+        {
+          "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 17
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        }
+      ]
+    },
+    {
+      "part": 8,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave5g-p08.md",
+      "files": [
+        {
+          "file": "docs/platform/run-supervisor/spec.md",
+          "set": "batch-114",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 6,
+          "inventoryEdges": 6,
+          "recordSha256": "6ffaa5af335e06b481d4d57614dfebdbe869492574379be3928e3ecee8a29cb3",
+          "sourceDigest": "90d112cb30010365840d3e303fb7e86fcff2a10274a9576ec85ad39fcb42c0c8",
+          "diffSha256": "9847943f301b8fd0842c53ee45683e1e38abd94e88cf2bfd8984cc0ae2048c14",
+          "recordBytes": 21281,
+          "sourceBytes": 58576,
+          "contextPlusRecordBytes": 79857
+        }
+      ],
+      "fileCount": 1,
+      "edges": 6,
+      "sourcePlusRecordBytes": 79857,
+      "indivisibleOversize": false,
+      "readingPages": [
+        {
+          "file": "docs/platform/run-supervisor/spec.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "sourcePageLines": 120,
+          "fieldPageBytes": 300000,
+          "readingMethod": "Python per-field extractor; never print a whole JSONL record, never run checker/probes."
+        }
+      ]
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0,
+  "scope": "Only new batches 122 down to 114; preserve every earlier review request and batch."
+}
