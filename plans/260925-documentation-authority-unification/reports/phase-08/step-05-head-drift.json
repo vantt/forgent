@@ -1,6 +1,6 @@
 {
   "kind": "Non-failing HEAD drift for Step 7 assembly; records remain at their own pins",
-  "headCommit": "9ceec7bdc8bd7243220b99e016bd880a00fa176f",
+  "headCommit": "35057308bdee2d7c65553ba758bd1556718ea8e4",
   "entries": [
     {
       "file": "docs/backlog.md",

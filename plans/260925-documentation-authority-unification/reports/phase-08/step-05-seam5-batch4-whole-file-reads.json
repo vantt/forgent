@@ -1,0 +1,212 @@
+[
+  {
+    "file": "test/runner/dead-vocabulary-guard.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+    "bytes": 23739,
+    "lines": 570
+  },
+  {
+    "file": "test/architecture.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "bca3887f60c239a1438954dfb803f2eab123c3aa2a78222ee04e1bbf3655a647",
+    "bytes": 67046,
+    "lines": 1314
+  },
+  {
+    "file": "apps/fgos-gateway/web/src/App.test.tsx",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "36dcbe12fd1175058dcfae826d0b141be00cd48018aba178477754b71c55384e",
+    "bytes": 3848,
+    "lines": 88
+  },
+  {
+    "file": "test/scripts/doc-global-closure.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "2078a00a7bc1ca32e4d6c14f12cef720996fb9ad67032167cb98ced711fa7147",
+    "bytes": 4132,
+    "lines": 13
+  },
+  {
+    "file": "test/scripts/doc-corpus-decisions.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "f18c9cdb2d3c58cd43a89d5f1d5fd11b24febb6aef38fc33465b05ee180e9860",
+    "bytes": 9493,
+    "lines": 143
+  },
+  {
+    "file": "test/scripts/doc-decision-conservation.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "d06b70b9f9f8b88079cda4ee475d84329ad253929814fed397a6489271400dbb",
+    "bytes": 7676,
+    "lines": 84
+  },
+  {
+    "file": "test/scripts/doc-decision-exact.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "23f038e6d6e51d641a9c15599a6494fb39fcf66f7e7415816321b2116a6c0210",
+    "bytes": 9015,
+    "lines": 120
+  },
+  {
+    "file": "test/scripts/doc-decision-mirrors.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "1ca9b0d96ea23ba9205f49a2f7d982b3d8bf304d623d9dc77f5f9476ebba2815",
+    "bytes": 6330,
+    "lines": 97
+  },
+  {
+    "file": "test/scripts/doc-decision-review.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "9e0b2d6b7d14906ff16515773425b272649d97ba98a98500f0f269d9bf7f8814",
+    "bytes": 13742,
+    "lines": 171
+  },
+  {
+    "file": "test/scripts/doc-link-pass.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "479cc0c5b5ecaf27bafbf81a056cd3035e0fbaa8c8b61a33b7aefa23342de437",
+    "bytes": 7065,
+    "lines": 109
+  },
+  {
+    "file": "test/scripts/doc-restoration-proofs.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "18c1b4f2f22ca882e69a758d49d056e2f94f939abd14884e9f6d58e52ed2c3b4",
+    "bytes": 6278,
+    "lines": 67
+  },
+  {
+    "file": "test/scripts/knowledge-classifier.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "1e21179ebf37b5d9fdde0b4d83a9fbf3afa60db1b9e77d672922ebc91de1cb2d",
+    "bytes": 2183,
+    "lines": 60
+  },
+  {
+    "file": "test/scripts/verify-phase-02.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "b3ff92351965da482c10d4b5a1168e507cca4a6a061773a9c1a40fdae531b6d4",
+    "bytes": 2626,
+    "lines": 74
+  },
+  {
+    "file": "test/scripts/doc-review-authorship.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "5f81473e6bd1f13f103f7c1774179b9c4e84b30f1d051fa13ee361e0f5806bef",
+    "bytes": 7824,
+    "lines": 105
+  },
+  {
+    "file": "test/cli/fgos-edit-2.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "cebb8efa8c3e9ca1a4ddffbf225c908903e592db5c38872a0f3b8f6071754b22",
+    "bytes": 8290,
+    "lines": 228
+  },
+  {
+    "file": "test/cli/fgos-intake-3.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "1b03411924da810a9e5093dbc670ce31cd86d3734404fdaee40a7ae888f13865",
+    "bytes": 11398,
+    "lines": 289
+  },
+  {
+    "file": "test/cli/fgos-intake-4.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "c8f06fc2504b122d677a82338524b0ecfa5f4dd494cbf697b413721428bd1a47",
+    "bytes": 15507,
+    "lines": 375
+  },
+  {
+    "file": "test/cli/fgos-intake-6.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "ed756703e7f976c45d0233d32721b16a88b136a721d0a09ff5688b49ba3ad740",
+    "bytes": 12592,
+    "lines": 330
+  },
+  {
+    "file": "test/cli/fgos-intake-7.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "162282033623274c976846b4ea14e72ffdacfd5f5103c39ee2df6f5dbe0914d8",
+    "bytes": 11423,
+    "lines": 264
+  },
+  {
+    "file": "test/cli/fgos-read-2.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "01d33edf3d5f7a17cd7906d6c7c7f6a13835c0e149625ccaaa455642e4456db6",
+    "bytes": 12626,
+    "lines": 340
+  },
+  {
+    "file": "test/cli/fgos-read-5.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "51eaccb7ddf8ee1aae6d07f13acea8fb5511dc57f41cbf8027eb44b2ef5461b3",
+    "bytes": 13315,
+    "lines": 271
+  },
+  {
+    "file": "test/state/domain-fields.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "41aa4bf9df0aa3f0412a93783f61a6e85fbe30361d6deeec26fc6394f036ade1",
+    "bytes": 8246,
+    "lines": 187
+  },
+  {
+    "file": "test/state/compound-learn-done-gate.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "179aed2aef52b77c8c17ac5f0902d0d0e9c3878453fe35dad274d3cffe0447cc",
+    "bytes": 5505,
+    "lines": 129
+  },
+  {
+    "file": "test/state/status-category.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "72b5ef557874f62cd46c9c3ceff229ee7a90520e642a5da5dc5e50989f7e1424",
+    "bytes": 9753,
+    "lines": 224
+  },
+  {
+    "file": "test/state/working-tree-clean-unified.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "f5632a99ffb085a2e8ec9786b8511e75633d37fc09ff07a7944d4f1de74a219c",
+    "bytes": 4435,
+    "lines": 85
+  },
+  {
+    "file": "test/state/fsm.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "32a916190b93ef29074e7e47984a2a466955f040d381862f8db33ccd651b653f",
+    "bytes": 24687,
+    "lines": 511
+  },
+  {
+    "file": "test/runner/dispatch-worker-session.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "ce16de65fa9b60c94ae08b26ad37e9d8ac4c6f4766796d3a6570be0cbfa0c6c4",
+    "bytes": 4752,
+    "lines": 110
+  },
+  {
+    "file": "test/runner/codex-cli-glm-cli-live-executors.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "080bb695c4ce52e92ce8d9e2f8b6b6a6519703d9959308153d41ad65c9b3f064",
+    "bytes": 4178,
+    "lines": 89
+  },
+  {
+    "file": "test/setup/dir-resolution.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "00ba30aa74c571c2329d57ad2bb371ec4eab5cc396a674b9019d29de3a075553",
+    "bytes": 7785,
+    "lines": 157
+  },
+  {
+    "file": "test/setup/uninstall-wiring.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "658a5adc65985beb0748a4fa9748c5b6ce5726351cd14c95b01721c0051d1aaa",
+    "bytes": 4794,
+    "lines": 109
+  }
+]

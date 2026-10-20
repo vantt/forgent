@@ -1,0 +1,19 @@
+# Root neutrality and test judgments
+
+Records only; runner owns the commit. Independent window review, Step 7 composition and Phase 9 execution remain Lead custody.
+
+R21 closes **42 additional neutral files / 2 original references / 727 original tuples**, reading **347,516 pinned source bytes** and preserving **234 prior R19 rejections**. The checker extends the existing R20 proof through the actual non-document base: temporary/home/state/fixture roots, local descendants, same-file caller bindings, repo named/namespace/CommonJS imports and same-crate Rust const/static. Mixed bindings/callers, repository/docs bases, escaping paths and unresolved values refuse proof. The initial inline-reassignment probe exposed a miss; the final assignment scan corrects it. Prior R19/R20 records are unchanged.
+
+R23 closes **30 distinct judgment files / 78 original references / 469 original tuples / 44 supplemental slots**. Across those slots: **100 admits / 491 rejects / 14 parks / 577 preserves / zero patches**. Every file has its complete pinned hash/mode/byte count, original identities, lexical closure, receipt, owning test declarations and assertion lines. R22 assigns preserve/park parity to the Phase 9 full suite; no per-file replay, candidate output or passing product test is claimed. Empty cutover specifications are explicit because no patch is proposed.
+
+`dead-vocabulary-guard` and `architecture` are first. Architecture retains the actual manifest under the prior L12-60/L12-71 ruling. The dead-vocabulary record retains its original survey carry and parks exact scan-set/history-policy dependencies; the component-boundary carriage conflict remains **P7-DOC-GAP-05**, a Phase 9 pre-landing blocker. Four-root searches and proposed-alias/registry lookups are pinned. Replacing a directory name alone cannot prove the same recursive read set. The existing prescribed remedy moves the complete carriage into provenance/history or retires it with the old sources; no guard or carried text was weakened.
+
+One cleanliness-test label tuple was removed before the author pin. Its record retains the original census source pin, hash, mode, passage and exact removal diff rather than inventing a current operation. All **13 previously authored record files remain byte-identical**.
+
+Integrated checker: **591 records / 2,582 original references / 10,052 original tuples / zero failures**. **157/157 negative probes reject; 15/15 new positive checks pass.** `step-05-seam5-batch4-verification.json` binds fresh results and raw logs. The final current-record integrated result is `step-05-seam5-batch4-final-full-check.json`; it includes the wrapped ADR0027 successor and pinned web-package proof command. Missing `test/src/...` diagnostics in logs are conservative unresolved-import refusals; no corresponding neutral proof is inferred.
+
+Continuation: **404 files / 1,040 references / 20,609 tuples**, with all original carries retained. The review list contains **35 cumulative judgment files**; **265 mechanical/neutral files** are enumerated separately and excluded from window packing. Conservation is exact: **704 files / 1,203 references / 25,007 tuples** across closed records and continuation. No seam completion, independent acceptance or cutover readiness is claimed.
+
+Reproduce with `env -u CLAUDE_CODE_SESSION_ID PYTHONDONTWRITEBYTECODE=1 python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-verify.py`. Measurements, source-read receipts and scope/preserved-record checks are adjacent `step-05-seam5-batch4-*.json` files.
+
+Only the authorized report directory changed. No fgOS CLI, git write, build, cargo, gateway/service start, product test execution, code/docs/skills/baseline edit, live-state or secrets read occurred. Inherited patch-apply scratch stayed under `/tmp/fgos-work/`. Markdown preview stays with Lead under the records-only boundary. `needsWrites: []`.

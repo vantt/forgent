@@ -1,0 +1,35 @@
+{
+  "files": 30,
+  "literalReferences": 78,
+  "dynamicTuples": 469,
+  "rules": {
+    "j4-coverage": "All 30 selected files, all original census ids, exact current/historical witnesses and whole-file lexical closure.",
+    "j4-pins": "Immutable complete source mode/hash/bytes; no patch claimed for preserve/park.",
+    "j4-ownership": "Every declaration and assertion stays pinned; R22 full-suite parity remains pending.",
+    "j4-receipts": "One receipt per complete file, exact input metadata and explicit pending full-suite obligation.",
+    "j4-search": "Park dependencies retain exact pinned searches, proposed aliases, and P7-DOC-GAP-05.",
+    "j4-review": "Every admitted and judgment reject is independently reviewable.",
+    "a-passage-agreement": "All pairs of overlapping operation intervals on the same line/passage agree in admission and effective disposition; independent adjacent expressions have distinct source intervals.",
+    "b-real-blocker": "R12: no boilerplate dependency shared after quoted operands, paths, IDs and line numbers are normalized; copies join their source passage; serialized state rows use their accepted per-file input dependency.",
+    "c-render-owner": "Every generated source-copy reference/tuple derives its disposition from the exact source owner; a park cites an actually parked source owner.",
+    "d-own-operand": "Each admitted dynamic tuple has its exact document-yielding sub-expression pathOperand in its pinned passage; every rejection names a closed R5 nonDocumentUse category.",
+    "e-retired-successor": "Preserved retired decision citations carry a live successorNote with a real heading anchor.",
+    "r11-plans-boundary": "R11: an operation rooted only in plans/** is rejected as plans-report-artifact; trace pinned declarations and imported constants, not adjacent context."
+  },
+  "checks": {
+    "j4-coverage": 31,
+    "j4-pins": 30,
+    "j4-ownership": 30,
+    "j4-receipts": 30,
+    "j4-review": 30,
+    "j4-search": 1,
+    "a-passage-agreement": 59,
+    "b-real-blocker": 14,
+    "d-own-operand": 469,
+    "r11-plans-boundary": 17,
+    "e-retired-successor": 1
+  },
+  "failureCount": 0,
+  "failures": [],
+  "headDrift": []
+}

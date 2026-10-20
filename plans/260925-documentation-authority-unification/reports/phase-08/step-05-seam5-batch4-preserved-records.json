@@ -1,0 +1,71 @@
+{
+  "existingRecordFiles": [
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sha256": "3b0931d75a32dc5e1a73e52356d4dc4aa178261ccd7b3ec1c7223bd03d60e513",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+      "sha256": "1625ec0891ce1a2f739ca90f6ca24ae72fcf5fbdf3253c89a067b11357038a25",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+      "sha256": "ed4437898c811c7758585aef8fc6e8d4071bbd8423557700026ba32da6606a35",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl",
+      "sha256": "347a36417e8b0ae034b09627ed2932d212c29fc23fad1e6d1df6ea2c85284c57",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+      "sha256": "0c3fc4c77dea4d2a23c6c05ee8deea6c3e0099296e5296f3005692d90969fe54",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl",
+      "sha256": "7b581f7649fcaeb9d895cf6771a83c006566800191e8a2ae6e2bbf49d8195cb6",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+      "sha256": "baa49123b6ed375b1776473431a07373d8f5192bb326c74d16fb7eee0065b367",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sha256": "779d12e1863b6cd693493b3dd9ba3a49ee55099f337e429924373f9d535a53b1",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "sha256": "9f3dbb93e32401ffee73df61fb16c6dc4ad97a0313a875ef0e88121930cfbad4",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "sha256": "7ece1cb25d2b5a48c70ad1431672d96c415428291f76a01bb1291e3b519e9a92",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-prompt-goldens.jsonl",
+      "sha256": "6f7aaa44bc6da3619bd9bbb1ba32e6faa9f66691bb04e8fa06738214c78cf423",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file-batch3.jsonl",
+      "sha256": "be4bb4dbb0dff9f27ab6f6112804f236e92a7181f4f353e634a2b932120994e5",
+      "unchanged": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
+      "sha256": "31b5f967b62e3455f3eca35281323de8c1d2520ff1be3899e04ed701690d1ff3",
+      "unchanged": true
+    }
+  ],
+  "allUnchanged": true,
+  "allNewCheckerScriptsParse": true
+}

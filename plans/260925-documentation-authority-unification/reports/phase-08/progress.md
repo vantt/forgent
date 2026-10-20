@@ -1136,3 +1136,17 @@ Pinned move set: 1,561 old physical paths plus retiring-prefix/ADR rules. All 67
 Final integrated checker: 519 authored records / 2,502 references / 8,856 tuples / zero failures. All 128/128 negative probes reject; new retained-literal, baseline-restoration and HEAD-only-drift positives pass. Initial duplicate-rule integration failure is retained and corrected; final result freshness and all raw log/result hashes verify.
 
 Review list: five judgment sources; 223 mechanical files separately enumerated. Continuation: 476 files / 1,120 references / 21,805 tuples / three original carries. Conservation: 704 files / 1,203 references / 25,007 tuples. Independent review, missing RUL104 law promotion, Step 7 composition and post-retirement npm/cargo proof remain pending. Records only; runner owns commits, no CLI/git write/product edit/state or secrets access. Final account: step-05-seam5-batch3-handback.md and verification/measurements receipts; needsWrites: [].
+
+
+## Seam 5 root-anchored neutrality — in progress
+
+Batch 4 acknowledged. Applying R21 root provenance with rejecting probes; R22 replay only for proposed patches; at least 30 complete judgment files targeted under R23. Records only; no CLI, git write, product edits or runtime-state reads.
+
+
+## Seam 5 root-anchored neutrality — closed records batch
+
+R21 closes **42 new neutral files / 2 references / 727 tuples / 347,516 pinned bytes**, retaining **234 prior R19 rejects**. R22/R23 close **30 separate judgment files / 78 references / 469 tuples / 44 added slots**: **100 admits, 491 rejects, 14 parks, 577 preserves, zero patches**. Owning declarations/assertion lines replace per-file replay for this preserve/park batch. The priority architecture manifest stays retained; dead-vocabulary scan-set dependencies and P7-DOC-GAP-05 remain explicit. A removed historical cleanliness-test label retains its census pin and exact removal diff. All 13 earlier record files stay byte-identical.
+
+Final integrated checker: **591 records / 2,582 references / 10,052 tuples / 0 failures**. All **157/157 negative probes reject**; **15/15 new positive checks pass**. Final source/log/result hashes and freshness validate. Initial inline-reassignment refusal failure was caught and corrected before final verification. Wrapped ADR0027 provenance and the pinned web-package S01 proof command are included in the final replay.
+
+Review list: **35 cumulative judgment files**; **265 mechanical/neutral files** separately listed. Continuation: **404 files / 1,040 references / 20,609 tuples**, all original carries retained. Exact set conservation: **704 files / 1,203 references / 25,007 tuples**. Independent window review, Step 7 composition and Phase 9 npm/cargo parity remain Lead custody. Records only; runner owns commits; no product edits, fgOS CLI, git write, build/service or live-state/secrets read. Scratch stays under `/tmp/fgos-work/`; preview remains Lead custody. `needsWrites: []`. See `step-05-seam5-batch4-handback.md`.

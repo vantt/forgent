@@ -1,0 +1,45 @@
+{
+  "neutral": {
+    "files": 42,
+    "references": 2,
+    "tuples": 727,
+    "sourceBytes": 347516,
+    "priorR19RejectsRetained": 234
+  },
+  "judgment": {
+    "files": 30,
+    "references": 78,
+    "tuples": 469,
+    "addedSlots": 44,
+    "admitted": 100,
+    "rejected": 491,
+    "dispositions": {
+      "parked": 14,
+      "preserve": 577
+    },
+    "patchFiles": 0,
+    "historicalOnlyTuples": [
+      {
+        "file": "test/state/working-tree-clean-unified.test.mjs",
+        "id": "dynamic-038834",
+        "originalInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+      }
+    ]
+  },
+  "remaining": {
+    "files": 404,
+    "references": 1040,
+    "tuples": 20609
+  },
+  "conservation": {
+    "files": 704,
+    "references": 1203,
+    "tuples": 25007
+  },
+  "cumulative": {
+    "closedFiles": 300,
+    "neutralMechanicalFiles": 265,
+    "judgmentFiles": 35
+  },
+  "parity": "No Phase 9 patches; R22 requires owning declarations/assertion lines, not per-file replay. Phase 9 full npm/cargo parity remains pending."
+}
