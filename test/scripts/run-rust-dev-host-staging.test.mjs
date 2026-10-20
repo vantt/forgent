@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { pruneRunDirs, releaseRunDir, STALE_RUN_DIR_MS } from '../../scripts/run-rust-dev-host.mjs';
+import { devHostEnv, pruneRunDirs, releaseRunDir, STALE_RUN_DIR_MS } from '../../scripts/run-rust-dev-host.mjs';
 
 // The staged dev host outlives its invocation while a detached process (a run supervisor) still runs
 // from it, and goes once that process has ended. A real executable copied into the run directory
@@ -59,4 +59,15 @@ test('an unused staged host is removed at once, and a young one is never pruned 
   pruneRunDirs(base, { now: Date.now() + STALE_RUN_DIR_MS + 1000 });
   assert.ok(fs.existsSync(other));
   assert.equal(fs.existsSync(young.dir), false);
+});
+
+test('the dev door points FGOS_HOST_BIN at the staged host, replacing any inherited host', () => {
+  const env = devHostEnv(
+    { FGOS_HOST_BIN: '/activated/bin/fgos', KEEP: '1' },
+    { fgosBin: '/stage/run-x/fgos', checkoutRoot: '/checkout', manifestPath: '/stage/run-x/manifest.json' },
+  );
+  assert.equal(env.FGOS_HOST_BIN, '/stage/run-x/fgos');
+  assert.equal(env.FGOS_ACTIVE_RELEASE_PATH, '/checkout');
+  assert.equal(env.FGOS_ACTIVE_MANIFEST_PATH, '/stage/run-x/manifest.json');
+  assert.equal(env.KEEP, '1');
 });

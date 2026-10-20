@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `npm run fgos:dev` now makes Node clients (identity, repository access, run supervisor, terminal control) use the working-tree host it staged, not the activated release's host. Resuming a unit run whose `unit.json` carries a `seatSchema` from a newer release is refused with `record-from-newer-release`; reading such a record still works.
+
 - A pi or omp seat in a herdr pane now gets its brief through the agent prompt door (one send that types and submits), as codex does. The raw typed brief took 7 to 25 s and sometimes lost its final Enter, and a seat stopped mid-typing could leave the rest of the brief in the pane's shell. The supervisor also re-reads its stop state before every send into the pane.
 
 - `npm test` now prepares the release fgos, fgctl and native addon it tests against (incremental), so the suite is green on a fresh machine, not only in CI.
