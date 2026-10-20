@@ -69,6 +69,7 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
   available();
   if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
   const native = call(() => loadNativeAddon(loaderOptions).openStore(resolvedRoot, machineId, files, remote));
+  const views = new WeakMap();
   const facade = {
     commonDir: resolvedRoot.commonDir,
     machineId,
@@ -82,7 +83,14 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
     readInGate(origin, stream, cursorSeq) { return call(() => native.readInGate(origin, stream, cursorSeq)); },
     read({ streams, cursor = null, folded = [], project = true }, heldRanks) {
       const ranks = outsideGate(heldRanks);
-      return historical(call(() => native.read(streams, cursor, folded, project, ranks, hotLockDepth())), 'legacy');
+      const retained = JSON.stringify(folded);
+      const response = call(() => native.read({ streams, cursor, folded: retained, project, view: views.get(folded) }, ranks, hotLockDepth()));
+      const { sequencePrefix, ...result } = historical(response.result, 'legacy');
+      // Preserve independent snapshots and use the exact bytes native verified,
+      // including when a caller supplied objects with custom JSON serialization.
+      result.sequence = (sequencePrefix ? JSON.parse(retained).slice(0, sequencePrefix) : []).concat(result.sequence);
+      views.set(result.sequence, response.view);
+      return result;
     },
     seal(stream, heldRanks, { opportunistic = false } = {}) {
       const ranks = outsideGate(heldRanks);

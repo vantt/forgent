@@ -128,7 +128,9 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
         await new Promise(r=>setTimeout(r,10));
       }
       const start=performance.now();fs.writeFileSync(path.join(barrier,'go'),'go');
-      const timer=setTimeout(()=>{failure=Error('200 mutations exceeded 60 s');for(const c of children)c.kill('SIGKILL');},60000);
+      // Spec 17(a): the 60 s exhaustion bound applies at 20 sessions; other levels only measure, under a safety bound.
+      const limitMs=concurrency===20?60000:900000;
+      const timer=setTimeout(()=>{failure=Error(`200 mutations exceeded ${limitMs/1000} s`);for(const c of children)c.kill('SIGKILL');},limitMs);
       let completed;try{completed=await Promise.all(pending);}finally{clearTimeout(timer);}
       const elapsedMs=performance.now()-start;
       const observations=completed.flatMap(c=>c.measurements.observations);
@@ -149,6 +151,7 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
       }
       const increments=observations.map(o=>o.storeIncrementMs), upperBounds=observations.map(o=>o.incrementUpperBoundMs), waits=observations.map(o=>o.waitMs);
       const row={seed,sessions:concurrency,mutations:observations.length,elapsedMs,windows,spawns,
+        outsideRead:{p50Ms:percentile(observations.map(o=>o.outsideReadMs),.5),p95Ms:percentile(observations.map(o=>o.outsideReadMs),.95)},
         incrementUpperBoundP95Ms:percentile(upperBounds,.95),
         storeIncrementP50Ms:percentile(increments,.5),storeIncrementP95Ms:percentile(increments,.95),
         stages:Object.fromEntries(['readInGate','append','fold','prepareEvents','cacheWrite'].map(stage=>[stage,{
@@ -157,7 +160,7 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
         appendFsyncs:{min:Math.min(...appendFsyncs),max:Math.max(...appendFsyncs),observations:appendFsyncs},
         gitExecsBetweenGates,gitExecsPerSteadyMutation:gitExecsBetweenGates/Math.max(1,windows-concurrency),
         convoy:{waitP50Ms:percentile(waits,.5),waitP95Ms:percentile(waits,.95),waitMaxMs:Math.max(...waits),observations},
-        verdict:observations.length===200&&windows===200&&appendFsyncs.length===200&&spawns===0&&elapsedMs<=60000&&(concurrency!==20||percentile(increments,.95)<=50)?'PASS':'FAIL'};
+        verdict:observations.length===200&&windows===200&&appendFsyncs.length===200&&spawns===0&&(concurrency!==20||(elapsedMs<=60000&&percentile(increments,.95)<=50))?'PASS':'FAIL'};
       result.rows.push(row);console.log(JSON.stringify({...row,convoy:{...row.convoy,observations:undefined}}));
     } finally {for(const c of children)if(c.exitCode===null)c.kill('SIGKILL');}
   }

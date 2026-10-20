@@ -8,7 +8,7 @@ use fgos_event_store::{
     registry::Registry,
 };
 use fgos_git::{GitDriver, Inspect, RepoHandle, ResolveRepo};
-use napi::{Error, Result};
+use napi::{bindgen_prelude::External, Error, Result};
 use napi_derive::napi;
 use serde::Deserialize;
 use serde_json::{json, Value};
@@ -23,6 +23,21 @@ fn available() -> Result<()> {
 }
 fn guarantee(g: &fgos_holder_lock::Guarantee) -> Value {
     json!({"driver":g.driver,"exclusion":g.exclusion.as_str(),"borrow":g.borrow.as_str(),"holders":g.holders.as_str(),"platform":g.platform,"notes":g.notes})
+}
+
+#[napi(object)]
+pub struct EventStoreReadRequest {
+    pub streams: Vec<String>,
+    pub cursor: Value,
+    pub folded: String,
+    pub project: bool,
+    pub view: Option<External<fgos_event_store::read::VerifiedView>>,
+}
+
+#[napi(object)]
+pub struct EventStoreRead {
+    pub result: Value,
+    pub view: External<fgos_event_store::read::VerifiedView>,
 }
 
 #[napi]
@@ -398,13 +413,17 @@ impl EventStore {
     #[napi]
     pub fn read(
         &self,
-        streams: Vec<String>,
-        cursor: Value,
-        folded: Value,
-        project: bool,
+        request: EventStoreReadRequest,
         held_ranks: Vec<u32>,
         hot_lock_depth: u32,
-    ) -> Result<Value> {
+    ) -> Result<EventStoreRead> {
+        let EventStoreReadRequest {
+            streams,
+            cursor,
+            folded,
+            project,
+            view,
+        } = request;
         let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
         let origin = match std::fs::symlink_metadata(self.layout.store()) {
             Ok(_) => {
@@ -420,9 +439,9 @@ impl EventStore {
         } else {
             serde_json::from_value(cursor).map_err(error)?
         };
-        let folded = serde_json::from_value::<Vec<fgos_event_store::envelope::Envelope>>(folded)
+        let folded = serde_json::from_str::<Vec<fgos_event_store::envelope::Envelope>>(&folded)
             .map_err(error)?;
-        let result = fgos_event_store::read::read(
+        let result = fgos_event_store::read::read_with_view(
             driver,
             repo,
             fgos_event_store::read::ReadRequest {
@@ -433,17 +452,28 @@ impl EventStore {
                 folded: &folded,
                 project,
             },
+            view.as_deref(),
         )
         .map_err(error)?;
+        // The facade already owns the supplied prefix. Return only changed
+        // envelopes across N-API; compare complete envelopes, not just hashes.
+        let sequence_prefix = result
+            .sequence
+            .iter()
+            .zip(&folded)
+            .take_while(|(a, b)| a == b)
+            .count();
         let fold = match result.fold {
             fgos_event_store::cursor::Fold::Incremental => json!({"kind":"incremental"}),
             fgos_event_store::cursor::Fold::RebuildRequired { first_difference } => {
                 json!({"kind":"rebuild-required","firstDifference":first_difference})
             }
         };
-        Ok(
-            json!({"events":result.events,"sequence":result.sequence,"legacy":result.legacy.into_iter().map(|e| json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>(),"deferred":result.deferred,"missing":result.missing,"concurrent":result.concurrent,"cursor":result.cursor,"fold":fold,"fullOrder":result.full_order}),
-        )
+        let view = External::new(result.verified_view);
+        Ok(EventStoreRead {
+            view,
+            result: json!({"events":result.events,"sequence":&result.sequence[sequence_prefix..],"sequencePrefix":sequence_prefix,"legacy":result.legacy.into_iter().map(|e| json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>(),"deferred":result.deferred,"missing":result.missing,"concurrent":result.concurrent,"cursor":result.cursor,"fold":fold,"fullOrder":result.full_order}),
+        })
     }
 }
 

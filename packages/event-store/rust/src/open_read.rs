@@ -39,20 +39,39 @@ pub fn decode(
     stream: &StreamId,
     strict: bool,
 ) -> Result<Framed, Error> {
-    if let Some(frame) = VERIFIED.with(|slot| {
+    let prefix = VERIFIED.with(|slot| {
         slot.borrow()
             .as_ref()
             .filter(|cached| {
                 cached.origin == origin
                     && cached.stream == stream.as_str()
                     && cached.strict == strict
-                    && cached.bytes == bytes
+                    && bytes.starts_with(&cached.bytes[..cached.frame.committed_len])
             })
             .map(|cached| cached.frame.clone())
-    }) {
-        return Ok(frame);
-    }
-    let frame = decode_verified(bytes, origin, stream, strict)?;
+    });
+    // Only marker-closed bytes are reusable. Compare the actual prefix on every
+    // read; a rewritten prefix falls back to full verification. Speculative
+    // suffixes are always decoded again, including a newly completed marker.
+    let frame = if let Some(mut prefix) = prefix {
+        let suffix = decode_verified(&bytes[prefix.committed_len..], origin, stream, strict)?;
+        if prefix
+            .events
+            .last()
+            .zip(suffix.events.first())
+            .is_some_and(|(a, b)| a.seq.checked_add(1) != Some(b.seq))
+        {
+            return Err(Error::new(
+                ErrorCode::EventStoreSeqRecoveryConflict,
+                "committed active batches have gap or overlap",
+            ));
+        }
+        prefix.committed_len += suffix.committed_len;
+        prefix.events.extend(suffix.events);
+        prefix
+    } else {
+        decode_verified(bytes, origin, stream, strict)?
+    };
     // Bound retained memory; large immutable histories are never retained.
     VERIFIED.with(|slot| {
         *slot.borrow_mut() = (bytes.len() <= 4 * 1024 * 1024).then(|| VerifiedFrame {
