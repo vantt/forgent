@@ -321,7 +321,9 @@ An adapter passes these before it is enabled; the core passes the first four wit
 | 2026-10-20 | The shared key is named `OPENROUTER_API_KEY` (question 5, answered) | owner | accepted; the rename is migration step 4 |
 | 2026-10-20 | Resolver order is environment, then project file, then global file (question 7, answered) | owner | accepted |
 | 2026-10-20 | The core and verbs are Rust (question 1, answered); the Node bridge is a later step, and the first slice only reports the options | owner | accepted; first slice landed on main as the crate `fgos-secrets` |
-| 2026-10-20 | Run the read probe of step X1 from a confined worker | owner | accepted |
+| 2026-10-20 | Run the read probe of step X1 from a confined worker | owner | accepted; run the same day, result in section 17 |
+| 2026-10-20 | Interim rename on the owner's machine: the entry in `.fgos/secrets.local.env` is now `OPENROUTER_API_KEY` with the same value (checked by comparing hashes of the value, never printed). The key itself is not rotated. Tests, docs and the changelog still carry the old name; migration step 4 is otherwise open | owner | done on this machine only; other machines keep their own file |
+| 2026-10-20 | The secrets auto-load hook was removed from `~/.zshrc` and `~/.bashrc` on the owner's machine (migration step 1). Checked before: no runtime code reads the variable, no other project has a secrets file, the pi login store holds the key. Checked after, from a fresh interactive zsh and bash with the old variables removed from the inherited environment: none of the three key variables is set, and `fgos dispatch probe-account` for `deepseek` and `z-ai` is healthy. The removed blocks are kept in `~/.fgos/removed-secrets-hook-261020.txt` for restore | owner | done on this machine; other machines follow the guide |
 | 2026-10-17 to 2026-10-19 | The OpenRouter key variable leaves the pi invocation env; the key is read from the login store | maintainer | landed in `4f6fc44d7`; kept by this spec |
 | 2026-08-25 | Secret values in `herdr pane --env` argv are an accepted risk | owner | recorded in `76d8539d1`; reopened as question 8 |
 
