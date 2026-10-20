@@ -1,0 +1,168 @@
+---
+area: seat-binding
+updated: 2026-10-20
+status: draft — chờ owner đọc và cho taste; chưa có code nào đổi theo bản này
+sources: [research-261020-0955-seat-binding-needs-and-mechanisms-inventory, discussion-261020-0947-model-tier-by-capability-and-seat, problem-261017-0022-model-tier-selection-misfit, model-pool-b1-fallback-and-account-order]
+---
+
+# Spec nháp: Seat Binding — ai ngồi ghế nào, ở tier nào, vì luật nào
+
+Nguồn sự thật đầu vào: [bản kiểm kê](research-261020-0955-seat-binding-needs-and-mechanisms-inventory.md) (N = nhu cầu, D = khó khăn, K = núm, O = chồng chéo; mọi số hiệu dưới đây trỏ về đó). Hướng của owner 2026-10-20 09:44–10:05: gom mọi chuyện chọn ghế vào một tài liệu và **một component có authority và ranh giới riêng**, đạt ba mục tiêu kép.
+
+## 1. Ba mục tiêu (owner, 2026-10-20 09:54)
+
+1. **Linh hoạt:** nhu cầu nào cũng cấu hình được, kể cả taste theo từng ghế (red-team chạy xai) và theo từng capability.
+2. **Rõ ràng:** cấu hình xong phát biểu được, và máy in ra được, đúng một câu cho mỗi ghế: *ghế X của capability Y chạy họ F, model M, tier T, account A — họ lấy từ luật …, tier từ luật …, trần từ luật …*.
+3. **Config đơn giản:** mỗi sự thật khai một lần, mặc định suy ra được, người khai chỉ viết chỗ khác mặc định.
+
+Nguyên tắc chọn model của owner (2026-10-20 09:50, memory `feedback_model_tier_by_nature_of_work`): việc đơn giản đã có kế hoạch và hướng dẫn chi tiết → model rẻ đúng trình độ; việc cần suy nghĩ phức tạp, góc nhìn riêng, thiết kế đặc biệt → họ cao cấp.
+
+## 2. Vì sao hôm nay rối (ba gốc rễ)
+
+| Gốc | Biểu hiện | Số hiệu |
+|---|---|---|
+| **G1. Rigor gánh ba việc** | Một giá trị `rigor` quyết cùng lúc tier (`rigorToTier`), số ghế checker (`checkersByRigor`) và độ chặt khác họ (distinct families ở high/critical). Muốn hội đồng mạnh thì phải chịu thêm checker; muốn rẻ thì không được chặt. Checker đọc rigor của unit, tier đọc rigor mạnh hơn của unit/capability. Tier `advanced` không rigor nào trỏ tới. | O3, O4, O16, N34, N37, D30, D32 |
+| **G2. Không có cấp "ghế" trong config** | Pool của capability là pool của **mọi** ghế trong unit, kể cả checker. Taste theo ghế chỉ làm được bằng đảo `prefer` cả capability (D24) hoặc `--override` từng lượt; preset cấm khai executor/tier (G2 của workflow). | N3, N5, O1, O11, O13, D24, D28 |
+| **G3. Một quyết định nhiều nơi tính** | Tier tính ở 6 chỗ, chỉ `bind` áp trần; model ở 3 chỗ; 2 walker; cổng ghi và doctor tính lại thiếu đầu vào; `explain` chỉ thấy một ghế producer. | N17, O7, O9, O17, D3, D16, D17, D31 |
+
+Thêm: từ vựng chéo nhau (`prefer` theo executor, `tierFallback` theo họ, `--provider` theo executor, "provider" bốn nghĩa — O2), ~25 capability lặp cùng một danh sách 5 họ (O14), `maxTier` không được validate và nằm ngoài hash config (O19).
+
+## 3. Component Seat Binding
+
+### 3.1 Authority (một câu)
+
+**Seat Binding là authority duy nhất trả lời: "ghế này chạy ai (họ, invocation, model), ở tier nào, bằng account nào, và khi hỏng thì sang đâu" — kèm lý do cho từng phần.** Không component nào khác tự tính tier, model, thứ tự họ, thứ tự account hay bước dự phòng.
+
+### 3.2 Ranh giới
+
+| Thuộc Seat Binding | Không thuộc Seat Binding |
+|---|---|
+| Tier của ghế, trần, thứ tự họ, ô model và pool, thứ tự account, quyết định xoay account hay đi tiếp (walk), kiểm pin/override, độ chặt khác họ khi chọn, câu giải thích | Số ghế và tên ghế của một pattern (Collaboration Patterns quyết; Seat Binding chỉ nhận danh sách ghế) |
+| Trạng thái account: lease, quarantine, lazy probe (`provider-capacity` thành kho trạng thái của component, adapter infra) | Chạy agent, transport, confinement, copy kho đăng nhập (Dispatch Transport and Confinement) |
+| Một hàm thuần cho quyết định + một port cho trạng thái account sống | Admission của case, frame, trần seat-launch (Workflow; Seat Binding chỉ báo số launch đã dùng) |
+| `explain` và `dry-bind` là chính hàm đó chạy không lease | Model của agent in-process trong harness (ngoài fgOS; ghi là ngoài phạm vi — N17 phần này để mở) |
+
+Bên dùng (chỉ hỏi, không tự tính): `runUnit` của hai cửa `fgos run` và `fgos workflow`, đường Work (`assignment-policy` thành bên dùng mỏng, bỏ phần tự tính tier/model), cổng ghi, doctor, `fgos dispatch explain`, `workflow start --seats`. Walker thứ hai `attemptProviderCapacityFallback` bị xoá, đường cũ chuyển sang walk của component (L10).
+
+### 3.3 Hình dạng
+
+- **Lõi quyết định thuần:** `bindSeat(ask, config, accountView) → { binding, why }`, trong đó `ask` = {capability, role, unit (writes, blind, skills), ghế đã ngồi trước (cho luật khác họ và spread), bước walk đã đi (`tried`, `excludePools`), override của người gọi}; `accountView` = ảnh chụp chỉ-đọc trạng thái account. Cùng một đầu vào cho cùng một đầu ra — cổng ghi và doctor gọi lại đúng hàm này với đầu vào đã ghi trong `unit.json` (đóng D16).
+- **Port trạng thái account:** `lease(pool, ranked)`, `release`, `quarantine`, `probe` — adapter là `provider-capacity` hôm nay (khoá kernel giữ nguyên).
+- **Từ vựng tier** (`TIER_STRENGTH`, `resolveStrongerTier`) và rigor chuyển xuống một leaf kernel dùng chung (hôm nay `bind` import từ `assignment-policy` — 6.3 kiểm kê).
+- **Ngôn ngữ:** câu hỏi cho owner (mục 9). Đề xuất Node trước: mọi bên gọi là Node, quyết định là logic thuần trên config, giống quyết định admission ở Node (N14 của workflow); chuyển Rust khi có bên gọi Rust.
+
+## 4. Tách ba việc của rigor (đóng G1)
+
+| Khái niệm | Trả lời | Quyết bởi | Không còn quyết |
+|---|---|---|---|
+| **tier** | model mạnh tới đâu | khai trực tiếp: `tier` của capability, của ghế, của role (mục 5) | — |
+| **rigor** | cẩn thận tới đâu | rigor của capability (sàn) và của unit, mạnh hơn thắng — **một** quy tắc cho cả hai việc dưới | không còn chọn tier |
+| ↳ số ghế checker | bao nhiêu người soát | `checkersByRigor[rigor]` (đọc rigor đã gộp, sửa O4) | |
+| ↳ độ chặt khác họ | các ghế có phải khác họ | high/critical → mỗi ghế một họ | |
+| **trần** | tối đa được bao nhiêu | `maxTier` global + `maxTier` của capability | |
+
+Hệ quả theo nguyên tắc owner: việc đã có plan (code) chạy rigor cao (nhiều checker, chặt) mà vẫn tier rẻ; hội đồng thiết kế chạy tier cao mà không buộc thêm checker. `rigorToTier` bị xoá (L10); `advanced` thành tier khai được như mọi tier khác (đóng N34).
+
+## 5. Config: một chỗ cho mỗi sự thật
+
+### 5.1 Các lớp và thứ tự ưu tiên
+
+Mỗi thuộc tính của ghế (`tier`, `families`) lấy từ lớp **cụ thể nhất** có khai; lớp trên đè lớp dưới, không trộn danh sách:
+
+1. **Override của người** trong lượt chạy (`--override`, `--tier` mới, `--account`) — chỉ origin người (`human-cli`) được nâng tier; override do agent tạo không được vượt tier đã cấu hình (chặn lại sự cố D1). Vượt trần → **từ chối có tên**, không clamp im lặng (N36).
+2. **Ghế trong capability:** `capabilities.<cap>.seats.<role>`.
+3. **Role toàn hệ thống:** `roles.<role>` (ví dụ `red-team` → xai).
+4. **Capability:** `capabilities.<cap>`.
+5. **Nhóm capability:** `capabilities."<domain>:*"` (gom ~25 danh sách lặp — O14).
+6. **Mặc định runner:** `defaults` (tier `standard`, families theo `tierFallback` của tier đó).
+
+Luật khác họ (independence) và spread **luôn** áp sau cùng, như bộ lọc: một role ưu tiên xai nhưng producer đã là xai thì ghế tự sang họ kế, và câu giải thích nói rõ vì sao.
+
+### 5.2 Hình dạng đề xuất (project `.fgos/config.json`, `runner`)
+
+```json
+"defaults": { "tier": "standard" },
+"maxTier": "flagship",
+"tierFallback": {
+  "nano":     ["gemini", "deepseek", "z-ai", "claude", "openai"],
+  "standard": ["gemini", "deepseek", "z-ai", "claude", "openai"],
+  "advanced": ["gemini", "deepseek", "z-ai", "claude", "openai"],
+  "flagship": ["claude", "openai", "gemini", "xai"],
+  "frontier": ["claude", "openai", "gemini", "xai"]
+},
+"roles": {
+  "red-team": { "families": ["xai"] }
+},
+"capabilities": {
+  "code:*":            { "families": ["gemini#omp-herdr", "deepseek", "z-ai", "claude"] },
+  "code:review":       { "families": ["openai#codex-cli-bwrap", "claude#claude-cli-bwrap"] },
+  "business:*":        { "families": ["claude", "openai", "gemini", "xai", "z-ai#pi-cli-bwrap"] },
+  "architecture:*":    { "tier": "flagship", "rigor": "high" },
+  "architecture:shape":     { "seats": { "panelist-1": { "tier": "frontier" } } },
+  "architecture:synthesize": { "tier": "frontier", "maxTier": "frontier", "rigor": "critical" },
+  "architecture:explain":   { "tier": "standard" }
+}
+```
+
+- `families` thay `prefer`, nói bằng **họ** (khớp `tierFallback`, `modelPolicies`; đóng O2); ghim invocation viết `họ#invocation`. Một họ có đúng một executor (RUL102), nên không mất thông tin.
+- `families` chỉ là thứ tự **ưu tiên lượt đầu**; khi hỏng đi tiếp theo `tierFallback` của tier, giới hạn trong các họ có trong `families` (giữ quyết định owner Q4: capability chỉ thu hẹp).
+- `seats.<role>` và `roles.<role>` chỉ có hai khoá: `tier`, `families`. Không có khoá nào khác ở cấp ghế (giữ config nhỏ).
+- `maxTier` của capability cho phép config khai tier vượt trần global cho đúng capability đó (thay luật "rigor của capability nâng trần", RUL103) — nhìn vào config là thấy chỗ nào được phép lên frontier.
+- Preset vẫn chỉ khai ý định (capability, pattern, persona); không mang tier/họ (giữ G2 của workflow, quyết định 0057). Taste theo ghế nằm ở config, một chỗ.
+- `modelPolicies`, `llmAccounts`, `executors` giữ nguyên hình dạng D-ADR0071 / MP-B2.
+
+### 5.3 Câu giải thích (máy in ra)
+
+`fgos dispatch explain` mở rộng: `--for <cap> [--role <r>]` cho một ghế, `--preset <id>` cho mọi ghế của một preset theo thứ tự chạy. Mỗi ghế in một dòng và nguồn từng phần, ví dụ:
+
+```
+architecture-advisory / critique-proposals / red-team
+  → xai grok-4.6 @ flagship, account xai/vantt
+    families: roles.red-team [xai]; independence: producer=xai? no → kept
+    tier: capabilities."architecture:*".tier = flagship; ceiling: maxTier flagship
+    on failure: rotate xai accounts → tierFallback.flagship ∩ families → (none left: refuse)
+```
+
+Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đều có ứng viên" bằng chính hàm này (thay `workflow-pools-satisfy-independence`).
+
+## 6. Dây chuyền một ghế (thứ tự cố định)
+
+1. **Tier:** override người (nếu có, kiểm quyền và trần) → `seats.<role>.tier` → `roles.<role>.tier` → `capability.tier` → nhóm → `defaults.tier`. Trần = `capability.maxTier` nếu khai, nếu không là `maxTier` global; vượt trần do người hỏi → từ chối có tên.
+2. **Thứ tự họ lượt đầu:** override executor → `seats.<role>.families` → `roles.<role>.families` → `capability.families` → nhóm → `tierFallback.<tier>`.
+3. **Lọc:** governance, skills, blind, posture, pool dùng được, **khác họ** (hard, theo rigor đã gộp), spread (soft).
+4. **Ô model và pool:** `modelPolicies.<họ>.<tier>` theo thứ tự các mục; thiếu ô → `tier-cell-missing`.
+5. **Account:** pin `pool/account` nếu có; nếu không, thứ tự khai trong pool, sticky trước, bỏ quarantine/disabled/không có kho đăng nhập (D-ADR0071).
+6. **Khi hỏng:** xoay account cùng pool (trừ ghế ghi đã sửa worktree, ghế bị pin, hết trần launch của frame) → mục kế trong ô cùng họ → họ kế theo `tierFallback.<tier>` ∩ danh sách họ của bước 2 → hết thì báo `fallbackExhausted` có lý do.
+7. **Ghi lại:** binding + câu giải thích vào `unit.json`; cổng ghi và doctor tính lại bằng chính bước 1–6 với đầu vào đã ghi.
+
+## 7. Nhu cầu → spec
+
+| Nhu cầu | Ở đâu trong spec |
+|---|---|
+| N1, N21, N34 code rẻ đúng trình độ, `advanced` khai được | 4, 5.2 (`code:*` families, tier mặc định standard hoặc khai `advanced`) |
+| N2, N33 thiết kế đặc biệt lên cao cấp, frontier có chủ đích | 5.2 `architecture:*`, `maxTier` theo capability |
+| N3, N5 taste theo ghế, red-team → xai | 5.1 lớp 2–3, 5.2 `roles`, `seats` |
+| N6 khác họ | 6 bước 3, rigor đã gộp (sửa O4) |
+| N7–N10, N28 xoay, dự phòng, pin, quarantine | 6 bước 5–6 (giữ nguyên D-ADR0071) |
+| N15 giải thích được | 5.3 |
+| N16, O14 config ngắn | 5.1 lớp 5 (`"<domain>:*"`), 5.2 |
+| N17, D3, D31 một authority | 3 |
+| N18, N35, N36 trần theo capability, quyền override | 5.1 lớp 1, 5.2 `maxTier` capability |
+| N19 đo chi phí | ngoài phạm vi (MP-COST Q2) |
+| N30 global config không làm vỡ release khác | 8 |
+
+## 8. Chuyển đổi (L10, một đợt cho mỗi contract)
+
+1. Lõi `bindSeat` + port account trong component; mọi bên gọi chuyển sang; xoá tier/model riêng của `assignment-policy`, `dispatch/cli.mjs`, `assignment.mjs`; xoá walker thứ hai.
+2. Config: `prefer` → `families` (MP-C gộp vào đây), `rigorToTier` xoá, thêm `tier`/`maxTier` capability, `roles`, `seats`, nhóm `"<domain>:*"`, `defaults`. Một lệnh `fgos setup` chuyển config cũ sang mới một lần, in diff; các key mới chỉ ở **project config** cho tới khi mọi release trên máy đọc được (N30, D22).
+3. `explain` theo ghế và theo preset; doctor dùng cùng hàm.
+4. Spec: file `docs/specs/seat-binding.md`, dòng mới trong `docs/platform/component-boundary.md`, supersede RUL80/91/98/102/103/106 phần chọn ghế bằng record mới (không sửa tại chỗ).
+
+## 9. Câu hỏi cho owner
+
+1. **Tách rigor khỏi tier (mục 4):** đồng ý xoá `rigorToTier`, tier khai trực tiếp? Hệ quả cần biết: item Work `risk: heavy` hôm nay tự lên flagship; sau tách nó chỉ thêm checker, tier giữ theo capability.
+2. **Lớp `roles` toàn hệ thống (mục 5.1 lớp 3):** đồng ý có taste theo role chung (red-team → xai), hay chỉ cho taste theo ghế trong từng capability?
+3. **Override của agent:** chỉ người (`human-cli`) được nâng tier; agent tự nâng → từ chối có tên. Đồng ý?
+4. **Ngôn ngữ component:** Node trước (đề xuất), hay Rust ngay theo luật thiết kế 4?
+5. **Có cần hội đồng kiến trúc soát bản này trước khi duyệt?** Đề xuất có: nó đổi authority và contract config của mọi lượt chạy.
+6. **Năm câu taste** của [báo cáo thảo luận](discussion-261020-0947-model-tier-by-capability-and-seat.md) (số ghế frontier ở `shape-proposals`, `explain` hạ tier, synthesis business/delphi, panel ý kiến dẫn bằng họ rẻ, `code:review`) — có thể trả lời sau, vì chỉ là giá trị trong config mới.
