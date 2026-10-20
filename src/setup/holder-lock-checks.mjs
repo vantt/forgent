@@ -22,6 +22,7 @@ import { PROTOCOL, KILL_WAIT_CONFIG_KEY, DEFAULT_KILL_WAIT_MS, MAX_KILL_WAIT_MS,
 import { resolveStateRoot, STATE_ROOT_ENV, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { loadLockRegistry } from '../holder-lock/registry.mjs';
 import { isCutOverLock, fenceStatus, fenceCutover, defaultProviderRuntimeDir } from '../holder-lock/fences.mjs';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { judge } from '../runner/dispatch/process-identity.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { listOpenAttemptDirs } from '../run-supervisor/client.mjs';
@@ -568,6 +569,25 @@ export function checkLockHolders(repoRoot) {
 // ---------------------------------------------------------------------
 
 /**
+ * The workspace's Git listing the fences need, read through Inspect:
+ * holder-lock sits below Git and never lists worktrees or branches itself.
+ * Empty outside a repository.
+ */
+export function workspaceListing(repoRoot) {
+  const inspect = createGitInspect(gitPortOptions(repoRoot));
+  if (inspect.resolveRepo().notARepository) return { worktrees: [], branches: [] };
+  const worktrees = [];
+  let cursor;
+  do {
+    const page = inspect.listWorktrees({ cursor, maxEntries: 4096 });
+    for (const row of page.entries) worktrees.push(Buffer.from(row.path).toString('utf8'));
+    cursor = page.nextCursor;
+  } while (cursor);
+  const branches = inspect.listBranches({ prefix: 'refs/heads/' }).map((ref) => ref.slice('refs/heads/'.length));
+  return { worktrees, branches };
+}
+
+/**
  * Every legacy lock path of the registry carries its cutover fence. A
  * missing fence warns and names the fix; an old lock file still present
  * is named, because it blocks the fix.
@@ -575,7 +595,7 @@ export function checkLockHolders(repoRoot) {
 export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProviderRuntimeDir() } = {}) {
   let status;
   try {
-    status = fenceStatus({ fgosDir: fgosDirOf(repoRoot), workspaceRoot: path.resolve(repoRoot), providerRuntimeDir });
+    status = fenceStatus({ fgosDir: fgosDirOf(repoRoot), workspaceRoot: path.resolve(repoRoot), ...workspaceListing(repoRoot), providerRuntimeDir });
   } catch (err) {
     return { passed: false, message: `cannot read the fence status: ${err.message}` };
   }
@@ -663,8 +683,10 @@ export function fixLockFences(repoRoot, { providerRuntimeDir = defaultProviderRu
   const workspaceRoot = path.resolve(repoRoot);
   const fgosDir = fgosDirOf(repoRoot);
   let status;
+  let listing;
   try {
-    status = fenceStatus({ fgosDir, workspaceRoot, providerRuntimeDir });
+    listing = workspaceListing(repoRoot);
+    status = fenceStatus({ fgosDir, workspaceRoot, ...listing, providerRuntimeDir });
   } catch (err) {
     return { changed: false, message: `cannot read the fence status: ${err.message}` };
   }
@@ -678,7 +700,7 @@ export function fixLockFences(repoRoot, { providerRuntimeDir = defaultProviderRu
   if (owners.length === 0) return { changed: false, message: 'fences not placed: the activated release does not yet take the locks still missing a fence; activate the release that ships them first' };
   let result;
   try {
-    result = fenceCutover({ workspaces: [workspaceRoot], fgosDir, workspaceRoot, providerRuntimeDir, owners, ...(bin ? { hostBin: bin } : {}), ...(excludePids ? { excludePids } : {}) });
+    result = fenceCutover({ workspaces: [{ root: workspaceRoot, worktrees: listing.worktrees }], fgosDir, workspaceRoot, ...listing, providerRuntimeDir, owners, ...(bin ? { hostBin: bin } : {}), ...(excludePids ? { excludePids } : {}) });
   } catch (err) {
     return { changed: false, message: `fences not placed: ${err.message}` };
   }

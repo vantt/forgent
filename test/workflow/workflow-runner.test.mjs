@@ -1,7 +1,7 @@
-import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 // test/workflow/workflow-runner.test.mjs — Integration tests for Workflow runner & sequencer (P3a)
 
 import '../helpers/process-tmp-root.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
@@ -2194,4 +2194,38 @@ test('an integration conflict fails the workflow and preserves both branches', a
   assert.equal(tip(wt.worktreePath), oldSource);
   assert.equal(fs.readFileSync(path.join(wt.worktreePath, 'README.md'), 'utf8'), 'incoming\n');
   assert.ok(readWorkflowEvents({ repoRoot: tmp, workflowRunId }).some(e => e.type === 'step.fail' && /integration.*refused/.test(e.payload.reason)));
+});
+
+test('integration lands nothing for a branch the target already contains or a unit without a branch', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({ id: 'test/already-integrated', steps: [
+    { id: 'write', units: [
+      { id: 'u1', template: { capability: 'docs:write', writes: ['notes.md'] } },
+      { id: 'u2', template: { capability: 'docs:read' } },
+    ] },
+    { id: 'land', kind: 'integrate', dependsOn: ['write'], units: [] },
+  ] });
+  const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
+  const wt = createWorkflowWorktree({ repoRoot: tmp, branch: `wf/${workflowRunId}/u1` });
+  worktreeDirs.push(wt.worktreePath);
+  fs.writeFileSync(path.join(wt.worktreePath, 'notes.md'), 'landed earlier\n');
+  execFileSync('git', ['add', 'notes.md'], { cwd: wt.worktreePath });
+  execFileSync('git', ['commit', '-qm', 'notes'], { cwd: wt.worktreePath });
+  assert.equal((await mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: wt.branch, targetBranch: 'main' })).merged, true);
+  const tip = () => execFileSync('git', ['rev-parse', 'refs/heads/main'], { cwd: tmp, encoding: 'utf8' }).trim();
+  const landed = tip();
+  const hold = acquireAdvanceLock(tmp, workflowRunId);
+  try {
+    for (const [type, payload] of [
+      ['step.start', { stepId: 'write' }],
+      ['unit.scheduled', { stepId: 'write', unitId: 'u1', ...wt }],
+      ['unit.complete', { stepId: 'write', unitId: 'u1', outcome: 'pass' }],
+      ['unit.scheduled', { stepId: 'write', unitId: 'u2' }],
+      ['unit.complete', { stepId: 'write', unitId: 'u2', outcome: 'pass' }],
+      ['step.complete', { stepId: 'write', outcome: 'pass' }],
+    ]) appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type, payload }, hold });
+  } finally { hold.release(); }
+  const state = await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
+  assert.equal(state.steps.land.status, 'completed', JSON.stringify(readWorkflowEvents({ repoRoot: tmp, workflowRunId }).filter(e => /fail/.test(e.type))));
+  assert.equal(tip(), landed, 'no second merge for work the target already has');
 });

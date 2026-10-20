@@ -1,5 +1,5 @@
-import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import '../helpers/process-tmp-root.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

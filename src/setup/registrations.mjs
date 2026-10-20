@@ -1,5 +1,5 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
-import { checkGit, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
+import { checkGit, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
@@ -353,16 +353,18 @@ function checkCliVersionVisible() {
   return { passed: true, message: `fgos ${info.packageVersion}${commitPart} — ${info.verbs.length} verbs` };
 }
 
-function checkNodeAndGit() {
+function checkNodeAndGit(cwd) {
   const major = parseInt(process.version.slice(1).split('.')[0], 10);
   if (Number.isNaN(major) || major < MIN_NODE_MAJOR) {
     return { passed: false, message: `node ${process.version} — need >=${MIN_NODE_MAJOR}` };
   }
+  let floor;
   try {
-    execFileSync('git', ['--version'], { encoding: 'utf8' });
+    floor = gitFloor(cwd);
   } catch (err) {
     return { passed: false, message: `git not available: ${err.message}` };
   }
+  if (!floor?.version) return { passed: false, message: 'git not available: fgos-git found no Git binary' };
   return { passed: true, message: `node ${process.version}, git available` };
 }
 
@@ -4103,13 +4105,12 @@ function checkDocCurrentPathMissing(cwd) {
   if (!fs.existsSync(path.join(root, '.git'))) return { passed: true, message: 'skipped (not a git checkout)' };
   const view = rebuild(fgosDir);
   const missing = [];
+  let head = null;
+  try { head = commitAt(root, 'HEAD'); } catch { /* no commit: every live path is missing at HEAD */ }
   for (const doc of Object.values(view.docs || {})) {
     if (!isLiveDocLifecycle(doc.docLifecycle)) continue;
     try {
-      const inspect = createGitInspect(gitPortOptions(root));
-      const revision = inspect.resolveCommit({ name: 'HEAD' });
-      const [entry] = inspect.pathsAtRevision({ revision, paths: [[...Buffer.from(doc.currentPath)]], maxBlobBytes: 32 * 1024 * 1024 });
-      if (!entry || ['absent', 'error'].includes(entry.value.kind)) throw new Error('current path absent at HEAD');
+      if (!head || !pathExistsAt(root, head, doc.currentPath)) throw new Error('current path absent at HEAD');
     } catch {
       missing.push(`${doc.docId} (${doc.currentPath})`);
     }
@@ -6394,14 +6395,29 @@ const CONVENTION_RULES_PATH = new URL('../../packages/convention/contracts/conve
 
 function conventionWorkingTreeRoot(cwd) {
   try {
-    return execFileSync(
-      'git',
-      ['rev-parse', '--path-format=absolute', '--show-toplevel'],
-      { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
-    ).trim();
+    const facts = createGitInspect(gitPortOptions(cwd)).resolveRepo();
+    return facts.notARepository ? null : facts.worktreeRoot;
   } catch {
     return null;
   }
+}
+
+/**
+ * Whether `relativePath` names an entry at `revision`. A blob larger than the
+ * read budget still exists; any other unreadable answer throws.
+ */
+function pathExistsAt(root, revision, relativePath) {
+  const [entry] = createGitInspect(gitPortOptions(root)).pathsAtRevision({ revision, paths: [[...Buffer.from(relativePath)]], maxBlobBytes: 1 });
+  if (!entry) throw new Error(`no answer for ${relativePath}`);
+  if (entry.value.kind === 'error' && entry.value.cause !== 'blob-too-large') throw new Error(`${relativePath} at ${revision}: ${entry.value.cause}`);
+  return entry.value.kind !== 'absent';
+}
+
+/** The commit `name` resolves to; throws when it names none. */
+function commitAt(root, name) {
+  const oid = createGitInspect(gitPortOptions(root)).resolveCommit({ name });
+  if (!oid) throw new Error(`${name} is not a commit`);
+  return oid;
 }
 
 function packagedConventionCutoff() {
@@ -6419,12 +6435,7 @@ function packagedConventionCutoff() {
 
 function pathWasIntroducedAfter(root, relativePath, cutoff) {
   try {
-    execFileSync(
-      'git',
-      ['cat-file', '-e', `${cutoff}:${relativePath}`],
-      { cwd: root, stdio: 'ignore' },
-    );
-    return false;
+    return !pathExistsAt(root, commitAt(root, cutoff), relativePath);
   } catch {
     return true;
   }
@@ -6471,11 +6482,7 @@ export function checkConventionConformance(cwd, {
   let cutoff;
   try {
     cutoff = cutoffResolver(root);
-    execFileSync(
-      'git',
-      ['cat-file', '-e', `${cutoff}^{commit}`],
-      { cwd: root, stdio: 'ignore' },
-    );
+    commitAt(root, cutoff);
   } catch (error) {
     return {
       passed: true,

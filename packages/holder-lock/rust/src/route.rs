@@ -516,13 +516,18 @@ fn lock_borrow_vectors(args: &[String]) -> i32 {
 }
 
 fn quiesce_scan(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--root", "--exclude-pid"], &["--workspace-only"]) {
+    let flags = match Flags::parse(args, &["--root", "--dir", "--exclude-pid"], &["--workspace-only"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
     let roots: Vec<PathBuf> = flags.values("--root").into_iter().map(PathBuf::from).collect();
     if roots.is_empty() {
         return usage("quiesce-scan needs at least one --root <path>");
+    }
+    // Linked worktrees come from the caller's Git listing; holder-lock never runs Git.
+    let dirs: Vec<PathBuf> = flags.values("--dir").into_iter().map(PathBuf::from).collect();
+    if !dirs.is_empty() && roots.len() != 1 {
+        return usage("quiesce-scan --dir belongs to exactly one --root");
     }
     let mut exclude = Vec::new();
     for raw in flags.values("--exclude-pid") {
@@ -531,32 +536,20 @@ fn quiesce_scan(args: &[String]) -> i32 {
             Err(_) => return usage(&format!("--exclude-pid needs a pid, got {raw}")),
         }
     }
-    quiesce::scan(&roots, &exclude, flags.has("--workspace-only"))
+    quiesce::scan(&roots, &dirs, &exclude, flags.has("--workspace-only"))
 }
 
 mod quiesce {
     use super::*;
     use fgos_process::facts::{scan as scan_processes, Scan, ScanFilter};
 
-    /// A workspace root and every linked worktree of it.
-    fn workspace_dirs(root: &Path) -> Vec<PathBuf> {
+    /// A workspace root and the linked worktrees its caller listed.
+    fn workspace_dirs(root: &Path, linked: &[PathBuf]) -> Vec<PathBuf> {
         let mut dirs = vec![root.canonicalize().unwrap_or_else(|_| root.to_path_buf())];
-        let listing = std::process::Command::new("git")
-            .arg("-C")
-            .arg(root)
-            .args(["worktree", "list", "--porcelain"])
-            .stdin(std::process::Stdio::null())
-            .stderr(std::process::Stdio::null())
-            .output();
-        if let Ok(out) = listing {
-            for line in String::from_utf8_lossy(&out.stdout).lines() {
-                if let Some(path) = line.strip_prefix("worktree ") {
-                    let p = PathBuf::from(path);
-                    let p = p.canonicalize().unwrap_or(p);
-                    if !dirs.contains(&p) {
-                        dirs.push(p);
-                    }
-                }
+        for p in linked {
+            let p = p.canonicalize().unwrap_or_else(|_| p.clone());
+            if !dirs.contains(&p) {
+                dirs.push(p);
             }
         }
         dirs
@@ -639,7 +632,7 @@ mod quiesce {
         false
     }
 
-    pub(super) fn scan(roots: &[PathBuf], exclude: &[u32], workspace_only: bool) -> i32 {
+    pub(super) fn scan(roots: &[PathBuf], linked: &[PathBuf], exclude: &[u32], workspace_only: bool) -> i32 {
         if !cfg!(target_os = "linux") {
             return emit(Some("unavailable"), json!({ "processes": [], "unreadable": 0, "detail": "process scan is only implemented on Linux; a person confirms no fgOS process is left" }), EXIT_UNAVAILABLE);
         }
@@ -649,7 +642,7 @@ mod quiesce {
             return emit(Some("unavailable"), json!({ "processes": [], "unreadable": 0, "detail": "the scan runs inside a PID namespace that hides the host's processes; run it from the host" }), EXIT_UNAVAILABLE);
         }
         let state_root = state_root::state_root().0;
-        let per_root: Vec<(PathBuf, Vec<PathBuf>)> = roots.iter().map(|r| (r.clone(), workspace_dirs(r))).collect();
+        let per_root: Vec<(PathBuf, Vec<PathBuf>)> = roots.iter().map(|r| (r.clone(), workspace_dirs(r, linked))).collect();
         let filter = ScanFilter { env_keys: vec![state_root::PINNED_ROOT_ENV.to_string()], include_self: false };
         let views = match scan_processes(&filter) {
             Scan::Views(views) => views,
@@ -714,7 +707,7 @@ mod quiesce {
     mod tests {
         use super::could_be_fgos;
         #[cfg(unix)]
-        use super::workspace_argument;
+        use super::{workspace_argument, workspace_dirs};
         #[cfg(unix)]
         use std::path::{Path, PathBuf};
 
@@ -748,6 +741,23 @@ mod quiesce {
                 None,
                 &dirs
             ));
+        }
+
+        #[cfg(unix)]
+        #[test]
+        fn workspace_dirs_are_the_root_and_the_listed_worktrees_only() {
+            let base = std::env::temp_dir().join(format!("fgos-quiesce-dirs-{}", std::process::id()));
+            let (root, linked) = (base.join("root"), base.join("linked"));
+            std::fs::create_dir_all(&root).unwrap();
+            std::fs::create_dir_all(&linked).unwrap();
+            let canonical = |p: &Path| p.canonicalize().unwrap();
+            assert_eq!(workspace_dirs(&root, &[]), vec![canonical(&root)], "nothing is listed for the caller");
+            assert_eq!(
+                workspace_dirs(&root, &[linked.clone(), root.clone(), base.join("gone")]),
+                vec![canonical(&root), canonical(&linked), base.join("gone")],
+                "duplicates collapse and a vanished directory is kept as given"
+            );
+            std::fs::remove_dir_all(&base).unwrap();
         }
 
         #[test]

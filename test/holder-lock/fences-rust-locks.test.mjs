@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { placeFences, fenceStatus, TOMBSTONE_FILE, V1_LOCK_PRESENT } from '../../src/holder-lock/fences.mjs';
+import { workspaceListing } from '../../src/setup/holder-lock-checks.mjs';
 import { useReleaseFixture, fixture, runFgctl } from '../rust-host/fgctl-init-fixture.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
@@ -45,7 +46,7 @@ function workspace(name) {
   return { root, fgosDir: path.join(root, '.fgos'), providerRuntimeDir: path.join(scratch, `${name}-no-provider-capacity`) };
 }
 
-const options = (ws, extra = {}) => ({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, ...extra });
+const options = (ws, extra = {}) => ({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, ...extra });
 
 function rustLockPaths(ws, root = stateHome) {
   return {

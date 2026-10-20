@@ -25,6 +25,7 @@ const {
   fixLockDirs,
   twoProcessProbe,
   activatedHolderLockRelease,
+  workspaceListing,
   MAX_KILL_WAIT_MS,
 } = await import('../../src/setup/holder-lock-checks.mjs');
 const { fenceStatus, placeFences } = await import('../../src/holder-lock/fences.mjs');
@@ -375,7 +376,7 @@ test('lock-fences sees the missing fences, and the fix places them only under an
   activate(root, { withRegistry: false });
   assert.match(activatedHolderLockRelease(root).reason, /still runs the old lock code/);
   assert.match(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }).message, /^fences not placed: the activated release .* still runs the old lock code/);
-  assert.equal(fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir }).complete, false, 'nothing was written');
+  assert.equal(fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, ...workspaceListing(root), providerRuntimeDir }).complete, false, 'nothing was written');
 
   activate(root, { withRegistry: true });
   assert.match(checkLockFences(root, { providerRuntimeDir }).message, / -- stop every fgOS process of this workspace, then run fgos doctor --fix$/);
@@ -392,7 +393,7 @@ test('a payload registry without the Rust callers\' locks fences only the locks 
   const root = workspace('fences-owners');
   // Establish the machine-wide fence independently of earlier tests.
   const preconditionRoot = workspace('fences-owners-precondition');
-  assert.equal(placeFences({ fgosDir: path.join(preconditionRoot, '.fgos'), workspaceRoot: preconditionRoot,
+  assert.equal(placeFences({ fgosDir: path.join(preconditionRoot, '.fgos'), workspaceRoot: preconditionRoot, ...workspaceListing(preconditionRoot),
     providerRuntimeDir: path.join(scratch, 'fences-owners-precondition'), owners: ['4.4'] }).ok, true);
   const providerRuntimeDir = path.join(scratch, 'fences-owners-provider-capacity');
   activate(root, { withRegistry: true });
@@ -406,7 +407,7 @@ test('a payload registry without the Rust callers\' locks fences only the locks 
   const fixed = fixLockFences(root, { providerRuntimeDir, hostBin: workspaceScopedHost() });
   assert.equal(fixed.changed, true, fixed.message);
   assert.match(fixed.message, /^placed 10 fence\(s\)/);
-  const status = fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir });
+  const status = fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, ...workspaceListing(root), providerRuntimeDir });
   // The explicit precondition above placed the machine-wide install tombstone.
   assert.deepEqual(status.missing.map((file) => path.relative(path.join(root, '.fgos'), file)).sort(), [path.join('installation', 'activation.lock'), path.join('observe', '.lock')]);
   assert.deepEqual(status.controllerMissing.map((file) => path.relative(path.join(root, '.fgos'), file)), [path.join('locks', 'activation.lock')], 'the controller fence stays with fgctl');
@@ -429,7 +430,7 @@ test('the fence fix refuses while an fgOS payload of the workspace runs, and nam
   const res = fixLockFences(root, { providerRuntimeDir, hostBin: workspaceScopedHost() });
   assert.equal(res.changed, false);
   assert.match(res.message, new RegExp(`^fences not placed: fgOS processes still running, stop them first: .*pid ${payload.pid} `));
-  assert.equal(fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir }).complete, false);
+  assert.equal(fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, ...workspaceListing(root), providerRuntimeDir }).complete, false);
   await stop(payload);
 });
 
