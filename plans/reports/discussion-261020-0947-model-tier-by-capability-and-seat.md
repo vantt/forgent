@@ -50,3 +50,9 @@ Notes:
 3. Architecture `explain-recommendation`: drop to flagship (or standard)?
 4. Business/delphi synthesis seats: lift to flagship, or keep standard?
 5. Opinion panels at standard (council-lite, delphi, group-cognition, nominal-group): lead with cheap families (gemini, deepseek, glm) instead of claude?
+
+## Owner answers so far
+
+- 2026-10-20 09:58: **confirmed** — `code:implement`, `coding:implement`, `fgos-coding-implement`, `code:test`, `code:refactor`, `execute` follow the proposal (gemini → deepseek → glm → claude, standard tier).
+- `code:review`, `code:debug`: owner undecided.
+- **Red-team seat → xai** (owner: grok tends to break and attack, which suits red-team). Facts: red-team is a checker role of the `reviewed` pattern, bound with the unit's own capability; every `code:*` unit gets it, and every unit at rigor high/critical; a checker must be a different family from the producer (and from the other checkers at high/critical). Today the only per-role lever is a seat override in each preset (`overrides: [{ scope: { role: red-team }, executor: xai }]`), which does not reach one-off `fgos run` units. Options: (a) per-preset overrides, no new mechanism; (b) one role-level preference in config (`runner.roles.<role>.prefer`), a soft preference that keeps the family-independence rule and falls back when xai is the producer or down — a small new lever, owner choice under RUL104. Big lead recommends (b).
