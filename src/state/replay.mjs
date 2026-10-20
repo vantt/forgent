@@ -8,7 +8,7 @@ import { resolveStepAlias } from '../workflow/steps.mjs';
 import { applyKnowledgeEvent } from './knowledge-registry.mjs';
 
 // tsk-49e: every top-level key applyEvent ever writes to `view` is either an
-export const VIEW_SCHEMA_VERSION = 5;
+export const VIEW_SCHEMA_VERSION = 6;
 
 // Containers are copied for incremental replay. Work handlers mutate item
 // fields, so clone those items as well to keep the caller's seed immutable.
@@ -67,8 +67,12 @@ function foldLegacyStage(target, item) {
  */
 export function foldEvents(events, seedView) {
   const view = seedView ? cloneTopLevel(seedView) : { work: {}, decisions: [] };
-  for (const event of events) {
-    const condition = event.payload?.precondition;
+  for (const original of events) {
+    const { precondition, ...payload } = original.payload ?? {};
+    const event = { ...original, payload };
+    if (event.origin) view.preconditionOrigins = { ...view.preconditionOrigins, [event.origin]: true };
+    const condition = precondition;
+
     const before = view.work[event.payload?.id];
     const beforeStatus = before?.status;
     if (condition && event.origin && event.h) {
@@ -83,11 +87,11 @@ export function foldEvents(events, seedView) {
           ? Object.keys(view.work).sort().filter(key => view.work[key].status === condition.capacity.status)
             .map(key => view.preconditionHeads?.[key]?.status).find(head => head && head.origin !== event.origin && (event.seen?.[`${head.origin}:${head.stream}`] ?? 0) < head.seq)
           : view.preconditionHeads?.[id]?.[reason === 'existence' ? 'existence' : 'status'];
-        if (!against || against.origin === event.origin || (event.seen?.[`${against.origin}:${against.stream}`] ?? 0) >= against.seq) {
+        if (Object.keys(view.preconditionOrigins ?? {}).every(origin => origin === event.origin)) {
           throw Object.assign(new Error('work-replay-precondition: causal precondition failed'), { code: 'work-replay-precondition' });
         }
         view.conflicts ??= [];
-        view.conflicts.push({ h: event.h, origin: event.origin, reason, against: against.h });
+        view.conflicts.push({ h: event.h, origin: event.origin, reason, against: against?.h ?? event.h });
         continue;
       }
     }

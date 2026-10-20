@@ -32,7 +32,7 @@ export function readSharedConfig(dir) {
     try {
       return JSON.parse(raw);
     } catch (err) {
-      throw new Error(`cannot parse shared config at "${sharedPath}": ${err.message}`);
+      throw new SyntaxError(`cannot parse shared config at "${sharedPath}": ${err.message}`);
     }
   }
   return {};
@@ -126,7 +126,8 @@ export function writeSharedConfig(dir, config) {
 export function readSharedConfigOrEmpty(dir) {
   try {
     return readSharedConfig(dir);
-  } catch {
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
     return {};
   }
 }

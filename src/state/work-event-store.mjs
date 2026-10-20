@@ -13,7 +13,7 @@ const lifecycle = new Set(JSON.parse(fs.readFileSync(new URL('../../packages/wor
 const refusal = code => Object.assign(new Error(code), { code });
 
 export function prepareWorkStore(dir, mainFgosDir) {
-  const config = readEventStoreConfig(path.dirname(dir));
+  const config = readEventStoreConfig(path.dirname(mainFgosDir));
   const store = prepareStore(path.dirname(dir), { trustedMain: path.dirname(mainFgosDir), config: { eventStore: config } });
   return { store, config };
 }
@@ -55,14 +55,19 @@ export function withWorkState(dir, mainFgosDir, writer, fn, options = {}) {
     readState: (store, { heldRanks, rebuild }) => readWorkState(store, { heldRanks,
       ...(rebuild ? {} : { cachePath: resolveFgosFile(mainFgosDir, FGOS_FILE.STATE) }) }),
     prepareEvents(tx, events) {
-      let decided = structuredClone(tx.view);
+      const states = new Map();
       for (const event of events) {
         const id = event.payload?.id;
-        if (event.type.startsWith('work.') && id) {
-          const item = decided.work[id];
-          event.payload.precondition = { ...event.payload.precondition, exists: !!item, ...(item ? { expectedStatus: item.status } : {}) };
-        }
-        decided = foldEvents([event], decided);
+        if (!event.type.startsWith('work.') || !id || event.type === 'work.discovery') continue;
+        const item = states.get(id) ?? { exists: !!tx.view.work[id], status: tx.view.work[id]?.status };
+        const transitions = event.type === 'work.move' || (event.type === 'work.step' && event.payload.toStatus !== undefined);
+        const { expectedStatus, ...condition } = event.payload.precondition ?? {};
+        event.payload.precondition = { ...condition, exists: item.exists,
+          ...(transitions && item.exists ? { expectedStatus: item.status } : {}) };
+        if (event.type === 'work.add') { item.exists = true; item.status = event.payload.status ?? 'todo'; }
+        if (event.type === 'work.move') item.status = event.payload.to;
+        if (event.type === 'work.step' && event.payload.toStatus !== undefined) item.status = event.payload.toStatus;
+        states.set(id, item);
       }
     },
   } });

@@ -292,7 +292,6 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
   const tx = {
     fgosDir: path.resolve(fgosDir),
     mainFgosDir,
-    eventStore,
     head,
     writer,
     /** Only a prepared consumer gate may acknowledge typed events. */
@@ -329,14 +328,14 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
       return fs.readFileSync(target, 'utf8');
     },
     exists(target) {
-      guard(target);
+      guard(target, true);
       const key = path.resolve(target);
       return staging && stagedFiles.has(key) ? stagedFiles.get(key) !== null : fs.existsSync(target);
     },
     list(target) {
-      guard(path.join(target, '.'));
+      guard(path.join(target, '.'), true);
       let names;
-      try { names = new Set(fs.readdirSync(target)); }
+      try { names = new Set(fs.readdirSync(target, { withFileTypes: true }).filter(entry => entry.isFile()).map(entry => entry.name)); }
       catch (error) { if (error.code !== 'ENOENT') throw error; names = new Set(); }
       if (staging) for (const [file, text] of stagedFiles) {
         if (path.dirname(file) === path.resolve(target)) {
@@ -388,8 +387,15 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
       if (stageEffects) {
         commitEvents?.(tx, events);
         staging = false;
-        for (const apply of effects) apply();
-        afterApply?.(tx);
+        try {
+          for (const apply of effects) apply();
+          afterApply?.(tx);
+        } catch (cause) {
+          if (!events.length) throw cause;
+          throw Object.assign(new Error('event-store-committed-with-recovery: append acknowledged; repair from the store before retrying'), {
+            code: 'event-store-committed-with-recovery', committed: true, events, cause,
+          });
+        }
       }
     },
     revoke: () => { live = false; },

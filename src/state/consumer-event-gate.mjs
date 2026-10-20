@@ -28,7 +28,7 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
   if (hotLockDepth() > 0) throw new HotLockError('hot-lock-reentry', 'Work cannot open a nested state transaction');
   if (!store) throw new TypeError('a prepared consumer store is required');
   config ??= readEventStoreConfig(path.dirname(dir));
-  const attempts = config.rebuild.maxAttempts;
+  const attempts = rebuild ? config.rebuild.maxAttempts : 5;
   const extraRoots = path.resolve(mainFgosDir) === path.resolve(dir) ? [] : [dir];
   let recoveryAttempted = false;
   for (let attempt = 0; attempt < attempts; attempt += 1) {
@@ -85,5 +85,5 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
       throw error;
     }
   }
-  throw refusal('event-store-rebuild-busy');
+  throw refusal(rebuild ? 'event-store-rebuild-busy' : 'event-store-catch-up-busy');
 }
