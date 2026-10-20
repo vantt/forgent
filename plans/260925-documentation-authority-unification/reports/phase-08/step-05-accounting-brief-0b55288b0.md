@@ -1,0 +1,12 @@
+# Merge and pair accounting brief (main merge 0b55288b0)
+
+Status: Lead brief for the next Doer turn (non-docs accounting).
+
+You are Doer for Phase 8 of plan 260925-documentation-authority-unification in the fgOS repo. Two accounting tasks, non-docs.
+
+This turn runs under `fgos run`: you only write files; the runner commits them. Do NOT run any git write. Never edit code, docs/**, README.md, AGENTS.md, CLAUDE.md, core/**, domains/**, .agents/**, plugins/**, apps/**, src/**, bin/**, packages/**, test/**, skills, the switchboard, gates, checkers, tests or baselines. Do not read `.fgos/secrets.local.env`, do not touch `.fgos/`. Never run the `fgos` CLI. Writable: plans/260925-documentation-authority-unification/reports/phase-08/**, plans/260925-documentation-authority-unification/ledger/decisions/** (Step 0 rebinds of this merge only), scripts/check-legacy-docs-ratchet.exceptions.json, plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json and .../phase-06/step10-sync4d-reproduction.json. python -B. Scratch /tmp/fgos-work/. Tests with `env -u CLAUDE_CODE_SESSION_ID`.
+
+1. Merge accounting, exactly in the format of owner-answers L12-65..L12-70: Lead merged LOCAL main into the plan branch at 0b55288b0 (main commits: `git log --oneline 0b55288b0^1..0b55288b0^2`: fgos-cook skill, board/report docs, CHANGELOG). Confirm ratchet exits 0 (refresh an exception only if needed; `node --test test/scripts/check-legacy-docs-ratchet.test.mjs` passes), Step 0 binding check on any changed candidate file, list Step 3/4/5 records whose consumer file main changed (deferred to Step 7). Record as L12-73 in owner-answers.md plus a short progress.md entry.
+2. Pair accounting (L12-11 two-commit procedure, see doer accounting turns before): AFTER task 1 is written, run `env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py`, take check A's exact unaccounted commit/path pairs for each manifest, and append each as `{commit, path, authority}` to the `exceptions` array of BOTH phase-06 manifests in the existing format (authority citing L12-11 and the producing commit). Change no other byte. Rerun the reporter: check A must report zero unaccounted pairs other than those your own runner commit will create.
+
+Final message: FIRST line a conventional commit subject (≤100 chars, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em).
