@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add the `debate` collaboration pattern: a thesis side and an antithesis side argue blind in parallel, answer each other's round-1 argument (`params.rebuttal: false` skips it), and a read-only judge on a provider family different from both sides rules; a pool that cannot seat such a judge is refused by name. `group-cognition`'s dialectical step now runs `debate` instead of `reviewed`, and its action synthesis builds on the judge's ruling.
+
 - Add `fgos worktree remove <path> --delivered-to <ref>`: removes a worktree through the Worktree port, which refuses a dirty checkout, one a process stands in, preserved worker state, or a tip not contained in the delivery target (branch name, full ref or object id). No force flag; the delivery statement is recorded as the operation's evidence digest.
 
 - Git typed commit and recovery reads ignore user signature/display settings; suite subprocess census no longer requires strace.

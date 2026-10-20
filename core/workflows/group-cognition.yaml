@@ -1,14 +1,14 @@
 # core/workflows/group-cognition.yaml — Group Cognition Deliberation Workflow
 # Group cognition workflow with divergent sense-making,
-# dialectical inquiry critique with red-team, and convergent action synthesis.
+# a dialectical debate (two opposed sides and an independent judge), and convergent action synthesis.
 
 id: group-cognition
 title: Group Cognition Deliberation Workflow
-description: Group cognition workflow with divergent sense-making, dialectical inquiry critique with red-team, and convergent action synthesis.
+description: Group cognition workflow with divergent sense-making, a dialectical debate between opposed sides ruled by an independent judge, and convergent action synthesis.
 
 # --- Guide head: what the playbook promises, beside the steps below (the steps are unchanged) ---
 kind: playbook
-purpose: Sense-making by independent lenses, a dialectical critique, then one action synthesis.
+purpose: Sense-making by independent lenses, a dialectical debate with a ruling, then one action synthesis.
 must:
   - id: independent-lenses
     guard: independence-blind
@@ -35,25 +35,13 @@ steps:
       - id: dialectical-critique
         template:
           capability: group-cognition:critique
-          pattern: reviewed
-          acceptOutcomes: [pass, findings]
-          params:
-            roleTasks:
-              reviewer: >-
-                You are the reviewer of work another agent just produced. Do not change any file. Read the
-                artifact the task names and the producer's own account of it, listed under Context refs; for a
-                code task also read the changed files. Do not look at git history unless the task names a
-                commit. Report what is wrong, unsupported or missing, with quoted evidence, or say plainly that
-                you found nothing. The task that was assigned: {objective}
-              red-team: >-
-                You are the red-team for work another agent just produced. Do not change any file. Read the
-                artifact the task names and the producer's own account of it, listed under Context refs; for a
-                code task also read the changed files. Do not look at git history unless the task names a
-                commit. Try to break it: wrong claims, hidden assumptions, missed cases. Report concrete
-                failures with quoted evidence, or say plainly that you found none. The task that was assigned:
-                {objective}
+          pattern: debate
           persona: critic
-          objective: Subject sense-making hypotheses to critical challenge, counter-arguments, and red-team review
+          objective: >-
+            Debate the strongest conclusion of the sense-making reports listed under Context refs. The
+            thesis side argues that conclusion, or the strongest current answer when the reports
+            disagree. The antithesis side reverses its load-bearing assumptions and argues the best
+            opposing answer. Each side then answers the other, and a judge on a third provider family rules.
   - id: action-synthesis
     title: Action Synthesis
     dependsOn: [dialectical-inquiry]
@@ -65,7 +53,9 @@ steps:
           persona: synthesizer
           objective: >-
             Converge verified evidence and counter-arguments into an actionable synthesis preserving
-            principled dissent. Write the verdict in this order. (1) UNRESOLVED FIRST: what is still
+            principled dissent. The debate's judge ruling (which side holds, which claims fail, the
+            decision and what would reverse it) is the basis for the disputed points; keep its reasons and
+            any dissent it records instead of re-deciding the debate. Write the verdict in this order. (1) UNRESOLVED FIRST: what is still
             unknown, contested or unsupported, and what would settle it. (2) POSITIONS: each participant's
             position by seat label only, never by role id. (3) AGREEMENT OR SPLIT: say plainly whether they
             agree; if they split, name the split and the sides, and do not average it away or invent

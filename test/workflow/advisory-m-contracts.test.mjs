@@ -98,8 +98,6 @@ function assignment(root, unit, role = 'producer', round = 1) {
 for (const flow of [
   { id: 'business-discussion', review: 'critique', unit: 'challenge-assumptions',
     downstream: 'synthesis', synthesis: 'synthesize-strategy', gate: 'approval' },
-  { id: 'group-cognition', review: 'dialectical-inquiry', unit: 'dialectical-critique',
-    downstream: 'action-synthesis', synthesis: 'synthesize-action' },
   { id: 'architecture-advisory', review: 'critique', unit: 'critique-proposals',
     downstream: 'synthesis', synthesis: 'synthesize-recommendation', gate: 'close' },
   { id: 'marketing/content-publish', review: 'draft', unit: 'draft-copy',
