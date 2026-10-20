@@ -66,7 +66,7 @@ function restoreCheckout(repo, worktree, target, { baseline, reapplyLocalDelta =
 export function resetDispatchWorktree(repo, worktree, target) { return restoreCheckout(repo, worktree, target, { discardLocalDelta: true }); }
 
 import { readWorktreeSetupCommands } from '../config/shared-config-file.mjs';
-import { statusPaths, nulPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
+import { statusPaths, inspectEntries, inspectPath } from '../util/git-paths.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
@@ -172,11 +172,16 @@ function provisioningRecordPath(stateRoot, worktreePath) {
   return path.join(stateRoot, 'worktree-provisioning', `${key}.json`);
 }
 
-// Untracked and ignored paths, a wholly untracked directory collapsed to `dir/`.
+// Untracked and ignored paths, a wholly untracked or ignored directory collapsed
+// to `dir/`. Git also names an ignored path inside a collapsed untracked
+// directory; the directory already covers it.
 function untrackedEntries(worktreePath) {
-  return nulPaths(execFileSync('git', ['ls-files', '--others', '--directory', '-z'], {
-    cwd: worktreePath, encoding: 'utf8', shell: false, maxBuffer: GIT_LIST_MAX_BUFFER,
-  }));
+  const inspect = inspectGit(worktreePath);
+  const listed = inspectEntries((page) => inspect.status({ ...page, untracked: 'normal', ignored: true }))
+    .filter((entry) => entry.untracked || entry.ignored)
+    .map((entry) => inspectPath(entry.path));
+  const dirs = listed.filter((rel) => rel.endsWith('/'));
+  return listed.filter((rel) => !dirs.some((dir) => rel !== dir && rel.startsWith(dir)));
 }
 
 function fileDigest(file) {

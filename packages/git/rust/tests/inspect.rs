@@ -94,14 +94,14 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
         )
         .unwrap();
         fs::write(repo_path.join("untracked"), "new").unwrap();
-        let status = driver.status(&repo, Untracked::All, Submodules::Configured, None, 1).unwrap();
+        let status = driver.status(&repo, Untracked::All, Submodules::Configured, Ignored::Excluded, None, 1).unwrap();
         assert!(!status.complete);
         let last = driver
-            .status(&repo, Untracked::All, Submodules::Configured, status.next_cursor, 1)
+            .status(&repo, Untracked::All, Submodules::Configured, Ignored::Excluded, status.next_cursor, 1)
             .unwrap();
         assert!(last.complete);
         assert!(last.entries.iter().any(|e| e.untracked));
-        let status = driver.status(&repo, Untracked::None, Submodules::Configured, None, 10).unwrap();
+        let status = driver.status(&repo, Untracked::None, Submodules::Configured, Ignored::Excluded, None, 10).unwrap();
         assert_eq!(status.entries[0].path, weird);
         assert_eq!(fs::read(repo.git_dir().join("index")).unwrap(), index);
         assert_eq!(
@@ -129,13 +129,13 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
         assert!(snapshot.files.iter().any(|f| f.path == b"link"
             && matches!(&f.fingerprint,PathFingerprint::Link {target} if target == b"new")));
         let stale = driver
-            .status(&repo, Untracked::All, Submodules::Configured, None, 1)
+            .status(&repo, Untracked::All, Submodules::Configured, Ignored::Excluded, None, 1)
             .unwrap()
             .next_cursor;
         fs::write(repo_path.join("another-untracked"), "third").unwrap();
         assert_eq!(
             driver
-                .status(&repo, Untracked::All, Submodules::Configured, stale, 1)
+                .status(&repo, Untracked::All, Submodules::Configured, Ignored::Excluded, stale, 1)
                 .unwrap_err()
                 .cause,
             "inspect-cursor-stale"
@@ -288,7 +288,7 @@ fn every_non_separator_filename_byte_round_trips_and_snapshots_never_follow_pare
         ResolveRepo::Repository(r) => r,
         _ => panic!(),
     };
-    let status = driver.status(&repo, Untracked::All, Submodules::Configured, None, 4096).unwrap();
+    let status = driver.status(&repo, Untracked::All, Submodules::Configured, Ignored::Excluded, None, 4096).unwrap();
     assert!(status.complete);
     assert_eq!(
         status
@@ -489,7 +489,7 @@ fn inspect_checkout_diffs_counts_index_listing_and_an_absent_state_root() {
     assert!(driver.diff_text(&repo, DiffSides::WorktreeAgainst(&head), &["*".into()], None, 1 << 20).is_err());
 
     let status = |submodules| {
-        driver.status(&repo, Untracked::None, submodules, None, 10).unwrap().entries.iter()
+        driver.status(&repo, Untracked::None, submodules, Ignored::Excluded, None, 10).unwrap().entries.iter()
             .map(|e| String::from_utf8(e.path.clone()).unwrap()).collect::<Vec<_>>()
     };
     assert!(status(Submodules::Configured).contains(&"sub".to_string()));
@@ -511,5 +511,44 @@ fn inspect_checkout_diffs_counts_index_listing_and_an_absent_state_root() {
     }
     assert_eq!(tracked, ["kept", "picked", "renamed", "staged", "sub"].map(|p| p.as_bytes().to_vec()));
     assert_eq!(driver.remote_url(&repo, "origin").unwrap(), "https://example.invalid/fixture.git");
+    let _ = fs::remove_dir_all(&root);
+}
+
+// Provisioning (`fgos worktree create`) records what it placed, ignored bytes included; no other
+// status reader asks for ignored paths, so this is their only proof.
+#[test]
+fn status_lists_ignored_paths_collapsed_only_when_asked() {
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::env::temp_dir().join(format!("fgos-inspect-ignored-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir(&root).unwrap();
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    git(&root, &["init", "-q", "repo"]);
+    let repo_path = root.join("repo");
+    fs::write(repo_path.join(".gitignore"), "node_modules/\n*.log\n").unwrap();
+    git(&repo_path, &["add", "."]);
+    git(&repo_path, &["-c", "user.name=F", "-c", "user.email=f@example.invalid", "commit", "-qm", "init"]);
+    for (rel, bytes) in [("node_modules/x/i.js", "n"), ("mixed/u.txt", "u"), ("mixed/x.log", "l"), ("root.log", "r"), ("new.js", "u")] {
+        let file = repo_path.join(rel);
+        fs::create_dir_all(file.parent().unwrap()).unwrap();
+        fs::write(file, bytes).unwrap();
+    }
+    let driver = GitDriver::new(&root).unwrap();
+    let repo = match driver.resolve_repo(&repo_path, &repo_path).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let listed = |ignored| {
+        let mut entries = driver.status(&repo, Untracked::Normal, Submodules::Configured, ignored, None, 100).unwrap().entries
+            .into_iter().map(|e| (String::from_utf8(e.path).unwrap(), e.untracked, e.ignored)).collect::<Vec<_>>();
+        entries.sort();
+        entries
+    };
+    let untracked = vec![("mixed/".to_string(), true, false), ("new.js".to_string(), true, false)];
+    assert_eq!(listed(Ignored::Excluded), untracked, "ignored paths are left out unless asked for");
+    let mut all = untracked;
+    all.extend([("mixed/x.log".to_string(), false, true), ("node_modules/".to_string(), false, true), ("root.log".to_string(), false, true)]);
+    all.sort();
+    assert_eq!(listed(Ignored::Listed), all, "a wholly ignored directory is collapsed; an ignored file in an untracked one is named");
     let _ = fs::remove_dir_all(&root);
 }

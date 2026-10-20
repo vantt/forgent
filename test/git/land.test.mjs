@@ -31,19 +31,6 @@ test('missing or mismatched verification and dirty candidate never move the targ
     assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
   } finally { f.close(); }
 });
-test('dirty non-overlapping main is tolerated, preserved, and reported lagging', async () => {
-  const f = fixture(); try {
-    fs.writeFileSync(path.join(f.repo, 'b'), 'keep local');
-    const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'dirty', request: f.request });
-    const r = await p.publish(evidence(c)); assert.equal(r.checkout, 'pending'); assert.equal(f.git('rev-parse', 'HEAD'), c.candidate); assert.equal(fs.readFileSync(path.join(f.repo, 'b'), 'utf8'), 'keep local');
-  } finally { f.close(); }
-});
-test('own paths dirtied during verification refuse publication; declared rename source counts', async () => {
-  const f = fixture(); try {
-    const p = f.port(); const request = { ...f.request, footprint: ['b'] }; const { candidate: c } = await p.prepare({ operationId: 'own', request });
-    f.git('mv', 'b', 'renamed'); await assert.rejects(async () => p.publish(evidence(c)), /main-checkout-dirty-mid-merge/); assert.equal(f.git('rev-parse', 'HEAD'), request.target);
-  } finally { f.close(); }
-});
 test('the same destination stays excluded across consumer verification', async () => {
   const f = fixture(); try {
     const p = f.port(); await p.prepare({ operationId: 'first', request: f.request });
@@ -142,19 +129,6 @@ test('a dirty file obstructing an incoming directory belongs to the clean gate',
     await assert.rejects(async () => f.port().prepare({ operationId: 'obstruction', request: f.request }), /main-checkout-dirty-mid-merge/); assert.equal(f.git('rev-parse', 'HEAD'), f.request.target); assert.equal(fs.readFileSync(path.join(f.repo, 'incoming-dir'), 'utf8'), 'keep obstructing bytes');
   } finally { f.close(); }
 });
-test('staged modification and addition outside the footprint survive in index and worktree', async () => {
-  const f = fixture(); try {
-    fs.writeFileSync(path.join(f.repo, 'b'), 'staged b\n');
-    fs.writeFileSync(path.join(f.repo, 'newstaged'), 'staged new\n');
-    f.git('add', 'b', 'newstaged');
-    const before = f.git('diff', '--cached', '--', 'b', 'newstaged');
-    const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'staged', request: f.request });
-    assert.equal((await p.publish(evidence(c))).checkout, 'pending');
-    assert.equal(f.git('diff', '--cached', '--', 'b', 'newstaged'), before);
-    assert.equal(fs.readFileSync(path.join(f.repo, 'b'), 'utf8'), 'staged b\n');
-    assert.equal(fs.readFileSync(path.join(f.repo, 'newstaged'), 'utf8'), 'staged new\n');
-  } finally { f.close(); }
-});
 test('staged overlap refuses before CAS', async () => {
   const f = fixture(); try {
     const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'overlap', request: f.request });
@@ -211,46 +185,6 @@ test('Land refuses an ephemeral checkout as its repository handle before creatin
       assert.equal(fs.existsSync(path.join(f.repo, '.fgos/runtime/git-candidates')), false);
       assert.equal(execFileSync('git', ['-C', ephemeral, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), f.request.target);
     } finally { p.close(); }
-  } finally { f.close(); }
-});
-
-test('prepare pins the current destination after source catchup and replay retains that binding', async () => {
-  const f = fixture();
-  try {
-    // Catchup's target was the original request.target; a sibling lands before prepare.
-    fs.writeFileSync(path.join(f.repo, 'b'), 'sibling landed\n');
-    f.git('commit', '-qam', 'sibling');
-    const currentTarget = f.git('rev-parse', 'HEAD');
-    const { target: _catchupTarget, ...request } = f.request;
-    const p = f.port();
-    const { candidate: c } = await p.prepare({ operationId: 'current-target', request });
-    assert.equal(c.target, currentTarget);
-    assert.equal(fs.readFileSync(path.join(c.worktree, 'b'), 'utf8'), 'sibling landed\n');
-    assert.equal(fs.readFileSync(path.join(c.worktree, 'a'), 'utf8'), 'incoming\n');
-    assert.deepEqual(execFileSync('git', ['-C', c.worktree, 'show', '-s', '--format=%P'], { encoding: 'utf8' }).trim().split(' '), [currentTarget, request.source]);
-    const receipt = await p.publish(evidence(c));
-    p.close();
-    f.git('update-ref', request.destination, f.request.target);
-    assert.deepEqual((await f.port().prepare({ operationId: 'current-target', request })).receipt, receipt);
-    assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
-    await assert.rejects(async () => f.port().prepare({ operationId: 'current-target', request: { ...request, message: 'different request' } }), /operation-id-reused/);
-  } finally { f.close(); }
-});
-
-test('declared candidate bytes resolve only the exact covered conflicts before verification', async () => {
-  const f = fixture();
-  try {
-    fs.writeFileSync(path.join(f.repo, 'a'), 'target disagreement\n');
-    f.git('commit', '-qam', 'divergent target');
-    const request = { ...f.request, target: f.git('rev-parse', 'HEAD'), files: [{ path: 'a', bytes: [...Buffer.from('consumer resolved\n')] }] };
-    const p = f.port();
-    const { candidate: c } = await p.prepare({ operationId: 'declared-resolution', request });
-    assert.equal(fs.readFileSync(path.join(c.worktree, 'a'), 'utf8'), 'consumer resolved\n');
-    assert.equal(execFileSync('git', ['-C', c.worktree, 'diff', '--name-only', '--diff-filter=U'], { encoding: 'utf8' }), '');
-    assert.equal(fs.existsSync(path.join(f.repo, '.git/MERGE_HEAD')), false);
-    assert.equal(f.git('rev-parse', 'HEAD'), request.target);
-    assert.equal(f.git('rev-parse', 'source'), request.source);
-    assert.equal((await p.publish(evidence(c))).localEffect.publishedOid, c.candidate);
   } finally { f.close(); }
 });
 

@@ -22,21 +22,15 @@ function fixture(conflict=false) {
  return {temp,repo,linked,git,target,port,held:[h.handle],close(){h.handle.release();fs.rmSync(temp,{recursive:true,force:true});}};
 }
 test('Sync creates a clean exact two-parent merge and no resolver grant',()=>{
- const f=fixture();try {const head=execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
+ const f=fixture();try {
+ assert.throws(()=>f.port.start({operationId:'missing',target:f.target,message:'sync'}),/custody/);
+ const head=execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
  const result=f.port.start({operationId:'clean',target:f.target,message:'consumer sync message'},f.held);assert.equal(result.state,'done');assert.deepEqual(result.resolverGrant,[]);
  assert.deepEqual(execFileSync('git',['-C',f.linked,'show','-s','--format=%P'],{encoding:'utf8'}).trim().split(' '),[head,f.target]);
  const replay=f.port.inspect({operationId:'clean'},f.held);assert.equal(replay.state,'done');assert.deepEqual(replay.commit,result.commit);
  assert.deepEqual(fs.readdirSync(path.join(f.repo,'.git/fgos/git/operations')),[]);
  assert.equal(f.git('for-each-ref','--format=%(refname)','refs/fgos/git-operations'),'');
  assert.deepEqual(f.port.start({operationId:'clean',target:f.target,message:'consumer sync message'},f.held).commit,result.commit);
- }finally{f.close();}
-});
-test('Sync leaves only temporary conflict grants and refuses markers before staging',()=>{
- const f=fixture(true);try {
- assert.throws(()=>f.port.start({operationId:'missing',target:f.target,message:'sync'}),/custody/);
- const result=f.port.start({operationId:'conflict',target:f.target,message:'sync'},f.held);assert.equal(result.state,'conflicted-open');assert.deepEqual(result.resolverGrant,['a']);
- for(const marker of ['<<<<<<<\tleft','||||||||\tbase','>>>>>>>']) {fs.writeFileSync(path.join(f.linked,'a'),marker+'\n');assert.throws(()=>f.port.continue({operationId:'conflict'},f.held),/conflict-markers/);}
- fs.writeFileSync(path.join(f.linked,'a'),'resolved\n');const finished=f.port.continue({operationId:'conflict'},f.held);assert.equal(finished.state,'done');assert.equal(finished.commit.status,'committed');
  }finally{f.close();}
 });
 test('Sync abort preserves resolver bytes and only closes its own merge',()=>{

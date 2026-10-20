@@ -123,7 +123,17 @@ impl ConfigStamp {
 pub(crate) struct ConfigCache {
     stamp: ConfigStamp,
     records: Vec<ConfigRecord>,
+    // Object format and ref storage are config facts (`extensions.*`), so
+    // they stay valid exactly as long as the stamp above does.
+    formats: Option<(ObjectFormat, RefStorage)>,
 }
+
+// Both caches are per process, not per driver: each Node port opens its own
+// driver, and a verb opens many. Every use still rechecks the source stamps;
+// the source list is keyed by the selected Git and the variables its answer
+// depends on.
+static CONFIG_SOURCES: Mutex<BTreeMap<(PathBuf, ConfigEnvironment), Vec<PathBuf>>> = Mutex::new(BTreeMap::new());
+static REPOSITORY_CONFIG: Mutex<BTreeMap<PathBuf, ConfigCache>> = Mutex::new(BTreeMap::new());
 
 fn refusal(cause: impl Into<String>) -> OperationError {
     OperationError {
@@ -189,8 +199,6 @@ pub struct GitDriver {
     hooks: PathBuf,
     git: PathBuf,
     containment: Box<dyn ContainmentDriver>,
-    publication_config: Mutex<BTreeMap<PathBuf, ConfigCache>>,
-    config_sources: Mutex<BTreeMap<ConfigEnvironment, Vec<PathBuf>>>,
 }
 impl GitDriver {
     pub(crate) fn state_root(&self) -> &Path { &self.state_root }
@@ -262,8 +270,6 @@ impl GitDriver {
             .clone()
             .ok_or_else(|| refusal("git-unavailable"))?;
         Ok(Self {
-            publication_config: Mutex::new(BTreeMap::new()),
-            config_sources: Mutex::new(BTreeMap::new()),
             state_root,
             hooks,
             git,
@@ -350,21 +356,22 @@ impl GitDriver {
     fn read_repository_facts(&self, repo: &mut RepoHandle) -> Result<Vec<ConfigRecord>> {
         let config = self.config(repo)?;
         self.check_config(repo, &config)?;
-        // Config trust and format facts are obtained once for this resolution.
-        let facts = self.repository_formats(repo)?;
-        let mut facts = std::str::from_utf8(&facts).map_err(|_| refusal("repository-facts-invalid"))?.lines();
-        let format = facts.next().ok_or_else(|| refusal("unsupported-object-format"))?;
-        repo.object_format = match format {
-            "sha1" => ObjectFormat::Sha1,
-            "sha256" => ObjectFormat::Sha256,
-            _ => return Err(refusal("unsupported-object-format")),
-        };
-        let refs = facts.next().ok_or_else(|| refusal("unsupported-ref-storage"))?;
-        if facts.next().is_some() { return Err(refusal("unsupported-ref-storage")); }
-        repo.layout.refs = match refs {
-            "files" => RefStorage::Files,
-            "reftable" => RefStorage::Reftable,
-            _ => return Err(refusal("unsupported-ref-storage")),
+        // A long-lived handle reuses the formats its unchanged config stamp
+        // already answered; a checkout handle reads them afresh every call.
+        let cached = if repo.checkout_config.is_some() { None } else { self.cached_formats(repo)? };
+        (repo.object_format, repo.layout.refs) = match cached {
+            Some(formats) => formats,
+            None => {
+                let formats = self.repository_formats(repo)?;
+                if repo.checkout_config.is_none() {
+                    if let Some(entry) = REPOSITORY_CONFIG.lock()
+                        .map_err(|_| refusal("config-cache-poisoned"))?.get_mut(&repo.git_dir)
+                    {
+                        entry.formats = Some(formats);
+                    }
+                }
+                formats
+            }
         };
         repo.layout.promisor = config.iter().any(|(_, k, v)| {
             (k.ends_with(".promisor") && v != b"false") || k == "extensions.partialclone"
@@ -372,12 +379,29 @@ impl GitDriver {
         Ok(config)
     }
 
-    fn repository_formats(&self, repo: &RepoHandle) -> Result<Vec<u8>> {
+    fn cached_formats(&self, repo: &RepoHandle) -> Result<Option<(ObjectFormat, RefStorage)>> {
+        Ok(REPOSITORY_CONFIG.lock().map_err(|_| refusal("config-cache-poisoned"))?
+            .get(&repo.git_dir).and_then(|entry| entry.formats))
+    }
+
+    fn repository_formats(&self, repo: &RepoHandle) -> Result<(ObjectFormat, RefStorage)> {
         let out = self.invoke(Some(repo), &repo.trusted_main_root,
             &["rev-parse", "--show-object-format", "--show-ref-format"], Policy::Inspect, None, true,
             PATH_LIMIT, Duration::from_secs(30))?;
         if !out.success { return Err(out.error("git-command-failed")); }
-        Ok(out.stdout)
+        let mut facts = std::str::from_utf8(&out.stdout).map_err(|_| refusal("repository-facts-invalid"))?.lines();
+        let object_format = match facts.next().ok_or_else(|| refusal("unsupported-object-format"))? {
+            "sha1" => ObjectFormat::Sha1,
+            "sha256" => ObjectFormat::Sha256,
+            _ => return Err(refusal("unsupported-object-format")),
+        };
+        let refs = match facts.next().ok_or_else(|| refusal("unsupported-ref-storage"))? {
+            "files" => RefStorage::Files,
+            "reftable" => RefStorage::Reftable,
+            _ => return Err(refusal("unsupported-ref-storage")),
+        };
+        if facts.next().is_some() { return Err(refusal("unsupported-ref-storage")); }
+        Ok((object_format, refs))
     }
 
     /// Disk-only authority check, kept before every checkout child. Git config
@@ -592,11 +616,10 @@ impl GitDriver {
         loan: Option<&dyn BorrowedSpawn>,
     ) -> Result<Vec<PathBuf>> {
         let environment = (
-            std::env::var_os("HOME"),
-            std::env::var_os("XDG_CONFIG_HOME"),
+            self.git.clone(),
+            (std::env::var_os("HOME"), std::env::var_os("XDG_CONFIG_HOME")),
         );
-        let mut sources = self
-            .config_sources
+        let mut sources = CONFIG_SOURCES
             .lock()
             .map_err(|_| refusal("config-cache-poisoned"))?;
         let globals = if let Some(paths) = sources.get(&environment) {
@@ -644,7 +667,7 @@ impl GitDriver {
         repo: &RepoHandle,
         handle: &fgos_holder_lock::Handle,
     ) -> Result<()> {
-        let mut cache = self.publication_config.lock()
+        let mut cache = REPOSITORY_CONFIG.lock()
             .map_err(|_| refusal("config-cache-poisoned"))?;
         let fresh = self.validated_config(repo, cache.get(&repo.git_dir), Policy::Publication, Some(handle))?;
         cache.insert(repo.git_dir.clone(), fresh);
@@ -693,7 +716,7 @@ impl GitDriver {
             if before != ConfigStamp::read(paths)? {
                 return Err(refusal("repository-config-changed-during-read"));
             }
-            return Ok(ConfigCache { stamp: before, records });
+            return Ok(ConfigCache { stamp: before, records, formats: None });
         }
     }
 
@@ -710,7 +733,7 @@ impl GitDriver {
         // rechecks source stamps, including missing files; no HEAD/ref fact
         // is retained between commands. A refusal keeps the last good stamp
         // so a long-lived read handle can recover after a config repair.
-        let mut cache = self.publication_config.lock()
+        let mut cache = REPOSITORY_CONFIG.lock()
             .map_err(|_| refusal("config-cache-poisoned"))?;
         let fresh = self.validated_config(repo, cache.get(&repo.git_dir), Policy::Inspect, None)?;
         let records = fresh.records.clone();
@@ -2594,6 +2617,27 @@ mod tests {
         assert_eq!(driver.preflight(&operation).unwrap_err().cause, "checkout-facts-invalidated");
         let next = driver.checkout_repository(&repo).unwrap();
         driver.checked(&next, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap();
+    }
+
+    // The config cache is shared by every driver in a process; a new driver must still see a
+    // config written after another driver cached it, and keep its formats while nothing changed.
+    #[test]
+    fn a_shared_config_cache_never_hides_a_later_config_write_from_a_new_driver() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        git(&dir.0, &["init", "-q", "--object-format=sha256"]);
+        let first = GitDriver::new(&state.0).unwrap();
+        assert_eq!(resolve(&first, &dir.0).object_format(), ObjectFormat::Sha256);
+        let cached = GitDriver::new(&state.0).unwrap();
+        assert_eq!(resolve(&cached, &dir.0).object_format(), ObjectFormat::Sha256, "formats reused while the stamp holds");
+        git(&dir.0, &["config", "filter.external.clean", "touch /unreachable"]);
+        let error = match GitDriver::new(&state.0).unwrap().resolve_repo(&dir.0, &dir.0) {
+            Err(error) => error,
+            Ok(_) => panic!("a config written after the cache filled was not seen"),
+        };
+        assert!(error.cause.contains("repository-config-untrusted: filter.external.clean"), "{}", error.cause);
+        git(&dir.0, &["config", "--unset", "filter.external.clean"]);
+        assert_eq!(resolve(&GitDriver::new(&state.0).unwrap(), &dir.0).object_format(), ObjectFormat::Sha256);
     }
 
     #[test]

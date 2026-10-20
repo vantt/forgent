@@ -136,9 +136,14 @@ impl GitInspect {
                     Some(Some("dirty")) => Submodules::IgnoreDirty,
                     _ => return Err(error("ignoreSubmodules: only \"dirty\"")),
                 };
+                let ignored = match args.get("ignored").filter(|v| !v.is_null()).map(|v| v.as_bool()) {
+                    None | Some(Some(false)) => Ignored::Excluded,
+                    Some(Some(true)) => Ignored::Listed,
+                    _ => return Err(error("expected ignored boolean")),
+                };
                 Ok(json!(self
                     .driver
-                    .status(&repo, untracked, submodules, cursor()?, max()?)
+                    .status(&repo, untracked, submodules, ignored, cursor()?, max()?)
                     .map_err(operation)?))
             }
             "diffText" => {

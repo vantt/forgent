@@ -252,7 +252,7 @@ impl GitDriver {
         let mut cursor = None;
         let mut dirty = false;
         loop {
-            let page = self.status(repo, Untracked::All, Submodules::Configured, cursor, 4096)?;
+            let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
             for entry in page.entries {
                 let p = fgos_write_scope::path_text(&entry.path).map_err(failure)?;
                 if p == ".fgos" || p.starts_with(".fgos/") {
@@ -1522,7 +1522,7 @@ impl GitDriver {
             let mut cursor = None;
             let mut dirty = false;
             loop {
-                let page = self.status(repo, Untracked::All, Submodules::Configured, cursor, 4096)?;
+                let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
                 dirty |= page
                     .entries
                     .iter()

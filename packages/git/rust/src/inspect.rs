@@ -44,6 +44,15 @@ pub enum Untracked {
     Normal,
     All,
 }
+/// Whether `status` also reports ignored paths, Git's `--ignored=traditional`:
+/// a wholly ignored directory is collapsed to `dir/`, and an ignored path
+/// inside a collapsed untracked directory is still listed on its own.
+#[derive(Debug, Clone, Copy, Default)]
+pub enum Ignored {
+    #[default]
+    Excluded,
+    Listed,
+}
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StatusEntry {
@@ -51,6 +60,7 @@ pub struct StatusEntry {
     pub index: u8,
     pub worktree: u8,
     pub untracked: bool,
+    pub ignored: bool,
     pub unmerged: bool,
 }
 #[derive(Debug, Serialize)]
@@ -293,6 +303,7 @@ impl GitDriver {
         repo: &RepoHandle,
         untracked: Untracked,
         submodules: Submodules,
+        ignored: Ignored,
         cursor: Option<InspectCursor>,
         max: usize,
     ) -> Result<InspectPage<StatusEntry>> {
@@ -307,7 +318,10 @@ impl GitDriver {
             "-z",
             "--no-renames",
             untracked,
-            "--ignored=no",
+            match ignored {
+                Ignored::Excluded => "--ignored=no",
+                Ignored::Listed => "--ignored=traditional",
+            },
         ];
         if let Submodules::IgnoreDirty = submodules {
             args.push("--ignore-submodules=dirty");
@@ -316,11 +330,12 @@ impl GitDriver {
         let mut entries = vec![];
         for record in records(&bytes)? {
             let entry = match record.first() {
-                Some(b'?') if record.starts_with(b"? ") => StatusEntry {
+                Some(kind @ (b'?' | b'!')) if record.get(1) == Some(&b' ') => StatusEntry {
                     path: record[2..].to_vec(),
-                    index: b'?',
-                    worktree: b'?',
-                    untracked: true,
+                    index: *kind,
+                    worktree: *kind,
+                    untracked: *kind == b'?',
+                    ignored: *kind == b'!',
                     unmerged: false,
                 },
                 Some(b'1') | Some(b'u') => {
@@ -336,6 +351,7 @@ impl GitDriver {
                         index: fields[1][0],
                         worktree: fields[1][1],
                         untracked: false,
+                        ignored: false,
                         unmerged,
                     }
                 }
@@ -776,7 +792,7 @@ impl GitDriver {
             previous_paths.iter().cloned().collect();
         let mut cursor = None;
         loop {
-            let page = self.status(repo, Untracked::All, Submodules::Configured, cursor, 4096)?;
+            let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
             paths.extend(page.entries.into_iter().map(|e| e.path));
             if paths.iter().map(|p| p.len() + 1).sum::<usize>() > crate::driver::PATH_LIMIT {
                 return Err(refused("snapshot-path-limit"));

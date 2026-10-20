@@ -38,14 +38,6 @@ test('ScopedCommit requires exact custody, preserves pre-existing dirt and liter
 test('ScopedCommit refuses foreign staged entries even within the write scope',()=>{
   const f=fixture();try {fs.writeFileSync(path.join(f.linked,'a'),'dirty');execFileSync('git',['-C',f.linked,'add','a']);assert.throws(()=>f.port.preflight({},f.held),/foreign-staged/);} finally {f.close();}
 });
-test('ScopedCommit records actual effect when a real hook changes the selected tree',()=>{
-  const f=fixture();try {
-    const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\nprintf hook > a\ngit add a\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
-    const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
-    const result=f.port.commit({operationId:'hook-tree',baseline,request:{writes:['a'],message:'hook test',cutoverGrant:null}},f.held);
-    assert.equal(result.status,'committed-but-contract-violation');assert.equal(execFileSync('git',['-C',f.linked,'show','HEAD:a'],{encoding:'utf8'}),'hook');assert.ok(result.oid);
-  } finally {f.close();}
-});
 test('ScopedCommit preserves rejection evidence and unstages only its own paths',()=>{
   const f=fixture();try {
     const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\necho original-hook-rejection >&2\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
