@@ -1,0 +1,455 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "rule": "L12-49 / A51",
+  "historicalPatchedPopulation": [
+    "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+    "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+    "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+    "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+    "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+    "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+    "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+    "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+    "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+    "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+    "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+    "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+    "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+    "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+    "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md"
+  ],
+  "historicalPatchedPopulationCount": 15,
+  "alreadyReviewedWave5a": [
+    "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+    "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+    "docs/knowledge/why-state-json-s-write-became-atomic-while-its-lock-scope-cl/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md",
+    "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+    "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md"
+  ],
+  "historicalPatchedReviewed": [
+    "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+    "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+    "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md"
+  ],
+  "historicalReviewedDenominator": 3,
+  "historicalReworkNumerator": 1,
+  "currentPatchedPopulation": [
+    "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+    "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+    "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+    "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+    "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+    "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+    "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+    "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+    "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+    "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+    "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+    "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+    "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+    "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md"
+  ],
+  "currentPatchedUnreviewed": [
+    "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+    "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+    "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+    "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+    "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+    "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+    "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+    "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+    "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+    "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+    "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+    "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md"
+  ],
+  "correctedFileSupplement": [
+    "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md"
+  ],
+  "originalPatchedPopulationCovered": [
+    "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+    "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+    "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+    "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+    "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+    "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+    "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+    "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+    "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+    "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+    "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+    "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+    "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+    "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+    "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md"
+  ],
+  "selectedFiles": 13,
+  "selectedEdges": 91,
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-batch081-x-p01.md",
+      "files": [
+        {
+          "file": "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-corrected-04939-targeted-re-review"
+          ],
+          "edges": 3,
+          "recordSha256": "9f97fbaf6e7f238def38f30972e56dba9526fe04cea8aac955542959a1e0dcaf",
+          "sourceDigest": "baa3695dba0d2b34592eb5157ec2b3b71e46d445a2c74e7a875f1d2dc4a8956d",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 15780,
+          "sourceBytes": 9813,
+          "contextPlusRecordBytes": 25593
+        },
+        {
+          "file": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 20,
+          "recordSha256": "b3819ab06a328725b9082b94c81babb3e9c0a251aec7cb870b57d10a50c4f623",
+          "sourceDigest": "9e4e9b80adf24affa29bd09ac8cee6e6f899341e9b5d7950abcd4140fad3aa44",
+          "diffSha256": "2511a82b907794c493d386f7c1c9bf5236e8c816694019871479bc83684d1f3e",
+          "recordBytes": 43013,
+          "sourceBytes": 19262,
+          "contextPlusRecordBytes": 62275
+        },
+        {
+          "file": "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 4,
+          "recordSha256": "ddea3fcc7a317b46215362acef5de25b5de1e3a5f90ae40e0f8e56a899a4e020",
+          "sourceDigest": "c118ef423ecbfc5bd260709f010b5f977cfffc1c0812c8ff8fad17b28074d827",
+          "diffSha256": "09cea7917b5db78dafd748aa8d2fd3c8409ffcfb5882fb002a8b6398181c7cc2",
+          "recordBytes": 23780,
+          "sourceBytes": 4907,
+          "contextPlusRecordBytes": 28687
+        },
+        {
+          "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 9,
+          "recordSha256": "a404e64251fb63ba0e61c227db1edb6d0d46829c4e82f172bf885902607b1308",
+          "sourceDigest": "7cf21351c63b388bb6d6fdba95f7351fc3fbd3c632de2b97f81aa7dd60878048",
+          "diffSha256": "8e43c49add2736ac3483851b70a110bf341cba75e9b6996928979d6a6e39c38c",
+          "recordBytes": 81009,
+          "sourceBytes": 22451,
+          "contextPlusRecordBytes": 103460
+        },
+        {
+          "file": "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 8,
+          "recordSha256": "0681999906c909fdd7d379751597317cd3062720b86805617636b2ba6d6302b0",
+          "sourceDigest": "a66490ef5283c0e51ce78f5565ead3ce54cf7e7e0ebd283cd03c615b31be9544",
+          "diffSha256": "d14ca5b507299003f1d71bb3cba6bb44f453f31b735e2b060739a53e48c47b77",
+          "recordBytes": 50094,
+          "sourceBytes": 6102,
+          "contextPlusRecordBytes": 56196
+        },
+        {
+          "file": "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 6,
+          "recordSha256": "c661f229e259815fd889534a1cd4fe811bc5c10dcfa707b8e290925dac9c7abf",
+          "sourceDigest": "7e181e8a4f754c4d33bfcae2f8e18cc93ea372eb878eca3fb532910c59677f76",
+          "diffSha256": "352480813776ba03c59c36bf1e6426d8b8b2d280864dc0c97857021a0a1971b7",
+          "recordBytes": 37693,
+          "sourceBytes": 7146,
+          "contextPlusRecordBytes": 44839
+        }
+      ],
+      "fileCount": 6,
+      "edges": 50,
+      "sourcePlusRecordBytes": 321050,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 20
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 9
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 8
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-batch081-x-p02.md",
+      "files": [
+        {
+          "file": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 4,
+          "recordSha256": "473276c8b89bcefe35c27fafd3ec1c1450f6f7f993a6634d92a112ec07cd939c",
+          "sourceDigest": "6140cc8ffe078af0f134362f60c032e633c413da36c96621fc1342fb9b743598",
+          "diffSha256": "94d27086582e15a5b56fcf10a6f09231ae92abf9b33438aa557153af66f10bdd",
+          "recordBytes": 16313,
+          "sourceBytes": 3951,
+          "contextPlusRecordBytes": 20264
+        },
+        {
+          "file": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 8,
+          "recordSha256": "10082becc41c35be433239a8c3c835f81a4f82842431173c1718fb26c2a081b1",
+          "sourceDigest": "3dd951c1355ef5cdc335d12f57954edeb7e90628bb42e0ab311f6f5d9d4ef4e7",
+          "diffSha256": "fbbc6d018c79faa157cbeab4d401dfd8c2a0527250cd85c230876735fc95802e",
+          "recordBytes": 44836,
+          "sourceBytes": 12820,
+          "contextPlusRecordBytes": 57656
+        },
+        {
+          "file": "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 3,
+          "recordSha256": "813e91dab6c7d25ec90bc9e75fbbe191a3b3cc329f551af1b3d9daf90e5658db",
+          "sourceDigest": "12c8cb390f839db3791eb37bf1765e96550549fb08490f9e50e8b6419e99268a",
+          "diffSha256": "a9280d8b5ed4bfb3f16eeb9db5dec34fe74e7f677169ae551139c951cd8e772c",
+          "recordBytes": 22827,
+          "sourceBytes": 5155,
+          "contextPlusRecordBytes": 27982
+        },
+        {
+          "file": "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 1,
+          "recordSha256": "bb18b4ebdff95b62abf518168c6602b9234da8e873ddeb2e7c854d99ea43eb91",
+          "sourceDigest": "e0a05376da5ee6e1c34334aec846766cf8d068bff87464b0b632b99cd7eca60b",
+          "diffSha256": "dbebe84957e1fe19bd19b5d9359bc1416f41230d3f698dda3203d3f3cfd429b5",
+          "recordBytes": 17042,
+          "sourceBytes": 1516,
+          "contextPlusRecordBytes": 18558
+        },
+        {
+          "file": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 6,
+          "recordSha256": "128bbc1e07661539b88fa6e0dba907e4073dfb82ea77069c146edb03c06ae6bb",
+          "sourceDigest": "1cbc795929d012368ede09260f179a75576defb1c1c3a17c4f56ce2d1245ac81",
+          "diffSha256": "adcdd6a655969ac68a7e9d1f49777b25d7da626b72f60ac450a6a7b738e46612",
+          "recordBytes": 25706,
+          "sourceBytes": 3901,
+          "contextPlusRecordBytes": 29607
+        },
+        {
+          "file": "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 10,
+          "recordSha256": "f6f8f5604103462398b1fc1fd9a829150e2b7e9e2b1c7492a8b478432b4c81c7",
+          "sourceDigest": "7bfa0d8af1bbbb8cbc48ffacedc710b7b879ae3b4a5b4611f383b115c2981623",
+          "diffSha256": "2b88241596f19f860cc74a5cdc7d0e8f2589798b0e6a1efb440b638792610889",
+          "recordBytes": 36367,
+          "sourceBytes": 6138,
+          "contextPlusRecordBytes": 42505
+        }
+      ],
+      "fileCount": 6,
+      "edges": 32,
+      "sourcePlusRecordBytes": 196572,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 8
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 10
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 3,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-batch081-x-p03.md",
+      "files": [
+        {
+          "file": "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
+          "set": "batch-081",
+          "strata": [
+            "L12-49-patched-stratum-expansion"
+          ],
+          "edges": 9,
+          "recordSha256": "b03e04f1e16a211732cb64009fdbab708acf9a022401b134a93f0c543c428bb1",
+          "sourceDigest": "76374ba65e53d2ac73b4a89bbdf995ec54d7b1ba6ba34445ccda83357547c666",
+          "diffSha256": "1b541111edb8ceb7db80c76ce6bf8acbde692d2bea28de7fb46dc2af00e4ad26",
+          "recordBytes": 30790,
+          "sourceBytes": 8346,
+          "contextPlusRecordBytes": 39136
+        }
+      ],
+      "fileCount": 1,
+      "edges": 9,
+      "sourcePlusRecordBytes": 39136,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 9
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "reviewedNewDenominator": 0,
+  "reworkNewNumerator": "pending",
+  "reviewersStarted": 0,
+  "accepted": 0
+}

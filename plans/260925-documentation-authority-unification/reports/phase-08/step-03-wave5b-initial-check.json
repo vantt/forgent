@@ -1,0 +1,24 @@
+{
+  "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 773,
+  "edges": 4671,
+  "failures": [
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "check": "retiring-preserve-wording",
+      "detail": ""
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+      "check": "retiring-preserve-wording",
+      "detail": ""
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+      "check": "retiring-preserve-wording",
+      "detail": ""
+    }
+  ],
+  "failureCount": 3,
+  "elapsedSeconds": 271.694
+}

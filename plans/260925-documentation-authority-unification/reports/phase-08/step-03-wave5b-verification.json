@@ -1,0 +1,91 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "assignmentInputHead": "4baf30cba68f9af49837bfa199a26ddbee63d36c",
+  "samplingReplay": [
+    {
+      "set": "batch-083",
+      "files": 4,
+      "edges": 12,
+      "patchedPopulation": 4,
+      "patchedSeeded": 1,
+      "mandatory": 0,
+      "unpatchedPopulation": 0,
+      "unpatchedSample": 0,
+      "dispositions": {
+        "preserve": 6,
+        "patch": 4,
+        "phase9-row-flip": 1,
+        "parked": 1
+      }
+    },
+    {
+      "set": "batch-084",
+      "files": 25,
+      "edges": 166,
+      "patchedPopulation": 19,
+      "patchedSeeded": 3,
+      "mandatory": 1,
+      "unpatchedPopulation": 5,
+      "unpatchedSample": 1,
+      "dispositions": {
+        "patch": 20,
+        "preserve": 143,
+        "parked": 3
+      }
+    },
+    {
+      "set": "batch-085",
+      "files": 3,
+      "edges": 6,
+      "patchedPopulation": 2,
+      "patchedSeeded": 1,
+      "mandatory": 0,
+      "unpatchedPopulation": 1,
+      "unpatchedSample": 1,
+      "dispositions": {
+        "parked": 1,
+        "preserve": 3,
+        "patch": 2
+      }
+    }
+  ],
+  "packets": [
+    {
+      "index": "step-03-wave5b-review-index.json",
+      "files": 8,
+      "edges": 145,
+      "parts": 2,
+      "bounds": "every part <=6 files, <=150 edges, <=400000 source-plus-record bytes"
+    },
+    {
+      "index": "step-03-batch081-expansion-review-index.json",
+      "files": 13,
+      "edges": 91,
+      "parts": 3,
+      "bounds": "every part <=6 files, <=150 edges, <=400000 source-plus-record bytes"
+    }
+  ],
+  "compactAdjacentWitnessesReplayed": 6,
+  "priorProtectedPathsVerified": 5040,
+  "changedPriorPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-081.jsonl"
+  ],
+  "onlyChangedPriorEdge": "maps-j-04939; other edges structurally identical; executable proof removed and compact adjacent search added for that edge",
+  "fullChecker": {
+    "files": 773,
+    "edges": 4671,
+    "failures": 0,
+    "openLeadRulingEdges": 0,
+    "locatorReviewFlags": 5,
+    "inheritedLocatorFlagsByteEquivalent": true
+  },
+  "commands": {
+    "fullChecker": "env -u CLAUDE_CODE_SESSION_ID python3 /tmp/fgos-work/wave5b-check.py",
+    "fullCheckerScript": "import sys,importlib.util,pathlib,json,time\nsys.dont_write_bytecode=True\nP=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-08').resolve()\nsp=importlib.util.spec_from_file_location('w',P/'step-03-wave5a-check.py');w=importlib.util.module_from_spec(sp);sp.loader.exec_module(w)\nm=w.m;m.SETS=tuple(f'{i:03}' for i in range(1,86));rs=m.records();t=time.monotonic();result=m.Checker(w.PIN).all(rs)\nresult['openLeadRulingEdgesPerSet']={f'batch-{b}':[e['edgeId'] for r in rs if r['reviewSet']=='batch-'+b for e in r.get('edges',[]) if e.get('blockedCategory')=='lead-ruling'] for b in m.SETS}\nresult['elapsedSeconds']=round(time.monotonic()-t,3)\n(P/'step-03-wave5b-check-result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\\n');print(json.dumps(result,ensure_ascii=False,indent=2));sys.exit(bool(result['failureCount']))\n",
+    "independentVerification": "env -u CLAUDE_CODE_SESSION_ID python3 /tmp/fgos-work/wave5b-verify.py",
+    "independentVerificationScript": "import sys, pathlib, json, hashlib, math, subprocess, importlib.util, collections\nsys.dont_write_bytecode=True\nP=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-08').resolve();ROOT=P.parents[3];PIN='ae141550c2e022310de7a0efea757580c0b2479f'\ndef sha(x):return hashlib.sha256(x if isinstance(x,bytes) else x.encode()).hexdigest()\ndef blob(f):return subprocess.check_output(['git','show',PIN+':'+f])\ndef read(n):return json.loads((P/n).read_text())\ndef records(b):return [json.loads(l) for l in (P/'step-03-records'/f'batch-{b}.jsonl').read_text().splitlines()]\nnew=[r for b in ('083','084','085') for r in records(b)];by={r['file']:r for b in [f'{i:03}' for i in range(1,86)] for r in records(b)}\nfreeze=read('step-03-wave5b-manifest.json');selections=[]\nfor g in freeze['sets']:\n b=g['set'].removeprefix('batch-');rs=records(b);pop=sorted(r['file'] for r in rs if r['diff']);seed='A51-step03-file-v1\\0'+PIN+'\\0'+b\n ranks=sorted([{'file':f,'rankHash':sha(seed+'\\0'+f)} for f in pop],key=lambda x:(x['rankHash'],x['file']));sample=[x['file'] for x in ranks[:math.ceil(.15*len(pop))]]\n mandatory=sorted(r['file'] for r in rs if len(blob(r['file']))>=65536 or len(r['inventoryEdgeIds'])>=40)\n assert g['population']==pop and g['seed']==seed and g['ranks']==ranks and g['sample']==sample and g['selected']==sorted(set(sample)|set(mandatory))\n u=freeze['unpatchedStrata'][b];upop=sorted(r['file'] for r in rs if not r['diff'] and r['edges'] and r['file'] not in g['selected']);useed='A51-step03-file-v1-unpatched\\0'+PIN+'\\0batch-'+b\n uranks=sorted([{'file':f,'rankHash':sha(useed+'\\0'+f)} for f in upop],key=lambda x:(x['rankHash'],x['file']));usample=[x['file'] for x in uranks[:math.ceil(.15*len(upop))]]\n assert u['seed']==useed and u['population']==upop and u['ranks']==uranks and u['selected']==usample\n selections.append({'set':g['set'],'files':len(rs),'edges':sum(len(r['edges']) for r in rs),'patchedPopulation':len(pop),'patchedSeeded':len(sample),'mandatory':len(mandatory),'unpatchedPopulation':len(upop),'unpatchedSample':len(usample),'dispositions':dict(collections.Counter(e['disposition'] for r in rs for e in r['edges']))})\nfor f in freeze['files']:\n r=by[f['file']];assert f['recordSha256']==sha(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\\n') and f['diffSha256']==sha(r['diff'])\nfor f in read('step-03-wave5b-binding-manifest.json')['recordFiles']:\n assert sha(pathlib.Path(f['path']).read_bytes())==f['sha256']\npackets=[]\nfor name in ('step-03-wave5b-review-index.json','step-03-batch081-expansion-review-index.json'):\n index=read(name);seen=[]\n for part in index['parts']:\n  assert part['fileCount']<=6 and part['edges']<=150 and part['sourcePlusRecordBytes']<=400000 and not part['indivisibleOversize']\n  for row in part['files']:\n   r=by[row['file']];seen.append(row['file']);rb=(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\\n').encode()\n   assert row['recordSha256']==sha(rb) and row['diffSha256']==sha(r['diff']) and row['sourceDigest']==sha(blob(r['file'])) and row['recordBytes']==len(rb)\n assert len(seen)==len(set(seen))==index['selectedFiles']\n packets.append({'index':name,'files':index['selectedFiles'],'edges':index['selectedEdges'],'parts':len(index['parts']),'bounds':'every part <=6 files, <=150 edges, <=400000 source-plus-record bytes'})\nexp=read('step-03-batch081-expansion-review-index.json');batch=records('081');old=read('step-03-wave5a-manifest.json');original=set(next(s for s in old['sets'] if s['set']=='batch-081')['population']);reviewed={r['file'] for part in read('step-03-wave5a-review-index.json')['parts'] for r in part['files'] if r['set']=='batch-081'};current={r['file'] for r in batch if r['diff']}\nassert set(exp['currentPatchedUnreviewed'])==current-reviewed and set(exp['originalPatchedPopulationCovered'])==original\noldbytes=subprocess.check_output(['git','show','HEAD:'+str(P.relative_to(pathlib.Path.cwd())/'step-03-records/batch-081.jsonl')]);oldrs=[json.loads(l) for l in oldbytes.decode().splitlines()];changed=[]\nfor a,b in zip(oldrs,batch):\n if a==b:continue\n changed.append(b['file']);assert [e for e in a['edges'] if e['edgeId']!='maps-j-04939']==[e for e in b['edges'] if e['edgeId']!='maps-j-04939']\n assert b['diff']=='' and next(e for e in b['edges'] if e['edgeId']=='maps-j-04939')['blockedCategory']=='description-rewrite'\nassert len(changed)==1\n# Existing resolver verifies supplemental compact full-adjacent witnesses too.\nsp=importlib.util.spec_from_file_location('m',P/'step-03-check.py');m=importlib.util.module_from_spec(sp);sp.loader.exec_module(m);compact=0\nfor r in new+[r for r in batch if r['file'] in changed]:\n for eid,witness in r['checks']['coverage'].get('adjacentResolutionSearches',{}).items():\n  e=next(e for e in r['edges'] if e['edgeId']==eid);body=blob(r['file']).decode();passage=m.adjacent_passage(body,e['sourceSpans']);m.verify_witness(witness,PIN,witness['legacyPath'],passage);compact+=1\nbaseline=json.load(open('/tmp/fgos-work/wave5b-start.json'));oldchanged=[p for p,h in baseline.items() if sha(pathlib.Path(p).read_bytes())!=h]\nallowed={str(P.relative_to(pathlib.Path.cwd())/'progress.md'),str(P.relative_to(pathlib.Path.cwd())/'step-03-records/batch-081.jsonl')};assert set(oldchanged)<=allowed\ntracked=subprocess.check_output(['git','diff','--name-only']).decode().splitlines();assert set(tracked)<=allowed\ncheck=read('step-03-wave5b-check-result.json');assert check['failureCount']==0 and check['files']==773 and check['edges']==4671 and not check['notClosableSets'] and not any(check['openLeadRulingEdgesPerSet'].values())\npriorflags=read('step-03-wave5a-check-result.json')['locatorReviewFlags'];assert check['locatorReviewFlags']==priorflags\nsubprocess.run(['git','diff','--check'],check=True)\nproof={'pin':PIN,'assignmentInputHead':subprocess.check_output(['git','rev-parse','HEAD']).decode().strip(),'samplingReplay':selections,'packets':packets,'compactAdjacentWitnessesReplayed':compact,'priorProtectedPathsVerified':len(baseline),'changedPriorPaths':oldchanged,'onlyChangedPriorEdge':'maps-j-04939; other edges structurally identical; executable proof removed and compact adjacent search added for that edge','fullChecker':{'files':773,'edges':4671,'failures':0,'openLeadRulingEdges':0,'locatorReviewFlags':len(priorflags),'inheritedLocatorFlagsByteEquivalent':True},'commands':{'fullChecker':'env -u CLAUDE_CODE_SESSION_ID python3 /tmp/fgos-work/wave5b-check.py','fullCheckerScript':pathlib.Path('/tmp/fgos-work/wave5b-check.py').read_text(),'independentVerification':'env -u CLAUDE_CODE_SESSION_ID python3 /tmp/fgos-work/wave5b-verify.py','independentVerificationScript':pathlib.Path('/tmp/fgos-work/wave5b-verify.py').read_text(),'scopeWhitespace':'git diff --check'},'limits':'Author bindings and record proof only; no npm/probe replay, semantic acceptance, consumer edit, runtime parity, committed-byte acceptance or set closure. Runner commits; Lead handles preview and independent review/accounting.'}\n(P/'step-03-wave5b-verification.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\\n');print(json.dumps({k:v for k,v in proof.items() if k not in ('commands','limits')},ensure_ascii=False))\n",
+    "scopeWhitespace": "git diff --check"
+  },
+  "limits": "Author bindings and record proof only; no npm/probe replay, semantic acceptance, consumer edit, runtime parity, committed-byte acceptance or set closure. Runner commits; Lead handles preview and independent review/accounting."
+}

@@ -1,0 +1,782 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 38085,
+      "lines": 780,
+      "sha256": "efda4957905c9cf31d86278a9af77b61987eb9c5998c8f8210a1d79c6defaea5",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b11b1e29c384bf7693cd9f2069fb34b3ccea073a9c5790426a192ce58dfd02f1"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "5e04e1c21481182bcb1d316ac6239f24e20a611b186e15e325d4dbc1c6ab6800"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "a02dfeea84574d94307e398b092f4aa544afdfc309f7d62cf56b09ac1c18f788"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "b7ce54eb2ef18609d05040856f486901842aa4b329ef99113edc42bb73982da1"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "ef3606ce693a618416221eeee52e016db6e58a2e2769e827b2455880da0eecd0"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "83bd6ea9f3a7e8cbc7b99e55aed75d81df71c4ef0094de3b02d9f336d87921fa"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "95ca5643a197d816241aa78335095a4d534797054e57bc09f7bac7975a63d5bb"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "6fc6dc491af1efa9db672c7833801263512b79cd6a02ab8391a2659039fdb473"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "7fb624a5dfa59d8a45160ec3ab58306f5f818aa620148476051426fadabe55ee"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 780,
+          "sha256": "d8fabe20207c22d5d16708ef586e50b89c3486cd62c3623e27aac538bc0646b2"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5694,
+      "lines": 49,
+      "sha256": "8a86884e59a7432f24bf2c3a5d23bfdbb4c908c48d7a9ee3c5d4344559540b9d",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 49,
+          "sha256": "d11781232d78ad2e3436c02c142eb8b9bf7687b7b1283881802ce5630bff8447"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9440,
+      "lines": 61,
+      "sha256": "7f706076d2ec787168a311fc77b84728c2e59ef7b6f95984b72ad5791bb0e95b",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 61,
+          "sha256": "966a33884971f2044d27d9f82ed14bd0fa4597fb29c4401b93f1bef2963c3d3d"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-confinement/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 47318,
+      "lines": 603,
+      "sha256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "0f7f6e5d92ef22456eb2297afd51b81788dae854a29db597406735341a9cc623"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "b15618fab46ffe55765c766ea92f8ce2f3325a270cdf16ad77bdb5b87ee6a317"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "c3bf55159c6338c745a7edf97ba062600847f9211dbd4b834afab8a9e85579b2"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "6b4d160872c21a71c81b9e69d83b050d5f019863d24303e753247acb201dd8c9"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "cc77e708ce47d10dbcb6bc52adda4bc5dfb131d39b4941f53d454f59cb724310"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "b84dbb7339313bbacdc75b6dfc4bbde8efa6636d6d83ba9cb94af2b2588f0177"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "1fd9f6a3ead2bfe69b3cc0c75ed4911181e07d236edbde316006a977b7d443c9"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 603,
+          "sha256": "47e7fd1cd82020478f9c7fd1c4ca3f126226655508fb636376919c7220b6b455"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 20241,
+      "lines": 356,
+      "sha256": "29a94c3bac47c039b65b9ab0879e5867de4035fe6962b27d33cf4957e9d4574d",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f4b130e52f428d1af5554a541e5a0b0f382305b65fbbd71d0ae6004341569b3c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "a77eb4f59554fe0128038e0c2aa35f3a7a0669940f52ba19b6d8e1527f935e5b"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "4c6e0d08e560ce20c1a2e952d641a2bd4872baabcd9fe430dc4fcbcd53b2b597"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "2c9ba7ee9e97f799732f26c997ca7683fa818d3ceba2b179685ce7b9c87a7074"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 356,
+          "sha256": "1d4c53ee029dcd06d9dc8a30135d34438d270ce98600152710854210c1c5eebf"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4730,
+      "lines": 80,
+      "sha256": "916fe71f475cad3e19f137283017d3c732912354051e5b526a2ee4fff744a346",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7d9f6c78f7de3eb4123ae20232cab7281204eafde5e7c5ca19f8428d8a535415"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 17108,
+      "lines": 246,
+      "sha256": "848999421de92c2840c86b3cbe459d3fb58fce4b8d0a718557547eacebbe7614",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d8c4052b8d9bdf7c8cc279af2df6ece6448b2a78323f0a1eb82d25ac0071f523"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6944614f0575b42eb344f21980238f7baeb93b6dad044145ad4bf0620c078dea"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "c8a00a343ca5e9660286c82acbd400a453bc7b3c53cbb9a5975447424928ace5"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 246,
+          "sha256": "d89752ad6500dbc2e482fb43bfca7b8e6e486c8ca59b67a5ed117d34d2d09810"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10660,
+      "lines": 145,
+      "sha256": "87959922ca6a7fd9ad225c802c95367734077b6df6b9cb92a8b9ae131204a9c6",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "9349e36b46b058ba8be18ccd20c0523fbc8cf5ce342041dc0721f433d4ab55ae"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 145,
+          "sha256": "93b411d8dd2e63c83f6e910190dc8789811f34e0c0266e46bf36fcb89099688e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6221,
+      "lines": 135,
+      "sha256": "726b5d36a7a0ee13be3b795cacf856be63394b0e4d42481ef1f1641a6d840967",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "02152d0ea09c61b84b6b50bf527f1e98a9b6a05123bc393126cd19eb57cb95b4"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 135,
+          "sha256": "5a5cc1bcf013861713aa2aedb57876c9e2de238cca079e79a545e7571a9be076"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 20039,
+      "lines": 288,
+      "sha256": "a5b3d04dbc725ba2248ed07fd24144cc2e3ffd4031ae2fc23d6088d12f50581b",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4f83df079fe5bf03611b8f17f8fcee94b507779773ccee7bda07abbb54d84555"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "fb483c5a7a2db0d6e2f8dcc10f6ee9a795541e7bdd68753a9d8793b62f1137e5"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "b996f5e00ed80be3bb0babd9e941213e47960fdc4a2421fa9a2f9057d93121b8"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 288,
+          "sha256": "ccd418a5080bf85e33f9009f46a1e703cdbaf7aeb0911026530aad4b2773fd22"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/runtime-model.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4334,
+      "lines": 75,
+      "sha256": "bb7d7f863fa4168f636b4e1fe9a6c914c06fdda3f2b39adfa3840189c1e69f90",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 75,
+          "sha256": "966e8667e867d9faf38ec97b8d72f49c2cf9d8cc8e92fc59547e0d1ed452851a"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 22938,
+      "lines": 301,
+      "sha256": "9c1cf88b17b728fda5a6d18e1d8d57de2b719bb0f50d9ded28947ffda8b8c2e7",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "216e99b706cfdddcaa60f05137688fb05348e8cd66b3bd5431368f0a15b45b58"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "5a7a56e3e2b2033f64a30aef8c12d6c7ce344c630d6df5d84d8a571ba76c34dc"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "153f69d9dab93bd6763c2e20e920afc88c5206fc6b2f94c080322e6ceb8b85b2"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 301,
+          "sha256": "751c7493bbca440019201eb6957d9ef7606276449e317e645e56b07351cebe61"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7994,
+      "lines": 138,
+      "sha256": "d7189aa5fcfd50500457ac1fab647dc687b58303153703a1c530fa63c38126f9",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "135fd24000aa196069244abf18e5ff38396339b4085a21201a4b1cd839125cb1"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 138,
+          "sha256": "ba8abc00455b4fd4859756b54d5eb930a7f4e63e5afc9b2dedab9a0c6297bce6"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/work-integration.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5573,
+      "lines": 96,
+      "sha256": "12741378ece5a65b7d8c01bbb3e98eb568ab7ca2514018f08733700c0220c05d",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "18285a90929b5a3090c985e90fb9a64163e86276095b552db41c105107ccb8da"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 96,
+          "sha256": "5112eb83413718b4dd326a3f7b317c62e4416f3c55967128d6d3cfdc01f7eac6"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 22436,
+      "lines": 342,
+      "sha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ca399811a7ef8717a71df4f1145959a0b615b2c4096f53dbe14668b783e351cb"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "4d3e5f97a1709315f7535006a35e1d34c7c16f5ee3e36e8c809fb33fc68baab5"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "262c7b4d3cb972dcde4d98651c66bf12f6c3ea050110e9f6182b674df2b53397"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "1df6a42d2c95dbc892159a768c3a94d4aa48c44365209ed3a8fd5b18f1428673"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 342,
+          "sha256": "1b0fdc006cf5929520bfee10d7b33ae20efd12b00da9fd2284c8161fbc09cf4c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4596,
+      "lines": 98,
+      "sha256": "3e63f3cc25d8f0a1aa9e7638d8187406ad882796b1f03e9b7ec63d94841b65a3",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b413e70820a9b42bf9383e58ebc9fa907c0f5f83454658d88efd85c4cf145043"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 98,
+          "sha256": "6404a04922d1eb2f486e7e1524da9d38869b9efeacc8be3565a7bc0d975eeeec"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3397,
+      "lines": 59,
+      "sha256": "9bc319cc98fc2be021eb34b207adff37cdf29a051e3da2b655c3b11880b3cfe0",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 59,
+          "sha256": "834e4be7050fc30388e9b689edc91c2b97cd81e67de7b77cfc33ae2aead50dad"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2342,
+      "lines": 44,
+      "sha256": "3cc1928aec230839162c8fdc2dc37c47bcd54eac67de4b50857f1ffa5a230653",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 44,
+          "sha256": "8f49167ca203b5b3c50ca218c945df161759f35b3a41111b61bd646cefce6c8e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2784,
+      "lines": 50,
+      "sha256": "ac76cdc7b77f1d60ce6927a96a14efbf261bc515afbec3186b9d629bc895c555",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 50,
+          "sha256": "b410f7908628d92dec65c79b548ebfcc034c90df6dd05d5772dac8110accf542"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2038,
+      "lines": 42,
+      "sha256": "67e9ce7843b88e6ebe0b7688b0e00f1490bfaedf718c1e5853826a3f98eabe8e",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 42,
+          "sha256": "9b687c8f600c733fecf7087e65be6cf1ced30170dde869cc9a3308f7813df7b5"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2666,
+      "lines": 48,
+      "sha256": "27fd53c723b38780e3bd3dee13827006c7bfa6650e57e3a29f55f941de37a772",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 48,
+          "sha256": "94d442644076403cfed3a7f54b028f7195c5ec503f360c4caa1e38b13c03373f"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5958,
+      "lines": 92,
+      "sha256": "36a638a0bcc156ac4aab3866514f3a875330fa0d6c5f609dcd989d5c21023bbd",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4f4c11f4298a5ba409010af913436e8231485967dcbf59607c83c9febbc4255d"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 92,
+          "sha256": "cba3035bec4e25bed739c08010470220f945e02bb0e86f1fb19ee75d7ee66c76"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4398,
+      "lines": 76,
+      "sha256": "7304aaaffd81ebf4dd9ebc580f171330c03e0cb2596835e04b24e630a41e2cd6",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 76,
+          "sha256": "929aed6b59b361a62428ef37fe369127773f6fb2d4530f70a55d080ca25f9723"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7944,
+      "lines": 121,
+      "sha256": "3e3784c6d5b9f6be51f824483be037040395a263cfb26eadae4a1762dc44427b",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3fe81400e84f532159932ede539494222c573ccf369a0d603480578755f6782c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 121,
+          "sha256": "06c39ebc2693572781a5ee39236acfdac6d20aa969897e227fbba2acc52e349d"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15574,
+      "lines": 496,
+      "sha256": "4564427d37a3233680d8407090063b3f3d13552612fed95bd5bbf473be8a535c",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "04cd81e413019b2b44cd8a56f025a9cbce9261570ac3f9c6c12afff5d5f29e5c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6fcd06b1d7acc76d7af10bcba14ca834ac980e874c971d310b2909b6c99e2bba"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "0822cc6402537ff0c443f29c9218215ab7b6e6341d8cf4553cbc41a0e026af05"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "a4f94d419358f6d4ebbc4a98719a38321ac47f9eb65703f70d5b532d74cae332"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "94f81f9e4e814cd61a608c7889eb3f7152ad14b120668da43f558de3f074d322"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "66f68aabbdfc7757fc6a5a674151536044375c081046c5629ed5336374c03c9c"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 496,
+          "sha256": "10017ebb49398f87184d5cdff40691e9a76ba36b35e2e679a03733d3c9c7cfae"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1816,
+      "lines": 32,
+      "sha256": "92ab5eaaa4c71e0c608ca98f2af80223dcba72b71d2c8117b02382ae8f456ed8",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 32,
+          "sha256": "975979c1312b5904b257c85d90ff05b546b26a8f46b801078eca815a32ac0d6e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6015,
+      "lines": 135,
+      "sha256": "714c1acff0c1314e401c63f586c52edcec7acc8873898a7a21a29d0739b75c04",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "9cd5ade2c7cec95e5ef899a7f304ff8946c098c1ba428dab599e80d1988abd0a"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 135,
+          "sha256": "6517c4532c693b808cc713c598c0defa53876790792142a52a9ebc2d7fad6d44"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 64938,
+      "lines": 1025,
+      "sha256": "2c59e9060dddfe463c8cb7da4ac0c5694f333ec5a5a2abe8b954312fa042a931",
+      "inventoryEdges": 40,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "9b086e08392d13f11bc06193d4553e116d862a12094300e3cf19fb467986d3f3"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "aeb26504e56aac06fb962b0e7877b785b050ae5f45ed939b608e2f59eac02f83"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "6745341f00139d16ee720cd4ae8f4236e922454ceb26322f654af9047fb74069"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "053a89383b1f8121d37524e2359ba88c6c40e96db0f37ac81c2694588173a980"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "e36794165f1d904432decec289db60a4dd9b1e13aef4e124622f78ec8ec441dd"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "7b09522938238df0b5161b0b497b73246146f08660d4511b2b6e3432555b64ab"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "ada9d28b62fa244a2dd56fcaf546a0db231818d8f088b4b7a6655420d0b24118"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "19b90d07d2349b027e11c977f9f94f6522ee49d6080860edcfe48938451dc111"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "c280235c47b5e779db06534237e060b65a790c24744c8838e0faafa15f31f278"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "fb22eb33416c39b35ee57bb2129c2e2863006b78acae52bc9f10b31369a44eeb"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "cc344f49de29d8eaa07294996a14ea9b54dde0735f05a7c47b0ab77b5fe93baf"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "7acfc01e0aae1c9fd1c458b379adafb66cbbbc1adbb46d35cd34f4c33669d24d"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1025,
+          "sha256": "b5149d0b466607825b812a8780c95abe92371fae18183d3297e3a6e4e2b0b3f2"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/migration-status.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4382,
+      "lines": 43,
+      "sha256": "03653cadcf168ee1fc2190ab7546a91392f55f988d8012435ac05b1698e1a3c0",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 43,
+          "sha256": "5e8b21d0a421e60234fafff06f47480375ec11a1c11bc0ce71f9b70bc7113729"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2815,
+      "lines": 39,
+      "sha256": "f43934d95cee46df8a950f7dd1607f101b90bf33af5bfa9dd6867fd8eaae60c7",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 39,
+          "sha256": "2e8cd879fe32788e79111db9e011c5d49fe1b57f1c8669b3a33d11b5b9fb34f8"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1761,
+      "lines": 31,
+      "sha256": "9b8fbd656ba0424b16dc4e036613faeaaac50280dc159c0c7dc39841d71ab7ba",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 31,
+          "sha256": "0fc7efe12e2f362660d9c34459e7b561640373034fce12726f32d3433a4d82c4"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1815,
+      "lines": 32,
+      "sha256": "909c0b05f248fff0ad1ea243a00b7b07df13e6e7a51153be81755658f8a64530",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 32,
+          "sha256": "ee649d78f31ffa00c3c23da641605a9c012026f0a2fe99346643d76af55d2aea"
+        }
+      ]
+    }
+  ],
+  "sourceBytes": 378050,
+  "method": "Complete immutable source-byte traversal, exact inventory spans, supplemental scan and per-edge adjacent-source/target assessment; not independent acceptance."
+}

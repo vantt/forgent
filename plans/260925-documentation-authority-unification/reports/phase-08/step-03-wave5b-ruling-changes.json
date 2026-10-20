@@ -1,0 +1,89 @@
+{
+  "rule": "L12-49",
+  "beforeSha256": "437b8e0ecfa1e80a9d62841c71956cdcf340dd4eaa1529ab3c5015fcc9b40bab",
+  "afterSha256": "72906ab6ca0b38d07cacd56e347ce2657f8dc36602ba889cb5d3ab13be2f3d9e",
+  "changes": [
+    {
+      "file": "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+      "beforeRecordSha256": "b764627949d8a5f743e6461908d901a17601401a2edccddf7e4436739a346da6",
+      "afterRecordSha256": "9f97fbaf6e7f238def38f30972e56dba9526fe04cea8aac955542959a1e0dcaf",
+      "beforeEdge": {
+        "blockedCategory": null,
+        "dependency": null,
+        "blockedReason": null,
+        "timing": "Phase 9",
+        "dependencyCategory": null,
+        "diffHunk": "@@ -91,7 +91,7 @@",
+        "matchedExpression": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+        "edgeId": "maps-j-04939",
+        "disposition": "patch",
+        "target": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 81,
+            "columnStart": 4,
+            "line": 94,
+            "text": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md"
+          }
+        ],
+        "reason": "L12-26, L12-30, L12-31, L12-32, L12-37: Phase 9 citation patch to exact committed holder docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md. The complete classify-step guide defines ad-hoc task identity and the executor mechanism; source cites it alongside the fallback fragment as the vocabulary example. No obsolete execute command is introduced into the source by this path patch.",
+        "anchor": null,
+        "unitId": "item-L88"
+      },
+      "afterEdge": {
+        "blockedCategory": "description-rewrite",
+        "dependency": "Description needs rewrite (L12-49): source says the classify-step guide shows the ad-hoc task id shape (<scope>#p<n>, invalid against ID_PATTERN). The registry knowledge-tree holder has no such text; that shape lives in core/skills/_shared/executor-dispatch-fallback.md. Reconcile the whole adjacent attribution before redirecting the dead how-to path, as for 04485.",
+        "blockedReason": "Description needs rewrite (L12-49): source says the classify-step guide shows the ad-hoc task id shape (<scope>#p<n>, invalid against ID_PATTERN). The registry knowledge-tree holder has no such text; that shape lives in core/skills/_shared/executor-dispatch-fallback.md. Reconcile the whole adjacent attribution before redirecting the dead how-to path, as for 04485.",
+        "timing": "none",
+        "dependencyCategory": "description-rewrite",
+        "diffHunk": null,
+        "matchedExpression": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+        "edgeId": "maps-j-04939",
+        "disposition": "parked",
+        "target": null,
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 81,
+            "columnStart": 4,
+            "line": 94,
+            "text": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md"
+          }
+        ],
+        "reason": "L12-30, L12-32, L12-34: Description needs rewrite (L12-49): source says the classify-step guide shows the ad-hoc task id shape (<scope>#p<n>, invalid against ID_PATTERN). The registry knowledge-tree holder has no such text; that shape lives in core/skills/_shared/executor-dispatch-fallback.md. Reconcile the whole adjacent attribution before redirecting the dead how-to path, as for 04485. Source path renamed at 47703ebf03ad149f433b7174d971f6d152eaa532 to docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md; original source spelling conserved.",
+        "anchor": null,
+        "unitId": "item-L88",
+        "targetFacts": [
+          {
+            "path": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+            "state": "renamed",
+            "commit": "47703ebf03ad149f433b7174d971f6d152eaa532",
+            "successor": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md"
+          }
+        ]
+      },
+      "afterSearchWitness": {
+        "sha256": "58f5f8581a85861c00fa2bdeb8d7219e234f584ca3717f286d1ed8cdf5233aa1",
+        "queries": [
+          {
+            "query": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+            "hitCount": 6,
+            "liveHitCount": 6,
+            "hitsSha256": "ce87ba00524317bf73878e51f34d34e0380b528be26608cdd17c3ff05dade1d1"
+          }
+        ]
+      },
+      "beforeDiff": "--- a/docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md\n+++ b/docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md\n@@ -91,7 +91,7 @@\n   concept a real work item already owns. The id shape\n   (`<scope>#p<n>`, deliberately invalid against `ID_PATTERN`) is\n   unchanged — see\n-  `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md`\n+  `docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md`\n   and the `_shared/executor-dispatch-fallback.md` fragment every skill's\n   own dispatch step points to. Found unimplemented in 3 files (plus 2\n   plugin mirrors) by `tsk-5tm`'s own post-merge review pass — unlike D7\n",
+      "afterDiff": "",
+      "otherEdgesByteEquivalent": true,
+      "removedExecutableProofs": [
+        "anchors",
+        "relativeResolution",
+        "labelForm",
+        "coverage.descriptionTruth",
+        "coverage.writerTrace",
+        "coverage.resolutionSearches"
+      ],
+      "supplementalLocatorSearches": "coverage.adjacentResolutionSearches uses unchanged resolver count/hash witness for full adjacent context, independently replayed via existing verify_witness; no full hit dump."
+    }
+  ]
+}

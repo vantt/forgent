@@ -1,0 +1,15 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "newSets": [
+    "batch-083",
+    "batch-084",
+    "batch-085"
+  ],
+  "gaps": [],
+  "openLeadRulingEdgesPerNewSet": {
+    "batch-083": [],
+    "batch-084": [],
+    "batch-085": []
+  },
+  "note": "No new rule required. Existing L12-47/L12-49 applied; no checker/probe/resolver change. Existing GAP-01/02/03, workflow/RUL10 carry and Step 5/Phase 9 obligations are not closed."
+}

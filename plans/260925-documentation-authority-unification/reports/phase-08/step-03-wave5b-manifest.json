@@ -1,0 +1,829 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "set": "batch-083",
+      "sourceBytes": 38085,
+      "digest": "efda4957905c9cf31d86278a9af77b61987eb9c5998c8f8210a1d79c6defaea5",
+      "inventoryFileDigest": "efda4957905c9cf31d86278a9af77b61987eb9c5998c8f8210a1d79c6defaea5",
+      "diffSha256": "b4df81e166df22ea57950cbad4db0eb787735c61d24d5d7278f69d7c32e278d2",
+      "recordSha256": "2d526aecaa7f669f8b0010415dbe23d0667b9df848b8ae5124a40da908c40722",
+      "recordBytes": 9735,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "set": "batch-083",
+      "sourceBytes": 5694,
+      "digest": "8a86884e59a7432f24bf2c3a5d23bfdbb4c908c48d7a9ee3c5d4344559540b9d",
+      "inventoryFileDigest": "8a86884e59a7432f24bf2c3a5d23bfdbb4c908c48d7a9ee3c5d4344559540b9d",
+      "diffSha256": "cc5ca533aa600471f49c78e61497a3792e4a185eb670944250af67967fe9cd7f",
+      "recordSha256": "aa58ecf52be8079c5c138521caeebb0a0159a08e67dba0216e9e76fd4b66328b",
+      "recordBytes": 9763,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "set": "batch-083",
+      "sourceBytes": 9440,
+      "digest": "7f706076d2ec787168a311fc77b84728c2e59ef7b6f95984b72ad5791bb0e95b",
+      "inventoryFileDigest": "7f706076d2ec787168a311fc77b84728c2e59ef7b6f95984b72ad5791bb0e95b",
+      "diffSha256": "228a60f05cc056396d75e1020b10f71287e18589ee9973ba57d7b7448c597bd6",
+      "recordSha256": "9d85179e2e24263ac0687fce23b988b52f327126e7792aad08902155a925e9c9",
+      "recordBytes": 12952,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-confinement/spec.md",
+      "set": "batch-083",
+      "sourceBytes": 47318,
+      "digest": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+      "inventoryFileDigest": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+      "diffSha256": "150106caf6a8b05ac6a991b13f57e250064a3807aa6d3e9ebae9ff9655f1419c",
+      "recordSha256": "454d623d23a0740cdc9f6ec9fc9ae9c5a04497d17755993d1bd63615c56d68f5",
+      "recordBytes": 227328,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 2,
+        "parked": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "set": "batch-084",
+      "sourceBytes": 20241,
+      "digest": "29a94c3bac47c039b65b9ab0879e5867de4035fe6962b27d33cf4957e9d4574d",
+      "inventoryFileDigest": "29a94c3bac47c039b65b9ab0879e5867de4035fe6962b27d33cf4957e9d4574d",
+      "diffSha256": "cc3be53f607bd214132e317a426514756528e9e529f403af0f255bdeda7fb445",
+      "recordSha256": "6e9aed8a58bc3fb578af2d31de14f4b60e19c375c46453c1bffc334a728d1bdf",
+      "recordBytes": 31137,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "set": "batch-084",
+      "sourceBytes": 4730,
+      "digest": "916fe71f475cad3e19f137283017d3c732912354051e5b526a2ee4fff744a346",
+      "inventoryFileDigest": "916fe71f475cad3e19f137283017d3c732912354051e5b526a2ee4fff744a346",
+      "diffSha256": "3d50bfd1edcc5fed67baa6a69e1d0daec7e514d662c00833eaa8e2a1ff8c6643",
+      "recordSha256": "08b9f227cabf657a84f85bafecf7a5f818c0adbf0083ab743b7580a55812eef8",
+      "recordBytes": 6572,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "set": "batch-084",
+      "sourceBytes": 17108,
+      "digest": "848999421de92c2840c86b3cbe459d3fb58fce4b8d0a718557547eacebbe7614",
+      "inventoryFileDigest": "848999421de92c2840c86b3cbe459d3fb58fce4b8d0a718557547eacebbe7614",
+      "diffSha256": "df49e153c62b5226cad31a253d33f1ef432460f260dfff5dfa3dfdfd1d489a72",
+      "recordSha256": "d52bd48da0b1c92b1c2564d1f15d76c2c92f3797d1c67e3caafef6b0ead16aa5",
+      "recordBytes": 7491,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "set": "batch-084",
+      "sourceBytes": 10660,
+      "digest": "87959922ca6a7fd9ad225c802c95367734077b6df6b9cb92a8b9ae131204a9c6",
+      "inventoryFileDigest": "87959922ca6a7fd9ad225c802c95367734077b6df6b9cb92a8b9ae131204a9c6",
+      "diffSha256": "a48416c36aa20c6db974b89b7d9567ab4d913968e3aede211892b1a9e047a9ec",
+      "recordSha256": "afbd91247dbee75965c931339caea2f253b57cc14ecbca2f477ca1bbe13dfaaf",
+      "recordBytes": 6602,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "set": "batch-084",
+      "sourceBytes": 6221,
+      "digest": "726b5d36a7a0ee13be3b795cacf856be63394b0e4d42481ef1f1641a6d840967",
+      "inventoryFileDigest": "726b5d36a7a0ee13be3b795cacf856be63394b0e4d42481ef1f1641a6d840967",
+      "diffSha256": "eb6d663f921439df1f0f43fd0bd003e42e3de21b3e6e9c0c0fb59f578c61cee6",
+      "recordSha256": "fb145b4c471ee5ca77404838cb20a272d91899efc48d09b84a5ff8bb5add55dc",
+      "recordBytes": 7643,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "set": "batch-084",
+      "sourceBytes": 20039,
+      "digest": "a5b3d04dbc725ba2248ed07fd24144cc2e3ffd4031ae2fc23d6088d12f50581b",
+      "inventoryFileDigest": "a5b3d04dbc725ba2248ed07fd24144cc2e3ffd4031ae2fc23d6088d12f50581b",
+      "diffSha256": "279f9853e8c6a599710293397a5d2f49db1943aa223d9008bdca2366ebca714b",
+      "recordSha256": "5aa5a05f92d1f95b85af3bb1228b229709947fd617c052f8df685df6e61b1560",
+      "recordBytes": 9040,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/runtime-model.md",
+      "set": "batch-084",
+      "sourceBytes": 4334,
+      "digest": "bb7d7f863fa4168f636b4e1fe9a6c914c06fdda3f2b39adfa3840189c1e69f90",
+      "inventoryFileDigest": "bb7d7f863fa4168f636b4e1fe9a6c914c06fdda3f2b39adfa3840189c1e69f90",
+      "diffSha256": "46e58e8c693667705224b1676df299fb8740c7cc7cf0f929e534591a7ab44035",
+      "recordSha256": "a285f3b69ac1116697d202a4597393cb1134670b9eb0f9ffaadfb2afb1936f7b",
+      "recordBytes": 7651,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "set": "batch-084",
+      "sourceBytes": 22938,
+      "digest": "9c1cf88b17b728fda5a6d18e1d8d57de2b719bb0f50d9ded28947ffda8b8c2e7",
+      "inventoryFileDigest": "9c1cf88b17b728fda5a6d18e1d8d57de2b719bb0f50d9ded28947ffda8b8c2e7",
+      "diffSha256": "73090f56a32603eea426699f10fc063c1811be07053b35cb215db8a534c87611",
+      "recordSha256": "14f939e2e43dcc54c510e2ea8bdfbc2071968276f213c4473360c7ad4881e3df",
+      "recordBytes": 6581,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+      "set": "batch-084",
+      "sourceBytes": 7994,
+      "digest": "d7189aa5fcfd50500457ac1fab647dc687b58303153703a1c530fa63c38126f9",
+      "inventoryFileDigest": "d7189aa5fcfd50500457ac1fab647dc687b58303153703a1c530fa63c38126f9",
+      "diffSha256": "2b83d0b299400a883813bc868412bb133f0cc153a1eb77b190677400f4e283bc",
+      "recordSha256": "147cf6134f8dafa800816fa788363bfdbecb21832bfc7778bdbdaf27cd0fa672",
+      "recordBytes": 7428,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/work-integration.md",
+      "set": "batch-084",
+      "sourceBytes": 5573,
+      "digest": "12741378ece5a65b7d8c01bbb3e98eb568ab7ca2514018f08733700c0220c05d",
+      "inventoryFileDigest": "12741378ece5a65b7d8c01bbb3e98eb568ab7ca2514018f08733700c0220c05d",
+      "diffSha256": "da22cad671c7c4fe6c67db985bf038e30658cef761113ae1c847268ac48f08e9",
+      "recordSha256": "8efaf2e65db52cbb979ad767f4389de3370f6ab39ffec65a4796ac05efbfdf69",
+      "recordBytes": 6560,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "set": "batch-084",
+      "sourceBytes": 22436,
+      "digest": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
+      "inventoryFileDigest": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
+      "diffSha256": "e2f9838cb175c1671181b1cec826ce1bc7c9f3e9d8e5b29f1c6713396d32002c",
+      "recordSha256": "9dbd510258e9571db008c97894174c3bda5d742ddaf77fcaf4bc1e2a2c8f64c0",
+      "recordBytes": 14621,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+      "set": "batch-084",
+      "sourceBytes": 4596,
+      "digest": "3e63f3cc25d8f0a1aa9e7638d8187406ad882796b1f03e9b7ec63d94841b65a3",
+      "inventoryFileDigest": "3e63f3cc25d8f0a1aa9e7638d8187406ad882796b1f03e9b7ec63d94841b65a3",
+      "diffSha256": "3fb63644eb321261f3ecc92bd844829a892238ab477d7691cf496fb7d53ad0f8",
+      "recordSha256": "9853b5541f11a24c0de4554940deacca33a4067196ef3709d7fe9256a2a19232",
+      "recordBytes": 6575,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+      "set": "batch-084",
+      "sourceBytes": 3397,
+      "digest": "9bc319cc98fc2be021eb34b207adff37cdf29a051e3da2b655c3b11880b3cfe0",
+      "inventoryFileDigest": "9bc319cc98fc2be021eb34b207adff37cdf29a051e3da2b655c3b11880b3cfe0",
+      "diffSha256": "d6a35a72b4963413a0a6715265e2167ae9d80018d64e4c20883640ba37368520",
+      "recordSha256": "10e4ebacd1868141ac28d9a6ea9a1b9f3d30dfc6a6cbfe0f69ab1fd1ea910091",
+      "recordBytes": 6599,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+      "set": "batch-084",
+      "sourceBytes": 2342,
+      "digest": "3cc1928aec230839162c8fdc2dc37c47bcd54eac67de4b50857f1ffa5a230653",
+      "inventoryFileDigest": "3cc1928aec230839162c8fdc2dc37c47bcd54eac67de4b50857f1ffa5a230653",
+      "diffSha256": "2bd3079fef8c78922eb4ddab1b1a1a4e0d3119312e95aed8c1eb5850b167c510",
+      "recordSha256": "df7732a02ba54f1b18d27ea9930279b484f816c855e795bac53a298013f9d321",
+      "recordBytes": 6614,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "set": "batch-084",
+      "sourceBytes": 2784,
+      "digest": "ac76cdc7b77f1d60ce6927a96a14efbf261bc515afbec3186b9d629bc895c555",
+      "inventoryFileDigest": "ac76cdc7b77f1d60ce6927a96a14efbf261bc515afbec3186b9d629bc895c555",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d4d0c7f24dda966adae7615e58d96c4908b5f0ebe4af846b923be01b8b430140",
+      "recordBytes": 2009,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+      "set": "batch-084",
+      "sourceBytes": 2038,
+      "digest": "67e9ce7843b88e6ebe0b7688b0e00f1490bfaedf718c1e5853826a3f98eabe8e",
+      "inventoryFileDigest": "67e9ce7843b88e6ebe0b7688b0e00f1490bfaedf718c1e5853826a3f98eabe8e",
+      "diffSha256": "8d20b37542d3e4fbe44eb847d5f820115fc9daab08a73b58b4cf2f8e05755926",
+      "recordSha256": "6f9d65732b2300fdd2f4e613728a4296715e01035bb5be16b3813b2c9d32c238",
+      "recordBytes": 6560,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+      "set": "batch-084",
+      "sourceBytes": 2666,
+      "digest": "27fd53c723b38780e3bd3dee13827006c7bfa6650e57e3a29f55f941de37a772",
+      "inventoryFileDigest": "27fd53c723b38780e3bd3dee13827006c7bfa6650e57e3a29f55f941de37a772",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "44adab45dbb33b42f9d96c51d761d82a05b183b44930f670aa53a45e11898a6e",
+      "recordBytes": 1939,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "set": "batch-084",
+      "sourceBytes": 5958,
+      "digest": "36a638a0bcc156ac4aab3866514f3a875330fa0d6c5f609dcd989d5c21023bbd",
+      "inventoryFileDigest": "36a638a0bcc156ac4aab3866514f3a875330fa0d6c5f609dcd989d5c21023bbd",
+      "diffSha256": "68878d8336ee356be8fa75112311f848b2ded88b4a83c8e657c4bc8521bfe2a0",
+      "recordSha256": "c30120a330c0643ee93053b3fa854a263030b74910593ea50228b973bbb5191a",
+      "recordBytes": 13317,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "set": "batch-084",
+      "sourceBytes": 4398,
+      "digest": "7304aaaffd81ebf4dd9ebc580f171330c03e0cb2596835e04b24e630a41e2cd6",
+      "inventoryFileDigest": "7304aaaffd81ebf4dd9ebc580f171330c03e0cb2596835e04b24e630a41e2cd6",
+      "diffSha256": "887c879f0f5af89dbf263863d92d363b6029dab3a42e52274c2a74b95704f541",
+      "recordSha256": "70b0a5a62ccf2bf0cbc25e8ed27c4eda30e587ae7247e8194bb8afcaeb7e114e",
+      "recordBytes": 7090,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "set": "batch-084",
+      "sourceBytes": 7944,
+      "digest": "3e3784c6d5b9f6be51f824483be037040395a263cfb26eadae4a1762dc44427b",
+      "inventoryFileDigest": "3e3784c6d5b9f6be51f824483be037040395a263cfb26eadae4a1762dc44427b",
+      "diffSha256": "fe1362988b27533d790cfbdc3767729cba81728a155fabd27f74128f63d6d63e",
+      "recordSha256": "e47abe4acd867251e6bd6c689f0d78be78fdda01d19971956b22c2c7c84b73d3",
+      "recordBytes": 6668,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+      "set": "batch-084",
+      "sourceBytes": 15574,
+      "digest": "4564427d37a3233680d8407090063b3f3d13552612fed95bd5bbf473be8a535c",
+      "inventoryFileDigest": "4564427d37a3233680d8407090063b3f3d13552612fed95bd5bbf473be8a535c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8f020f37d0443454d92eb6f172e35d0470589b3b0e872015486057be930e5048",
+      "recordBytes": 2094,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+      "set": "batch-084",
+      "sourceBytes": 1816,
+      "digest": "92ab5eaaa4c71e0c608ca98f2af80223dcba72b71d2c8117b02382ae8f456ed8",
+      "inventoryFileDigest": "92ab5eaaa4c71e0c608ca98f2af80223dcba72b71d2c8117b02382ae8f456ed8",
+      "diffSha256": "d807d302dba922a38faf60ebdbc8f14b1d3dfd1e6c5bb835dca3bd38a8785d4e",
+      "recordSha256": "77bf2ac69a14ee88890dd6e13d57873f253d72638b8d781937f2805f92f81cd2",
+      "recordBytes": 7216,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md",
+      "set": "batch-084",
+      "sourceBytes": 6015,
+      "digest": "714c1acff0c1314e401c63f586c52edcec7acc8873898a7a21a29d0739b75c04",
+      "inventoryFileDigest": "714c1acff0c1314e401c63f586c52edcec7acc8873898a7a21a29d0739b75c04",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1e130eb23214158bd116e288d81fc1ec6fa5b0d6ec581d695bbde6773272e424",
+      "recordBytes": 5005,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+      "set": "batch-084",
+      "sourceBytes": 64938,
+      "digest": "2c59e9060dddfe463c8cb7da4ac0c5694f333ec5a5a2abe8b954312fa042a931",
+      "inventoryFileDigest": "2c59e9060dddfe463c8cb7da4ac0c5694f333ec5a5a2abe8b954312fa042a931",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e06fd279d93c538e7d59febe48a14b2f365943556dc1cb6eeedd1cb170eb263f",
+      "recordBytes": 194114,
+      "retiresWithTree": false,
+      "edgeCount": 131,
+      "dispositions": {
+        "preserve": 131
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/migration-status.md",
+      "set": "batch-084",
+      "sourceBytes": 4382,
+      "digest": "03653cadcf168ee1fc2190ab7546a91392f55f988d8012435ac05b1698e1a3c0",
+      "inventoryFileDigest": "03653cadcf168ee1fc2190ab7546a91392f55f988d8012435ac05b1698e1a3c0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2649fbcbea8c53ec3a45323a5fe0241f2d182a27aa8e494e2106b454ffbfbab3",
+      "recordBytes": 9959,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md",
+      "set": "batch-085",
+      "sourceBytes": 2815,
+      "digest": "f43934d95cee46df8a950f7dd1607f101b90bf33af5bfa9dd6867fd8eaae60c7",
+      "inventoryFileDigest": "f43934d95cee46df8a950f7dd1607f101b90bf33af5bfa9dd6867fd8eaae60c7",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "847a7cf797064ee2d2773ad2f94cb02b575d79312fe5b102459490c14f93b537",
+      "recordBytes": 8348,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "parked": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+      "set": "batch-085",
+      "sourceBytes": 1761,
+      "digest": "9b8fbd656ba0424b16dc4e036613faeaaac50280dc159c0c7dc39841d71ab7ba",
+      "inventoryFileDigest": "9b8fbd656ba0424b16dc4e036613faeaaac50280dc159c0c7dc39841d71ab7ba",
+      "diffSha256": "99807d6d9b792740596fb8535e790293b2dda6fe7506a84ac38f05ec604d5f34",
+      "recordSha256": "051b1bfd47fdc201157f01bb40b97cd08579755ce7bc2e2af942dc57e4ee47ba",
+      "recordBytes": 7216,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+      "set": "batch-085",
+      "sourceBytes": 1815,
+      "digest": "909c0b05f248fff0ad1ea243a00b7b07df13e6e7a51153be81755658f8a64530",
+      "inventoryFileDigest": "909c0b05f248fff0ad1ea243a00b7b07df13e6e7a51153be81755658f8a64530",
+      "diffSha256": "daa644a8a30307fb1a32b03701a78cec20f0164753cb86c1ec306c30da982b19",
+      "recordSha256": "83bb9d7081905e27e9e37a64d83516b3b8c5391a8b216c4243654378e6c975ff",
+      "recordBytes": 7204,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-083",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000083",
+      "population": [
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/spec.md"
+      ],
+      "populationCount": 4,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-confinement/spec.md",
+          "rankHash": "1d1339f655b8152b73002cb4f33f719db6e7a23d3efab35e4e8d72bea036f4ca"
+        },
+        {
+          "file": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+          "rankHash": "472140b3fb3ab81b38d0a02b5211365d58595653edd4004b71feb5d948c87050"
+        },
+        {
+          "file": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+          "rankHash": "4d778163068cc8b480417099080c105f9371842ca9c4027df52f24ca5e2a3ea6"
+        },
+        {
+          "file": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+          "rankHash": "ecb8cefd79dc5eccc60311c92ba426a326c0335ed77f36b9756141de3752c4c6"
+        }
+      ],
+      "sample": [
+        "docs/platform/agent-confinement/spec.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/agent-confinement/spec.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/spec.md"
+      ],
+      "dispositions": {
+        "preserve": 6,
+        "patch": 4,
+        "phase9-row-flip": 1,
+        "parked": 1
+      }
+    },
+    {
+      "set": "batch-084",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000084",
+      "population": [
+        "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+        "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+        "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "docs/platform/agent-coordination/architecture/protocol-model.md",
+        "docs/platform/agent-coordination/architecture/run-handle.md",
+        "docs/platform/agent-coordination/architecture/runtime-model.md",
+        "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+        "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+        "docs/platform/agent-coordination/architecture/work-integration.md",
+        "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+        "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+        "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+        "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+        "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+        "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+        "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md"
+      ],
+      "populationCount": 19,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+          "rankHash": "0a687fdf6477ff6e3f72089054456293e0ecc5889078b4be6c3ec26356c96a19"
+        },
+        {
+          "file": "docs/platform/agent-coordination/architecture/protocol-model.md",
+          "rankHash": "13cee953a56a0ac96f8d36bfdba398e34ca7e11cea0b9ad4661845e9b923ce66"
+        },
+        {
+          "file": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+          "rankHash": "2dc5a1e2ed79f1c1c1de2cda67d68a39dcd3b7a0e3550dde5be3bb75c79f5e81"
+        },
+        {
+          "file": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "rankHash": "31527bcb9b32ff0faa4985ec4c4e336bf2b385efdaa192e9f4759a9faa7a8a02"
+        },
+        {
+          "file": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+          "rankHash": "36aa0d5f0319d4caba98616fd8d3a7c2974fd4aa7d78b0003ec175b4d91d2b1c"
+        },
+        {
+          "file": "docs/platform/agent-coordination/architecture/runtime-model.md",
+          "rankHash": "3b952cd91c3f50624ac0fa0038c178ed1d2ceadc1948f1700102f1e011942991"
+        },
+        {
+          "file": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+          "rankHash": "3be9f3b3ed6fcf56766847c85674c64cee571d5312c8a06ec45556d6e9dc0f8b"
+        },
+        {
+          "file": "docs/platform/agent-coordination/architecture/work-integration.md",
+          "rankHash": "493f3113b2bfcbd41dc3be3144a89873903d1c711b797dd8dacec2a59ad61665"
+        },
+        {
+          "file": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+          "rankHash": "65615cf80a2073716a7783737697f52b2620014ff36e7751454becb7c3038c83"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+          "rankHash": "6bd8ded0e21498a1efcbf9a7d22bcc7f441eba90617e9d332817e10c0cc3a8a0"
+        },
+        {
+          "file": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+          "rankHash": "93d96215d9e8ecda48cbbfc46ffe7b72fbd53fe83f3f44b80f2d14769e8d3ee1"
+        },
+        {
+          "file": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+          "rankHash": "b22334c5346df8fcbc709bde54a48f3120b0add441080fa6947e499a1523985e"
+        },
+        {
+          "file": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+          "rankHash": "be8ff4333453304dd7c5c963f70a88fc01057236e229e5247ae824316fa90eb8"
+        },
+        {
+          "file": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "rankHash": "c07d322e3e9258ce9355973b3acd4039ccd0de31714db7960d57f1de5fff959e"
+        },
+        {
+          "file": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+          "rankHash": "c15f386486166166ed2943cfa6ee6f7a63954112734946350f737171f01ea8b6"
+        },
+        {
+          "file": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+          "rankHash": "d643487239c855ff13815a5777b9ea03312bbdbea4d14decaad58281d4cc5694"
+        },
+        {
+          "file": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+          "rankHash": "d95b05aa7798b43d2a6437be93e3640893fd1cade91b8a2f6acc6b413344c02d"
+        },
+        {
+          "file": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+          "rankHash": "f28895904e7c03c8c378a17e12cda18f1a7031085a5fc1ced76182067c1b369a"
+        },
+        {
+          "file": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+          "rankHash": "fe19fbe7a52fa9d28cb4b184cdf777179946a43eacefa7d9b7dbd64c92eb3199"
+        }
+      ],
+      "sample": [
+        "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+        "docs/platform/agent-coordination/architecture/protocol-model.md",
+        "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+          "bytes": 64938,
+          "edges": 131,
+          "sizeThreshold": false,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+        "docs/platform/agent-coordination/architecture/protocol-model.md",
+        "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md"
+      ],
+      "distinctReviewCount": 4,
+      "pilotFullReviewFiles": [
+        "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+        "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+        "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "docs/platform/agent-coordination/architecture/protocol-model.md",
+        "docs/platform/agent-coordination/architecture/run-handle.md",
+        "docs/platform/agent-coordination/architecture/runtime-model.md",
+        "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+        "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+        "docs/platform/agent-coordination/architecture/work-integration.md",
+        "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+        "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+        "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+        "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+        "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+        "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+        "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+        "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+        "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+        "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+        "docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md",
+        "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+        "docs/platform/agent-coordination/history/documentation-migration/migration-status.md"
+      ],
+      "dispositions": {
+        "patch": 20,
+        "preserve": 143,
+        "parked": 3
+      }
+    },
+    {
+      "set": "batch-085",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000085",
+      "population": [
+        "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+        "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md"
+      ],
+      "populationCount": 2,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+          "rankHash": "16ecd04980acbc9e9952c3176c6033d50a222c221f2cf2b82e5625408970cf62"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+          "rankHash": "b50bd6c8c5d9d85651f86ed6cc882afb442d5f23a71323e02100b7f1f046387d"
+        }
+      ],
+      "sample": [
+        "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md",
+        "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+        "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md"
+      ],
+      "dispositions": {
+        "parked": 1,
+        "preserve": 3,
+        "patch": 2
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "083": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-083",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "084": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-084",
+      "population": [
+        "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+        "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+        "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+        "docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md",
+        "docs/platform/agent-coordination/history/documentation-migration/migration-status.md"
+      ],
+      "populationCount": 5,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+          "rankHash": "32daaa7f1ae50d9b72ca3d2e687cf0fb5a7330d4200411f02a986c9b6508159f"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+          "rankHash": "59980eeb82a683b0a8482939f3a4b45ff0221661014be3b7024a1a6bcb574382"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md",
+          "rankHash": "89c3417c5182b2ef9f8f3f73cf4f847c1d78e46e100b2c5519a8ab3a157a7fbf"
+        },
+        {
+          "file": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+          "rankHash": "9d3dd61da9f5166a10c87a4ac15f05d2601c337f43cd7d70fdbb3c1cfd7c9af8"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/documentation-migration/migration-status.md",
+          "rankHash": "c4bb0e561b046a07c732cc037fad616c37848a9ec85680f24cda64de5a188320"
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "085": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-085",
+      "population": [
+        "docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md",
+          "rankHash": "4200e172202b1673f60ca307979d252783af26dbf59ed8b0fe4c6f43c0ec6f15"
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-083.jsonl",
+      "sha256": "5a162275f1549ea6aee6a6f7a11c44d3e8703a1374fa8645efb7eb0313580c66"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-084.jsonl",
+      "sha256": "dec0768bf5563eccfac0f741c6a6f0704544720ab10b2d68a3a062c0722146ba"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-085.jsonl",
+      "sha256": "05a375a17f91dd9b96f5bfd27127bf490193059faf9ba1435a0438851d1cbd24"
+    }
+  ]
+}
