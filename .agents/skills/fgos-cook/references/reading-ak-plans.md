@@ -29,8 +29,8 @@ read-only check of capability annotations; it never gives you the slices.
    workspaces), is for the owner or a consent gate, not a slice.
 9. **"After red-team" corrections at the end of a phase win over the older text.**
    Read to the end of every file.
-10. **Owner decisions in `plan.md`** (labels like A1-A3, D1-D8) go into the `--input`
-    of every slice they touch.
+10. **Owner decisions recorded in `plan.md`** (numbered answers or locked-decision
+    lists) go into the `--input` of every slice they touch.
 
 ## Check the plan against the code first
 
