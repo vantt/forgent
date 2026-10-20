@@ -1,8 +1,9 @@
 // git-dir-layout.mjs -- which repository a directory belongs to, and the identity keys its config
 // files hold, read from the files Git lays out (a `.git` directory, or a `.git` file naming a linked
-// checkout's gitdir and its `commondir`). The test launcher and its config guard only need these
-// facts about the checkout running the suite, so they start no `git` child (Git spec §12: every Git
-// child outside the fgos-git driver is a writer to the one-door gate).
+// checkout's gitdir and its `commondir`); which files it holds, read through a caller's Inspect port.
+// The test launcher and its config guard only need these facts about the checkout running the suite,
+// so they start no `git` child (Git spec §12: every Git child outside the fgos-git driver is a writer
+// to the one-door gate).
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -47,4 +48,29 @@ export function configEntries(file, pattern) {
     if (pattern.test(key)) out.push(`${key} ${value}`);
   }
   return out;
+}
+
+/** Tracked and untracked non-ignored paths under `repoRoot`, relative to it, read through the Inspect
+ * port `inspect` (src/git/inspect.mjs); null outside a repository. A failed read throws: the source
+ * set is never guessed. */
+export function repositoryFiles(repoRoot, inspect) {
+  const facts = inspect.resolveRepo();
+  if (facts.notARepository) return null;
+  const top = fs.realpathSync(facts.worktreeRoot);
+  const prefix = path.relative(top, fs.realpathSync(repoRoot)).replaceAll('\\', '/');
+  const under = (rel) => (prefix === '' ? rel : rel.startsWith(`${prefix}/`) ? rel.slice(prefix.length + 1) : null);
+  const files = new Set();
+  const add = (bytes) => { const rel = under(Buffer.from(bytes).toString('utf8')); if (rel) files.add(rel); };
+  let cursor;
+  do {
+    const page = inspect.trackedPaths({ maxEntries: 4096, cursor });
+    page.entries.forEach(add);
+    cursor = page.nextCursor;
+  } while (cursor);
+  do {
+    const page = inspect.status({ untracked: 'all', maxEntries: 4096, cursor });
+    for (const entry of page.entries) if (entry.untracked) add(entry.path);
+    cursor = page.nextCursor;
+  } while (cursor);
+  return files;
 }

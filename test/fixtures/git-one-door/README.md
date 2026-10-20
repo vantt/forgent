@@ -11,8 +11,11 @@ substitution inside a quoted `echo` operand, git as an executor command in defau
 parsed config, git returned by a function passed in a parameter, git from a method of a value in a
 module-private `Map`, a wrapper called by name and also handed on as a value, git picked by a Rust
 `match` arm from a const list, git through a Rust argv runner on a caller-named repository (next to
-the same argv on a `temp_dir()` repository, the production sandbox probe), and git passed from Node to
-an N-API constructor). Two trees hold what must not be a site:
+the same argv on a `temp_dir()` repository, the production sandbox probe), git passed from Node to
+an N-API constructor, a promisified `execFile` exported across modules, `shell: true` held in an
+options variable, a child_process function picked by a computed member, `reflog expire` and a
+two-operand `symbolic-ref` in a hook, and a Rust `git -C <caller's repo> reset` in a function that also
+writes under `temp_dir()`). Two trees hold what must not be a site:
 `standalone-skill` (a skill whose SKILL.md declares `metadata.oneDoor: standalone`, next to one that
 does not) and the `die "... (git clone ...)"` line of `shell-data-operand`. `test/git/one-door.test.mjs` requires the
 scan to report each one. The files are never imported or run.

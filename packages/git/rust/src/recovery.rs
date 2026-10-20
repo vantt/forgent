@@ -46,8 +46,16 @@ pub(crate) fn kind(k: &OperationKind) -> &'static str {
     }
 }
 impl GitDriver {
+    /// An id with no journal, live or compacted, refuses with the exact cause
+    /// `git-operation-unknown`: no attempt exists under it, so a caller may
+    /// start one. Every other read failure keeps its own cause.
     pub fn inspect_operation(&self, repo: &RepoHandle, id: &str) -> Result<Value> {
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
+        let unknown = |e: &wal::WalError| matches!(e, wal::WalError::Io(io) if io.kind() == std::io::ErrorKind::NotFound);
+        let wal = match Wal::open_existing(repo.common_dir(), wal::OsFileSystem) {
+            Ok(wal) => wal,
+            Err(e) if unknown(&e) => return Err(failure("git-operation-unknown")),
+            Err(e) => return Err(failure(e)),
+        };
         if let Some(c) = wal.compacted(id).map_err(failure)? {
             let outcome = c.outcome().map_err(failure)?;
             let compact_kind = match &outcome {
@@ -61,7 +69,11 @@ impl GitDriver {
             return Ok(json!({"repoIdentity":wal.repository_identity(),"operationId":id,"kind":compact_kind,"requestDigest":c.request,
                 "terminal":true,"compacted":true,"outcome":outcome}));
         }
-        let c = wal.inspect(id).map_err(failure)?;
+        let c = match wal.inspect(id) {
+            Ok(c) => c,
+            Err(e) if unknown(&e) => return Err(failure("git-operation-unknown")),
+            Err(e) => return Err(failure(e)),
+        };
         Ok(
             json!({"repoIdentity":wal.repository_identity(),"operationId":id,"kind":kind(&c.intent().kind),"requestDigest":c.intent().request_digest,"intent":c.intent(),"terminal":c.outcome().is_some(),"compacted":false,"outcome":c.outcome(),"phase":c.last_state()}),
         )

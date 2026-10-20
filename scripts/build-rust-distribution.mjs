@@ -13,8 +13,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { createGitInspect, gitPortOptions } from '../src/git/inspect.mjs';
-import { writeMutationCensus } from './git-one-door-scan.mjs';
-import { repositoryDirs } from './lib/git-dir-layout.mjs';
+import { scan, writeMutationCensus } from './git-one-door-scan.mjs';
+import { repositoryDirs, repositoryFiles } from './lib/git-dir-layout.mjs';
 import { fileURLToPath } from 'node:url';
 import { releaseBinaryPath } from '../src/util/release-binary-path.mjs';
 import { releaseTargetForHost, manifestTargetForHost } from '../src/util/release-targets.mjs';
@@ -180,29 +180,6 @@ export function listLegacyNodeSourceFiles(repoRoot, openInspect) {
   return [...new Set(sourceFiles.map((file) => path.relative(resolvedRepo, path.resolve(resolvedRepo, file)).replaceAll('\\', '/')).filter((file) => !allowed || allowed.has(file)))].sort();
 }
 
-// Tracked and untracked non-ignored paths under `repoRoot`, relative to it; null outside a
-// repository. A failed read throws: the source set is never guessed.
-function repositoryFiles(repoRoot, inspect) {
-  const facts = inspect.resolveRepo();
-  if (facts.notARepository) return null;
-  const top = fs.realpathSync(facts.worktreeRoot);
-  const prefix = path.relative(top, fs.realpathSync(repoRoot)).replaceAll('\\', '/');
-  const under = (rel) => (prefix === '' ? rel : rel.startsWith(`${prefix}/`) ? rel.slice(prefix.length + 1) : null);
-  const files = new Set();
-  const add = (bytes) => { const rel = under(Buffer.from(bytes).toString('utf8')); if (rel) files.add(rel); };
-  let cursor;
-  do {
-    const page = inspect.trackedPaths({ maxEntries: 4096, cursor });
-    page.entries.forEach(add);
-    cursor = page.nextCursor;
-  } while (cursor);
-  do {
-    const page = inspect.status({ untracked: 'all', maxEntries: 4096, cursor });
-    for (const entry of page.entries) if (entry.untracked) add(entry.path);
-    cursor = page.nextCursor;
-  } while (cursor);
-  return files;
-}
 
 /**
  * Finds the installed directory of every production dependency (and of their own dependencies),
@@ -362,12 +339,13 @@ export function buildRustDistribution({
   const legacyNodeRoot = path.join(resolvedOut, 'libexec', 'legacy-node');
   fs.mkdirSync(legacyNodeRoot, { recursive: true });
 
-  // The one-door census of exactly the sources this release ships (Git spec §12, V-GATE); doctor's
-  // git-mutation-one-door checks it is empty and was built from the payload it sits in.
-  writeMutationCensus(resolvedRepo);
   // The addon this build just compiled reads the checkout's file list (no `git` child of our own).
   const builtAddon = { manifest: { components: { nativeAddon: nativeAddonComponent(addonLibrary, path.basename(addonLibrary), resolvedRepo) } }, releaseRoot: outputDir };
-  const sourceFiles = listLegacyNodeSourceFiles(resolvedRepo, () => createGitInspect(gitPortOptions(resolvedRepo), { descriptor: builtAddon }));
+  const openInspect = () => createGitInspect(gitPortOptions(resolvedRepo), { descriptor: builtAddon });
+  // The one-door census of the product this checkout declares (Git spec §12, V-GATE); doctor's
+  // git-mutation-one-door checks it is empty and was built from the payload it sits in.
+  writeMutationCensus(resolvedRepo, scan({ root: resolvedRepo, openInspect }));
+  const sourceFiles = listLegacyNodeSourceFiles(resolvedRepo, openInspect);
 
   for (const rel of sourceFiles) {
     const srcFull = path.join(resolvedRepo, rel);

@@ -12,6 +12,7 @@ import {
   createWorktree,
   createClaimWorktree,
   createDispatchWorktree,
+  removeDispatchWorktree,
   createBranchRef,
   removeWorktree,
   listLeftovers,
@@ -1170,7 +1171,7 @@ test('provisionDependencies runs npm ci when package-lock.json is present', () =
   assert.equal(fs.existsSync(path.join(worktreeDir, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
 });
 
-test('createWorktree provisions a declared dependency into the fresh worktree automatically', () => {
+test('createWorktree and createVerifyCheckout provision a declared dependency, and runner teardown removes both checkouts with what provisioning placed', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
   const localDep = mkLocalDependency();
@@ -1185,6 +1186,17 @@ test('createWorktree provisions a declared dependency into the fresh worktree au
   const wt = createWorktree(repoRoot, 'item-deps', { worktreeDir });
 
   assert.equal(fs.existsSync(path.join(wt.path, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
+  // The ignored install would make the Worktree port refuse; teardown sets
+  // aside exactly what provisioning recorded, so nothing is left behind.
+  const failures = [];
+  removeDispatchWorktree(repoRoot, wt.path, (line) => failures.push(line));
+  assert.deepEqual(failures, []);
+  assert.deepEqual(fs.readdirSync(worktreeDir), [], 'no checkout or set-aside directory is left');
+
+  const verify = createVerifyCheckout(repoRoot, branchTip(repoRoot, 'HEAD'));
+  assert.equal(fs.existsSync(path.join(verify, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
+  removeWorktree(repoRoot, verify, { force: true });
+  assert.deepEqual(fs.readdirSync(path.dirname(verify)).filter((name) => name.includes(path.basename(verify))), []);
 });
 
 test('createWorktree provisions dependencies after git worktree add and leaves its lock scope empty', () => {

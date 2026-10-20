@@ -224,7 +224,7 @@ impl GitDriver {
         if paths.is_empty() {
             return Ok(());
         }
-        let mut error = failure("restore-orphaned-patch: inspect preserved patches before resync");
+        let mut error = failure("restore-orphaned-patch: an interrupted restore left the patches in orphanedPaths; apply what is still wanted from each, then delete the patch files and restore again");
         error.detail = Some(Box::new(serde_json::json!({"orphanedPaths":paths})));
         Err(error)
     }

@@ -1,7 +1,65 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d694974f6219a763b3e17fb86de6a7ff51aebb3f5f1933ca1ac59ec1414bc4b9",
+  "payloadDigest": "abae58e1c6f7dfc471b389e7e325ac50dc05e79e75c86a1fa90185fd2f06c693",
   "files": {
+    ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+    ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+    ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
+    ".agents/skills/_shared/catchup-self-recovery.md": "575cbf6b4a7b1ab056895575b53848d8fcd0c8174f10c050c412a8e753552a4c",
+    ".agents/skills/_shared/citation-format.md": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+    ".agents/skills/_shared/coding-cell-policy.md": "a40741fb21ae5c0ee158fc5bc1d0810943b4b5b18c285f223125fd8ea89381ca",
+    ".agents/skills/_shared/coding-worker-contract.md": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+    ".agents/skills/_shared/coordination-driver.md": "ef2a69889415d05f9c5578ac1f5e5dae0c2a1f6797d76572afc67b64ce6ec142",
+    ".agents/skills/_shared/decision-question.md": "59e905ab0e06d35299aed5420de2edafbe83bfb1030bc200dad423db38950393",
+    ".agents/skills/_shared/executor-dispatch-fallback.md": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+    ".agents/skills/_shared/fgos-cli-fallback.md": "de0c928316be7ec03cee52d43974e249bbaae9fe3d90ac3fa2c175705eefc587",
+    ".agents/skills/_shared/planning-capability-awareness.md": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+    ".agents/skills/_shared/private-cell-worktree.md": "923953e396b4c7e77ae3d8d94ecfb3572ec8224a063721ac1082f714711dcb8d",
+    ".agents/skills/distill/CREATION-LOG.md": "60afdb5c524fa528f6771c9d9a7d4e3ef2bdb1364ff6abf1bdd3210fb5c9d9d9",
+    ".agents/skills/distill/SKILL.md": "f77023f445a8ceaa8c64cea237504712aa76b9f0f8c07cd8843d991c93ea4bec",
+    ".agents/skills/distill/references/consult-protocol.md": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503",
+    ".agents/skills/distill/references/deep-dive-protocol.md": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
+    ".agents/skills/distill/references/extract-rules.md": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8",
+    ".agents/skills/distill/scripts/distill.mjs": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+    ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+    ".agents/skills/fgos-advise/SKILL.md": "37b42d396cc54d8d57f66188aa95738e45ca3bee30aa2c159e77d6baaf6fe4e4",
+    ".agents/skills/fgos-advise/references/request-kinds-and-routes.md": "b6a5fe324e636686e11c6b9e618bd9594e4972d4016bb7b8669aa532d7dbbd4f",
+    ".agents/skills/fgos-architecture-panel/SKILL.md": "0e73e2b90921338641519e55d65edfa3869b1e66acd09420e614fd3cf7f24dfd",
+    ".agents/skills/fgos-clarifying/SKILL.md": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+    ".agents/skills/fgos-coding-discovering/SKILL.md": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
+    ".agents/skills/fgos-coding-driving/SKILL.md": "07066c5f3789392655f000f60883a8d8d432a0a9f39f1ca8f5971f3c5befa0ba",
+    ".agents/skills/fgos-coding-driving/references/caller-contract.md": "dcf13fe93461eedc708bc65b496eee323c7fca421b597f296f5d4dbeb28eca6c",
+    ".agents/skills/fgos-coding-driving/references/loop-mechanics.md": "c8afa92336735847e4f2486c272098898ec6017efa0a6588c274004588b307e1",
+    ".agents/skills/fgos-coding-driving/references/reclaim-and-role-graph.md": "a61b76a44bfc046808e494629a298e34535861e2af676b0c370ba030855b645c",
+    ".agents/skills/fgos-coding-exploring/SKILL.md": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+    ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+    ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+    ".agents/skills/fgos-coding-exploring/references/re-entry-from-planning.md": "53bdbc198a36a11d4c4b8b29dea4a15254602c80c278651b6c7f865edcee6ed4",
+    ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
+    ".agents/skills/fgos-coding-implement/SKILL.md": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+    ".agents/skills/fgos-coding-implement/references/implement-and-collaboration.md": "8b595ac32f219313bdc7e824803fdb2be32692dea986326f376dc20acd4966f2",
+    ".agents/skills/fgos-coding-implement/references/return-mechanics.md": "ba349aaaa33f3ddc317ed468f6abde8acd41df307e58b30ff75d83fef04cdfb2",
+    ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+    ".agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+    ".agents/skills/fgos-coding-knowledge/SKILL.md": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+    ".agents/skills/fgos-coding-planning/SKILL.md": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+    ".agents/skills/fgos-coding-planning/references/approach-and-shape.md": "8b264db72fb94bd59c8bd3e5b1ebb939f3a7b0776645bcda7fa54b5577004f9b",
+    ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md": "49fed6b7fb21fab69354cb383c8857926d3636c53f08e8c040e4763f1a50aa70",
+    ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md": "d15bbb0c0b52d6bca57ede0d785dce5a4682db90912a499f9ee164b457e25c77",
+    ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+    ".agents/skills/fgos-coding-shaping/SKILL.md": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3",
+    ".agents/skills/fgos-coding-validating/SKILL.md": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+    ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+    ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+    ".agents/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md": "1b0496bcdc6e22ab650325b363dae7eb225b7b61cd154d0b1b7489f449622b30",
+    ".agents/skills/fgos-fanout/SKILL.md": "2d3c472e1bdf901d31ee54dff6e444f737650f73175cbd597732d2f4742ebb79",
+    ".agents/skills/fgos-fanout/references/wave-dispatch-mechanics.md": "a0fe69420b35473170e16047369fb3ce6d9dff9c33de08d9b84e00ef46a6f885",
+    ".agents/skills/fgos-group-thinking/SKILL.md": "3992738511dbd7eb4c512a9b6da86aa59539064390c08474bb1ccf6913919146",
+    ".agents/skills/fgos-indexing/SKILL.md": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+    ".agents/skills/fgos-lock-fence/SKILL.md": "d3d2feb9dd0152b1e7bb3a7b2359846643d47ed630c3e303f87fec5e550653cb",
+    ".agents/skills/fgos-researching/SKILL.md": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
+    ".agents/skills/fgos-routing/SKILL.md": "8a215975394d282772c768e69a0767aabbf1a2ca30e0fe7959252f7fcdba3a8e",
+    ".agents/skills/fgos-run/SKILL.md": "35b588f7e0afe600c86b6e1e5215884db108ba0e72fc224f2ccc6a6b328718d6",
     ".githooks/pre-commit": "53c4ce05726ed6372d34f15f41d32c563d208204142b1459f4ec1b8d8d58cab2",
     "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "7af12a8d93283e26be8009e5eaebf15f09a0b3ac756fd311d62f6e184c7997de",
@@ -29,7 +87,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "dca3d8b530f20aaf8d9d8d424f12ec1c5d9670812566ab4d6c51583f3bb7b573",
-    "bin/fgos.mjs": "f11d8f3d813ae9739ffa2b1f6f14a7aa1dc5f80a35ea820a629f8d7de9d69cdd",
+    "bin/fgos.mjs": "77cdf84808600911deec6d03b48ad819e3462179056fbda77c3f736bec6cf304",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -65,6 +123,43 @@
     "core/skills/instruction-audit/references/lane-prompts.md": "7768d7562c9d45d2c40fb5602ed542c7711df2d31978351c1751f801ac6de112",
     "core/skills/instruction-audit/references/report-template.md": "c1f2f637b2ba40ec03b3a6a99c65a9ca851283d20e03140b3bec45f08f222b24",
     "core/skills/instruction-audit/scripts/instruction-audit.mjs": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
+    "domains/coding/harness/enrich-and-validate-contract.mjs": "f88bd4866af0cb12fe2d07967056e1baf214e27a45939de9ea56be76851e923b",
+    "domains/coding/skills/_shared/coding-cell-policy.md": "c8bb7df8a38059cc8bbe70adc524acf2838f0c7d5e785b894f0c6a17724aa0b7",
+    "domains/coding/skills/fgos-coding-discovering/SKILL.md": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+    "domains/coding/skills/fgos-coding-driving/SKILL.md": "e241360f3670b6c54d8c730ff6028f4455174c6019b426338e93312cae2d71bd",
+    "domains/coding/skills/fgos-coding-driving/references/caller-contract.md": "e24b2edec6a8c260be7be810537e324c9dcf2a8be322f42531644a719c7cc418",
+    "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md": "fa1d4c0f277f05e5213486db2709fda6caec91f6c4ff0e0c67028cee21275713",
+    "domains/coding/skills/fgos-coding-driving/references/reclaim-and-role-graph.md": "47e1ad800ea1f15ed59e81ef3f12149015a218fe496c2909331fa25064e7dc16",
+    "domains/coding/skills/fgos-coding-exploring/SKILL.md": "9427b9e7d3bfe654519419ec2ec8632b66b69bca11218c2279238cc4f3289d3f",
+    "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md": "b0bc2aeacea29dbe5f4ea8d46a684ca9f907453f8813f02accf226f1549463bc",
+    "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+    "domains/coding/skills/fgos-coding-exploring/references/re-entry-from-planning.md": "bf05e294c104a9c413c6bdb41c3ce0443dcf90d3bf180239dc0a187e8bd58d8c",
+    "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+    "domains/coding/skills/fgos-coding-implement/SKILL.md": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+    "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md": "1be49dfb43f958ffd5d54aa73ba8a4e29f4591332f3f46316970f1dcab34ad37",
+    "domains/coding/skills/fgos-coding-implement/references/return-mechanics.md": "ef6e11b880c3b1e55f42d0963f17b9127e530aaad576ff034a0afe98cdc09067",
+    "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+    "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md": "ea2d3891915949c1e9764240b81af748393713f00685ac173eb5c64ed1df9043",
+    "domains/coding/skills/fgos-coding-knowledge/SKILL.md": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+    "domains/coding/skills/fgos-coding-planning/SKILL.md": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+    "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md": "f6d79063ae11e9e48db33b5876ea414292f9023c1da4b2adc70478e4785ce576",
+    "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md": "4eca5e5f5db1c61d2582cced415a1b283d3663274760fea6e76e9ffb3ad3b3e7",
+    "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md": "5d48fdf43978474a8339f75bf2b1bc9e215e02545a2cbda4019845d6feb42297",
+    "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+    "domains/coding/skills/fgos-coding-shaping/SKILL.md": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+    "domains/coding/skills/fgos-coding-validating/SKILL.md": "fa831842240da6d8b77ad4193a09c1ccf8ea7972608ec31fc3966c2511b06d0c",
+    "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md": "7e448dffd744f14eec929b42849e7c6567743a257ee3950e7f559ba2c78a3183",
+    "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+    "domains/coding/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md": "186f7bb8f6fce1dc830dd9037f672dc41a06dff4806232a294e43d3c7bba4a55",
+    "herdr-dashboard/src/app.rs": "bb8c95fa65a18cebe52413eda1fbae4e1ddbea52dd0dc669ac187ace699a9144",
+    "herdr-dashboard/src/layout.rs": "3368fb8cf97ee8a752a4098bdefcaec286e50f8a663d90209fd089056926dc4a",
+    "herdr-dashboard/src/lib.rs": "229f88b132cd3f09c678e6fae506611e4f79f03797bfbd054c18f1781eaded91",
+    "herdr-dashboard/src/main.rs": "6e9dfd22d7b97abc3c62af20ece3080671731c52f5863d48e450656f57186371",
+    "herdr-dashboard/src/pane_scan.rs": "4e71fa33d2081c4e36bee7c0d90c5c85cbb7a203bce86117e9a43e408ad0ec10",
+    "herdr-dashboard/src/pick.rs": "47e41bfc684fbcebb488f85b3a1a9948a911d8c01e207b37c92bf78320b42770",
+    "herdr-dashboard/src/ports.rs": "db6dfc823d3697b6f35fd8632fba6ea0b8c5e256d4bdd38487fa87a935faa179",
+    "herdr-dashboard/src/ui.rs": "c112cef4793c0be65d8e48143e8575df8954436c972f7f3aec185cf222460b64",
+    "herdr-dashboard/tests/render_smoke.rs": "068febb6148d9a441f9cd98cc7983b403a0232942866d932efb1336aec6c5d6b",
     "packages/agent-protocol/rust/src/direct/agy.rs": "1eaf215ff0b4efa4bb581f41ca2a98d86773ce9e087926ef92abd657eed13f91",
     "packages/agent-protocol/rust/src/direct/claude.rs": "34c80434bfac9de112d8dd76b6c67d44f7f51f944437e095e6e27ac59ed39864",
     "packages/agent-protocol/rust/src/direct/codex.rs": "73bffec03c56a22c01f286fe1897125a59b07e58540eb86c67dc16f5f088bfb3",
@@ -197,11 +292,11 @@
     "packages/git/rust/src/lib.rs": "b311d1d392a1c795aa2ee791ffe076bb1becbc5077d6c2f7015695112a6eaf84",
     "packages/git/rust/src/native_lock.rs": "a90c68aba9a82cc3154815e47edba2230edbd9b641675c5da0eabf2ce6c17beb",
     "packages/git/rust/src/publication.rs": "a09e00aab211c6e3c299160a1eabef8bc77248287fb0469e593135e06470157e",
-    "packages/git/rust/src/recovery.rs": "6d6672e4431f26d3da1990228bffc79ecf7a28d2678e97cdea65274e2049f31b",
+    "packages/git/rust/src/recovery.rs": "63789a96393fc12e897aa098bbe617c96fd6301e40c185a5385471b36f45c6b6",
     "packages/git/rust/src/refs.rs": "50aa5b9639f8bebc933cb0ceaebf5759c3df8d1ef95cda50fb0702444eac3521",
     "packages/git/rust/src/remote.rs": "5d4be338ec334daf9270869bfd7ae7a392a74a80636666206a9e0744734873e4",
     "packages/git/rust/src/repository_config.rs": "fee7b1369e589ad300f19174d8464b3eaef005b49d77d39b98b2be0c3ae58b2e",
-    "packages/git/rust/src/restore.rs": "439789a2fd72fd56d83973a02e0c4aa495239041422ae698be510b1cc5436f9b",
+    "packages/git/rust/src/restore.rs": "83be51119cf4ca3611fc04bcbef1c6a789ddd81dc370f60f28a4b8980d5c88d5",
     "packages/git/rust/src/scoped_commit.rs": "aa8e543cedf224e676fef9327342de176c650693c7c52b9a52fade1a671320e6",
     "packages/git/rust/src/sync.rs": "103096ec5cc98194be1acb9987e9cd71d0edc5f0a885ccd1929f31f0bff73f4e",
     "packages/git/rust/src/wal.rs": "d795a14faac0bcfea6d76c4cde6edadc0f82cc292353cbf974037aba42bb54ae",
@@ -269,6 +364,7 @@
     "packages/host-runtime/rust/tests/external_process_router_integration.rs": "b148036009fcdec18da2fe1dabc95b78783c7e22ef39e68e455e4202e02c5841",
     "packages/host-runtime/rust/tests/external_process_tests.rs": "81b734850beb225a00f68489ec7c8ca9134dfe493d490c0b8678e197dc7f6be6",
     "packages/host-runtime/rust/tests/external_provider_manifest_and_registry.rs": "ffa583b9b802ab706ec905a8ac02991108a9de0331db29180b9f6ab765b5c8df",
+    "packages/host-runtime/rust/tests/fixtures/external-provider/echo_process.rs": "fffe07e53575edbc812ebba86e3b3fe86a466be48cd7e76c1b9a02c78e44a02a",
     "packages/host-runtime/rust/tests/module_graph.rs": "5983813aa0fe08d9d6c9d28af9e20ae0f8ba55079586ac98d31745609dd0db32",
     "packages/host-runtime/rust/tests/two_projectors.rs": "66b488f34d6e1d41b614840287105d02bf214f2eb754ff3876a87f85b05204ed",
     "packages/observe/rust/src/case_journal.rs": "cde5b3da1389ced2c58ffc486ed5bda893e22fd8fdcbc706e1247d5f4cdc315d",
@@ -322,6 +418,8 @@
     "packages/process/rust/tests/containment_spawn_timeout.rs": "d97c290dd403f9e883ab5c72107cc7abb13b9fc716740623d90b6a9fe6247d16",
     "packages/process/rust/tests/containment_windows.rs": "6eae384469fca3d9b9291709f1eb144eb0c56351a246311f255f545df1ba755e",
     "packages/process/rust/tests/file_users.rs": "6dfa7e15e0641b32ca730e0c9fdb0c1f3deca30e4f3c2bd3db056d107085aca6",
+    "packages/process/rust/tests/fixtures/bwrap-without-info-fd.sh": "111366f74ac4efc4497524d5181754ad8e4c50837bf4caa26777ff1f3bc6a69c",
+    "packages/process/rust/tests/fixtures/heartbeat-grandchild.sh": "71c6568f2f95b3e59883ddbd45e1527bead193017594b6b2f0dc767ab4d9fd22",
     "packages/process/rust/tests/holders_multiprocess.rs": "5acbbcb82b2a3fd77e177592785ae4579c50c0612fd4a9fe0424928fa116b03f",
     "packages/process/rust/tests/judge_vectors.rs": "b1633fd4092114d469cba250fbbb8f01724cc5e3a66d85e046b373ed259ef401",
     "packages/process/rust/tests/signal_identity.rs": "7048cb36bffbf0fe9700e4d27460416b908f8169b57843c6c79d69920cfa9c4e",
@@ -357,6 +455,8 @@
     "packages/run-supervisor/rust/tests/adopt_matrix.rs": "d6453cbfa5736d0707bfc00660153de2adf9e55122cb81c834399ecc1f82f52c",
     "packages/run-supervisor/rust/tests/adopt_scan_perf.rs": "c774c90084882596fb6b2c05bfbe90772c8233e553d7869c2fe5ffab30dc9610",
     "packages/run-supervisor/rust/tests/envelope_digest_vectors.rs": "593eacf90542d07acb74ce2917ece2c9f82e6e63a205045aeb2a022106fee153",
+    "packages/run-supervisor/rust/tests/fixtures/ignore-sigterm.sh": "5e83e7c47f0c6dd3ee7c21e7aa6c3854b39535fe7593d1becd6a89e806419d0a",
+    "packages/run-supervisor/rust/tests/fixtures/noisy-agent.mjs": "d384bd401ebc75cc0dbdaf2700614f9fea03a1db79567ebd0f0c846f959771ac",
     "packages/run-supervisor/rust/tests/gate_ceiling.rs": "9ad2b5a80ef1007870044ffec3ee38d141aa705b2d7796d342fd7da777d2b3fd",
     "packages/run-supervisor/rust/tests/gate_go.rs": "54bbdda764f20e9055bf99f77e38a763026476813348edc4b8c298edc84fd889",
     "packages/run-supervisor/rust/tests/gate_orphan.rs": "ee7cb384c3ff2914c8e3c03eab3887ec068218952d29b9a769fa726dd6727519",
@@ -414,6 +514,7 @@
     "packages/terminal-control/rust/tests/common/mod.rs": "2efd1236e7220b349466e3bec19cfcb09ec686986b3e447c2e9cb2fd24bf20aa",
     "packages/terminal-control/rust/tests/core_failures.rs": "5cacc9d82c3b8e69b988f276c696910591531a59cd72df2cf6acb79b8054044d",
     "packages/terminal-control/rust/tests/core_rules.rs": "d6a67efee12ea914ed47b52168e14710d2e613081120af182e8803edf1e1fce4",
+    "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh": "99f68a80b5b4c7d20b515abd06a85af9f5601d24691711feb988d9d98ce36ae1",
     "packages/terminal-control/rust/tests/herdr_driver_fake.rs": "5d9b276c54539299d45710b7737b3fe17059a48495c54bd8d69ae2586d8ebe25",
     "packages/terminal-control/rust/tests/herdr_driver_fixtures.rs": "833c56ae001bf3b5fd99a11c75ac3b73e8383467c32a6adf3047b36403c5b94e",
     "packages/terminal-control/rust/tests/herdr_driver_live.rs": "3d2f2bc0b66db1fb4cccab5098256835782985ed7b901822f85cc6f459503534",
@@ -425,7 +526,7 @@
     "scripts/backfill-status-category.mjs": "bff22a3805f8a38f1c7d93b7cee3b53ee5b6dde0d978b4fdbfb760c1cc3622d6",
     "scripts/backfill-unit-summaries.mjs": "a11d12e63191bc31bf7a27b2c7279ac5ea8403730045dbbaa8f8ce2738b275e5",
     "scripts/build-domain-registry.mjs": "ad239f74764832366c3c3bd43c674012904a78944bd6d6b9d2c8eb481c1a62c0",
-    "scripts/build-rust-distribution.mjs": "0ed8c146b44fc76626024e461884c5ff0d0c53e26cd1d99767031296d43ca425",
+    "scripts/build-rust-distribution.mjs": "56f7df72e28a66b77904b1ab5531fcbd455db100e5fea7a80603f406cb876ee0",
     "scripts/build-skill-wrappers.mjs": "ca8b0121333b29830a35553e7360f14c19254d0a157cb5f79c217ad749038242",
     "scripts/check-backlog-reconciliation.mjs": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
     "scripts/check-decision-citation-drift.mjs": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
@@ -463,7 +564,7 @@
     "scripts/knowledge-classifier.mjs": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
     "scripts/knowledge-migration.mjs": "10193fda8ea6a58e3727847031f372309786ec05f181c4b79a67692791f0ac51",
     "scripts/lib/full-suite-queue.mjs": "fa7c31d57af4626de9acb5c5298d618f285c3f7e139c0ac0772a0bc9210e9d06",
-    "scripts/lib/git-dir-layout.mjs": "505305f3e411a52902c8bfd4e6c305cad355c5109483088ea29bb1eab7d4eb94",
+    "scripts/lib/git-dir-layout.mjs": "710ff2406bed4faa4a35ff3ccd2910e97d693112b64cd82802efc2f99027232f",
     "scripts/lib/git-ports.mjs": "119f38a44c2eb068dc2f7f1236f83d44cb1a1f2c10827e2aebf5efd9c7f6b24b",
     "scripts/lib/git-spawn-match.mjs": "f18f85e7107bcacdde3ebe864f13bfc0eb7e3199927824cae8e64f39853037ad",
     "scripts/lib/is-main-module.mjs": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
@@ -678,7 +779,7 @@
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
     "src/runner/main-fgos-checkpoint.mjs": "7bcdab7f2b887e149170b50180f97eae0ce666abff0aca88b9477357ed4d8e52",
-    "src/runner/merge.mjs": "c916d81f4223f2611439d7133afb3570cef33fee0c907d21105b501a8fd2fd44",
+    "src/runner/merge.mjs": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577",
     "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
     "src/runner/operation-choice.mjs": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
     "src/runner/paths.mjs": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f",
@@ -693,7 +794,7 @@
     "src/runner/work-compat.mjs": "a804010f1992b05a28e07e11681c06919b1bc4a72fd1ab3e77bd2590bb020d25",
     "src/runner/work-dispatch.mjs": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f",
     "src/runner/worker-log.mjs": "b33f235b50765aff48b4dfd5ad15ea09fccacea4b7ea4ca52dc4df8dd3226ba1",
-    "src/runner/worktree.mjs": "2b2bca4cd7eafa3c718c8b67587e79a49b4abb9ad6ba273d9abf559a9507f5f7",
+    "src/runner/worktree.mjs": "5f53b99f7cbcfd71be81e28def0cd40f6dfb99497fb68292c169bc770a8bb133",
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/setup/agent-cli-trust.mjs": "6a70801d94f369a216d626b240022c5291ab8efdf742d0e1ce63721ac1669537",
     "src/setup/agent-hooks.mjs": "0109366e1a1a117b0128a729d4753dc8de14d92ac1c5ba5893959d01a62c1088",
@@ -708,7 +809,7 @@
     "src/setup/event-store-fixes.mjs": "4f3a95add8dee1f08c1dd2d38fdb0cf7b5ee7101909faf965c0b2e6ebdaa142e",
     "src/setup/executor-posture-coverage.mjs": "fb5f81c62e01aa7ca3f229a4f2e440f14eb0ac96e73469f942ce418f7854a043",
     "src/setup/executor-profile-warnings.mjs": "7edcf8b4ddb7030651b4607e364b7a2e4a78e9166c967893c25880a949ea37be",
-    "src/setup/git-checks.mjs": "32815fbd7724a9507e21254a29e769a904ac732471c1e5978fce0375b9f92c1a",
+    "src/setup/git-checks.mjs": "77d5fe8928a7effeccc14af2aa0cf8a5e578978851967c35cfb95a8b853a6e28",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/holder-lock-checks.mjs": "b51860bfe681104ab3ec462333150ea39d183e707162af4319d90e18040791f6",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
@@ -717,7 +818,7 @@
     "src/setup/lock-record-checks.mjs": "d72db4c75a047cf55437b661e42ec7e0cb38b6370e98bfb9f8942f9eef7bb278",
     "src/setup/model-pool-checks.mjs": "9a5f4c2319d630932b4c1ef3bf97ba90c41a2147271725fa1c87e64b472b1ec1",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "35881dceb6935250616e16a2356a8cd03e3661a8b64ef6770b54df93f7ac9fbd",
+    "src/setup/registrations.mjs": "eac44ceb1bd5bb132964989720ea5b0fde09137aaa0ef0f6e22a70c53aeacdb5",
     "src/setup/run-supervisor-checks.mjs": "4d44ebc8f640f3aad66f84df74a1c5ce28851ced8c1c708f31313e986a93e1ac",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
@@ -791,7 +892,7 @@
     "src/verbs/events/rebuild.mjs": "d60b26c628b4375b9ab4b0cb59feebd4b16cbae53cc339b549868663246c7cfa",
     "src/verbs/events/status.mjs": "6fb73280f473c45dc2de55c1ad4514235a0f5e9563ebf7e2801d7b4c072ffc6f",
     "src/verbs/events/sync.mjs": "d83b18e084460987b49d3c811c18851368d217efb2d2f354cb675231692030f8",
-    "src/verbs/merge/approve.mjs": "4322f76e9a5ba9e8d5f7bdaf98ab18f081f774720b3fa2b1579c1e8e1240daa8",
+    "src/verbs/merge/approve.mjs": "17e31ab88a2e358f3cda75501e36ff470f9243734c73bb1325c79e516e455195",
     "src/verbs/merge/catchup.mjs": "3c73bf052a078cbe1ef40a271c32e7772da918637abf7cd2bbb7065dbd2be245",
     "src/verbs/merge/iron-law-level.mjs": "28037a676ec6f8533c2c8b0bcd66be0ec8dff1acfca0d656de7c5baa02043b73",
     "src/verbs/merge/merge.mjs": "0a453f93896685a77cf5494ff5d2f6f8106ff638e1b17079a368801fdb064f89",
@@ -804,7 +905,7 @@
     "src/verbs/state/read.mjs": "a49ff63f71318e7b6066059078273a6c224ad7ec10c8790f25fabd13cae5cd93",
     "src/verbs/state/step.mjs": "ddebfcb5b53edfd67086ead35d886b86a1f49ad0ce18b98d7b637df239b059fb",
     "src/verbs/worktree/create.mjs": "b09413339c4594efa3261433f827ee1d8dd7080d270fc1cf28e9d68e2b4ed261",
-    "src/verbs/worktree/remove.mjs": "cb7bd4b56f4bb446296a83d1b784ae95749a3863501f350b6cff25864917ec96",
+    "src/verbs/worktree/remove.mjs": "5fb637c87b16cacb0caa20dbc7023cf22a6e261c06505050048cb6190b906dc5",
     "src/workflow/case-admission-port.mjs": "dc2a23e8536202456613a06cb85c2508d215ba8c7819d77088646b15127b36b3",
     "src/workflow/case-admission.mjs": "92b13d3a089e77f46fd1de5331ddb45d594d146c34225bcf9657804c4dbb5a42",
     "src/workflow/case-bindings.mjs": "d553c2bfef7a52bfed32c7674685f0b56b1473235d74a260c9b54274bf78e8fc",
@@ -830,8 +931,73 @@
     "src/workflow/unit-handoff.mjs": "76f4be618c5202f829311d0c161d144ef0fb1b4ddcf08425eef43afee78991bd",
     "src/workflow/units-source.mjs": "4e7c37fd0b0cced310b968154d579b8dc0c1949e27493f8ca68bb92421e91745"
   },
-  "sites": [],
+  "outsideProduct": {
+    ".agentkit": 2,
+    ".claude-plugin": 1,
+    ".claude": 109,
+    ".fgos": 104,
+    ".gitattributes": 1,
+    ".github": 9,
+    ".gitignore": 1,
+    "AGENTS.md": 1,
+    "CHANGELOG.md": 1,
+    "CLAUDE.md": 1,
+    "Cargo.lock": 1,
+    "Cargo.toml": 1,
+    "archive": 756,
+    "clippy.toml": 1,
+    "components": 1,
+    "docs": 4151,
+    "dogfood-fixture": 16,
+    "examples": 8,
+    "install.sh": 1,
+    "package-lock.json": 1,
+    "packages": 135,
+    "plans": 1731,
+    "plugins": 97,
+    "rustfmt.toml": 1,
+    "test": 755,
+    "tools": 13
+  },
+  "sites": [
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "line": 33,
+      "spawn": "skill text",
+      "binary": "git mv",
+      "family": "skill"
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "line": 32,
+      "spawn": "skill text",
+      "binary": "git mv",
+      "family": "skill"
+    }
+  ],
   "classes": [
+    {
+      "path": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 49,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".agents/skills/distill/scripts/distill.mjs:299",
+        ".agents/skills/distill/scripts/distill.mjs:301",
+        ".agents/skills/distill/scripts/distill.mjs:304",
+        ".agents/skills/distill/scripts/distill.mjs:307",
+        ".agents/skills/distill/scripts/distill.mjs:309",
+        ".agents/skills/distill/scripts/distill.mjs:313",
+        ".agents/skills/distill/scripts/distill.mjs:314",
+        ".agents/skills/distill/scripts/distill.mjs:346",
+        ".agents/skills/distill/scripts/distill.mjs:384",
+        ".agents/skills/distill/scripts/distill.mjs:388",
+        ".agents/skills/distill/scripts/distill.mjs:458"
+      ],
+      "class": "standalone-skill-script",
+      "skill": "distill"
+    },
     {
       "path": ".githooks/pre-commit",
       "line": 47,
@@ -879,7 +1045,7 @@
       ],
       "class": "hook-read-context",
       "verbs": [
-        "symbolic-ref"
+        "symbolic-ref read"
       ]
     },
     {
@@ -935,7 +1101,7 @@
       ],
       "class": "hook-read-context",
       "verbs": [
-        "symbolic-ref"
+        "symbolic-ref read"
       ]
     },
     {
@@ -949,7 +1115,7 @@
       ],
       "class": "hook-read-context",
       "verbs": [
-        "symbolic-ref"
+        "symbolic-ref read"
       ]
     },
     {
@@ -1047,7 +1213,7 @@
       ],
       "class": "hook-read-context",
       "verbs": [
-        "symbolic-ref"
+        "symbolic-ref read"
       ]
     },
     {
@@ -1061,7 +1227,7 @@
       ],
       "class": "hook-read-context",
       "verbs": [
-        "reflog"
+        "reflog show"
       ]
     },
     {
@@ -1381,14 +1547,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3477,
+      "line": 3473,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3621,
+      "line": 3617,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(configuration file data)",
       "class": "configured-binary"
@@ -1426,6 +1592,34 @@
       ],
       "class": "standalone-skill-script",
       "skill": "instruction-audit"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 53,
+      "spawn": "Command::new <- herdr-dashboard/src/layout.rs:184",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 63,
+      "spawn": "Command::new <- herdr-dashboard/src/layout.rs:184",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 99,
+      "spawn": "Command::new <- herdr-dashboard/src/pick.rs:377",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 111,
+      "spawn": "Command::new <- herdr-dashboard/src/pane_scan.rs:178",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
@@ -2227,7 +2421,7 @@
       "line": 49,
       "spawn": "execFileSync",
       "binary": "git",
-      "family": "spawn",
+      "family": "shell",
       "class": "sandbox-door"
     },
     {
@@ -2547,21 +2741,21 @@
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 1221,
+      "line": 1216,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 1251,
+      "line": 1246,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/worktree.mjs",
-      "line": 145,
+      "line": 146,
       "spawn": "execFileSync",
       "binary": "(configuration file data)",
       "class": "configured-binary"

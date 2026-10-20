@@ -44,6 +44,13 @@ const SHAPES = [
   ['rust-option-match', 'packages/demo/rust/src/lib.rs', 'rust', 'a Rust if-let over a match whose arm picks git from a const list'],
   ['rust-sandbox-argv', 'packages/demo/rust/src/lib.rs', 'rust', 'git through a Rust argv runner on a repository the caller names'],
   ['napi-node-caller', 'src/port.mjs', 'rust', 'git passed from Node to an N-API constructor whose field a Rust spawn runs'],
+  // Spawn functions reached through promisify, a shell option held in a variable, a computed member.
+  ['promisify-exec', 'src/push.mjs', 'spawn', 'a promisified execFile exported by one module and called with git in another'],
+  ['shell-option-variable', 'src/stage.mjs', 'shell', 'a shell string run with shell: true from an options variable'],
+  ['computed-member', 'src/commit.mjs', 'unresolved-binary', 'a child_process function picked by a computed member the scan cannot read'],
+  // Read verbs in their write forms inside a hook, and a Rust reset whose function also touches temp_dir().
+  ['hook-read-verb-writes', '.githooks/post-checkout', 'shell', 'reflog expire and a two-operand symbolic-ref in a hook'],
+  ['rust-temp-dir-unrelated', 'packages/demo/rust/src/lib.rs', 'rust', 'git -C on a caller-named repository in a function that writes under temp_dir()'],
 ];
 
 test('the static scan reports a Git spawn in each shape a literal search misses', () => {
@@ -67,6 +74,27 @@ test('a declared standalone skill and text quoted into a data command are not si
   const sandbox = scan({ root: path.join(PROBES, 'rust-sandbox-argv') });
   assert.deepEqual(sandbox.sites.map((s) => s.line), [22]);
   assert.deepEqual(sandbox.classes.map((c) => [c.class, c.function]), [['production-sandbox-probe', 'probe']]);
+  // temp_dir() and `init` in the same body are no proof: only the repository's own data flow is.
+  assert.deepEqual(scan({ root: path.join(PROBES, 'rust-temp-dir-unrelated') }).classes, []);
+});
+
+test('the scan judges every file its root declares as product, whatever the directory is called, and only counts the rest', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-one-door-tree-'));
+  try {
+    const write = (file, text) => { fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true }); fs.writeFileSync(path.join(root, file), text); };
+    const reset = "import { execFileSync } from 'node:child_process';\nexecFileSync('git', ['reset', '--hard']);\n";
+    write('package.json', JSON.stringify({ files: ['src'], bin: { tool: 'bin/tool.mjs' } }));
+    write('src/runner/fixtures/x.mjs', reset);
+    write('src/dist/y.mjs', reset);
+    write('bin/tool.mjs', reset);
+    write('test/z.test.mjs', reset);
+    const result = scan({ root });
+    assert.deepEqual(result.sites.map((s) => s.path).sort(), ['bin/tool.mjs', 'src/dist/y.mjs', 'src/runner/fixtures/x.mjs']);
+    assert.deepEqual(result.outsideProduct, { test: 1 });
+    // With no product declared at its root, every file of the tree is judged.
+    fs.rmSync(path.join(root, 'package.json'));
+    assert.ok(scan({ root }).sites.some((s) => s.path === 'test/z.test.mjs'));
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
 
 test('doctor refuses a census that lists a site, or whose files do not match the payload it sits in', () => {

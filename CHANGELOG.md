@@ -9,25 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `fgos doctor` check `git-mutation-one-door` reads the release's `packages/git/contracts/mutation-census.v1.json`, which the release build writes from `scripts/git-one-door-scan.mjs`. The check fails when the census lists any `git` or hook spawn outside the fgos-git driver, or was not built from the payload it ships in. `npm test` also fails when product code (`src`, `bin`, `scripts`) starts `git` or a hook while the suite runs, and names the call site.
   - Commands from operator configuration or from a Work item's declared verify command count as configured binaries, not sites.
-  - The census built from this tree lists no site, so the check passes. Executor commands are traced to the runner config files and their defaults. The holder-lock borrow vectors, which run `git` only in a temp repository they create, count as the production sandbox probe.
+  - Executor commands are traced to the runner config files and their defaults. The holder-lock borrow vectors, which run `git` only in a temp repository they create, count as the production sandbox probe; that class now needs the repository's own data flow to a `temp_dir()` path, never `temp_dir()` and `init` merely appearing in the same function.
+  - The scan lists every file of the checkout through Inspect and skips no directory by its name. It judges what the checkout declares as product (the payload `package.json` ships, every crate the Cargo workspace names, the installed hooks); the census counts the other files (tests, fixtures, records, `tools/`) per top-level directory. Built from this tree it lists two sites: the same `git mv` sentence in `domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md` and its `.agents/skills` render, until that sentence is reworded.
+  - The scan also follows `promisify(execFile)` across modules, a `shell: true` held in an options variable, and a computed member on `child_process` (an unreadable one is a site). A hook's `reflog` and `symbolic-ref` count as reads only in their read forms.
   - Scripts of a skill that declares `metadata.oneDoor: standalone` in its SKILL.md (`distill`, `instruction-audit`) are counted as `standalone-skill-script`, not as sites; the test spy now watches `core/skills/` too.
   - The scan now follows functions passed around as values and methods of returned objects. The phase 07 unit 22 report names each open site.
 
 - `fgos main-checkout-reset` resets through the Git SafeRestore port instead of a raw `git reset --hard`.
   - With `--confirm` it keeps the old HEAD pinned and snapshots the discarded local changes, and its result carries an `operationId` and a `snapshot`.
+  - `--confirm` is an operator flag, not proof that a human confirmed: any caller that can run the verb, an agent included, can pass it. A confirmed reset may move to any commit, sideways or backward. The old HEAD stays pinned at `refs/fgos/git-operations/<operationId>/candidate` with its snapshot until the SafeRestore `acknowledge` operation releases them; no verb calls it yet, so the pin and snapshot stay.
   - It also clears a stopped merge, cherry-pick or revert.
   - The list of commits it would drop no longer shows `--stat` and stops at 50 lines.
   - An unknown `--sha` is refused before anything runs.
 
 - The gateway and the herdr dashboard find the main checkout through fgos-git instead of running `git rev-parse`.
 
-- `fgos return` verifies a branch in a checkout made and removed through the Worktree port. A checkout that still holds bytes after verify is kept and named instead of force-removed. `fgos preflight`, `resync-worktree`, `compound --doc-path` and `knowledge attest` read Git through Inspect. `resync-worktree` run where no branch is checked out now asks for `--branch`.
+- `fgos return` verifies a branch in a checkout made and removed through the Worktree port. A checkout that still holds bytes after verify is kept and named instead of force-removed. The verify checkout is now provisioned like a Land candidate (dependency install, then the project's `worktreeSetup.commands`), and what that placed is recorded and set aside on removal, so the checkout no longer stays behind with its `node_modules`. Dispatch worktrees and the already-merged verification checkout of `approve` are torn down the same way. `fgos preflight`, `resync-worktree`, `compound --doc-path` and `knowledge attest` read Git through Inspect. `resync-worktree` run where no branch is checked out now asks for `--branch`.
 
 - `scripts/install-git-hooks.mjs` reports a RepositoryConfig refusal (for example `git-fence-missing` in a checkout that was never activated) as one line with exit 1, not a stack trace. The shell integration's `fgos` and `fgos-runner` functions find the main checkout from the `.git` layout on disk instead of running `git`.
 
 - The activation gate (`fgctl`) and `fgos events migrate` stop check also scan processes working in the workspace's linked worktrees.
 
 - Workflow integration merges through Land and skips work the target already has.
+
+- `fgos approve` retried after a refusal that came before Land started (a held merge slot under `--no-wait`, a busy main checkout, a stopped merge, a conflict found before the candidate) reuses the Land operation it recorded and delivers, instead of failing on a journal that was never written. The decision log gains one engine decision for each Land operation approve starts, and one for each blocked `sync-root` result.
+  - An approve whose earlier Land was interrupted mid-publication refuses and names `fgos doctor --fix`. Its new `git-land-recovery` fix recovers interrupted Land operations under Land's own locks: one that never attempted its publication closes as abandoned; an attempted one only by the writer that started it, and the fix names that writer otherwise. `fgos setup` runs the same fix.
+  - A failure while publishing that Land cannot classify is reported as an unknown effect (`land-effect-unknown`, naming `fgos doctor --fix`), no longer as a failed merge that parks the item `blocked`. A failure of the drift report after a land is reported beside the land in `postLand.error`.
+
+- A SafeRestore (`resync-worktree`, `main-checkout-reset` and every other restore) refuses with `restore-orphaned-patch` while an interrupted restore's patch for that branch is left under the Git directory's `fgos-resync-patches/`. The refusal names the patches; apply what is still wanted from each, then delete them and restore again.
 
 - `fgos uninstall` leaves a `core.hooksPath` that fgOS did not record setting.
 

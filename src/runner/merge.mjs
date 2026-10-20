@@ -1169,11 +1169,6 @@ export async function landRunnerItem(repoRoot, item, {
   // Read the paths this branch brings before it lands: afterwards the target
   // contains it and the diff that names them is empty (tsk-2ypd).
   const landedFiles = changedFiles(repoRoot, item, { trunk: target });
-  const withPostLand = (result) => ({
-    ...result,
-    // Detection is read-only work after publication, never inside it.
-    postLand: detectPostLandDrift(repoRoot, listWork(fgosDir), item, { target, landedFiles, sessions: listSessions(repoRoot) }),
-  });
   const options = gitPortOptions(repoRoot, { mutation: true });
   const port = createGitLand(options);
   // A result that published nothing carries the `abandoned` settlement, so
@@ -1184,7 +1179,7 @@ export async function landRunnerItem(repoRoot, item, {
     return landSettlement ? { ...result, landSettlement } : result;
   };
   let phase = 'prepare';
-  try {
+  const result = await (async () => { try {
     const { candidate, receipt: previous } = await port.prepare({
       operationId,
       waitMs: lockWaitMs,
@@ -1200,9 +1195,9 @@ export async function landRunnerItem(repoRoot, item, {
       },
     });
     if (previous) {
-      return withPostLand(settled({ outcome: 'merged', branch,
+      return settled({ outcome: 'merged', branch,
         check: { passed: true, status: 0, timedOut: false, skipped: true, output: `publication already verified and recorded by Land operation ${operationId}; awaiting Work settlement` },
-        receipt: previous }, 'delivered'));
+        receipt: previous }, 'delivered');
     }
     // Eligibility still belongs to Work, decided against the exact source and
     // target Land pinned for this candidate, never a target read before it.
@@ -1234,7 +1229,7 @@ export async function landRunnerItem(repoRoot, item, {
       candidate: candidate.candidate, treeDigest: candidate.treeDigest,
       evidenceDigest: crypto.createHash('sha256').update(JSON.stringify({ item: item.id, check })).digest('hex'),
     }, { waitMs: lockWaitMs });
-    return withPostLand(settled({ outcome: 'merged', branch, check, receipt, ...(selfResolved && { selfResolved }) }, 'delivered'));
+    return settled({ outcome: 'merged', branch, check, receipt, ...(selfResolved && { selfResolved }) }, 'delivered');
   } catch (err) {
     let detail;
     try { detail = JSON.parse(err.message); } catch { detail = {}; }
@@ -1252,7 +1247,7 @@ export async function landRunnerItem(repoRoot, item, {
         if (!invariant.passed) return { outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant) };
         return { outcome: 'merged', branch, check };
       });
-      return verified.outcome === 'merged' ? withPostLand(verified) : verified;
+      return verified;
     }
     if (cause === 'land-conflict-aborted') return settled({ outcome: 'conflict', branch });
     if (cause === 'main-checkout-dirty-mid-merge') return settled({ outcome: cause, branch });
@@ -1268,13 +1263,32 @@ export async function landRunnerItem(repoRoot, item, {
     // Preserve Land's stale result, including operation identity and recovery
     // evidence. Never re-run verification or CAS against a different target.
     if (detail.errorClass === 'stale' || cause === 'land-target-changed' || cause === 'land-cas-lost') throw err;
+    // A publication whose effect is unknown is never claimed abandoned: no
+    // Work result is recorded, the candidate stays, and Land recovery
+    // decides what happened before this id is published again.
+    if (phase === 'publish') {
+      throw new MergeError(`cannot tell whether "${branch}" was published into "${target}": Land operation ${operationId} failed during publication (${err.message}). Run \`fgos doctor --fix\` (git-land-recovery) to settle it, then approve again.`, {
+        branch, targetRef: target, code: 'land-effect-unknown', operationId,
+      });
+    }
     return settled({
       outcome: 'merge-failed-unclassified', branch,
       error: { message: err.message, stderr: err.stderr ?? null, status: err.status ?? null },
     });
   } finally {
     port.close();
+  } })();
+  if (result.outcome !== 'merged') return result;
+  // Drift detection is read-only reporting after publication, outside the
+  // publication's error handling: its failure never turns a land into a
+  // failed merge.
+  let postLand;
+  try {
+    postLand = detectPostLandDrift(repoRoot, listWork(fgosDir), item, { target, landedFiles, sessions: listSessions(repoRoot) });
+  } catch (err) {
+    postLand = { landed: item.id, target, landedFiles, error: `post-land drift detection failed: ${err.message}` };
   }
+  return { ...result, postLand };
 }
 
 /** Work's unique settlement identity `(repoIdentity, operationId,
@@ -1319,14 +1333,13 @@ function checkedOutRef(repoRoot) {
 /**
  * Run `fn` on a tree holding `target`'s tip: the main checkout itself when it
  * has the target checked out, otherwise a disposable detached checkout made
- * and removed through the Worktree port, provisioned like a Land candidate.
+ * (and provisioned like a Land candidate) and removed through the Worktree
+ * port.
  */
 async function withTargetCheckout(repoRoot, target, onMain, fn) {
   if (onMain) return fn(repoRoot);
   const checkout = createVerifyCheckout(repoRoot, resolveRefSha(repoRoot, target));
   try {
-    provisionDependencies(checkout);
-    runWorktreeSetupCommands(checkout, repoRoot);
     return await fn(checkout);
   } finally {
     try { removeWorktree(repoRoot, checkout, { force: true }); }

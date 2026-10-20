@@ -10,6 +10,8 @@
 
 **Unit 20 checkpoint:** V-GATE is built (item 4): the data-flow scan `scripts/git-one-door-scan.mjs`, the runtime spy preloaded by `scripts/run-tests.mjs`, the nine seeded probes in `test/git/one-door.test.mjs`, the build-written `packages/git/contracts/mutation-census.v1.json` and doctor `git-mutation-one-door`. The census is not empty yet; the open sites and the owner questions are in the [unit 20 report](../reports/phase-lead-261020-2002-git-p07-u20-one-door-gate.md).
 
+**Unit 24 checkpoint:** the pre-merge risk review's H1-H3, M1, M2, M4-M6 and L1 are fixed; M3 and L2-L4 are follow-ups. The scan now judges the whole declared product, which reveals one skill-text site (a `git mv` sentence in `domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md` and its render) whose source is outside the unit's write scope. See the [unit 24 report](../reports/phase-lead-261020-2339-git-p07-u24-review-fixes.md).
+
 ## Context
 
 - Spec §13 (every row, outer scripts, Workflow deletion), §12 (same-release invariant, allowlist zero, detection rule, stop-everything), §15 E6 and T/T2/T3, §16 (lessons stay tested at their guard), §18 item 8 (Q1).

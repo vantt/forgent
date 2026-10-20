@@ -144,8 +144,10 @@ function moveBlockedOrConflict(dir, { id, reason, role = 'system' }, { repoRoot,
 /**
  * The Land operation id this approve publishes `id`'s branch under, into
  * `destination`. A publication Land already recorded for this exact source
- * and destination is settled under its original id; an attempt whose effect
- * is unknown refuses before another operation is created. A fresh id is
+ * and destination is settled under its original id, and a recorded id Land
+ * never journalled (a refusal before its intent) is reused as it is; an
+ * attempt whose effect is unknown refuses before another operation is
+ * created, naming `fgos doctor --fix` as its recovery. A fresh id is
  * recorded as a decision before Land starts, so the publication identity
  * outlives a lost acknowledgement (Git spec §9 step 6, M4).
  */
@@ -154,10 +156,21 @@ function landOperationFor(dir, repoRoot, view, id, destination) {
   const prior = [...view.decisions].reverse().find(decision => decision.id === id
     && decision.landOperation?.source === source && decision.landOperation?.destination === destination);
   if (prior) {
-    const operation = createGitRecovery(gitPortOptions(repoRoot, { mutation: true })).inspectOperation({ operationId: prior.landOperation.operationId });
-    if (operation.outcome?.kind === 'land') return prior.landOperation.operationId;
+    const { operationId } = prior.landOperation;
+    let operation;
+    try {
+      operation = createGitRecovery(gitPortOptions(repoRoot, { mutation: true })).inspectOperation({ operationId });
+    } catch (err) {
+      let cause;
+      try { cause = JSON.parse(err.message).cause; } catch { /* not a native refusal */ }
+      if (cause === 'git-operation-unknown') return operationId;
+      throw err;
+    }
+    if (operation.outcome?.kind === 'land') return operationId;
     if (!operation.terminal && ['target-attempt', 'land-verified'].includes(operation.phase?.phase)) {
-      throw new StoreError('precondition', `approve: Land operation ${prior.landOperation.operationId} requires recovery before another publication.`);
+      throw new StoreError('precondition', `approve: Land operation ${operationId} was interrupted and requires recovery before another publication. `
+        + 'Run `fgos doctor --fix` (git-land-recovery) to recover it under its own locks, then approve again; '
+        + 'an attempted publication is recoverable only by the writer that started it, which the fix names when it refuses.');
     }
   }
   const operationId = crypto.randomUUID();

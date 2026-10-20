@@ -8,6 +8,13 @@
 // binary is a parameter is resolved at each caller; callers of a Git wrapper are counted on the site.
 // A binary the scan cannot resolve counts as a site: unknown data flow is never assumed safe.
 //
+// The scan lists every file of its root (inside a repository: tracked and untracked non-ignored paths,
+// read through Inspect) and skips no directory by its name. It judges the product the root's owners
+// declare: the Node payload package.json ships (`files`, `bin`), every crate the root Cargo workspace
+// names (members and its separately built `exclude` crates) and the installed hooks directory. Files
+// outside that declaration (tests, fixtures, records) are counted per top-level directory in the
+// census; a root that declares nothing (a probe tree) is judged whole.
+//
 // Named classes (spec §13) are reported apart from product sites and never by path alone:
 //   - git-driver: Command::new inside fgos-git's own crate source, the one door;
 //   - sandbox-door: the shared sandbox door (scripts/lib/sandbox-git.mjs), recognised because its
@@ -30,17 +37,20 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lexSource } from './lib/js-source-lexer.mjs';
 import { STANDALONE_SKILL_CLASS, shellRunsGit, standaloneSkillOf } from './lib/git-spawn-match.mjs';
+import { repositoryDirs, repositoryFiles } from './lib/git-dir-layout.mjs';
+import { createGitInspect, gitPortOptions } from '../src/git/inspect.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export const SCAN_ROOTS = ['src', 'bin', 'scripts', 'packages', 'apps', '.githooks', 'core/skills'];
-const SKIP_DIRS = new Set(['node_modules', 'target', '.git', 'dist', 'fixtures']);
+// The hooks directory `fgos setup` wires as core.hooksPath (src/setup/git-hooks.mjs).
+const HOOKS_DIR = '.githooks';
 const JS_EXT = new Set(['.mjs', '.js', '.cjs']);
 const SPAWN_FNS = ['execFileSync', 'execFile', 'spawnSync', 'spawn', 'execSync', 'exec'];
 const SHELL_FNS = new Set(['execSync', 'exec']);
 const SHELLS = new Set(['sh', 'bash', 'zsh', 'dash', 'cmd', 'cmd.exe', 'powershell', 'pwsh']);
 const PASSTHROUGH = new Set(['env', 'nice', 'timeout', 'xargs', 'sudo', 'nohup', 'stdbuf', 'npx']);
 const HOOK_NAMES = new Set(['pre-commit', 'prepare-commit-msg', 'commit-msg', 'post-commit', 'pre-push', 'pre-rebase', 'post-checkout', 'post-merge', 'pre-receive', 'post-receive', 'update', 'reference-transaction', 'pre-merge-commit', 'post-rewrite']);
-const READ_VERBS = new Set(['reflog', 'config --get', 'config --get-all', 'config --list', 'rev-parse', 'diff', 'show', 'cat-file', 'ls-files', 'ls-tree', 'log', 'merge-base', 'for-each-ref', 'symbolic-ref', 'rev-list', 'var', 'version', '--version', 'check-attr', 'check-ignore', 'name-rev', 'describe']);
+// Verbs that only read, keyed by `hookVerb`: `reflog` and `symbolic-ref` count only in their read forms.
+const READ_VERBS = new Set(['reflog show', 'reflog exists', 'config --get', 'config --get-all', 'config --list', 'rev-parse', 'diff', 'show', 'cat-file', 'ls-files', 'ls-tree', 'log', 'merge-base', 'for-each-ref', 'symbolic-ref read', 'rev-list', 'var', 'version', '--version', 'check-attr', 'check-ignore', 'name-rev', 'describe']);
 const WRITE_VERBS = /\bgit\s+(?:-C\s+\S+\s+)?(add|commit|push|pull|fetch|merge|rebase|reset|checkout|switch|restore|rm|mv|stash|tag|cherry-pick|revert|am|apply|clean|init|clone|update-ref|update-index|gc|prune|notes|hook\s+run|worktree\s+(?:add|remove|prune|move|lock|unlock|repair)|branch\s+-[dDfmM]|config\s+(?!--get|-l|--list)[\w.-]+\s+\S)/;
 const PROHIBITION = /\b(never|not|don't|do not|no longer|instead of|refuse[sd]?|forbid|rather than|without)\b/i;
 
@@ -48,22 +58,44 @@ const rel = (root, file) => path.relative(root, file).split(path.sep).join('/');
 const lineOf = (text, index) => text.slice(0, index).split('\n').length;
 const sha256 = (data) => crypto.createHash('sha256').update(data).digest('hex');
 
-export function listFiles(root, roots = SCAN_ROOTS) {
+/** Every file of `root`, relative to it: inside a repository its tracked and untracked non-ignored
+ * paths, read through Inspect (`openInspect()` opens the port); outside one, every file on disk. No
+ * directory is left out by its name. */
+export function listFiles(root, openInspect = () => createGitInspect(gitPortOptions(root))) {
+  if (repositoryDirs(root)) {
+    const files = repositoryFiles(root, openInspect());
+    if (files) return [...files].sort();
+  }
   const out = [];
   const walk = (dir) => {
-    let entries;
-    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
-    for (const entry of entries) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) { if (!SKIP_DIRS.has(entry.name)) walk(full); continue; }
-      if (entry.isFile()) out.push(full);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.isFile()) out.push(rel(root, full));
     }
   };
-  for (const r of roots) {
-    const full = path.join(root, r);
-    if (fs.existsSync(full)) (fs.statSync(full).isDirectory() ? walk(full) : out.push(full));
-  }
+  walk(root);
   return out.sort();
+}
+
+/**
+ * The product `root`'s owners declare, as a predicate over relative paths, or null when `root`
+ * declares none (then every file is judged): the Node payload its package.json ships (`files`,
+ * `bin`, package.json itself), every crate its Cargo workspace names (members, and the crates it
+ * builds on their own under `exclude`), and the hooks directory `fgos setup` installs. Files outside
+ * it (tests, fixtures, records) are counted in the census, never judged as product.
+ */
+export function declaredProduct(root) {
+  let pkg = null;
+  let cargo = null;
+  try { pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')); } catch { /* none declared */ }
+  try { cargo = fs.readFileSync(path.join(root, 'Cargo.toml'), 'utf8'); } catch { /* none declared */ }
+  if (!Array.isArray(pkg?.files) && !cargo) return null;
+  const crates = (key) => [...(new RegExp(`^\\s*${key}\\s*=\\s*\\[([^\\]]*)\\]`, 'm').exec(cargo ?? '')?.[1] ?? '').matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+  const bins = typeof pkg?.bin === 'string' ? [pkg.bin] : Object.values(pkg?.bin ?? {});
+  const entries = [...(pkg?.files ?? []), ...bins, 'package.json', ...crates('members'), ...crates('exclude'), HOOKS_DIR]
+    .map((entry) => path.posix.normalize(entry.replaceAll('\\', '/')).replace(/\/$/, ''));
+  return (name) => entries.some((entry) => name === entry || name.startsWith(`${entry}/`));
 }
 
 function kindOf(name, source) {
@@ -830,9 +862,12 @@ function statementEnd(shape, start) {
 
 function childProcessBindings(file) {
   // Local names that are child_process spawn functions, and namespace objects for child_process.
+  // Memoized per file; an import cycle reads the bindings found so far.
+  if (file.cpBindings) return file.cpBindings;
   const fns = new Map();
   const spaces = new Set();
   const borrowed = new Set();
+  file.cpBindings = { fns, spaces, borrowed };
   const src = file.code;
   const cp = /['"](?:node:)?child_process['"]/;
   for (const m of src.matchAll(/import\s+([^;]*?)\s+from\s+(['"][^'"]+['"])/g)) {
@@ -849,9 +884,14 @@ function childProcessBindings(file) {
       }
     } else {
       const named = /\{([^}]*)\}/.exec(clause);
+      // A spawn function another module of the tree exports under a name of its own.
+      const spec = m[2].slice(1, -1);
+      const from = spec.startsWith('.') && file.ctx?.js.get(path.posix.normalize(path.posix.join(path.posix.dirname(file.name), spec)));
+      const exported = from && from !== file ? childProcessBindings(from).fns : new Map();
       if (named) for (const part of named[1].split(',')) {
         const [orig, alias] = part.trim().split(/\s+as\s+/);
         if (orig === 'runBorrowed') borrowed.add(alias ?? orig);
+        else if (exported.has(orig) && new RegExp(`export\\s+(?:const|let|var)\\s+${orig.replace(/\$/g, '\\$')}\\b|export\\s*\\{[^}]*\\b${orig.replace(/\$/g, '\\$')}\\b`).test(from.code)) fns.set(alias ?? orig, exported.get(orig));
       }
     }
   }
@@ -872,7 +912,8 @@ function childProcessBindings(file) {
     changed = false;
     for (const m of src.matchAll(/(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([^;\n]+)/g)) {
       if (fns.has(m[1])) continue;
-      const rhs = m[2].trim().replace(/;$/, '');
+      // `promisify(execFile)` calls the spawn function with the same arguments.
+      const rhs = m[2].trim().replace(/;$/, '').replace(/^(?:[\w$]+\.)?promisify\(\s*([\w$.]+)\s*\)$/, '$1');
       const ref = /^(?:[\w$.]+\s*(?:\?\?|\|\|)\s*)*([\w$.]+)$/.exec(rhs)?.[1];
       if (!ref) continue;
       for (const [name, orig] of [...fns]) if (ref === name) { fns.set(m[1], orig); changed = true; break; }
@@ -883,7 +924,7 @@ function childProcessBindings(file) {
       }
     }
   }
-  return { fns, spaces, borrowed };
+  return file.cpBindings;
 }
 
 function jsCallSites(file) {
@@ -901,6 +942,19 @@ function jsCallSites(file) {
   for (const ns of spaces) {
     const re = new RegExp(`(?<![\\w$.])${ns}\\s*\\.\\s*(${SPAWN_FNS.join('|')})\\s*\\(`, 'g');
     for (let m; (m = re.exec(shape));) push(m[1], m.index + m[0].length - 1, `${ns}.${m[1]}`);
+    // A computed member (`cp[name](..)`): the spawn function its key names; a key the scan cannot
+    // read is a call of an unknown child_process function.
+    const computed = new RegExp(`(?<![\\w$.])${ns}\\s*(?:\\?\\.)?\\[`, 'g');
+    for (let m; (m = computed.exec(shape));) {
+      const close = splitArgs(shape, m.index + m[0].length - 1).close;
+      const call = /^\s*(?:\?\.)?\(/.exec(shape.slice(close + 1, close + 8));
+      if (!call) continue;
+      const key = file.code.slice(m.index + m[0].length, close);
+      const names = file.evaluate(key, m.index).map((v) => v.lit);
+      const open = close + 1 + call[0].length - 1;
+      if (names.length && names.every((n) => n !== undefined)) for (const n of names) { if (SPAWN_FNS.includes(n)) push(n, open, `${ns}[${n}]`); }
+      else push('computed', open, `${ns}[${key.trim()}]`);
+    }
   }
   for (const local of borrowed) {
     const re = new RegExp(`(?<![\\w$.])${local}\\s*\\(`, 'g');
@@ -993,14 +1047,49 @@ function jsBinaries(file, site) {
       return file.elements(args, at, 0).map((script) => ({ value: script, shell: true }));
     });
   }
+  if (site.fn === 'computed') return [{ value: { unknown: `computed child_process member ${site.via}` } }];
   const first = argText(0);
   if (first === undefined) return [{ value: { unknown: '(no argument)' } }];
   const options = argText(SHELL_FNS.has(site.fn) ? 1 : 2) ?? argText(1) ?? '';
   const values = file.evaluate(first, at);
-  if (SHELL_FNS.has(site.fn) || /\bshell\s*:\s*(true|['"])/.test(options)) {
-    return values.map((value) => ({ value, shell: true }));
+  const shell = SHELL_FNS.has(site.fn) || shellOption(file, options, at);
+  if (shell === true) return values.map((value) => ({ value, shell: true }));
+  const direct = values.map((value) => ({ value, argvText: argText(1) }));
+  // Options the scan cannot read may set `shell`: the binary is judged both ways.
+  return shell === 'maybe' ? [...direct, ...values.map((value) => ({ value, shell: true }))] : direct;
+}
+
+/** Whether spawn options `text` set `shell`: true, false, or 'maybe' when the options cannot be
+ * read. An identifier is read through its declaration, a spread through its operand. */
+function shellOption(file, text, at, depth = 0) {
+  text = text.trim();
+  if (!text || text.startsWith('[') || /^['"`]/.test(text) || /^(?:undefined|null)$/.test(text)) return false;
+  if (depth > 4) return 'maybe';
+  if (IDENT_RE.test(text)) {
+    const b = file.binding(text, at);
+    if (!b || b.of || b.array || b.key) return 'maybe';
+    const start = b.m.index + b.m[0].length;
+    if (file.shape[start] !== '{') return 'maybe';
+    return shellOption(file, file.code.slice(start, splitArgs(file.shape, start).close + 1), b.m.index, depth + 1);
   }
-  return values.map((value) => ({ value, argvText: argText(1) }));
+  if (!text.startsWith('{')) return 'maybe';
+  const { shape } = lexSource(text);
+  let found = false;
+  for (const { from, to } of splitArgs(shape, 0).args) {
+    const member = text.slice(from, to).trim();
+    if (member.startsWith('...')) {
+      const inner = shellOption(file, member.slice(3), at, depth + 1);
+      if (inner === true) return true;
+      if (inner === 'maybe') found = 'maybe';
+      continue;
+    }
+    const value = /^shell\s*(?::\s*([\s\S]*))?$/.exec(member);
+    if (!value) continue;
+    if (value[1] === undefined) return 'maybe'; // `{ shell }`
+    if (/^(?:false|0|null|undefined)$/.test(value[1].trim())) return found;
+    return /^(?:true|['"`])/.test(value[1].trim()) ? true : 'maybe';
+  }
+  return found;
 }
 
 function classifyJs(file, site, entry) {
@@ -1062,14 +1151,28 @@ function scriptText(file, id, index) {
   return unknown ? null : text;
 }
 
+/** The verb of a Git argv (its words after `git`), in the form READ_VERBS keys: `config` with its
+ * first option, `reflog` with its subcommand (`show` when none), and `symbolic-ref` as `read` only
+ * when it names one ref and sets or deletes nothing. */
+function hookVerb(words) {
+  let i = 0;
+  while (i < words.length && /^(-C|-c|--git-dir|--work-tree)$/.test(words[i])) i += 2;
+  const [verb, ...rest] = words.slice(i);
+  if (verb === 'config') return `config ${rest[0]}`;
+  if (verb === 'reflog') return `reflog ${rest[0] && !rest[0].startsWith('-') ? rest[0] : 'show'}`;
+  if (verb === 'symbolic-ref') {
+    const sets = rest.some((w) => /^(-d|--delete|-m)$/.test(w)) || rest.filter((w) => !w.startsWith('-')).length !== 1;
+    return `symbolic-ref ${sets ? 'write' : 'read'}`;
+  }
+  return verb;
+}
+
 function firstVerbs(file, open) {
-  // Literal argv verbs at a call: the first literal in the argv array after global options.
+  // Literal argv verbs at a call: the literals of the argv array.
   const { args } = splitArgs(file.shape, open);
   const argv = args[1] ? file.code.slice(args[1].from, args[1].to) : '';
   const lits = [...argv.matchAll(/['"]([^'"]+)['"]/g)].map((m) => m[1]);
-  let i = 0;
-  while (i < lits.length && /^(-C|-c|--git-dir|--work-tree)$/.test(lits[i])) i += 2;
-  return lits[i] === 'config' ? `config ${lits[i + 1]}` : lits[i];
+  return lits.length ? hookVerb(lits) : undefined;
 }
 
 function scanJs(name, source, ctx) {
@@ -1309,8 +1412,13 @@ function computeValueFlow(ctx, file, fn) {
       follow(r.file, start, r.at + r.length, path.slice(1));
     }
   };
-  // The expression [start, end) in `f` holds the function at property `path` of its value.
-  const follow = (f, start, end, path) => {
+  // The expression [start, end) in `f` holds the function at property `path` of its value. Follows
+  // are queued and drained by the loop below, never nested: a key read in many files would otherwise
+  // chain one follow inside the next until the stack runs out.
+  const pending = [];
+  const follow = (...flow) => { pending.push(flow); };
+  const drain = () => { while (pending.length) followNow(...pending.shift()); };
+  const followNow = (f, start, end, path) => {
     const flowKey = `${f.name}:${start}:${end}:${path.join('.')}`;
     if (followed.has(flowKey)) return;
     followed.add(flowKey);
@@ -1424,6 +1532,7 @@ function computeValueFlow(ctx, file, fn) {
   } else {
     push({ kind: 'name', file, scope: enclosing(file.spans, fn.from - 1), name: fn.name, path: [], origin: true });
   }
+  drain();
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const f = item.file;
@@ -1453,6 +1562,7 @@ function computeValueFlow(ctx, file, fn) {
       if (item.origin && /^\s*\.\s*[A-Za-z_$][\w$]*\s*=(?![=>])/.test(shape.slice(after, after + 80))) continue; // `fn.prop = ...` describes the function
       follow(f, at, after, item.path);
     }
+    drain();
   }
   return { calls, escapes };
 }
@@ -1656,7 +1766,8 @@ function rustModel(name, source) {
   const testFile = /(^|\/)tests\//.test(name) || /(^|\/)benches\//.test(name);
   const tests = rustTestRanges(code);
   const block = (open) => { let depth = 0; let end = open; for (; end < code.length; end++) { if (code[end] === '{') depth++; else if (code[end] === '}' && --depth === 0) break; } return end; };
-  const fns = [...code.matchAll(/\bfn\s+(\w+)\s*(?:<[^>]*>)?\s*\(([^)]*)\)[^{;]*\{/g)].map((m) => {
+  // Generic parameters may nest one level (`fn run<S: AsRef<OsStr>>(..)`).
+  const fns = [...code.matchAll(/\bfn\s+(\w+)\s*(?:<(?:[^<>]|<[^<>]*>)*>)?\s*\(([^)]*)\)[^{;]*\{/g)].map((m) => {
     const open = m.index + m[0].length - 1;
     return { name: m[1], params: m[2], from: m.index, bodyFrom: open, to: block(open) };
   });
@@ -1667,7 +1778,7 @@ function rustModel(name, source) {
   const evalRust = (expr, index, depth = 0) => {
     for (let prev; prev !== expr;) {
       prev = expr;
-      expr = expr.trim().replace(/^\(\s*([\s\S]*?)\s*\)$/, (m, inner) => (rustBalanced(inner) ? inner : m)).replace(/^&\*?|\?$|\.(?:as_str|as_ref|clone|as_os_str|to_path_buf|to_owned|to_string|to_string_lossy|into_owned|into_os_string|into|as_path|into_iter|collect(?:::<[^>]*>)?)\(\)$|\.map\(\s*Into::into\s*\)$|\.with_extension\([^()]*\)$|\.(?:unwrap_or_default|unwrap)\(\)$|\.expect\(\s*"[^"]*"\s*\)$/g, '').trim();
+      expr = expr.trim().replace(/^\(\s*([\s\S]*?)\s*\)$/, (m, inner) => (rustBalanced(inner) ? inner : m)).replace(/^&\*?|\?$|\.(?:as_str|as_ref|clone|as_os_str|to_path_buf|to_owned|to_string|to_string_lossy|into_owned|into_os_string|into|as_path|into_iter|ok|collect(?:::<[^>]*>)?)\(\)$|\.map\(\s*Into::into\s*\)$|\.with_extension\([^()]*\)$|\.(?:unwrap_or_default|unwrap)\(\)$|\.expect\(\s*"[^"]*"\s*\)$/g, '').trim();
     }
     // A string-keyed index into parsed data (`launch["command"]`): configuration, not product code.
     if (/\[\s*"[^"]+"\s*\]|\.get\(\s*"[^"]+"\s*\)/.test(expr)) return [{ external: `parsed configuration (${expr.replace(/\s+/g, ' ').slice(0, 60)})` }];
@@ -1689,13 +1800,23 @@ function rustModel(name, source) {
     // `LIST.iter().map(PathBuf::from).find(..)`: an element of the list.
     const pick = /^([\s\S]+?)\.(?:iter|into_iter)\(\)(?:\.(?:map\(\s*(?:\w+::)*\w+\s*\)|copied\(\)|cloned\(\)))*\.(?:find\([\s\S]*\)|next\(\)|last\(\))$/.exec(expr);
     if (pick) return rustElements(pick[1], index, depth + 1);
-    const call = /^([a-z_]\w*)\s*\(/i.exec(expr);
-    if (call && !fns.some((f) => f.name === call[1])) {
+    // A call by bare name, or through a module path of this crate (`pick::herdr_bin()`); a path into
+    // std, core or alloc names no function of this crate.
+    const qualified = /^(?!(?:std|core|alloc)::)((?:[a-z_][a-z0-9_]*::)+)([a-z_][a-z0-9_]*)\s*\(/.exec(expr);
+    const call = qualified ? [qualified[0], qualified[2]] : /^([a-z_]\w*)\s*\(/i.exec(expr);
+    if (call && (qualified || !fns.some((f) => f.name === call[1]))) {
       // A local closure (`let pick = |..| body`): its body.
       const closure = new RegExp(`\\blet\\s+${call[1]}\\s*=\\s*(?:move\\s*)?\\|[^|]*\\|\\s*([^;]+);`).exec(code);
       if (closure) return evalRust(source.slice(closure.index + closure[0].indexOf(closure[1]), closure.index + closure[0].length - 1), closure.index, depth + 1);
-      // A function of this crate imported by `use` (`tail_shim_path` from `shim.rs`).
-      const other = model.ctx && [...model.ctx.rust.values()].find((m) => m !== model && m.name.replace(/\/src\/.*$/, '') === name.replace(/\/src\/.*$/, '') && m.fns.some((f) => f.name === call[1] && /\bpub\b[^;{]*$/.test(m.code.slice(Math.max(0, f.from - 30), f.from))));
+      // A function of this crate imported by `use` (`tail_shim_path` from `shim.rs`), or reached
+      // through a module path: in this crate, else the one module file of that name in another crate
+      // (`fgos::resolve_fgos` from a dependency's `fgos.rs`).
+      const exports = (m) => m.fns.some((f) => f.name === call[1] && /\bpub\b[^;{]*$/.test(m.code.slice(Math.max(0, f.from - 30), f.from)));
+      const crateOf = (n) => n.replace(/\/src\/.*$/, '');
+      const models = model.ctx ? [...model.ctx.rust.values()].filter((m) => m !== model && exports(m)) : [];
+      const module = qualified?.[1].split('::').filter(Boolean).at(-1);
+      const elsewhere = module ? models.filter((m) => m.name.endsWith(`/${module}.rs`) || m.name.endsWith(`/${module}/mod.rs`)) : [];
+      const other = models.find((m) => crateOf(m.name) === crateOf(name)) ?? (elsewhere.length === 1 ? elsewhere[0] : undefined);
       if (other) {
         const f = other.fns.find((x) => x.name === call[1]);
         const out = rustExits(other, f).flatMap((e) => other.eval(e, f.bodyFrom + 1, depth + 1)).flatMap((v) => {
@@ -1710,7 +1831,7 @@ function rustModel(name, source) {
         return out.length ? out : [{ unknown: expr }];
       }
     }
-    const callee = call && fns.find((f) => f.name === call[1]);
+    const callee = call && !qualified && fns.find((f) => f.name === call[1]);
     if (callee && !/^(Some|Ok|Err)$/.test(call[1])) {
       const out = rustExits(model, callee).flatMap((e) => evalRust(e, callee.bodyFrom + 1, depth + 1));
       return out.length ? out : [{ unknown: expr }];
@@ -2215,7 +2336,7 @@ function scanRust(model, ctx) {
         if (cls === 'external') { ctx.classes.push({ ...site, class: 'configured-binary' }); continue; }
         if (cls === 'uncalled') { ctx.classes.push({ ...site, class: 'uncalled-wrapper' }); continue; }
         if (/^packages\/git\/rust\/src\//.test(where.path) && (cls === 'git' || (runner && cls !== 'hook'))) { ctx.classes.push({ ...site, class: 'git-driver' }); continue; }
-        if (cls === 'git' && repo && fn && (rustTempRepo(ctx, model, fn, repo) || (/temp_dir\(\)/.test(code.slice(fn.bodyFrom, fn.to)) && /\binit\b/.test(source.slice(fn.bodyFrom, fn.to))))) {
+        if (cls === 'git' && repo && fn && rustTempRepo(ctx, model, fn, repo)) {
           ctx.classes.push({ ...record, class: 'production-sandbox-probe', function: fn.name, repository: repo.trim() }); continue;
         }
         // A program reached through an argv runner whose argv names its repository (`[git, "-C", repo]`):
@@ -2274,7 +2395,9 @@ function scanShell(name, source, ctx) {
     const line = shellCodeOf(text.replace(/(^|\s)#.*$/, ''), dataCommands);
     if (!shellRunsGit(line)) return;
     const record = { path: name, line: i + 1, spawn: 'shell', binary: line.trim().slice(0, 80) };
-    if (name.startsWith('.githooks/') && !WRITE_VERBS.test(line)) { ctx.classes.push({ ...record, class: 'hook-read-context' }); return; }
+    // A hook line reads only when every git command on it is a read verb in its read form.
+    const commands = [...line.matchAll(/(?:^|[;&|(`]|\$\()\s*(?:\S*\/)?git\s+([^;&|)`]*)/g)].map((m) => hookVerb(m[1].trim().split(/\s+/).map((w) => w.replace(/^["']|["']$/g, ''))));
+    if (name.startsWith(`${HOOKS_DIR}/`) && commands.length && commands.every((verb) => READ_VERBS.has(verb))) { ctx.classes.push({ ...record, class: 'hook-read-context', verbs: commands }); return; }
     ctx.raw.push({ ...record, family: 'shell' });
   });
 }
@@ -2291,9 +2414,19 @@ function scanSkill(name, source, ctx) {
 
 // ---------- driver ----------
 
-export function scan({ root = REPO, roots = SCAN_ROOTS, files } = {}) {
+export function scan({ root = REPO, files, openInspect } = {}) {
   const ctx = { js: new Map(), rust: new Map(), raw: [], wrappers: [], classes: [], markers: [] };
-  const list = files ?? listFiles(root, roots);
+  // Outside the declared product, files are counted per top-level directory, never parsed.
+  const outsideProduct = {};
+  let list = files;
+  if (!list) {
+    const product = declaredProduct(root);
+    list = [];
+    for (const name of listFiles(root, openInspect)) {
+      if (!product || product(name)) list.push(path.join(root, name));
+      else outsideProduct[name.split('/')[0]] = (outsideProduct[name.split('/')[0]] ?? 0) + 1;
+    }
+  }
   const digests = {};
   for (const full of list) {
     const name = rel(root, full);
@@ -2335,10 +2468,16 @@ export function scan({ root = REPO, roots = SCAN_ROOTS, files } = {}) {
     if (doors.has(record.path) && file && /\[\s*SANDBOX_DOOR\s*\]/.test(file.code.slice(site.open, splitArgs(file.shape, site.open).close))) {
       ctx.classes.push({ ...record, class: 'sandbox-door' }); continue;
     }
-    if (record.path.startsWith('.githooks/') && file && record.family === 'spawn') {
+    if (record.path.startsWith(`${HOOKS_DIR}/`) && file && record.family === 'spawn') {
       const callers = s.callers ?? [];
       const own = firstVerbs(file, site.open);
-      const verbs = own ? [own] : callers.map((c) => { const [p, l] = c.split(/:(?=\d+$)/); const f = ctx.js.get(p); const line = f.source.split('\n')[Number(l) - 1] ?? ''; const lits = [.../\[\s*['"]([^'"]+)['"](?:\s*,\s*['"]([^'"]+)['"])?/.exec(line) ?? []]; return lits[1] === 'config' ? `config ${lits[2]}` : lits[1]; });
+      const verbs = own ? [own] : callers.map((c) => {
+        const [p, l] = c.split(/:(?=\d+$)/);
+        const line = ctx.js.get(p).source.split('\n')[Number(l) - 1] ?? '';
+        const argv = /\[([^\]]*)\]/.exec(line)?.[1] ?? '';
+        const lits = [...argv.matchAll(/['"]([^'"]+)['"]/g)].map((m) => m[1]);
+        return lits.length ? hookVerb(lits) : undefined;
+      });
       if (verbs.every((v) => v && READ_VERBS.has(v))) { ctx.classes.push({ ...record, class: 'hook-read-context', verbs }); continue; }
     }
     sites.push(record);
@@ -2351,13 +2490,13 @@ export function scan({ root = REPO, roots = SCAN_ROOTS, files } = {}) {
   for (const s of finalSites) families[s.family] = (families[s.family] ?? 0) + 1;
   const classCounts = {};
   for (const c of classes) classCounts[c.class] = (classCounts[c.class] ?? 0) + 1;
-  return { sites: finalSites, families, classes, classCounts, files: digests };
+  return { sites: finalSites, families, classes, classCounts, files: digests, outsideProduct };
 }
 
 /** The census written by the build: zero sites expected; the digest binds it to the scanned payload. */
 export function census(result) {
   const payloadDigest = sha256(JSON.stringify(Object.entries(result.files).sort(([a], [b]) => a.localeCompare(b))));
-  return { schema: 'mutation-census.v1', payloadDigest, files: result.files, sites: result.sites, classes: result.classes };
+  return { schema: 'mutation-census.v1', payloadDigest, files: result.files, outsideProduct: result.outsideProduct ?? {}, sites: result.sites, classes: result.classes };
 }
 
 export function censusDigestMatches(doc) {
@@ -2400,16 +2539,19 @@ export function verifyCensus(doc, payloadRoot) {
 async function main(argv) {
   const opt = (flag) => { const i = argv.indexOf(flag); return i >= 0 ? argv[i + 1] : undefined; };
   const root = path.resolve(opt('--root') ?? REPO);
-  const result = scan({ root });
+  // Run as a plain script, the checkout's own addon is staged before Inspect lists the files.
+  const { inspectRepo } = await import('./lib/git-ports.mjs');
+  const result = scan({ root, openInspect: () => inspectRepo(root) });
   if (argv.includes('--write-census')) writeMutationCensus(root, result);
-  if (argv.includes('--json')) process.stdout.write(`${JSON.stringify({ sites: result.sites, families: result.families, classCounts: result.classCounts, classes: result.classes }, null, 2)}\n`);
+  if (argv.includes('--json')) process.stdout.write(`${JSON.stringify({ sites: result.sites, families: result.families, classCounts: result.classCounts, classes: result.classes, outsideProduct: result.outsideProduct }, null, 2)}\n`);
   else {
     for (const s of result.sites) process.stdout.write(`${s.family}\t${s.path}:${s.line}\t${s.spawn}\t${s.binary}${s.callers ? `\t(${s.callers.length} callers)` : ''}\n`);
-    process.stdout.write(`${result.sites.length} undeclared site(s) ${JSON.stringify(result.families)}; classes ${JSON.stringify(result.classCounts)}\n`);
+    process.stdout.write(`${result.sites.length} undeclared site(s) ${JSON.stringify(result.families)}; classes ${JSON.stringify(result.classCounts)}; outside the declared product ${JSON.stringify(result.outsideProduct)}\n`);
   }
   return result.sites.length === 0 ? 0 : 1;
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  process.exitCode = await main(process.argv.slice(2));
+  // Not a top-level await: main's import of the script addon door imports this module back.
+  main(process.argv.slice(2)).then((code) => { process.exitCode = code; });
 }

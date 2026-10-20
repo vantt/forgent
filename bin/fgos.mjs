@@ -102,7 +102,7 @@ import { invokeDispatchReconcileOperation } from '../src/verbs/dispatch/reconcil
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
 import { unreleasedHasEntries, pathExistsAt, commitAt } from '../src/setup/registrations.mjs';
-import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, gitWorktrees, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, gitWorktrees, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
@@ -3457,16 +3457,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
             // never consults NODE_PATH, so a bare-specifier import (e.g.
             // "yaml") can only resolve via a real node_modules directory
             // reachable by walking up from tmpWorktree itself. A symlink
-            // pointed at the nearest real install was considered here too
-            // (tsk-5l2-1) and rejected for the same reason tsk-2vd D2
-            // already rejected it for createWorktree: it only reflects
-            // whatever the symlink source already has installed, never the
-            // checked-out branch's own declared dependencies — exactly the
-            // scenario (a branch merging in a new dependency before that
-            // merge lands on the source's own default branch) that exposed
-            // this whole gap. provisionDependencies installs for THIS
-            // worktree's own package.json instead.
-            provisionDependencies(tmpWorktree);
+            // pointed at the nearest real install was rejected (tsk-2vd D2):
+            // it only reflects whatever the symlink source has installed,
+            // never the checked-out branch's own declared dependencies.
+            // createVerifyCheckout provisions THIS checkout's own
+            // package.json and records what it placed, so removeWorktree
+            // below takes it back.
             check = await runGoalCheck(item, tmpWorktree, timeoutMs);
             // tsk-516 (CONTEXT.md D3/D4): the repo-invariant checks run in the
             // SAME disposable worktree, while it still exists — the `finally`

@@ -345,7 +345,7 @@ const approveOptions = (id, waitFlags) => ({
   acknowledgeDrift: () => {},
 });
 
-test('approve --no-wait with the trunk\'s merge slot held fails at once naming the slot, and the item stays awaiting-approval', async () => {
+test('approve --no-wait with the trunk\'s merge slot held fails at once naming the slot, the item stays awaiting-approval, and a retry once the slot is free delivers under the same recorded operation', async () => {
   const { holdLockInChild } = await import('../helpers/hold-lock-in-child.mjs');
   const { listWork } = await import('../../src/state/store.mjs');
   const { cwd, fgosDir } = await approvableRootRepo('tsk-nowait');
@@ -367,6 +367,14 @@ test('approve --no-wait with the trunk\'s merge slot held fails at once naming t
     holder.child.kill('SIGKILL');
     await holder.exited;
   }
+  // The refusal came before Land journalled anything, so the recorded id is
+  // no prior attempt: the retry reuses it instead of failing on the journal.
+  const result = await approveUseCase({ dir: fgosDir, repoRoot: cwd }, approveOptions('tsk-nowait', { noWait: true }));
+  assert.equal(result.to, 'delivered', JSON.stringify(result));
+  const view = listWork(fgosDir);
+  const recorded = view.decisions.filter((d) => d.id === 'tsk-nowait' && d.landOperation);
+  assert.equal(recorded.length, 1, 'a retry records no second Land operation');
+  assert.equal(view.work['tsk-nowait'].landSettlement.operationId, recorded[0].landOperation.operationId);
 });
 
 test('approve --wait <ms> waits for the held merge slot and lands once the holder releases', async () => {
@@ -402,6 +410,36 @@ test('sync-root --no-wait with the trunk\'s merge slot held fails at once naming
     holder.child.kill('SIGKILL');
     await holder.exited;
   }
+});
+
+test('a failing post-land drift detection is reported beside a landed merge, never as a failed merge', async () => {
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
+  const { cwd, fgosDir } = await approvableRootRepo('tsk-drift-broken');
+  // The verify breaks the session registry drift detection reads, after
+  // approve's own guards have read it and before Land publishes.
+  const registry = path.join(fgosDir, 'sessions.json');
+  const item = { id: 'tsk-drift-broken', verify: `node -e "require('fs').writeFileSync('${registry}','not json')"` };
+  const result = await landRunnerItem(cwd, item, { branch: 'fgw/tsk-drift-broken', timeoutMs: 60000 });
+  assert.equal(result.outcome, 'merged', JSON.stringify(result));
+  assert.equal(result.landSettlement.settlementKind, 'delivered');
+  assert.match(result.postLand.error, /post-land drift detection failed: .*sessions\.json/);
+  assert.equal(execGit(cwd, ['show', 'main:produced.txt']), 'ok\n', 'the branch landed on main');
+});
+
+test('an unclassified failure while publishing claims no abandoned result: the land reports its effect unknown and doctor --fix settles it through Land recovery', async () => {
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
+  const { fixLandRecovery } = await import('../../src/setup/git-checks.mjs');
+  const { cwd } = await approvableRootRepo('tsk-publish-unknown');
+  const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
+  // The verify edits a tracked file of the candidate, so publication refuses.
+  const item = { id: 'tsk-publish-unknown', verify: `node -e "require('fs').writeFileSync('produced.txt','edited by verify')"` };
+  const err = await landRunnerItem(cwd, item, { branch: 'fgw/tsk-publish-unknown', timeoutMs: 60000 }).then(() => null, (e) => e);
+  assert.equal(err?.code, 'land-effect-unknown', String(err?.stack ?? err));
+  assert.match(err.message, /fgos doctor --fix/);
+  assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
+  const fixed = fixLandRecovery(cwd);
+  assert.equal(fixed.changed, true, fixed.message);
+  assert.match(fixed.message, new RegExp(`recovered interrupted Land operations: ${err.operationId}`));
 });
 
 test('approve releases the published Land candidate once Work has recorded the delivery', async () => {
