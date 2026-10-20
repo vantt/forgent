@@ -56,3 +56,10 @@ Notes:
 - 2026-10-20 09:58: **confirmed** — `code:implement`, `coding:implement`, `fgos-coding-implement`, `code:test`, `code:refactor`, `execute` follow the proposal (gemini → deepseek → glm → claude, standard tier).
 - `code:review`, `code:debug`: owner undecided.
 - **Red-team seat → xai** (owner: grok tends to break and attack, which suits red-team). Facts: red-team is a checker role of the `reviewed` pattern, bound with the unit's own capability; every `code:*` unit gets it, and every unit at rigor high/critical; a checker must be a different family from the producer (and from the other checkers at high/critical). Today the only per-role lever is a seat override in each preset (`overrides: [{ scope: { role: red-team }, executor: xai }]`), which does not reach one-off `fgos run` units. Options: (a) per-preset overrides, no new mechanism; (b) one role-level preference in config (`runner.roles.<role>.prefer`), a soft preference that keeps the family-independence rule and falls back when xai is the producer or down — a small new lever, owner choice under RUL104. Big lead recommends (b).
+
+## Correction (2026-10-20 10:25)
+
+Two statements above are wrong against the code (inventory [research-261020-0955](research-261020-0955-seat-binding-needs-and-mechanisms-inventory.md), O1/D28):
+- The "seat override in a preset" lever does **not** exist: `src/workflow/definition.mjs` refuses `executor`, `tier`, `prefer` and `overrides` on workflow units and templates; the runner emits seat-scoped overrides only for persona, effort, timeout and account (`src/workflow/unit-handoff.mjs`). So option (a) for red-team → xai is not "no new mechanism"; any per-seat family/tier taste in presets needs a new lever, which belongs to the seat binding spec.
+- `--override` (JSON, scoped by role/unit) **does** reach a one-off `fgos run` (`bin/fgos.mjs` run branch). Per-seat taste works per run today, not per preset.
+- Live config: since main `c55adb9bb` (10:20) the code capabilities follow the confirmed order and `tierFallback` is set; `code:review`/`code:debug` have codex then claude.
