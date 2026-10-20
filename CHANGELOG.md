@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Harden the dormant Event Store: reuse verified reads and stamped Git configuration, avoid syncing untouched directories, expose local maintenance facts and canonical branch keys, and block retired event paths and event-ref bypasses. Store latency benchmarks can seed realistic history without a Work consumer.
+
 - Add `fgos worktree remove <path> --delivered-to <ref>`: removes a worktree through the Worktree port, which refuses a dirty checkout, one a process stands in, preserved worker state, or a tip not contained in the delivery target (branch name, full ref or object id). No force flag; the delivery statement is recorded as the operation's evidence digest.
 
 - Git typed commit and recovery reads ignore user signature/display settings; suite subprocess census no longer requires strace.
