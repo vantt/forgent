@@ -1,3 +1,40 @@
+## L12-57 local main merge — bounded handback (2026-10-20)
+
+Input `3732d245d75d7c40b7206ac53707821176c471ec`; local main `4729cfc18`, base `44daae2a0`, **96 commits**. Accounting/population refresh complete in scope; **binding application blocked by effective write scope**. Runner owns commit, Lead owns separate L12-11 committed-pair accounting. No consumer/Step 3 record/reproduction manifest edit.
+
+- Exact tier-1 identity comparison: **26 paths**, including **21 docs paths / ten candidate paths**, in `step-00-l12-57-merge-rebindings.json`. Lead's one conflict kept plan-side candidate coordination decisions README: the rewritten text has no V-001–V-012 sentence to receive main's V-013 line edit; verified identical to the merge first parent. `.fgos/config.json` carried from main only (Lead provenance), no config/state/secrets read or write, no origin pull or git write.
+- Exceptions: **three refreshed / two added**, each citing exact main commits and retaining previous accounting verbatim. Ratchet **clean: 996 files / 28 edits / two new**, **28/28 ratchet tests pass**, zero failures/skips; logs `step-00-l12-57-ratchet{,-tests}.log`. No checker/test/baseline change.
+- Step 0: both unchanged manifest extractors agree on complete historical/current units for all changed files. **129 direct bindings + 128 group members checked; 19 direct corrections proposed (11 content / eight position)**. Sixteen contextual group records additionally hold **128 preexisting stale member ordinals**, uniquely located by full footer text and complete decision ancestry in both parents; no group identity split. Full passage/ancestry/digest journal and proposed rows remove approvals and return to pending review. **Applied 0**: eight required decision shards are outside the effective write scope, listed in journal `needsWrites`; a separate expanded-scope Unit is required. Zero ambiguous passage joins does not mean zero outstanding drift or acceptance.
+- Tier 2: **17 canonical Step 3 records / 16 source-digest drifts** below; candidate coordination README is byte-identical after plan-side resolution. Pins remain exactly as recorded, no old approval silently applies to changed source. Deferred until application, when actual passage/hunk/target evidence must be relocated and reviewed; retiring-tree records recheck coverage instead of applying a patch. Earlier L12-44 six-record obligations stay separately owed. Step 3 remains closed under L12-56.
+- Step 4 preparation at `b2162b0b4`: **301 files / 823 slots / 262 source owners, 0 apply-now**. Refreshed merge pin: **309 files / 833 slots / 268 source owners**, **0 apply-now / 105 Phase 9 / 724 preserve / four park**. Eleven existing population files / 141 slots changed (six Step 4 files / 68 slots), all retain exact source-line correspondence and original census ids with refreshed current hashes. **Eight new files / ten slots**: worker-contract source + two renders (three Phase 9), one plan + four historical reports (seven preserve). Census gaps use exact source tuples, no invented IDs. Render headers and both bodies equal canonical source with one-line offset. Two new maintained candidate specs add **eight** occurrences to the separate class-3 gap list, outside Step 4 totals. Files/commits/digests/spans and scope limits: `step-00-l12-57-tier2-population-drift.json` and updated population/request.
+- Scheduling: existing **31** batches retained plus **two** supplemental pending-census groups; **34** estimated context parts / **165** estimated author pairs / **33** accounting parts. Lead must admit new census slots and freeze actual bytes/time before dispatch. These are estimates, no review acceptance, build determinism, source/render installed parity or executable patch claim.
+
+| Batch | Main-changed consumer | Recorded author pin | At application |
+|---|---|---|---|
+| `batch-004` | `docs/architect/agent-coordination/decisions/README.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-013` | `docs/platform/README.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-015` | `docs/platform/agent-coordination/decisions/README.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | unchanged; validate only |
+| `batch-040` | `docs/specs/distribution.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-041` | `docs/specs/runner.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-041` | `docs/specs/workflow.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-044` | `docs/architect/agent-coordination/vision.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-061` | `docs/distillery/porting-log.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-068` | `docs/how-to/install-fgos-in-a-project-and-use-doctor.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-089` | `docs/platform/agent-coordination/vision.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-100` | `docs/platform/event-store/spec.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-101` | `docs/platform/git/spec.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-110` | `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-114` | `docs/platform/run-supervisor/spec.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-119` | `docs/platform/terminal-control/spec.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-126` | `docs/architecture-manifest.json` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+| `batch-126` | `docs/backlog.md` | `ae141550c2e022310de7a0efea757580c0b2479f` | deferred rebind |
+
+Structural/write-scope proof: `step-00-l12-57-verification.json`; all 141 refreshed and ten new source spans/digests match current bytes, all proposed corrections preserve source identities, and protected manifests/closed records/decision shards remain unchanged.
+
+Next: Lead scopes the eight ledger writes, applies/reviews proposed rebindings, admits new census gaps and schedules source-owner authors. Workflow candidate carry (L12-27), A47 final conservation of all ten changed candidate paths and separate real-commit L12-11 accounting remain open. No full suite/reproduction-green claim; clean committed-byte acceptance follows the runner and separate accounting commit. Scratch only `/tmp/fgos-work/merge57/`; tests unset `CLAUDE_CODE_SESSION_ID`; no concurrent heavy job or preview/service startup. Markdown preview remains with Lead's authorized environment.
+
+## Previous preparation handback (preserved verbatim)
+
 ## Step 4 preparation — author handback (2026-10-20)
 
 Input `35512e2789f1d58a1410edf64d9e0c08c516cdf9`. **Preparation only; no consumer/Step 3 record edits.** Step 3 remains CLOSED under L12-56. Runner commits; no git write or fgOS CLI used.

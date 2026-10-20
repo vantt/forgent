@@ -1,0 +1,110 @@
+{
+  "inputHEAD": "3732d245d75d7c40b7206ac53707821176c471ec",
+  "status": "blocked-binding-application-outside-write-scope",
+  "commands": [
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs",
+      "exit": 0,
+      "result": "996 files / 28 accounted edits / two accounted new / zero violations",
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet.log"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "exit": 0,
+      "tests": 28,
+      "pass": 28,
+      "fail": 0,
+      "skip": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet-tests.log"
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    }
+  ],
+  "structuralProof": {
+    "exceptionChanges": [
+      "docs/specs/distribution.md",
+      "docs/specs/runner.md",
+      "docs/specs/workflow.md",
+      "docs/architect/agent-coordination/decisions/README.md",
+      "docs/architect/agent-coordination/vision.md"
+    ],
+    "previousAccountingRetainedExactly": true,
+    "changedAndNewPopulationSpansAndHashesVerified": true,
+    "changedExistingFiles": 11,
+    "changedExistingSlots": 141,
+    "newStep4Files": 8,
+    "newStep4Slots": 10,
+    "newClass3Files": 2,
+    "newClass3Slots": 8,
+    "step4": {
+      "files": 309,
+      "edges": 833,
+      "sourceOwners": 268,
+      "classes": {
+        "phase9": 105,
+        "preserve": 724,
+        "park": 4
+      }
+    },
+    "step0": {
+      "directBindingsChecked": 129,
+      "groupMembersChecked": 128,
+      "contentChanged": 11,
+      "positionalOnly": 8,
+      "proposedRebindings": 19,
+      "appliedRebindings": 0,
+      "preexistingGroupRecordsNeedingCorrection": 16,
+      "preexistingGroupMemberCorrections": 128,
+      "decisionShardsNeedingWrites": 8
+    },
+    "step3RecordsUnchanged": 17,
+    "step3SourceDigestDrifts": 16,
+    "allDecisionShardsUnchanged": true,
+    "allProposedCorrectionsPendingNoApprovalCarry": true,
+    "sourceIdentitiesPreserved": true,
+    "consumerDiffEmpty": true,
+    "writeScopeVerified": true
+  },
+  "protectedReproductionManifests": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "728ab223d6df40ab05473c62fd29609a510708523a27858025398bfcff3568fa"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "2087ca9dafb4422ae2d0505d4927b163d0ab8d5a91f037d653dd6c1528ace45a"
+    }
+  ],
+  "needsWrites": [
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json"
+  ],
+  "trackedAndNewWritesBeforeThisReceipt": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-merge-rebindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-ratchet.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-step3-deferred-rebinds.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-tier2-population-drift.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-57-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-authoring-request.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-batches.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-population.json",
+    "scripts/check-legacy-docs-ratchet.exceptions.json"
+  ],
+  "limits": [
+    "No decision correction applied: eight shards outside effective scope; proposed rows/journal ready for separately scoped Unit.",
+    "Independent review not launched or accepted; new census slots not accepted by author.",
+    "No full suite or reproduction scripts run; committed-byte acceptance remains separate after actual runner commit and L12-11 accounting.",
+    "No git write, fgOS CLI, consumer/Step3 record edit, .fgos/config/secrets read or write (mandatory external outbox is the brief exception), preview or service startup."
+  ]
+}

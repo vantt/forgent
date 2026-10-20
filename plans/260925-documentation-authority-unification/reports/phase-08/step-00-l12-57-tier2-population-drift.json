@@ -1,0 +1,552 @@
+{
+  "decision": "L12-57",
+  "previousInputHEAD": "35512e2789f1d58a1410edf64d9e0c08c516cdf9",
+  "preparationAuthorCommit": "b2162b0b4",
+  "previousStep4": {
+    "files": 301,
+    "edges": 823,
+    "sourceOwners": 262,
+    "classes": {
+      "phase9": 102,
+      "preserve": 717,
+      "park": 4
+    }
+  },
+  "currentStep4": {
+    "files": 309,
+    "edges": 833,
+    "sourceOwners": 268,
+    "classes": {
+      "phase9": 105,
+      "preserve": 724,
+      "park": 4
+    }
+  },
+  "existingPopulationFilesChangedByMain": [
+    {
+      "file": ".githooks/pre-commit",
+      "buckets": {
+        "step4": 3
+      },
+      "slots": 3,
+      "previousDigest": "7336dd950d4f8b87c31862de930bf6a64df3b0be56823a435a7a3d46148d0ad0",
+      "currentDigest": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "relocatedSlots": 3,
+      "unresolvedSlots": 0,
+      "mainPathCommits": [
+        "eb4efd5c2fc2e60df5ebfd7f1ec03a76adc6b40a fix(event-store): address dormant store review findings",
+        "1ab6c566d72c7bb9141d8601bf3f991e31a29073 fix(event-store): harden the dormant store layer"
+      ],
+      "action": "Refresh source/context review at new input pin; original census ids retained. Behavioral slots remain Step 5."
+    },
+    {
+      "file": ".gitignore",
+      "buckets": {
+        "step5": 1
+      },
+      "slots": 1,
+      "previousDigest": "7c5da3570111d60dfdb1436bd0a9f0f807b760d5d0f7b2bae4e6f7e4380dfaea",
+      "currentDigest": "c1ccdb7e87cf9c588dbfb045d7cbb9ade4485d1226711efbc36e908fe6f8b2f5",
+      "relocatedSlots": 1,
+      "unresolvedSlots": 0,
+      "mainPathCommits": [
+        "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
+      ],
+      "action": "Refresh source/context review at new input pin; original census ids retained. Behavioral slots remain Step 5."
+    },
+    {
+      "file": "AGENTS.md",
+      "buckets": {
+        "step4": 37
+      },
+      "slots": 37,
+      "previousDigest": "f6582e14f5fd4e3a616eebbd5d6af1187ff0276e456cfc460d96b74f8a3c568b",
+      "currentDigest": "898a34841eece4742d6441e704f2c0fef14cf800b4e6a62f879fef5dba2130e1",
+      "relocatedSlots": 37,
+      "unresolvedSlots": 0,
+      "mainPathCommits": [
+        "d3c74e76bbe0dd8f10eb67a27d9d1eb81ca1be0e docs(agents): say the dev door keeps a staged host a detached supervisor still runs from"
+      ],
+      "action": "Refresh source/context review at new input pin; original census ids retained. Behavioral slots remain Step 5."
+    },
+    {
+      "file": "CHANGELOG.md",
+      "buckets": {
+        "step4": 1
+      },
+      "slots": 1,
+      "previousDigest": "899b804d2317b0392e932e6dbbaf02a5f4f00eb23d711b896a9c8870a5b94b44",
+      "currentDigest": "6edda75bd4f92d5be267754e05e91530bba2bd4d895bd20a4c5e02258e5f2715",
+      "relocatedSlots": 1,
+      "unresolvedSlots": 0,
+      "mainPathCommits": [
+        "e1d5a400514d07524b490fcb23358176e546ff80 fix(run-supervisor): decide the pane only after settlement completes and keep a dev host in use",
+        "168cc0243c02d0b45a16e337389ade21e84dbd6d Merge remote-tracking branch 'origin/main' into fix/close-settled-failed-panes",
+        "6e0f280b4b832f8479168c7a8c2dfe4fde9b2fb5 perf(event-store): reduce validated store read latency",
+        "a184db4cc65fa0423131898ec1ab75d47fc0e532 Merge remote-tracking branch 'origin/main' into es/p09s-store-fixes",
+        "58c530e13437de3c5ef08f03515b9a42d0b4927d fix(run-supervisor): close settled failed panes with captured output",
+        "3b00e4b197fd3872cf37ea9a040fdf2504db7b43 Merge branch 'worktree-agent-aaa1663dd7a12a80b' into HEAD",
+        "4a07c6bb865b66e4b85b893e0a0a683d6aae4537 feat(runner): add the debate collaboration pattern with an independent judge role",
+        "4194b2aaccf3340e9acc2849e3c3c6c08d987148 chore(config): stop building the Rust workspace in every new worktree",
+        "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief",
+        "eb4efd5c2fc2e60df5ebfd7f1ec03a76adc6b40a fix(event-store): address dormant store review findings",
+        "1ab6c566d72c7bb9141d8601bf3f991e31a29073 fix(event-store): harden the dormant store layer"
+      ],
+      "action": "Refresh source/context review at new input pin; original census ids retained. Behavioral slots remain Step 5."
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/README.md",
+      "buckets": {
+        "class3": 1
+      },
+      "slots": 1,
+      "previousDigest": "01c9e283e31a787e1d80bab2763a145a0b2b795f311579bc807fcae380dd887a",
+      "currentDigest": "8c653d2ae5e9423ff8b1b6ff55130f803716a1c5b05c4362b95322edfbadaa0e",
+      "relocatedSlots": 1,
+      "unresolvedSlots": 0,
+      "mainPathCommits": [
+        "8997f7709730846c174670ae81f77366a7a985d2 docs(vision): record V-013, the agent mailbox as a narrow delivery component"
+      ],
+      "action": "Refresh source/context review at new input pin; original census ids retained. Behavioral slots remain Step 5."
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "buckets": {
+        "step4": 15,
+        "step5": 1
+      },
+      "slots": 16,
+      "previousDigest": "d214975971f8723b2d749bed305fc93d4206d71fc04b1be3a82f13af6ba6b89f",
+      "currentDigest": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "relocatedSlots": 16,
+      "unresolvedSlots": 0,
+      "mainPathCommits": [
+        "4a07c6bb865b66e4b85b893e0a0a683d6aae4537 feat(runner): add the debate collaboration pattern with an independent judge role"
+      ],
+      "action": "Refresh source/context review at new input pin; original census ids retained. Behavioral slots remain Step 5."
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "buckets": {
+        "step5": 3
+      },
+      "slots": 3,
+      "previousDigest": "37bf1a46c188efa5b2d100da253a4632f62519ca896b394245ca33d7ce9545cf",
+      "currentDigest": "7dab2f9aaa2d97fcb33ed9d0ddc378aec9ee314f2f4e960808514ce96797c212",
+      "relocatedSlots": 3,
+      "unresolvedSlots": 0,
+      "mainPathCommits": [
+        "4a07c6bb865b66e4b85b893e0a0a683d6aae4537 feat(runner): add the debate collaboration pattern with an independent judge role"
+      ],
+      "action": "Refresh source/context review at new input pin; original census ids retained. Behavioral slots remain Step 5."
+    },
+    {
+      "file": "src/runner/dispatch/config.mjs",
+      "buckets": {
+        "step4": 7
+      },
+      "slots": 7,
+      "previousDigest": "59c8be31aa01d8c5016766a5478e2959d4be8cfdaca1ce66a94be65178ff34f0",
+      "currentDigest": "6d32edc9d13ab80dbab237e71deb8beb971e7a94ac1bea547d1eb6c8ac2c6b2f",
+      "relocatedSlots": 7,
+      "unresolvedSlots": 0,
+      "mainPathCommits": [
+        "94259c336e58c4aa762a90b50c55b461afe03b49 fix(runner): resolve a tier cell's first entry whichever pool serves it"
+      ],
+      "action": "Refresh source/context review at new input pin; original census ids retained. Behavioral slots remain Step 5."
+    },
+    {
+      "file": "src/runner/dispatch/resolve.mjs",
+      "buckets": {
+        "step4": 5
+      },
+      "slots": 5,
+      "previousDigest": "ebb03fc0c51557ca40ecc959cc89180f6b771b7cfe9138392a24a3ec3e178d08",
+      "currentDigest": "2b4ef017b414383b5a0360b98f9eb420d709ee15d3b8acf83769fa1aec675375",
+      "relocatedSlots": 5,
+      "unresolvedSlots": 0,
+      "mainPathCommits": [
+        "94259c336e58c4aa762a90b50c55b461afe03b49 fix(runner): resolve a tier cell's first entry whichever pool serves it"
+      ],
+      "action": "Refresh source/context review at new input pin; original census ids retained. Behavioral slots remain Step 5."
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "buckets": {
+        "step5": 64
+      },
+      "slots": 64,
+      "previousDigest": "41568dad5cf20aa73fcbb09e08fab084bb77faea5638fa43e3e7bbe5806b3ce6",
+      "currentDigest": "d461e9d5f52ddab6fd725e0e61d4c22526682dafa8bb15928f3926026c6db562",
+      "relocatedSlots": 64,
+      "unresolvedSlots": 0,
+      "mainPathCommits": [
+        "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
+      ],
+      "action": "Refresh source/context review at new input pin; original census ids retained. Behavioral slots remain Step 5."
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "buckets": {
+        "step5": 3
+      },
+      "slots": 3,
+      "previousDigest": "3c64e7fb10c2052662cccec43505edc8aa4f3b259c5d1f71b5d3cb03a4ea9e2e",
+      "currentDigest": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "relocatedSlots": 3,
+      "unresolvedSlots": 0,
+      "mainPathCommits": [
+        "f647aa65ccb7988d128a0e467132162e799c4df6 fix(setup): skill prune only removes entries fgOS assembled"
+      ],
+      "action": "Refresh source/context review at new input pin; original census ids retained. Behavioral slots remain Step 5."
+    }
+  ],
+  "newFileCensusGaps": [
+    {
+      "file": ".agents/skills/_shared/ak-cook-worker-contract.md",
+      "inputCommit": "3732d245d75d7c40b7206ac53707821176c471ec",
+      "digest": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "occurrences": [
+        {
+          "line": 7,
+          "columnStart": 6,
+          "columnEndExclusive": 26,
+          "text": "docs/specs/runner.md",
+          "lineText": "it (`docs/specs/runner.md`, \"Skills reach `bind()`\")."
+        }
+      ],
+      "slots": 1,
+      "censusStatus": "new-file-not-in-Step2; retain exact (inputCommit,file,line,column,text) supplement, no invented census ids",
+      "mainPathCommits": [
+        "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
+      ]
+    },
+    {
+      "file": "core/skills/_shared/ak-cook-worker-contract.md",
+      "inputCommit": "3732d245d75d7c40b7206ac53707821176c471ec",
+      "digest": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
+      "occurrences": [
+        {
+          "line": 6,
+          "columnStart": 6,
+          "columnEndExclusive": 26,
+          "text": "docs/specs/runner.md",
+          "lineText": "it (`docs/specs/runner.md`, \"Skills reach `bind()`\")."
+        }
+      ],
+      "slots": 1,
+      "censusStatus": "new-file-not-in-Step2; retain exact (inputCommit,file,line,column,text) supplement, no invented census ids",
+      "mainPathCommits": [
+        "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
+      ]
+    },
+    {
+      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "inputCommit": "3732d245d75d7c40b7206ac53707821176c471ec",
+      "digest": "c5e83e6ad211216f2cfedf0edeb208d7495c2173fbb299b395ac0e4e4e5d3bd7",
+      "occurrences": [
+        {
+          "line": 38,
+          "columnStart": 15,
+          "columnEndExclusive": 37,
+          "text": "docs/specs/workflow.md",
+          "lineText": "| 4 | Specs: `docs/specs/workflow.md` (patterns), `docs/specs/runner.md` (roles, independence), CHANGELOG | doc guards green |"
+        },
+        {
+          "line": 38,
+          "columnStart": 52,
+          "columnEndExclusive": 72,
+          "text": "docs/specs/runner.md",
+          "lineText": "| 4 | Specs: `docs/specs/workflow.md` (patterns), `docs/specs/runner.md` (roles, independence), CHANGELOG | doc guards green |"
+        }
+      ],
+      "slots": 2,
+      "censusStatus": "new-file-not-in-Step2; retain exact (inputCommit,file,line,column,text) supplement, no invented census ids",
+      "mainPathCommits": [
+        "08cd22d8ec9aa614f1d7ce6baa52d4d42366b20f docs(board): land the ak:cook worker slice, the OpenRouter pool fix and the debate pattern",
+        "36f2a5cf71df3146ebdd65cf3a71d69885f68490 docs(plan): plan the debate pattern and the judge role"
+      ]
+    },
+    {
+      "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+      "inputCommit": "3732d245d75d7c40b7206ac53707821176c471ec",
+      "digest": "e888fcf7bbb67a8e6bc716b5359fd06a5022ef56f80139ce24ef21684fc3813a",
+      "occurrences": [
+        {
+          "line": 35,
+          "columnStart": 48,
+          "columnEndExclusive": 68,
+          "text": "docs/specs/runner.md",
+          "lineText": "Question for each round: one sentence on what `docs/specs/runner.md` says its area is about, read only."
+        }
+      ],
+      "slots": 1,
+      "censusStatus": "new-file-not-in-Step2; retain exact (inputCommit,file,line,column,text) supplement, no invented census ids",
+      "mainPathCommits": [
+        "996f82d32ca793e51ad4946323c9ec2cc4aebaec docs(report): prove the per-tier fallback and declared account order on live rounds"
+      ]
+    },
+    {
+      "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+      "inputCommit": "3732d245d75d7c40b7206ac53707821176c471ec",
+      "digest": "b448582368aa6fdca0c97badf598f5e783540d508cec3f260a68a19fd2ae327a",
+      "occurrences": [
+        {
+          "line": 28,
+          "columnStart": 137,
+          "columnEndExclusive": 157,
+          "text": "docs/specs/runner.md",
+          "lineText": "- Commit 2: `src/runner/dispatch/resolve.mjs` (resolveTierModel, doc comments), `src/runner/dispatch/config.mjs` (supportsPolicyTier), `docs/specs/runner.md` (one sentence in RUL106 Candidates), tests."
+        }
+      ],
+      "slots": 1,
+      "censusStatus": "new-file-not-in-Step2; retain exact (inputCommit,file,line,column,text) supplement, no invented census ids",
+      "mainPathCommits": [
+        "6672923c922e9cebaa32e50e377a045ca0d75b3d test(runner): assert the openrouter-served glm cell and record the tier-cell resolution report"
+      ]
+    },
+    {
+      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "inputCommit": "3732d245d75d7c40b7206ac53707821176c471ec",
+      "digest": "d8e9dd76b56af721e93d98008fc64ae5f4fd8ba3c08aa610428443e624a700b9",
+      "occurrences": [
+        {
+          "line": 16,
+          "columnStart": 11,
+          "columnEndExclusive": 33,
+          "text": "docs/specs/workflow.md",
+          "lineText": "- Specs: `docs/specs/workflow.md` (pattern paragraph + admission ceiling), `docs/specs/runner.md` (pattern list, skills note, independence bullet). `CHANGELOG.md` Unreleased line."
+        },
+        {
+          "line": 16,
+          "columnStart": 77,
+          "columnEndExclusive": 97,
+          "text": "docs/specs/runner.md",
+          "lineText": "- Specs: `docs/specs/workflow.md` (pattern paragraph + admission ceiling), `docs/specs/runner.md` (pattern list, skills note, independence bullet). `CHANGELOG.md` Unreleased line."
+        }
+      ],
+      "slots": 2,
+      "censusStatus": "new-file-not-in-Step2; retain exact (inputCommit,file,line,column,text) supplement, no invented census ids",
+      "mainPathCommits": [
+        "d7f9e8bb27fea2f36c43dabb8717a7a5c54ad61e chore(architecture): register the debate pattern in the manifest; add phase report"
+      ]
+    },
+    {
+      "file": "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md",
+      "inputCommit": "3732d245d75d7c40b7206ac53707821176c471ec",
+      "digest": "d05a7a264c697d888a6beb1ced5e6dc9c73fa96a34a78734e8722071eb5a4cdc",
+      "occurrences": [
+        {
+          "line": 125,
+          "columnStart": 95,
+          "columnEndExclusive": 121,
+          "text": "docs/specs/workflow.md:195",
+          "lineText": "| 18 | trả lời cổng người của một Workflow run: file `gate-answers/` rồi `advance`/`resume` (`docs/specs/workflow.md:195,351`; `docs/routing-handoff-contract.md:80-81`) | owner → run | câu trả lời | giờ–ngày | **không** (run đang park) | không | run vẫn park, không mất. **Đã chạy** |"
+        }
+      ],
+      "slots": 1,
+      "censusStatus": "new-file-not-in-Step2; retain exact (inputCommit,file,line,column,text) supplement, no invented census ids",
+      "mainPathCommits": [
+        "5d1a567cf1014ad3927fd2bc0b8a0fb5d1827d13 docs(research): add the mailbox address and first consumer research"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/ak-cook-worker-contract.md",
+      "inputCommit": "3732d245d75d7c40b7206ac53707821176c471ec",
+      "digest": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "occurrences": [
+        {
+          "line": 7,
+          "columnStart": 6,
+          "columnEndExclusive": 26,
+          "text": "docs/specs/runner.md",
+          "lineText": "it (`docs/specs/runner.md`, \"Skills reach `bind()`\")."
+        }
+      ],
+      "slots": 1,
+      "censusStatus": "new-file-not-in-Step2; retain exact (inputCommit,file,line,column,text) supplement, no invented census ids",
+      "mainPathCommits": [
+        "9fa8a08f07b8187bc304380a263549bf7ff62c0e feat(runner): declare ak:cook on claude, copy ak skills into worktrees, add skills doctor check and worker brief"
+      ]
+    }
+  ],
+  "newDocumentationClass3Gaps": [
+    {
+      "file": "docs/platform/agent-mailbox/spec.md",
+      "inputCommit": "3732d245d75d7c40b7206ac53707821176c471ec",
+      "digest": "f277f500ef4abc0154f0798dfeeb186f3db60ee22e4af127225bb8ffffd7ff72",
+      "occurrences": [
+        {
+          "line": 16,
+          "columnStart": 3,
+          "columnEndExclusive": 46,
+          "text": "docs/architect/agent-coordination/vision.md",
+          "lineText": "- docs/architect/agent-coordination/vision.md (V-011)"
+        },
+        {
+          "line": 17,
+          "columnStart": 3,
+          "columnEndExclusive": 70,
+          "text": "docs/architect/agent-coordination/contracts/coordination-session.md",
+          "lineText": "- docs/architect/agent-coordination/contracts/coordination-session.md"
+        },
+        {
+          "line": 74,
+          "columnStart": 117,
+          "columnEndExclusive": 160,
+          "text": "docs/architect/agent-coordination/vision.md",
+          "lineText": "The owner accepted this narrowed claim on 2026-10-20 and it is recorded as V-013 in the agent coordination vision (`docs/architect/agent-coordination/vision.md` and its platform copy); V-011 is not edited. V-013 covers the first slice only. The later parts of section 15 are open to be added, each with its own argument under V-011's three tests (recovery need above all) and its own owner decision."
+        }
+      ],
+      "slots": 3,
+      "censusStatus": "new-file-not-in-Step2; retain exact (inputCommit,file,line,column,text) supplement, no invented census ids",
+      "mainPathCommits": [
+        "8997f7709730846c174670ae81f77366a7a985d2 docs(vision): record V-013, the agent mailbox as a narrow delivery component",
+        "0f2fdae84990749741700d6bb019e7cd6c5cf0df docs(research): measure whether pi and omp export their session id",
+        "bc3ca845e50744918457290ef12a37f4d5513bb1 docs(platform): record case B as the first mailbox consumer",
+        "70e714aee6c2536a701a83c1463076c5e7dadf7f docs(platform): keep a process-keyed generation number in the first mailbox slice",
+        "ea5b2f2856776986423ce43821bc6115bde79c36 docs(platform): note that pi and omp have their own session ids",
+        "69cf651632557cb65ad48e6f1c3ffebe1a206b33 docs(platform): keep headless workers out of the first mailbox slice",
+        "4f9053c5390b7b3bb82c7e25d0bbe7259e0d2029 docs(platform): record the head-only delegation boundary for the mailbox",
+        "5d1a567cf1014ad3927fd2bc0b8a0fb5d1827d13 docs(research): add the mailbox address and first consumer research",
+        "3904b74afbaff33cfc3a5e198f9821e49ae0b7e6 docs(research): measure Claude Code socket while busy, subagent hooks and resume",
+        "af66140c7d66187294b589212f8916c26bf175ec docs(platform): record the address unit and that durable sessions are not done",
+        "65538aa0d65f07d38d69e4813ba04c294ff6ad85 docs(platform): revise agent mailbox design after second council round",
+        "c951985bc3aa0144027e683844f00cbcb78a55cd docs(platform): narrow agent mailbox spec to the delivery slice after council review",
+        "6b5e5119e6f1dee7fea8be2ce1c649fae655d571 docs(platform): add draft agent mailbox spec with hexagonal ports"
+      ],
+      "owner": "new maintained documentation: class-3 population gap, Lead must inventory/author separately"
+    },
+    {
+      "file": "docs/platform/secrets/spec.md",
+      "inputCommit": "3732d245d75d7c40b7206ac53707821176c471ec",
+      "digest": "fc2ec510cb4da233ac3cf0c0d251a7d74a7cb6b4bd2c7019e0ff2a64a1b25d08",
+      "occurrences": [
+        {
+          "line": 16,
+          "columnStart": 3,
+          "columnEndExclusive": 38,
+          "text": "docs/specs/confinement-authority.md",
+          "lineText": "- docs/specs/confinement-authority.md (hostRead, \"secret, not blind\" limit)"
+        },
+        {
+          "line": 17,
+          "columnStart": 3,
+          "columnEndExclusive": 47,
+          "text": "docs/history/glm-openrouter-executor/plan.md",
+          "lineText": "- docs/history/glm-openrouter-executor/plan.md (decision that the key lives in an untracked file)"
+        },
+        {
+          "line": 57,
+          "columnStart": 135,
+          "columnEndExclusive": 179,
+          "text": "docs/history/glm-openrouter-executor/plan.md",
+          "lineText": "| The shared OpenRouter key was decided to live in an untracked file `.fgos/secrets.local.env`, sourced before dispatch | decision | `docs/history/glm-openrouter-executor/plan.md` (item 4) |"
+        },
+        {
+          "line": 68,
+          "columnStart": 162,
+          "columnEndExclusive": 197,
+          "text": "docs/specs/confinement-authority.md",
+          "lineText": "**Correction.** An earlier statement in this project's discussion said that the bwrap confinement hides `.fgos/secrets.local.env` from workers. That was wrong. `docs/specs/confinement-authority.md` lists the file under the open limits as \"secret, not blind\" (section 9.2 closing paragraph), and the built-in `host-write-denied` policy has `hostRead: allow`. Read from the policy and the spec, a confined worker can read the file today. **This was not tested live.** A live probe is delivery step X1."
+        },
+        {
+          "line": 231,
+          "columnStart": 17,
+          "columnEndExclusive": 52,
+          "text": "docs/specs/confinement-authority.md",
+          "lineText": "| Confinement (`docs/specs/confinement-authority.md`) | Owns what a worker can read. This component asks for secret paths to be hidden from it (section 15 question 4); it does not implement hiding |"
+        }
+      ],
+      "slots": 5,
+      "censusStatus": "new-file-not-in-Step2; retain exact (inputCommit,file,line,column,text) supplement, no invented census ids",
+      "mainPathCommits": [
+        "5d1a567cf1014ad3927fd2bc0b8a0fb5d1827d13 docs(research): add the mailbox address and first consumer research",
+        "ac4665264ae7af64b89a87ce1b4ec100d655f7ab docs(platform): record that key rotation is the owner's later work",
+        "5908b664dda9950bdac26354467ded12666e3adf docs(plan): record the shell secrets hook removal and the variable rename",
+        "91a24518b38ed0d0372b03a01a570526575566c2 docs(platform): record the secrets decisions and the worker read probe result",
+        "675dd41a841d4f975f3424aaf315ccd2e21eba33 docs(platform): add draft secrets component spec with a SecretSource port"
+      ],
+      "owner": "new maintained documentation: class-3 population gap, Lead must inventory/author separately"
+    }
+  ],
+  "newFileScan": {
+    "base": "44daae2a0ecf31d9dcd8fbfb8905652b8b98eb28",
+    "main": "4729cfc18030638f0069db1e6f2f0226fee5cb33",
+    "pattern": "docs/(?:specs|architect|decisions|history|contracts|ui-spec)(?:/[^\\s`\\\"\\'<>|;,)\\]]*|\\b)",
+    "newTrackedFiles": 56,
+    "readableFilesWithZeroRootHits": [
+      "docs/distillery/deep-dives/agent-mailbox-delivery.md",
+      "docs/distillery/sources/reason-network.md",
+      "packages/secrets/contracts/declaration.v1.schema.json",
+      "packages/secrets/rust/Cargo.toml",
+      "packages/secrets/rust/src/declaration.rs",
+      "packages/secrets/rust/src/expand.rs",
+      "packages/secrets/rust/src/file_source.rs",
+      "packages/secrets/rust/src/lib.rs",
+      "packages/secrets/rust/src/redaction.rs",
+      "packages/secrets/rust/src/resolver.rs",
+      "packages/secrets/rust/src/source.rs",
+      "packages/secrets/rust/tests/common/mod.rs",
+      "packages/secrets/rust/tests/declaration_contract.rs",
+      "packages/secrets/rust/tests/file_source.rs",
+      "packages/secrets/rust/tests/no_stdin.rs",
+      "packages/secrets/rust/tests/resolver.rs",
+      "plans/261020-1151-cook-p4-ak-cook-in-worker/plan.md",
+      "plans/reports/audit-261020-1250-old-worktrees-merge-inventory.md",
+      "plans/reports/audit-261020-1512-tmp-test-dirs-cleanup.md",
+      "plans/reports/debug-261020-1611-pi-herdr-brief-not-submitted.md",
+      "plans/reports/guide-261020-1327-mailbox-and-secrets-landing.md",
+      "plans/reports/landing-261020-1527-cook-p4-debate-mpb1-fix-owner-machine.md",
+      "plans/reports/phase-lead-261020-1140-es-store-u1-store-layer-fixes.md",
+      "plans/reports/phase-lead-261020-1158-es-store-u2-review-fixes.md",
+      "plans/reports/phase-lead-261020-1200-cook-p4-ak-cook-in-worker.md",
+      "plans/reports/phase-lead-261020-1402-close-settled-failed-panes.md",
+      "plans/reports/phase-lead-261020-1420-es-store-read-latency.md",
+      "plans/reports/phase-lead-261020-1453-close-settled-failed-panes-u2.md",
+      "plans/reports/research-261019-1653-mailbox-delivery-cli-probe.md",
+      "plans/reports/research-261019-1828-mailbox-spec-council-round1.md",
+      "plans/reports/research-261019-1834-mailbox-spec-council-round2.md",
+      "plans/reports/research-261020-1327-mailbox-spec-architecture-panel.md",
+      "plans/reports/research-261020-1339-model-family-tier-ladders.md",
+      "plans/reports/research-261020-1457-mailbox-claude-busy-socket-and-subagent-probe.md",
+      "plans/reports/research-261020-1547-mailbox-pi-omp-session-id-probe.md",
+      "plans/reports/review-261020-1156-es-store-layer.md",
+      "scripts/event-store/store-increment-worker.mjs",
+      "scripts/git-addon.mjs",
+      "src/runner/execution/patterns/debate.mjs",
+      "test/event-store/door-fixtures.test.mjs",
+      "test/event-store/door.test.mjs",
+      "test/event-store/store-hardening.test.mjs",
+      "test/githooks/event-layout.test.mjs",
+      "test/runner/execution/patterns/debate.test.mjs",
+      "test/scripts/run-rust-dev-host-staging.test.mjs",
+      "test/workflow/group-cognition-debate.test.mjs"
+    ],
+    "limits": "Tracked new text files only; no .fgos, ignored/external/live read. Supplementary occurrence keys are not accepted Step 2 census ids. New candidate-doc references require separate class-3 coverage; not hidden in Step 4 counts."
+  },
+  "applyNow": 0,
+  "readiness": "New gap slots included in totals, pending census admission and independent per-file authoring; no source/record edit or acceptance.",
+  "newSourceRenderJoins": [
+    {
+      "source": "core/skills/_shared/ak-cook-worker-contract.md",
+      "render": ".agents/skills/_shared/ak-cook-worker-contract.md",
+      "header": "<!-- Generated by fgOS skill assembly from core/skills/_shared/ak-cook-worker-contract.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->",
+      "sourceDigest": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
+      "renderDigest": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "bodyByteEqual": true,
+      "lineOffset": 1,
+      "parityLimit": "Repository body/header check only; no build or installed-package proof."
+    },
+    {
+      "source": "core/skills/_shared/ak-cook-worker-contract.md",
+      "render": "plugins/fgOS/skills/_shared/ak-cook-worker-contract.md",
+      "header": "<!-- Generated by fgOS skill assembly from core/skills/_shared/ak-cook-worker-contract.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->",
+      "sourceDigest": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
+      "renderDigest": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "bodyByteEqual": true,
+      "lineOffset": 1,
+      "parityLimit": "Repository body/header check only; no build or installed-package proof."
+    }
+  ]
+}

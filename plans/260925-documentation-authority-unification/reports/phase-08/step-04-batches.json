@@ -1,15 +1,15 @@
 {
-  "inputHEAD": "35512e2789f1d58a1410edf64d9e0c08c516cdf9",
+  "inputHEAD": "3732d245d75d7c40b7206ac53707821176c471ec",
   "state": "prepared; authoring not executed; independent review not started",
   "pairEstimateAssumption": "5 report paths per author batch: records, frozen manifest, request, verification receipt, progress; no consumer/render change authorized. Actual git commit/path pairs from real runner commit replace this estimate before L12-11 accounting. 2 accounting manifest files belong to the following accounting Unit, never fabricated into author pairs. Both exception literals reviewed for every pair.",
   "summary": {
-    "batches": 31,
-    "edges": 823,
-    "consumerFiles": 301,
-    "sourceOwners": 262,
-    "estimatedSourceReviewParts": 32,
-    "estimatedAuthorPairs": 155,
-    "estimatedAccountingParts": 31,
+    "batches": 33,
+    "edges": 833,
+    "consumerFiles": 309,
+    "sourceOwners": 268,
+    "estimatedSourceReviewParts": 34,
+    "estimatedAuthorPairs": 165,
+    "estimatedAccountingParts": 33,
     "mandatoryFiles": [
       "CHANGELOG.md",
       "apps/fgos-gateway/src/gateway.rs",
@@ -26,7 +26,9 @@
       "src/state/store.mjs"
     ],
     "applyNow": 0,
-    "renderMutationPairs": 0
+    "renderMutationPairs": 0,
+    "acceptedInventoryBatches": 31,
+    "supplementaryGapGroups": 2
   },
   "batches": [
     {
@@ -12708,5 +12710,73 @@
       "conditionalPhase9AccountingParts": 1,
       "mandatoryFiles": []
     }
-  ]
+  ],
+  "mainMergeSupplement": {
+    "decision": "L12-57",
+    "pendingCensusAdmission": true,
+    "rule": "Earlier 31 batches retain existing census identities; source hashes/spans must use the refreshed population. Additional two bounded groups use exact supplemental occurrence tuples, no invented edge ids. Lead freezes new request bytes and budget before dispatch.",
+    "groups": [
+      {
+        "batch": "step04-032",
+        "sourceOwner": "core/skills/_shared/ak-cook-worker-contract.md",
+        "files": [
+          ".agents/skills/_shared/ak-cook-worker-contract.md",
+          "core/skills/_shared/ak-cook-worker-contract.md",
+          "plugins/fgOS/skills/_shared/ak-cook-worker-contract.md"
+        ],
+        "slots": 3,
+        "classes": {
+          "phase9": 3
+        },
+        "renderOnlyFiles": 2,
+        "contextPartsEstimate": 1,
+        "estimatedAuthorPairs": 5,
+        "estimatedAccountingParts": 1
+      },
+      {
+        "batch": "step04-033",
+        "sourceOwner": "new main historical reports/plans",
+        "files": [
+          "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+          "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+          "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+          "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+          "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md"
+        ],
+        "slots": 7,
+        "classes": {
+          "preserve": 7
+        },
+        "contextPartsEstimate": 1,
+        "estimatedAuthorPairs": 5,
+        "estimatedAccountingParts": 1
+      }
+    ]
+  },
+  "priorSummary": {
+    "batches": 31,
+    "edges": 823,
+    "consumerFiles": 301,
+    "sourceOwners": 262,
+    "estimatedSourceReviewParts": 32,
+    "estimatedAuthorPairs": 155,
+    "estimatedAccountingParts": 31,
+    "mandatoryFiles": [
+      "CHANGELOG.md",
+      "apps/fgos-gateway/src/gateway.rs",
+      "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "bin/fgos.mjs",
+      "packages/distribution/rust/src/init.rs",
+      "src/cli/command-registry.mjs",
+      "src/runner/dispatch/assignment-runner.mjs",
+      "src/runner/dispatch/config.mjs",
+      "src/runner/dispatch/confinement/authority.mjs",
+      "src/runner/loop.mjs",
+      "src/runner/merge.mjs",
+      "src/runner/worktree.mjs",
+      "src/state/store.mjs"
+    ],
+    "applyNow": 0,
+    "renderMutationPairs": 0
+  }
 }
